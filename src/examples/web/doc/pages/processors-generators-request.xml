@@ -19,7 +19,7 @@
         <title>Request Generator</title>
     </header>
     <body>
-        <anchor id="request-generator"/>
+        <a name="request-generator"/>
         <section>
             <title>Introduction</title>
             <p>

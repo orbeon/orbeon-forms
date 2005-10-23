@@ -118,7 +118,7 @@
                 </define>
             </xml-source>
         </section>
-        <anchor id="param"/>
+        <a name="param"/>
         <section>
             <title>&lt;p:param&gt; element</title>
             <p>
@@ -162,7 +162,7 @@
             </xml-source>
         </section>
 
-        <anchor id="processor"/>
+        <a name="processor"/>
         <section>
             <title>&lt;p:processor&gt; element</title>
             <p>
@@ -303,7 +303,7 @@
                 </define>
             </xml-source>
         </section>
-        <anchor id="choose"/>
+        <a name="choose"/>
         <section>
             <title>&lt;p:choose&gt; element</title>
             <p>
@@ -373,7 +373,7 @@
                 </define>
             </xml-source>
         </section>
-        <anchor id="for-each"/>
+        <a name="for-each"/>
         <section>
             <title>&lt;p:for-each&gt; element</title>
             <p>
@@ -471,7 +471,7 @@
                 </li>
             </ul>
         </section>
-        <anchor id="href-attribute"/>
+        <a name="href-attribute"/>
         <section>
             <title>href attribute</title>
             <p>
@@ -731,7 +731,7 @@
                     <li>a pipeline output with the <code>ref</code> attribute</li>
                 </ul>
             </section>
-            <anchor id="optional"/>
+            <a name="optional"/>
             <section>
                 <title>Mandatory and Optional Inputs and Outputs</title>
                 <p>

@@ -136,7 +136,7 @@
                 </li>
             </ul>
         </section>
-        <anchor id="request-security-processor"/>
+        <a name="request-security-processor"/>
         <section>
             <title>Accessing Security Information From the Application</title>
             <p>

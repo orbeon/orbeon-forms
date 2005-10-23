@@ -327,7 +327,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 encoding from within an HTML document is not supported.
             </p>
         </section>
-        <anchor id="http-headers"/>
+        <a name="http-headers"/>
         <section>
             <title>HTTP Headers</title>
             <p>

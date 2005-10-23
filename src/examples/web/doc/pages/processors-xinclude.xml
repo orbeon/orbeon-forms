@@ -188,7 +188,7 @@
                     those features.
                 </note>
             </section>
-            <anchor id="user-defined"/>
+            <a name="user-defined"/>
             <section>
                 <title>User-Defined Inputs</title>
                 <p>

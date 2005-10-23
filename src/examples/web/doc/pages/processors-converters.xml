@@ -36,7 +36,7 @@
                 document.
             </p>
         </section>
-        <anchor id="standard-converters"/>
+        <a name="standard-converters"/>
         <section>
             <title>Standard Converters</title>
             <p>
@@ -145,7 +145,7 @@
                     </config>
                 </xml-source>
             </section>
-            <anchor id="xml-converter"/>
+            <a name="xml-converter"/>
             <section>
                 <title>XML Converter</title>
                 <p>
@@ -268,7 +268,7 @@
                 </xml-source>
             </section>
         </section>
-        <anchor id="to-xml-converter"/>
+        <a name="to-xml-converter"/>
         <section>
             <title>To-XML Converter</title>
             <p>
@@ -334,7 +334,7 @@
 <!---->
 <!--            </p>-->
 <!--        </section>-->
-        <anchor id="xls-converters"/>
+        <a name="xls-converters"/>
         <section>
             <title>XLS Converters</title>
             <p>

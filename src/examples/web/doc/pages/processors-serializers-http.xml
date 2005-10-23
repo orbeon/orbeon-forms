@@ -186,7 +186,7 @@
                 </li>
             </ol>
         </section>
-        <anchor id="binary-mode"/>
+        <a name="binary-mode"/>
         <section>
             <title>Binary Mode</title>
             <section>
@@ -261,7 +261,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
             </section>
         </section>
-        <anchor id="text-mode"/>
+        <a name="text-mode"/>
         <section>
             <title>Text Mode</title>
             <section>

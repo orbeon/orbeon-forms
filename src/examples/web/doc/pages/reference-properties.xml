@@ -75,7 +75,7 @@
         </section>
         <section>
             <title>Global Properties</title>
-            <anchor id="log4j"/>
+            <a name="log4j"/>
             <section>
                 <title>oxf.log4j-config</title>
                 <p>
@@ -316,10 +316,10 @@
                 </p>
             </section>
         </section>
-        <anchor id="java-processor"/>
+        <a name="java-processor"/>
         <section>
             <title>Java Processor Properties</title>
-            <anchor id="java-classpath"/>
+            <a name="java-classpath"/>
             <section>
                 <title>Class Path</title>
                 <p>
@@ -352,7 +352,7 @@
                     </table>
                 </p>
             </section>
-            <anchor id="java-jarpath"/>
+            <a name="java-jarpath"/>
             <section>
                 <title>JAR Path</title>
                 <p>
@@ -387,7 +387,7 @@
                     </table>
                 </p>
             </section>
-            <anchor id="java-compiler-jar"/>
+            <a name="java-compiler-jar"/>
             <section>
                 <title>Compiler JAR</title>
                 <p>
@@ -431,7 +431,7 @@
                     </table>
                 </p>
             </section>
-            <anchor id="java-compiler-class"/>
+            <a name="java-compiler-class"/>
             <section>
                 <title>Compiler Main Class</title>
                 <p>
@@ -468,7 +468,7 @@
                 </p>
             </section>
         </section>
-        <anchor id="email-processor"/>
+        <a name="email-processor"/>
         <section>
             <title>Email Processor Properties</title>
             <section>

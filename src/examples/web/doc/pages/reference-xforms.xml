@@ -1309,7 +1309,7 @@
                 <code>xxforms</code> namespace.
             </p>
             <section>
-                <anchor id="conditionals"/>
+                <a name="conditionals"/>
                 <title>Conditionals</title>
                 <p>
                     Two controls provide a mechanism to selectively enable markup and other XForms controls depending of

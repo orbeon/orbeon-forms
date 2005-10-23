@@ -870,7 +870,7 @@ select first_name, last_name
                     </p>
                 </warning>
             </section>
-            <anchor id="binary-data"/>
+            <a name="binary-data"/>
             <section>
                 <title>Reading and Writing Binary Data</title>
                 <p>

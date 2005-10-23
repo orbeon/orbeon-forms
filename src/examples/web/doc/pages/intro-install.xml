@@ -592,7 +592,7 @@
 <!--                </li>-->
 <!--            </ol>-->
 <!--        </section>-->
-<!--        <anchor id="oc4j"/>-->
+<!--        <a name="oc4j"/>-->
 <!--        <section>-->
 <!--            <title>Installing OXF on Oracle 9i AS</title>-->
 <!--            <p>-->
@@ -660,7 +660,7 @@
 <!--                </li>-->
 <!--            </ol>-->
 <!--        </section>-->
-        <anchor id="jboss"/>
+        <a name="jboss"/>
         <section>
             <title>Installing OPS on &jboss-vers;</title>
             <ol>
@@ -782,7 +782,7 @@
 <!--                </li>-->
 <!--            </ol>-->
 <!--        </section>-->
-        <anchor id="tutorial"/>
+        <a name="tutorial"/>
         <section>
             <title>Running the BizDoc Application from the OPS Tutorial</title>
             <p>
@@ -798,7 +798,7 @@
 <!--                browser.-->
 <!--            </p>-->
         </section>
-        <anchor id="security"/>
+        <a name="security"/>
         <section>
             <title>Security</title>
             <p>

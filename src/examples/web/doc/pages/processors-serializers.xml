@@ -31,7 +31,7 @@
             </p>
         </section>
 
-        <anchor id="url-serializer"/>
+        <a name="url-serializer"/>
         <section>
             <title>URL Serializer</title>
             <p>
@@ -106,7 +106,7 @@
                 <code>indent</code> and <code>indent-amount</code>.
             </p>
         </section>
-        <anchor id="scope-serializer"/>
+        <a name="scope-serializer"/>
         <section>
             <title>Scope Serializer</title>
             <p>
@@ -230,7 +230,7 @@
                 The content type and content length headers are also supported.
             </p>
 
-            <anchor id="http-configuration"/>
+            <a name="http-configuration"/>
             <section>
                 <title>Configuration</title>
                 <p>
@@ -349,7 +349,7 @@
                 </xml-source>
             </section>
 
-            <anchor id="XMLSerializer"/>
+            <a name="XMLSerializer"/>
             <section>
                 <title>XML Serializer</title>
                 <p>
@@ -369,7 +369,7 @@
                 </xml-source>
             </section>
 
-            <anchor id="html-serializer"/>
+            <a name="html-serializer"/>
             <section>
                 <title>HTML Serializer</title>
                 <p>

@@ -4,8 +4,12 @@
     <name>My Cool Blog</name>
     <categories>
         <category>
-            <name>General Stuff</name>
-            <name>Cool Stuff</name>
+            <name>General</name>
+            <id>1</id>
+        </category>
+        <category>
+            <name>Music</name>
+            <id>2</id>
         </category>
     </categories>
 </blog>

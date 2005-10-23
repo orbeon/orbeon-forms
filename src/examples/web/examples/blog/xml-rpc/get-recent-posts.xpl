@@ -58,8 +58,8 @@
         <p:output name="categories" id="categories"/>
     </p:processor>
 
-    <!-- Convert content of description -->
-    <p:for-each href="#recent-posts" select="/posts/post" root="descriptions" id="descriptions">
+    <!-- Convert content -->
+    <p:for-each href="#recent-posts" select="/posts/post" root="contents" id="contents">
         <p:processor name="oxf:xml-converter" xmlns:p="http://www.orbeon.com/oxf/pipeline">
              <p:input name="config">
                  <config>
@@ -70,19 +70,19 @@
                      <omit-xml-declaration>true</omit-xml-declaration>
                  </config>
              </p:input>
-             <p:input name="data" href="current()#xpointer(/*/description)"/>
-             <p:output name="data" ref="descriptions"/>
+             <p:input name="data" href="current()#xpointer(/*/content)"/>
+             <p:output name="data" ref="contents"/>
          </p:processor>
     </p:for-each>
 
     <!-- Format response -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#recent-posts"/>
-        <p:input name="descriptions" href="#descriptions"/>
+        <p:input name="contents" href="#contents"/>
         <p:input name="categories" href="#categories"/>
         <p:input name="config">
             <params xsl:version="2.0">
-                <xsl:variable name="descriptions" select="doc('input:descriptions')/*/*" as="element()+"/>
+                <xsl:variable name="contents" select="doc('input:contents')/*/*" as="element()+"/>
                 <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
                 <param>
                     <value>
@@ -90,7 +90,7 @@
                             <data>
                                 <xsl:for-each select="/posts/post">
                                     <xsl:variable name="position" select="position()"/>
-                                    <xsl:variable name="description" select="$descriptions[$position]"/>
+                                    <xsl:variable name="content" select="$contents[$position]"/>
                                     <value>
                                         <struct>
                                             <member>
@@ -103,7 +103,7 @@
                                             </member>
                                             <member>
                                                 <name>description</name>
-                                                <value><string><xsl:value-of select="substring($description, 14, string-length($description) - 27)"/></string></value>
+                                                <value><string><xsl:value-of select="substring($content, 14, string-length($content) - 27)"/></string></value>
                                             </member>
                                             <member>
                                                 <name>published</name>

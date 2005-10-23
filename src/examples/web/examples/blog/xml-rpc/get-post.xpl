@@ -53,14 +53,14 @@
                  <omit-xml-declaration>true</omit-xml-declaration>
              </config>
          </p:input>
-         <p:input name="data" href="#post#xpointer(/*/description)"/>
-         <p:output name="data" id="description"/>
+         <p:input name="data" href="#post#xpointer(/*/content)"/>
+         <p:output name="data" id="content"/>
      </p:processor>
 
     <!-- Format response -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#post"/>
-        <p:input name="description" href="#description"/>
+        <p:input name="content" href="#content"/>
         <p:input name="config">
             <params xsl:version="2.0">
                 <param>
@@ -77,8 +77,8 @@
                                 </member>
                                 <member>
                                     <name>description</name>
-                                    <xsl:variable name="description" select="doc('input:description')/*" as="xs:string"/>
-                                    <value><string><xsl:value-of select="substring($description, 14, string-length($description) - 27)"/></string></value>
+                                    <xsl:variable name="content" select="doc('input:content')/*" as="xs:string"/>
+                                    <value><string><xsl:value-of select="substring($content, 14, string-length($content) - 27)"/></string></value>
                                 </member>
                                 <member>
                                     <name>published</name>

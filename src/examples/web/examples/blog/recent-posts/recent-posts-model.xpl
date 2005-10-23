@@ -16,7 +16,7 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param type="input" name="instance"/>
+    <p:param type="input" name="instance" debug="xxxinstance"/>
     <p:param type="output" name="data"/>
 
     <!-- Call data access to get blog information -->
@@ -41,11 +41,20 @@
                 <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/post-id))"/>
                 <p:output name="post" id="post"/>
             </p:processor>
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="../data-access/get-comments.xpl"/>
+                <p:input name="query" href="aggregate('query', #instance#xpointer(/*/post-id))"/>
+                <p:output name="comments" id="comments"/>
+            </p:processor>
         </p:when>
         <p:otherwise>
             <p:processor name="oxf:identity">
                 <p:input name="data"><dummy/></p:input>
                 <p:output name="data" id="post"/>
+            </p:processor>
+            <p:processor name="oxf:identity">
+                <p:input name="data"><dummy/></p:input>
+                <p:output name="data" id="comments"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
@@ -65,8 +74,9 @@
         <p:input name="blog" href="#blogs#xpointer(/*/blog[1])"/>
         <p:input name="post" href="#post"/>
         <p:input name="posts" href="#posts"/>
+        <p:input name="comments" href="#comments"/>
         <p:input name="categories" href="#categories"/>
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="data" debug="xxxrecent-posts"/>
     </p:processor>
 
 </p:config>

@@ -24,20 +24,18 @@
             <element name="name">
                 <data type="string"/>
             </element>
-            <optional>
-                <element name="categories">
-                    <oneOrMore>
-                        <element name="category">
-                            <element name="name">
-                                <data type="string"/>
-                            </element>
-                            <element name="id">
-                                <data type="positiveInteger"/>
-                            </element>
+            <element name="categories">
+                <zeroOrMore>
+                    <element name="category">
+                        <element name="name">
+                            <data type="string"/>
                         </element>
-                    </oneOrMore>
-                </element>
-            </optional>
+                        <element name="id">
+                            <data type="positiveInteger"/>
+                        </element>
+                    </element>
+                </zeroOrMore>
+            </element>
         </element>
     </start>
 

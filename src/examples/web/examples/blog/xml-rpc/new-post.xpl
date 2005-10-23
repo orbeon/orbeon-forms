@@ -55,21 +55,21 @@
                 <username><xsl:value-of select="/params/param[2]/value/string"/></username>
                 <blog-id><xsl:value-of select="/params/param[1]/value/string"/></blog-id>
                 <title><xsl:value-of select="/params/param[4]/value/struct/member[name = 'title']/value"/></title>
-                <description>
+                <content>
                     <xsl:copy-of select="saxon:parse(concat('&lt;root>', /params/param[4]/value/struct/member[name = 'description']/value, '&lt;/root>'))/*/node()"/>
-                </description>
+                </content>
                 <published><xsl:value-of select="if (/params/param[5]/value/boolean = 1) then 'true' else 'false'"/></published>
                 <date-created><xsl:value-of select="adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H'))"/></date-created>
-                <xsl:if test="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string[normalize-space(.) != '']">
-                    <categories>
+                <categories>
+                    <xsl:if test="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string[normalize-space(.) != '']">
                         <xsl:for-each select="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string">
                             <xsl:variable name="category-name" select="normalize-space(.)"/>
                             <category-id>
                                 <xsl:value-of select="($categories[name = $category-name]/id, $categories[1]/id)[1]"/>
                             </category-id>
                         </xsl:for-each>
-                    </categories>
-                </xsl:if>
+                    </xsl:if>
+                </categories>
                 <comments/>
             </post>
         </p:input>

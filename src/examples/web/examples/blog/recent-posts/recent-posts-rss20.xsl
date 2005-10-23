@@ -73,7 +73,7 @@
                             <xsl:value-of select="local:path-to-url($request, local:post-path(/*/blog/username, /*/blog/blog-id, post-id))"/>
                         </link>
                         <description>
-                            <xsl:value-of select="substring-before(substring-after(saxon:serialize(description, 'html-output'), '>'), '&lt;/description>')"/>
+                            <xsl:value-of select="substring-before(substring-after(saxon:serialize(content, 'html-output'), '>'), '&lt;/description>')"/>
                         </description>
                         <author>
                             <xsl:value-of select="username"/><!-- TODO: should have full name information -->

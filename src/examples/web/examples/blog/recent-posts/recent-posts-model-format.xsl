@@ -25,6 +25,7 @@
     <xsl:variable name="post" select="doc('input:post')/*" as="element()"/>
     <xsl:variable name="posts" select="doc('input:posts')/*" as="element()"/>
     <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
+    <xsl:variable name="only-one-post" select="exists($post/post-id)" as="xs:boolean"/>
 
     <xsl:template match="/">
 
@@ -68,10 +69,10 @@
             </feeds>
 
             <posts>
-                <xsl:for-each-group select="$posts/post[published = 'true']" group-by="xs:date(xs:dateTime(date-created))">
+                <xsl:for-each-group select="$posts/post[published = 'true' and (not($only-one-post) or post-id = $post/post-id)]" group-by="xs:date(xs:dateTime(date-created))">
                     <xsl:sort select="xs:dateTime(date-created)" order="descending"/>
                     <day>
-                        <date><xsl:value-of select="date-created"/></date>
+                        <date><xsl:value-of select="xs:date(xs:dateTime(date-created))"/></date>
                         <formatted-date><xsl:value-of select="local:format-dateTime-default(date-created, true())"/></formatted-date>
 
                         <xsl:for-each select="current-group()">
@@ -82,20 +83,23 @@
                                     <xsl:attribute name="only" select="'true'"/>
                                 </xsl:if>
                                 <xsl:copy-of select="*[name() != 'categories']"/>
-                                <xsl:if test="categories">
-                                    <categories>
-                                        <xsl:for-each select="categories/category-id">
-                                            <xsl:for-each select="$categories[id = current()]">
-                                                <xsl:copy>
-                                                    <xsl:copy-of select="*"/>
-                                                    <link>
-                                                        <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, id)"/>
-                                                    </link>
-                                                </xsl:copy>
-                                            </xsl:for-each>
+                                <categories>
+                                    <xsl:for-each select="categories/category-id">
+                                        <xsl:for-each select="$categories[id = current()]">
+                                            <xsl:copy>
+                                                <xsl:copy-of select="*"/>
+                                                <link>
+                                                    <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, id)"/>
+                                                </link>
+                                            </xsl:copy>
                                         </xsl:for-each>
-                                    </categories>
-                                </xsl:if>
+                                    </xsl:for-each>
+                                </categories>
+                                <comments>
+                                    <xsl:if test="$only-one-post">
+                                        <xsl:copy-of select="doc('input:comments')/*/comment"/>
+                                    </xsl:if>
+                                </comments>
                                 <links>
                                     <fragment-name><xsl:value-of select="concat('post-', post-id)"/></fragment-name>
                                     <post><xsl:value-of select="local:post-path($instance/username, $blog/blog-id, post-id)"/></post>

@@ -1,0 +1,15 @@
+<comment>
+    <comment-id>comment789</comment-id>
+    <post-id>post456</post-id>
+    <blog-id>blog123</blog-id>
+    <poster-info>
+        <name/>
+        <email/>
+        <uri/>
+    </poster-info>
+    <comment-info>
+        <title/>
+        <content/>
+        <date-created/>
+    </comment-info>
+</comment>

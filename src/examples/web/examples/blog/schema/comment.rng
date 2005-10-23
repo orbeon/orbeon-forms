@@ -14,34 +14,37 @@
 <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
 
     <start>
-        <element name="post">
-            <element name="blog-id">
+        <element name="comment">
+            <element name="comment-id">
                 <data type="string"/>
             </element>
-            <element name="username">
+            <element name="blog-id">
                 <data type="string"/>
             </element>
             <element name="post-id">
                 <data type="string"/>
             </element>
-            <element name="title">
-                <data type="string"/>
+            <element name="poster-info">
+                <element name="name">
+                    <data type="string"/>
+                </element>
+                <element name="email">
+                    <data type="string"/>
+                </element>
+                <element name="uri">
+                    <data type="anyURI"/>
+                </element>
             </element>
-            <element name="content">
-                <data type="string"/>
-            </element>
-            <element name="published">
-                <data type="boolean"/>
-            </element>
-            <element name="date-created">
-                <data type="dateTime"/>
-            </element>
-            <element name="categories">
-                <zeroOrMore>
-                    <element name="category-id">
-                        <data type="positiveInteger"/>
-                    </element>
-                </zeroOrMore>
+            <element name="comment-info">
+                <element name="title">
+                    <data type="string"/>
+                </element>
+                <element name="content">
+                    <data type="string"/>
+                </element>
+                <element name="date-created">
+                    <data type="dateTime"/>
+                </element>
             </element>
         </element>
     </start>

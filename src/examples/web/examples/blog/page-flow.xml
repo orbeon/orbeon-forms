@@ -32,18 +32,8 @@
     <page path-info="/blog/xmlrpc" model="xml-rpc.xpl"/>
 
     <!-- Services -->
-    <page path-info="/blog/save-comment">
-        <action>
-            <result page="post" transform="oxf:xslt" instance-passing="redirect">
-                <form xsl:version="2.0" xmlns="">
-                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
-                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
-                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
-                    <format><xsl:value-of select="doc('input:instance')/form/format"/></format>
-                    <category><xsl:value-of select="doc('input:instance')/form/category"/></category>
-                </form>
-            </result>
-        </action>
+    <page path-info="/blog/save-comment" view="recent-posts/save-comment-view.xpl">
+        <action action="recent-posts/do-save-comment.xpl"/>
     </page>
 
     <page path-info="/blog/format-comment" view="recent-posts/format-comment.xpl"/>

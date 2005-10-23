@@ -3,19 +3,10 @@
     <username>ebruchez</username>
     <blog-id>blog123</blog-id>
     <title>Post du Jour</title>
-    <description>What a day...</description>
+    <content>What a day...</content>
     <published>true</published>
     <date-created>2004-03-28T10:00:00</date-created>
     <categories>
         <category-id>1</category-id>
     </categories>
-    <comments>
-        <comment>
-            <date-created>2004-03-28T10:12:23</date-created>
-            <name>John Doe</name>
-            <email>e@b</email>
-            <uri>http://john.doe.name/</uri>
-            <text>Great post!</text>
-        </comment>
-    </comments>
 </post>

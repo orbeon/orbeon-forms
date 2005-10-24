@@ -232,6 +232,7 @@
                     <page path-info="/report/detail" view="report/detail/report-detail-view.xsl"/>
                 </xml-source>
             </section>
+            <a name="page-model-page-view"/>
             <section>
                 <title>Page Model and Page View</title>
                 <img print-format="pdf" src="pages/reference-controller-mvc.png" style="float: right; margin-left: 1em"/>

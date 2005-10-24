@@ -158,6 +158,29 @@
                 </p>
             </section>
             <section>
+                <title>Page Flow Definitions</title>
+                <p>
+                    Within your page flow, you define a page model and either a static page view:
+                </p>
+                <xml-source>
+                    <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xhtml"/>
+                </xml-source>
+                <p>
+                    Or a dynamic XSLT page view:
+                </p>
+                <xml-source>
+                    <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xsl"/>
+                </xml-source>
+                <p>
+                    The page model is in charge of producing an XML document which is then going to
+                    be used by the page view to initialize the XForms instance. As always with OPS,
+                    the page model produces this document on its <code>data</code> output, and the
+                    page view can access this document on its <code>data</code> input, as shown in
+                    the following sections. This mechanism is described in details in the <a
+                    href="reference-page-flow#page-model-page-view">PFC documentation</a>.
+                </p>
+            </section>
+            <section>
                 <title>Using XInclude</title>
                 <p>
                     Following the MVC architecture, the PFC page model generates an XML document
@@ -228,7 +251,25 @@
                     <code>data</code> output of the page view, which is produced on the
                     <code>data</code> output of the page model.
                 </p>
+                <note>
+                    It is possible to use XInclude instructions in a dynamic XSLT page view as well.
+                    In this case, it is important to note that XInclude instructions are processed
+                    before XSLT instructions, i.e. the result of XInclude instructions is an XSLT
+                    stylesheet, which is then executed. [TODO: Figure showing XInclude -> XSLT
+                    processing.]
+                </note>
             </section>
+        </section>
+        <section>
+            <title>XSLT or XForms?</title>
+            <p>
+                There are some similarities between XSLT and XForms. XSLT can be used to extract
+                data from an XML document, format it, and output it with <code>xsl:value-of</code>.
+                XForms can do the same using <code>xforms:output</code>.
+            </p>
+            <p>
+                TODO
+            </p>
         </section>
         <section>
             <title>Relative Paths</title>

@@ -563,7 +563,7 @@ function xformsInitializeControlsUnder(root) {
                     var target = getEventTarget(event);
                     // If this is an input field, set value on parent and send event on parent element
                     if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
-                        target.parentNode.valaue = target.value;
+                        target.parentNode.value = target.value;
                         target = target.parentNode;
                     }
                     xformsValueChanged(target, null);

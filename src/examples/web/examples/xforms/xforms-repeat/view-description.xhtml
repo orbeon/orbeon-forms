@@ -1,0 +1,30 @@
+<xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:ui="http://www.example.com/ui"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events">
+    <!-- Description value -->
+    <xforms:group ref="@ui:edit-relevant">
+        <xforms:output ref="../@description" xhtml:size="30"/>
+    </xforms:group>
+    <!-- Description edition field -->
+    <xforms:group ref="@ui:save-relevant">
+        <xforms:input ref="../@description" xhtml:size="30"/>
+    </xforms:group>
+    <!-- Trigger to edit description -->
+    <xforms:trigger appearance="xxforms:image" ref="@ui:edit-relevant">
+        <xxforms:img src="/images/edit.gif"/>
+        <xforms:action ev:event="DOMActivate">
+            <xforms:setvalue ref="../@ui:edit-relevant" value="'false'"/>
+            <xforms:setvalue ref="../@ui:save-relevant" value="'true'"/>
+        </xforms:action>
+    </xforms:trigger>
+    <!-- Trigger to save description -->
+    <xforms:trigger appearance="xxforms:image" ref="@ui:save-relevant">
+        <xxforms:img src="/images/save.gif"/>
+        <xforms:action ev:event="DOMActivate">
+            <xforms:setvalue ref="../@ui:edit-relevant" value="'true'"/>
+            <xforms:setvalue ref="../@ui:save-relevant" value="'false'"/>
+        </xforms:action>
+    </xforms:trigger>
+</xhtml:span>

@@ -33,8 +33,15 @@ function xformsUpdateStyle(element) {
             else xformsAddClass(element, "xforms-disabled");
         }
         if (xformsIsDefined(readonly)) {
-            if (readonly) element.disabled = true;
-            else element.disabled = false;
+            var isXFormsInput = xformsArrayContains(element.className.split(" "), "xforms-input");
+            // Set form field to disabled
+            var disabledTarget = isXFormsInput ? element.childNodes[1] : element;
+            if (readonly) disabledTarget.setAttribute("disabled", "disabled");
+            else disabledTarget.removeAttribute("disabled");
+            // For input field, grey out value
+            if (isXFormsInput)
+                if (readonly) xformsAddClass(element.childNodes[0], "xforms-readonly");
+                else xformsRemoveClass(element.childNodes[0], "xforms-readonly");
         }
     }
 
@@ -185,13 +192,14 @@ function xformsUpdateStyle(element) {
 
             if (className == "xforms-input") {
 
+                var inputField = element.childNodes[1];
+                var showCalendar = element.childNodes[2];
+
                 if (!element.setupDone) {
                     element.setupDone = true;
 
                     // Assign ids to input field and icon for date picker
-                    var inputField = element.childNodes[1];
                     inputField.id = "input-" + element.id;
-                    var showCalendar = element.childNodes[2];
                     showCalendar.id = "showcalendar-" + element.id;
 
                     function calendarUpdate() {
@@ -215,10 +223,15 @@ function xformsUpdateStyle(element) {
                     var jscalendarOnClick = element.onclick;
                     element.onclick = function() {
                         // Call jscalendar handler only if this is date field
-                        if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date"))
+                        if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
+                                && !inputField.disabled)
                             jscalendarOnClick();
                     }
                 }
+
+                // Disable or enable input field depending if control is relevant
+                // TODO: Should this be commented?
+                //updateRelevantReadonly(inputField, control.isRelevant, control.isReadonly);
             }
             
             if (className == "xforms-select1-compact") {

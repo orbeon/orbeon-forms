@@ -557,20 +557,22 @@ function xformsInitializeControlsUnder(root) {
                 // Handle value change and incremental modification
                 control.previousValue = control.value;
                 control.userModications = false;
-                xformsAddEventListener(control, "change", function(event) {
+
+                // Function called when value changes
+                function handleValueChange(event) {
                     var target = getEventTarget(event);
                     // If this is an input field, set value on parent and send event on parent element
                     if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
-                        target.parentNode.value = target.value;
+                        target.parentNode.valaue = target.value;
                         target = target.parentNode;
                     }
                     xformsValueChanged(target, null);
-                });
-                if (isIncremental) {
-                    xformsAddEventListener(control, "keyup", function(event) {
-                        xformsValueChanged(getEventTarget(event), null);
-                    });
                 }
+
+                // Register listeners
+                xformsAddEventListener(control, "change", handleValueChange);
+                if (isIncremental)
+                    xformsAddEventListener(control, "keyup", handleValueChange);
             }
 
             // Register listener on focus in and out events

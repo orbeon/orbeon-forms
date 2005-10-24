@@ -198,7 +198,7 @@
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
+                    <xsl:value-of select="xforms:label"/>
                 </xhtml:a>
             </xsl:when>
             <!-- Image appearance -->
@@ -681,19 +681,17 @@
 
     <xsl:template match="xforms:group|xforms:switch">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" as="xs:boolean" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $id)"/>
-            <xsl:if test="not($generate-template)">
-                <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
-                    if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
-                <xsl:attribute name="class" select="string-join($classes , ' ')"/>
-            </xsl:if>
+            <xsl:variable name="disabled-class" as="xs:string?"
+                    select="if (not($generate-template) and xxforms:control($id)/@relevant = 'false')
+                    then 'xforms-disabled' else ()"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., (concat('xforms-', local-name()), $disabled-class), $id)"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>
-    
+
     <xsl:template match="xforms:case">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
@@ -701,16 +699,16 @@
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case', $id)"/>
             <xsl:variable name="div-information" as="element()"
                 select="$response/xxforms:action/xxforms:divs/xxforms:div[@id = $id]"/>
-            <xsl:attribute name="style" select="concat('display: ', 
+            <xsl:attribute name="style" select="concat('display: ',
                 if ($div-information/@visibility = 'visible') then 'block' else 'none')"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>
-    
+
     <!-- - - - - - - Utility templates and functions - - - - - - -->
 
     <xsl:template match="xforms:*"/>
-    
+
     <xsl:function name="xxforms:copy-attributes">
         <xsl:param name="element" as="element()?"/>
         <xsl:param name="classes" as="xs:string*"/>
@@ -727,7 +725,7 @@
         </xsl:if>
         <!-- Copy class attribute, both in xhtml namespace and no namespace -->
         <xsl:variable name="class" as="xs:string" select="string-join
-            (($element/@xhtml:class, $element/@class, $classes, 
+            (($element/@xhtml:class, $element/@class, $classes,
             if ($element/@incremental = 'true') then 'xforms-incremental' else ()), ' ')"/>
         <xsl:if test="string-length($class) > 0">
             <xsl:attribute name="class" select="$class"/>
@@ -737,7 +735,7 @@
             <xsl:attribute name="{local-name()}" select="."/>
         </xsl:for-each>
     </xsl:function>
-    
+
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
         <xsl:variable name="control"

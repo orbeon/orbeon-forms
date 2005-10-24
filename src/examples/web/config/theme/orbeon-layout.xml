@@ -644,7 +644,7 @@ ul {
 
 .xforms-showcalendar {
     margin-left: .5em;
-    background-image: url(../../images/showCalendar2.gif);
+    background-image: url(../../images/calendar.gif);
     background-repeat: no-repeat;
     background-position: top left;
     display: -moz-inline-box;
@@ -720,6 +720,10 @@ ul {
 
 .xforms-disabled {
     display: none;
+}
+
+.xforms-readonly {
+    color: gray;
 }
 
 <!-- Hide input field for <xforms:input> when type is date -->

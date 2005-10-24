@@ -33,14 +33,6 @@
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head>
-                <!-- Handle meta elements -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:meta"/>
-                <!-- Copy user-defined links -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:link"/>
-                <!-- Copy user-defined stylesheets -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:style"/>
-                <!-- Copy user-defined scripts -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:script"/>
                 <!-- Calendar -->
                 <xhtml:link rel="stylesheet" href="/config/theme/jscalendar/calendar-blue.css" type="text/css"/>
                 <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar.js"/>
@@ -54,6 +46,14 @@
                 <xhtml:script type="text/javascript" src="/ops/javascript/time-utils.js"/>
                 <xhtml:script type="text/javascript" src="/ops/javascript/sarissa.js"/>
                 <xhtml:script type="text/javascript" src="/ops/javascript/xforms.js"/>
+                <!-- Handle meta elements -->
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:meta"/>
+                <!-- Copy user-defined links -->
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:link"/>
+                <!-- Copy user-defined stylesheets -->
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:style"/>
+                <!-- Copy user-defined scripts -->
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:script"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>

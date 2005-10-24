@@ -16,7 +16,7 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param type="input" name="instance" debug="xxxinstance"/>
+    <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
     <!-- Call data access to get blog information -->
@@ -76,7 +76,8 @@
         <p:input name="posts" href="#posts"/>
         <p:input name="comments" href="#comments"/>
         <p:input name="categories" href="#categories"/>
-        <p:output name="data" ref="data" debug="xxxrecent-posts"/>
+        <!--<p:output name="data" ref="data" debug="xxxrecent-posts"/>-->
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

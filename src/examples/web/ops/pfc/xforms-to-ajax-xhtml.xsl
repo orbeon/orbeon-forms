@@ -198,7 +198,7 @@
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="xforms:label"/>
+                    <xsl:value-of select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
                 </xhtml:a>
             </xsl:when>
             <!-- Image appearance -->
@@ -681,9 +681,15 @@
 
     <xsl:template match="xforms:group|xforms:switch">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $id)"/>
+            <xsl:if test="not($generate-template)">
+                <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
+                    if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
+                <xsl:attribute name="class" select="string-join($classes , ' ')"/>
+            </xsl:if>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>

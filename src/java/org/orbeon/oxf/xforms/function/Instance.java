@@ -43,12 +43,12 @@ public class Instance extends XFormsFunction {
 
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
-        Expression instanceIdExpression = argument[0];
-        String instanceId = instanceIdExpression.evaluateAsString(xpathContext);
+        final Expression instanceIdExpression = argument[0];
+        final String instanceId = instanceIdExpression.evaluateAsString(xpathContext);
 
         // Get model and instance with given id for that model only
-        XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();
-        XFormsInstance instance = model.getInstance(instanceId);
+        final XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();
+        final XFormsInstance instance = model.getInstance(instanceId);
 
         // Return instance document
         if (instance != null) {

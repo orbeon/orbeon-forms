@@ -31,7 +31,7 @@
                 <xsl:copy-of select="/*/* except /*/comment-id"/>
             </comment>
         </p:input>
-        <p:output name="data" id="updated-comment" debug="xxxupdated-comment"/>
+        <p:output name="data" id="updated-comment"/>
     </p:processor>
 
     <!-- Insert it -->
@@ -40,7 +40,7 @@
         <p:input name="query">
             <xdb:insert collection="/db/orbeon/blog-example/comments" create-collection="true"/>
         </p:input>
-        <p:input name="data" href="#updated-comment"/>
+        <p:input name="data" href="#updated-comment" schema-href="../schema/comment.rng"/>
     </p:processor>
 
 </p:config>

@@ -138,6 +138,16 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
         StandardFunction.arg(e, 4, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+
+        // eXForms functions
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}relevant", EXFormsRelevant.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}readonly", EXFormsReadonly.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+
+        e = register("{" + XFormsConstants.EXFORMS_NAMESPACE_URI  + "}required", EXFormsRequired.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
     }
 
     /**
@@ -163,7 +173,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
             entry = (StandardFunction.Entry) functionTable.get(local);
-        } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)) {
+        } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI) || uri.equals(XFormsConstants.EXFORMS_NAMESPACE_URI)) {
             entry = (StandardFunction.Entry) functionTable.get("{" + uri + "}" + local);
         } else {
             return null;

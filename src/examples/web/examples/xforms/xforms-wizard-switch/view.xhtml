@@ -30,14 +30,14 @@
             </xforms:instance>
             <xforms:instance id="buttons-state">
                 <buttons-state>
-                    <finish relevant="false"/>
+                    <finish readonly="false"/>
                 </buttons-state>
             </xforms:instance>
             <xforms:instance id="formatted">
                 <formated-instance/>
             </xforms:instance>                
             <xforms:bind nodeset="/user/age" constraint="number(.) >= 0"/>
-            <xforms:bind nodeset="instance('buttons-state')/finish" readonly="@relevant = 'false'"/>
+            <xforms:bind nodeset="instance('buttons-state')/finish" readonly="@readonly = 'false'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/config/theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
@@ -47,10 +47,10 @@
         <xhtml:p>
             <xforms:group ref="instance('text')">
                 <xforms:action ev:event="xforms-invalid">
-                    <xforms:setvalue ref="instance('buttons-state')/finish/@relevant">false</xforms:setvalue>
+                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
                 </xforms:action>
                 <xforms:action ev:event="xforms-valid">
-                    <xforms:setvalue ref="instance('buttons-state')/finish/@relevant">true</xforms:setvalue>
+                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
                 </xforms:action>
                 <xforms:switch>
                     <xforms:case id="firstname" selected="true">
@@ -91,10 +91,10 @@
                             <xforms:input ref="age" incremental="true">
                                 <xforms:label class="fixed-width">Age:</xforms:label>
                                 <xforms:action ev:event="xforms-valid">
-                                    <xforms:setvalue ref="instance('buttons-state')/finish/@relevant">true</xforms:setvalue>
+                                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
                                 </xforms:action>
                                 <xforms:action ev:event="xforms-invalid">
-                                    <xforms:setvalue ref="instance('buttons-state')/finish/@relevant">false</xforms:setvalue>
+                                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
                                 </xforms:action>
                             </xforms:input>
                         </xhtml:p>

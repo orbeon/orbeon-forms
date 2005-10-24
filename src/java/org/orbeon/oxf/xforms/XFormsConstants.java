@@ -31,6 +31,9 @@ public class XFormsConstants {
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
     public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
 
+    // eXForms at http://www.exforms.org/
+    public static final String EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0";
+
     public static final String XML_EVENTS_PREFIX = "ev";
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";
     public static final Namespace XML_EVENTS_NAMESPACE = new Namespace(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI);

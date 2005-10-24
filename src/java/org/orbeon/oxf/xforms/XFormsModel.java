@@ -700,6 +700,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                         } else {
                             // External instance
+
+                            // TODO: Handle relative URLs
+//                            if (serverSideRelative) {
+//
+//                            } else {
+//
+//                            }
+//
+//
+//                            xxx
+
                             final LocationData locationData = (LocationData) instanceContainer.getData();
                             final URL srcURL = ProcessorUtils.createRelativeURL(locationData, srcAttribute);
                             final URLGenerator urlGenerator = new URLGenerator(srcURL);
@@ -931,14 +942,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     private void clearInstanceDataEventState() {
-        for (Iterator i = instances.iterator(); i.hasNext();) {
-            XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
-                public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
-                    if (localInstanceData != null) {
-                        localInstanceData.clearInstanceDataEventState();
+        if (instances != null) {
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                    public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
+                        if (localInstanceData != null) {
+                            localInstanceData.clearInstanceDataEventState();
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 

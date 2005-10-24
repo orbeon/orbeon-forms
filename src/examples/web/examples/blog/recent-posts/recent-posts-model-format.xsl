@@ -20,6 +20,8 @@
 
     <xsl:import href="../util/blog-functions.xsl"/>
 
+    <xsl:output method="html" omit-xml-declaration="yes" name="html-output"/>
+
     <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
     <xsl:variable name="blog" select="doc('input:blog')/*" as="element()"/>
     <xsl:variable name="post" select="doc('input:post')/*" as="element()"/>
@@ -30,6 +32,10 @@
     <xsl:template match="/">
 
         <recent-posts>
+
+            <submission>
+                <xsl:copy-of select="$instance"/>
+            </submission>
 
             <user>
                 <username><xsl:value-of select="$instance/username"/></username>
@@ -79,10 +85,12 @@
                             <xsl:sort select="xs:dateTime(date-created)" order="descending"/>
 
                             <xsl:copy>
-                                <xsl:if test="post-id = $post/post-id">
-                                    <xsl:attribute name="only" select="'true'"/>
-                                </xsl:if>
-                                <xsl:copy-of select="*[name() != 'categories']"/>
+                                <xsl:copy-of select="* except (content, categories)"/>
+                                <content>
+                                    <xsl:variable name="content" select="saxon:serialize(content, 'html-output')" as="xs:string"/>
+                                    <xsl:variable name="content-end" select="substring-after($content, '&gt;')" as="xs:string"/>
+                                    <xsl:value-of select="substring($content-end, 1, string-length($content-end) - 10)"/>
+                                </content>
                                 <categories>
                                     <xsl:for-each select="categories/category-id">
                                         <xsl:for-each select="$categories[id = current()]">
@@ -97,6 +105,9 @@
                                 </categories>
                                 <comments>
                                     <xsl:if test="$only-one-post">
+                                        <!-- Tells whether comments should be displayed -->
+                                        <xsl:attribute name="show" select="'true'"/>
+                                        <!-- All the comments -->
                                         <xsl:copy-of select="doc('input:comments')/*/comment"/>
                                     </xsl:if>
                                 </comments>

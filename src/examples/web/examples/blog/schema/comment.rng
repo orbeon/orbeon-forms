@@ -40,6 +40,12 @@
                     <data type="string"/>
                 </element>
                 <element name="content">
+                    <attribute name="word-count">
+                        <data type="nonNegativeInteger"/>
+                    </attribute>
+                    <attribute name="character-count">
+                        <data type="nonNegativeInteger"/>
+                    </attribute>
                     <data type="string"/>
                 </element>
                 <element name="date-created">

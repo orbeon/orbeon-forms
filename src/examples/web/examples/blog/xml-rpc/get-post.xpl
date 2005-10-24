@@ -78,7 +78,7 @@
                                 <member>
                                     <name>description</name>
                                     <xsl:variable name="content" select="doc('input:content')/*" as="xs:string"/>
-                                    <value><string><xsl:value-of select="substring($content, 14, string-length($content) - 27)"/></string></value>
+                                    <value><string><xsl:value-of select="substring($content, 10, string-length($content) - 19)"/></string></value>
                                 </member>
                                 <member>
                                     <name>published</name>

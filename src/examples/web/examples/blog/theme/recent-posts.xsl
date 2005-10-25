@@ -205,11 +205,11 @@
 
                     <!-- Display posts with XForms -->
                     <!-- Posts are alread grouped by day -->
-                    <xforms:repeat nodeset="instance('main')/posts/day" id="dayRepeat">
+                    <xforms:repeat nodeset="instance('main')/posts/day">
                         <h2>
                             <xforms:output ref="date"/>
                         </h2>
-                        <xforms:repeat nodeset="post" id="postRepeat">
+                        <xforms:repeat nodeset="post">
                             <!-- Display post title -->
                             <!--<a name="{links/fragment-name}"/>-->
                             <a name="xxx"/>
@@ -233,7 +233,7 @@
                             <!-- Display post information and links -->
                             <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
                                 <xforms:output value="'Filed under: '"/>
-                                <xforms:repeat nodeset="categories/category" id="postCategoryRepeat">
+                                <xforms:repeat nodeset="categories/category">
                                     <xforms:output value="if (preceding-sibling::name) then ', ' else ''"/>
                                     <!--<a href="{link}">-->
                                         <!--<xforms:output ref="name"/>-->
@@ -401,7 +401,7 @@
                                         </xforms:group>
                                         <!-- Display existing comments with XForms -->
                                         <h3>Comments</h3>
-                                        <xforms:repeat nodeset="instance('main')/posts/day/post/comments/comment" id="commentsRepeat">
+                                        <xforms:repeat nodeset="instance('main')/posts/day/post/comments/comment">
                                             <!-- Display comment content -->
                                             <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em">
                                                 <xforms:output ref="comment-info/content" appearance="xxforms:html"/>

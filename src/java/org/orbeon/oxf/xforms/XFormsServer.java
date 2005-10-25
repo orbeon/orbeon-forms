@@ -499,32 +499,8 @@ public class XFormsServer extends ProcessorImpl {
 
                     } else if (size2 < size1) {
                         // Size has shrunk
-
-                        // TODO: Fix this splitting algorithm. For example, document-info-repeat is
-                        // split into "document" and "info-repeat", when it should not be split at
-                        // all.
+                        
                         final String repeatControlId = controlInfo2.getId();
-//                        final StringTokenizer st = new StringTokenizer(repeatControlId, "-");
-//                        final StringBuffer templateIdBuffer = new StringBuffer();
-//                        final StringBuffer parentIndexesBuffer = new StringBuffer();
-//                        boolean hasInteger = false;
-//                        while (st.hasMoreTokens()) {
-//                            final String nextToken = st.nextToken();
-//                            try {
-//                                Integer.parseInt(nextToken);
-//                                // Integer
-//                                hasInteger = true;
-//                                if (parentIndexesBuffer.length() > 0)
-//                                    parentIndexesBuffer.append('-');
-//                                parentIndexesBuffer.append(nextToken);
-//                            } catch (NumberFormatException e) {
-//                                // Not an integer
-//                                if (templateIdBuffer.length() > 0)
-//                                    templateIdBuffer.append('-');
-//                                templateIdBuffer.append(nextToken);
-//                            }
-//                        }
-
                         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
                         final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
                         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);

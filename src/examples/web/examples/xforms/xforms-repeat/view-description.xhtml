@@ -4,27 +4,21 @@
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
     <!-- Description value -->
-    <xforms:group ref="@ui:edit-relevant">
+    <xforms:group ref="@ui:output">
         <xforms:output ref="../@description" xhtml:size="30"/>
     </xforms:group>
     <!-- Description edition field -->
-    <xforms:group ref="@ui:save-relevant">
+    <xforms:group ref="@ui:input">
         <xforms:input ref="../@description" xhtml:size="30"/>
     </xforms:group>
     <!-- Trigger to edit description -->
-    <xforms:trigger appearance="xxforms:image" ref="@ui:edit-relevant">
+    <xforms:trigger appearance="xxforms:image" ref="@ui:edit-trigger">
         <xxforms:img src="/images/edit.gif"/>
-        <xforms:action ev:event="DOMActivate">
-            <xforms:setvalue ref="../@ui:edit-relevant" value="'false'"/>
-            <xforms:setvalue ref="../@ui:save-relevant" value="'true'"/>
-        </xforms:action>
+        <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'edit'"/>
     </xforms:trigger>
     <!-- Trigger to save description -->
-    <xforms:trigger appearance="xxforms:image" ref="@ui:save-relevant">
+    <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
         <xxforms:img src="/images/save.gif"/>
-        <xforms:action ev:event="DOMActivate">
-            <xforms:setvalue ref="../@ui:edit-relevant" value="'true'"/>
-            <xforms:setvalue ref="../@ui:save-relevant" value="'false'"/>
-        </xforms:action>
+        <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
     </xforms:trigger>
 </xhtml:span>

@@ -977,7 +977,11 @@ function xformsHandleResponse() {
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
                                                 // XForms output
                                                 var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
-                                                xformsReplaceNodeText(documentElement, newOutputControlValue);
+                                                if (xformsArrayContains(documentElementClasses, "xforms-output-image")) {
+                                                    documentElement.firstChild.src = newOutputControlValue;
+                                                } else {
+                                                    xformsReplaceNodeText(documentElement, newOutputControlValue);
+                                                }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-input")) {
                                                 var displayField = documentElement.childNodes[0];
                                                 var inputField = documentElement.childNodes[1];

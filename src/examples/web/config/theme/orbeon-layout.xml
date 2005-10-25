@@ -737,6 +737,7 @@ span.xforms-type-string {
 }
 
 #xforms-messages {
+    display: none;
     background: #fcc;
 }
 

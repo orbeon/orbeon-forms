@@ -16,6 +16,11 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.function.*;
 import org.orbeon.oxf.xforms.function.Last;
+import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
+import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
+import org.orbeon.oxf.xforms.function.exforms.EXFormsRequired;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsCallXPL;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsValid;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
@@ -104,13 +109,18 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("instance", Instance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // OPS call-xpl function
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}call-xpl", CallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        // OPS XXForms functions
+        // xxforms:call-xpl
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}call-xpl", XXFormsCallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         //StandardFunction.arg(e, 0, Type.ANY_URI_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 2, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 3, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+
+        // xxforms:valid
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}valid", XXFormsValid.class, 0, 1, 1, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
         // Useful XSLT function
         e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

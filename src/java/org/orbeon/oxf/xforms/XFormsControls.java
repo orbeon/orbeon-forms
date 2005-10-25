@@ -640,7 +640,7 @@ public class XFormsControls {
                             valueControls.add(controlInfo);
                         }
                     } else {
-                        // Control is not bound to a node - it becomes non-releveant
+                        // Control is not bound to a node - it becomes non-relevant
                         controlInfo.setReadonly(false);
                         controlInfo.setRequired(false);
                         controlInfo.setRelevant(false);
@@ -920,7 +920,7 @@ public class XFormsControls {
             final String controlName = controlElement.getName();
 
             final String controlId = controlElement.attributeValue("id");
-            final String effectiveControlId = controlId + idPostfix;
+            final String effectiveControlId = controlId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
 
             if (controlName.equals("repeat")) {
                 // Handle xforms:repeat
@@ -943,7 +943,8 @@ public class XFormsControls {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
                                     controlElementVisitorListener.startRepeatIteration(currentPosition);
-                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentPosition);
+                                    final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
+                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, newIdPostfix);
                                     controlElementVisitorListener.endRepeatIteration(currentPosition);
                                 }
                             } finally {

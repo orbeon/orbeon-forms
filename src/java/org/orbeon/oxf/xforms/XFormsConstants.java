@@ -98,6 +98,9 @@ public class XFormsConstants {
     public static final String XFORMS_DEFAULT_DATE_FORMAT_PROPERTY = "oxf.xforms.format.date";
     public static final String XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY = "oxf.xforms.format.dateTime";
     public static final String XFORMS_DEFAULT_TIME_FORMAT_PROPERTY = "oxf.xforms.format.time";
+
+    public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
+    public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     
     private XFormsConstants() {
         // Disallow contruction

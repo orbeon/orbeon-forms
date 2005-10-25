@@ -108,11 +108,11 @@
                     <content character-count="0" word-count="0"/>
                 </comment>
             </xforms:instance>
-            <!--<xforms:instance id="triggers">-->
-                <!--<triggers xmlns="">-->
-                    <!--<submit-comment readonly="0"/>-->
-                <!--</triggers>-->
-            <!--</xforms:instance>-->
+            <xforms:instance id="utils">
+                <utils xmlns="">
+                    <submit-comment-trigger/>
+                </utils>
+            </xforms:instance>
 
             <xforms:bind nodeset="instance('main')">
                 <xforms:bind nodeset="posts/day/date" type="xs:date"/>
@@ -138,12 +138,16 @@
                 <!--<xsd:pattern value="[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*"/>-->
             </xforms:bind>
 
-            <xforms:bind nodeset="instance('format-comment-response')"
-                         relevant="normalize-space(instance('new-comment')/comment/name) != ''
-                                   and normalize-space(instance('new-comment')/comment/content) != ''"/>
+            <!--<xforms:bind nodeset="instance('format-comment-response')"-->
+                         <!--relevant="normalize-space(instance('new-comment')/comment/name) != ''-->
+                                   <!--and normalize-space(instance('new-comment')/comment/content) != ''"/>-->
 
-            <!--<xforms:bind nodeset="instance('triggers')">-->
-                <!--<xforms:bind nodeset="submit-comment" readonly="@readonly = 'true'"/>-->
+            <!--<xforms:bind nodeset="instance('utils')">-->
+                <!--<xforms:bind nodeset="submit-comment-trigger"-->
+                             <!--readonly="not(xxforms:valid(instance('new-comment')/comment/name)-->
+                                       <!--and xxforms:valid(instance('new-comment')/comment/email)-->
+                                       <!--and xxforms:valid(instance('new-comment')/comment/uri)-->
+                                       <!--and xxforms:valid(instance('new-comment')/comment/content))"/>-->
             <!--</xforms:bind>-->
 
             <!-- Call comment saving service-->
@@ -154,6 +158,7 @@
                     <xforms:setvalue ref="instance('new-comment')/check/value2"/>
                     <xforms:setvalue ref="instance('new-comment')/check/value3"/>
                     <xforms:setvalue ref="instance('new-comment')/comment/content"/>
+                    <xforms:recalculate/>
                     <!-- TODO: Display status message -->
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
@@ -340,8 +345,7 @@
                                             <tr>
                                                 <td>
                                                     <span style="white-space: nowrap">
-                                                        <!--<xforms:trigger ref="instance('triggers')/submit-comment">-->
-                                                        <xforms:trigger>
+                                                        <xforms:trigger ref="instance('utils')/submit-comment-trigger">
                                                             <xforms:label>Submit Comment</xforms:label>
                                                             <xforms:action ev:event="DOMActivate">
                                                                 <xforms:setvalue ref="instance('add-comment-request')/comment/blog-id" value="instance('main')/submission/*/blog-id"/>
@@ -406,7 +410,7 @@
                                             <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
                                                 Comment by
                                                 <!--<a href="mailto:{$instance/form/comment/email}"> xxx -->
-                                                <xforms:output ref="poster-info/name"/>
+                                                    <xforms:output ref="poster-info/name"/>
                                                 <xforms:output value="' @ '"/>
                                                 <xforms:output ref="comment-info/date-created"/>
                                                 <xforms:output value="' ('"/>

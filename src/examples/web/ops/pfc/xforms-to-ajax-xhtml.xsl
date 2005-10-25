@@ -23,6 +23,9 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:output name="xml" method="xml"/>
 
+    <xsl:variable name="repeat-hiearchy-separator-1" select="'&#xb7;'" as="xs:string"/><!-- middle dot -->
+    <xsl:variable name="repeat-hiearchy-separator-2" select="'-'" as="xs:string"/>
+
     <xsl:variable name="request" as="element()" 
         select="doc('input:request')/xxforms:event-request"/>
     <xsl:variable name="response" as="element()" 
@@ -189,6 +192,7 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="label-value" select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
 
         <xsl:choose>
             <!-- Link appearance -->
@@ -198,7 +202,7 @@
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="xforms:label"/>
+                    <xsl:value-of select="$label-value"/>
                 </xhtml:a>
             </xsl:when>
             <!-- Image appearance -->
@@ -206,7 +210,7 @@
                             and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'image'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
-                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{xforms:label}" >
+                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{$label-value}" >
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
                     <xsl:copy-of select="xxforms:img/@* except (xxforms:img/@src, xxforms:img/@alt)"/>
                 </xhtml:input>
@@ -226,6 +230,7 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="label-value" select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
 
         <xsl:choose>
             <!-- Link appearance -->
@@ -235,7 +240,7 @@
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="xforms:label"/>
+                    <xsl:value-of select="$label-value"/>
                 </xhtml:a>
             </xsl:when>
             <!-- Image appearance -->
@@ -243,7 +248,7 @@
                             and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'image'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
-                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{xforms:label}" >
+                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{$label-value}" >
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
                     <xsl:copy-of select="xxforms:img/@* except (xxforms:img/@src, xxforms:img/@alt)"/>
                 </xhtml:input>
@@ -546,18 +551,19 @@
         <xsl:if test="$top-level-repeat or not($generate-template)">
             <!-- Repeat content for the number of occurrences the XForms Server gives us -->
             <xsl:for-each select="(1 to $current-repeat-iteration/@occurs)">
+                <xsl:variable name="current-iteration" select="current()"/>
                 <!-- Delimiter: between repeat entries -->
-                <xsl:if test="current() > 1">
+                <xsl:if test="$current-iteration > 1">
                     <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
                 </xsl:if>
                 <!-- Is the current iteration selected? -->
-                <xsl:variable name="current-repeat-selected" as="xs:boolean" select="$repeat-selected and current() = $current-repeat-index/@index"/>
+                <xsl:variable name="current-repeat-selected" as="xs:boolean" select="$repeat-selected and $current-iteration = $current-repeat-index/@index"/>
                 <!-- Is the current iteration relevant? -->
                 <xsl:variable name="action-repeat-iteration" as="element()"
-                    select="$response/xxforms:action/xxforms:control-values/xxforms:repeat-iteration[@id = $id and @iteration = current()]"/>
+                    select="$response/xxforms:action/xxforms:control-values/xxforms:repeat-iteration[@id = $id and @iteration = $current-iteration]"/>
                 <xsl:variable name="current-repeat-relevant" as="xs:boolean" select="$action-repeat-iteration/@relevant = 'true'"/>
                 <!-- Classes we add on the element in the current repeat iteration -->
-                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, '-'))"/>
+                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, $repeat-hiearchy-separator-2))"/>
                 <xsl:variable name="added-classes" as="xs:string*"
                     select="(if ($current-repeat-selected) then
                         concat('xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2') else (),
@@ -565,7 +571,7 @@
                 <!-- Get children of current repeat iteration adding a span element around text nodes -->
                 <xsl:variable name="current-repeat-children-nodes" as="node()*">
                     <xsl:apply-templates select="$xforms-repeat/node()">
-                        <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
+                        <xsl:with-param name="id-postfix" select="if ($id-postfix = '') then concat($repeat-hiearchy-separator-1, $current-iteration) else concat($id-postfix, $repeat-hiearchy-separator-2, $current-iteration)" tunnel="yes"/>
                         <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
                         <xsl:with-param name="generate-template" select="false()" tunnel="yes"/>
                         <xsl:with-param name="repeat-selected" select="$current-repeat-selected" tunnel="yes"/>

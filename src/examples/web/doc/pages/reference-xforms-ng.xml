@@ -409,5 +409,41 @@
                 </p>
             </section>
         </section>
+        <section>
+            <title>Extension Functions</title>
+            <p>
+                OPS implements some extension functions which can be used from XPath expressions in
+                XForms documents.
+            </p>
+            <section>
+                <title>OPS Extensions</title>
+                <p>
+                    The following functions are implemented:
+                </p>
+                <ul>
+                    <li>
+                        <p><code>xxforms:call-xpl()</code> TODO</p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>eXForms Extensions</title>
+                <p>
+                    The following <a href="http://www.exforms.org/mips.html">functions from
+                    eXForms</a> are implemented:
+                </p>
+                <ul>
+                    <li>
+                        <p><code>exf:relevant()</code></p>
+                    </li>
+                    <li>
+                        <p><code>exf:readonly()</code></p>
+                    </li>
+                    <li>
+                        <p><code>exf:required()</code></p>
+                    </li>
+                </ul>
+           </section>
+        </section>
     </body>
 </document>

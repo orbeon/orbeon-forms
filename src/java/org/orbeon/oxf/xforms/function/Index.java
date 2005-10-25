@@ -55,7 +55,7 @@ public class Index extends XFormsFunction {
 
             if (index == -1) {
                 // Dispatch exception event
-                final String message = "Function index uses repeat id '" + repeatId + "' which it not in scope";
+                final String message = "Function index uses repeat id '" + repeatId + "' which is not in scope";
                 final RuntimeException exception = new ValidationException(message, null);
 
                 // Obtain PipelineContext - this function is always called from controls so

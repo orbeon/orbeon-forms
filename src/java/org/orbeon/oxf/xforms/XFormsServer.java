@@ -525,9 +525,9 @@ public class XFormsServer extends ProcessorImpl {
 //                            }
 //                        }
 
-                        final int indexOfDash = repeatControlId.indexOf('-');
-                        final String templateId = (indexOfDash == -1) ? repeatControlId : repeatControlId.substring(0, indexOfDash);
-                        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
+                        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+                        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+                        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
@@ -576,11 +576,11 @@ public class XFormsServer extends ProcessorImpl {
     private void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsControls.RepeatControlInfo repeatControlInfo, int idSuffix) {
 
         final String repeatControlId = repeatControlInfo.getId();
-        final int indexOfDash = repeatControlId.indexOf('-');
-        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
+        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", "-" + idSuffix});
+                new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", Integer.toString(idSuffix) });
     }
 
     private void outputSubmissionInfo(PipelineContext pipelineContext, ContentHandlerHelper ch) {

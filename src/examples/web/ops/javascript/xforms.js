@@ -25,6 +25,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS = 100;
+var REPEAT_HIERARCHY_SEPARATOR_1 = "\xB7";
+var REPEAT_HIERARCHY_SEPARATOR_2 = "-";
 
 /* * * * * * Utility functions * * * * * */
 
@@ -184,9 +186,26 @@ function xformsStringReplace(node, placeholder, replacement) {
     xformsStringReplaceWorker(node);
 }
 
+function xformsAppendRepeatSuffix(id, suffix) {
+
+//    xformsLog("xformsAppendRepeatSuffix:id " + id);
+//    xformsLog("xformsAppendRepeatSuffix:suffix " + suffix);
+
+    if (suffix == "")
+        return id;
+
+    if (suffix.charAt(0) == REPEAT_HIERARCHY_SEPARATOR_2)
+        suffix = suffix.substring(1);
+
+    if (id.indexOf(REPEAT_HIERARCHY_SEPARATOR_1) == -1)
+        return id + REPEAT_HIERARCHY_SEPARATOR_1 + suffix;
+    else
+        return id + REPEAT_HIERARCHY_SEPARATOR_2 + suffix;
+}
+
 /**
- * Locate the delimiter at the given position starting from a repeat begin element.
- */
+* Locate the delimiter at the given position starting from a repeat begin element.
+*/
 function xformsFindRepeatDelimiter(repeatId, index) {
 
     // Find id of repeat begin for the current repeatId
@@ -196,7 +215,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
         while (true) {
             var parent = document.xformsRepeatTreeChildToParent[currentId];
             if (parent == null) break;
-            parentRepeatIndexes = "-" + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
+            parentRepeatIndexes = REPEAT_HIERARCHY_SEPARATOR_2 + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
             currentId = parent;
         }
     }
@@ -770,8 +789,8 @@ function xformsPageLoaded() {
 
 function xformsGetLocalName(element) {
     if (element.nodeType == 1) {
-        return element.tagName.indexOf(":") == -1 
-            ? element.tagName 
+        return element.tagName.indexOf(":") == -1
+            ? element.tagName
             : element.tagName.substr(element.tagName.indexOf(":") + 1);
     } else {
         return null;
@@ -847,19 +866,19 @@ function xformsHandleResponse() {
                                             }
                                         }
                                     } else {
-                                    
+
                                         // Case of checkboxes / radio bottons
-                                        
+
                                         // Get element following control
                                         var template = documentElement.nextSibling;
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
-                                            
+
                                         // Get its child element and clone
                                         template = template.firstChild;
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
-                                            
+
                                         // Function to find the input element below a given node
                                         function getInput(node) {
                                             if (node.nodeType == ELEMENT_TYPE) {
@@ -889,9 +908,9 @@ function xformsHandleResponse() {
                                             var itemElement = itemsetElement.childNodes[k];
                                             if (itemElement.nodeType == ELEMENT_TYPE) {
                                                 var templateClone = template.cloneNode(true);
-                                                xformsStringReplace(templateClone, "$xforms-template-label$", 
+                                                xformsStringReplace(templateClone, "$xforms-template-label$",
                                                     itemElement.getAttribute("label"));
-                                                xformsStringReplace(templateClone, "$xforms-template-value$", 
+                                                xformsStringReplace(templateClone, "$xforms-template-value$",
                                                     itemElement.getAttribute("value"));
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement.getAttribute("value")] == true)
@@ -899,7 +918,7 @@ function xformsHandleResponse() {
                                                 documentElement.appendChild(templateClone);
                                             }
                                         }
-                                        
+
                                         // Compute value, of checkboxes/radio buttons and register listeners
                                         xformsInitCheckesRadios(documentElement);
                                     }
@@ -1099,9 +1118,11 @@ function xformsHandleResponse() {
                                                         function addSuffixToIds(element, idSuffix, repeatDepth) {
                                                             var idSuffixWithDepth = idSuffix;
                                                             for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-                                                                 idSuffixWithDepth += "-1";
-                                                            if (element.id) element.id += idSuffixWithDepth;
-                                                            if (element.htmlFor) element.htmlFor += idSuffixWithDepth;
+                                                                 idSuffixWithDepth += REPEAT_HIERARCHY_SEPARATOR_2 + "1";
+                                                            if (element.id)
+                                                                element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
+                                                            if (element.htmlFor)
+                                                                element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
                                                             // Remove references to hint, help, alert, label as they might have changed
                                                             if (xformsIsDefined(element.labelElement)) element.labelElement = null;
                                                             if (xformsIsDefined(element.hintElement)) element.hintElement = null;
@@ -1118,7 +1139,7 @@ function xformsHandleResponse() {
                                                                 }
                                                             }
                                                         }
-                                                        addSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : "-" + parentIndexes + idSuffix, 0);
+                                                        addSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, 0);
                                                         // Remove "xforms-repeat-template" from classes on copy of element
                                                         var nodeCopyClasses = nodeCopy.className.split(" ");
                                                         var nodeCopyNewClasses = new Array();
@@ -1151,7 +1172,7 @@ function xformsHandleResponse() {
                                                     afterInsertionPoint = cursor;
                                                 } else {
                                                     // Nested repeat: does not contain a template
-                                                    var repeatEnd = document.getElementById("repeat-end-" + repeatId + "-" + parentIndexes);
+                                                    var repeatEnd = document.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
                                                     afterInsertionPoint = repeatEnd;
                                                 }
                                             }
@@ -1174,8 +1195,7 @@ function xformsHandleResponse() {
                                             var parentIndexes = deleteElementElement.getAttribute("parent-indexes");
                                             var count = deleteElementElement.getAttribute("count");
                                             // Find end of the repeat
-                                            var repeatEnd = document.getElementById("repeat-end-" + deleteId
-                                                + (parentIndexes == "" ? "" : "-" + parentIndexes));
+                                            var repeatEnd = document.getElementById("repeat-end-" + xformsAppendRepeatSuffix(deleteId, parentIndexes));
                                             // Find last element to delete
                                             var lastElementToDelete;
                                             {

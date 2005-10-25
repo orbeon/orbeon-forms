@@ -14,30 +14,35 @@
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:ui="http://www.example.com/ui"
+        xmlns:xi="http://www.w3.org/2001/XInclude">
     <xhtml:head>
         <xhtml:title>XForms Repeating Elements</xhtml:title>
         <xforms:model>
-            <xforms:instance id="todo-list">
-                <todo-list>
-                    <todo description="Bills to pay">
-                        <task description="Mobile phone" done=""/>
-                        <task description="Internet service provider" done=""/>
-                        <task description="Lease" done="true"/>
-                        <task description="" done=""/>
-                    </todo>
-                    <todo description="Buy groceries">
-                        <task description="Milk" done=""/>
-                        <task description="Bread" done=""/>
-                        <task description="Watermelon" done=""/>
-                        <task description="Cereals" done=""/>
-                        <task description="Jam" done=""/>
-                        <task description="" done=""/>
-                    </todo>
-                    <todo description="">
-                        <task description="" done=""/>
-                    </todo>
-                </todo-list>
+            <!-- Data entered by the user -->
+            <xforms:instance id="lists">
+                <lists initialized="false">
+                    <list description="Buy groceries" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
+                        <task description="Milk" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Bread" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Watermelon" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Cereals" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Jam" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                    </list>
+                    <list description="Bills to pay" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
+                        <task description="Mobile phone" due="2005-10-24" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Internet service provider" due="2005-10-29" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Lease" due="2005-11-01" done="true" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                    </list>
+                    <list description="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                    </list>
+                </lists>
             </xforms:instance>
             <xforms:instance id="triggers">
                 <triggers>
@@ -46,91 +51,171 @@
                 </triggers>
             </xforms:instance>
             <xforms:submission method="post"/>
-            <xforms:bind nodeset="/todo-list/todo" relevant="count(following-sibling::todo) > 0"/>
-            <xforms:bind nodeset="/todo-list/todo/@description" readonly="count(../task) > 1 and count(../task[@done = '']) = 1"/>
-            <xforms:bind nodeset="/todo-list/todo/task" relevant="count(following-sibling::task) > 0"/>
-            <xforms:bind nodeset="/todo-list/todo/task/@description" readonly="../@done = 'true'"/>
-            <xforms:bind nodeset="instance('triggers')/remove-todo" readonly="count(instance('todo-list')/todo) = 1"/>
-            <xforms:bind nodeset="instance('triggers')/remove-todo-item" readonly="count(instance('todo-list')/todo[index('todoSet')]/task) = 1"/>
+            <!-- Rules that apply to the data entered by the user -->
+            <xforms:bind nodeset="/lists/list" relevant="count(following-sibling::list) > 0">
+                <xforms:bind nodeset="@description" readonly="count(../task) > 1 and count(../task[@done = '']) = 1"/>
+                <xforms:bind nodeset="task" relevant="count(following-sibling::task) > 0">
+                    <xforms:bind nodeset="@description" readonly="../@done = 'true'"/>
+                    <xforms:bind nodeset="@due" readonly="../@done = 'true'" relevant=". != ''" type="xs:date"/>
+                </xforms:bind>
+            </xforms:bind>
+            <!-- Rules that apply to the UI -->
+            <xforms:bind nodeset="/lists/list">
+                <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view'"/>
+                <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit'"/>
+                <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
+                <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit'"/>
+                <xforms:bind nodeset="task">
+                    <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view'"/>
+                    <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit'"/>
+                    <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
+                    <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit'"/>
+                </xforms:bind>
+            </xforms:bind>
+            <xforms:bind nodeset="instance('triggers')">
+                <xforms:bind nodeset="remove-list" readonly="count(instance('lists')/list) = 1"/>
+                <xforms:bind nodeset="remove-list-item" readonly="count(instance('lists')/list[index('listSet')]/task) = 1"/>
+            </xforms:bind>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group ref="/todo-list">
-            <xforms:recalculate ev:event="DOMFocusIn"/> <!-- Doesn't seem to have an effect -->
-            <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td>
-                        <!-- Actions on to-dos and tasks-->
-                        <xhtml:fieldset>
-                            <xhtml:legend>To-do List Actions</xhtml:legend>
-                            <!-- Add/remove current to-do -->
-                            <xhtml:p>
-                                <xhtml:span class="fixed-width">Todo:</xhtml:span>
-                                <xforms:trigger>
-                                    <xforms:label>Add</xforms:label>
-                                    <xforms:insert ev:event="DOMActivate" nodeset="/todo-list/todo"
-                                        at="min((last(), index('todoSet') + 1))" position="before"/>
-                                </xforms:trigger>
-                                <xforms:trigger ref="instance('triggers')/remove-todo">
-                                    <xforms:label>Remove</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:delete nodeset="/todo-list/todo"
-                                            at="index('todoSet')"/>
-                                        <xforms:setindex repeat="todoSet"
-                                            index="max((min((index('todoSet'), count(/todo-list/todo) - 1)), 1))"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xhtml:p>
-                            <!-- Add/remove current task -->
-                            <xhtml:p>
-                                <xhtml:span class="fixed-width">Todo item:</xhtml:span>
-                                <xforms:trigger>
-                                    <xforms:label>Add</xforms:label>
-                                    <xforms:insert ev:event="DOMActivate" nodeset="/todo-list/todo[index('todoSet')]/task"
-                                        at="min((last(), index('taskSet') + 1))" position="before"/>
-                                </xforms:trigger>
-                                <xforms:trigger ref="instance('triggers')/remove-todo-item">
-                                    <xforms:label>Remove</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:delete nodeset="/todo-list/todo[index('todoSet')]/task"
-                                            at="index('taskSet')"/>
-                                        <xforms:setindex repeat="taskSet"
-                                            index="max((min((index('taskSet'), count(/todo-list/todo[index('todoSet')]/task) - 1)), 1))"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xhtml:p>
-                        </xhtml:fieldset>
-                        <xhtml:div style="margin-top: 3em; padding-left: 1em">
-                            <!-- Iterate over todos -->
-                            <xforms:repeat nodeset="todo" id="todoSet">
-                                <xhtml:div style="padding: .5em 1em .5em 1em">
-                                    <xhtml:p>
-                                        <xforms:input ref="@description" xhtml:size="30"/>
-                                        <xforms:output value="if (count(task) = 1) then ''
-                                            else if (count(task[@done = '']) = 1) then 'Done'
-                                            else concat(count(task[@done = '']) - 1, ' left')"/>
-                                    </xhtml:p>
-                                    <!-- Iterate over tasks -->
-                                    <xforms:repeat nodeset="task" id="taskSet">
-                                        <xhtml:p>
-                                            <xforms:output value="if (@done = '') then
-                                                concat(count(preceding-sibling::task[@done = '']) + 1, '.') else '-'"
-                                                style="width: 2em; display: -moz-inline-box"/>
-                                            <xforms:input ref="@description" xhtml:size="30"/>
-                                            <xforms:select ref="@done" appearance="full">
-                                                <xforms:item>
-                                                    <xforms:label>Done</xforms:label>
-                                                    <xforms:value>true</xforms:value>
-                                                </xforms:item>
-                                            </xforms:select>
-                                        </xhtml:p>
-                                    </xforms:repeat>
-                                </xhtml:div>
-                            </xforms:repeat>
-                        </xhtml:div>
-                    </td>
-                </tr>
-            </table>
-        </xforms:group>
+        <!-- Styles used just for this example -->
+        <xhtml:style type="text/css">
+            .actions-label { margin-top: 1em; margin-bottom: .5em; }
+            .actions-list { margin-left: 2em; }
+            .actions-action { margin-left: 1em; }
+            .lists-container   { margin-top: 2em; }
+            .list-container   { padding: 5px; margin-top:1em; margin-bottom: 5px; }
+            .todo-conatiner   { padding: 4px; }
+        </xhtml:style>
+
+        <!-- Actions on list -->
+        <xhtml:div class="actions-label">Actions on selected todo list:</xhtml:div>
+        <xhtml:div class="actions-list">
+            <!-- Edit description -->
+            <xforms:group class="actions-action">
+                <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'edit'"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/edit.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Edit description</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Create new list -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list"
+                    at="min((last(), index('listSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/add.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Create new list</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Delete current list -->
+            <xforms:group class="actions-action">
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:delete nodeset="/lists/list"
+                        at="index('listSet')"/>
+                    <xforms:setindex repeat="listSet"
+                        index="max((min((index('listSet'), count(/lists/list) - 1)), 1))"/>
+                </xforms:action>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/remove.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Delete current list</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+        </xhtml:div>
+
+        <!-- Actions on to-do -->
+        <xhtml:div class="actions-label">Actions on selected todo:</xhtml:div>
+        <xhtml:div class="actions-list">
+            <!-- Edit description -->
+            <xforms:group class="actions-action">
+                <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'edit'"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/edit.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Edit description</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Create new to-do -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list[index('listSet')]/task"
+                    at="min((last(), index('taskSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/add.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Add new todo</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Delete current to-do -->
+            <xforms:group class="actions-action">
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:delete nodeset="/lists/list[index('listSet')]/task"
+                        at="index('taskSet')"/>
+                    <xforms:setindex repeat="taskSet"
+                        index="max((min((index('taskSet'), count(/lists/list[index('listSet')]/task) - 1)), 1))"/>
+                </xforms:action>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/remove.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Delete current todo</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Add due date -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list[index('listSet')]/task"
+                    at="min((last(), index('taskSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/date-add.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Add due date</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+        </xhtml:div>
+
+        <!-- Iterate over lists -->
+        <xhtml:div class="lists-container">
+            <xforms:repeat nodeset="list" id="list">
+                <xhtml:div class="list-container">
+                    <xhtml:div>
+                        <!-- Description -->
+                        <xi:include href="view-description.xhtml"/>
+                        <!-- How many to-do are left -->
+                        <xforms:output value="if (count(task) = 1) then ''
+                            else if (count(task[@done = '']) = 1) then '(Done)'
+                            else concat('(', count(task[@done = '']) - 1, ' left)')"/>
+                    </xhtml:div>
+                    <xhtml:div style="padding: 5px">
+                        <!-- Iterate over to-dos -->
+                        <xforms:repeat nodeset="task" id="task">
+                            <xhtml:div class="todo-container">
+                                <!-- Icon signaling the status of this to-do -->
+                                <xforms:output value="concat('../images/status-',
+                                    if (@done = 'true') then 'done' else 'in-progress', '.gif')" mediatype="image/*"/>
+                                <!-- Position of current to-do -->
+                                <xforms:output value="if (@done = '') then
+                                    concat(count(preceding-sibling::task[@done = '']) + 1, '.') else '-'"
+                                    style="width: 15px; display: -moz-inline-box"/>
+                                <!-- Description -->
+                                <xi:include href="view-description.xhtml"/>
+                                <xforms:group ref="@due">
+                                    -- due on:
+                                    <xforms:input ref="."/>
+                                </xforms:group>
+                            </xhtml:div>
+                        </xforms:repeat>
+                    </xhtml:div>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

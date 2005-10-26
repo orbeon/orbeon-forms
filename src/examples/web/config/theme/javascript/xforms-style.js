@@ -33,15 +33,23 @@ function xformsUpdateStyle(element) {
             else xformsAddClass(element, "xforms-disabled");
         }
         if (xformsIsDefined(readonly)) {
-            var isXFormsInput = xformsArrayContains(element.className.split(" "), "xforms-input");
-            // Set form field to disabled
-            var disabledTarget = isXFormsInput ? element.childNodes[1] : element;
-            if (readonly) disabledTarget.setAttribute("disabled", "disabled");
-            else disabledTarget.removeAttribute("disabled");
-            // For input field, grey out value
-            if (isXFormsInput)
-                if (readonly) xformsAddClass(element.childNodes[0], "xforms-readonly");
-                else xformsRemoveClass(element.childNodes[0], "xforms-readonly");
+            var classes = element.className.split(" ");
+            if (xformsArrayContains(classes, "xforms-input")) {
+                // XForms input
+                var displayValue = element.childNodes[0];
+                if (readonly) xformsAddClass(displayValue, "xforms-readonly");
+                else xformsRemoveClass(displayValue, "xforms-readonly");
+                var textField = element.childNodes[1];
+                if (readonly) textField.setAttribute("disabled", "disabled");
+                else textField.removeAttribute("disabled");
+            } else if (xformsArrayContains(classes, "xforms-output")) {
+                if (readonly) xformsAddClass(element, "xforms-readonly");
+                else xformsRemoveClass(element, "xforms-readonly");
+            } else {
+                // Other controls
+                if (readonly) element.setAttribute("disabled", "disabled");
+                else element.removeAttribute("disabled");
+            }
         }
     }
 

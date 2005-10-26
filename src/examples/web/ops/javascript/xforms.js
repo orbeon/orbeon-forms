@@ -215,7 +215,9 @@ function xformsFindRepeatDelimiter(repeatId, index) {
         while (true) {
             var parent = document.xformsRepeatTreeChildToParent[currentId];
             if (parent == null) break;
-            parentRepeatIndexes = REPEAT_HIERARCHY_SEPARATOR_2 + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
+            var grandParent = document.xformsRepeatTreeChildToParent[parent];
+            parentRepeatIndexes = (grandParent == null ? REPEAT_HIERARCHY_SEPARATOR_1 : REPEAT_HIERARCHY_SEPARATOR_2)
+                    + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
             currentId = parent;
         }
     }

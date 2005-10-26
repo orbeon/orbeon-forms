@@ -563,7 +563,7 @@
                     select="$response/xxforms:action/xxforms:control-values/xxforms:repeat-iteration[@id = $id and @iteration = $current-iteration]"/>
                 <xsl:variable name="current-repeat-relevant" as="xs:boolean" select="$action-repeat-iteration/@relevant = 'true'"/>
                 <!-- Classes we add on the element in the current repeat iteration -->
-                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, $repeat-hiearchy-separator-2))"/>
+                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, $repeat-hiearchy-separator-1))"/>
                 <xsl:variable name="added-classes" as="xs:string*"
                     select="(if ($current-repeat-selected) then
                         concat('xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2') else (),

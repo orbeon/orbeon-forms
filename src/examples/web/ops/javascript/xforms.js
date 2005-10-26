@@ -447,6 +447,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
         var isXFormsTrigger = false;
+        var isXFormsOutput = false;
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
@@ -466,6 +467,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsComboboxList = true;
             if (className == "xforms-trigger")
                 isXFormsTrigger = true;
+            if (className == "xforms-output")
+                isXFormsOutput = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -572,6 +575,13 @@ function xformsInitializeControlsUnder(root) {
                     xformsAddEventListener(document, "mousemove", rangeMouseMove);
                     xformsAddEventListener(document, "mouseup", rangeMouseUp);
                 }
+            } else if (isXFormsOutput) {
+                xformsAddEventListener(control, "click", function(event) {
+                    var events = new Array();
+                    var target = getEventTarget(event);
+                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                    xformsFireEvents(events);
+                });
             } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
                 // Don't add listeners on spans
             } else {

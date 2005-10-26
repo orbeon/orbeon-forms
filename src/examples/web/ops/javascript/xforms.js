@@ -1380,6 +1380,18 @@ function xformsHandleResponse() {
                                 }
                                 break;
                             }
+
+                            // Set focus to a control
+                            case "setfocus": {
+                                var setfocusElement = actionElement.childNodes[actionIndex];
+                                var controlId = setfocusElement.getAttribute("control-id");
+                                var control = document.getElementById(controlId);
+                                var controlClasses = control.className.split(" ");
+                                if (xformsArrayContains(controlClasses, "xforms-input"))
+                                    control = control.childNodes[1];
+                                control.focus();
+                                break;
+                            }
                         }
                     }
                 }

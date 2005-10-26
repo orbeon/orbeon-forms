@@ -26,21 +26,21 @@
             <xforms:instance id="lists">
                 <lists initialized="false">
                     <list description="Buy groceries" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
-                        <task description="Milk" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Bread" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Watermelon" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Cereals" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Jam" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Milk" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Bread" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Watermelon" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Cereals" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Jam" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
                     </list>
                     <list description="Bills to pay" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
-                        <task description="Mobile phone" due="2005-10-24" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Internet service provider" due="2005-10-29" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="Lease" due="2005-11-01" done="true" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
-                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="Mobile phone" due="2005-10-24" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Internet service provider" due="2005-10-29" done="" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="Lease" due="2005-11-01" done="true" ui:mode="view" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
                     </list>
                     <list description="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="">
-                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger=""/>
+                        <task description="" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:edit-trigger="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
                     </list>
                 </lists>
             </xforms:instance>
@@ -66,6 +66,8 @@
                 <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
                 <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit'"/>
                 <xforms:bind nodeset="task">
+                    <xforms:bind nodeset="@ui:mark-done-trigger" relevant="../@done = ''"/>
+                    <xforms:bind nodeset="@ui:mark-not-done-trigger" relevant="../@done = 'true'"/>
                     <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view'"/>
                     <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit'"/>
                     <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
@@ -180,6 +182,39 @@
                     <xforms:label>Add due date</xforms:label>
                 </xforms:trigger>
             </xforms:group>
+            <!-- Remove due date -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list[index('listSet')]/task"
+                    at="min((last(), index('taskSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/date-remove.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Remove due date</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Mark done -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list[index('listSet')]/task"
+                    at="min((last(), index('taskSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/mark-done.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Mark done</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
+            <!-- Not done -->
+            <xforms:group class="actions-action">
+                <xforms:insert ev:event="DOMActivate" nodeset="/lists/list[index('listSet')]/task"
+                    at="min((last(), index('taskSet') + 1))" position="before"/>
+                <xforms:trigger appearance="xxforms:image">
+                    <xxforms:img src="/images/mark-undo.gif"/>
+                </xforms:trigger>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Not done</xforms:label>
+                </xforms:trigger>
+            </xforms:group>
         </xhtml:div>
 
         <!-- Iterate over lists -->
@@ -198,9 +233,20 @@
                         <!-- Iterate over to-dos -->
                         <xforms:repeat nodeset="task" id="task">
                             <xhtml:div class="todo-container">
-                                <!-- Icon signaling the status of this to-do -->
-                                <xforms:output value="concat('../images/status-',
-                                    if (@done = 'true') then 'done' else 'in-progress', '.gif')" mediatype="image/*"/>
+                                <!-- In progress icon -->
+                                <xforms:group ref="@ui:mark-done-trigger">
+                                    <xforms:setvalue ref="../@done" ev:event="DOMActivate">true</xforms:setvalue>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xxforms:img src="/images/status-in-progress.gif"/>
+                                    </xforms:trigger>
+                                </xforms:group>
+                                <!-- Done icon -->
+                                <xforms:group ref="@ui:mark-not-done-trigger">
+                                    <xforms:setvalue ref="../@done" ev:event="DOMActivate"/>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xxforms:img src="/images/status-done.gif"/>
+                                    </xforms:trigger>
+                                </xforms:group>
                                 <!-- Position of current to-do -->
                                 <xforms:output value="if (@done = '') then
                                     concat(count(preceding-sibling::task[@done = '']) + 1, '.') else '-'"

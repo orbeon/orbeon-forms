@@ -107,7 +107,10 @@
         <xhtml:div class="actions-list">
             <!-- Edit description -->
             <xforms:group ref="@ui:list-edit-trigger" class="actions-action">
-                <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/@ui:mode" value="'edit'"/>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="/lists/list[index('list')]/@ui:mode" value="'edit'"/>
+                    <xforms:setfocus control="list-description-input"/>
+                </xforms:action>
                 <xforms:trigger appearance="xxforms:image">
                     <xxforms:img src="/images/edit.gif"/>
                 </xforms:trigger>
@@ -147,7 +150,10 @@
         <xhtml:div class="actions-list">
             <!-- Edit description -->
             <xforms:group ref="@ui:todo-edit-trigger" class="actions-action">
-                <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode" value="'edit'"/>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode" value="'edit'"/>
+                    <xforms:setfocus control="todo-description-input"/>
+                </xforms:action>
                 <xforms:trigger appearance="xxforms:image">
                     <xxforms:img src="/images/edit.gif"/>
                 </xforms:trigger>
@@ -203,7 +209,10 @@
             </xforms:group>
             <!-- Mark done -->
             <xforms:group ref="@ui:mark-done-trigger" class="actions-action">
-                <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@done">true</xforms:setvalue>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done">true</xforms:setvalue>
+                    <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode">view</xforms:setvalue>
+                </xforms:action>
                 <xforms:trigger appearance="xxforms:image">
                     <xxforms:img src="/images/mark-done.gif"/>
                 </xforms:trigger>
@@ -228,8 +237,19 @@
             <xforms:repeat nodeset="list" id="list">
                 <xhtml:div class="list-container">
                     <xhtml:div>
-                        <!-- Description -->
-                        <xi:include href="view-description.xhtml"/>
+                        <!-- Description value -->
+                        <xforms:group ref="@ui:output">
+                            <xforms:output ref="../@description"/>
+                        </xforms:group>
+                        <!-- Description edition field -->
+                        <xforms:group ref="@ui:input">
+                            <xforms:input id="list-description-input" ref="../@description" xhtml:size="30"/>
+                        </xforms:group>
+                        <!-- Trigger to save description -->
+                        <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
+                            <xxforms:img src="/images/save.gif"/>
+                            <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
+                        </xforms:trigger>
                         <!-- How many to-do are left -->
                         <xforms:output value="if (count(todo) = 1) then ''
                             else if (count(todo[@done = '']) = 1) then '(Done)'
@@ -241,7 +261,10 @@
                             <xhtml:div class="todo-container">
                                 <!-- In progress icon -->
                                 <xforms:group ref="@ui:mark-done-trigger" class="todo-status">
-                                    <xforms:setvalue ref="../@done" ev:event="DOMActivate">true</xforms:setvalue>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="../@done" >true</xforms:setvalue>
+                                        <xforms:setvalue ref="../@ui:mode" >view</xforms:setvalue>
+                                    </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xxforms:img src="/images/status-in-progress.gif"/>
                                     </xforms:trigger>
@@ -257,8 +280,19 @@
                                 <xforms:output value="if (@done = '') then
                                     concat(count(preceding-sibling::todo[@done = '']) + 1, '.') else '-'"
                                     style="width: 15px; display: -moz-inline-box"/>
-                                <!-- Description -->
-                                <xi:include href="view-description.xhtml"/>
+                                <!-- Description value -->
+                                <xforms:group ref="@ui:output">
+                                    <xforms:output ref="../@description"/>
+                                </xforms:group>
+                                <!-- Description edition field -->
+                                <xforms:group ref="@ui:input">
+                                    <xforms:input id="todo-description-input" ref="../@description" xhtml:size="30"/>
+                                </xforms:group>
+                                <!-- Trigger to save descr  iption -->
+                                <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
+                                    <xxforms:img src="/images/save.gif"/>
+                                    <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
+                                </xforms:trigger>
                                 <xforms:group ref="@due">
                                     -- due on:
                                     <xforms:input ref="."/>

@@ -329,6 +329,12 @@
                     </li>
                     <li>
                         <p>
+                            <b>Image Mediatype.</b> The <code>xforms:output</code> control may refer
+                            to an image URI.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Message, Label, Help, Hint, and Alert.</b>
                             <code>xforms:label</code>, <code>xforms:help</code>,
                             <code>xforms:hint</code>, and <code>xforms:alert</code> may use an
@@ -342,6 +348,13 @@
                         </note>
                     </li>
                 </ul>
+                <p>
+                    URIs are resolved relatively to a <i>base URI</i>. The base URI is, by default,
+                    the external URL used to display the XForms page, with special handling of the
+                    servlet context, if necessary. It is also possible to override this behavior by
+                    adding <code>xml:base</code> attributes on <code>xforms:load</code> or any of
+                    its ancestor elements.
+                </p>
                 <!--<p>-->
                     <!--As a general rule, for URLs relative to the :-->
                 <!--</p>-->
@@ -388,29 +401,23 @@
                 <p>
                     The <code>xforms:load action</code> can refer to a resource to load either
                     through the <code>resource</code> attribute or using a single-node binding
-                    retrieving the URL from an XForms instance. In both cases, the value of the URL
-                    is resolved relatively to a base URL.
-                </p>
-                <p>
-                    This base URL is, by default, the external URL used to display the XForms page,
-                    with special handling of the servlet context, if necessary. It is also possible
-                    to override this behavior by adding <code>xml:base</code> attributes on
-                    <code>xforms:load</code> or any of its ancestor elements.
+                    retrieving the URI from an XForms instance. In both cases, the value of the URI
+                    is resolved relatively to the base URI.
                 </p>
                 <p>
                     The following assumes that OPS runs in the <code>/ops</code> servlet context:
                 </p>
                 <table>
                     <tr>
-                        <th>Base URL<br/>(External URL or <code>xml:base</code> attributes)</th>
-                        <th>Initial URL<br/>(<code>resource</code> or Single-Node Binding)</th>
+                        <th>Base URI<br/>(External URL or <code>xml:base</code> attributes)</th>
+                        <th>Initial URI<br/>(<code>resource</code> or Single-Node Binding)</th>
                         <th><code>show</code></th>
-                        <th>Resolved URL</th>
+                        <th>Resolved URI</th>
                         <th>Comment</th>
                     </tr>
                     <tr>
                         <td rowspan="6">
-                            <p>The following URL is loaded in a servlet:</p>
+                            <p>The following URI is loaded in a servlet:</p>
                             <p>
                                 <code>http://example.org/ops/my-page</code>
                             </p>
@@ -507,6 +514,14 @@
                 </table>
             </section>
             <section>
+                <title>Image Mediatype for <code>xforms:output</code></title>
+                <p>
+                    When an <code>xforms:output</code> control refers to an image URI, as documented
+                    <a href="#image-mediatype">below</a>, the resulting value is resolved
+                    relatively to the base URI.
+                </p>
+            </section>
+            <section>
                 <title>Submission</title>
                 <p>
                     TODO
@@ -561,40 +576,88 @@
             </section>
         </section>
         <section>
-            <title>Extension Functions</title>
-            <p>
-                OPS implements some extension functions which can be used from XPath expressions in
-                XForms documents.
-            </p>
+            <title>Extensions</title>
+            <a name="image-mediatype"/>
             <section>
-                <title>OPS Extensions</title>
+                <title>Media Type for <code>xforms:output</code></title>
                 <p>
-                    The following functions are implemented:
+                    In XForms 1.0, <code>xforms:output</code> is used to display text. However,
+                    based on a proposal in a draft version of XForms 1.1, OPS supports a
+                    <code>mediatype</code> attribute on that element. Currently, only image types
+                    are supported. When the following conditions are met for an
+                    <code>xforms:output</code> control:
                 </p>
                 <ul>
                     <li>
-                        <p><code>xxforms:call-xpl()</code> TODO</p>
+                        <p>
+                            The control has an optional <code>mediatype</code> attribute referring
+                            to an image, such as <code>image/*</code> or <code>image/jpeg</code>.
+                        </p>
                     </li>
-                </ul>
+                   <li>
+                        <p>
+                            The value is provided to the <code>xforms:output</code> control with
+                            the <code>value</code> attribute, or with a single-node binding to a
+                            node without type or with an <code>xs:anyURI</code> type.
+                        </p>
+                    </li>
+               </ul>
+                <p>
+                    The resulting value is interpreted as URI pointing to an image. The image is
+                    loaded where the <code>xforms:output</code> is located. When a single-node
+                    binding is used, it is possible to dynamically change the image pointed to. For
+                    example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
+                </xml-source>
+                <xml-source show-namespaces="false">
+                    <xforms:model>
+                        <xforms:instance>
+                            <image-uri/>
+                        </xforms:instance>
+                        <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
+                    </xforms:model>
+                    ...
+                    <xforms:output mediatype="image/*" ref="image-uri"/>
+                </xml-source>
             </section>
             <section>
-                <title>eXForms Extensions</title>
+                <title>XPath Extension Functions</title>
                 <p>
-                    The following <a href="http://www.exforms.org/mips.html">functions from
-                    eXForms</a> are implemented:
+                    OPS implements some extension functions which can be used from XPath expressions
+                    in XForms documents.
                 </p>
-                <ul>
-                    <li>
-                        <p><code>exf:relevant()</code></p>
-                    </li>
-                    <li>
-                        <p><code>exf:readonly()</code></p>
-                    </li>
-                    <li>
-                        <p><code>exf:required()</code></p>
-                    </li>
-                </ul>
-           </section>
+                <section>
+                    <title>OPS Extensions</title>
+                    <p>
+                        The following functions are implemented:
+                    </p>
+                    <ul>
+                        <li>
+                            <p><code>xxforms:call-xpl()</code> TODO</p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <title>eXForms Extensions</title>
+                    <p>
+                        The following <a href="http://www.exforms.org/mips.html">functions from
+                        eXForms</a> are implemented:
+                    </p>
+                    <ul>
+                        <li>
+                            <p><code>exf:relevant()</code></p>
+                        </li>
+                        <li>
+                            <p><code>exf:readonly()</code></p>
+                        </li>
+                        <li>
+                            <p><code>exf:required()</code></p>
+                        </li>
+                    </ul>
+                </section>
+            </section>
         </section>
     </body>
 </document>

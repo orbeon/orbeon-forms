@@ -42,7 +42,11 @@ function xformsUpdateStyle(element) {
                 var textField = element.childNodes[1];
                 if (readonly) textField.setAttribute("disabled", "disabled");
                 else textField.removeAttribute("disabled");
-            } else if (xformsArrayContains(classes, "xforms-output")) {
+                var showCalendar = element.childNodes[2];
+                if (readonly) xformsAddClass(showCalendar, "xforms-showcalendar-readonly");
+                else xformsRemoveClass(showCalendar, "xforms-showcalendar-readonly");
+            } else if (xformsArrayContains(classes, "xforms-output") || xformsArrayContains(classes, "xforms-group")) {
+                // XForms output and group
                 if (readonly) xformsAddClass(element, "xforms-readonly");
                 else xformsRemoveClass(element, "xforms-readonly");
             } else {

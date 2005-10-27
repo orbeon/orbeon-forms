@@ -108,7 +108,7 @@
                         <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
                             if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
                         <xsl:attribute name="class" select="string-join($classes , ' ')"/>
-                        <xsl:if test="xxforms:control($id)/@readonly = 'true' and not(local-name($xforms-control) = 'output')">
+                        <xsl:if test="xxforms:control($id)/@readonly = 'true' and not(local-name($xforms-control) = ('output', 'input'))">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                         </xsl:if>
                         <xsl:copy-of select="node()"/>
@@ -158,7 +158,6 @@
                                   select="local-name-from-QName(xs:QName(@appearance)) = 'html'
                                           and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
                     <!-- TODO: should test on type prefix as well and namespace-uri-for-prefix(substring-before(xxforms:control($id)/@type, ':'), xxforms:control($id)) = $xs-uri -->
-                    <!-- and local-name-from-QName(xs:QName(xxforms:control($id)/@type)) = 'anyURI' -->
                     <xsl:variable name="is-image"
                                   select="starts-with(xxforms:control($id)/@mediatype, 'image/')" as="xs:boolean"/>
                     <xsl:variable name="html-class" as="xs:string?"
@@ -167,7 +166,11 @@
                                           else ()"/>
                     <xsl:variable name="is-date-or-time" select="xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
                     <xsl:variable name="date-class" as="xs:string?" select="if ($is-date-or-time) then 'xforms-date' else ()"/>
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class, $date-class), $id)"/>
+                    <xsl:variable name="readonly-class" as="xs:string?"
+                            select="if (xxforms:control($id)/@readonly = 'true') then 'xforms-readonly' else ()"/>
+                    <xsl:variable name="disabled-class" as="xs:string?"
+                            select="if (xxforms:control($id)/@relevant = 'false') then 'xforms-disabled' else ()"/>
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class, $date-class, $readonly-class, $disabled-class), $id)"/>
                     <xsl:choose>
                         <!-- Case of image media type with URI -->
                         <xsl:when test="$is-image">
@@ -293,13 +296,16 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="is-date-or-time" select="if ($generate-template) then false()
             else xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
+        <xsl:variable name="is-readonly" select="if ($generate-template) then false() else xxforms:control($id)/@readonly = 'true'"/>
         <xsl:variable name="type-class" as="xs:string?" select="if ($is-date-or-time)
             then 'xforms-type-date' else 'xforms-type-string'"/>
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-input'), $id)"/>
             <!-- Output for formatted date -->
             <xhtml:span>
-                <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-date-display', ())"/>
+                <xsl:variable name="showcalendar-readonly-class" as="xs:string?"
+                    select="if ($is-readonly) then 'xforms-readonly' else ()"/>
+                <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-date-display', $showcalendar-readonly-class), ())"/>
                 <xsl:if test="$is-date-or-time">
                     <xsl:value-of select="xxforms:control($id)/@display-value"/>
                 </xsl:if>
@@ -312,7 +318,10 @@
                 <xsl:copy-of select="xxforms:copy-attributes(., ($type-class), $id)"/>
             </xhtml:input>
             <!-- Date picker -->
-            <xhtml:span class="xforms-showcalendar {$type-class}"/>
+            <xsl:variable name="showcalendar-readonly-class" as="xs:string?"
+                    select="if ($is-readonly) then 'xforms-showcalendar-readonly' else ()"/>
+            <xsl:variable name="class" as="xs:string" select="string-join(('xforms-showcalendar', $type-class, $showcalendar-readonly-class), ' ')"/>
+            <xhtml:span class="{$class}"/>
         </xhtml:span>
     </xsl:template>
 
@@ -691,10 +700,13 @@
         <xsl:param name="generate-template" select="false()" as="xs:boolean" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
+            <xsl:variable name="readonly-class" as="xs:string?"
+                    select="if (not($generate-template) and xxforms:control($id)/@readonly = 'true')
+                    then 'xforms-readonly' else ()"/>
             <xsl:variable name="disabled-class" as="xs:string?"
                     select="if (not($generate-template) and xxforms:control($id)/@relevant = 'false')
                     then 'xforms-disabled' else ()"/>
-            <xsl:copy-of select="xxforms:copy-attributes(., (concat('xforms-', local-name()), $disabled-class), $id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., (concat('xforms-', local-name()), $disabled-class, $readonly-class), $id)"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>

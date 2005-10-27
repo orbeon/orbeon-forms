@@ -654,6 +654,10 @@ ul {
     vertical-align: middle;
 }
 
+.xforms-showcalendar-readonly {
+    display: none;
+}
+
 .xforms-range-casing {
     height: 30px;
     overflow: hidden;

@@ -579,6 +579,11 @@ function xformsInitializeControlsUnder(root) {
                 xformsAddEventListener(control, "click", function(event) {
                     var events = new Array();
                     var target = getEventTarget(event);
+                    // In the case of appearance="xxforms:html, target can be an element inside
+                    // the xforms-output, not the xforms-output itself. So we are here looking for the
+                    // xforms-parent when necessary.
+                    while (!xformsArrayContains(target.className.split(" "), "xforms-output"))
+                        target = target.parentNode;
                     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
                     xformsFireEvents(events);
                 });

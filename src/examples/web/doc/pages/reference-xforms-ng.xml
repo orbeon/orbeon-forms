@@ -356,6 +356,129 @@
                 </p>
             </section>
             <section>
+                <title>Load Action</title>
+                <p>
+                    The <code>xforms:load action</code> can refer to a resource to load either
+                    through the <code>resource</code> attribute or using a single-node binding
+                    retrieving the URL from an XForms instance. In both cases, the value of the URL
+                    is resolved relatively to a base URL.
+                </p>
+                <p>
+                    This base URL is, by default, the external URL used to display the XForms page,
+                    with special handling of the servlet context, if necessary. It is also possible
+                    to override this behavior by adding <code>xml:base</code> attributes on
+                    <code>xforms:load</code> or any of its ancestor elements.
+                </p>
+                <p>
+                    The following assumes that OPS runs in the <code>/ops</code> servlet context:
+                </p>
+                <table>
+                    <tr>
+                        <th>Base URL<br/>(External URL or <code>xml:base</code> attributes)</th>
+                        <th>Initial URL<br/>(<code>resource</code> or Single-Node Binding)</th>
+                        <th><code>show</code></th>
+                        <th>Resolved URL</th>
+                        <th>Comment</th>
+                    </tr>
+                    <tr>
+                        <td rowspan="6">
+                            <p>The following URL is loaded in a servlet:</p>
+                            <p>
+                                <code>http://example.org/ops/my-page</code>
+                            </p>
+                        </td>
+                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td>
+                            An absolute URL is left untouched. The new page replaces the existing
+                            page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                        <td>
+                            An absolute URL is left untouched. A new window or tab opens for the new
+                            page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>http://example.org/ops/my-new-page</code></td>
+                        <td>
+                            Absolute paths resolve against the current servlet context. The new page
+                            replaces the existing page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                        <td>
+                            Absolute paths resolve against the current servlet context. A new window
+                            or tab opens for the new page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><code>admin/main-page</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>http://example.org/ops/admin/main-page</code></td>
+                        <td>
+                            The new page replaces the existing page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                        <td>
+                            A new window or tab opens for the new page.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6">
+                            <p>The following path is loaded in a portlet:</p>
+                            <p>
+                                <code>/my-example/my-page</code>
+                            </p>
+                        </td>
+                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td>
+                            This causes the application to load a page outside of the portlet,
+                            replacing the entire portal.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                        <td>
+                            This causes the application to load a page in a new window outside of
+                            the portlet.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td rowspan="2">
+                            The resulting path is loaded within the portlet.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><code>admin/main-page</code></td>
+                        <td><code>replace</code></td>
+                        <td rowspan="2"><code>/my-example/admin/main-page</code></td>
+                        <td rowspan="2">
+                            The resulting path is loaded within the portlet.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                    </tr>
+                </table>
+            </section>
+            <section>
                 <title>Submission</title>
                 <p>
                     TODO

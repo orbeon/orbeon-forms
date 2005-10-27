@@ -70,6 +70,14 @@
                     </check>
                 </form>
             </xforms:instance>
+            <xforms:instance id="new-comment-validity">
+                <comment xmlns="">
+                    <name>1</name>
+                    <email>0</email>
+                    <uri>0</uri>
+                    <content>0</content>
+                </comment>
+            </xforms:instance>
             <xforms:instance id="add-comment-request">
                 <request xmlns="">
                     <!-- We pass the XML submission so we can retrieve the correct list of posts -->
@@ -92,6 +100,7 @@
                     </comment>
                 </request>
             </xforms:instance>
+            <!-- Comment formatting service -->
             <xforms:instance id="format-comment-request">
                 <comment xmlns="">
                     <name/>
@@ -108,11 +117,16 @@
                     <content character-count="0" word-count="0"/>
                 </comment>
             </xforms:instance>
+            <!-- This instance keeps special properties controlling the appearance of buttons, groups, etc. -->
             <xforms:instance id="utils">
                 <utils xmlns="">
                     <submit-comment-trigger/>
+                    <comment-preview-group/>
                 </utils>
             </xforms:instance>
+
+            <xforms:bind nodeset="instance('utils')/submit-comment-trigger" readonly="sum(instance('new-comment-validity')/*) != 0"/>
+            <xforms:bind nodeset="instance('utils')/comment-preview-group" relevant="sum(instance('new-comment-validity')/*) = 0"/>
 
             <xforms:bind nodeset="instance('main')">
                 <xforms:bind nodeset="posts/day/date" type="xs:date"/>
@@ -138,18 +152,6 @@
                 <!--<xsd:pattern value="[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-'\*\+\-/=\?\^_`\{-~]+)*"/>-->
             </xforms:bind>
 
-            <!--<xforms:bind nodeset="instance('format-comment-response')"-->
-                         <!--relevant="normalize-space(instance('new-comment')/comment/name) != ''-->
-                                   <!--and normalize-space(instance('new-comment')/comment/content) != ''"/>-->
-
-            <!--<xforms:bind nodeset="instance('utils')">-->
-                <!--<xforms:bind nodeset="submit-comment-trigger"-->
-                             <!--readonly="not(xxforms:valid(instance('new-comment')/comment/name)-->
-                                       <!--and xxforms:valid(instance('new-comment')/comment/email)-->
-                                       <!--and xxforms:valid(instance('new-comment')/comment/uri)-->
-                                       <!--and xxforms:valid(instance('new-comment')/comment/content))"/>-->
-            <!--</xforms:bind>-->
-
             <!-- Call comment saving service-->
             <xforms:submission id="save-comment-submission" method="post" action="/blog/save-comment" ref="instance('add-comment-request')" replace="instance" instance="main">
                 <xforms:action ev:event="xforms-submit-done">
@@ -171,6 +173,9 @@
         </xforms:model>
     </head>
     <body>
+
+        <xforms:output ref="instance('new-comment-validity')" appearance="xxforms:html"/>
+
         <table>
             <tr>
                 <!-- Left column -->
@@ -266,12 +271,6 @@
                             <xforms:group ref="comments/@show">
                                 <div>
                                     <xforms:group ref="instance('new-comment')">
-                                        <!--<xforms:action ev:event="xforms-invalid">-->
-                                            <!--<xforms:setvalue ref="instance('triggers')/submit-comment/@readonly" value=". + 1"/>-->
-                                        <!--</xforms:action>-->
-                                        <!--<xforms:action ev:event="xforms-valid">-->
-                                            <!--<xforms:setvalue ref="instance('triggers')/submit-comment/@readonly" value=". - 1"/>-->
-                                        <!--</xforms:action>-->
                                         <h3>Post New Comment</h3>
                                         <table>
                                             <tr>
@@ -286,6 +285,12 @@
                                                             <xforms:setvalue ref="instance('format-comment-request')/uri" value="instance('new-comment')/comment/uri"/>
                                                             <xforms:setvalue ref="instance('format-comment-request')/content" value="instance('new-comment')/comment/content"/>
                                                             <xforms:send submission="format-comment-submission"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-invalid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/name" value="1"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-valid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/name" value="0"/>
                                                         </xforms:action>
                                                     </xforms:input>
                                                 </td>
@@ -303,6 +308,12 @@
                                                             <xforms:setvalue ref="instance('format-comment-request')/content" value="instance('new-comment')/comment/content"/>
                                                             <xforms:send submission="format-comment-submission"/>
                                                         </xforms:action>
+                                                        <xforms:action ev:event="xforms-invalid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/email" value="1"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-valid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/email" value="0"/>
+                                                        </xforms:action>
                                                     </xforms:input>
                                                 </td>
                                             </tr>
@@ -317,6 +328,12 @@
                                                             <xforms:setvalue ref="instance('format-comment-request')/uri" value="instance('new-comment')/comment/uri"/>
                                                             <xforms:setvalue ref="instance('format-comment-request')/content" value="instance('new-comment')/comment/content"/>
                                                             <xforms:send submission="format-comment-submission"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-invalid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/uri" value="1"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-valid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/uri" value="0"/>
                                                         </xforms:action>
                                                     </xforms:input>
                                                 </td>
@@ -338,6 +355,12 @@
                                                             <xforms:setvalue ref="instance('format-comment-request')/uri" value="instance('new-comment')/comment/uri"/>
                                                             <xforms:setvalue ref="instance('format-comment-request')/content" value="instance('new-comment')/comment/content"/>
                                                             <xforms:send submission="format-comment-submission"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-invalid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/content" value="1"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-valid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/content" value="0"/>
                                                         </xforms:action>
                                                     </xforms:textarea>
                                                 </td>
@@ -375,7 +398,7 @@
                                             </tr>
                                         </table>
                                         <!-- Display comment preview -->
-                                        <xforms:group ref="instance('format-comment-response')">
+                                        <xforms:group ref="instance('utils')/comment-preview-group">
                                             <p>
                                                 This is how your comment will appear:
                                             </p>

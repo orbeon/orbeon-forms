@@ -45,7 +45,7 @@
     <xi:include href="cache/tests-cache.xml"/>
 
     <!-- This test should probably be hand-customized to be clearer -->
-    <test description="xforms-portlet-forms" name="oxf:xslt">
+    <test description="xforms-portlet-forms" name="oxf:unsafe-xslt">
         <input name="config" href="oxf:/ops/pfc/xforms-portlet-forms.xsl"/>
         <input name="data" href="oxf:/ops/unit-tests/xforms-portlet-forms/input-data.xml"/>
         <input name="annotated-data" href="oxf:/ops/unit-tests/xforms-portlet-forms/input-annotated-data.xml"/>

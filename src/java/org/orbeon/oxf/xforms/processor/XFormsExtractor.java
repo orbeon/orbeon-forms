@@ -25,12 +25,14 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -88,7 +90,9 @@ public class XFormsExtractor extends ProcessorImpl {
 
                     public void startDocument() throws SAXException {
                         super.startDocument();
-                        super.startElement("", "static-state", "static-state", XMLUtils.EMPTY_ATTRIBUTES);
+                        final AttributesImpl attributesImp = new AttributesImpl();
+                        attributesImp.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
+                        super.startElement("", "static-state", "static-state", attributesImp);
                     }
 
                     public void endDocument() throws SAXException {

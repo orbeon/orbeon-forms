@@ -611,16 +611,15 @@ public class XFormsActionInterpreter {
 
     private void resolveLoadValue(PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value) {
 
-        final boolean isPortletLoad = false;//TODO
+        final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
 
-        final URI resolvedURI = XFormsUtils.resolveURI(actionElement, value);;
+        final URI resolvedURI = XFormsUtils.resolveURI(actionElement, value);
         final String resolvedURISTring = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         final String externalURL;
         // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
-        // runs in a servlet! The distinction between render and resource URLs is currently not
-        // useful.
+        // runs in a servlet when processing these events!
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
             if (doReplace) {

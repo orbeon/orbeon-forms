@@ -791,7 +791,8 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Create XForms Engine
-        XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement);
+        XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement,
+                staticStateDocument.getRootElement().attributeValue("container-type"));
 
         // Get instances
         boolean isInitializeEvent;

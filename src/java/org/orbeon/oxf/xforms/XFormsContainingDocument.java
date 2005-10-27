@@ -46,6 +46,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private List models;
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
+    private String containerType;
 
     private XFormsModelSubmission activeSubmission;
     private List messages;
@@ -55,12 +56,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(models, controlsDocument, null);
+        this(models, controlsDocument, null, null);
     }
 
-    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement) {
+    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
+        this.containerType = containerType;
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
@@ -90,6 +92,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsControls getXFormsControls() {
         return xformsControls;
+    }
+
+    /**
+     * Return the container type that generate the XForms page, either "servlet" or "portlet".
+     */
+    public String getContainerType() {
+        return containerType;
     }
 
     /**

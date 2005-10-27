@@ -22,6 +22,12 @@
         <element name="xxforms:event-response">
             <optional>
                 <element name="xxforms:static-state">
+                    <attribute name="container-type">
+                        <choice>
+                            <value>servlet</value>
+                            <value>portlet</value>
+                        </choice>
+                    </attribute>
                     <data type="string"/>
                 </element>
             </optional>

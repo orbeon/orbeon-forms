@@ -13,10 +13,19 @@
  */
 package org.orbeon.oxf.portlet;
 
+import org.dom4j.Document;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.common.OXFException;
+
 import javax.portlet.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Naming convention followed:
@@ -45,6 +54,8 @@ public class PortletURLImpl implements PortletURL {
     private static final String ACTION_USER_PARAM_PREFIX = "" + ACTION_USER_PARAM_PREFIX_CHAR;
     private static final String CONTAINER_PARAM_PREFIX = "x";
 
+    private PipelineContext portalPipelineContext;
+    private ExternalContext portalExternalContext;
     private int portletId;
     private String urlPrefix;
 
@@ -54,7 +65,9 @@ public class PortletURLImpl implements PortletURL {
     private boolean isAction;
 
 
-    PortletURLImpl(int portletId, String urlPrefix, int urlType) {
+    PortletURLImpl(PipelineContext portalPipelineContext, ExternalContext portalExternalContext, int portletId, String urlPrefix, int urlType) {
+        this.portalPipelineContext = portalPipelineContext;
+        this.portalExternalContext = portalExternalContext;
         this.portletId = portletId;
         this.urlPrefix = urlPrefix;
         this.isAction = urlType == ACTION_URL;
@@ -111,6 +124,13 @@ public class PortletURLImpl implements PortletURL {
         sb.append(value);
     }
 
+    private void appendRawParameter(boolean first, StringBuffer sb, String name, String value) {
+        sb.append(first ? "?" : "&amp;");// CHECK: who escapes ampersand?
+        sb.append(name);
+        sb.append('=');
+        sb.append(value);
+    }
+
     public String toString() {
         // Start with prefix
         StringBuffer sb = new StringBuffer(urlPrefix);
@@ -130,7 +150,7 @@ public class PortletURLImpl implements PortletURL {
 
         //URLEncoder.encode(s, "UTF-8");
 
-        // Append parameters
+        // Append user parameters
         for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
             String name = (String) i.next();
             String[] value = (String[]) parameters.get(name);
@@ -138,6 +158,19 @@ public class PortletURLImpl implements PortletURL {
                 appendUserParameter(false, sb, name, value[j]);
             }
         }
+
+        // Append other container parameters
+        final Document portalXFormsInstanceDocument = (Document) portalExternalContext.getRequest().getAttributesMap().get(XFormsInstance.REQUEST_PORTAL_INSTANCE_DOCUMENT);
+        if (portalXFormsInstanceDocument != null) {
+            final String instanceString = XFormsUtils.encodeXMLAsDOM(portalPipelineContext, portalXFormsInstanceDocument);
+            try {
+                appendRawParameter(false, sb, "$instance", URLEncoder.encode(instanceString, "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                // Should not happen
+                throw new OXFException(e);
+            }
+        }
+
         return sb.toString();
     }
 
@@ -186,7 +219,7 @@ public class PortletURLImpl implements PortletURL {
             } catch (Exception ex) {
                 // Ignore invalid parameters
                 //ex.printStackTrace();
-                continue;
+                //continue;
             }
         }
 

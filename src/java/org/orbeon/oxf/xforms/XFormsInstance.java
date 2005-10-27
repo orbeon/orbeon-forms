@@ -43,7 +43,8 @@ import java.util.Map;
  */
 public class XFormsInstance implements XFormsEventTarget {
 
-    public static final String REQUEST_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
+    public static final String REQUEST_FORWARD_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.forward-xforms-instance-document";
+    public static final String REQUEST_PORTAL_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
 
     private PipelineContext pipelineContext;
     private String id;
@@ -279,7 +280,7 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
-        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_INSTANCE_DOCUMENT);
+        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
         return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null);
     }
 

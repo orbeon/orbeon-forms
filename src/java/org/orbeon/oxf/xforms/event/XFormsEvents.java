@@ -26,6 +26,9 @@ public class XFormsEvents {
     // Custom submit event
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
 
+    // Custom load event
+    public static final String XXFORMS_LOAD = "xxforms-load";
+
     // Standard sequences
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 

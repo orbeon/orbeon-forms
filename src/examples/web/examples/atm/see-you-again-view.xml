@@ -17,10 +17,10 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="/">
-            <xhtml:p><img src="/examples/atm/apukwik.gif" width="314" height="232"/></xhtml:p>
+            <xhtml:p><xhtml:img src="/examples/atm/apukwik.gif" width="314" height="232" alt="See you again!"/></xhtml:p>
         </xforms:group>
         <xhtml:p style="margin-top: 3em">
-            <a href="/atm" f:url-type="action">Back</a> to ATM home<br/>
+            <xhtml:a href="/atm">Back</xhtml:a> to ATM home<br/>
         </xhtml:p>
     </xhtml:body>
 </xhtml:html>

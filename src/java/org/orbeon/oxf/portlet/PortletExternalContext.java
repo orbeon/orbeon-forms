@@ -342,9 +342,8 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         private String rewritePortletURL(String urlString, int urlType) {
-            // Case where a protocol is specified: the URL is left untouched (is
-            // this a correct way of detecting the situation?)
-            if (urlString.indexOf(":") != -1 || urlString.startsWith("#")) return urlString;
+            // Case where a protocol is specified OR it's just a fragment: the URL is left untouched
+            if (NetUtils.urlHasProtocol(urlString) || urlString.startsWith("#")) return urlString;
 
             try {
                 // Parse URL
@@ -375,10 +374,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
 
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
 
-            // NOTE: We just ignore generateAbsoluteURL here
-
             // Case where a protocol is specified: the URL is left untouched
-            // We consider that a protocol consists only of ASCII letters
             if (NetUtils.urlHasProtocol(urlString))
                 return urlString;
 

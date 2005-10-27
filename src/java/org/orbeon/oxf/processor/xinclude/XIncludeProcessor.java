@@ -20,12 +20,11 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.*;
-import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.sax.SAXSource;
 import java.util.Enumeration;
@@ -129,19 +128,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 // Clean-up namespace mappings
                 sendStartPrefixMappings();
                 // Add or replace xml:base attribute
-                final AttributesImpl newAttributes = new AttributesImpl();
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    final String attributeURI = attributes.getURI(i);
-                    final String attributeValue = attributes.getValue(i);
-                    final String attributeType = attributes.getType(i);
-                    final String attributeQName = attributes.getQName(i);
-                    final String attributeLocalname = attributes.getLocalName(i);
-
-                    if (!(XMLConstants.XML_URI.equals(attributeURI) && "base".equals(attributeLocalname)))
-                        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
-                }
-                newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, xmlBase);
-                attributes = newAttributes;
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", xmlBase);
             }
 
             if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {

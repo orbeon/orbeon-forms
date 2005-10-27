@@ -18,6 +18,7 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -27,6 +28,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Implementation of all the XForms actions.
@@ -569,17 +572,14 @@ public class XFormsActionInterpreter {
 
             final String ref = actionElement.attributeValue("ref");
             final String resource = actionElement.attributeValue("resource");
-            final String show;
+            final String showAttribute;
             {
-                final String showAttribute = actionElement.attributeValue("show");
-                if (showAttribute == null) {
-                    show = "replace";
-                } else {
-                    if (!(showAttribute.equals("replace") || showAttribute.equals("new")))
-                        throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
-                    show = showAttribute;
-                }
+                final String rawShowAttribute = actionElement.attributeValue("show");
+                showAttribute = (rawShowAttribute == null) ? "replace" : rawShowAttribute;
+                if (!("replace".equals(showAttribute) || "new".equals(showAttribute)))
+                    throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
             }
+            final boolean doReplace = "replace".equals(showAttribute);
 
             if (ref != null && resource != null) {
                 // "If both are present, the action has no effect."
@@ -589,8 +589,7 @@ public class XFormsActionInterpreter {
                 final Node currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
-                    // TODO: resolve relative URIs
-                    containingDocument.addLoad(value, show);
+                    resolveLoadValue(pipelineContext, actionElement, doReplace, value);
                 } else {
                     // Should we do this here?
                     containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
@@ -598,20 +597,56 @@ public class XFormsActionInterpreter {
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {
                 // Use linking attribute
-                // TODO: resolve relative URIs
-                containingDocument.addLoad(resource, show);
+                resolveLoadValue(pipelineContext, actionElement, doReplace, resource);
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else {
                 // "Either the single node binding attributes, pointing to a URI in the instance
                 // data, or the linking attributes are required."
                 throw new OXFException("Missing 'resource' or 'ref' attribute on xforms:load element.");
             }
-
-
-
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);
         }
+    }
+
+    private void resolveLoadValue(PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value) {
+
+        final boolean isPortletLoad = false;//TODO
+
+        final URI resolvedURI = XFormsUtils.resolveURI(actionElement, value);;
+        final String resolvedURISTring = resolvedURI.toString();
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+        final String externalURL;
+        // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
+        // runs in a servlet! The distinction between render and resource URLs is currently not
+        // useful.
+        if (!isPortletLoad) {
+            // XForms page was loaded from a servlet
+            if (doReplace) {
+                externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
+            } else {
+                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+            }
+        } else {
+            // XForms page was loaded from a portlet
+            if (doReplace) {
+                if (resolvedURI.getFragment() != null) {
+                    // Remove fragment if there is one, as it doesn't serve in a portlet
+                    try {
+                        externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+                    } catch (URISyntaxException e) {
+                        throw new OXFException(e);
+                    }
+                } else {
+                    externalURL = resolvedURISTring;
+                }
+            } else {
+                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+            }
+        }
+
+        containingDocument.addLoad(externalURL, doReplace, isPortletLoad);
     }
 
     public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {

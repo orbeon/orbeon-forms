@@ -18,7 +18,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsElementContext;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
@@ -42,11 +44,11 @@ public class XFormsOutput extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Get XForms model
-                XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
-                            return new XFormsModel(readInputAsDOM4J(context, input));
-                        }
-                    });
+                XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
+                    public Object read(PipelineContext context, ProcessorInput input) {
+                        return new XFormsModel(readInputAsDOM4J(context, input));
+                    }
+                });
                 try {
                     // Clone because we set the instance, and that must not be cached
                     model = (org.orbeon.oxf.xforms.XFormsModel) model.clone();

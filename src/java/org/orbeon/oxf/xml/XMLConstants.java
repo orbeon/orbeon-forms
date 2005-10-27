@@ -18,7 +18,9 @@ import org.dom4j.QName;
 
 public class XMLConstants {
 
+    public static final String XML_PREFIX = "xml";
     public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
+    public static final QName XML_BASE_QNAME = new QName("base", new Namespace(XML_PREFIX, XML_URI));
 
     public static final String XSI_PREFIX = "xsi";
     public static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";

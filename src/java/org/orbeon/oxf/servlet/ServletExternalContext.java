@@ -583,7 +583,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         private String rewriteURL(String urlString, boolean generateAbsoluteURL) {
             // Case where a protocol is specified: the URL is left untouched
-            // We consider that a protocol consists only of ASCII letters
             if (NetUtils.urlHasProtocol(urlString))
                 return urlString;
 

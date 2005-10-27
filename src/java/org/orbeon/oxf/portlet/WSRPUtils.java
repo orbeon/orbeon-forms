@@ -167,64 +167,8 @@ public class WSRPUtils {
 
                 currentIndex = endIndex + END_TAG_LENGTH;
 
-                // Parse URL
-                Map wsrpParameters = NetUtils.decodeQueryString(encodedURL, true);
+                writer.write(decodePortletURL(encodedURL, response));
 
-                // Check URL type and create URL
-                try {
-                    String[] urlTypeValues = (String[]) wsrpParameters.get(URL_TYPE_PARAM);
-                    if (urlTypeValues == null)
-                        throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
-                    String urlTypeValue = urlTypeValues[0];
-
-                    if (urlTypeValue.equals(URL_TYPE_RESOURCE_STRING)) {
-                        // Case of a resource
-                        String[] urlValues = (String[]) wsrpParameters.get(URL_PARAM);
-                        if (urlValues != null) {
-                            String url = response.encodeURL(URLDecoder.decode(urlValues[0], "utf-8"));
-                            writer.write(XMLUtils.escapeXML(url));
-                        }
-                        // TODO: We ignore a request to rewrite the resource
-                    } else {
-                        // Case of a render or action request
-                        // create a PortletURL
-                        PortletURL portletURL = null;
-                        if (urlTypeValue.equals(URL_TYPE_BLOCKING_ACTION_STRING))
-                            portletURL = response.createActionURL();
-                        else if (urlTypeValue.equals(URL_TYPE_RENDER_STRING))
-                            portletURL = response.createRenderURL();
-                        else
-                            throw new OXFException("Invalid URL type for WSRP encoded URL: " + encodedURL);
-
-                        // Get portlet mode
-                        String[] portletModeValues = (String[]) wsrpParameters.get(MODE_PARAM);
-                        if (portletModeValues != null) {
-                            portletURL.setPortletMode(new PortletMode(portletModeValues[0]));
-                        }
-
-                        // Get window state
-                        String[] windowStateValues = (String[]) wsrpParameters.get(WINDOW_STATE_PARAM);
-                        if (windowStateValues != null) {
-                            portletURL.setWindowState(new WindowState(windowStateValues[0]));
-                        }
-
-                        // Get navigational state
-                        String[] navigationalStateValues = (String[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM);
-                        if (navigationalStateValues != null) {
-                            String decodedNavigationalState = URLDecoder.decode(navigationalStateValues[0], "utf-8");
-                            Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
-                            portletURL.setParameters(navigationParameters);
-                        }
-
-                        // TODO: wsrp-fragmentID
-                        // TODO: wsrp-secureURL
-
-                        // Write resulting encoded PortletURL
-                        writer.write(portletURL.toString());
-                    }
-                } catch (PortletException e) {
-                    throw new OXFException(e);
-                }
             } else if (index < stringLength - BASE_TAG_LENGTH && s.charAt(index + BASE_TAG_LENGTH) == '_') {
                 // Namespace encoding
                 writer.write(response.getNamespace());
@@ -233,9 +177,83 @@ public class WSRPUtils {
                 throw new OXFException("Invalid wsrp rewrite tagging.");
             }
         }
-        // Write remaining of string
+        // Write remainder of string
         if (currentIndex < stringLength) {
             writer.write(s, currentIndex, s.length() - currentIndex);
+        }
+    }
+
+    private static String decodePortletURL(String encodedURL, RenderResponse response) {
+        // Parse URL
+        Map wsrpParameters = NetUtils.decodeQueryString(encodedURL, true);
+
+        // Check URL type and create URL
+        try {
+            String[] urlTypeValues = (String[]) wsrpParameters.get(URL_TYPE_PARAM);
+            if (urlTypeValues == null)
+                throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
+            String urlTypeValue = urlTypeValues[0];
+
+            if (urlTypeValue.equals(URL_TYPE_RESOURCE_STRING)) {
+                // Case of a resource
+                String[] urlValues = (String[]) wsrpParameters.get(URL_PARAM);
+                if (urlValues != null) {
+                    String url = null;
+                    try {
+                        url = response.encodeURL(URLDecoder.decode(urlValues[0], "utf-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        // Should not happen
+                        throw new OXFException(e);
+                    }
+                    return XMLUtils.escapeXML(url);
+                }
+                // TODO: We ignore a request to rewrite the resource
+                return "";
+            } else {
+                // Case of a render or action request
+                // create a PortletURL
+                PortletURL portletURL = null;
+                if (urlTypeValue.equals(URL_TYPE_BLOCKING_ACTION_STRING))
+                    portletURL = response.createActionURL();
+                else if (urlTypeValue.equals(URL_TYPE_RENDER_STRING))
+                    portletURL = response.createRenderURL();
+                else
+                    throw new OXFException("Invalid URL type for WSRP encoded URL: " + encodedURL);
+
+                // Get portlet mode
+                String[] portletModeValues = (String[]) wsrpParameters.get(MODE_PARAM);
+                if (portletModeValues != null) {
+                    portletURL.setPortletMode(new PortletMode(portletModeValues[0]));
+                }
+
+                // Get window state
+                String[] windowStateValues = (String[]) wsrpParameters.get(WINDOW_STATE_PARAM);
+                if (windowStateValues != null) {
+                    portletURL.setWindowState(new WindowState(windowStateValues[0]));
+                }
+
+                // Get navigational state
+                String[] navigationalStateValues = (String[]) wsrpParameters.get(NAVIGATIONAL_STATE_PARAM);
+                if (navigationalStateValues != null) {
+                    String decodedNavigationalState = null;
+                    try {
+                        decodedNavigationalState = URLDecoder.decode(navigationalStateValues[0], "utf-8");
+                    } catch (UnsupportedEncodingException e) {
+                        // Should not happen
+                        throw new OXFException(e);
+                    }
+                    Map navigationParameters = NetUtils.decodeQueryString(decodedNavigationalState, true);
+                    portletURL.setParameters(navigationParameters);
+                }
+
+                // TODO: wsrp-fragmentID
+                // TODO: wsrp-secureURL
+
+                // Write resulting encoded PortletURL
+                return portletURL.toString();
+            }
+        } catch (PortletException e) {
+            throw new OXFException(e);
         }
     }
 }

@@ -1037,7 +1037,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         Document config = null;
                         try {
                             config = Dom4jUtils.parseText
-                                    ("<config><key>" + XFormsInstance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
+                                    ("<config><key>" + XFormsInstance.REQUEST_FORWARD_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {

@@ -994,4 +994,22 @@ public class XMLUtils {
             ret.addAttribute( ns, lnam, qnam, typ, val );
         }
         return ret;
-    }}
+    }
+
+    public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String localname, String value) {
+        final AttributesImpl newAttributes = new AttributesImpl();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            final String attributeURI = attributes.getURI(i);
+            final String attributeValue = attributes.getValue(i);
+            final String attributeType = attributes.getType(i);
+            final String attributeQName = attributes.getQName(i);
+            final String attributeLocalname = attributes.getLocalName(i);
+
+            if (!(uri.equals(attributeURI) && localname.equals(attributeLocalname)))
+                newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
+        }
+        newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, value);
+        return newAttributes;
+    }
+
+}

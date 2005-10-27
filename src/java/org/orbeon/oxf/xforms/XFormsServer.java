@@ -23,8 +23,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -144,6 +146,7 @@ public class XFormsServer extends ProcessorImpl {
                 // NOTE: Static state is produced externally during initialization
 
                 // Output dynamic state
+                boolean requireClientSubmission = false;
                 {
                     final Document dynamicStateDocument = Dom4jUtils.createDocument();
                     final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
@@ -190,11 +193,35 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Submission automatic event if needed
                     {
-                        XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
-                        if (activeSubmission != null) {
-                            final Element eventElement = dynamicStateElement.addElement("event");
-                            eventElement.addAttribute("source-control-id", activeSubmission.getId());
-                            eventElement.addAttribute("name", "xxforms-submit");
+                        // Check for xxforms-submit event
+                        {
+                            final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
+                            if (activeSubmission != null) {
+                                final Element eventElement = dynamicStateElement.addElement("event");
+                                eventElement.addAttribute("source-control-id", activeSubmission.getId());
+                                eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
+                                requireClientSubmission = true;
+                            }
+                        }
+                        // Check for xxforms-load event
+                        {
+                            final List loads = containingDocument.getLoads();
+                            if (loads != null) {
+                                for (Iterator i = loads.iterator(); i.hasNext();) {
+                                    final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
+
+                                    if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource())) {
+                                        // We need to submit the event so that the portlet can load the new path
+                                        final Element eventElement = dynamicStateElement.addElement("event");
+                                        eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
+                                        eventElement.addAttribute("resource", load.getResource());
+                                        eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
+                                        requireClientSubmission = true;
+
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -273,10 +300,9 @@ public class XFormsServer extends ProcessorImpl {
                         ch.endElement();
                     }
 
-                    // Output submit information
+                    // Check if we want to require the client to perform a form submission
                     {
-                        final XFormsModelSubmission submission = containingDocument.getActiveSubmission();
-                        if (submission != null)
+                        if (requireClientSubmission)
                             outputSubmissionInfo(pipelineContext, ch);
                     }
 
@@ -499,7 +525,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     } else if (size2 < size1) {
                         // Size has shrunk
-                        
+
                         final String repeatControlId = controlInfo2.getId();
                         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
                         final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
@@ -581,8 +607,11 @@ public class XFormsServer extends ProcessorImpl {
     private void outputLoadsInfo(ContentHandlerHelper ch, List loads) {
         for (Iterator i = loads.iterator(); i.hasNext();) {
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
-                    new String[]{ "resource", load.getResource(), "show", load.getShow() });
+
+            if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()))) {
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
+                        new String[]{ "resource", load.getResource(), "show", load.isReplace() ? "replace" : "new" });
+            }
         }
     }
 
@@ -818,9 +847,10 @@ public class XFormsServer extends ProcessorImpl {
         // Run automatic event if present
         if (eventElement != null) {
             final String controlId = eventElement.attributeValue("source-control-id");
+            final String resource = eventElement.attributeValue("resource");
             final String eventName = eventElement.attributeValue("name");
 
-            containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, null, null, filesElement);
+            containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, null, resource, filesElement);
         }
 
         return containingDocument;

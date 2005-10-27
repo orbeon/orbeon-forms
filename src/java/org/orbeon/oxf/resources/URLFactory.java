@@ -22,8 +22,8 @@ import java.net.URLStreamHandler;
 /**
  * This factory should be used (instead of new URL(...)) to create URL objects for URLs that use
  * the "oxf:" protocol (other protocols will work as well).
- * <p/>
- * <p>Implementation note: This is necessary as the URL JDK implementation will always try to load
+ *
+ * Implementation note: This is necessary as the URL JDK implementation will always try to load
  * URLStreamHandler registered with the system property using the system class loader, and this
  * fails as our URLStreamHandler is not loaded by the system class loader.
  */

@@ -16,28 +16,30 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.portlet.WSRPUtils;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.AttributesImpl;
 
+import javax.portlet.RenderResponse;
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
@@ -49,28 +51,13 @@ public class XFormsUtils {
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
 
     /**
-     * Adds to <code>target</code> all the attributes in <code>source</code>
-     * that are not in the XForms namespace.
-     */
-//    public static void addNonXFormsAttributes(AttributesImpl target, Attributes source) {
-//        for (Iterator i = new XMLUtils.AttributesIterator(source); i.hasNext();) {
-//            XMLUtils.Attribute attribute = (XMLUtils.Attribute) i.next();
-//            if (!"".equals(attribute.getURI()) &&
-//                    !XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getURI())) {
-//                target.addAttribute(attribute.getURI(), attribute.getLocalName(),
-//                        attribute.getQName(), ContentHandlerHelper.CDATA, attribute.getValue());
-//            }
-//        }
-//    }
-
-    /**
      * Return the local XForms instance data for the given node, null if not available.
      */
     public static InstanceData getLocalInstanceData(Node node) {
         return node instanceof Element
-            ? (InstanceData) ((Element) node).getData()
-            : node instanceof Attribute
-            ? (InstanceData) ((Attribute) node).getData() : null;
+                ? (InstanceData) ((Element) node).getData()
+                : node instanceof Attribute
+                ? (InstanceData) ((Attribute) node).getData() : null;
     }
 
     /**
@@ -109,7 +96,7 @@ public class XFormsUtils {
     public static void setInitialDecoration(Document document) {
         Element rootElement = document.getRootElement();
         Map idToNodeMap = new HashMap();
-        setInitialDecorationWorker(rootElement, new int[] {-1}, idToNodeMap);
+        setInitialDecorationWorker(rootElement, new int[]{-1}, idToNodeMap);
         ((InstanceData) rootElement.getData()).setIdToNodeMap(idToNodeMap);
     }
 
@@ -158,12 +145,12 @@ public class XFormsUtils {
 
     public static boolean isNameEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (XFormsConstants.XFORMS_ENCRYPT_NAMES_PROPERTY, false).booleanValue();
+                (XFormsConstants.XFORMS_ENCRYPT_NAMES_PROPERTY, false).booleanValue();
     }
 
     public static boolean isHiddenEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
+                (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 
     /**
@@ -327,8 +314,7 @@ public class XFormsUtils {
                 byte[] buffer = new byte[1024];
                 GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
                 int size;
-                while ((size = gzipInputStream.read(buffer)) != -1)
-                    xml.append(new String(buffer, 0, size, "utf-8"));
+                while ((size = gzipInputStream.read(buffer)) != -1) xml.append(new String(buffer, 0, size, "utf-8"));
                 xmlText = xml.toString();
             }
             // Parse XML and return documents
@@ -356,8 +342,7 @@ public class XFormsUtils {
             StringBuffer value = new StringBuffer();
             char[] buff = new char[BUFFER_SIZE];
             int c = 0;
-            while ((c = reader.read(buff, 0, BUFFER_SIZE - 1)) != -1)
-                value.append(buff, 0, c);
+            while ((c = reader.read(buff, 0, BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);
             return value.toString();
         } finally {
             if (reader != null)
@@ -384,5 +369,43 @@ public class XFormsUtils {
 
     public static interface InstanceWalker {
         public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData);
+    }
+
+    /**
+     * Resolve a URI string against an element, taking into account ancestor xml:base elements for
+     * the resolution.
+     *
+     * @param element   element used to consider xml:base scope
+     * @param uri       URI to resolve
+     * @return          resolved URI
+     */
+    public static URI resolveURI(Element element, String uri) {
+        final List xmlBaseElements = new ArrayList();
+
+        // Collect xml:base values
+        Element currentElement = element;
+        do {
+            final String xmlBaseAttribute = element.attributeValue(XMLConstants.XML_BASE_QNAME);
+            if (xmlBaseAttribute != null)
+                xmlBaseElements.add(xmlBaseAttribute);
+            currentElement = currentElement.getParent();
+        } while(currentElement != null);
+
+        // Go from root to leaf
+        Collections.reverse(xmlBaseElements);
+        xmlBaseElements.add(uri);
+
+        // Resolve paths from root to leaf
+        try {
+            URI result = null;
+            for (Iterator i = xmlBaseElements.iterator(); i.hasNext();) {
+                final String currentXMLBase = (String) i.next();
+                final URI currentXMLBaseURI = new URI(currentXMLBase);
+                result = (result == null) ? currentXMLBaseURI : result.resolve(currentXMLBaseURI);
+            }
+            return result;
+        } catch (URISyntaxException e) {
+            throw new ValidationException("Error while resolving URI: " + uri, e, (LocationData) element.getData());
+        }
     }
 }

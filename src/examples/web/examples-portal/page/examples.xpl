@@ -98,6 +98,7 @@
         <p:processor name="oxf:portlet-include">
 <!--            <p:input name="config" href="#portlet-include-config" schema-uri="http://orbeon.org/oxf/xml/portlet-include" />-->
             <p:input name="config" href="#portlet-include-config" />
+            <p:input name="instance" href="#instance" />
             <p:output name="data" ref="aggregated-portlets"/>
         </p:processor>
 

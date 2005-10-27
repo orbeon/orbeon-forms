@@ -18,12 +18,15 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.NetUtils;
 
 import java.util.*;
+import java.io.IOException;
 
 /**
  * Represents an XForms containing document.
@@ -35,6 +38,8 @@ import java.util.*;
  * o Event handlers hierarchy
  */
 public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
+
+    public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
     // At some point we need to be able to store this
 //    private LocationData locationData;
@@ -108,7 +113,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Search in controls
-        return xformsControls.getObjectById(id);
+        {
+            final Object resultObject = xformsControls.getObjectById(id);
+            if (resultObject != null)
+                return resultObject;
+        }
+
+        // Check containing document
+        if (id.equals(getId()))
+            return this;
+
+        return null;
     }
 
     /**
@@ -166,10 +181,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoad(String resource, String show) {
+    public void addLoad(String resource, boolean isReplace, boolean isPortletLoad) {
         if (loads == null)
             loads = new ArrayList();
-        loads.add(new Load(resource, show));
+        loads.add(new Load(resource, isReplace, isPortletLoad));
     }
 
     /**
@@ -181,19 +196,25 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public static class Load {
         private String resource;
-        private String show;
+        private boolean isReplace;
+        private boolean isPortletLoad;
 
-        public Load(String resource, String show) {
+        public Load(String resource, boolean replace, boolean portletLoad) {
             this.resource = resource;
-            this.show = show;
+            isReplace = replace;
+            isPortletLoad = portletLoad;
         }
 
         public String getResource() {
             return resource;
         }
 
-        public String getShow() {
-            return show;
+        public boolean isReplace() {
+            return isReplace;
+        }
+
+        public boolean isPortletLoad() {
+            return isPortletLoad;
         }
     }
 
@@ -299,6 +320,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Internal submission event
             dispatchEvent(pipelineContext, xformsEvent);
 
+        } else if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
+            // Internal load event
+            dispatchEvent(pipelineContext, xformsEvent);
         } else {
             throw new OXFException("Invalid event dispatched by client: " + eventName);
         }
@@ -349,7 +373,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public String getId() {
-        throw new OXFException("Method getId() should not be called on XFormsContainingDocument.");
+        return CONTAINING_DOCUMENT_PSEUDO_ID;
     }
 
     public LocationData getLocationData() {
@@ -357,7 +381,30 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-        throw new OXFException("Method performDefaultAction() should not be called on XFormsContainingDocument.");
+
+        if (XFormsEvents.XXFORMS_LOAD.equals(event.getEventName())) {
+            // Internal load event
+            final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
+            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            try {
+                final String resource = xxformsLoadEvent.getResource();
+
+                final String pathInfo;
+                final Map parameters;
+
+                final int qmIndex = resource.indexOf('?');
+                if (qmIndex != -1) {
+                    pathInfo = resource.substring(0, qmIndex);
+                    parameters = NetUtils.decodeQueryString(resource.substring(qmIndex + 1), false);
+                } else {
+                    pathInfo = resource;
+                    parameters = null;
+                }
+                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false);
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+        }
     }
 
     /**

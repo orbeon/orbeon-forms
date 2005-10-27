@@ -169,7 +169,7 @@ public class PortletContainer implements Serializable {
         if (!portletState.getWindowState().equals(WindowState.MINIMIZED)) {
             // Create request and response
             RenderRequestImpl renderRequest = new RenderRequestImpl(externalContext, portletConfig, portletId, request, portletState);
-            RenderResponseImpl renderResponse = new RenderResponseImpl(portletId, externalContext, renderRequest, streamInterceptor);
+            RenderResponseImpl renderResponse = new RenderResponseImpl(portletId, pipelineContext, externalContext, renderRequest, streamInterceptor);
 
             try {
                 // Render portlet
@@ -247,7 +247,7 @@ public class PortletContainer implements Serializable {
 
             // Create request and response
             ActionRequestImpl actionRequest = new ActionRequestImpl(pipelineContext, externalContext, portletConfig, portletId, externalContext.getRequest(), portletState);
-            ActionResponseImpl actionResponse = new ActionResponseImpl(portletId, externalContext, actionRequest, requestParameters);
+            ActionResponseImpl actionResponse = new ActionResponseImpl(portletId, pipelineContext, externalContext, actionRequest, requestParameters);
 
             // Call the Portlet.processAction(). This can modify the request parameters used in Portlet.render().
             try {

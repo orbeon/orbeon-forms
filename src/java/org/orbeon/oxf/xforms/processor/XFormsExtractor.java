@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms.processor;
 
 import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -24,11 +26,16 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
+import java.util.Stack;
 
 /**
  * This processor extracts XForms models and controls from an XHTML document and creates a static
@@ -43,13 +50,15 @@ public class XFormsExtractor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
                     private final String HTML_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "html");
                     private final String HEAD_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "head");
                     private final String BODY_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
+
+                    private Locator locator;
 
                     private int level;
                     private String element0;
@@ -64,6 +73,18 @@ public class XFormsExtractor extends ProcessorImpl {
                     private int modelLevel;
                     private boolean inControl;
                     private int controlLevel;
+
+                    // Create xml:base stack
+                    private final ExternalContext externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
+                    private Stack xmlBaseStack = new Stack();
+                    {
+                        try {
+                            final String rootXMLBase = externalContext.getRequest().getRequestPath();
+                            xmlBaseStack.push(new URI(rootXMLBase));
+                        } catch (URISyntaxException e) {
+                            throw new ValidationException(e, new LocationData(locator));
+                        }
+                    }
 
                     public void startDocument() throws SAXException {
                         super.startDocument();
@@ -89,6 +110,21 @@ public class XFormsExtractor extends ProcessorImpl {
 
                         namespaceSupport.pushContext();
 
+                        // Handle xml:base
+                        if (!inModel && !inControl) {
+                            final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
+                            if (xmlBaseAttribute == null) {
+                                xmlBaseStack.push(xmlBaseStack.peek());
+                            } else {
+                                try {
+                                    final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+                                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
+                                } catch (URISyntaxException e) {
+                                    throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                                }
+                            }
+                        }
+
                         // Remember first two levels of elements
                         if (level == 0) {
                             element0 = Dom4jUtils.buildExplodedQName(uri, localname);
@@ -111,6 +147,10 @@ public class XFormsExtractor extends ProcessorImpl {
                                         super.startElement("", "models", "models", XMLUtils.EMPTY_ATTRIBUTES);
 
                                     gotModel = true;
+
+                                    // Add xml:base on element
+                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", getCurrentBaseURI());
+
                                     sendStartPrefixMappings();
 
                                 } else if (!inModel && !inControl && BODY_QNAME.equals(element1)) {
@@ -125,6 +165,10 @@ public class XFormsExtractor extends ProcessorImpl {
                                         super.startElement("", "controls", "controls", XMLUtils.EMPTY_ATTRIBUTES);
 
                                     gotControl = true;
+
+                                    // Add xml:base on element
+                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", getCurrentBaseURI());
+
                                     sendStartPrefixMappings();
                                 }
 
@@ -139,6 +183,11 @@ public class XFormsExtractor extends ProcessorImpl {
                         }
 
                         level++;
+                    }
+
+                    private String getCurrentBaseURI() {
+                        final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+                        return currentXMLBaseURI.toString();
                     }
 
                     private void sendStartPrefixMappings() throws SAXException {
@@ -179,6 +228,10 @@ public class XFormsExtractor extends ProcessorImpl {
                             inControl = false;
                             sendEndPrefixMappings();
                         }
+
+                        if (!inModel && !inControl) {
+                            xmlBaseStack.pop();
+                        }
                     }
 
                     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -195,6 +248,11 @@ public class XFormsExtractor extends ProcessorImpl {
                     public void endPrefixMapping(String s) throws SAXException {
                         if (inModel || inControl)
                             super.endPrefixMapping(s);
+                    }
+
+                    public void setDocumentLocator(Locator locator) {
+                        this.locator = locator;
+                        super.setDocumentLocator(locator);
                     }
                 });
             }

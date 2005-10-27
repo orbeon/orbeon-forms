@@ -127,6 +127,8 @@ public class OXFPortletDelegate extends GenericPortlet {
                 } else {
                     // NOTE: We take the liberty to modify the Map, as nobody will use it anymore
                     Map redirectParameters = bufferedResponse.getRedirectParameters();
+                    if (redirectParameters == null)
+                        redirectParameters = new HashMap();
                     redirectParameters.put(PortletExternalContext.PATH_PARAMETER_NAME, new String[]{bufferedResponse.getRedirectPathInfo()});
 
                     // Set the new parameters for the subsequent render requests

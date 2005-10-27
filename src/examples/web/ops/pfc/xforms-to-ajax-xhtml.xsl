@@ -174,7 +174,7 @@
                     <xsl:choose>
                         <!-- Case of image media type with URI -->
                         <xsl:when test="$is-image">
-                            <xhtml:img src="{xxforms:control($id)}"/>
+                            <xhtml:img src="{xxforms:control($id)}" f:url-norewrite="true"/><!-- The URL has already been rewritten by the XForms engine -->
                         </xsl:when>
                         <!-- Display formatted value for dates -->
                         <xsl:when test="$is-date-or-time">

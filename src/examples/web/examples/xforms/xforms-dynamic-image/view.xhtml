@@ -20,7 +20,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Output Image</xhtml:title>
+        <xhtml:title>Dynamic Images With XForms</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance>
                 <candidates current="1">
@@ -71,7 +71,7 @@
                 <xforms:group ref="candidate[position() = /candidates/@current]">
                     <xforms:output ref="name" class="president-name"/>
                     <xforms:output ref="party" class="president-party"/>
-                    <xforms:output value="concat('../images/2004-candidates/', image)" mediatype="image/*" class="president-image"/>
+                    <xforms:output value="concat('/images/2004-candidates/', image)" mediatype="image/*" class="president-image"/>
                 </xforms:group>
             </xhtml:div>
             <xforms:trigger appearance="xxforms:link">

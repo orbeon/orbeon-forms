@@ -20,6 +20,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
@@ -29,12 +30,14 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
 import java.util.*;
+import java.net.URI;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
@@ -1858,17 +1861,37 @@ public class XFormsControls {
         }
 
         public void evaluateValue(PipelineContext pipelineContext) {
+            final String rawValue;
             if (valueAttribute == null) {
-                // Use default way of obtaining control value
-                super.evaluateValue(pipelineContext);
+                // Get value from single-node binding
+                rawValue = XFormsInstance.getValueForNode(currentBindingContext.getSingleNode());
             } else {
                 // Value comes from the XPath expression within the value attribute
                 final String value = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext,
                         currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
                         "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, functionLibrary, null);
 
-                super.setValue(value);
+                rawValue = value;
             }
+
+            // Handle mediatype if necessary
+            final String updatedValue;
+            if (mediaTypeAttribute != null && mediaTypeAttribute.startsWith("image/")) {
+                final String type = getType();
+                if (type == null || type.equals(Dom4jUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
+                    // Rewrite URI
+
+                    final URI resolvedURI = XFormsUtils.resolveURI(getElement(), rawValue);
+                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    updatedValue = externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), false);
+                } else {
+                    updatedValue = rawValue;
+                }
+            } else {
+                updatedValue = rawValue;
+            }
+
+            super.setValue(updatedValue);
         }
 
         public void evaluateDisplayValue(PipelineContext pipelineContext) {

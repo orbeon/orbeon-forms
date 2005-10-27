@@ -402,11 +402,9 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                     finalResult = request.getContextPath() + tempResult;
                 }
 
-                // Encode the URL a la WSRP
-                if (!generateAbsoluteURL)
-                    return WSRPUtils.encodeResourceURL(finalResult, false);
-                else
-                    return finalResult;
+                // We could encode the URL a la WSRP, but for resources, we can always produce an
+                // URL here, so just do so!
+                return finalResult;
             } catch (Exception e) {
                 throw new OXFException(e);
             }

@@ -55,7 +55,7 @@
             <p:choose href="#request-info">
                 <p:when test="/request/container-type = 'servlet'">
                     <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
-                    <p:processor name="oxf:xslt">
+                    <p:processor name="oxf:unsafe-xslt">
                         <p:input name="config" href="xforms-portlet-forms.xsl"/>
                         <p:input name="data" href="#xhtml-data"/>
                         <p:output name="data" ref="xformed-data"/>

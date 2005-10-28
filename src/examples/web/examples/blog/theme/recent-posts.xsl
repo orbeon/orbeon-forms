@@ -77,6 +77,7 @@
                     <email>0</email>
                     <uri>0</uri>
                     <content>1</content>
+                    <check>1</check>
                 </comment>
             </xforms:instance>
             <xforms:instance id="add-comment-request">
@@ -127,7 +128,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('utils')/submit-comment-trigger" readonly="sum(instance('new-comment-validity')/*) != 0"/>
-            <xforms:bind nodeset="instance('utils')/comment-preview-group" relevant="sum(instance('new-comment-validity')/*) = 0"/>
+            <xforms:bind nodeset="instance('utils')/comment-preview-group" relevant="sum(instance('new-comment-validity')/(* except check)) = 0"/>
 
             <xforms:bind nodeset="instance('main')">
                 <xforms:bind nodeset="posts/day/date" type="xs:date"/>
@@ -394,6 +395,12 @@
                                                     <xforms:input ref="check/value3" incremental="true" xhtml:size="3">
                                                         <xforms:alert>Please enter a correct check value!</xforms:alert>
                                                         <xforms:hint>Please enter a check value. This is a measure against comment spam.</xforms:hint>
+                                                        <xforms:action ev:event="xforms-invalid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/check" value="1"/>
+                                                        </xforms:action>
+                                                        <xforms:action ev:event="xforms-valid">
+                                                            <xforms:setvalue ref="instance('new-comment-validity')/check" value="0"/>
+                                                        </xforms:action>
                                                     </xforms:input>
                                                 </td>
                                             </tr>

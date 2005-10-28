@@ -45,7 +45,7 @@
             <param name="ConversionPattern" value="%t %-5p %c{2} - %m%n"/>
         </layout>
     </appender>
-
+    
     <!--
     <category name="org.orbeon.oxf.processor.xmldb.XMLDBProcessor">
         <priority value="debug"/>

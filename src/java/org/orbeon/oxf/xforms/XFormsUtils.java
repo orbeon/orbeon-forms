@@ -143,11 +143,30 @@ public class XFormsUtils {
         }
     }
 
+    /**
+     * Mark all value nodes of an instance document as having changed.
+     */
+    public static void markAllValuesChanged(Document document) {
+        XFormsUtils.iterateInstanceData(document, new XFormsUtils.InstanceWalker() {
+            public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
+                if (localInstanceData != null) {
+                    localInstanceData.markValueChanged();
+                }
+            }
+        });
+    }
+
+    /**
+     * Return whether name encryption is enabled (legacy XForms engine only).
+     */
     public static boolean isNameEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_ENCRYPT_NAMES_PROPERTY, false).booleanValue();
     }
 
+    /**
+     * Return whether hidden fields encryption is enabled.
+     */
     public static boolean isHiddenEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
@@ -249,15 +268,24 @@ public class XFormsUtils {
     }
 
     private static void iterateInstanceData(Element element, InstanceWalker instanceWalker) {
-        instanceWalker.walk(element, getLocalInstanceData(element), getInheritedInstanceData(element));
 
+        final List childrenElements = element.elements();
+
+        // We should probably not "walk" an element which contains elements
+        if (childrenElements.size() == 0)
+            instanceWalker.walk(element, getLocalInstanceData(element), getInheritedInstanceData(element));
+
+        // "walk" current element's attributes
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             final Attribute attribute = (Attribute) i.next();
             instanceWalker.walk(attribute, getLocalInstanceData(attribute), getInheritedInstanceData(attribute));
         }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            final Element child = (Element) i.next();
-            iterateInstanceData(child, instanceWalker);
+        // "walk" current element's children elements
+        if (childrenElements.size() != 0) {
+            for (Iterator i = childrenElements.iterator(); i.hasNext();) {
+                final Element child = (Element) i.next();
+                iterateInstanceData(child, instanceWalker);
+            }
         }
     }
 

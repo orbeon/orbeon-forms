@@ -66,6 +66,9 @@ public class XFormsActionInterpreter {
 
         final String actionEventName = actionElement.getName();
 
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - executing action: " + actionEventName);
+
         if (XFormsActions.XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
             // 10.1.9 The setvalue Element
             // xforms:setvalue

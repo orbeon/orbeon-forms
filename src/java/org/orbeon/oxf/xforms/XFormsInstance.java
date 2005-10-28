@@ -27,8 +27,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -288,8 +288,7 @@ public class XFormsInstance implements XFormsEventTarget {
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (externalContext == null)
             throw new OXFException("Missing external context");
-        ExternalContext.Request request = externalContext.getRequest();
-        return request;
+        return externalContext.getRequest();
     }
 
     public String getId() {

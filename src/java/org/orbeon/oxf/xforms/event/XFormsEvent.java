@@ -13,6 +13,9 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.XFormsServer;
 
 
 /**
@@ -25,11 +28,17 @@ public abstract class XFormsEvent {
     private boolean bubbles;
     private boolean cancelable;
 
+    private LocationData locationData;
+
     protected XFormsEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         this.eventName = eventName;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
         this.cancelable = cancelable;
+
+        // Get location information for debugging only (it's time consuming)
+        if (XFormsServer.logger.isDebugEnabled())
+            this.locationData = Dom4jUtils.getLocationData(2);
     }
 
     public String getEventName() {
@@ -46,5 +55,9 @@ public abstract class XFormsEvent {
 
     public boolean isCancelable() {
         return cancelable;
+    }
+
+    public LocationData getLocationData() {
+        return locationData;
     }
 }

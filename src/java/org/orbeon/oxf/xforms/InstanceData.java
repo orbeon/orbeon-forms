@@ -165,8 +165,7 @@ public class InstanceData implements Cloneable {
         } else {
             unmod = Collections.unmodifiableCollection(schemaErrors);
         }
-        final Iterator ret = unmod.iterator();
-        return ret;
+        return unmod.iterator();
     }
 
     public void addSchemaError(final String msg, final String stringValue) {
@@ -257,4 +256,11 @@ public class InstanceData implements Cloneable {
 
         return result;
     }
+
+//    public String toString() {
+//        return "[valueChanged=" + valueChanged
+//                + ", previousValidState=" + previousValidState
+//                + ", validState=" + getValid().get()
+//                +"]";
+//    }
 }

@@ -70,12 +70,13 @@
                     </check>
                 </form>
             </xforms:instance>
+            <!-- Handle current validity information for new comments -->
             <xforms:instance id="new-comment-validity">
                 <comment xmlns="">
                     <name>1</name>
                     <email>0</email>
                     <uri>0</uri>
-                    <content>0</content>
+                    <content>1</content>
                 </comment>
             </xforms:instance>
             <xforms:instance id="add-comment-request">
@@ -174,7 +175,7 @@
     </head>
     <body>
 
-        <xforms:output ref="instance('new-comment-validity')" appearance="xxforms:html"/>
+        <!--<xforms:output ref="instance('new-comment-validity')" appearance="xxforms:html"/>-->
 
         <table>
             <tr>
@@ -399,28 +400,30 @@
                                         </table>
                                         <!-- Display comment preview -->
                                         <xforms:group ref="instance('utils')/comment-preview-group">
-                                            <p>
-                                                This is how your comment will appear:
-                                            </p>
-                                            <!-- Display comment content -->
-                                            <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
-                                                <xforms:output ref="content" appearance="xxforms:html"/>
-                                            </div>
-                                            <!-- Display comment information and links -->
-                                            <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
-                                                Comment by
-                                                <!--<a href="mailto:{$instance/form/comment/email}"> xxx -->
-                                                <xforms:output ref="name"/>
-                                                <xforms:output value="' @ '"/>
-                                                <xforms:output ref="instance('new-comment')/comment/date-created"/>
-                                                <!--<xforms:group ref="text">-->
-                                                    <xforms:output value="' ('"/>
-                                                    <xforms:output ref="content/@word-count"/>
-                                                    <xforms:output value="if (content/@word-count > 1) then ' words, ' else ' word, '"/>
-                                                    <xforms:output ref="content/@character-count"/>
-                                                    <xforms:output value="if (content/@character-count > 1) then ' characters)' else ' character)'"/>
-                                                <!--</xforms:group>-->
-                                            </div>
+                                            <xforms:group ref="instance('format-comment-response')">
+                                                <p>
+                                                    This is how your comment will appear:
+                                                </p>
+                                                <!-- Display comment content -->
+                                                <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
+                                                    <xforms:output ref="content" appearance="xxforms:html"/>
+                                                </div>
+                                                <!-- Display comment information and links -->
+                                                <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
+                                                    Comment by
+                                                    <!--<a href="mailto:{$instance/form/comment/email}"> xxx -->
+                                                    <xforms:output ref="name"/>
+                                                    <xforms:output value="' @ '"/>
+                                                    <xforms:output ref="instance('new-comment')/comment/date-created"/>
+                                                    <!--<xforms:group ref="text">-->
+                                                        <xforms:output value="' ('"/>
+                                                        <xforms:output ref="content/@word-count"/>
+                                                        <xforms:output value="if (content/@word-count > 1) then ' words, ' else ' word, '"/>
+                                                        <xforms:output ref="content/@character-count"/>
+                                                        <xforms:output value="if (content/@character-count > 1) then ' characters)' else ' character)'"/>
+                                                    <!--</xforms:group>-->
+                                                </div>
+                                            </xforms:group>
                                         </xforms:group>
                                         <!-- Display existing comments with XForms -->
                                         <h3>Comments</h3>

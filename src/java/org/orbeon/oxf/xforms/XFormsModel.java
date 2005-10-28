@@ -744,7 +744,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
-            clearInstanceDataEventState();
+//            clearInstanceDataEventState();
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -835,14 +835,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                             setNode(node);
 
-                            // Dispatch xforms-value-changed
+                            // Check if value has changed
                             final boolean valueChanged = inheritedInstanceData.isValueChanged();
-                            {
-                                if (valueChanged) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        eventsToDispatch.add(new XFormsValueChangeEvent((XFormsEventTarget) i.next()));
-                                }
-                            }
 
                             // Dispatch xforms-optional/xforms-required
                             {
@@ -889,13 +883,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             {
                                 final boolean previousValidState = inheritedInstanceData.getPreviousValidState();
                                 final boolean newValidState = inheritedInstanceData.getValid().get();
-                                if (previousValidState && !newValidState) {
+                                if ((valueChanged || previousValidState) && !newValidState) {
                                     for (Iterator i = getBoundControlsIterator(); i.hasNext();)
                                         eventsToDispatch.add(new XFormsInvalidEvent((XFormsEventTarget) i.next()));
-                                } else if (!previousValidState && newValidState) {
+                                } else if ((valueChanged || !previousValidState) && newValidState) {
                                     for (Iterator i = getBoundControlsIterator(); i.hasNext();)
                                         eventsToDispatch.add(new XFormsValidEvent((XFormsEventTarget) i.next()));
                                 }
+                            }
+
+                            // Dispatch xforms-value-changed
+                            // NOTE: deferred behavior is broken in XForms 1.0; 1.1 should
+                            // introduce better behavior; howver, with the 1.0 behavior, it works
+                            // better for us for now to send xforms-value-changed last
+                            if (valueChanged) {
+                                for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                    eventsToDispatch.add(new XFormsValueChangeEvent((XFormsEventTarget) i.next()));
                             }
                         }
                     });

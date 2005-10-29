@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XForms Repeat</title>
+    <title>XForms To Do Lists</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">

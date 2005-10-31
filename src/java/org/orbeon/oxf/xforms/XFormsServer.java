@@ -925,9 +925,9 @@ public class XFormsServer extends ProcessorImpl {
         if (pool == null) {
             pool = createXFormsContainingDocumentPool(pipelineContext, staticStateString, dynamicStateString, filesElement);
             // We don't add the pool to the cache here, as we may decide not to cache later on
-            logger.info("xxx DID NOT FIND containing document pool in cache when restoring");
+            logger.debug("getContainingDocument: did not find containing document pool in cache.");
         } else {
-            logger.info("xxx FOUND containing document pool in cache when restoring");
+            logger.debug("getContainingDocument: found containing document pool in cache when restoring.");
         }
 
         try {
@@ -957,11 +957,11 @@ public class XFormsServer extends ProcessorImpl {
             pool = containingDocument.getObjectPool();
             if (pool != null) {
                 cache.add(pipelineContext, cacheKey, validity, pool);
-                logger.info("xxx CACHED containing document when returning");
+                logger.debug("cacheContainingDocument: cached containing document.");
             }
         } else {
             // Pool is already in cache (either we got the document from cache, or somebody created the pool in the meanwhile)
-            logger.info("xxx DID NOT CACHE containing document (because found in cache) when returning");
+            logger.debug("cacheContainingDocument: did not cache containing document (cached pool exists).");
         }
     }
 

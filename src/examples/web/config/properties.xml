@@ -32,9 +32,11 @@
     <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
 
     <!-- Default formatting of xs:date, xs:dateTime and xs:time -->
-    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+
+    <property as="xs:boolean" name="oxf.xforms.cache.context"                        value="true"/>
     
 
     <!--                               Profiling support.                                        -->

@@ -542,7 +542,7 @@ public class XFormsActionInterpreter {
 
                 if (message != null) {
                     // Store message for sending to client
-                    containingDocument.addMessage(message, level);
+                    containingDocument.addClientMessage(message, level);
 
                     // NOTE: In the future, we *may* want to save and resume the event state before and
                     // after displaying a message, in order to possibly provide a behavior which is more
@@ -648,7 +648,7 @@ public class XFormsActionInterpreter {
             }
         }
 
-        containingDocument.addLoad(externalURL, doReplace, isPortletLoad);
+        containingDocument.addClientLoad(externalURL, doReplace, isPortletLoad);
     }
 
     public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {

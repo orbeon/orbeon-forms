@@ -40,23 +40,6 @@ import java.util.*;
  */
 public class XPathCache {
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
-    private static final boolean doCache = true;
-
-    public static XPath createCacheXPath(PipelineContext context, String xpathExpression) {
-        if (doCache) {
-            Long validity = new Long(0);
-            Cache cache = ObjectCache.instance();
-            InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression", xpathExpression);
-            XPath xpath = (XPath) cache.findValid(context, cacheKey, validity);
-            if (xpath == null) {
-                xpath = Dom4jUtils.createXPath(xpathExpression);
-                cache.add(context, cacheKey, validity, xpath);
-            }
-            return xpath;
-        } else {
-            return Dom4jUtils.createXPath(xpathExpression);
-        }
-    }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
                                                            NodeInfo contextNode,

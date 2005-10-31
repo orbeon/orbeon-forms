@@ -17,8 +17,6 @@ import org.dom4j.InvalidXPathException;
 import org.jaxen.*;
 import org.jaxen.dom.DOMXPath;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -301,33 +299,6 @@ public class XPathUtils {
 
         return prefixedXPath.toString();
     }
-
-    /**
-     * Returns an XPath object based on an XPath expression and a node. The XPath expression can
-     * have have encoded namespaces, for instance:
-     *
-     *     /{http://www.example.com/x}a/{http://www.example.com/y}b
-     *
-     * The expression may or may not have prefixes. If it does, prefixes are used. This is not
-     * strictly necessary, but using the existing prefixes will yield better error messages.
-     * Otherwise, prefixes are automatically generated.
-     *
-     *     /{http://www.example.com/x}x:a/{http://www.example.com/y}y:b
-     */
-    public static org.dom4j.XPath xpathWithFullURI(PipelineContext context, String xpath) {
-        Map prefixToURIMap = new HashMap();
-        org.dom4j.XPath path = XPathCache.createCacheXPath(context, xpathWithFullURIString(xpath, prefixToURIMap));
-        path.setNamespaceContext(new SimpleNamespaceContext(prefixToURIMap));
-        return path;
-    }
-
-    // Apparently no longer in use
-//    public static XPathExpression xpath2WithFullURI(DocumentWrapper documentWrapper, Map repeatIdToIndex, String xpath) {
-//        Map prefixToURIMap = new HashMap();
-//        String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
-//        return XPathCache.createCacheXPath20(null, documentWrapper, null, xpathExpression,
-//                prefixToURIMap, repeatIdToIndex, null);
-//    }
 
     /**
      * Example:

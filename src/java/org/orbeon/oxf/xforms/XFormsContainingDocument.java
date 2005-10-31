@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.NetUtils;
+import org.apache.commons.pool.ObjectPool;
 
 import java.util.*;
 import java.io.IOException;
@@ -41,13 +42,18 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
-    // At some point we need to be able to store this
-//    private LocationData locationData;
+//    private LocationData locationData; // At some point we need to be able to store this
+
+    // Object pool this object belongs to, if any 
+    private ObjectPool objectPool;
+
+    // A document contains models and controls
     private List models;
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
     private String containerType;
 
+    // Client state
     private XFormsModelSubmission activeSubmission;
     private List messages;
     private List loads;
@@ -56,10 +62,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(models, controlsDocument, null, null);
+        this(null, models, controlsDocument, null, null);
     }
 
-    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
+    public XFormsContainingDocument(ObjectPool objectPool, List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
+        this.objectPool = objectPool;
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
         this.containerType = containerType;
@@ -70,6 +77,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 modelsMap.put(model.getId(), model);
             model.setContainingDocument(this);
         }
+    }
+
+    public ObjectPool getObjectPool() {
+        return objectPool;
     }
 
     /**
@@ -143,11 +154,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Clear current client state.
+     */
+    public void clearClientState() {
+        this.activeSubmission = null;
+        this.messages = null;
+        this.loads = null;
+        this.focusEffectiveControlId = null;
+    }
+
+    /**
      * Set the active submission.
      *
      * This can be called with a non-null value at most once.
      */
-    public void setActiveSubmission(XFormsModelSubmission activeSubmission) {
+    public void setClientActiveSubmission(XFormsModelSubmission activeSubmission) {
         if (this.activeSubmission != null)
             throw new OXFException("There is already an active submission.");
         this.activeSubmission = activeSubmission;
@@ -156,7 +177,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms message to send to the client.
      */
-    public void addMessage(String message, String level) {
+    public void addClientMessage(String message, String level) {
         if (messages == null)
             messages = new ArrayList();
         messages.add(new Message(message, level));
@@ -165,7 +186,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the list of messages to send to the client, null if none.
      */
-    public List getMessages() {
+    public List getClientMessages() {
         return messages;
     }
 
@@ -190,7 +211,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoad(String resource, boolean isReplace, boolean isPortletLoad) {
+    public void addClientLoad(String resource, boolean isReplace, boolean isPortletLoad) {
         if (loads == null)
             loads = new ArrayList();
         loads.add(new Load(resource, isReplace, isPortletLoad));
@@ -199,7 +220,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the list of messages to send to the client, null if none.
      */
-    public List getLoads() {
+    public List getClientLoads() {
         return loads;
     }
 
@@ -234,14 +255,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      *
      * @param effectiveControlId
      */
-    public void setFocus(String effectiveControlId) {
+    public void setClientFocusEffectiveControlId(String effectiveControlId) {
         this.focusEffectiveControlId = effectiveControlId;
     }
 
     /**
      * Return the effective control id of the control to set the focus to, or null.
      */
-    public String getFocusEffectiveControlId() {
+    public String getClientFocusEffectiveControlId() {
         return focusEffectiveControlId;
     }
 
@@ -340,6 +361,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void dispatchExternalEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
+
+            // This is called upon the first creation of the XForms engine only
+
             // 4.2 Initialization Events
 
             // 1. Dispatch xforms-model-construct to all models
@@ -358,12 +382,20 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             final XXFormsInitializeStateEvent initializeStateEvent = (XXFormsInitializeStateEvent) xformsEvent;
+
+            // This is called whenever the state of the XForms engine needs to be rebuilt
+
+            // Clear containing document state
+            clearClientState();
+
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
                 dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
             }
+
             dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
+
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
             final XXFormsInitializeControlsEvent initializeControlsEvent = (XXFormsInitializeControlsEvent) xformsEvent;

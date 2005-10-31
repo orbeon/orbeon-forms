@@ -193,7 +193,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Deferred submission
                 if (isDeferredSubmissionFirstPass) {
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
-                    containingDocument.setActiveSubmission(this);
+                    containingDocument.setClientActiveSubmission(this);
                     return;
                 }
 

@@ -627,7 +627,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void loadSchemasIfNeeded(PipelineContext pipelineContext) {
         final Element modelElement = modelDocument.getRootElement();
         // Create Schema validator only if we have schemas specified
-        if (modelElement.attributeValue("schema") != null) {
+        if (modelElement.attributeValue("schema") != null && schemaValidator == null) {
             schemaValidator = new XFormsModelSchemaValidator();
             schemaValidator.loadSchemas(pipelineContext, modelElement);
         }

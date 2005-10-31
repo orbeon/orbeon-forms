@@ -130,6 +130,7 @@ public class PooledXPathExpression {
         }
     }
 
+    // TODO: This will be used when we upgrade to Saxon >= 8.5.
     private static class ListSequenceIterator implements SequenceIterator, Cloneable {
 
         private List contextNodeset;

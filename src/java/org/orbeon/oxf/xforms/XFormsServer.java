@@ -14,6 +14,10 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.ObjectPool;
+import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -29,6 +33,10 @@ import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.ObjectCache;
+import org.orbeon.oxf.cache.InternalCacheKey;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -45,6 +53,8 @@ public class XFormsServer extends ProcessorImpl {
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
+
+    private static final String CONTAINING_DOCUMENT_KEY_TYPE = "oxf.xforms.cache.context.containing-document";
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
 
@@ -103,241 +113,269 @@ public class XFormsServer extends ProcessorImpl {
         // Get files if any
         final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
-        // Create and initialize XForms engine from encoded data
-        XFormsContainingDocument containingDocument
-                = createXFormsEngine(pipelineContext, staticStateString, dynamicStateString, filesElement);
-
-        // Run event if any
-        boolean isInitializationRun = true;
-        {
-            final List eventElements = actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME);
-            if (eventElements != null && eventElements.size() > 0) {
-                for (Iterator i = eventElements.iterator(); i.hasNext();) {
-                    final Element eventElement = (Element) i.next();
-                    final String sourceControlId = eventElement.attributeValue("source-control-id");
-                    final String otherControlId = eventElement.attributeValue("other-control-id");
-                    final String eventName = eventElement.attributeValue("name");
-                    final String value = eventElement.getText();
-
-                    if (sourceControlId != null && eventName != null) {
-                        // An event is passed
-                        containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
-                        isInitializationRun = false;
-                    } else if (!(sourceControlId == null && eventName == null)) {
-                        throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
-                    }
-                }
-            } else {
-                isInitializationRun = true;
-            }
+        XFormsContainingDocument containingDocument = null;
+        // Try to obtain containing document from cache first
+        if (isCacheContexts()) {
+            containingDocument = getContainingDocument(pipelineContext, staticStateString, dynamicStateString, filesElement);
+        } else {
+            containingDocument = createXFormsContainingDocument(null, pipelineContext, staticStateString, dynamicStateString, filesElement);
         }
 
-        // Create resulting document if there is a ContentHandler
-        if (contentHandler != null) {
-            final XFormsControls xFormsControls = containingDocument.getXFormsControls();
-            xFormsControls.rebuildCurrentControlsState(pipelineContext);
-            final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
-            try {
-                final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
-                ch.startDocument();
-                contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+        try {
+            // Run event if any
+            boolean isInitializationRun = true;
+            {
+                final List eventElements = actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME);
+                if (eventElements != null && eventElements.size() > 0) {
+                    for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                        final Element eventElement = (Element) i.next();
+                        final String sourceControlId = eventElement.attributeValue("source-control-id");
+                        final String otherControlId = eventElement.attributeValue("other-control-id");
+                        final String eventName = eventElement.attributeValue("name");
+                        final String value = eventElement.getText();
 
-                // NOTE: Static state is produced externally during initialization
-
-                // Output dynamic state
-                boolean requireClientSubmission = false;
-                {
-                    final Document dynamicStateDocument = Dom4jUtils.createDocument();
-                    final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-                    // Output updated instances
-                    {
-                        final Element instancesElement = dynamicStateElement.addElement("instances");
-
-                        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                            final XFormsModel currentModel = (XFormsModel) i.next();
-
-                            for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                                final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                                instancesElement.add((currentInstance).getDocument().getRootElement().createCopy());
-                                // Log instance if needed
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("XForms - resulting instance: model id='" + currentModel.getId() +  "', instance id= '" + currentInstance.getId() + "'\n"
-                                            + Dom4jUtils.domToString(currentInstance.getDocument()));
-                                }
-                            }
+                        if (sourceControlId != null && eventName != null) {
+                            // An event is passed
+                            containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
+                            isInitializationRun = false;
+                        } else if (!(sourceControlId == null && eventName == null)) {
+                            throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
                     }
+                } else {
+                    isInitializationRun = true;
+                }
+            }
 
-                    // Output divs information
-                    {
-                        final Element divsElement = dynamicStateElement.addElement("divs");
-                        outputSwitchDivs(divsElement, currentControlsState);
-                    }
+            // Create resulting document if there is a ContentHandler
+            if (contentHandler != null) {
+                final XFormsControls xFormsControls = containingDocument.getXFormsControls();
+                xFormsControls.rebuildCurrentControlsState(pipelineContext);
+                final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
+                try {
+                    final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+                    ch.startDocument();
+                    contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-                    // Output repeat index information
-                    {
-                        final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-                        if (repeatIdToIndex != null && repeatIdToIndex.size() != 0) {
-                            final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
-                            for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                                final Map.Entry currentEntry = (Map.Entry) i.next();
-                                final String repeatId = (String) currentEntry.getKey();
-                                final Integer index = (Integer) currentEntry.getValue();
-                                final Element newElement = repeatIndexesElement.addElement("repeat-index");
-                                newElement.addAttribute("id", repeatId);
-                                newElement.addAttribute("index", index.toString());
-                            }
-                        }
-                    }
+                    // NOTE: Static state is produced externally during initialization only
 
-                    // Submission automatic event if needed
+                    // Output dynamic state
+                    boolean requireClientSubmission = false;
                     {
-                        // Check for xxforms-submit event
+                        final Document dynamicStateDocument = Dom4jUtils.createDocument();
+                        final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
+                        // Output updated instances
                         {
-                            final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
-                            if (activeSubmission != null) {
-                                final Element eventElement = dynamicStateElement.addElement("event");
-                                eventElement.addAttribute("source-control-id", activeSubmission.getId());
-                                eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
-                                requireClientSubmission = true;
-                            }
-                        }
-                        // Check for xxforms-load event
-                        {
-                            final List loads = containingDocument.getLoads();
-                            if (loads != null) {
-                                for (Iterator i = loads.iterator(); i.hasNext();) {
-                                    final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
+                            final Element instancesElement = dynamicStateElement.addElement("instances");
 
-                                    if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource())) {
-                                        // We need to submit the event so that the portlet can load the new path
-                                        final Element eventElement = dynamicStateElement.addElement("event");
-                                        eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
-                                        eventElement.addAttribute("resource", load.getResource());
-                                        eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
-                                        requireClientSubmission = true;
+                            for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+                                final XFormsModel currentModel = (XFormsModel) i.next();
 
-                                        break;
+                                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                                    instancesElement.add((currentInstance).getDocument().getRootElement().createCopy());
+                                    // Log instance if needed
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("XForms - resulting instance: model id='" + currentModel.getId() +  "', instance id= '" + currentInstance.getId() + "'\n"
+                                                + Dom4jUtils.domToString(currentInstance.getDocument()));
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Encode dynamic state
-                    final String encodedDynamicState = XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument);
+                        // Output divs information
+                        {
+                            final Element divsElement = dynamicStateElement.addElement("divs");
+                            outputSwitchDivs(divsElement, currentControlsState);
+                        }
 
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                    ch.text(encodedDynamicState);
-                    ch.endElement();
-                }
-
-                // Output action
-                {
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
-
-                    // Output new controls values and associated information
-                    {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-
-                        diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
-                                currentControlsState.getChildren());
-
-                        ch.endElement();
-                    }
-
-                    // Output divs information
-                    {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                        outputSwitchDivs(ch, currentControlsState);
-                        ch.endElement();
-                    }
-
-                    // Output repeats information
-                    {
-                        if (isInitializationRun) {
-                            // Output initial repeat information
-                            outputInitialRepeatInfo(ch, currentControlsState);
-                        } else {
-                            // Output index updates
-                            final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
-                            final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-                            if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
-                                boolean found = false;
-                                for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                        // Output repeat index information
+                        {
+                            final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                            if (repeatIdToIndex != null && repeatIdToIndex.size() != 0) {
+                                final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
+                                for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                                     final Map.Entry currentEntry = (Map.Entry) i.next();
                                     final String repeatId = (String) currentEntry.getKey();
                                     final Integer index = (Integer) currentEntry.getValue();
+                                    final Element newElement = repeatIndexesElement.addElement("repeat-index");
+                                    newElement.addAttribute("id", repeatId);
+                                    newElement.addAttribute("index", index.toString());
+                                }
+                            }
+                        }
 
-                                    // Output information if there is a difference
-                                    final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
-                                    if (!index.equals(newIndex)) {
+                        // Submission automatic event if needed
+                        {
+                            // Check for xxforms-submit event
+                            {
+                                final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
+                                if (activeSubmission != null) {
+                                    final Element eventElement = dynamicStateElement.addElement("event");
+                                    eventElement.addAttribute("source-control-id", activeSubmission.getId());
+                                    eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
+                                    requireClientSubmission = true;
+                                }
+                            }
+                            // Check for xxforms-load event
+                            {
+                                final List loads = containingDocument.getClientLoads();
+                                if (loads != null) {
+                                    for (Iterator i = loads.iterator(); i.hasNext();) {
+                                        final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
 
-                                        if (!found) {
-                                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
-                                            found = true;
+                                        if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource())) {
+                                            // We need to submit the event so that the portlet can load the new path
+                                            final Element eventElement = dynamicStateElement.addElement("event");
+                                            eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
+                                            eventElement.addAttribute("resource", load.getResource());
+                                            eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
+                                            requireClientSubmission = true;
+
+                                            break;
                                         }
-
-                                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                                                new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
                                     }
                                 }
-                                if (found)
-                                    ch.endElement();
                             }
+                        }
+
+                        // Encode dynamic state
+                        final String newEncodedDynamicState = XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument);
+
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
+                        ch.text(newEncodedDynamicState);
+                        ch.endElement();
+
+                        // Cache if requested and possible
+                        if (isCacheContexts() && !requireClientSubmission) {
+
+                            // NOTE: We check on requireClientSubmission because the event is encoded
+                            // in the dynamic state. But if we stored the event separately, then we
+                            // could still cache the containing document.
+
+                            cacheContainingDocument(pipelineContext, staticStateString, newEncodedDynamicState, containingDocument);
                         }
                     }
 
-                    // Output itemset information
+                    // Output action
                     {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-                        if (isInitializationRun) {
-                            outputItemsets(ch, xFormsControls.getItemsetFull());
-                        } else {
-                            outputItemsets(ch, xFormsControls.getItemsetUpdate());
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
+
+                        // Output new controls values and associated information
+                        {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
+
+                            diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                                    currentControlsState.getChildren());
+
+                            ch.endElement();
                         }
+
+                        // Output divs information
+                        {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
+                            outputSwitchDivs(ch, currentControlsState);
+                            ch.endElement();
+                        }
+
+                        // Output repeats information
+                        {
+                            if (isInitializationRun) {
+                                // Output initial repeat information
+                                outputInitialRepeatInfo(ch, currentControlsState);
+                            } else {
+                                // Output index updates
+                                final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
+                                final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                                if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
+                                    boolean found = false;
+                                    for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                                        final String repeatId = (String) currentEntry.getKey();
+                                        final Integer index = (Integer) currentEntry.getValue();
+
+                                        // Output information if there is a difference
+                                        final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
+                                        if (!index.equals(newIndex)) {
+
+                                            if (!found) {
+                                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+                                                found = true;
+                                            }
+
+                                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                                                    new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
+                                        }
+                                    }
+                                    if (found)
+                                        ch.endElement();
+                                }
+                            }
+                        }
+
+                        // Output itemset information
+                        {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
+                            if (isInitializationRun) {
+                                outputItemsets(ch, xFormsControls.getItemsetFull());
+                            } else {
+                                outputItemsets(ch, xFormsControls.getItemsetUpdate());
+                            }
+                            ch.endElement();
+                        }
+
+                        // Check if we want to require the client to perform a form submission
+                        {
+                            if (requireClientSubmission)
+                                outputSubmissionInfo(pipelineContext, ch);
+                        }
+
+                        // Output messages to display
+                        {
+                            final List messages = containingDocument.getClientMessages();
+                            if (messages != null) {
+                                outputMessagesInfo(ch, messages);
+                            }
+                        }
+
+                        // Output loads
+                        {
+                            final List loads = containingDocument.getClientLoads();
+                            if (loads != null) {
+                                outputLoadsInfo(ch, loads);
+                            }
+                        }
+
+                        // Output focus instructions
+                        {
+                            final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
+                            if (focusEffectiveControlId != null) {
+                                outputFocusInfo(ch, focusEffectiveControlId);
+                            }
+                        }
+
                         ch.endElement();
                     }
 
-                    // Check if we want to require the client to perform a form submission
-                    {
-                        if (requireClientSubmission)
-                            outputSubmissionInfo(pipelineContext, ch);
-                    }
-
-                    // Output messages to display
-                    {
-                        final List messages = containingDocument.getMessages();
-                        if (messages != null) {
-                            outputMessagesInfo(ch, messages);
-                        }
-                    }
-
-                    // Output loads
-                    {
-                        final List loads = containingDocument.getLoads();
-                        if (loads != null) {
-                            outputLoadsInfo(ch, loads);
-                        }
-                    }
-
-                    // Output focus instructions
-                    {
-                        final String focusEffectiveControlId = containingDocument.getFocusEffectiveControlId();
-                        if (focusEffectiveControlId != null) {
-                            outputFocusInfo(ch, focusEffectiveControlId);
-                        }
-                    }
-
                     ch.endElement();
+                    contentHandler.endPrefixMapping("xxf");
+                    ch.endDocument();
+                } catch (SAXException e) {
+                    throw new OXFException(e);
                 }
-
-                ch.endElement();
-                contentHandler.endPrefixMapping("xxf");
-                ch.endDocument();
-            } catch (SAXException e) {
-                throw new OXFException(e);
+            }
+        } finally {
+            // This must be done whatever happens
+            if (containingDocument != null) {
+                final ObjectPool objectPool = containingDocument.getObjectPool();
+                if (objectPool != null) {
+                    try {
+                        objectPool.returnObject(containingDocument);
+                    } catch (Exception e) {
+                        throw new OXFException(e);
+                    }
+                }
             }
         }
     }
@@ -748,8 +786,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String staticStateString,
-                                                              String dynamicStateString, Element filesElement) {
+    private static XFormsContainingDocument createXFormsContainingDocument(ObjectPool objectPool, PipelineContext pipelineContext,
+                                                                           String staticStateString, String dynamicStateString, Element filesElement) {
 
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, staticStateString);
         final Document dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
@@ -791,7 +829,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Create XForms Engine
-        XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement,
+        XFormsContainingDocument containingDocument = new XFormsContainingDocument(objectPool, models, controlsDocument, repeatIndexesElement,
                 staticStateDocument.getRootElement().attributeValue("container-type"));
 
         // Get instances
@@ -855,5 +893,115 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         return containingDocument;
+    }
+
+    private static ObjectPool createXFormsContainingDocumentPool(PipelineContext pipelineContext, String staticStateString, String dynamicStateString, Element filesElement) {
+        try {
+            final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
+            pool.setFactory(new CachedPoolableObjetFactory(pool, pipelineContext, staticStateString, dynamicStateString, filesElement));
+
+            return pool;
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private static boolean isCacheContexts() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_CACHE_CONTEXTS_PROPERTY, false).booleanValue();
+    }
+
+    private static XFormsContainingDocument getContainingDocument(PipelineContext pipelineContext, String staticStateString,
+                                                                  String dynamicStateString, Element filesElement) {
+
+        final Long validity = new Long(0);
+        final Cache cache = ObjectCache.instance();
+        final String cacheKeyString = StringUtils.deleteWhitespace(staticStateString + "|" + dynamicStateString);
+        //logger.info("xxx KEY used when returning: " + cacheKeyString);
+
+        // Try to find pool in cache, create it if not found
+        final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
+        ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
+        if (pool == null) {
+            pool = createXFormsContainingDocumentPool(pipelineContext, staticStateString, dynamicStateString, filesElement);
+            // We don't add the pool to the cache here, as we may decide not to cache later on
+            logger.info("xxx DID NOT FIND containing document pool in cache when restoring");
+        } else {
+            logger.info("xxx FOUND containing document pool in cache when restoring");
+        }
+
+        try {
+            // Get object from pool
+            final XFormsContainingDocument containingDocument = (XFormsContainingDocument) pool.borrowObject();
+            // Initialize state
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, null, null));
+            // Return document
+            return containingDocument;
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private static void cacheContainingDocument(PipelineContext pipelineContext, String staticStateString, String dynamicStateString, XFormsContainingDocument containingDocument) {
+
+        // Document was not in pool
+        final Long validity = new Long(0);
+        final Cache cache = ObjectCache.instance();
+        final String cacheKeyString = StringUtils.deleteWhitespace(staticStateString + "|" + dynamicStateString);
+        //logger.info("xxx KEY used when returning: " + cacheKeyString);
+
+        final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
+        ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
+        if (pool == null) {
+            // The pool is not in cache
+            pool = containingDocument.getObjectPool();
+            if (pool != null) {
+                cache.add(pipelineContext, cacheKey, validity, pool);
+                logger.info("xxx CACHED containing document when returning");
+            }
+        } else {
+            // Pool is already in cache (either we got the document from cache, or somebody created the pool in the meanwhile)
+            logger.info("xxx DID NOT CACHE containing document (because found in cache) when returning");
+        }
+    }
+
+    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
+        private final ObjectPool pool;
+        private PipelineContext pipelineContext;
+        private String staticStateString;
+        private String dynamicStateString;
+        private Element filesElement;
+
+        public CachedPoolableObjetFactory(ObjectPool pool, PipelineContext pipelineContext, String staticStateString, String dynamicStateString, Element filesElement) {
+            this.pool = pool;
+            this.pipelineContext = pipelineContext; // TODO: this is bad, we should not store the PipelineContext!
+            this.staticStateString = staticStateString;
+            this.dynamicStateString = dynamicStateString;
+            this.filesElement = filesElement;
+        }
+
+        public void activateObject(Object o) throws Exception {
+        }
+
+        public void destroyObject(Object o) throws Exception {
+            if (o instanceof XFormsContainingDocument) {
+//                final XFormsContainingDocument xp = (XFormsContainingDocument) o;
+            } else
+                throw new OXFException(o.toString() + " is not an XFormsContainingDocument");
+        }
+
+        public Object makeObject() throws Exception {
+            if (logger.isDebugEnabled())
+                logger.debug("");
+
+            return createXFormsContainingDocument(pool, pipelineContext, staticStateString, dynamicStateString, filesElement);
+        }
+
+        public void passivateObject(Object o) throws Exception {
+        }
+
+        public boolean validateObject(Object o) {
+            return true;
+        }
     }
 }

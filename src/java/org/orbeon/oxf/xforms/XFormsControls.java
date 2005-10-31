@@ -19,25 +19,24 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
-import java.util.*;
 import java.net.URI;
+import java.util.*;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
@@ -48,6 +47,7 @@ public class XFormsControls {
 
     private Map itemsetIdToItemsetInfoMap;// TODO: this may be also refactored into ControlsState
 
+    private boolean initialized;
     private ControlsState initialControlsState;
     private ControlsState currentControlsState;
 
@@ -207,32 +207,42 @@ public class XFormsControls {
     public void initialize(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
 
         if (controlsDocument != null) {
-            // Initialize itemset information
-            itemsetIdToItemsetInfoMap = getItemsetInfo(pipelineContext, null);
-            // Get initial controls state information
-            initialControlsState = buildControlsState(pipelineContext);
-            currentControlsState = initialControlsState;
 
-            // Set switch state if any
-            if (divsElement != null) {
-                for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
-                    final Element divElement = (Element) i.next();
+            if (initialized) {
+                // Use existing controls state
+                initialControlsState = currentControlsState;
+            } else {
+                // Rebuild controls state
 
-                    final String caseId = divElement.attributeValue("id");
-                    final String visibility = divElement.attributeValue("visibility");
+                // Initialize itemset information
+                itemsetIdToItemsetInfoMap = getItemsetInfo(pipelineContext, null);
+                // Get initial controls state information
+                initialControlsState = buildControlsState(pipelineContext);
+                currentControlsState = initialControlsState;
 
-                    updateSwitchInfo(caseId, "visible".equals(visibility));
+                // Set switch state if any
+                if (divsElement != null) {
+                    for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
+                        final Element divElement = (Element) i.next();
+
+                        final String caseId = divElement.attributeValue("id");
+                        final String visibility = divElement.attributeValue("visibility");
+
+                        updateSwitchInfo(caseId, "visible".equals(visibility));
+                    }
                 }
+
+                // Set repeat index state if any
+                setRepeatIndexState(repeatIndexesElement);
+
+                // Evaluate values after index state has been computed
+                initialControlsState.evaluateValueControls(pipelineContext);
             }
-
-            // Set repeat index state if any
-            setRepeatIndexState(repeatIndexesElement);
-
-            // Evaluate values after index state has been computed
-            initialControlsState.evaluateValueControls(pipelineContext);
         }
 
         resetBindingContext();
+
+        initialized = true;
     }
 
     private void setRepeatIndexState(Element repeatIndexesElement) {
@@ -1123,6 +1133,7 @@ public class XFormsControls {
     }
 
     private String getChildElementValue(PipelineContext pipelineContext, QName qName) {
+
         // Check first if there is a current control element
         Element controlElement = getCurrentContext().getControlElement();
         if (controlElement == null)
@@ -1162,8 +1173,33 @@ public class XFormsControls {
         }
 
         // Try to get static value
-        if (result == null)
-            result = childElement.getStringValue();
+        if (result == null) {
+            if (childElement.element(XFormsConstants.XFORMS_OUTPUT_QNAME) != null) {
+                // There is at least one xforms:output element inside
+
+//                final StringBuffer sb = new StringBuffer();
+//                for (Iterator i = childElement.content().iterator(); i.hasNext();) {
+//                    final Object currentObject = i.next();
+//                    if (currentObject instanceof Element) {
+//                        final Element currentElement = (Element) currentObject;
+//                        if (currentElement.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+//                            // This is an xforms:output
+//
+//                            final OutputControlInfo outputControl = new OutputControlInfo(null, currentElement, currentElement.getName(), null);
+//                            outputControl.
+//                        }
+//                    } else if (currentObject instanceof String) {
+//                        sb.append(currentObject);
+//                    }
+//                }
+
+                // TEMP
+                result = childElement.getStringValue();
+            } else {
+                // Plain text
+                result = childElement.getStringValue();
+            }
+        }
 
         popBinding();
         return result;
@@ -1608,7 +1644,7 @@ public class XFormsControls {
             return displayValue;
         }
 
-        private void setValue(String value) {
+        protected void setValue(String value) {
             this.value = value;
         }
 
@@ -1810,7 +1846,7 @@ public class XFormsControls {
 
                     // Store new focus information for client
                     if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
-                        containingDocument.setFocus(getId());
+                        containingDocument.setClientFocusEffectiveControlId(getId());
                     }
                 }
             }
@@ -1867,11 +1903,9 @@ public class XFormsControls {
                 rawValue = XFormsInstance.getValueForNode(currentBindingContext.getSingleNode());
             } else {
                 // Value comes from the XPath expression within the value attribute
-                final String value = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext,
+                rawValue = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext,
                         currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
                         "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, functionLibrary, null);
-
-                rawValue = value;
             }
 
             // Handle mediatype if necessary

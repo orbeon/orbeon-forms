@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2005 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,9 +15,44 @@
     <title>XForms To Do Lists</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p xmlns="http://www.w3.org/1999/xhtml">
-            This example illustrates how to create repeating structures in OPS with the XForms
-            repeat module.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p >
+                The <i>To Do Lists</i> example application illustrates many cool XForms features,
+                such as:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Nested <code>xforms:repeat</code>: serveral to do lists can each contain
+                        several items.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use of the <code>relevant</code> model item property for conditional
+                        display of controls.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Automatic formatting of values with type <code>xs:date</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use of multiple XForms instances.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use of <code>xforms:setfocus</code> and <code>xforms:setindex</code>.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                There is currently no persistence of the data edited, but the example could be
+                enhanced with a simple XML-based backend.
+            </p>
+        </div>
     </description>
 </example-descriptor>

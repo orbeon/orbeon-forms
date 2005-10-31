@@ -395,6 +395,9 @@
                     interpret the URI relative to the location of the source XForms page, which is
                     usually an <code>oxf:</code> URI.
                 </p>
+                <p>
+                    TODO
+                </p>
             </section>
             <section>
                 <title>Load Action</title>
@@ -577,50 +580,66 @@
         </section>
         <section>
             <title>Extensions</title>
-            <a name="image-mediatype"/>
             <section>
                 <title>Media Type for <code>xforms:output</code></title>
                 <p>
                     In XForms 1.0, <code>xforms:output</code> is used to display text. However,
                     based on a proposal in a draft version of XForms 1.1, OPS supports a
-                    <code>mediatype</code> attribute on that element. Currently, only image types
-                    are supported. When the following conditions are met for an
-                    <code>xforms:output</code> control:
+                    <code>mediatype</code> attribute on that element.
                 </p>
-                <ul>
-                    <li>
-                        <p>
-                            The control has an optional <code>mediatype</code> attribute referring
-                            to an image, such as <code>image/*</code> or <code>image/jpeg</code>.
-                        </p>
-                    </li>
-                   <li>
-                        <p>
-                            The value is provided to the <code>xforms:output</code> control with
-                            the <code>value</code> attribute, or with a single-node binding to a
-                            node without type or with an <code>xs:anyURI</code> type.
-                        </p>
-                    </li>
-               </ul>
-                <p>
-                    The resulting value is interpreted as URI pointing to an image. The image is
-                    loaded where the <code>xforms:output</code> is located. When a single-node
-                    binding is used, it is possible to dynamically change the image pointed to. For
-                    example:
-                </p>
-                <xml-source show-namespaces="false">
-                    <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
-                </xml-source>
-                <xml-source show-namespaces="false">
-                    <xforms:model>
-                        <xforms:instance>
-                            <image-uri/>
-                        </xforms:instance>
-                        <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
-                    </xforms:model>
-                    ...
-                    <xforms:output mediatype="image/*" ref="image-uri"/>
-                </xml-source>
+                <a name="image-mediatype"/>
+                <section>
+                    <title>Image Types</title>
+                    <p>
+                         When the following conditions are met for an <code>xforms:output</code>
+                         control:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The control has an optional <code>mediatype</code> attribute
+                                referring to an image, such as <code>image/*</code> or
+                                <code>image/jpeg</code>.
+                            </p>
+                        </li>
+                       <li>
+                            <p>
+                                The value is provided to the <code>xforms:output</code> control with
+                                the <code>value</code> attribute, or with a single-node binding to a
+                                node without type or with an <code>xs:anyURI</code> type.
+                            </p>
+                        </li>
+                   </ul>
+                    <p>
+                        The resulting value is interpreted as URI pointing to an image. The image is
+                        loaded where the <code>xforms:output</code> is located. When a single-node
+                        binding is used, it is possible to dynamically change the image pointed to.
+                        For example:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <xforms:model>
+                            <xforms:instance>
+                                <image-uri/>
+                            </xforms:instance>
+                            <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
+                        </xforms:model>
+                        ...
+                        <xforms:output mediatype="image/*" ref="image-uri"/>
+                    </xml-source>
+                    <note>
+                        It is not yet possible to directly embed image data using the
+                        <code>base64Binary</code> type.
+                    </note>
+                </section>
+                <section>
+                    <title>HTML Type</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
             </section>
             <section>
                 <title>XPath Extension Functions</title>
@@ -642,8 +661,10 @@
                 <section>
                     <title>eXForms Extensions</title>
                     <p>
-                        The following <a href="http://www.exforms.org/mips.html">functions from
-                        eXForms</a> are implemented:
+                        <a href="http://www.exforms.org/">eXForms</a> is a suggested set of
+                        extensions to XForms 1.0, grouped into different modules. OPS supports the
+                        <a href="http://www.exforms.org/mips.html"><code>exf:mip</code></a> module,
+                        which includes the following functions:
                     </p>
                     <ul>
                         <li>
@@ -656,6 +677,10 @@
                             <p><code>exf:required()</code></p>
                         </li>
                     </ul>
+                    <p>
+                        eXForms functions live in the <code>http://www.exforms.org/exf/1-0</code>
+                        namespace, usually bound to the prefix <code>exf</code>.
+                    </p>
                 </section>
             </section>
         </section>

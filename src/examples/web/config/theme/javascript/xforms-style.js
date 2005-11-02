@@ -260,7 +260,10 @@ function xformsUpdateStyle(element) {
             if (className == "xforms-trigger") {
                 // Update label on trigger
                 if (element.labelMessage && element.labelMessage != xformsStringValue(element)) {
-                    xformsReplaceNodeText(element, element.labelMessage);
+                    if (element.tagName.toLowerCase() == "input")
+                        element.alt = element.labelMessage;
+                    else
+                        xformsReplaceNodeText(element, element.labelMessage);
                 }
             }
             

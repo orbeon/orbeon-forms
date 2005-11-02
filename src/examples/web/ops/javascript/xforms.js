@@ -64,8 +64,8 @@ function xformsRemoveEventListener(target, eventName, handler) {
 
 function xformsDispatchEvent(target, eventName) {
     if (target.dispatchEvent) {
-        var event = document.createEvent("MouseEvent");
-        event.initEvent("change", 0, 0);
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent(eventName, true, true);
         target.dispatchEvent(event);
     } else {
         target.fireEvent("on" + eventName);
@@ -187,16 +187,10 @@ function xformsStringReplace(node, placeholder, replacement) {
 }
 
 function xformsAppendRepeatSuffix(id, suffix) {
-
-//    xformsLog("xformsAppendRepeatSuffix:id " + id);
-//    xformsLog("xformsAppendRepeatSuffix:suffix " + suffix);
-
     if (suffix == "")
         return id;
-
     if (suffix.charAt(0) == REPEAT_HIERARCHY_SEPARATOR_2)
         suffix = suffix.substring(1);
-
     if (id.indexOf(REPEAT_HIERARCHY_SEPARATOR_1) == -1)
         return id + REPEAT_HIERARCHY_SEPARATOR_1 + suffix;
     else
@@ -448,6 +442,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsComboboxList = false;
         var isXFormsTrigger = false;
         var isXFormsOutput = false;
+        var isXFormsInput = false;
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
@@ -469,6 +464,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsTrigger = true;
             if (className == "xforms-output")
                 isXFormsOutput = true;
+            if (className == "xforms-input")
+                isXFormsInput = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -587,6 +584,37 @@ function xformsInitializeControlsUnder(root) {
                     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
                     xformsFireEvents(events);
                 });
+            } else if (isXFormsInput) {
+                control.value = control.childNodes[1].value;
+                control.previousValue = control.childNodes[1].value;
+                if (control.watch) {
+                    // Firefox implements a watch() method
+                    control.watch("value", function(property, oldvalue, newvalue) {
+                        var span = this;
+                        var textField = span.childNodes[1];
+                        span.value = newvalue;
+                        textField.value = newvalue;
+                        xformsDispatchEvent(textField, "change");
+                        return newvalue;
+                    });
+                } else {
+                    // IE throws a propertychange event
+                    xformsAddEventListener(control, "propertychange", function(event) {
+                        if (event.propertyName == "value") {
+                            var span = getEventTarget(event);
+                            if (!span.valueSetByXForms) {
+                                var textField = span.childNodes[1];
+                                textField.value = span.value;
+                                span.valueSetByXForms = true;
+                                span.value = span.previousValue;
+                                xformsDispatchEvent(textField, "change");
+                            }
+                            if (span.valueSetByXForms) {
+                                span.valueSetByXForms = false;
+                            }
+                        }
+                    });
+                }
             } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
                 // Don't add listeners on spans
             } else {
@@ -599,6 +627,7 @@ function xformsInitializeControlsUnder(root) {
                     var target = getEventTarget(event);
                     // If this is an input field, set value on parent and send event on parent element
                     if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
+                        target.parentNode.valueSetByXForms = true;
                         target.parentNode.value = target.value;
                         target = target.parentNode;
                     }
@@ -1026,10 +1055,12 @@ function xformsHandleResponse() {
                                                 // Populate values
                                                 xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                                 if (documentElement.value != newControlValue) {
-                                                    documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
-                                                    inputField.value = newControlValue;
+                                                    documentElement.valueSetByXForms = true;
+                                                    documentElement.value = newControlValue;
                                                 }
+                                                if (inputField.value != newControlValue)
+                                                    inputField.value = newControlValue;
 
                                                 // Change classes on control and date pick based on type
                                                 if (type == "{http://www.w3.org/2001/XMLSchema}date") {

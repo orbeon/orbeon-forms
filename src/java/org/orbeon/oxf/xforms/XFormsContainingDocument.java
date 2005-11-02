@@ -44,8 +44,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
 //    private LocationData locationData; // At some point we need to be able to store this
 
-    // Object pool this object belongs to, if any 
-    private ObjectPool objectPool;
+    // Object pool this object must be returned to, if any
+    private ObjectPool sourceObjectPool;
 
     // A document contains models and controls
     private List models;
@@ -62,11 +62,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(null, models, controlsDocument, null, null);
+        this(models, controlsDocument, null, null);
     }
 
-    public XFormsContainingDocument(ObjectPool objectPool, List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
-        this.objectPool = objectPool;
+    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
+
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
         this.containerType = containerType;
@@ -79,8 +79,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    public ObjectPool getObjectPool() {
-        return objectPool;
+    public void setSourceObjectPool(ObjectPool sourceObjectPool) {
+        this.sourceObjectPool = sourceObjectPool;
+    }
+
+    public ObjectPool getSourceObjectPool() {
+        return sourceObjectPool;
     }
 
     /**

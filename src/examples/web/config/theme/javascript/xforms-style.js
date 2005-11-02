@@ -315,8 +315,6 @@ function xformsUpdateStyle(element) {
                                 xformsFireEvents(new Array(xformsCreateEventArray(child, "DOMActivate", null, false)));
                             }
                         }
-                        
-                        
                     };
                     xformsAddEventListener(element, "click", clickEventHandler);
                 }

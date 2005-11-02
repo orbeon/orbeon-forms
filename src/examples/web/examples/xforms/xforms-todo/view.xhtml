@@ -69,17 +69,17 @@
                 <xforms:bind nodeset="@ui:mark-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = ''"/>
                 <xforms:bind nodeset="@ui:not-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = 'true'"/>
                 <xforms:bind nodeset="list">
-                    <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view'"/>
-                    <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit'"/>
-                    <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
-                    <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit'"/>
+                    <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view' or count(../todo[@done = '']) = 1"/>
+                    <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit' and count(../todo[@done = '']) > 1"/>
+                    <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view' or count(../todo[@done = '']) = 1"/>
+                    <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit' and count(../todo[@done = '']) > 1"/>
                     <xforms:bind nodeset="todo">
                         <xforms:bind nodeset="@ui:mark-done-trigger" relevant="../@done = ''"/>
                         <xforms:bind nodeset="@ui:mark-not-done-trigger" relevant="../@done = 'true'"/>
-                        <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view'"/>
-                        <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit'"/>
-                        <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view'"/>
-                        <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit'"/>
+                        <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view' or ../@done = 'true'"/>
+                        <xforms:bind nodeset="@ui:input" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
+                        <xforms:bind nodeset="@ui:edit-trigger" relevant="../@ui:mode = 'view' or ../@done = 'true'"/>
+                        <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
                     </xforms:bind>
                 </xforms:bind>
             </xforms:bind>
@@ -230,10 +230,7 @@
                             </xforms:group>
                             <!-- Mark done -->
                             <xforms:group ref="@ui:mark-done-trigger" class="actions-action">
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done">true</xforms:setvalue>
-                                    <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode">view</xforms:setvalue>
-                                </xforms:action>
+                                <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done" ev:event="DOMActivate">true</xforms:setvalue>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/mark-done.gif"/>
                                     <xforms:label>Done</xforms:label>
@@ -329,10 +326,7 @@
                             <xhtml:div class="todo-container">
                                 <!-- In progress icon -->
                                 <xforms:group ref="@ui:mark-done-trigger" class="todo-status">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then 'true' else ."/>
-                                        <xforms:setvalue ref="../@ui:mode" value="if (/lists/@ui:mode = 'edit') then 'view' else ."/>
-                                    </xforms:action>
+                                    <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then 'true' else ." ev:event="DOMActivate"/>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xxforms:img src="/images/status-in-progress.gif"/>
                                         <xforms:label>In Progress</xforms:label>

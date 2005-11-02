@@ -46,12 +46,6 @@
     <xhtml:body>
         <xhtml:p>
             <xforms:group ref="instance('text')">
-                <xforms:action ev:event="xforms-invalid">
-                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
-                </xforms:action>
-                <xforms:action ev:event="xforms-valid">
-                    <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
-                </xforms:action>
                 <xforms:switch>
                     <xforms:case id="firstname" selected="true">
                         <xhtml:p>Step 1 of 3</xhtml:p>
@@ -85,7 +79,7 @@
                             </xforms:trigger>
                         </xhtml:p>
                     </xforms:case>
-                    <xforms:case id="age" selected="true">
+                    <xforms:case id="age">
                         <xhtml:p>Step 3 of 3</xhtml:p>
                         <xhtml:p>
                             <xforms:input ref="age" incremental="true">

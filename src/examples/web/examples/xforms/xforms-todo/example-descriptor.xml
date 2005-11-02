@@ -35,7 +35,14 @@
                 </li>
                 <li>
                     <p>
-                        Automatic formatting of values with type <code>xs:date</code>.
+                        Typing with <code>xs:date</code> allowing for automatic formatting of
+                        dates.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use of <code>xforms:submission</code> with <code>instance="replace"</code>,
+                        here to call an XML service able to format an XML document into HTML.
                     </p>
                 </li>
                 <li>

@@ -134,6 +134,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/add.gif"/>
+                                    <xforms:label>Add</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>New</xforms:label>
@@ -148,6 +149,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/remove.gif"/>
+                                    <xforms:label>Remove</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Delete</xforms:label>
@@ -167,6 +169,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/edit.gif"/>
+                                    <xforms:label>Edit</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Edit</xforms:label>
@@ -181,6 +184,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/add.gif"/>
+                                    <xforms:label>Add</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>New</xforms:label>
@@ -195,6 +199,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/remove.gif"/>
+                                    <xforms:label>Remove</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Delete</xforms:label>
@@ -206,6 +211,7 @@
                                     value="current-date()"/>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/date-add.gif"/>
+                                    <xforms:label>Add due date</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Add due date</xforms:label>
@@ -216,6 +222,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"/>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/date-remove.gif"/>
+                                    <xforms:label>Remove due date</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Remove due date</xforms:label>
@@ -229,6 +236,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/mark-done.gif"/>
+                                    <xforms:label>Done</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Done</xforms:label>
@@ -239,6 +247,7 @@
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@done"/>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/mark-undo.gif"/>
+                                    <xforms:label>Not done</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Not done</xforms:label>
@@ -258,6 +267,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/view-xml.gif"/>
+                                    <xforms:label>View XML</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>View XML</xforms:label>
@@ -277,6 +287,7 @@
                     </xforms:action>
                     <xforms:trigger appearance="xxforms:image">
                         <xxforms:img src="/images/back.gif"/>
+                        <xforms:label>Back to editing</xforms:label>
                     </xforms:trigger>
                     <xforms:trigger appearance="xxforms:link">
                         <xforms:label>Back to editing</xforms:label>
@@ -305,6 +316,7 @@
                         <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
                             <xxforms:img src="/images/save.gif"/>
                             <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
+                            <xforms:label>Save</xforms:label>
                         </xforms:trigger>
                         <!-- How many to do are left -->
                         <xforms:output value="if (count(todo) = 1) then ''
@@ -323,6 +335,7 @@
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xxforms:img src="/images/status-in-progress.gif"/>
+                                        <xforms:label>In Progress</xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                                 <!-- Done icon -->
@@ -330,6 +343,7 @@
                                     <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then '' else ." ev:event="DOMActivate"/>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xxforms:img src="/images/status-done.gif"/>
+                                        <xforms:label>Done</xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                                 <!-- Position of current to do -->
@@ -348,6 +362,7 @@
                                 <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
                                     <xxforms:img src="/images/save.gif"/>
                                     <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
+                                    <xforms:label>Save</xforms:label>
                                 </xforms:trigger>
                                 <xforms:group ref="@due">
                                     -- due on:

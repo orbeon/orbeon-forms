@@ -583,8 +583,8 @@ ul {
     display: inline-block; 
     white-space: nowrap;
     padding-left: 20px;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     overflow: hidden;
     font-size: 10px;
     color: black;
@@ -607,13 +607,13 @@ ul {
     display: inline-block;  
     white-space: nowrap;
     padding-left: 20px;
-    width: 20px;
-    height: 22px;
+    width: 16px;
+    height: 16px;
     overflow: hidden;
     font-size: 10px;
     color: black;
     line-height: 10px;
-    margin-left: .5em;
+    margin-left: .2em;
     vertical-align: middle;
 }
 

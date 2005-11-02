@@ -148,22 +148,20 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
 
         <xhtml:span>
+            <xsl:variable name="is-html"
+                          select="local-name-from-QName(xs:QName(@appearance)) = 'html'
+                                  and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
+            <xsl:variable name="is-image"
+                          select="starts-with(@mediatype, 'image/')" as="xs:boolean"/>
+            <xsl:variable name="html-class" as="xs:string?"
+                          select="if ($is-html) then 'xforms-output-html'
+                                  else if ($is-image) then 'xforms-output-image'
+                                  else ()"/>
             <xsl:choose>
                 <xsl:when test="$generate-template">
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output'), $id)"/>
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class), $id)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
-                    <xsl:variable name="is-html"
-                                  select="local-name-from-QName(xs:QName(@appearance)) = 'html'
-                                          and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
-                    <!-- TODO: should test on type prefix as well and namespace-uri-for-prefix(substring-before(xxforms:control($id)/@type, ':'), xxforms:control($id)) = $xs-uri -->
-                    <xsl:variable name="is-image"
-                                  select="starts-with(xxforms:control($id)/@mediatype, 'image/')" as="xs:boolean"/>
-                    <xsl:variable name="html-class" as="xs:string?"
-                                  select="if ($is-html) then 'xforms-output-html'
-                                          else if ($is-image) then 'xforms-output-image'
-                                          else ()"/>
                     <xsl:variable name="is-date-or-time" select="xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
                     <xsl:variable name="date-class" as="xs:string?" select="if ($is-date-or-time) then 'xforms-date' else ()"/>
                     <xsl:variable name="readonly-class" as="xs:string?"

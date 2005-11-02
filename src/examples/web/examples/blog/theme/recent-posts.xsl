@@ -422,13 +422,11 @@
                                                     <xforms:output ref="name"/>
                                                     <xforms:output value="' @ '"/>
                                                     <xforms:output ref="instance('new-comment')/comment/date-created"/>
-                                                    <!--<xforms:group ref="text">-->
-                                                        <xforms:output value="' ('"/>
-                                                        <xforms:output ref="content/@word-count"/>
-                                                        <xforms:output value="if (content/@word-count > 1) then ' words, ' else ' word, '"/>
-                                                        <xforms:output ref="content/@character-count"/>
-                                                        <xforms:output value="if (content/@character-count > 1) then ' characters)' else ' character)'"/>
-                                                    <!--</xforms:group>-->
+                                                    <xforms:output value="' ('"/>
+                                                    <xforms:output ref="content/@word-count"/>
+                                                    <xforms:output value="if (content/@word-count > 1) then ' words, ' else ' word, '"/>
+                                                    <xforms:output ref="content/@character-count"/>
+                                                    <xforms:output value="if (content/@character-count > 1) then ' characters)' else ' character)'"/>
                                                 </div>
                                             </xforms:group>
                                         </xforms:group>

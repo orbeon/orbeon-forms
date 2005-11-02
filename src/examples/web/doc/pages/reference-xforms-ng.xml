@@ -94,10 +94,10 @@
                     also supports the following XSLT 2.0 functions:
                 </p>
                 <ul>
-                    <li><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</li>
-                    <li><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</li>
-                    <li><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</li>
-                    <li><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</li>
+                    <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
+                    <li><p><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</p></li>
+                    <li><p><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</p></li>
+                    <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
                 </ul>
                 <p>
                     The XPath expression is evaluated by the XForms engine whenever the value bound
@@ -144,8 +144,8 @@
                     built-in defaults, are as follows:
                 </p>
                 <xml-source>
-                    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else ."/>
-                    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
                     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
                 </xml-source>
                 <p>
@@ -154,12 +154,12 @@
                 <ul>
                     <li>
                         <p>
-                            <code>2004-01-07</code> is displayed as <code>January 7, 2004</code>
+                            <code>2004-01-07</code> is displayed as <code>Wednesday January 7, 2004</code>
                         </p>
                     </li>
                     <li>
                         <p>
-                            <code>2004-01-07T04:38:35.123</code> is displayed as <code>January 7, 2004 04:38:35 UTC</code>
+                            <code>2004-01-07T04:38:35.123</code> is displayed as <code>Wednesday January 7, 2004 04:38:35 UTC</code>
                         </p>
                     </li>
                     <li>
@@ -647,6 +647,18 @@
                     OPS implements some extension functions which can be used from XPath expressions
                     in XForms documents.
                 </p>
+                <section>
+                    <title>XSLT 2.0 Extensions</title>
+                    <p>
+                        When using XPath 2.0, the following functions from XSLT 2.0 are also available:
+                    </p>
+                    <ul>
+                        <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
+                        <li><p><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</p></li>
+                        <li><p><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</p></li>
+                        <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
+                    </ul>
+                </section>
                 <section>
                     <title>OPS Extensions</title>
                     <p>

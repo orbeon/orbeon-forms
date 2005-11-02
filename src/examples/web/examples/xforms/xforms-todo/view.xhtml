@@ -92,14 +92,15 @@
     <xhtml:body>
         <!-- Styles used just for this example -->
         <xhtml:style type="text/css">
-            .actions-label       { white-space: nowrap; text-align: right; }
-            .actions-list        { white-space: nowrap; }
-            .actions-action      { padding-left: 1em;  }
-            .lists-container     { margin-top: 2em; }
-            .list-container      { padding: 5px; margin-top: 1em; margin-bottom: 5px; border: solid 1px #f93; }
-            .todo-container      { padding: 2px; }
-            .todo-status         { padding-left: 4px; }
-            .view-xml-container  { margin-top: 2em; }
+            .actions-label           { white-space: nowrap; text-align: right; }
+            .actions-list            { white-space: nowrap; }
+            .actions-action          { padding-left: 1em;  }
+            .lists-container         { margin-top: 2em; }
+            .list-container          { padding: 5px; margin-top: 1em; margin-bottom: 5px; border: solid 1px #f93; }
+            .todo-container          { padding: 2px; }
+            .todo-status             { padding-left: 4px; }
+            .todo-position           { width: 15px; display: -moz-inline-box; }
+            .view-xml-container      { margin-top: 2em; }
         </xhtml:style>
 
         <xforms:switch>
@@ -307,7 +308,7 @@
                         </xforms:group>
                         <!-- Description edition field -->
                         <xforms:group ref="@ui:input">
-                            <xforms:input id="list-description-input" ref="../@description" xhtml:size="30"/>
+                            <xforms:input id="list-description-input" ref="../@description" class="list-description-input"/>
                         </xforms:group>
                         <!-- Trigger to save description -->
                         <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
@@ -343,14 +344,14 @@
                                 <!-- Position of current to do -->
                                 <xforms:output value="if (@done = '') then
                                     concat(count(preceding-sibling::todo[@done = '']) + 1, '.') else '-'"
-                                    style="width: 15px; display: -moz-inline-box"/>
+                                    class="todo-position"/>
                                 <!-- Description value -->
                                 <xforms:group ref="@ui:output">
                                     <xforms:output ref="../@description"/>
                                 </xforms:group>
                                 <!-- Description edition field -->
                                 <xforms:group ref="@ui:input">
-                                    <xforms:input id="todo-description-input" ref="../@description" xhtml:size="30"/>
+                                    <xforms:input id="todo-description-input" ref="../@description"/>
                                 </xforms:group>
                                 <!-- Trigger to save descr  iption -->
                                 <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">

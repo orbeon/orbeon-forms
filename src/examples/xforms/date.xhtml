@@ -24,34 +24,61 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <node date-type="false">2002-08-02</node>
-                    <node date-type="true">2003-09-03</node>
+                    <node>
+                        <date>2002-08-02</date>
+                        <is-date-type>false</is-date-type>
+                        <readonly>false</readonly>
+                        <relevant>true</relevant>
+                    </node>
+                    <node>
+                        <date>2003-09-03</date>
+                        <is-date-type>true</is-date-type>
+                        <readonly>false</readonly>
+                        <relevant>true</relevant>
+                    </node>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/node[@date-type = 'true']" type="xs:date"/>
+            <xforms:bind nodeset="/instance/node/date[../is-date-type = 'true']" type="xs:date"/>
+            <xforms:bind nodeset="/instance/node/date" readonly="../readonly = 'true'" relevant="../relevant = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:table class="gridtable">
             <xhtml:tr>
                 <xhtml:th>Type</xhtml:th>
+                <xhtml:th>Read only</xhtml:th>
+                <xhtml:th>Relevant</xhtml:th>
                 <xhtml:th>&lt;xforms:input></xhtml:th>
                 <xhtml:th>&lt;xforms:output></xhtml:th>
             </xhtml:tr>
             <xforms:repeat nodeset="node" id="nodes">
                 <xhtml:tr>
                     <xhtml:td>
-                        <xforms:output value="if (@date-type = 'true') then 'Date ' else 'No type '"/>
+                        <xforms:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
                         <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>[toggle]</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="@date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                            <xforms:label>[change]</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
                         </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:input ref="."/>
+                        <xforms:output value="readonly"/>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[change]</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+                        </xforms:trigger>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:output ref="."/>
+                        <xforms:output value="relevant"/>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[change]</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:input ref="date"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="date"/>
                     </xhtml:td>
                 </xhtml:tr>
             </xforms:repeat>

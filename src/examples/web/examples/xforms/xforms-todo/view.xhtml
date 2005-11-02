@@ -21,6 +21,18 @@
         xmlns:xi="http://www.w3.org/2001/XInclude">
     <xhtml:head>
         <xhtml:title>To Do Lists</xhtml:title>
+        <!-- Styles used just for this example -->
+        <xhtml:style type="text/css">
+            .actions-label           { white-space: nowrap; text-align: right; }
+            .actions-list            { white-space: nowrap; }
+            .actions-action          { padding-left: 1em;  }
+            .lists-container         { margin-top: 2em; }
+            .list-container          { padding: 5px; margin-top: 1em; margin-bottom: 5px; border: solid 1px #f93; }
+            .todo-container          { padding: 2px; }
+            .todo-status             { padding-left: 4px; }
+            .todo-position           { width: 15px; display: -moz-inline-box; }
+            .view-xml-container      { margin-top: 2em; }
+        </xhtml:style>
         <xforms:model>
             <!-- Data entered by the user -->
             <xforms:instance id="instance">
@@ -90,19 +102,6 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <!-- Styles used just for this example -->
-        <xhtml:style type="text/css">
-            .actions-label           { white-space: nowrap; text-align: right; }
-            .actions-list            { white-space: nowrap; }
-            .actions-action          { padding-left: 1em;  }
-            .lists-container         { margin-top: 2em; }
-            .list-container          { padding: 5px; margin-top: 1em; margin-bottom: 5px; border: solid 1px #f93; }
-            .todo-container          { padding: 2px; }
-            .todo-status             { padding-left: 4px; }
-            .todo-position           { width: 15px; display: -moz-inline-box; }
-            .view-xml-container      { margin-top: 2em; }
-        </xhtml:style>
-
         <xforms:switch>
             <xforms:case id="edit">
                 <xhtml:p>

@@ -648,46 +648,52 @@ function xformsInitializeControlsUnder(root) {
                         // Focus out events are only handled when we have receive a focus in event.
                         // Here we just save the event which will be handled when we receive a focus
                         // in from the browser.
-                        var target = getEventTarget(event);
-                        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
-                            target = target.parentNode;
-                        if (target != null)
-                            document.xformsPreviousDOMFocusOut = target;
+                        if (!document.xformsMaskFocusEvents) {
+                            var target = getEventTarget(event);
+                            while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+                                target = target.parentNode;
+                            if (target != null)
+                                document.xformsPreviousDOMFocusOut = target;
+                        }
                     });
                     xformsAddEventListener(control, "focus", function(event) {
-                        var target = getEventTarget(event);
-                        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
-                            target = target.parentNode;
-                        var sendFocusEvents = target != null;
+                        if (!document.xformsMaskFocusEvents) {
+                            var target = getEventTarget(event);
+                            while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+                                target = target.parentNode;
+                            var sendFocusEvents = target != null;
 
-                        // We have just received a change event: try to combine both
-                        if (sendFocusEvents && document.xformsPreviousValueChanged) {
-                            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
-                            document.xformsPreviousValueChanged = null;
-                            if (eventSent)
-                                document.xformsPreviousDOMFocusOut = null;
-                            // If value changed didn't send anything, we still want to send the focus events
-                            sendFocusEvents = !eventSent;
-                        }
+                            // We have just received a change event: try to combine both
+                            if (sendFocusEvents && document.xformsPreviousValueChanged) {
+                                var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
+                                document.xformsPreviousValueChanged = null;
+                                if (eventSent)
+                                    document.xformsPreviousDOMFocusOut = null;
+                                // If value changed didn't send anything, we still want to send the focus events
+                                sendFocusEvents = !eventSent;
+                            }
 
-                        // Send focus events
-                        if (sendFocusEvents) {
-                            if (document.xformsPreviousDOMFocusOut) {
-                                if (document.xformsPreviousDOMFocusOut != target) {
-                                    var events = new Array();
-                                    events.push(xformsCreateEventArray
-                                        (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
-                                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                                    xformsFireEvents(events);
-                                }
-                                document.xformsPreviousDOMFocusOut = null;
-                            } else {
-                                if (document.xformsPreviousDOMFocusIn != target) {
-                                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)));
+                            // Send focus events
+                            if (sendFocusEvents) {
+                                if (document.xformsPreviousDOMFocusOut) {
+                                    if (document.xformsPreviousDOMFocusOut != target) {
+                                        var events = new Array();
+                                        events.push(xformsCreateEventArray
+                                            (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
+                                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                                        xformsFireEvents(events);
+                                    }
+                                    document.xformsPreviousDOMFocusOut = null;
+                                } else {
+                                    if (document.xformsPreviousDOMFocusIn != target) {
+                                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)));
+                                    }
                                 }
                             }
+                            document.xformsPreviousDOMFocusIn = target;
+                        } else {
+                            document.xformsMaskFocusEvents = false;
                         }
-                        document.xformsPreviousDOMFocusIn = target;
                     });
                 }
             }
@@ -1425,6 +1431,7 @@ function xformsHandleResponse() {
                                 var controlClasses = control.className.split(" ");
                                 if (xformsArrayContains(controlClasses, "xforms-input"))
                                     control = control.childNodes[1];
+                                document.xformsMaskFocusEvents = true;
                                 control.focus();
                                 break;
                             }

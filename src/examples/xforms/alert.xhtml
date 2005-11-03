@@ -25,7 +25,7 @@
             <xforms:instance id="instance">
                 <instance>
                     <node value="Foo" valid="1" readonly="0" required="0"/>
-                    <node value="Bar" valid="1" readonly="0" required="0"/>
+                    <node value="" valid="1" readonly="0" required="0"/>
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
@@ -36,7 +36,9 @@
         <xhtml:table class="gridtable">
             <xhtml:tr>
                 <xhtml:th>Control</xhtml:th>
-                <xhtml:th>Change MIP</xhtml:th>
+                <xhtml:th>Valid</xhtml:th>
+                <xhtml:th>Read only</xhtml:th>
+                <xhtml:th>Required</xhtml:th>
             </xhtml:tr>
             <xforms:repeat nodeset="/instance/node">
                 <xhtml:tr>
@@ -46,23 +48,33 @@
                         </xforms:input>
                     </xhtml:td>
                     <xhtml:td>
-                        Toggle:
+                        <xforms:output ref="@valid"/>
                         <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>[validity]</xforms:label>
+                            <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@valid" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="@readonly"/>
                         <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>[readonly]</xforms:label>
+                            <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@readonly" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="@required"/>
                         <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>[required]</xforms:label>
+                            <xforms:label> [toggle]</xforms:label>
                             <xforms:setvalue ref="@required" value="(. + 1) mod 2" ev:event="DOMActivate"/>
                         </xforms:trigger>
                     </xhtml:td>
                 </xhtml:tr>
-                <xhtml:tr/>
             </xforms:repeat>
+            <xhtml:tr/>
         </xhtml:table>
+        <xforms:trigger>
+            <xforms:label>Add line</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
+        </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

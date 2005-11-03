@@ -999,6 +999,7 @@ function xformsHandleResponse() {
                                             var controlId = controlElement.getAttribute("id");
                                             var relevant = controlElement.getAttribute("relevant");
                                             var readonly = controlElement.getAttribute("readonly");
+                                            var required = controlElement.getAttribute("required");
                                             var displayValue = controlElement.getAttribute("display-value");
                                             var type = controlElement.getAttribute("type");
                                             var documentElement = document.getElementById(controlId);
@@ -1135,6 +1136,8 @@ function xformsHandleResponse() {
                                                 documentElement.isRelevant = relevant == "true";
                                             if (readonly)
                                                 documentElement.isReadonly = readonly == "true";
+                                            if (required)
+                                                documentElement.isRequired = required == "true";
 
                                             // Update style
                                             xformsUpdateStyle(documentElement);
@@ -1449,17 +1452,22 @@ function xformsHandleResponse() {
 
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
-                
             // We received an error from the server
-            var messageElement = responseXML.getElementsByTagName("message");
-            var errorMessageNode = document.createTextNode
-                (messageElement[messageElement.length - 1].firstChild.data);
+
+            // Find an error message starting from the inner-most exception
+            var errorMessage = "XForms error";
+            var messageElements = responseXML.getElementsByTagName("message");
+            for (var messageIndex = messageElements.length - 1; messageIndex >= 0; messageIndex--) {
+                if (messageElements[messageIndex].firstChild != null) {
+                    errorMessage += ": " + xformsStringValue(messageElements[messageIndex]);
+                    break;
+                }
+            }
+            xformsLog(errorMessage);
+            // Display error
             var errorContainer = document.xformsLoadingError;
-            while (errorContainer.firstChild)
-                errorContainer.removeChild(errorContainer.firstChild);
-            errorContainer.appendChild(errorMessageNode);
+            xformsReplaceNodeText(errorContainer, errorMessage);
             xformsDisplayLoading("error");
-            
         } else {
 
             // The server didn't send valid XML

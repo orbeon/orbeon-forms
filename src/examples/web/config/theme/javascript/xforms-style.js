@@ -27,7 +27,7 @@ function xformsUpdateStyle(element) {
         }
     }
 
-    function updateRelevantReadonly(element, relevant, readonly) {
+    function updateRelevantReadonly(element, relevant, readonly, required) {
         if (xformsIsDefined(relevant)) {
             if (relevant) xformsRemoveClass(element, "xforms-disabled")
             else xformsAddClass(element, "xforms-disabled");
@@ -53,6 +53,20 @@ function xformsUpdateStyle(element) {
                 // Other controls
                 if (readonly) element.setAttribute("disabled", "disabled");
                 else element.removeAttribute("disabled");
+            }
+        }
+        if (xformsIsDefined(required)) {
+            var elementsToUpdate = new Array(element);
+            var classes = element.className.split(" ");
+            if (xformsArrayContains(classes, "xforms-input")) {
+                // For inputs, update class on child elements as well
+                for (var i = 0; i < element.childNodes.length; i++)
+                    elementsToUpdate.push(element.childNodes[i]);
+            }
+            // Update class on elements
+            for (var i = 0; i < elementsToUpdate.length; i++) {
+                if (required) xformsAddClass(elementsToUpdate[i], "xforms-required")
+                else xformsRemoveClass(elementsToUpdate[i], "xforms-required");
             }
         }
     }
@@ -84,7 +98,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable label depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-hint") {
@@ -127,7 +141,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable hint depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
             
             if (className == "xforms-help") {
@@ -178,7 +192,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable help depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
@@ -199,7 +213,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable help depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-input") {
@@ -240,10 +254,6 @@ function xformsUpdateStyle(element) {
                             jscalendarOnClick();
                     }
                 }
-
-                // Disable or enable input field depending if control is relevant
-                // TODO: Should this be commented?
-                //updateRelevantReadonly(inputField, control.isRelevant, control.isReadonly);
             }
             
             if (className == "xforms-select1-compact") {
@@ -281,7 +291,7 @@ function xformsUpdateStyle(element) {
             }
 
             // Update relevant
-            updateRelevantReadonly(element, element.isRelevant, element.isReadonly);
+            updateRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             

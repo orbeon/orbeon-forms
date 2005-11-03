@@ -12,49 +12,57 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
         <xhtml:title>XForms Alert</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <a>false</a>
-                    <b>false</b>
+                    <node value="Foo" valid="1" readonly="0" required="0"/>
+                    <node value="Bar" valid="1" readonly="0" required="0"/>
                 </instance>
             </xforms:instance>
-            <xforms:instance id="alert">
-                <alert></alert>
-            </xforms:instance>
-            <xforms:bind nodeset="/instance/(a|b)" readonly="true()" constraint=". = 'true'"/>
-            <xforms:bind nodeset="instance('alert')" calculate="concat('Second control incorrect. Time: ', current-time())"/>
+            <xforms:bind nodeset="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
+                    required="../@required = 1"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
-            <xhtml:p>
-                <xforms:input ref="a">
-                    <xforms:alert>First control incorrect</xforms:alert>
-                </xforms:input>
-                <xforms:trigger>
-                    <xforms:label>Toggle validity</xforms:label>
-                    <xforms:setvalue ref="a" value="if (. = 'true') then 'false' else 'true'" ev:event="DOMActivate"/>
-                </xforms:trigger>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:input ref="b">
-                    <xforms:alert ref="instance('alert')"/>
-                </xforms:input>
-                <xforms:trigger>
-                    <xforms:label>Toggle validity</xforms:label>
-                    <xforms:setvalue ref="b" value="if (. = 'true') then 'false' else 'true'" ev:event="DOMActivate"/>
-                </xforms:trigger>
-            </xhtml:p>
-        </xforms:group>
+        <xhtml:table class="gridtable">
+            <xhtml:tr>
+                <xhtml:th>Control</xhtml:th>
+                <xhtml:th>Change MIP</xhtml:th>
+            </xhtml:tr>
+            <xforms:repeat nodeset="/instance/node">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:input ref="@value">
+                            <xforms:alert>Error message</xforms:alert>
+                        </xforms:input>
+                    </xhtml:td>
+                    <xhtml:td>
+                        Toggle:
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[validity]</xforms:label>
+                            <xforms:setvalue ref="@valid" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[readonly]</xforms:label>
+                            <xforms:setvalue ref="@readonly" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[required]</xforms:label>
+                            <xforms:setvalue ref="@required" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr/>
+            </xforms:repeat>
+        </xhtml:table>
     </xhtml:body>
 </xhtml:html>

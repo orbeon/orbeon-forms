@@ -305,19 +305,28 @@ function xformsLogProperties(object) {
 function xformsDisplayLoading(state) {
     switch (state) {
         case "loading" :
-            document.xformsLoadingLoading.style.display = "block";
-            document.xformsLoadingError.style.display = "none";
-            document.xformsLoadingNone.style.display = "none";
+            if (document.xformsLoadingLoading != null)
+                document.xformsLoadingLoading.style.display = "block";
+            if (document.xformsLoadingError != null)
+                document.xformsLoadingError.style.display = "none";
+            if (document.xformsLoadingNone != null)
+                document.xformsLoadingNone.style.display = "none";
             break;
         case "error":
-            document.xformsLoadingLoading.style.display = "none";
-            document.xformsLoadingError.style.display = "block";
-            document.xformsLoadingNone.style.display = "none";
+            if (document.xformsLoadingLoading != null)
+                document.xformsLoadingLoading.style.display = "none";
+            if (document.xformsLoadingError != null)
+                document.xformsLoadingError.style.display = "block";
+            if (document.xformsLoadingNone != null)
+                document.xformsLoadingNone.style.display = "none";
             break;
         case "none":
-            document.xformsLoadingLoading.style.display = "none";
-            document.xformsLoadingError.style.display = "none";
-            document.xformsLoadingNone.style.display = "block";
+            if (document.xformsLoadingLoading != null)
+                document.xformsLoadingLoading.style.display = "none";
+            if (document.xformsLoadingError != null)
+                document.xformsLoadingError.style.display = "none";
+            if (document.xformsLoadingNone != null)
+                document.xformsLoadingNone.style.display = "block";
             break;
     }
 }
@@ -777,6 +786,9 @@ function xformsPageLoaded() {
             if (xformsArrayContains(form.className.split(" "), "xforms-form")) {
                 // This is a XForms form
                 document.xformsForm = form;
+                document.xformsLoadingLoading = null;
+                document.xformsLoadingError = null;
+                document.xformsLoadingNone = null;
                 var spans = form.getElementsByTagName("span");
                 for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
                     if (spans[spanIndex].className == "xforms-loading-loading")

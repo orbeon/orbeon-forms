@@ -26,13 +26,11 @@
         <title>BizDoc Detail</title>
         <xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
             <xforms:action ev:event="xforms-submit-done">
-                <xforms:setvalue ref="instance('repeats')/submitting">false</xforms:setvalue>
                 <xforms:setvalue ref="instance('main-instance')/message">Submission successful!</xforms:setvalue>
                 <xforms:toggle case="message"/>
                 <xforms:toggle case="ok-message"/>
             </xforms:action>
             <xforms:action ev:event="xforms-submit-error">
-                <xforms:setvalue ref="instance('repeats')/submitting">false</xforms:setvalue>
                 <xforms:setvalue ref="instance('main-instance')/message">Submission failed! Please correct errors first.</xforms:setvalue>
                 <xforms:toggle case="message"/>
                 <xforms:toggle case="error-message"/>
@@ -55,11 +53,6 @@
                     <remove-child/>
                 </triggers>
             </xforms:instance>
-            <xforms:instance id="repeats">
-                <repeats xmlns="">
-                    <submitting>false</submitting>
-                </repeats>
-            </xforms:instance>
             <xforms:bind nodeset="/form/document/claim:claim">
                 
                 <!-- Add some required elements -->
@@ -72,31 +65,32 @@
                         <xforms:bind nodeset="claim:address/claim:state-province" required="true()"/>
                         <xforms:bind nodeset="claim:address/claim:country" required="true()"/>
                     </xforms:bind>
+
                     <xforms:bind nodeset="claim:person-info">
                         <xforms:bind nodeset="claim:birth-date" required="true()" type="xs:date"/>
                         <xforms:bind nodeset="claim:occupation" required="true()"/>
                     </xforms:bind>
+
+                    <xforms:bind nodeset="claim:family-info/claim:children">
+                        <!-- Handle the empty repeat entry necessary to add new entries with xforms:repeat -->
+                        <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
+                        <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
+                        <xforms:bind nodeset="claim:child[last()]/claim:birth-date" calculate="current-date()"/>
+                        <!-- Set date type -->
+                        <xforms:bind nodeset="claim:child/claim:birth-date" type="xs:date"/>
+                    </xforms:bind>
+
+                    <!-- Accident date -->
+                    <xforms:bind nodeset="claim:claim-info/claim:accident-date" type="xs:date"/>
+
+                    <!-- This bind element handles calculated values -->
+                    <xforms:bind nodeset="claim:claim-info/claim:rate"
+                                 calculate="if (../claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)
+                                            then if (current-date() - xs:date(/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date) > xdt:dayTimeDuration('P365D'))
+                                                 then 10
+                                                 else 5
+                                            else 0"/>
                 </xforms:bind>
-
-
-                <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
-                    <!-- Handle the empty repeat entry necessary to add new entries with xforms:repeat -->
-                    <xforms:bind nodeset="claim:child[last()]" relevant="instance('repeats')/submitting = 'true'"/>
-                    <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
-                    <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
-                    <!-- Set date types -->
-                    <xforms:bind nodeset="claim:child/claim:birth-date" type="xs:date"/>
-                </xforms:bind>
-
-                <!-- This bind element handles calculated values -->
-                <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:rate"
-                             calculate="if (../claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)
-                                        then if (current-date() - xs:date(/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date) > xdt:dayTimeDuration('P365D'))
-                                             then 10
-                                             else 5
-                                        else 0"/>
-                <!-- Date -->
-                <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:accident-date" type="xs:date"/>
             </xforms:bind>
             <xforms:bind nodeset="instance('triggers')/remove-child"
                 relevant="count(instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child) > 1"/>
@@ -282,7 +276,6 @@
                                         <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="instance('repeats')/submitting">true</xforms:setvalue>
                                                 <xforms:recalculate model="main-model"/>
                                                 <xforms:send submission="save"/>
                                             </xforms:action>
@@ -409,7 +402,7 @@
                                             <th align="left">Birth Date</th>
                                             <th align="left">Name</th>
                                         </tr>
-                                        <xforms:repeat nodeset="claim:children/claim:child" id="children">
+                                        <xforms:repeat nodeset="claim:children/claim:child[position() lt last()]" id="children">
                                             <tr>
                                                 <td align="right">
                                                     <xforms:input ref="claim:birth-date">
@@ -515,7 +508,6 @@
                                         <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="instance('repeats')/submitting">true</xforms:setvalue>
                                                 <xforms:recalculate model="main-model"/>
                                                 <xforms:send submission="save"/>
                                             </xforms:action>

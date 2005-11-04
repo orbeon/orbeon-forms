@@ -65,8 +65,20 @@ function xformsUpdateStyle(element) {
             }
             // Update class on elements
             for (var i = 0; i < elementsToUpdate.length; i++) {
-                if (required && element.value == "") xformsAddClass(elementsToUpdate[i], "xforms-required")
-                else xformsRemoveClass(elementsToUpdate[i], "xforms-required");
+                if (required) {
+                    xformsAddClass(elementsToUpdate[i], "xforms-required");
+                    if (element.value == "") {
+                        xformsAddClass(elementsToUpdate[i], "xforms-required-empty");
+                        xformsRemoveClass(elementsToUpdate[i], "xforms-required-filled");
+                    } else {
+                        xformsAddClass(elementsToUpdate[i], "xforms-required-filled");
+                        xformsRemoveClass(elementsToUpdate[i], "xforms-required-empty");
+                    }
+                } else {
+                    xformsRemoveClass(elementsToUpdate[i], "xforms-required");
+                    xformsRemoveClass(elementsToUpdate[i], "xforms-required-filled");
+                    xformsRemoveClass(elementsToUpdate[i], "xforms-required-empty");
+                }
             }
         }
     }

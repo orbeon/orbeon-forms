@@ -71,7 +71,7 @@ public class MemoryCacheImpl implements Cache {
             keyToEntryMap.put(key, entry);
             linkedList.addFirst(entry);
         } else {
-            // Update validity
+            // Update validity and move to the front
             entry.validity = validity;
             entry.object = object;
             linkedList.remove(entry);

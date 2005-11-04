@@ -308,6 +308,102 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:static-state>
+                    <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <controls>
+                            <xforms:group ref="/" id="group111">
+                                <xforms:group ref="nested111" id="group112">
+                                    <xforms:group ref="nested112" id="group113">
+                                        <xforms:output ref="first" id="id111"/>
+                                        <xforms:output ref="second" id="id112"/>
+                                        <xforms:output ref="third" id="id113"/>
+                                        <xforms:output ref="fourth" id="id114"/>
+                                    </xforms:group>
+                                </xforms:group>
+                            </xforms:group>
+                            <xforms:group ref="instance(&apos;instance12&apos;)" id="group121">
+                                <xforms:group ref="nested122" id="group122">
+                                    <xforms:output ref="first" id="id121"/>
+                                    <xforms:output ref="second" id="id122"/>
+                                    <xforms:output ref="third" id="id123"/>
+                                    <xforms:output ref="fourth" id="id124"/>
+                                </xforms:group>
+                            </xforms:group>
+                            <xforms:group ref="/" id="group211">
+                                <xforms:group ref="nested211" model="model2" id="group212">
+                                    <xforms:group ref="nested212" id="group213">
+                                        <xforms:output ref="first" id="id211"/>
+                                        <xforms:output ref="second" id="id212"/>
+                                        <xforms:output ref="third" id="id213"/>
+                                        <xforms:output ref="fourth" id="id214"/>
+                                    </xforms:group>
+                                    <xforms:group ref="instance(&apos;instance22&apos;)" id="group214">
+                                        <xforms:group ref="nested222" id="group8">
+                                            <xforms:output ref="first" id="id221"/>
+                                            <xforms:output ref="second" id="id222"/>
+                                            <xforms:output ref="third" id="id223"/>
+                                            <xforms:output ref="fourth" id="id224"/>
+                                            <xforms:group ref="instance(&apos;instance21&apos;)" id="group215">
+                                                <xforms:group ref="nested212" id="group10">
+                                                    <xforms:output ref="first" id="id211b"/>
+                                                    <xforms:output ref="second" id="id212b"/>
+                                                    <xforms:output ref="third" id="id213b"/>
+                                                    <xforms:output ref="fourth" id="id214b"/>
+                                                </xforms:group>
+                                            </xforms:group>
+                                        </xforms:group>
+                                    </xforms:group>
+                                </xforms:group>
+                            </xforms:group>
+                        </controls>
+                        <models>
+                            <xforms:model>
+                                <xforms:instance>
+                                    <nested111>
+                                        <nested112>
+                                            <first>111</first>
+                                            <second>112</second>
+                                            <third>113</third>
+                                            <fourth>114</fourth>
+                                        </nested112>
+                                    </nested111>
+                                </xforms:instance>
+                                <xforms:instance id="instance12">
+                                    <nested121>
+                                        <nested122>
+                                            <first>121</first>
+                                            <second>122</second>
+                                            <third>123</third>
+                                            <fourth>124</fourth>
+                                        </nested122>
+                                    </nested121>
+                                </xforms:instance>
+                            </xforms:model>
+                            <xforms:model id="model2">
+                                <xforms:instance id="instance21">
+                                    <nested211>
+                                        <nested212>
+                                            <first>211</first>
+                                            <second>212</second>
+                                            <third>213</third>
+                                            <fourth>214</fourth>
+                                        </nested212>
+                                    </nested211>
+                                </xforms:instance>
+                                <xforms:instance id="instance22">
+                                    <nested221>
+                                        <nested222>
+                                            <first>221</first>
+                                            <second>222</second>
+                                            <third>223</third>
+                                            <fourth>224</fourth>
+                                        </nested222>
+                                    </nested221>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -599,9 +695,8 @@
                     <p:output name="response" id="repeat-response"/>
                 </p:processor>
 
-                <p:processor name="oxf:unsafe-xslt">
+                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="data"><dummy/></p:input>
-                    <p:input name="request"><xxforms:event-request/></p:input>
                     <p:input name="response" href="#repeat-response"/>
                     <p:input name="controls" href="xforms-server/repeat-full-controls.xml"/>
                     <p:input name="config">
@@ -610,16 +705,14 @@
                             <xsl:import href="/ops/pfc/xforms-to-ajax-xhtml.xsl"/>
 
                             <xsl:template match="/">
-                                <xsl:apply-templates select="doc('input:response')/*"/>
+                                <xxforms:event-response>
+                                    <xsl:copy-of select="doc('input:response')/*/*"/>
+                                    <xxforms:controls>
+                                        <xsl:apply-templates select="doc('input:controls')/*/*"/>
+                                    </xxforms:controls>
+                                </xxforms:event-response>
                             </xsl:template>
-                            <xsl:template match="xxforms:itemsets">
-                                <xsl:copy>
-                                    <xsl:apply-templates/>
-                                </xsl:copy>
-                                <xxforms:controls>
-                                    <xsl:apply-templates select="doc('input:controls')/*/*"/>
-                                </xxforms:controls>
-                            </xsl:template>
+
                         </xsl:stylesheet>
                     </p:input>
                     <p:output name="data" ref="response"/>
@@ -628,8 +721,49 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
+            <xxforms:event-response xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <xxf:static-state xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                    <static-state>
+                        <controls xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:repeat nodeset="/form/departments/department" id="id123">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="../department" at="2" position="after"/>
+                                </xforms:action>
+                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:insert nodeset="../../department[index(&apos;id123&apos;)]/employee" at="2" position="after"/>
+                                    </xforms:action>
+                                    <xforms:output ref="@first" id="id125"/>
+                                    <xforms:output ref="@last" id="id126"/>
+                                </xforms:repeat>
+                            </xforms:repeat>
+                        </controls>
+                        <models>
+                            <xforms:model>
+                                <xforms:instance>
+                                    <form>
+                                        <departments>
+                                            <department>
+                                                <employee first="f11" last="l11"/>
+                                                <employee first="f12" last="l12"/>
+                                            </department>
+                                            <department>
+                                                <employee first="f21" last="l21"/>
+                                            </department>
+                                            <department>
+                                                <employee first="f31" last="l31"/>
+                                                <employee first="f32" last="l32"/>
+                                                <employee first="f33" last="l33"/>
+                                                <employee first="f34" last="l34"/>
+                                            </department>
+                                        </departments>
+                                    </form>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
+                <xxf:dynamic-state xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <dynamic-state>
                         <instances>
                             <form>
@@ -657,7 +791,7 @@
                         </repeat-indexes>
                     </dynamic-state>
                 </xxf:dynamic-state>
-                <xxf:action>
+                <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:control-values>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="2"/>
                         <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="3"/>
@@ -700,122 +834,122 @@
                         <xxf:repeat-iteration id="id124·1" occurs="2"/>
                     </xxf:repeats>
                     <xxf:itemsets/>
-                    <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                        <table>
-                            <tr id="repeat-begin-id123" class="xforms-repeat-begin-end"/>
-                            <tr class="xforms-repeat-delimiter"/>
-                            <tr class="xforms-repeat-selected-item-1">
-                                <td>
-                                    <table>
-                                        <tr id="repeat-begin-id124·1" class="xforms-repeat-begin-end"/>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·1-1" class="xforms-control xforms-output">f11</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·1-1" class="xforms-control xforms-output">l11</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr class="xforms-repeat-selected-item-2">
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·1-2" class="xforms-control xforms-output">f12</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·1-2" class="xforms-control xforms-output">l12</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr id="repeat-end-id124·1" class="xforms-repeat-begin-end"/>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr class="xforms-repeat-delimiter"/>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr id="repeat-begin-id124·2" class="xforms-repeat-begin-end"/>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·2-1" class="xforms-control xforms-output">f21</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·2-1" class="xforms-control xforms-output">l21</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr id="repeat-end-id124·2" class="xforms-repeat-begin-end"/>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr class="xforms-repeat-delimiter"/>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr id="repeat-begin-id124·3" class="xforms-repeat-begin-end"/>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-1" class="xforms-control xforms-output">f31</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-1" class="xforms-control xforms-output">l31</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-2" class="xforms-control xforms-output">f32</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-2" class="xforms-control xforms-output">l32</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-3" class="xforms-control xforms-output">f33</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-3" class="xforms-control xforms-output">l33</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-4" class="xforms-control xforms-output">f34</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-4" class="xforms-control xforms-output">l34</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr id="repeat-end-id124·3" class="xforms-repeat-begin-end"/>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr class="xforms-repeat-delimiter"/>
-                            <tr class="xforms-repeat-template">
-                                <td>
-                                    <table>
-                                        <tr id="repeat-begin-id124" class="xforms-repeat-begin-end"/>
-                                        <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output"/>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output"/>
-                                            </td>
-                                        </tr>
-                                        <tr id="repeat-end-id124" class="xforms-repeat-begin-end"/>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr id="repeat-end-id123" class="xforms-repeat-begin-end"/>
-                        </table>
-                    </xxforms:controls>
                 </xxf:action>
-            </xxf:event-response>
+                <xxforms:controls>
+                    <table>
+                        <tr id="repeat-begin-id123" class="xforms-repeat-begin-end"/>
+                        <tr class="xforms-repeat-delimiter"/>
+                        <tr class="xforms-repeat-selected-item-1">
+                            <td>
+                                <table>
+                                    <tr id="repeat-begin-id124·1" class="xforms-repeat-begin-end"/>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·1-1" class="xforms-control xforms-output">f11</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·1-1" class="xforms-control xforms-output">l11</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr class="xforms-repeat-selected-item-2">
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·1-2" class="xforms-control xforms-output">f12</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·1-2" class="xforms-control xforms-output">l12</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr id="repeat-end-id124·1" class="xforms-repeat-begin-end"/>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr class="xforms-repeat-delimiter"/>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr id="repeat-begin-id124·2" class="xforms-repeat-begin-end"/>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·2-1" class="xforms-control xforms-output">f21</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·2-1" class="xforms-control xforms-output">l21</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr id="repeat-end-id124·2" class="xforms-repeat-begin-end"/>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr class="xforms-repeat-delimiter"/>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr id="repeat-begin-id124·3" class="xforms-repeat-begin-end"/>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-1" class="xforms-control xforms-output">f31</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-1" class="xforms-control xforms-output">l31</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-2" class="xforms-control xforms-output">f32</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-2" class="xforms-control xforms-output">l32</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-3" class="xforms-control xforms-output">f33</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-3" class="xforms-control xforms-output">l33</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125·3-4" class="xforms-control xforms-output">f34</xhtml:span>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126·3-4" class="xforms-control xforms-output">l34</xhtml:span>
+                                        </td>
+                                    </tr>
+                                    <tr id="repeat-end-id124·3" class="xforms-repeat-begin-end"/>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr class="xforms-repeat-delimiter"/>
+                        <tr class="xforms-repeat-template">
+                            <td>
+                                <table>
+                                    <tr id="repeat-begin-id124" class="xforms-repeat-begin-end"/>
+                                    <tr class="xforms-repeat-delimiter"/>
+                                    <tr>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output"/>
+                                        </td>
+                                        <td>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output"/>
+                                        </td>
+                                    </tr>
+                                    <tr id="repeat-end-id124" class="xforms-repeat-begin-end"/>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr id="repeat-end-id123" class="xforms-repeat-begin-end"/>
+                    </table>
+                </xxforms:controls>
+            </xxforms:event-response>
         </output>
     </test>
 
@@ -1184,6 +1318,29 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                 <xxf:static-state>
+                    <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <controls>
+                            <xforms:group ref="instance(&apos;tests&apos;)" id="id1">
+                                <xforms:input ref="noFoundData" id="id2">
+                                    <xforms:label class="fixed-width" id="id3">test noFoundData:</xforms:label>
+                                </xforms:input>
+                            </xforms:group>
+                        </controls>
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="tests">
+                                    <instance>
+                                        <noFoundData>0</noFoundData>
+                                    </instance>
+                                </xforms:instance>
+                                <xforms:bind nodeset="instance(&apos;tests&apos;)" id="id4">
+                                    <xforms:bind nodeset="noFoundData" calculate=". + 1" id="id5"/>
+                                </xforms:bind>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1244,6 +1401,25 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:static-state>
+                    <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <controls>
+                            <xforms:group ref="instance(&apos;main-instance&apos;)" id="id1">
+                                <xforms:input ref="this-is-an-existing-node" id="id2"/>
+                                <xforms:input ref="this-is-a-non-existing-node" id="id3"/>
+                            </xforms:group>
+                        </controls>
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="main-instance">
+                                    <instance>
+                                        <this-is-an-existing-node/>
+                                    </instance>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -1304,6 +1480,24 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:static-state>
+                    <static-state xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <controls>
+                            <xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), &apos;[MNn] [D], [Y]&apos;, &apos;en&apos;, (), ())"/>
+                            <xforms:output id="id2" ref="date" xxforms:format="format-date(xs:date(.), &apos;[D]. [MNn] [Y]&apos;, &apos;de&apos;, (), ())"/>
+                        </controls>
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="main-instance">
+                                    <instance>
+                                        <date>2005-10-11</date>
+                                    </instance>
+                                </xforms:instance>
+                                <xforms:bind nodeset="instance(&apos;main-instance&apos;)/date" type="xs:date"/>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>

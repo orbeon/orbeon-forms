@@ -15,23 +15,18 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
@@ -54,7 +49,7 @@ public class XFormsServer extends ProcessorImpl {
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
 
-    private static final String CONTAINING_DOCUMENT_KEY_TYPE = "oxf.xforms.cache.context.containing-document";
+    private static final String SESSION_STATE_PREFIX = "session:";
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
 
@@ -90,22 +85,11 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
+
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
         // Extract information from request
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
-
-        // Get static state
-        final String staticStateString;
-        {
-            final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
-            staticStateString = staticStateElement.getTextTrim();
-        }
-
-        // Get dynamic state
-        final String dynamicStateString;
-        {
-            final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
-            dynamicStateString = dynamicStateElement.getTextTrim();
-        }
 
         // Get action
         final Element actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
@@ -113,19 +97,68 @@ public class XFormsServer extends ProcessorImpl {
         // Get files if any (those come from xforms-server-submit.xpl upon submission)
         final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
+        // Retrieve state
+        final String pageGenerationId;
+        final XFormsState xformsState;
+        {
+            // Get static state
+            final String staticStateString;
+            {
+                final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
+                staticStateString = staticStateElement.getTextTrim();
+            }
+
+            // Get dynamic state
+            final String dynamicStateString;
+            {
+                final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
+                dynamicStateString = dynamicStateElement.getTextTrim();
+            }
+
+            if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
+                // State doesn't come with the request, we should look it up in the repository
+                final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
+
+                // Extract page generation id
+                pageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
+
+                // We don't create the cache at this point as it may not be necessary
+                final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
+                final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(pageGenerationId, requestId);
+
+                // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
+                if (sessionFormsState == null)
+                    throw new OXFException("Unable to retrieve XForms engine state.");
+
+                xformsState = sessionFormsState;
+            } else {
+                // State comes with request
+
+                if (XFormsUtils.isCacheSession()) {
+                    // Produce page generation id
+                    pageGenerationId = UUIDUtils.createPseudoUUID();
+                } else {
+                    pageGenerationId = null;
+                }
+
+                xformsState = new XFormsState(staticStateString, dynamicStateString);
+            }
+        }
+
         final XFormsContainingDocument containingDocument;
-        // Try to obtain containing document from cache first
-        if (isCacheContexts()) {
+        if (XFormsUtils.isCacheDocument()) {
+            // Try to obtain containing document from cache
             if (filesElement == null) {
                 // No fileElements, this may have been cached
-                containingDocument = getContainingDocument(pipelineContext, staticStateString, dynamicStateString);
+                containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
             } else  {
                 // If there are filesElement, then we know this was not cached
                 logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
-                containingDocument = createXFormsContainingDocument(pipelineContext, staticStateString, dynamicStateString, filesElement);
+                containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
             }
         } else {
-            containingDocument = createXFormsContainingDocument(pipelineContext, staticStateString, dynamicStateString, filesElement);
+            // Otherwise we recreate the containindg document from scratch
+            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
         }
 
         try {
@@ -165,9 +198,7 @@ public class XFormsServer extends ProcessorImpl {
                     contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-                    // NOTE: Static state is produced externally during initialization only
-
-                    // Output dynamic state
+                    // Output state
                     boolean requireClientSubmission = false;
                     {
                         final Document dynamicStateDocument = Dom4jUtils.createDocument();
@@ -247,20 +278,43 @@ public class XFormsServer extends ProcessorImpl {
                             }
                         }
 
+                        // Produce static state if needed
+                        if (isInitializationRun) {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
+                            if (XFormsUtils.isCacheSession()) {
+                                // Produce static state key, infact a page generation id
+                                ch.text(SESSION_STATE_PREFIX + pageGenerationId);
+                            } else {
+                                // Produce encoded static state
+                                ch.text(xformsState.getStaticState());
+                            }
+                            ch.endElement();
+                        }
+
                         // Encode dynamic state
                         final String newEncodedDynamicState = XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument);
+                        final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                        ch.text(newEncodedDynamicState);
+                        if (XFormsUtils.isCacheSession()) {
+                            // Produce dynamic state key
+                            final String newRequestId = UUIDUtils.createPseudoUUID();
+                            final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);
+                            sessionCache.add(pageGenerationId, newRequestId, newXFormsState);
+                            ch.text(SESSION_STATE_PREFIX + newRequestId);
+                        } else {
+                            // Send state to the client
+                            ch.text(newEncodedDynamicState);
+                        }
                         ch.endElement();
 
-                        // Cache if requested and possible
-                        if (isCacheContexts()) {
+                        // Cache document if requested and possible
+                        if (XFormsUtils.isCacheDocument()) {
                             if (!requireClientSubmission) {
                                 // NOTE: We check on requireClientSubmission because the event is encoded
                                 // in the dynamic state. But if we stored the event separately, then we
                                 // could still cache the containing document.
-                                cacheContainingDocument(pipelineContext, staticStateString, newEncodedDynamicState, containingDocument);
+                                XFormsServerDocumentCache.instance().add(pipelineContext, newXFormsState, containingDocument);
                             } else {
                                 // Since we cannot cache the result, we have to get the object out of its current pool
                                 final ObjectPool objectPool = containingDocument.getSourceObjectPool();
@@ -347,7 +401,7 @@ public class XFormsServer extends ProcessorImpl {
                         // Check if we want to require the client to perform a form submission
                         {
                             if (requireClientSubmission)
-                                outputSubmissionInfo(pipelineContext, ch);
+                                outputSubmissionInfo(externalContext, ch);
                         }
 
                         // Output messages to display
@@ -643,10 +697,8 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", Integer.toString(idSuffix) });
     }
 
-    private void outputSubmissionInfo(PipelineContext pipelineContext, ContentHandlerHelper ch) {
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    private void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch) {
         final String requestURL = externalContext.getRequest().getRequestURL();
-
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
                 new String[]{"action", requestURL, "method", "POST"});
@@ -806,13 +858,16 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext,
-                                                                           String staticStateString, String dynamicStateString, Element filesElement) {
+    static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement) {
 
         logger.debug("XForms - containing document cache: creating new document.");
 
-        final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, staticStateString);
-        final Document dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
+        final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState());
+        final Document dynamicStateDocument;
+        {
+            final String dynamicStateString = xformsState.getDynamicState();
+            dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
+        }
 
         // Get controls from static state
 //        final Document controlsDocument = Dom4jUtils.createDocument();
@@ -917,136 +972,25 @@ public class XFormsServer extends ProcessorImpl {
         return containingDocument;
     }
 
-    private static ObjectPool createXFormsContainingDocumentPool(String staticStateString, String dynamicStateString) {
-        try {
-            final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
-            pool.setFactory(new CachedPoolableObjetFactory(pool, staticStateString, dynamicStateString));
+    public static class XFormsState {
+        private String staticState;
+        private String dynamicState;
 
-            return pool;
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    private static boolean isCacheContexts() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_CACHE_CONTEXTS_PROPERTY, false).booleanValue();
-    }
-
-    private static XFormsContainingDocument getContainingDocument(PipelineContext pipelineContext, String staticStateString, String dynamicStateString) {
-
-        final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance();
-        final String cacheKeyString = StringUtils.deleteWhitespace(staticStateString + "|" + dynamicStateString);
-        //logger.info("xxx KEY used when returning: " + cacheKeyString);
-
-        // Try to find pool in cache, create it if not found
-        final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
-
-        final XFormsContainingDocument containingDocument;
-        final ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
-        if (pool == null) {
-            // We don't add the pool to the cache here
-            logger.debug("XForms - containing document cache (getContainingDocument): did not find document pool in cache.");
-            containingDocument = createXFormsContainingDocument(pipelineContext, staticStateString, dynamicStateString, null);
-        } else {
-            // Get object from pool
-            logger.debug("XForms - containing document cache (getContainingDocument): found containing document pool in cache; getting document from pool.");
-            try {
-                containingDocument = (XFormsContainingDocument) pool.borrowObject();
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-            // Initialize state
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, null, null));
-        }
-        containingDocument.setSourceObjectPool(pool);
-
-        // Return document
-        return containingDocument;
-    }
-
-    private static void cacheContainingDocument(PipelineContext pipelineContext, String staticStateString, String dynamicStateString, XFormsContainingDocument containingDocument) {
-
-        // Document was not in pool
-        final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance();
-        final String cacheKeyString = StringUtils.deleteWhitespace(staticStateString + "|" + dynamicStateString);
-        //logger.info("xxx KEY used when returning: " + cacheKeyString);
-
-        final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
-        ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
-        if (destinationPool == null) {
-            // The pool is not in cache
-            destinationPool = createXFormsContainingDocumentPool(staticStateString, dynamicStateString);
-            cache.add(pipelineContext, cacheKey, validity, destinationPool);
-            logger.debug("XForms - containing document cache (cacheContainingDocument): did not find document pool in cache; creating new pool and returning document to it.");
-        } else {
-            // Pool is already in cache
-            logger.debug("XForms - containing document cache (cacheContainingDocument): found containing document pool in cache. Returning document to it.");
+        public XFormsState(String staticState, String dynamicState) {
+            this.staticState = staticState;
+            this.dynamicState = dynamicState;
         }
 
-        // Return object to destination pool
-        try {
-            destinationPool.returnObject(containingDocument);
-        } catch (Exception e) {
-            throw new OXFException(e);
+        public String getStaticState() {
+            return staticState;
         }
 
-        // Remove object from source pool
-        final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
-        if (sourceObjectPool != null && sourceObjectPool != destinationPool) {
-            try {
-                logger.debug("XForms - containing document cache: discarding document from source pool.");
-                sourceObjectPool.invalidateObject(containingDocument);
-            } catch (Exception e) {
-                throw new OXFException(e);
-            }
-        }
-        containingDocument.setSourceObjectPool(null);
-    }
-
-    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
-        private final ObjectPool pool;
-        private String staticStateString;
-        private String dynamicStateString;
-
-        public CachedPoolableObjetFactory(ObjectPool pool, String staticStateString, String dynamicStateString) {
-            this.pool = pool;
-            this.staticStateString = staticStateString;
-            this.dynamicStateString = dynamicStateString;
+        public String getDynamicState() {
+            return dynamicState;
         }
 
-        public void activateObject(Object o) throws Exception {
-        }
-
-        public void destroyObject(Object o) throws Exception {
-            if (o instanceof XFormsContainingDocument) {
-                // Don't actually "damage" the object, as it may be put into another pool when
-                // invalidated from the current pool
-            } else
-                throw new OXFException(o.toString() + " is not an XFormsContainingDocument");
-        }
-
-        public Object makeObject() throws Exception {
-            // We create a new PipelineContext, because we have trouble passing it from
-            // borrowObject() up to here; it is only used for statistics so that's ok
-            final XFormsContainingDocument result = createXFormsContainingDocument(new PipelineContext(), staticStateString, dynamicStateString, null);
-            result.setSourceObjectPool(pool);
-            return result;
-        }
-
-        public void passivateObject(Object o) throws Exception {
-        }
-
-        public boolean validateObject(Object o) {
-            // We don't need the below anymore, as we are returning the document to the right pool
-//            final XFormsContainingDocument containingDocument = (XFormsContainingDocument) o;
-//            final boolean valid = dynamicStateString.equals(containingDocument.getDynamicStateString());
-//            if (logger.isDebugEnabled())
-//                logger.debug("XForms - containing document cache (validateObject): " + valid);
-//            return valid;
-            return true;
+        public String toString() {
+            return StringUtils.deleteWhitespace(staticState + "|" + dynamicState);
         }
     }
 }

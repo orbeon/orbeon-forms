@@ -214,7 +214,7 @@ public class OXFProperties {
         }
 
         public String getString(String name, String defaultValue) {
-            String result = getString(name);
+            final String result = getString(name);
             return (result == null) ? defaultValue : result;
         }
 
@@ -222,12 +222,17 @@ public class OXFProperties {
             return (Integer) getProperty(name, XMLConstants.XS_INTEGER_QNAME);
         }
 
+        public Integer getInteger(String name, int defaultValue) {
+            final Integer result = getInteger(name);
+            return (result == null) ? new Integer(defaultValue) : result;
+        }
+
         public Boolean getBoolean(String name) {
             return (Boolean) getProperty(name, XMLConstants.XS_BOOLEAN_QNAME);
         }
 
         public Boolean getBoolean(String name, boolean defaultValue) {
-            Boolean result = getBoolean(name);
+            final Boolean result = getBoolean(name);
             return (result == null) ? new Boolean(defaultValue) : result;
         }
 

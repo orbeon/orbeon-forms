@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.portlet.WSRPUtils;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
@@ -32,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
-import javax.portlet.RenderResponse;
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,6 +46,7 @@ public class XFormsUtils {
 
     private static final int BUFFER_SIZE = 1024;
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
+    private static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
 
     /**
      * Return the local XForms instance data for the given node, null if not available.
@@ -393,6 +391,21 @@ public class XFormsUtils {
             // Convert from xs:anyURI to xs:base64Binary
             return XMLUtils.anyURIToBase64Binary(value);
         }
+    }
+
+    public static boolean isCacheDocument() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_CACHE_DOCUMENT_PROPERTY, false).booleanValue();
+    }
+
+    public static boolean isCacheSession() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_CACHE_SESSION_PROPERTY, false).booleanValue();
+    }
+
+    public static int getSessionCacheSize() {
+        return OXFProperties.instance().getPropertySet().getInteger
+                (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
     }
 
     public static interface InstanceWalker {

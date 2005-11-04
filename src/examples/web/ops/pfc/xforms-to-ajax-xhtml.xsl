@@ -12,13 +12,13 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:saxon="http://saxon.sf.net/"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="xforms xxforms xs saxon xhtml f">
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        exclude-result-prefixes="xforms xxforms xs saxon xhtml f">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:output name="xml" method="xml"/>
@@ -27,8 +27,6 @@
     <xsl:variable name="repeat-hiearchy-separator-1" select="'&#xb7;'" as="xs:string"/> <!-- middle dot -->
     <xsl:variable name="repeat-hiearchy-separator-2" select="'-'" as="xs:string"/>
 
-    <xsl:variable name="request" as="element()" 
-        select="doc('input:request')/xxforms:event-request"/>
     <xsl:variable name="response" as="element()" 
         select="doc('input:response')/xxforms:event-response"/>
 
@@ -54,7 +52,7 @@
                     <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
                 </xsl:if>
                 <!-- Store private information used by the client-side JavaScript -->
-                <xhtml:input type="hidden" name="$static-state" value="{$request/xxforms:static-state}"/>
+                <xhtml:input type="hidden" name="$static-state" value="{$response/xxforms:static-state}"/>
                 <xhtml:input type="hidden" name="$dynamic-state" value="{$response/xxforms:dynamic-state}"/>
                 <xhtml:input type="hidden" name="$temp-dynamic-state" value=""/>
                 <!-- Store information about nested repeats hierarchy -->

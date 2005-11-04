@@ -40,17 +40,22 @@ public class XFormsRequestEncoder extends ProcessorImpl {
                 final ContentHandlerHelper contentHandlerHelper = new ContentHandlerHelper(contentHandler);
                 contentHandlerHelper.startDocument();
                 contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-request");
-                contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state");
 
+                // Encode static state here
+                contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state");
                 final Document document = readCacheInputAsDOM4J(pipelineContext, INPUT_DATA);
                 final String encoded = XFormsUtils.encodeXML(pipelineContext, document, XFormsUtils.getEncryptionKey());
                 contentHandlerHelper.text(encoded);
-
                 contentHandlerHelper.endElement();
+
+                // Dynamic state is created by the XForms serer
                 contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
                 contentHandlerHelper.endElement();
+
+                // No action at this point
                 contentHandlerHelper.startElement("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
                 contentHandlerHelper.endElement();
+
                 contentHandlerHelper.endElement();
                 contentHandlerHelper.endDocument();
             }

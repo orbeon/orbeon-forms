@@ -309,7 +309,14 @@
 			                	(you only want to do so if you declared specific information about the operation
 			                	in the <code>interface</code> input).
 		                	</li>
-	                	</ul>
+                            <li>
+			                	The optional <code>timeout</code> attribute on the <code>execute </code> element
+			                	specifies a connection timeout in milliseconds. The value must be a
+			                	non-negative integer, with the value <code>0</code> meaning no timeout. If not
+			                	specified, the timeout value is the default timeout of the underlying web
+			                	service implementation.
+		                	</li>
+                        </ul>
 	                </li>
                 </ul>
             </section>

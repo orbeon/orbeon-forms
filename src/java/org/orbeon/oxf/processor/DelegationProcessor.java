@@ -79,6 +79,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                     Locator locator;
                     String operationName;
+                    Integer operationTimeout;
                     ServiceDefinition service;
                     OperationDefinition operation;
                     SAXStore parameters;
@@ -112,8 +113,21 @@ public class DelegationProcessor extends ProcessorImpl {
                                     }
                                 }
                                 if (operation == null)
-                                    throw new ValidationException("No operation '" + operationName + "' declared",
-                                            new LocationData(locator));
+                                    throw new ValidationException("No operation '" + operationName + "' declared", new LocationData(locator));
+                            }
+
+                            // Get timeout if any
+                            {
+                                final String timeoutAttribute = attributes.getValue("timeout");
+                                if (timeoutAttribute != null) {
+                                    try {
+                                        operationTimeout = new Integer(timeoutAttribute);
+                                    } catch (NumberFormatException e) {
+                                        throw new ValidationException("Invalid timeout specified: " + timeoutAttribute, new LocationData(locator));
+                                    }
+                                    if (operationTimeout.intValue() < 0)
+                                        throw new ValidationException("Invalid timeout specified: " + operationTimeout, new LocationData(locator));
+                                }
                             }
 
                             parameters = new SAXStore();
@@ -139,6 +153,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         // Call Web service
                                         Service axisService = new Service();
                                         Call call = (Call) axisService.createCall();
+                                        if (operationTimeout != null)
+                                            call.setTimeout(operationTimeout);
 
                                         // Read all parameters in root node
                                         final Node rootNode;

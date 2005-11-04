@@ -1463,7 +1463,6 @@ function xformsHandleResponse() {
                     break;
                 }
             }
-            xformsLog(errorMessage);
             // Display error
             var errorContainer = document.xformsLoadingError;
             xformsReplaceNodeText(errorContainer, errorMessage);

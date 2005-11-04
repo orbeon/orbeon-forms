@@ -39,31 +39,41 @@
         </section>
         <section>
             <title>Getting Started</title>
-            <p>
-                The easiest way to get started with simple examples is to use the OPS XForms
-                Sandbox. This tool allows you to upload example XForms files from your web browser
-                and to see the results directly. You can access the XForms sandbox:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <b>Online:</b> visit <a
-                        href="http://www.orbeon.com/ops/goto-example/xforms-sandbox">this link</a>
-                        to access the online public XForms Sandbox.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Locally:</b> if this documentation is produced by your local installation
-                        of OPS, visit <a href="/goto-example/xforms-sandbox">this link</a>.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                After submitting an XHTML + XForms file, the result, or errors, should display. Use
-                your browser's "Back" button to return to the main XForms Sandbox page, or use a
-                bookmark.
-            </p>
+            <section>
+                <title>The XForms Sandbox</title>
+                <p>
+                    The easiest way to get started with simple examples is to use the OPS XForms
+                    Sandbox. This tool allows you to upload example XForms files from your web browser
+                    and to see the results directly. You can access the XForms sandbox:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Online:</b> visit <a
+                            href="http://www.orbeon.com/ops/goto-example/xforms-sandbox">this link</a>
+                            to access the online public XForms Sandbox.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Locally:</b> if this documentation is produced by your local installation
+                            of OPS, visit <a href="/goto-example/xforms-sandbox">this link</a>.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    After submitting an XHTML + XForms file, the result, or errors, should display. Use
+                    your browser's "Back" button to return to the main XForms Sandbox page, or use a
+                    bookmark.
+                </p>
+            </section>
+            <section>
+                <title>Integrating XForms in OPS</title>
+                <p>
+                    TODO: past the sandbox, how to integrate XForms with OPS: single static page,
+                    dynamic page, PFC and MVC, submissions, services, proxy mode, etc.
+                </p>
+            </section>
         </section>
         <section>
             <title>Programming With XForms 1.0</title>

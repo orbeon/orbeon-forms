@@ -120,6 +120,7 @@
                                 </xforms:action>
                                 <xforms:trigger appearance="xxforms:image">
                                     <xxforms:img src="/images/edit.gif"/>
+                                    <xforms:label>Edit</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label>Edit</xforms:label>
@@ -307,7 +308,9 @@
                         </xforms:group>
                         <!-- Description edition field -->
                         <xforms:group ref="@ui:input">
-                            <xforms:input id="list-description-input" ref="../@description" class="list-description-input"/>
+                            <xforms:input id="list-description-input" ref="../@description" class="list-description-input">
+                                <xforms:label/>
+                            </xforms:input>
                         </xforms:group>
                         <!-- Trigger to save description -->
                         <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
@@ -350,7 +353,9 @@
                                 </xforms:group>
                                 <!-- Description edition field -->
                                 <xforms:group ref="@ui:input">
-                                    <xforms:input id="todo-description-input" ref="../@description"/>
+                                    <xforms:input id="todo-description-input" ref="../@description">
+                                        <xforms:label/>
+                                    </xforms:input>
                                 </xforms:group>
                                 <!-- Trigger to save descr  iption -->
                                 <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">

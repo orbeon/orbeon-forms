@@ -399,8 +399,10 @@ public class XFormsUtils {
     }
 
     public static boolean isCacheSession() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_CACHE_SESSION_PROPERTY, false).booleanValue();
+        final String propertyValue = OXFProperties.instance().getPropertySet().getString
+                (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+
+        return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
     public static int getSessionCacheSize() {

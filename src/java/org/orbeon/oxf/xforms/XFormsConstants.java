@@ -99,10 +99,14 @@ public class XFormsConstants {
     public static final String XFORMS_DEFAULT_DATE_FORMAT_PROPERTY = "oxf.xforms.format.date";
     public static final String XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY = "oxf.xforms.format.dateTime";
     public static final String XFORMS_DEFAULT_TIME_FORMAT_PROPERTY = "oxf.xforms.format.time";
+    public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
     public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
-    public static final String XFORMS_CACHE_SESSION_PROPERTY = "oxf.xforms.cache.session";
     public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
-    
+
+    public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
+    public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";
+    public static final String XXFORMS_STATE_HANDLING_SESSION_VALUE = "session";
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     

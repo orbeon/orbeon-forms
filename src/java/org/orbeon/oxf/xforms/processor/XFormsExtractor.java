@@ -62,6 +62,8 @@ public class XFormsExtractor extends ProcessorImpl {
 
                     private Locator locator;
 
+                    private String stateHandling;
+
                     private int level;
                     private String element0;
                     private String element1;
@@ -75,6 +77,8 @@ public class XFormsExtractor extends ProcessorImpl {
                     private int modelLevel;
                     private boolean inControl;
                     private int controlLevel;
+
+                    private boolean mustOutputFirstElement = true;
 
                     // Create xml:base stack
                     private final ExternalContext externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
@@ -90,19 +94,34 @@ public class XFormsExtractor extends ProcessorImpl {
 
                     public void startDocument() throws SAXException {
                         super.startDocument();
-                        final AttributesImpl attributesImp = new AttributesImpl();
-                        attributesImp.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
-                        super.startElement("", "static-state", "static-state", attributesImp);
+                    }
+
+                    private void outputFirstElementIfNeeded() throws SAXException {
+                        if (mustOutputFirstElement) {
+                            final AttributesImpl attributesImp = new AttributesImpl();
+                            attributesImp.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
+                            if (stateHandling != null)
+                                attributesImp.addAttribute("", "state-handling", "state-handling", ContentHandlerHelper.CDATA, stateHandling);
+                            super.startElement("", "static-state", "static-state", attributesImp);
+                            mustOutputFirstElement = false;
+                        }
                     }
 
                     public void endDocument() throws SAXException {
 
-                        // Close elements
-                        if (gotModel && gotControl) {
-                            super.endElement("", "controls", "controls");
-                        } else if (gotModel) {
+                        // Start and close elements
+                        if (!gotModel && !gotControl) {
+                            outputFirstElementIfNeeded();
+                            super.startElement("", "models", "models", XMLUtils.EMPTY_ATTRIBUTES);
+                        }
+
+                        if (gotModel && !gotControl) {
                             super.endElement("", "models", "models");
                             super.startElement("", "controls", "controls", XMLUtils.EMPTY_ATTRIBUTES);
+                            super.endElement("", "controls", "controls");
+                        }
+
+                        if (gotModel && gotControl) {
                             super.endElement("", "controls", "controls");
                         }
 
@@ -114,17 +133,29 @@ public class XFormsExtractor extends ProcessorImpl {
 
                         namespaceSupport.pushContext();
 
-                        // Handle xml:base
                         if (!inModel && !inControl) {
-                            final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
-                            if (xmlBaseAttribute == null) {
-                                xmlBaseStack.push(xmlBaseStack.peek());
-                            } else {
-                                try {
-                                    final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
-                                    xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
-                                } catch (URISyntaxException e) {
-                                    throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                            // Handle xml:base
+                            {
+                                final String xmlBaseAttribute = attributes.getValue(XMLConstants.XML_URI, "base");
+                                if (xmlBaseAttribute == null) {
+                                    xmlBaseStack.push(xmlBaseStack.peek());
+                                } else {
+                                    try {
+                                        final URI currentXMLBaseURI = (URI) xmlBaseStack.peek();
+                                        xmlBaseStack.push(currentXMLBaseURI.resolve(new URI(xmlBaseAttribute)));
+                                    } catch (URISyntaxException e) {
+                                        throw new ValidationException("Error creating URI from: '" + xmlBaseStack.peek() + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                                    }
+                                }
+                            }
+                            // Handle preferences
+                            if (stateHandling == null) {
+                                final String xxformsStateHandling = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
+                                if (xxformsStateHandling != null) {
+                                    if (!(xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE) || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)))
+                                        throw new ValidationException("Invalid " + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
+
+                                    stateHandling = xxformsStateHandling;
                                 }
                             }
                         }
@@ -147,8 +178,10 @@ public class XFormsExtractor extends ProcessorImpl {
                                     if (gotControl)
                                         throw new OXFException("/xhtml:html/xhtml:head//xforms:model occurred after /xhtml:html/xhtml:body//xforms:*");
 
-                                    if (!gotModel)
+                                    if (!gotModel) {
+                                        outputFirstElementIfNeeded();
                                         super.startElement("", "models", "models", XMLUtils.EMPTY_ATTRIBUTES);
+                                    }
 
                                     gotModel = true;
 
@@ -162,11 +195,16 @@ public class XFormsExtractor extends ProcessorImpl {
                                     inControl = true;
                                     controlLevel = level;
 
-                                    if (gotModel && !gotControl)
-                                        super.endElement("", "models", "models");
-
-                                    if (!gotControl)
+                                    if (!gotControl) {
+                                        if (gotModel) {
+                                            super.endElement("", "models", "models");
+                                        } else {
+                                            outputFirstElementIfNeeded();
+                                            super.startElement("", "models", "models", XMLUtils.EMPTY_ATTRIBUTES);
+                                            super.endElement("", "models", "models");
+                                        }
                                         super.startElement("", "controls", "controls", XMLUtils.EMPTY_ATTRIBUTES);
+                                    }
 
                                     gotControl = true;
 

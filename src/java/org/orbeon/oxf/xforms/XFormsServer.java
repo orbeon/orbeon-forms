@@ -98,7 +98,7 @@ public class XFormsServer extends ProcessorImpl {
         final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
 
         // Retrieve state
-        final String pageGenerationId;
+        final String requestPageGenerationId;
         final XFormsState xformsState;
         {
             // Get static state
@@ -120,11 +120,11 @@ public class XFormsServer extends ProcessorImpl {
                 final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
 
                 // Extract page generation id
-                pageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
+                requestPageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
 
                 // We don't create the cache at this point as it may not be necessary
                 final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
-                final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(pageGenerationId, requestId);
+                final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
 
                 // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                 if (sessionFormsState == null)
@@ -133,14 +133,7 @@ public class XFormsServer extends ProcessorImpl {
                 xformsState = sessionFormsState;
             } else {
                 // State comes with request
-
-                if (XFormsUtils.isCacheSession()) {
-                    // Produce page generation id
-                    pageGenerationId = UUIDUtils.createPseudoUUID();
-                } else {
-                    pageGenerationId = null;
-                }
-
+                requestPageGenerationId = null;
                 xformsState = new XFormsState(staticStateString, dynamicStateString);
             }
         }
@@ -279,11 +272,12 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Produce static state if needed
+                        final String currentPageGenerationId = (requestPageGenerationId != null) ? requestPageGenerationId : UUIDUtils.createPseudoUUID();
                         if (isInitializationRun) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
-                            if (XFormsUtils.isCacheSession()) {
+                            if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
                                 // Produce static state key, infact a page generation id
-                                ch.text(SESSION_STATE_PREFIX + pageGenerationId);
+                                ch.text(SESSION_STATE_PREFIX + currentPageGenerationId);
                             } else {
                                 // Produce encoded static state
                                 ch.text(xformsState.getStaticState());
@@ -296,11 +290,11 @@ public class XFormsServer extends ProcessorImpl {
                         final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                        if (XFormsUtils.isCacheSession()) {
+                        if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
                             // Produce dynamic state key
                             final String newRequestId = UUIDUtils.createPseudoUUID();
                             final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);
-                            sessionCache.add(pageGenerationId, newRequestId, newXFormsState);
+                            sessionCache.add(currentPageGenerationId, newRequestId, newXFormsState);
                             ch.text(SESSION_STATE_PREFIX + newRequestId);
                         } else {
                             // Send state to the client
@@ -906,8 +900,15 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Create XForms Engine
+        final String stateHandling;
+        {
+            final String stateHandlingAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
+            stateHandling = (stateHandlingAttribute != null)
+                    ? stateHandlingAttribute
+                    : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
+        }
         final XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement,
-                staticStateDocument.getRootElement().attributeValue("container-type"));
+                staticStateDocument.getRootElement().attributeValue("container-type"), stateHandling);
 
         // Get instances
         boolean isInitializeEvent;

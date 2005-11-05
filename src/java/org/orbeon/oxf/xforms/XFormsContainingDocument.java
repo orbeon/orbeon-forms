@@ -52,6 +52,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
     private String containerType;
+    private String stateHandling;
 
     // Client state
     private XFormsModelSubmission activeSubmission;
@@ -62,14 +63,15 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(models, controlsDocument, null, null);
+        this(models, controlsDocument, null, null, null);
     }
 
-    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType) {
+    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType, String stateHandling) {
 
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
         this.containerType = containerType;
+        this.stateHandling = stateHandling;
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
@@ -114,6 +116,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String getContainerType() {
         return containerType;
+    }
+
+    /**
+     * Return the state handling strategy for this document, either "client" or "session".
+     */
+    public String getStateHandling() {
+        return stateHandling;
     }
 
     /**

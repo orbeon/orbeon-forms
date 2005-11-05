@@ -706,5 +706,173 @@
                 </section>
             </section>
         </section>
+        <a name="state-handling"/>
+        <section>
+            <title>State Handling</title>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    The OPS XForms engine requires keeping processing state while operating on an
+                    XForms page. Such state includes the current values of XForms instances,
+                    selected repeated elements, and more. With OPS, XForms state information can be
+                    handled in one of two ways:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Client-side:</b> in this case, static initial state information is
+                            sent along with the initial HTML page, and dynamic state is exchanged
+                            over the wire between the client browser and the OPS XForms server when
+                            necessary.
+                        </p>
+                        <p>
+                            Benefits of the approach:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    The OPS server is entirely stateless. It only requires memory
+                                    while processing a client request. It can be restarted without
+                                    consequence for the XForms engine.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    State information does not expire as long as the user keeps the
+                                    application page open in the web browser.
+                                </p>
+                            </li>
+                        </ul>
+                        <p>
+                            Drawbacks of the approach:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Resulting HTML pages are larger. In particular, the size of
+                                    state data grows when XForms instances grow, regardless of
+                                    whether many XForms controls are bound to instance data.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    More data circulates between the client browser and the OPS
+                                    XForms server.
+                                </p>
+                            </li>
+                        </ul>
+                        <note>
+                            OPS compresses and encrypts XForms state information sent to the
+                            client.
+                        </note>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Server-side:</b> in this case, state information is stored on the
+                            server, in association with an application session. Only very little
+                            state information circulates between client and server.
+                        </p>
+                        <p>
+                            Benefits of the approach:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Resulting HTML page are smaller. HTML pages increase in size as
+                                    more XForms controls are used, but they don't increase in size
+                                    proportionally to the size of XForms instances. This means that
+                                    very large XForms instances can be processed without impacting
+                                    client-server performance.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Small amounts of data circulate between the client browser and
+                                    the OPS XForms server.
+                                </p>
+                            </li>
+                        </ul>
+                        <p>
+                            Drawbacks of the approach:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    The OPS server is stateful. It requires server memory to store
+                                    state information in a session even when no request is being
+                                    processed. The server must be configured to determine how much
+                                    state information is kept in a session, how long session take to
+                                    expire, etc.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    State information can expire if the server is restarted (in case
+                                    session information is not restored), or when sessions expire,
+                                    even if the client browser is still displaying the page.
+                                    Expired state information causes an XForms page to no longer
+                                    function until it is reloaded.
+                                </p>
+                            </li>
+                        </ul>
+                        <note>
+                            OPS ensures that it is possible to open multiple client browser windows
+                            showing the same page within the same session.
+                        </note>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Configuring State Handling</title>
+                <p>
+                    State handling can be configured globally for all pages, or locally for each
+                    individual page served. Global configuration is performed in
+                    <code>properties.xml</code> with the <code>oxf.xforms.state-handling</code>
+                    property. When missing or set to <code>client</code>, state is stored
+                    client-side. When set to <code>session</code>, state is stored server-side in a
+                    session. For example:
+                </p>
+                <xml-source>
+                    <comment> Store state in the session </comment>
+                    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>
+                </xml-source>
+                <p>
+                    The global configuration can be overridden for each page by setting the
+                    <code>xxforms:state-handling</code> attribute in the page. This attribute can be
+                    set for example on the root element of the XHTML page, or on the first
+                    <code>xforms:model</code> element. Only the first such attribute encountered by
+                    the XForms engine is used:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:model xxforms:state-handling="client">
+                        ...
+                    </xforms:model>
+                </xml-source>
+                <p>
+                    When storing state in a session, the maximum size of the data to be stored for
+                    each user can be selected using the <code>oxf.xforms.cache.session.size</code>
+                    property. The size is specified in bytes:
+                </p>
+                <xml-source>
+                    <comment> Allow a maximum of 500 KB of state information for each user </comment>
+                    <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
+                </xml-source>
+                <p>
+                    Whether state information is kept client-side or server-side, a property
+                    controls whether the XForms engine should try to optimize state reconstruction
+                    by using a cache. This property should usually be set to <code>true</code>:
+                </p>
+                <xml-source>
+                    <comment> This should usually be set to "true" </comment>
+                    <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>Handling the Browser's Back Button</title>
+                <p>
+                    TODO: Explain what OPS does and how different browsers behave.
+                </p>
+            </section>
+        </section>
     </body>
 </document>

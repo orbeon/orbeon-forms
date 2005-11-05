@@ -400,7 +400,7 @@ public class XFormsUtils {
 
     public static boolean isCacheSession() {
         final String propertyValue = OXFProperties.instance().getPropertySet().getString
-                (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+                (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE);
 
         return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }

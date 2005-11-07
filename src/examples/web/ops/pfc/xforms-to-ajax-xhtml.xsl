@@ -24,6 +24,7 @@
     <xsl:output name="xml" method="xml"/>
 
     <xsl:variable name="display-loading" as="xs:boolean" select="false()"/> <!-- This should be configurable -->
+    <xsl:variable name="display-error" as="xs:boolean" select="true()"/> <!-- This should be configurable -->
     <xsl:variable name="repeat-hiearchy-separator-1" select="'&#xb7;'" as="xs:string"/> <!-- middle dot -->
     <xsl:variable name="repeat-hiearchy-separator-2" select="'-'" as="xs:string"/>
 
@@ -75,8 +76,10 @@
                 <xhtml:span id="xforms-repeat-indexes"><xsl:value-of select="string-join($repeat-indexes-value, '')"/></xhtml:span>
                 <xsl:if test="$display-loading">
                     <xhtml:span class="xforms-loading-loading"/>
-                    <xhtml:span class="xforms-loading-error"/>
                     <xhtml:span class="xforms-loading-none"/>
+                </xsl:if>
+                <xsl:if test="$display-error">
+                    <xhtml:span class="xforms-loading-error"/>
                 </xsl:if>
                 <xsl:apply-templates/>
             </xhtml:form>

@@ -58,6 +58,18 @@
                     <td align="center">Yes</td>
                 </tr>
             </table>
+            <p>
+                The Directory Scanner is usually called this way in XPL:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:directory-scanner">
+                    <comment> The configuration can often be inline </comment>
+                    <p:input name="config">
+                        ...
+                    </p:input>
+                    <p:output name="data" id="directory-scan"/>
+                </p:processor>
+            </xml-source>
         </section>
         <section>
             <title>Configuration</title>

@@ -14,19 +14,21 @@
 <example-descriptor>
     <title>XForms Multi-Screen Wizard</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
-         <p>
-            In some cases, it makes sense to create a multiple-pages interface to fill out a single
-            logical form. Such wizard-like user interfaces are typically used to make the user
-            experience more intuitive, or when different sections in the form need to be filled out
-            based on previous answers.
-        </p>
-        <p>
-            The example below is an example of a simple wizard: the first 3 steps ask questions to
-            the end-user and the last step displays the information entered in the previous steps.
-            There only one XForms model for the whole wizard, and the navigation logic is defined in
-            the Page Flow Controller configuration file, as illustrated by the diagram below.
-        </p>
-        <p><img src="/examples/xforms/xforms-wizard/xforms-wizard.png"/></p>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+             <p>
+                In some cases, it makes sense to create a multiple-pages interface to fill out a single
+                logical form. Such wizard-like user interfaces are typically used to make the user
+                experience more intuitive, or when different sections in the form need to be filled out
+                based on previous answers.
+            </p>
+            <p>
+                The example below is an example of a simple wizard: the first 3 steps ask questions to
+                the end-user and the last step displays the information entered in the previous steps.
+                The navigation logic is defined in the Page Flow Controller configuration file, as
+                illustrated by the diagram below.
+            </p>
+            <p><img src="/examples/xforms/xforms-wizard-pfc/xforms-wizard.png"/></p>
+        </div>
     </description>
 </example-descriptor>

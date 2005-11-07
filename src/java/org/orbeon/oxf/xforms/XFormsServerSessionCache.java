@@ -103,7 +103,7 @@ public class XFormsServerSessionCache {
     public synchronized XFormsServer.XFormsState find(String pageGenerationId, String requestId) {
         final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(pageGenerationId);
         if (existingCacheEntry != null) {
-            // Move to the front
+            // Move to the front (is this useful in our use case?)
             if (linkedList.getFirst() != existingCacheEntry) {
                 linkedList.remove(existingCacheEntry);
                 linkedList.addFirst(existingCacheEntry);

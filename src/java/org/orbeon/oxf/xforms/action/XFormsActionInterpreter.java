@@ -704,7 +704,7 @@ public class XFormsActionInterpreter {
         // rebuilt or updated as a result of this action."
         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
             XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.applyComputedExpressionBinds(pipelineContext);
+            currentModel.applyComputedExpressionBinds(pipelineContext, false);
             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
         }
     }

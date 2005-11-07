@@ -260,10 +260,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     /**
      * Apply relevant and readonly binds only.
      */
-    public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
+    public void applyComputedExpressionBinds(final PipelineContext pipelineContext, final boolean doCalculate) {
         applyBinds(new BindRunner() {
             public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, this);
+                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, doCalculate, this);
             }
         });
     }
@@ -296,7 +296,30 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, final boolean doCalculate, BindRunner bindRunner) {
+
+        // Handle calculate MIP
+        if (doCalculate && modelBind.getCalculate() != null) {
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Compute calculated value
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                    try {
+                        final Object result = expr.evaluateSingle();
+                        final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
+                        // Place in element
+                        XFormsInstance.setValueForNode(pipelineContext, node, stringResult, null);
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
+                    }
+                }
+            });
+        }
 
         // Handle required MIP
         if (modelBind.getRequired() != null) {
@@ -479,34 +502,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
     }
 
-    private void handleCalculateBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
-
-        // Handle calculate MIP
-        if (modelBind.getCalculate() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
-                    // Compute calculated value
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-                    try {
-                        final Object result = expr.evaluateSingle();
-                        final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
-                        // Place in element
-                        XFormsInstance.setValueForNode(pipelineContext, node, stringResult, null);
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
-                    }
-                }
-            });
-        }
-
-        handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
-    }
-
     private void handleChildrenBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
         // Handle children binds
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
@@ -661,7 +656,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Internal event to restore state
 
             loadSchemasIfNeeded(pipelineContext);
-            applyComputedExpressionBinds(pipelineContext);
+            applyComputedExpressionBinds(pipelineContext, false);
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
             clearInstanceDataEventState();
 
@@ -764,14 +759,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             if (instances != null) {
                 // Update computed expression binds
-                applyComputedExpressionBinds(pipelineContext);
-
-                // Run calculate binds
-                applyBinds(new BindRunner() {
-                    public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                        handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
-                    }
-                });
+                applyComputedExpressionBinds(pipelineContext, true);
             }
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {

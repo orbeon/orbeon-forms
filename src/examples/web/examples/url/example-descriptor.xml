@@ -15,17 +15,11 @@
     <title>HTML Screen-Scraping</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <div xmlns="http://www.w3.org/1999/xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://orbeon.org/oxf/xml/formatting">
             <p>
-                OPS loads resources URLs (<code>oxf:</code>, <code>http:</code>, etc...) with the
-                help of the URL generator. It then parses XML files. The URL fenerator is
-                configurable to use a validating XML parser.
-            </p>
-            <p>
-                The URL Generator can optionally <a href="http://tidy.sourceforge.net/">tidy</a> its
-                output, allowing OPS to transform any HTML page into XHTML. To demonstrate this
-                feature, this page loads the <a href="http://www.cnn.com">CNN.com</a> home page and
-                uses XPath to extract the main headline.
+                This example demonstrates the use of the URL generator in <a
+                href="/doc/processors-generators-url#html-mode" f:url-type="resource">HTML</a> mode
+                and the use of XQuery and XSLT to perform screen-scraping.
             </p>
         </div>
     </description>

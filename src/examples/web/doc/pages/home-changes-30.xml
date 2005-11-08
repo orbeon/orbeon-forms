@@ -18,11 +18,12 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql">
+        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <header>
         <title>Changes in Version 3.0 BETA</title>
     </header>
     <body>
+        <a name="introduction"/>
         <section>
             <title>Introduction</title>
             <p>
@@ -43,6 +44,7 @@
                 mailing-list</a> for feedback about OPS 3.0 BETA.
             </p>
         </section>
+        <a name="limitations"/>
         <section>
             <title>Known Limitations of OPS 3.0 BETA</title>
             <p>
@@ -52,17 +54,6 @@
                 <li>
                     <p>
                         Initial generation of an XForms page may have poor performance.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Image and link appearances are not supported for the
-                        <code>xforms:submit</code> and <code>xforms:trigger</code> controls.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The <code>xforms:message</code> action is not implemented.
                     </p>
                 </li>
                 <li>
@@ -149,6 +140,7 @@
                 </li>
             </ul>
         </section>
+        <a name="xforms"/>
         <section>
             <title>XForms</title>
             <section>
@@ -349,20 +341,21 @@
                 <title>Migrating to the OPS 3.0 XForms Engine</title>
                 <warning>
                     <p>
-                        By default, your applications written against OPS 2.8 will use the legacy
-                        2.8 XForms engine in OPS 3.0. With OPS 3.0, you use XForms in the way you
-                        expect when combining XForms with XHTML, in that you do not declare an
-                        XForms model separately from your XHTML page.
+                        Your applications written against OPS 2.8 and run within OPS 3.0 without
+                        modifications uses the Classic XForms engine of OPS 3.0. In order to
+                        trigger the use of XForms NG and benefit from all the new XForms features of
+                        OPS 3.0, some code migration work is required. Note that it is possible to
+                        determine on a page by page basis whether XForms Classic or XForms NG is
+                        used, and therefore to progressively upgrade your application to XForms NG.
                     </p>
                 </warning>
                 <p>
-                    In order to leverage most of the new features of XForms 3.0, it is necessary to
-                    migrate your forms. This is a list of tasks to accomplish and possible caveats:
+                    This is a list of tasks to accomplish and possible caveats:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            For a given <code>&lt;page&gt;</code> element:if your OPS 2.8 XForms
+                            For a given <code>&lt;page&gt;</code> element: if your OPS 2.8 XForms
                             model is static (which is usually the case), copy it under your XHTML
                             page view's <code>xhtml:head</code> element. Then remove the
                             <code>xforms</code> attribute from the <code>&lt;page&gt;</code>
@@ -417,6 +410,7 @@
                 </ul>
             </section>
         </section>
+        <a name="page-flow"/>
         <section>
             <title>Page Flow</title>
             <section>
@@ -535,6 +529,7 @@
                 </ul>
             </section>
         </section>
+        <a name="xslt"/>
         <section>
             <title>XSLT processor</title>
             <p>
@@ -595,6 +590,7 @@
                 OPS. See XML serializer.
             </p>
         </section>
+        <a name="xquery"/>
         <section>
             <title>XQuery processor</title>
             <p>
@@ -636,6 +632,7 @@
                 </li>
             </ul>
         </section>
+        <a name="xhtml"/>
         <section>
             <title>XHTML Support</title>
             <p>
@@ -670,6 +667,7 @@
                 </p>
             </note>
         </section>
+        <a name="sql"/>
         <section>
             <title>SQL Processor</title>
             <section>
@@ -886,6 +884,7 @@
                 </ul>
             </section>
         </section>
+        <a name="file-serializer"/>
         <section>
             <title>File Serializer</title>
             <p>
@@ -903,6 +902,7 @@
                  [TODO: MARK INCOMPATIBLE CHANGE]
             </p>
         </section>
+        <a name="error-reporting"/>
         <section>
             <title>Enhanced Error Reporting</title>
             <p>
@@ -960,6 +960,7 @@
                 changing the <a href="reference-error-pipeline">error processor</a>.
             </p>
         </section>
+        <a name="xpl-profiling"/>
         <section>
             <title>XPL Profiling Support</title>
             <ul>
@@ -992,6 +993,7 @@
                 </li>
             </ul>
         </section>
+        <a name="other"/>
         <section>
             <title>Other Changes</title>
             <p>

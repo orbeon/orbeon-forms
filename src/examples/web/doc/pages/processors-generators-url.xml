@@ -34,6 +34,7 @@
                 Managers</link> for more information about the <code>oxf:</code> protocol.
             </p>
         </section>
+        <a name="content-type"/>
         <section>
             <title>Content Type</title>
             <p>
@@ -64,6 +65,7 @@
                 </li>
             </ol>
         </section>
+        <a name="xml-mode"/>
         <section>
             <title>XML Mode</title>
             <p>
@@ -100,6 +102,7 @@
                 </p>
             </note>
         </section>
+        <a name="html-mode"/>
         <section>
             <title>HTML Mode</title>
             <p>
@@ -142,6 +145,7 @@
                 </p>
             </note>
         </section>
+        <a name="text-mode"/>
         <section>
             <title>Text Mode</title>
             <p>
@@ -199,6 +203,7 @@ This is line three of the input document!
                 </p>
             </note>
         </section>
+        <a name="binary-mode"/>
         <section>
             <title>Binary Mode</title>
             <p>
@@ -243,6 +248,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </p>
             </note>
         </section>
+        <a name="character-encoding"/>
         <section>
             <title>Character Encoding</title>
             <p>
@@ -355,6 +361,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </p:processor>
             </xml-source>
         </section>
+        <a name="cache-control"/>
         <section>
             <title>Cache Control</title>
             <p>
@@ -388,6 +395,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 fetched.
             </p>
         </section>
+        <a name="relative-urls"/>
         <section>
             <title>Relative URLs</title>
             <p>

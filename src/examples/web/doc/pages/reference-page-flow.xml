@@ -78,6 +78,7 @@
                 </p>
             </note>
         </section>
+        <a name="basics"/>
         <section>
             <title>Basics</title>
             <section>
@@ -439,6 +440,7 @@
                     </p>
                 </ul>
             </section>
+            <a name="internal-submission"/>
             <section>
                 <title>Internal XForms Submission</title>
                 <p>
@@ -487,6 +489,7 @@
                     </p>
 <!--                </note>-->
             </section>
+            <a name="external-submission"/>
             <section>
                 <title>External XML Submission</title>
                 <p>
@@ -504,6 +507,7 @@
                     implementation of XML-RPC and web services handlers using this mechanism.
                 </p>
             </section>
+            <a name="default-submission"/>
             <section>
                 <title>Default Submission</title>
                 <p>
@@ -516,6 +520,7 @@
                     <page path-info="/report/detail" default-submission="report-detail-default-submission.xml"/>
                 </xml-source>
             </section>
+            <a name="accessing-submission"/>
             <section>
                 <title>Accessing XML Submission Data</title>
                 <p>
@@ -569,6 +574,7 @@
                     <null xsi:nil="true"/>
                 </xml-source>
             </section>
+            <a name="url-extraction"/>
             <section>
                 <title>Extracting Data From the URL</title>
                 <p>

@@ -309,6 +309,7 @@
                 TODO
             </p>
         </section>
+        <a name="relative-paths"/>
         <section>
             <title>Relative Paths</title>
             <section>
@@ -386,6 +387,7 @@
                     <!--</li>-->
                 <!--</ul>-->
             </section>
+            <a name="relative-paths-external-instances"/>
             <section>
                 <title>External Instances</title>
                 <p>
@@ -409,6 +411,7 @@
                     TODO
                 </p>
             </section>
+            <a name="relative-paths-load-action"/>
             <section>
                 <title>Load Action</title>
                 <p>
@@ -526,6 +529,7 @@
                     </tr>
                 </table>
             </section>
+            <a name="relative-paths-image-mediatype"/>
             <section>
                 <title>Image Mediatype for <code>xforms:output</code></title>
                 <p>
@@ -534,12 +538,20 @@
                     relatively to the base URI.
                 </p>
             </section>
+            <a name="relative-paths-submission"/>
             <section>
                 <title>Submission</title>
                 <p>
                     TODO
                 </p>
             </section>
+        </section>
+        <section>
+            <title>Labels, Hints, Alerts, Help Messages</title>
+            <p>
+                TODO: explain purpose, styling, content allowed (xforms:output), and when e.g.
+                labels should not be used.
+            </p>
         </section>
         <section>
             <title>XForms and Services</title>
@@ -873,6 +885,19 @@
                     TODO: Explain what OPS does and how different browsers behave.
                 </p>
             </section>
+            <section>
+                <title>Configuring Session Handling</title>
+                <p>
+                    TODO: Configuration tips: expiration (web.xml), passivation? (Tomcat).
+                </p>
+            </section>
+        </section>
+        <a name="javascript"/>
+        <section>
+            <title>Javascript Integration</title>
+            <p>
+                TODO: Describe how you can use your own Javascript to set values to XForms controls.
+            </p>
         </section>
     </body>
 </document>

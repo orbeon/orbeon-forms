@@ -59,7 +59,7 @@
                 </tr>
             </table>
             <p>
-                The Directory Scanner is usually called this way in XPL:
+                The Directory Scanner is typically called this way from XPL pipelines:
             </p>
             <xml-source>
                 <p:processor name="oxf:directory-scanner">

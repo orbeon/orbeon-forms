@@ -653,8 +653,25 @@
                 <li>
                     <p>
                         It adds, under <code>xhtml:head</code>, links to OPS CSS stylesheets and
-                        scripts necessary for the server-side XForms engine.
+                        scripts necessary for the server-side XForms engine, in particular the
+                        following CSS stylesheets:
                     </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>orbeon.css:</b> definitions proprietary to the default theme.
+                                These definitions are likely to be overridden by the user as they
+                                create their own theme.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>xforms.css:</b> definitions related to XForms controls. These
+                                definitions may be changed by users if they are not happy with the
+                                defaults.
+                            </p>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <p>

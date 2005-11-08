@@ -137,8 +137,6 @@
         </action>
     </page>
 
-    <page id="layout-css" path-info="/config/theme/orbeon-layout.cssd" model="/config/theme/orbeon-layout.xpl"/>
-
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

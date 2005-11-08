@@ -296,7 +296,7 @@
 
     <!-- WAR -->
 	
-    <target name="war" depends="jars,orbeon-source-files-lists">
+    <target name="war" depends="jars,orbeon-source-files-lists,orbeon-css-templates">
         <echo message="war.dir: ${war.dir}"/>
         <mkdir dir="${war.classes}"/>
         <!--<javac destdir="${war.dir}/WEB-INF/classes"-->
@@ -384,6 +384,20 @@
                 <include name="org/orbeon/oxf/xml/dom4j/LocationData.java"/>
             </fileset>
         </javadoc>
+    </target>
+
+    <target name="orbeon-css-templates" depends="init">
+
+        <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
+            <filtersfile file="${web-examples-src.dir}/ops/css/css-constants.properties"/>
+        </filterset>
+
+        <copy file="${web-examples-src.dir}/ops/css/orbeon.css.template" toFile="${web-examples-src.dir}/config/theme/orbeon.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
+        <copy file="${web-examples-src.dir}/ops/css/xforms.css.template" toFile="${web-examples-src.dir}/config/theme/xforms.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
     </target>
 
     <target name="orbeon-source-files-lists" depends="init">

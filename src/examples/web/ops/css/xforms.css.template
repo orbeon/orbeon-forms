@@ -1,0 +1,239 @@
+/*
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+
+.xforms-output-html {
+    display: none;
+}
+
+.xforms-control {
+    vertical-align: middle;
+}
+
+.xforms-hint {
+    color: #666;
+    font-size: 85%;
+    min-height: 2em;
+    background-image: url(../../images/greybracket.gif);
+    background-repeat: no-repeat;
+    background-position: left center;
+    margin-left: .25em;
+    padding-left: 1.5em;
+    vertical-align: middle;
+}
+
+.xforms-hint-active {
+    color: #000;
+    font-size: 85%;
+    min-height: 2em;
+    background-image: url(../../images/bracket.gif);
+    background-repeat: no-repeat;
+    background-position: left center;
+    margin-left: .25em;
+    padding-left: 1.5em;
+    vertical-align: middle;
+}
+
+.xforms-alert-inactive, .xforms-alert-active {
+    display: -moz-inline-box;
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 20px;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    font-size: 10px;
+    color: black;
+    line-height: 10px;
+    margin-left: .25em;
+    vertical-align: middle;
+}
+
+.xforms-alert-active {
+    background-image: url(../../images/error.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+}
+
+.xforms-help {
+    background-image: url(../../images/help.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    display: -moz-inline-box;
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 20px;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    font-size: 10px;
+    color: black;
+    line-height: 10px;
+    margin-left: .2em;
+    vertical-align: middle;
+}
+
+.xforms-loading-loading {
+    display: none;
+    height: 18px;
+}
+
+.xforms-loading-error {
+    background-image: url(../../images/error.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    padding-left: 20px;
+    margin-left: 0;
+    color: #c00;
+    display: none;
+    height: 18px;
+}
+
+.xforms-loading-none {
+    display: block;
+    height: 18px;
+}
+
+.xforms-input {
+    cursor: pointer;
+}
+
+.xforms-showcalendar {
+    margin-left: .5em;
+    background-image: url(../../images/calendar.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    display: -moz-inline-box;
+    display: inline-block;
+    width: 26px;
+    height: 19px;
+    vertical-align: middle;
+}
+
+.xforms-showcalendar-readonly {
+    display: none;
+}
+
+.xforms-range-casing {
+    height: 30px;
+    overflow: hidden;
+    font-size: 1px;
+}
+
+.xforms-range-track {
+    position: relative;
+    top: 12px;
+    border:1px solid &dark-color;;
+    background-color: &xxlight-color;;
+    width: 300px;
+    height: 6px;
+    z-index: 5;
+    overflow: hidden;
+}
+
+.xforms-range-slider {
+    position: relative;
+    z-index:6;
+    border:1px solid &dark-color;;
+    background-color:&light-color;;
+    top: 0px;
+    padding:0px;
+    width: 10px;
+    height: 16px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.xforms-select-template {
+    display: none;
+}
+
+.xforms-repeat-template {
+    display: none;
+}
+
+.xforms-repeat-delimiter {
+    display: none;
+}
+
+.xforms-repeat-begin-end {
+    display: none;
+}
+
+.xforms-repeat-selected-item-1 {
+    background: #ffc;
+}
+
+.xforms-repeat-selected-item-2 {
+    background: #ff9;
+}
+
+.xforms-debug {
+    background: #fc9;
+    position: absolute;
+    -moz-opacity:0.5;
+    opacity: 0.5;
+    filter:alpha(opacity=50);
+    border: 1px solid red;
+    font-size: 11px;
+}
+
+.xforms-disabled {
+    display: none;
+}
+
+.xforms-readonly {
+    color: gray;
+}
+
+input.xforms-required-empty {
+    border: 1px solid #f99;
+    background: #fcc;
+    padding-bottom: 3px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+/* Hide input field for <xforms:input> when type is date */
+input.xforms-type-date {
+    display: none;
+}
+
+/* Hide date pickend for <xforms:input> when type not date */
+span.xforms-type-string {
+    display: none;
+}
+
+#xforms-messages {
+    display: none;
+    background: #fcc;
+}
+
+.xforms-message {
+    list-style: disc;
+    display: list-item;
+    margin-left: 2em;
+}
+
+#xforms-repeat-tree {
+    display: none;
+}
+
+#xforms-repeat-indexes {
+    display: none;
+}
+
+/* Styles used by xforms-to-xhtml.xsl */
+.xforms-legacy-error-table { border: 0; margin: 0px; padding: 0px; }
+.xforms-legacy-error-table td { border: 0; margin: 0px; padding: 0px; }
+.xforms-legacy-help-table { margin: 0px }

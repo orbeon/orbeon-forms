@@ -613,7 +613,7 @@
                 <li>
                     <p>
                         Instead of XForms elements, you will find XHTML elements. Those elements may
-                        use some CSS classes defined in <code>orbeon-layout.xml</code>.
+                        use some CSS classes defined in <code>xforms.css</code>.
                     </p>
                 </li>
                 <li>

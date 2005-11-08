@@ -35,7 +35,7 @@
     </test>
 
     <test description="HTML conversion" name="oxf:html-converter">
-        <input name="data" href="oxf:/examples/tutorial/hello4/ask-name-view.xhtml"/>
+        <input name="data" href="oxf:/examples/tutorial/hello3/view.xhtml"/>
         <input name="config">
             <config>
                 <content-type>text/html</content-type>
@@ -45,7 +45,7 @@
             </config>
         </input>
         <output name="data">
-            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/html; charset=io-8859-1">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt; &lt;html&gt; &lt;head&gt; &lt;title&gt;Hello World Page Flow&lt;/title&gt; &lt;/head&gt; &lt;body&gt; &lt;xforms:group&gt; &lt;p&gt; Please enter your first name: &lt;xforms:input ref="/myform/first-name"&gt;&lt;/xforms:input&gt; &lt;xforms:submit&gt; &lt;xforms:label&gt;Greet Me!&lt;/xforms:label&gt; &lt;xforms:setvalue ref="/myform/action"&gt;next&lt;/xforms:setvalue&gt; &lt;/xforms:submit&gt; &lt;/p&gt; &lt;/xforms:group&gt; &lt;/body&gt; &lt;/html&gt;</document>
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/html; charset=io-8859-1">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt; &lt;html&gt; &lt;head&gt; &lt;title&gt;Hello World XForms&lt;/title&gt; &lt;xforms:model&gt; &lt;xforms:instance&gt; &lt;first-name&gt;&lt;/first-name&gt; &lt;/xforms:instance&gt; &lt;/xforms:model&gt; &lt;/head&gt; &lt;body&gt; &lt;xforms:output value="if (/first-name = '') then '' else concat('Hello ', /first-name)"&gt;&lt;/xforms:output&gt; &lt;p&gt; Please enter your first name: &lt;xforms:input ref="/first-name" incremental="true"&gt;&lt;/xforms:input&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</document>
         </output>
     </test>
 

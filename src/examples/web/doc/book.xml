@@ -34,6 +34,7 @@
     <menu label="Core Technologies Reference">
         <menu label="XForms">
             <menu-item label="XForms Reference" href="reference-xforms"/>
+            <menu-item label="XForms NG Reference" href="reference-xforms-ng"/>
             <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
             <menu-item label="XForms Test Suite" href="reference-xforms-test-suite"/>
         </menu>

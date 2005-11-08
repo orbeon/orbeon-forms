@@ -12,18 +12,17 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting">
-    <title>Saving State in Session</title>
+    <title>Accessing the Session</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description >
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This example illustrates the use of the Scope generator and serializer. The <a
-                href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
+                This example illustrates the use of the Scope generator and Scope serializer. The
+                <a href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
                 generator</a> retrieves an XML Document from a Request, Session or Application
                 context and sends it to a pipeline. The <a
                 href="/doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
-                serializer</a> stores an XML document to a Request, Session or Application
-                context.
+                serializer</a> stores an XML document to a Request, Session or Application context.
             </p>
             <p>
                 This example implements a simple shopping cart. You can add a string to the session and

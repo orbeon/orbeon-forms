@@ -36,7 +36,7 @@
         <xforms:model>
             <!-- Data entered by the user -->
             <xforms:instance id="instance">
-                <lists initialized="false" ui:mode="edit" ui:list-edit-trigger="" ui:list-delete-trigger="" ui:todo-edit-trigger="" ui:todo-delete-trigger="" ui:add-due-trigger="" ui:remove-due-trigger="" ui:mark-done-trigger="" ui:not-done-trigger="">
+                <lists ui:mode="edit" ui:list-edit-trigger="" ui:list-delete-trigger="" ui:todo-edit-trigger="" ui:todo-delete-trigger="" ui:add-due-trigger="" ui:remove-due-trigger="" ui:mark-done-trigger="" ui:not-done-trigger="">
                     <list description="Buy groceries" ui:mode="view" ui:done="" ui:output="" ui:input="" ui:save-trigger="">
                         <todo description="Milk" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
                         <todo description="Bread" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
@@ -72,14 +72,6 @@
             </xforms:bind>
             <!-- Rules that apply to the UI -->
             <xforms:bind nodeset="/lists">
-                <xforms:bind nodeset="@ui:list-edit-trigger" relevant="../list[index('list')]/@ui:mode = 'view' and ../list[index('list')]/@ui:done = ''"/>
-                <xforms:bind nodeset="@ui:list-delete-trigger" relevant="count(../list) > 1"/>
-                <xforms:bind nodeset="@ui:todo-edit-trigger" relevant="../list[index('list')]/todo[index('todo')][@ui:mode = 'view' and @done = '']"/>
-                <xforms:bind nodeset="@ui:todo-delete-trigger" relevant="count(../list[index('list')]/todo) > 1"/>
-                <xforms:bind nodeset="@ui:add-due-trigger" relevant="../list[index('list')]/todo[index('todo')][@due = '' and @done = '']"/>
-                <xforms:bind nodeset="@ui:remove-due-trigger" relevant="../list[index('list')]/todo[index('todo')][@due != '' and @done = '']"/>
-                <xforms:bind nodeset="@ui:mark-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = ''"/>
-                <xforms:bind nodeset="@ui:not-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = 'true'"/>
                 <xforms:bind nodeset="list">
                     <xforms:bind nodeset="@ui:done" calculate="if (count(../todo) > 1 and count(../todo[@done = '']) = 1) then 'true' else ''"/>
                     <xforms:bind nodeset="@ui:output" relevant="../@ui:mode = 'view' or ../@ui:done = 'true'"/>
@@ -93,6 +85,14 @@
                         <xforms:bind nodeset="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
                     </xforms:bind>
                 </xforms:bind>
+                <xforms:bind nodeset="@ui:list-edit-trigger" relevant="../list[index('list')]/@ui:mode = 'view' and ../list[index('list')]/@ui:done = ''"/>
+                <xforms:bind nodeset="@ui:list-delete-trigger" relevant="count(../list) > 1"/>
+                <xforms:bind nodeset="@ui:todo-edit-trigger" relevant="../list[index('list')]/todo[index('todo')][@ui:mode = 'view' and @done = '']"/>
+                <xforms:bind nodeset="@ui:todo-delete-trigger" relevant="count(../list[index('list')]/todo) > 1"/>
+                <xforms:bind nodeset="@ui:add-due-trigger" relevant="../list[index('list')]/todo[index('todo')][@due = '' and @done = '']"/>
+                <xforms:bind nodeset="@ui:remove-due-trigger" relevant="../list[index('list')]/todo[index('todo')][@due != '' and @done = '']"/>
+                <xforms:bind nodeset="@ui:mark-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = ''"/>
+                <xforms:bind nodeset="@ui:not-done-trigger" relevant="../list[index('list')]/todo[index('todo')]/@done = 'true'"/>
             </xforms:bind>
             <xforms:bind nodeset="instance('triggers')">
                 <xforms:bind nodeset="remove-list" readonly="count(instance('lists')/list) = 1"/>
@@ -301,7 +301,6 @@
             <xforms:repeat nodeset="list" id="list">
                 <xhtml:div class="list-container">
                     <xhtml:div>
-                        /<xforms:output ref="@ui:done"/>/
                         <!-- Description value -->
                         <xforms:group ref="@ui:output">
                             <xforms:output ref="../@description"/>

@@ -18,46 +18,43 @@
 
     <xhtml:head><xhtml:title>XQuery The Web</xhtml:title></xhtml:head>
     <xhtml:body>
-        <p>
-            <img src="/images/xquery-the-web.gif" style="float: right; margin: 0 0 2em 2em"/>
-
-            <ul style="margin-left: 2em; padding-left: 0">
-                <li>
-                    <span class="question">What is this service?</span> Using XQuery, extract data from web sites,
-                    recombine it, include it in your own pages, create feeds, ...
-                </li>
-                <li>
-                    <span class="question">How do I use it?</span> Enter a URL you want to extract information from,
-                    enter an XQuery, and the format of the output. Use JavaScript if you want to
-                    include the output of the query in your own pages.
-                </li>
-                <li>
-                    <span class="question">What is the format of the generated URL?</span> This is REST service. The
-                    URL format is:
-                    <tt>xquery-the-web?output=xml|html|javascript&amp;url=...&amp;xquery=...</tt>.
-                    The form below just help you generate one of those URLs.
-                </li>
-                <li>
-                    <span class="question">What are the restriction for using this service?</span> Don't make a
-                    commercial use of this service. Be courteous to us and sites you are querying.
-                    Be creative.
-                </li>
-                <li>
-                    <span class="question">How can I submit feedback or ask other questions?</span> Join and post your
-                    feedback/questions on the <a
-                    href="http://www.objectweb.org/wws/info/ops-users">ops-users mailing list</a>.
-                </li>
-            </ul>
-        </p>
+        <xhtml:img src="/images/xquery-the-web.gif" alt="" style="float: right; margin: 0 0 2em 2em"/>
+        <xhtml:ul style="margin-left: 2em; padding-left: 0">
+            <xhtml:li>
+                <xhtml:span class="question">What is this service?</xhtml:span> Using XQuery, extract data from web sites,
+                recombine it, include it in your own pages, create feeds, ...
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="question">How do I use it?</xhtml:span> Enter a URL you want to extract information from,
+                enter an XQuery, and the format of the output. Use JavaScript if you want to
+                include the output of the query in your own pages.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="question">What is the format of the generated URL?</xhtml:span> This is REST service. The
+                URL format is:
+                <xhtml:tt>xquery-the-web?output=xml|html|javascript&amp;url=...&amp;xquery=...</xhtml:tt>.
+                The form below just help you generate one of those URLs.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="question">What are the restriction for using this service?</xhtml:span> Don't make a
+                commercial use of this service. Be courteous to us and sites you are querying.
+                Be creative.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="question">How can I submit feedback or ask other questions?</xhtml:span> Join and post your
+                feedback/questions on the <a
+                href="http://www.objectweb.org/wws/info/ops-users">ops-users mailing list</a>.
+            </xhtml:li>
+        </xhtml:ul>
         <xforms:group ref="/instance">
-            <table class="gridtable" width="100%" style="clear: both; margin-top: 2em;">
-                <tr>
-                    <th width="1%">URL:</th>
-                    <td><xforms:input xhtml:class="tt" ref="url" xhtml:style="width: 100%" xhtml:tabindex="1"/></td>
-                </tr>
-                <tr>
-                    <th>XQuery:</th>
-                    <td>
+            <xhtml:table class="gridtable" width="100%" style="clear: both; margin-top: 2em;">
+                <xhtml:tr>
+                    <xhtml:th width="1%">URL:</xhtml:th>
+                    <xhtml:td><xforms:input xhtml:class="tt" ref="url" xhtml:style="width: 100%" xhtml:tabindex="1"/></xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>XQuery:</xhtml:th>
+                    <xhtml:td>
                         <xforms:select1 appearance="full" ref="xquery-type">
                             <xforms:item xhtml:id="xquerySourceInline">
                                 <xforms:label>Inline</xforms:label>
@@ -72,7 +69,7 @@
                         <xforms:input xhtml:id="xqueryURL" xhtml:class="tt" ref="xquery-url" xhtml:style="width: 100%" xhtml:tabindex="1"/>
                         <xforms:textarea xhtml:id="xqueryTextArea" ref="xquery" xhtml:style="width: 100%; line-height: 1em" xhtml:tabindex="2"/>
 
-                        <script>
+                        <xhtml:script>
                             var xquerySourceInline = document.getElementById('xquerySourceInline');
                             var xquerySourceURL = document.getElementById('xquerySourceURL');
 
@@ -100,12 +97,12 @@
                             
                             updateRows();
                             textarea.onkeyup = updateRows;
-                        </script>
-                    </td>
-                </tr>
-                <tr>
-                    <th style="white-space: nowrap">Output format:</th>
-                    <td>
+                        </xhtml:script>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th style="white-space: nowrap">Output format:</xhtml:th>
+                    <xhtml:td>
                         <xforms:select1 ref="output" appearance="full">
                             <xforms:choices>
                                 <xforms:item xhtml:tabindex="3">
@@ -122,52 +119,52 @@
                                 </xforms:item>
                             </xforms:choices>
                         </xforms:select1>
-                    </td>
-                </tr>
-                <tr>
-                    <th/>
-                    <td>            
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th/>
+                    <xhtml:td>
                         <xforms:submit xhtml:tabindex="6">
                             <xforms:label>Run XQuery</xforms:label>
                             <xforms:setvalue ref="action">submit</xforms:setvalue>
                         </xforms:submit>
-                    </td>
-                </tr>
-            </table>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
         </xforms:group>
-        <b>Examples:</b>
-        <ul>
-            <li>
-                <b>
-                <a f:url-type="resource" href="/examples/xquery-the-web/xquery/udell-tags.xq">View Source</a> - 
-                <a f:url-type="resource"
+        <xhtml:b>Examples:</xhtml:b>
+        <xhtml:ul>
+            <xhtml:li>
+                <xhtml:b>
+                <xhtml:a f:url-type="resource" href="/examples/xquery-the-web/xquery/udell-tags.xq">View Source</xhtml:a> -
+                <xhtml:a f:url-type="resource"
                 href="/direct/xquery-the-web?url=http://weblog.infoworld.com/udell/rss.xml&amp;xquery-url=oxf:/examples/xquery-the-web/xquery/udell-tags.xq&amp;output=html">Run
-                It</a></b> - Gets the latest stories in 
+                It</xhtml:a></xhtml:b> - Gets the latest stories in
                 <a href="http://weblog.infoworld.com/udell/">Jon Udell weblog</a> and for each 
                 one finds the tags assigned by users to that story on 
                 <a href="http://del.icio.us/">del.icios.us</a>. It then displays those 
                 tags, sorted by frequency and displays the tags that appear only 
                 once with a smaller font.
-            </li>
-            <li>
-                <b>
-                <a f:url-type="resource" href="/examples/xquery-the-web/xquery/technorati.xq">View Source</a> - 
-                <a f:url-type="resource"
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:b>
+                <xhtml:a f:url-type="resource" href="/examples/xquery-the-web/xquery/technorati.xq">View Source</xhtml:a> -
+                <xhtml:a f:url-type="resource"
                 href="/direct/xquery-the-web?url=http://www.technorati.com/tag/&amp;xquery-url=oxf:/examples/xquery-the-web/xquery/technorati.xq&amp;output=html">Run
-                It</a></b> - Gets the <a href="http://www.technorati.com/tag/">top 5 tags</a> from
+                It</xhtml:a></xhtml:b> - Gets the <a href="http://www.technorati.com/tag/">top 5 tags</a> from
                 Technorati by popularity and for each one gets related images from <a
                 href="http://www.google.com/imghp?hl=en&amp;tab=wi&amp;q=">Google Image Search</a>.
-            </li>
-            <li>
-                <b>
-                <a f:url-type="resource" href="/examples/xquery-the-web/xquery/blogrolling.xq">View Source</a> - 
-                <a f:url-type="resource"
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:b>
+                <xhtml:a f:url-type="resource" href="/examples/xquery-the-web/xquery/blogrolling.xq">View Source</xhtml:a> -
+                <xhtml:a f:url-type="resource"
                 href="/direct/xquery-the-web?url=http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0&amp;xquery-url=oxf:/examples/xquery-the-web/xquery/blogrolling.xq&amp;output=javascript">Run
-                It</a></b> - Creates JavaScript that generates an HTML list to be embedded in a
+                It</xhtml:a></xhtml:b> - Creates JavaScript that generates an HTML list to be embedded in a
                 Blogger/Blogspot <a href="http://avernet.blogspot.com/">blog</a> based on an <a
                 href="http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0">RSS
                 feed</a> generated by <a href="http://www.blogrolling.com/">Blogrolling.com</a>.
-            </li>
-        </ul>
+            </xhtml:li>
+        </xhtml:ul>
     </xhtml:body>
 </xhtml:html>

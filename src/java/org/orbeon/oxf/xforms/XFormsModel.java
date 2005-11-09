@@ -257,12 +257,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     /**
-     * Apply relevant and readonly binds only.
+     * Apply calculate binds.
      */
-    public void applyComputedExpressionBinds(final PipelineContext pipelineContext, final boolean doCalculate) {
+    public void applyCalculateBinds(final PipelineContext pipelineContext) {
         applyBinds(new BindRunner() {
             public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, doCalculate, this);
+                handleCalculateBinds(pipelineContext, modelBind, documentWrapper, this);
+            }
+        });
+    }
+
+    /**
+     * Apply required, relevant and readonly binds.
+     */
+    public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
+        applyBinds(new BindRunner() {
+            public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
+                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
     }
@@ -295,10 +306,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, final boolean doCalculate, BindRunner bindRunner) {
-
+    private void handleCalculateBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
         // Handle calculate MIP
-        if (doCalculate && modelBind.getCalculate() != null) {
+        if (modelBind.getCalculate() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
                     // Compute calculated value
@@ -319,6 +329,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 }
             });
         }
+
+        handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
+    }
+
+    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
 
         // Handle required MIP
         if (modelBind.getRequired() != null) {
@@ -655,7 +670,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Internal event to restore state
 
             loadSchemasIfNeeded(pipelineContext);
-            applyComputedExpressionBinds(pipelineContext, false);
+            applyComputedExpressionBinds(pipelineContext);
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
             clearInstanceDataEventState();
 
@@ -757,8 +772,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             if (instances != null) {
+                // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
+                // to evaluate "calculate" binds before the other binds.
+
+                // Apply calculate binds
+                applyCalculateBinds(pipelineContext);
+
                 // Update computed expression binds
-                applyComputedExpressionBinds(pipelineContext, true);
+                applyComputedExpressionBinds(pipelineContext);
             }
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {

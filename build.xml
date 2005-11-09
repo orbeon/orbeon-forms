@@ -828,7 +828,7 @@ ${files}
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
     
-    <target name="post-update" depends="orbeon-source-files-lists">
+    <target name="post-update" depends="orbeon-source-files-lists,orbeon-css-templates">
         <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
     </target>
 

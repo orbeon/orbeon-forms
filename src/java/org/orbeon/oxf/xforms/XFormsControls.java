@@ -1838,7 +1838,7 @@ public class XFormsControls {
                         // those are updated, but is that what we should do?
                         for (Iterator i = getContainingDocument().getModels().iterator(); i.hasNext();) {
                             XFormsModel currentModel = (XFormsModel) i.next();
-                            currentModel.applyComputedExpressionBinds(pipelineContext, false);
+                            currentModel.applyComputedExpressionBinds(pipelineContext);
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }
                         // TODO: Should try to use the code of the <setindex> action

@@ -342,10 +342,21 @@ function xformsValueChanged(target, other) {
     return sendEvent;
 }
 
-/**
-* Parameter is an array of arrays with each array containing:
-* new Array(target, eventName, value, incremental, other)
-*/
+// Function called when value changes
+function xformsHandleValueChange(event) {
+    var target = getEventTarget(event);
+    // If this is an input field, set value on parent and send event on parent element
+    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
+        target.parentNode.valueSetByXForms = true;
+        target.parentNode.value = target.value;
+        target = target.parentNode;
+    }
+    xformsValueChanged(target, null);
+}
+
+
+// Parameter is an array of arrays with each array containing:
+// new Array(target, eventName, value, incremental, other)
 function xformsFireEvents(events) {
 
     // Store events to fire
@@ -629,10 +640,9 @@ function xformsInitializeControlsUnder(root) {
                 // Intercept end-user pressing enter in text field
                 xformsAddEventListener(textfield, "keypress", function(event) {
                     if (event.keyCode == 10 || event.keyCode == 13) {
+                        xformsHandleValueChange(event);
                         var span = getEventTarget(event).parentNode;
-                        var events = new Array();
-                        events.push(xformsCreateEventArray(span, "DOMActivate", null));
-                        xformsFireEvents(events);
+                        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
                     }
                 });
             } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
@@ -641,23 +651,10 @@ function xformsInitializeControlsUnder(root) {
                 // Handle value change and incremental modification
                 control.previousValue = control.value;
                 control.userModications = false;
-
-                // Function called when value changes
-                function handleValueChange(event) {
-                    var target = getEventTarget(event);
-                    // If this is an input field, set value on parent and send event on parent element
-                    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
-                        target.parentNode.valueSetByXForms = true;
-                        target.parentNode.value = target.value;
-                        target = target.parentNode;
-                    }
-                    xformsValueChanged(target, null);
-                }
-
                 // Register listeners
-                xformsAddEventListener(control, "change", handleValueChange);
+                xformsAddEventListener(control, "change", xformsHandleValueChange);
                 if (isIncremental)
-                    xformsAddEventListener(control, "keyup", handleValueChange);
+                    xformsAddEventListener(control, "keyup", xformsHandleValueChange);
             }
 
             // Register listener on focus in and out events

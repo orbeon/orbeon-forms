@@ -595,7 +595,9 @@ function xformsInitializeControlsUnder(root) {
                 });
             } else if (isXFormsInput) {
                 control.value = control.childNodes[1].value;
-                control.previousValue = control.childNodes[1].value;
+                var textfield = control.childNodes[1];
+                control.previousValue = textfield.value;
+                // Intercept custom JavaScript code changing control value
                 if (control.watch) {
                     // Firefox implements a watch() method
                     control.watch("value", function(property, oldvalue, newvalue) {
@@ -624,6 +626,15 @@ function xformsInitializeControlsUnder(root) {
                         }
                     });
                 }
+                // Intercept end-user pressing enter in text field
+                xformsAddEventListener(textfield, "keypress", function(event) {
+                    if (event.keyCode == 10 || event.keyCode == 13) {
+                        var span = getEventTarget(event).parentNode;
+                        var events = new Array();
+                        events.push(xformsCreateEventArray(span, "DOMActivate", null));
+                        xformsFireEvents(events);
+                    }
+                });
             } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
                 // Don't add listeners on spans
             } else {

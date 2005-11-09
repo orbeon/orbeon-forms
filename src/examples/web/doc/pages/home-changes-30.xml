@@ -377,6 +377,12 @@
                     -->
                     <li>
                         <p>
+                            TODO: point to XForms Instance Initialization documentation, and explain
+                            how this was different with Classic.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             TODO: xforms:submission and xforms:submit (id, action, method).
                         </p>
                     </li>

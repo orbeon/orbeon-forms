@@ -440,16 +440,16 @@
     </xsl:template>
 
     <!-- Display as list / combobox -->
-    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')]
-            | xforms:select[@appearance = 'compact']">
+    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact') or not(@appearance)]
+            | xforms:select[@appearance = 'compact' or not(@appearance)]">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="class" as="xs:string"
-            select="if (local-name() = 'select1' and @appearance = 'minimal') then 'xforms-select1-minimal'
+            select="if (local-name() = 'select1' and (@appearance = 'minimal' or not(@appearance))) then 'xforms-select1-minimal'
                 else if (local-name() = 'select1' and @appearance = 'compact') then 'xforms-select1-compact'
-                else if (local-name() = 'select' and @appearance = 'compact') then 'xforms-select-compact'
+                else if (local-name() = 'select' and (@appearance = 'compact' or not(@appearance))) then 'xforms-select-compact'
                 else ()"/>
 
         <xhtml:select name="{$id}">

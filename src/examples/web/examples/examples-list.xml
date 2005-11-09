@@ -48,19 +48,6 @@
         <example id="tutorial-hello2" path="tutorial/hello2" label="Hello World MVC"/>
         <example id="tutorial-hello3" path="tutorial/hello3" label="Hello World XForms" xforms-ng="true"/>
         <example id="tutorial-hello4" path="tutorial/hello4" label="Hello World Page Flow" xforms-ng="true"/>
-    </section>
-    <section label="Document-Centric Apps">
-        <example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>
-        <example id="bizdoc2" label="&quot;BizDoc&quot; NG" xforms-ng="true"/>
-        <example id="blog" label="The OPS Blog" xforms-ng="true"/>
-    </section>
-    <section label="Database App">
-        <example id="employees" label="The &quot;Employees&quot; Example"/>
-        <!--
-        <example id="petstore" label="The &quot;Pet Store&quot; Example"/>
-        -->
-    </section>
-    <section label="Controlling Page Flow">
         <example id="atm" label="ATM Page Flow"/>
         <example id="counter" label="Counter Page Flow"/>
     </section>
@@ -79,20 +66,19 @@
         <example id="xforms-dynamic-image" path="xforms/xforms-dynamic-image" label="Dynamic Image" xforms-ng="true"/>
         <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
     </section>
-    <section label="Presenting Data">
-        <example id="reports" label="Data in multiple formats"/>
-        <example id="charts" label="Charts &amp; Graphs" xforms-ng="true"/>
-        <example id="imageserver" label="Image Transformations"/>
-        <!--<example id="excel" label="Excel Import / Export"/>-->
+    <section label="Document-Centric Apps">
+        <example id="bizdoc2" label="&quot;BizDoc&quot; NG" xforms-ng="true"/>
+        <example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>
+        <example id="blog" label="The OPS Blog" xforms-ng="true"/>
     </section>
-    <section label="Database Access">
-        <example id="address-book" label="Address Book Classic"/>
-        <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
-        <example id="xmldb" label="XML:DB Databases"/>
-    </section>
-    <section label="PDF Processing">
-        <example id="pdf-upload" path="pdf/pdf-upload" label="Extract PDF Info"/>
-        <example id="pdf-template" path="pdf/pdf-template" label="PDF Templates"/>
+    <section label="Cool Stuff">
+        <example id="xquery-the-web" label="XQuery The Web"/>
+        <example id="url" label="HTML Screen-Scraping"/>
+        <example id="rss" label="Create Your Own RSS Feeds"/>
+        <example id="spellchecker" label="Google Spell Checker"/>
+        <example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>
+        <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
+        <example id="yim" label="Instant Messaging"/>
     </section>
     <section label="Query &amp; Transformation">
         <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>
@@ -104,12 +90,25 @@
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
     </section>
-    <!--
-    <section label="Enterprise Service Bus">
-        <example id="xmlserver" label="Simple Bus Service"/>
+    <section label="Presenting and Formatting Data">
+        <example id="reports" label="Data in multiple formats"/>
+        <example id="charts" label="Charts &amp; Graphs" xforms-ng="true"/>
+        <example id="imageserver" label="Image Transformations"/>
+        <!--<example id="excel" label="Excel Import / Export"/>-->
+        <example id="pdf-upload" path="pdf/pdf-upload" label="PDF Extraction"/>
+        <example id="pdf-template" path="pdf/pdf-template" label="PDF Templates"/>
     </section>
-    -->
-    <section label="Calling a Web Service">
+    <section label="Database Access">
+        <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
+        <example id="address-book" label="Address Book Classic"/>
+        <example id="employees" label="The &quot;Employees&quot; Example"/>
+        <example id="xmldb" label="XML:DB Databases"/>
+        <!--<example id="petstore" label="The &quot;Pet Store&quot; Example"/>-->
+    </section>
+    <!--<section label="Enterprise Service Bus">-->
+        <!--<example id="xmlserver" label="Simple Bus Service"/>-->
+    <!--</section>-->
+    <section label="Calling Web Services">
         <example id="quotes" label="Famous Quotes"/>
         <example id="ca-traffic" label="California Traffic"/>
         <example id="stock-quote" label="Stock Quote"/>
@@ -129,14 +128,5 @@
         <example id="cart" label="Accessing the Session" xforms-ng="true"/>
         <example id="java" label="Java Processor"/>
         <example id="authentication" label="J2EE Authentication" standalone="true"/>
-    </section>
-    <section label="Cool Stuff">
-        <example id="xquery-the-web" label="XQuery The Web"/>
-        <example id="url" label="HTML Screen-Scraping"/>
-        <example id="rss" label="Create Your Own RSS Feeds"/>
-        <example id="spellchecker" label="Google Spell Checker"/>
-        <example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>
-        <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
-        <example id="yim" label="Instant Messaging"/>
     </section>
 </examples-list>

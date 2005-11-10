@@ -89,22 +89,17 @@
                     <!-- Extract models and controls -->
                     <p:processor name="oxf:xforms-extractor">
                         <!--<p:input name="data" href="#annotated-view" debug="xxxannotated-view"/>-->
-                        <!--<p:output name="data" id="xforms-models-controls" debug="xxxcontrols"/>-->
+                        <!--<p:output name="data" id="static-state" debug="xxxcontrols"/>-->
                         <p:input name="data" href="#annotated-view"/>
-                        <p:output name="data" id="xforms-models-controls"/>
+                        <p:output name="data" id="static-state"/>
                     </p:processor>
                     <!--<p:processor name="oxf:sax-debugger">-->
-                        <!--<p:input name="data" href="#xforms-models-controls1"/>-->
-                        <!--<p:output name="data" id="xforms-models-controls" debug="xxxcontrols"/>-->
+                        <!--<p:input name="data" href="#static-state1"/>-->
+                        <!--<p:output name="data" id="static-state" debug="xxxcontrols"/>-->
                     <!--</p:processor>-->
-                    <!-- Build request to XForms server -->
-                    <p:processor name="oxf:xforms-request-encoder">
-                        <p:input name="data" href="#xforms-models-controls"/>
-                        <p:output name="data" id="xforms-request"/>
-                    </p:processor>
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
-                        <p:input name="request" href="#xforms-request"/>
+                        <p:input name="static-state" href="#static-state"/>
                         <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->
                         <p:output name="response" id="response"/>
                     </p:processor>

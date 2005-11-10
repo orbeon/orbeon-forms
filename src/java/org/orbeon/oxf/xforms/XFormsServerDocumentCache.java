@@ -43,9 +43,8 @@ public class XFormsServerDocumentCache {
         return instance;
     }
 
-    public void add(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
+    public synchronized void add(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
-        // Document was not in pool
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance();
         final String cacheKeyString = xformsState.toString();
@@ -83,7 +82,14 @@ public class XFormsServerDocumentCache {
         containingDocument.setSourceObjectPool(null);
     }
 
-    public XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
+    /**
+     * Find an XFormsContainingDocument from the cache. If not found, create it.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param xformsState           state used to search cache
+     * @return                      XFormsContainingDocument
+     */
+    public synchronized XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
 
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance();

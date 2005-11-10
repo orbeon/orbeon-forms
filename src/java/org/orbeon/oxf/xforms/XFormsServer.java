@@ -22,7 +22,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -47,6 +46,7 @@ public class XFormsServer extends ProcessorImpl {
     static public Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
+    private static final String INPUT_STATIC_STATE = "static-state";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
 
     private static final String SESSION_STATE_PREFIX = "session:";
@@ -60,7 +60,8 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public XFormsServer() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_REQUEST));
+        //addInputInfo(new ProcessorInputOutputInfo(INPUT_REQUEST)); // optional
+        //addInputInfo(new ProcessorInputOutputInfo(INPUT_STATIC_STATE)); // optional
         //addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_RESPONSE)); // optional
     }
 
@@ -88,76 +89,95 @@ public class XFormsServer extends ProcessorImpl {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        // Extract information from request
-        final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+        boolean hasRequestInput = getConnectedInputs().get(INPUT_REQUEST) != null;
 
-        // Get action
-        final Element actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
-
-        // Get files if any (those come from xforms-server-submit.xpl upon submission)
-        final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
-
-        // Retrieve state
-        final String requestPageGenerationId;
-        final XFormsState xformsState;
-        {
-            // Get static state
-            final String staticStateString;
-            {
-                final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
-                staticStateString = staticStateElement.getTextTrim();
-            }
-
-            // Get dynamic state
-            final String dynamicStateString;
-            {
-                final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
-                dynamicStateString = dynamicStateElement.getTextTrim();
-            }
-
-            if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
-                // State doesn't come with the request, we should look it up in the repository
-                final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
-
-                // Extract page generation id
-                requestPageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
-
-                // We don't create the cache at this point as it may not be necessary
-                final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
-                final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
-
-                // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
-                if (sessionFormsState == null)
-                    throw new OXFException("Unable to retrieve XForms engine state.");
-
-                xformsState = sessionFormsState;
-            } else {
-                // State comes with request
-                requestPageGenerationId = null;
-                xformsState = new XFormsState(staticStateString, dynamicStateString);
-            }
-        }
-
+        final Element filesElement;
+        final Element actionElement;
         final XFormsContainingDocument containingDocument;
-        if (XFormsUtils.isCacheDocument()) {
-            // Try to obtain containing document from cache
-            if (filesElement == null) {
-                // No fileElements, this may have been cached
-                containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
-            } else  {
-                // If there are filesElement, then we know this was not cached
-                logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
+        final XFormsState xformsState;
+        final String requestPageGenerationId;
+        final boolean isInitializationRun;
+        if (hasRequestInput) {
+            // Use request input provided by client
+            final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+
+            // Get action
+            actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
+
+            // Get files if any (those come from xforms-server-submit.xpl upon submission)
+            filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
+
+            // Retrieve state
+            {
+                // Get static state
+                final String staticStateString;
+                {
+                    final Element staticStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_STATIC_STATE_QNAME);
+                    staticStateString = staticStateElement.getTextTrim();
+                }
+
+                // Get dynamic state
+                final String dynamicStateString;
+                {
+                    final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
+                    dynamicStateString = dynamicStateElement.getTextTrim();
+                }
+
+                if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
+                    // State doesn't come with the request, we should look it up in the repository
+                    final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
+
+                    // Extract page generation id
+                    requestPageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
+
+                    // We don't create the cache at this point as it may not be necessary
+                    final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
+                    final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
+
+                    // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
+                    if (sessionFormsState == null)
+                        throw new OXFException("Unable to retrieve XForms engine state.");
+
+                    xformsState = sessionFormsState;
+                } else {
+                    // State comes with request
+                    requestPageGenerationId = null;
+                    xformsState = new XFormsState(staticStateString, dynamicStateString);
+                }
+            }
+
+            if (XFormsUtils.isCacheDocument()) {
+                // Try to obtain containing document from cache
+                if (filesElement == null) {
+                    // No fileElements, this may have been cached
+                    containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
+                } else  {
+                    // If there are filesElement, then we know this was not cached
+                    logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
+                    containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+                }
+            } else {
+                // Otherwise we recreate the containindg document from scratch
                 containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
             }
+            isInitializationRun = false;
         } else {
-            // Otherwise we recreate the containindg document from scratch
-            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+            // Use static-state input provided during initialization run
+
+            final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
+
+            xformsState = new XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
+            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, null, staticStateDocument);
+
+            filesElement = null;
+            actionElement = null;
+            requestPageGenerationId = null;
+            isInitializationRun = true;
         }
 
         try {
             // Run event if any
-            boolean isInitializationRun = true;
-            {
+            if (actionElement != null) {
                 final List eventElements = actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME);
                 if (eventElements != null && eventElements.size() > 0) {
                     for (Iterator i = eventElements.iterator(); i.hasNext();) {
@@ -170,13 +190,10 @@ public class XFormsServer extends ProcessorImpl {
                         if (sourceControlId != null && eventName != null) {
                             // An event is passed
                             containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
-                            isInitializationRun = false;
                         } else if (!(sourceControlId == null && eventName == null)) {
                             throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
                     }
-                } else {
-                    isInitializationRun = true;
                 }
             }
 
@@ -852,11 +869,19 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement) {
+    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement) {
+        return createXFormsContainingDocument(pipelineContext, xformsState, filesElement, null);
+    }
 
-        logger.debug("XForms - containing document cache: creating new document.");
+    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement, Document staticStateDocument) {
 
-        final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState());
+        if (staticStateDocument == null) {
+            staticStateDocument = XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState());
+            logger.debug("XForms - creating new document.");
+        } else {
+            logger.debug("XForms - creating new document (static state Document provided).");
+        }
+
         final Document dynamicStateDocument;
         {
             final String dynamicStateString = xformsState.getDynamicState();

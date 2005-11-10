@@ -195,10 +195,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event/>
-                    </p:input>
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
                     <p:input name="controls">
                         <controls>
                             <!-- First model, first instance -->
@@ -297,9 +294,6 @@
                                 </xforms:instance>
                             </xforms:model>
                         </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <xxforms:instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -683,15 +677,9 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event/>
-                    </p:input>
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
                     <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
-                    <p:input name="instances">
-                        <xxforms:instances/>
-                    </p:input>
                     <p:output name="response" id="repeat-response"/>
                 </p:processor>
 
@@ -1282,10 +1270,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event/>
-                    </p:input>
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
                     <p:input name="controls">
                         <controls>
                             <xforms:group ref="instance('tests')" id="id1">
@@ -1308,9 +1293,6 @@
                                 </xforms:bind>
                             </xforms:model>
                         </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <xxforms:instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1369,10 +1351,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event/>
-                    </p:input>
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
                     <p:input name="controls">
                         <controls>
                             <xforms:group ref="instance('main-instance')" id="id1">
@@ -1391,9 +1370,6 @@
                                 </xforms:instance>
                             </xforms:model>
                         </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <xxforms:instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1449,10 +1425,7 @@
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event/>
-                    </p:input>
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
                     <p:input name="controls">
                         <controls>
                             <xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
@@ -1470,9 +1443,6 @@
                                 <xforms:bind nodeset="instance('main-instance')/date" type="xs:date"/>
                             </xforms:model>
                         </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <xxforms:instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>

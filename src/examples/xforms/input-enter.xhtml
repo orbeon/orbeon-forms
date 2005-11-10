@@ -23,13 +23,18 @@
         <xhtml:title>XForms Alert</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
-                <instance/>
+                <instance>
+                    <textfield/>
+                </instance>
             </xforms:instance>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:input id="textfield" ref=".">
-            <xforms:label>Press enter in the text field: </xforms:label>
-        </xforms:input>
+        <xhtml:p>
+            <xforms:input id="textfield" ref="textfield" incremental="true">
+                <xforms:label>Press enter in the text field: </xforms:label>
+            </xforms:input>
+            <xforms:output ref="textfield"/>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

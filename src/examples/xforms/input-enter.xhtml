@@ -20,7 +20,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>XForms Alert</xhtml:title>
+        <xhtml:title>XForms Enter Key</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
@@ -33,6 +33,7 @@
         <xhtml:p>
             <xforms:input id="textfield" ref="textfield" incremental="true">
                 <xforms:label>Press enter in the text field: </xforms:label>
+                <xforms:message level="modal" ev:event="DOMActivate">The enter key was pressed!</xforms:message>
             </xforms:input>
             <xforms:output ref="textfield"/>
         </xhtml:p>

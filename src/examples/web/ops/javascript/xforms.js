@@ -332,17 +332,17 @@ function xformsDisplayLoading(state) {
 }
 
 function xformsValueChanged(target, other) {
-    var sendEvent = target.value != target.previousValue;
-    if (sendEvent) {
+    var valueChanged = target.value != target.previousValue;
+    if (valueChanged) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
         xformsFireEvents(new Array(xformsCreateEventArray
                 (target, "xxforms-value-change-with-focus-change", target.value, other)));
     }
-    return sendEvent;
+    return valueChanged;
 }
 
-// Function called when value changes
+// Function called by browser when value changes (either after changing focus or keyboard input)
 function xformsHandleValueChange(event) {
     var target = getEventTarget(event);
     // If this is an input field, set value on parent and send event on parent element
@@ -352,6 +352,7 @@ function xformsHandleValueChange(event) {
         target = target.parentNode;
     }
     xformsValueChanged(target, null);
+    return true;
 }
 
 
@@ -364,9 +365,7 @@ function xformsFireEvents(events) {
         document.xformsEvents.push(events[eventIndex]);
 
     // Fire them with a delay to give us a change to aggregate events together
-    window.setTimeout(function() {
-        xformsExecuteNextRequest();
-    }, XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS);
+    window.setTimeout(xformsExecuteNextRequest, XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS);
     
     return false;
 }
@@ -630,8 +629,7 @@ function xformsInitializeControlsUnder(root) {
                                 span.valueSetByXForms = true;
                                 span.value = span.previousValue;
                                 xformsDispatchEvent(textField, "change");
-                            }
-                            if (span.valueSetByXForms) {
+                            } else {
                                 span.valueSetByXForms = false;
                             }
                         }
@@ -645,7 +643,7 @@ function xformsInitializeControlsUnder(root) {
                         xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
                     }
                 });
-            } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
+            } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
             } else {
                 // Handle value change and incremental modification
@@ -1546,7 +1544,21 @@ function xformsExecuteNextRequest() {
                     eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
             }
             document.xformsEvents = new Array();
-            document.xformsChangedIdsRequest = new Array();
+
+            // Reset changes, as changes are included in this bach of events
+            var newXFormsChangedIdsRequest = new Array();
+            for (var idIndex = 0; idIndex < document.xformsChangedIdsRequest.length; idIndex++) {
+                var controlId = document.xformsChangedIdsRequest[idIndex];
+                var control = document.getElementById(controlId);
+                // Keep textfields if their value has changed and we didn't get a notification yet
+                // It is not clear why the browser delays the call to our key listener
+                // for textfields but not for textareas
+                if (xformsArrayContains(control.className.split(" "), "xforms-input")
+                        && control.childNodes[1].value != control.value)
+                    newXFormsChangedIdsRequest.push(controlId);
+            }
+            document.xformsChangedIdsRequest = newXFormsChangedIdsRequest;
+
             requestDocument = eventFiredElement.ownerDocument;
         }
 

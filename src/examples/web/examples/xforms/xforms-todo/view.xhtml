@@ -305,18 +305,21 @@
                         <xforms:group ref="@ui:output">
                             <xforms:output ref="../@description"/>
                         </xforms:group>
-                        <!-- Description edition field -->
-                        <xforms:group ref="@ui:input">
-                            <xforms:input id="list-description-input" ref="../@description" class="list-description-input">
-                                <xforms:label/>
-                            </xforms:input>
+                        <xforms:group>
+                            <!-- Description edition field -->
+                            <xforms:group ref="@ui:input">
+                                <xforms:input id="list-description-input" ref="../@description" class="list-description-input">
+                                    <xforms:label/>
+                                </xforms:input>
+                            </xforms:group>
+                            <!-- Trigger to save description -->
+                            <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
+                                <xxforms:img src="/images/save.gif"/>
+                                <xforms:label>Save</xforms:label>
+                            </xforms:trigger>
+                            <!-- This catches both "enter" in the input and pressing the trigger -->
+                            <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
                         </xforms:group>
-                        <!-- Trigger to save description -->
-                        <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
-                            <xxforms:img src="/images/save.gif"/>
-                            <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
-                            <xforms:label>Save</xforms:label>
-                        </xforms:trigger>
                         <!-- How many to do are left -->
                         <xforms:output value="if (count(todo) = 1) then ''
                             else if (count(todo[@done = '']) = 1) then '(Done)'
@@ -350,18 +353,21 @@
                                 <xforms:group ref="@ui:output">
                                     <xforms:output ref="../@description"/>
                                 </xforms:group>
-                                <!-- Description edition field -->
-                                <xforms:group ref="@ui:input">
-                                    <xforms:input id="todo-description-input" ref="../@description">
-                                        <xforms:label/>
-                                    </xforms:input>
+                                <xforms:group>
+                                    <!-- Description edition field -->
+                                    <xforms:group ref="@ui:input">
+                                        <xforms:input id="todo-description-input" ref="../@description">
+                                            <xforms:label/>
+                                        </xforms:input>
+                                    </xforms:group>
+                                    <!-- Trigger to save description -->
+                                    <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
+                                        <xxforms:img src="/images/save.gif"/>
+                                        <xforms:label>Save</xforms:label>
+                                    </xforms:trigger>
+                                    <!-- This catches both "enter" in the input and pressing the trigger -->
+                                    <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
                                 </xforms:group>
-                                <!-- Trigger to save descr  iption -->
-                                <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
-                                    <xxforms:img src="/images/save.gif"/>
-                                    <xforms:setvalue ev:event="DOMActivate" ref="../@ui:mode" value="'view'"/>
-                                    <xforms:label>Save</xforms:label>
-                                </xforms:trigger>
                                 <xforms:group ref="@due">
                                     -- due on:
                                     <xforms:input ref="."/>

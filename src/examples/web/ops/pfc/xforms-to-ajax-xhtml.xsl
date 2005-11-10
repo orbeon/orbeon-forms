@@ -317,7 +317,7 @@
                 <xsl:if test="not($generate-template) and xxforms:control($id)/@readonly = 'true'">
                     <xsl:attribute name="disabled">disabled</xsl:attribute>
                 </xsl:if>
-                <xsl:copy-of select="xxforms:copy-attributes(., ($type-class), $id)"/>
+                <xsl:copy-of select="xxforms:copy-attributes(., ($type-class), ())"/>
             </xhtml:input>
             <!-- Date picker -->
             <xsl:variable name="showcalendar-readonly-class" as="xs:string?"

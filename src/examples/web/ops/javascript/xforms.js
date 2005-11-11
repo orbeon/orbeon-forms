@@ -611,6 +611,7 @@ function xformsInitializeControlsUnder(root) {
                 var textfield = control.childNodes[1];
                 control.previousValue = textfield.value;
                 // Intercept custom JavaScript code changing control value
+                if (false) { // TODO: Added as this creates an infinite loop in form002 test case
                 if (control.watch) {
                     // Firefox implements a watch() method
                     control.watch("value", function(property, oldvalue, newvalue) {
@@ -646,6 +647,7 @@ function xformsInitializeControlsUnder(root) {
                         xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
                     }
                 });
+                }
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
             } else {
@@ -1452,8 +1454,7 @@ function xformsHandleResponse() {
                                 var setfocusElement = actionElement.childNodes[actionIndex];
                                 var controlId = setfocusElement.getAttribute("control-id");
                                 var control = document.getElementById(controlId);
-                                var controlClasses = control.className.split(" ");
-                                if (xformsArrayContains(controlClasses, "xforms-input"))
+                                if (xformsArrayContains(control.className.split(" "), "xforms-input"))
                                     control = control.childNodes[1];
                                 document.xformsMaskFocusEvents = true;
                                 control.focus();

@@ -25,40 +25,51 @@
             <xforms:instance id="instance">
                 <fruits>
                     <orange>bloody</orange>
+                    <orange>valencia</orange>
                     <apple>green</apple>
                     <apple>red</apple>
                     <apple>iPod</apple>
                     <pear>green</pear>
+                    <pear>williams</pear>
                     <pear>yellow</pear>
                 </fruits>
             </xforms:instance>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="orange" id="orange">
-            <xhtml:div>
-                <xforms:input ref=".">
-                    <xforms:label>Orange: </xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:repeat>
-        <xforms:repeat nodeset="apple" id="apple">
-            <xhtml:div>
-                <xforms:input ref=".">
-                    <xforms:label>Apple: </xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:repeat>
-        <xforms:trigger>
-            <xforms:label>Add apple</xforms:label>
-            <xforms:insert nodeset="apple" at="index('apple')" position="after" ev:event="DOMActivate"/>
-        </xforms:trigger>
-        <xforms:repeat nodeset="pear" id="pear">
-            <xhtml:div>
-                <xforms:input ref=".">
-                    <xforms:label>Pear: </xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:repeat>
+        <xhtml:div>
+            <xhtml:p>Oranges:</xhtml:p>
+            <xforms:repeat nodeset="orange" id="orange">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Apples:</xhtml:p>
+            <xforms:repeat nodeset="apple" id="apple">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+            <xforms:trigger>
+                <xforms:label>Add apple</xforms:label>
+                <xforms:insert nodeset="apple" at="index('apple')" position="after" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Pears:</xhtml:p>
+            <xforms:repeat nodeset="pear" id="pear">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

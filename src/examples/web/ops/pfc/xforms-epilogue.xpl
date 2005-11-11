@@ -86,7 +86,7 @@
                         <p:input name="data" href="#widgeted-view"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
-                    <!-- Extract models and controls -->
+                    <!-- Extract models and controls for XForms server -->
                     <p:processor name="oxf:xforms-extractor">
                         <!--<p:input name="data" href="#annotated-view" debug="xxxannotated-view"/>-->
                         <!--<p:output name="data" id="static-state" debug="xxxcontrols"/>-->

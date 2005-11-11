@@ -993,7 +993,7 @@
                         <divs/>
                         <repeat-indexes>
                             <repeat-index id="id123" index="3"/>
-                            <repeat-index id="id124" index="1"/>
+                            <repeat-index id="id124" index="2"/>
                         </repeat-indexes>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1024,7 +1024,6 @@
                     <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="2" new-index="1"/>
                     </xxf:repeat-indexes>
                     <xxf:itemsets/>
                 </xxf:action>

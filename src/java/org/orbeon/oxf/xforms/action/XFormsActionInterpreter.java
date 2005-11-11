@@ -250,14 +250,12 @@ public class XFormsActionInterpreter {
                 final List siblingElements = parentElement.elements();
                 final int actualIndex = siblingElements.indexOf(indexElement);
 
-                // Insert new element (changes to the list are reflected in the document)
-                final int newNodeIndex;
+                // Prepare insertion of new element
+                final int actualInsertionIndex;
                 if ("after".equals(positionAttribute) || "NaN".equals(insertionIndexString)) {
-                    siblingElements.add(actualIndex + 1, clonedElement);
-                    newNodeIndex = insertionIndex + 1;
+                    actualInsertionIndex = actualIndex + 1;
                 } else if ("before".equals(positionAttribute)) {
-                    siblingElements.add(actualIndex, clonedElement);
-                    newNodeIndex = insertionIndex;
+                    actualInsertionIndex = actualIndex;
                 } else {
                     throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
                 }
@@ -267,29 +265,89 @@ public class XFormsActionInterpreter {
                 // The indexes for inner nested repeat collections are re-initialized to
                 // startindex."
 
-                // Find list of affected repeat ids
-                final Map boundRepeatIds = new HashMap();
-                final Map childrenRepeatIds = new HashMap();
-                findAffectedRepeatIds(pipelineContext, parentElement, boundRepeatIds, childrenRepeatIds);
+                // Perform the insertion
+                siblingElements.add(actualInsertionIndex, clonedElement);
 
                 // Rebuild ControlsState
                 xformsControls.rebuildCurrentControlsState(pipelineContext);
                 final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                // Update repeat information for the ids found
-                if (boundRepeatIds.size() != 0 || childrenRepeatIds.size() != 0) {
+                // Update repeat indexes
+                // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
+                currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
-                    for (Iterator i = boundRepeatIds.keySet().iterator(); i.hasNext();) {
-                        final String repeatId = (String) i.next();
-                        currentControlsState.updateRepeatIndex(repeatId, newNodeIndex);
+                    private XFormsControls.ControlInfo foundControl;
+
+                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            // Found an xforms:repeat
+                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                            final String repeatId = repeatControlInfo.getOriginalId();
+                            final List repeatNodeSet = xformsControls.getCurrentNodeset();
+
+                            if (foundControl == null) {
+                                // We are not yet inside a matching xforms:repeat
+
+                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                                    // Find whether one node of the repeat node-set contains the inserted node
+                                    int index = 1;
+                                    for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); index++) {
+                                        final Element currentNode = (Element) i.next();
+                                        if (currentNode == clonedElement) {
+                                            // Found xforms:repeat affected by the change
+
+                                            // "The index for any repeating sequence that is bound
+                                            // to the homogeneous collection where the node was
+                                            // added is updated to point to the newly added node."
+                                            currentControlsState.updateRepeatIndex(repeatId, index);
+
+                                            // First step: set all children indexes to 0
+                                            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
+                                            if (nestedRepeatIds != null) {
+                                                for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
+                                                    final String nestedRepeatId = (String) j.next();
+                                                    currentControlsState.updateRepeatIndex(nestedRepeatId, 0);
+                                                }
+                                            }
+
+                                            foundControl = controlInfo;
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                // This is a child xforms:repeat of a matching xforms:repeat
+                                // Second step: update non-empty repeat indexes to the appropriate value
+
+                                // "The indexes for inner nested repeat collections are re-initialized to startindex."
+
+                                // NOTE: We do this, but we also adjust the index:
+                                // "The index for this repeating structure is initialized to the
+                                // value of startindex. If the initial startindex is less than 1 it
+                                // defaults to 1. If the index is greater than the initial node-set
+                                // then it defaults to the size of the node-set."
+
+                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                                    int newIndex = repeatControlInfo.getStartIndex();
+
+                                    if (newIndex < 1)
+                                        newIndex = 1;
+                                    if (newIndex > repeatNodeSet.size())
+                                        newIndex = repeatNodeSet.size();
+
+                                    currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                                }
+                            }
+                        }
                     }
-                    for (Iterator i = childrenRepeatIds.keySet().iterator(); i.hasNext();) {
-                        final String repeatId = (String) i.next();
-                        //final int newIndex = ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue();
-                        final int newIndex = 1;
-                        currentControlsState.updateRepeatIndex(repeatId, newIndex);
+
+                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            if (foundControl == controlInfo)
+                                foundControl = null;
+                        }
                     }
-                }
+                });
 
                 // "4. If the insert is successful, the event xforms-insert is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
@@ -317,14 +375,14 @@ public class XFormsActionInterpreter {
             // Set current binding in order to evaluate the current nodeset
             // "1. The homogeneous collection to be updated is determined by evaluating the Node Set Binding."
 
-            final List collectionToBeUpdated = xformsControls.getCurrentNodeset();
+            final List collectionToUpdate = xformsControls.getCurrentNodeset();
 
-            if (collectionToBeUpdated.size() > 0) {
+            if (collectionToUpdate.size() > 0) {
                 // "If the collection is empty, the delete action has no effect."
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-                final Element parentElement;
-                int deletionIndex;
+                final Element elementToRemove;
+                final int deletionIndex;
                 final List siblingElements;
                 final int actualIndex;
                 {
@@ -332,82 +390,179 @@ public class XFormsActionInterpreter {
                             xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
                             "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
-                    // Don't think we will get NaN with XPath 2.0...
-                    deletionIndex = "NaN".equals(deletionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(deletionIndexString) ;
+                    // We will not get NaN with XPath 2.0...
+                    int tempDeletionIndex = "NaN".equals(deletionIndexString) ? collectionToUpdate.size() : Integer.parseInt(deletionIndexString) ;
 
                     // Adjust index to be in range
-                    if (deletionIndex > collectionToBeUpdated.size())
-                        deletionIndex = collectionToBeUpdated.size();
+                    if (tempDeletionIndex > collectionToUpdate.size())
+                        tempDeletionIndex = collectionToUpdate.size();
 
-                    if (deletionIndex < 1)
-                        deletionIndex = 1;
+                    if (tempDeletionIndex < 1)
+                        tempDeletionIndex = 1;
+
+                    deletionIndex = tempDeletionIndex;
 
                     // Find actual deletion point
-                    final Element indexElement = (Element) collectionToBeUpdated.get(deletionIndex - 1);
-
-                    parentElement = indexElement.getParent();
+                    elementToRemove = (Element) collectionToUpdate.get(tempDeletionIndex - 1);
+                    final Element parentElement = elementToRemove.getParent();
                     siblingElements = parentElement.elements();
-                    actualIndex = siblingElements.indexOf(indexElement);
+                    actualIndex = siblingElements.indexOf(elementToRemove);
                 }
 
-                // Find list of affected repeat ids
-                final Map boundRepeatIds = new HashMap();
-                final Map childrenRepeatIds = new HashMap();
-                findAffectedRepeatIds(pipelineContext, parentElement, boundRepeatIds, childrenRepeatIds);
-
-                // Then only perform the deletion (so that the list above is correct even when the last node is deleted)
-                siblingElements.remove(actualIndex);
-
-                // Rebuild ControlsState
+                // Get current repeat indexes
                 final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-                final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                // Update repeat information for the ids found
-                if (boundRepeatIds.size() != 0 || childrenRepeatIds.size() != 0) {
-                    boolean updateInnerRepeats = false;
-                    // Iterate over bound repeat ids
-                    for (Iterator i = boundRepeatIds.keySet().iterator(); i.hasNext();) {
-                        final String repeatId = (String) i.next();
+                // Find updates to repeat indexes
+                final Map repeatIndexUpdates = new HashMap();
+                final Map nestedRepeatIndexUpdates = new HashMap();
+                // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
+                xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
-                        if (collectionToBeUpdated.size() == 1) {
-                            // Delete the last element of the collection: the index must be set to 0
-                            currentControlsState.updateRepeatIndex(repeatId, 0);
-                            updateInnerRepeats = true;
-                        } else {
-                            final int currentlySelected = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
-                            if (currentlySelected == deletionIndex) {
-                                if (deletionIndex == collectionToBeUpdated.size()) {
+                    private XFormsControls.ControlInfo foundControl;
+                    private boolean reinitializeInner;
 
-                                    // o "When the last remaining item in the collection is removed,
-                                    // the index position becomes 0."
+                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            // Found an xforms:repeat
+                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                            final String repeatId = repeatControlInfo.getOriginalId();
 
-                                    // o "When the index was pointing to the deleted node, which was
-                                    // the last item in the collection, the index will point to the new
-                                    // last node of the collection and the index of inner repeats is
-                                    // reinitialized."
+                            final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                            if (foundControl == null) {
+                                // We are not yet inside a matching xforms:repeat
 
-                                    currentControlsState.updateRepeatIndex(repeatId, currentlySelected - 1);
-                                    updateInnerRepeats = true;
-                                } else {
-                                    // o "When the index was pointing to the deleted node, which was
-                                    // not the last item in the collection, the index position is not
-                                    // changed and the index of inner repeats is re-initialized."
+                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                                    // Find whether one node of the repeat node-set contains the inserted node
+                                    for (Iterator i = repeatNodeSet.iterator(); i.hasNext();) {
+                                        final Element currentNode = (Element) i.next();
+                                        if (currentNode == elementToRemove) {
+                                            // Found xforms:repeat affected by the change
 
-                                    updateInnerRepeats = true;
+                                            final int newIndex;
+                                            if (repeatNodeSet.size() == 1) {
+                                                // Delete the last element of the collection: the index must be set to 0
+                                                newIndex = 0;
+                                                reinitializeInner = false;
+                                            } else {
+                                                final int currentIndex = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
+                                                if (currentIndex == deletionIndex) {
+                                                    if (deletionIndex == repeatNodeSet.size()) {
+
+                                                        // o "When the last remaining item in the collection is removed,
+                                                        // the index position becomes 0."
+
+                                                        // o "When the index was pointing to the deleted node, which was
+                                                        // the last item in the collection, the index will point to the new
+                                                        // last node of the collection and the index of inner repeats is
+                                                        // reinitialized."
+
+                                                        newIndex = currentIndex - 1;
+                                                        reinitializeInner = true;
+                                                    } else {
+                                                        // o "When the index was pointing to the deleted node, which was
+                                                        // not the last item in the collection, the index position is not
+                                                        // changed and the index of inner repeats is re-initialized."
+
+                                                        newIndex = currentIndex;
+                                                        reinitializeInner = true;
+                                                    }
+                                                } else {
+                                                    // "The index should point to the same node
+                                                    // after a delete as it did before the delete"
+
+                                                    if (currentIndex < deletionIndex) {
+                                                        newIndex = currentIndex;
+                                                    } else {
+                                                        newIndex = currentIndex - 1;
+                                                    }
+                                                    reinitializeInner = false;
+                                                }
+                                            }
+
+                                            repeatIndexUpdates.put(repeatId, new Integer(newIndex));
+
+                                            // Handle children
+                                            if (reinitializeInner) {
+                                                // First step: set all children indexes to 0
+                                                final List nestedRepeatIds = xformsControls.getCurrentControlsState().getNestedRepeatIds(repeatId);
+                                                if (nestedRepeatIds != null) {
+                                                    for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
+                                                        final String nestedRepeatId = (String) j.next();
+                                                        repeatIndexUpdates.put(nestedRepeatId, new Integer(0));
+                                                        nestedRepeatIndexUpdates.put(nestedRepeatId, "");
+                                                    }
+                                                }
+                                            }
+
+                                            foundControl = controlInfo;
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    if (updateInnerRepeats) {
-                        for (Iterator i = childrenRepeatIds.keySet().iterator(); i.hasNext();) {
-                            final String repeatId = (String) i.next();
-                            final int newIndex = (collectionToBeUpdated.size() == 1) ? 0 : 1;
-                            currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            if (foundControl == controlInfo)
+                                foundControl = null;
                         }
                     }
+                });
+
+                // Then only perform the deletion
+                siblingElements.remove(actualIndex);
+
+                // Rebuild ControlsState
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
+                final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
+                // Update affected repeat index information
+                if (repeatIndexUpdates.size() > 0) {
+                    for (Iterator i = repeatIndexUpdates.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        currentControlsState.updateRepeatIndex((String) currentEntry.getKey(), ((Integer) currentEntry.getValue()).intValue());
+                    }
                 }
+
+                // Update children repeats information
+                xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+
+                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            // Found an xforms:repeat
+                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                            final String repeatId = repeatControlInfo.getOriginalId();
+
+                            if (nestedRepeatIndexUpdates.get(repeatId) != null) {
+                                // Found nested repeat id to update
+
+                                final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                                    int newIndex = repeatControlInfo.getStartIndex();
+
+                                    if (newIndex < 1)
+                                        newIndex = 1;
+                                    if (newIndex > repeatNodeSet.size())
+                                        newIndex = repeatNodeSet.size();
+
+                                    currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                                    //currentControlsState.updateRepeatIndex(repeatId, 1);
+
+                                    // NOTE: XForms 1.0 2nd edition actually says "To re-initialize
+                                    // a repeat means to change the index to 0 if it is empty,
+                                    // otherwise 1." However, for, xforms:insert, we are supposed to
+                                    // update to startindex. Here, for now, we decide to use
+                                    // startindex for consistency.
+                                }
+                            }
+                        }
+                    }
+
+                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+                    }
+                });
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent(currentInstance, atAttribute));
@@ -690,12 +845,12 @@ public class XFormsActionInterpreter {
                 }
             }
 
-            // "The indexes for inner nested repeat collections are re-initialized to 1."
+            // "The indexes for inner nested repeat collections are re-initialized to startindex."
             final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
             if (nestedRepeatIds != null) {
                 for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
                     final String currentRepeatId = (String) i.next();
-                    currentControlsState.updateRepeatIndex(currentRepeatId, 1);
+                    currentControlsState.updateRepeatIndex(currentRepeatId, 1);// TODO: use startindex!
                 }
             }
         }
@@ -721,44 +876,6 @@ public class XFormsActionInterpreter {
             xformsControls.resetBindingContext();
         }
         xformsControls.pushBinding(pipelineContext, actionElement);
-    }
-
-    private void findAffectedRepeatIds(final PipelineContext pipelineContext, final Element parentElement, final Map setRepeatIds, final Map resetRepeatIds) {
-        xformsControls.visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
-            private Element foundControlElement = null;
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                if (controlElement.getName().equals("repeat")) {
-                    if (foundControlElement == null) {
-                        // We are not yet inside a matching xforms:repeat
-                        final List currentNodeset = xformsControls.getCurrentNodeset();
-                        if (currentNodeset.size() > 0) {
-                            final Element currentNode = (Element) xformsControls.getCurrentSingleNode();
-                            final Element currentParent = currentNode.getParent();
-                            if (currentParent == parentElement) {
-                                // Found xforms:repeat affected by the change
-                                setRepeatIds.put(controlElement.attributeValue("id"), "");
-                                foundControlElement = controlElement;
-                            }
-                        }
-                    } else {
-                        // This xforms:repeat is inside a matching xforms:repeat
-                        resetRepeatIds.put(controlElement.attributeValue("id"), "");
-                    }
-                }
-                return true;
-            }
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                if (foundControlElement == controlElement)
-                    foundControlElement = null;
-                return true;
-            }
-
-            public void startRepeatIteration(int iteration) {
-            }
-
-            public void endRepeatIteration(int iteration) {
-            }
-        });
     }
 
     private static class ActionContext {

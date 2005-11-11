@@ -177,19 +177,6 @@ public class XFormsControls {
             }
 
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-//                if (controlElement.getName().equals("repeat")) {
-//                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.pop();
-//                    final List children = repeatControlInfo.getChildren();
-//                    if (children == null || children.size() == 0) {
-//                        // Update repeat index to 0 if there was no iteration
-//                        result.updateRepeatIndex(effectiveControlId, 0);
-//                        // Current index is 0
-//                        result.setRepeatIterations(effectiveControlId, 0);
-//                    } else {
-//                        // Number of iterations is number of children
-//                        result.setRepeatIterations(effectiveControlId, children.size());
-//                    }
-//                }
                 return true;
             }
 
@@ -1047,9 +1034,9 @@ public class XFormsControls {
         handleControlInfo(controlInfoVisitorListener, currentControlInfo.getChildren());
     }
 
-    private void handleControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, List chilren) {
-        if (chilren != null && chilren.size() > 0) {
-            for (Iterator i = chilren.iterator(); i.hasNext();) {
+    private void handleControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, List children) {
+        if (children != null && children.size() > 0) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
                 final ControlInfo controlInfo= (ControlInfo) i.next();
                 controlInfoVisitorListener.startVisitControl(controlInfo);
                 handleControlInfo(controlInfoVisitorListener, controlInfo.getChildren());
@@ -1396,7 +1383,7 @@ public class XFormsControls {
             final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
             final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
             final List newChildren = repeatControlInfo.getChildren();
-            if (newChildren != null && newChildren.size() > 0) {
+            if (newChildren != null && newChildren.size() > 0 && index > 0) {
                 Map result = new HashMap();
                 visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
                 return new ArrayList(result.keySet());
@@ -1441,6 +1428,44 @@ public class XFormsControls {
                     if (newChildren != null)
                         visitRepeatHierarchy(result, newChildren);
                 }
+            }
+        }
+
+        /**
+         * Visit all the ControlInfo elements by following the current repeat indexes and setting
+         * current bindings.
+         */
+        public void visitControlInfoFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, ControlInfoVisitorListener controlInfoVisitorListener) {
+            xformsControls.resetBindingContext();
+            visitControlInfoFollowRepeats(pipelineContext, xformsControls, this.children, controlInfoVisitorListener);
+        }
+
+        private void visitControlInfoFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, List children, ControlInfoVisitorListener controlInfoVisitorListener) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final ControlInfo currentControlInfo = (ControlInfo) i.next();
+
+                xformsControls.pushBinding(pipelineContext, currentControlInfo);
+                controlInfoVisitorListener.startVisitControl(currentControlInfo);
+                {
+                    if (currentControlInfo instanceof RepeatControlInfo) {
+                        final RepeatControlInfo currentRepeatControlInfo = (RepeatControlInfo) currentControlInfo;
+                        final String repeatId = currentRepeatControlInfo.getRepeatId();
+                        final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
+
+                        if (index > 0) {
+                            final List newChildren = currentControlInfo.getChildren();
+                            if (newChildren != null && newChildren.size() > 0)
+                                visitControlInfoFollowRepeats(pipelineContext, xformsControls, Collections.singletonList(newChildren.get(index - 1)), controlInfoVisitorListener);
+                        }
+
+                    } else {
+                        final List newChildren = currentControlInfo.getChildren();
+                        if (newChildren != null)
+                            visitControlInfoFollowRepeats(pipelineContext, xformsControls, newChildren, controlInfoVisitorListener);
+                    }
+                }
+                controlInfoVisitorListener.endVisitControl(currentControlInfo);
+                xformsControls.popBinding();
             }
         }
 

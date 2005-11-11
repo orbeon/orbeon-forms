@@ -196,7 +196,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
 
-            // TODO: Handle repeat controls
+            // TODO: Handle repeat controls, AKA "switch within repeat"
             final String caseId = actionElement.attributeValue("case");
 
             // Update xforms:switch info and dispatch events
@@ -846,13 +846,50 @@ public class XFormsActionInterpreter {
             }
 
             // "The indexes for inner nested repeat collections are re-initialized to startindex."
-            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
-            if (nestedRepeatIds != null) {
-                for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
-                    final String currentRepeatId = (String) i.next();
-                    currentControlsState.updateRepeatIndex(currentRepeatId, 1);// TODO: use startindex!
+            {
+                // First step: set all children indexes to 0
+                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
+                final Map nestedRepeatIdsMap = new HashMap();
+                if (nestedRepeatIds != null) {
+                    for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
+                        final String currentRepeatId = (String) i.next();
+                        nestedRepeatIdsMap.put(currentRepeatId, "");
+                        currentControlsState.updateRepeatIndex(currentRepeatId, 0);
+                    }
                 }
+
+                // Second step: update non-empty repeat indexes to the appropriate value
+                currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+
+                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                            // Found an xforms:repeat
+                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                            final String repeatId = repeatControlInfo.getOriginalId();
+
+                            if (nestedRepeatIdsMap.get(repeatId) != null) {
+                                // Found nested repeat id to update
+
+                                final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                                    int newIndex = repeatControlInfo.getStartIndex();
+
+                                    if (newIndex < 1)
+                                        newIndex = 1;
+                                    if (newIndex > repeatNodeSet.size())
+                                        newIndex = repeatNodeSet.size();
+
+                                    currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                                }
+                            }
+                        }
+                    }
+
+                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+                    }
+                });
             }
+
         }
 
         // TODO: "The implementation data structures for tracking computational dependencies are

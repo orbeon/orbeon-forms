@@ -30,23 +30,18 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Text</xhtml:th>
-                <xhtml:th>HTML View</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat nodeset="node" id="nodes">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="." incremental="true" style="width: 20em"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="." appearance="xxforms:html"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-            <xhtml:tr/>
-        </xhtml:table>
+        <xforms:repeat nodeset="node" id="nodes">
+            <xhtml:div>
+                <xhtml:p>
+                    <xforms:input ref="." incremental="true" style="width: 20em">
+                        <xforms:label>Text: </xforms:label>
+                    </xforms:input>
+                </xhtml:p>
+                <xhtml:p>
+                    HTML: <xforms:output ref="." appearance="xxforms:html"/>
+                </xhtml:p>
+            </xhtml:div>
+        </xforms:repeat>
         <xforms:trigger>
             <xforms:label>Add line</xforms:label>
             <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>

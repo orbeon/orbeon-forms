@@ -215,8 +215,15 @@ function xformsUpdateStyle(element) {
                     control.alertElement = element;
 
                 // Change alert status when necessary
-                if (xformsIsDefined(control.isValid))
-                    element.className = control.isValid ? "xforms-alert-inactive" : "xforms-alert-active";
+                if (xformsIsDefined(control.isValid)) {
+                    if (control.isValid) {
+                        xformsAddClass(element, "xforms-alert-inactive");
+                        xformsRemoveClass(element, "xforms-alert-active");
+                    } else {
+                        xformsAddClass(element, "xforms-alert-active");
+                        xformsRemoveClass(element, "xforms-alert-inactive");
+                    }
+                }
 
                 // Change message if necessary
                 if (control.alertMessage) {

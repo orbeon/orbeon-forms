@@ -611,7 +611,7 @@ function xformsInitializeControlsUnder(root) {
                 var textfield = control.childNodes[1];
                 control.previousValue = textfield.value;
                 // Intercept custom JavaScript code changing control value
-                if (false) { // TODO: Added as this creates an infinite loop in form002 test case
+                if (false) {
                 if (control.watch) {
                     // Firefox implements a watch() method
                     control.watch("value", function(property, oldvalue, newvalue) {
@@ -729,7 +729,7 @@ function xformsInitializeControlsUnder(root) {
 
             // Alert label next to the control
             if (isXFormsAlert) {
-                var isActive = xformsArrayContains(className.split(" "), "xforms-alert-active");
+                var isActive = xformsArrayContains(control.className.split(" "), "xforms-alert-active");
 
                 // Store reference in control element to this alert element
                 var alertFor = document.getElementById(control.htmlFor);

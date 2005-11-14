@@ -304,7 +304,7 @@ public class Dom4jUtils {
          */
         final LocationDocumentSource lds = new LocationDocumentSource(d);
         final XMLReader rdr = lds.getXMLReader();
-        rdr.setErrorHandler(XMLUtils.errorHandler);
+        rdr.setErrorHandler(XMLUtils.ERROR_HANDLER);
         return lds;
     }
 

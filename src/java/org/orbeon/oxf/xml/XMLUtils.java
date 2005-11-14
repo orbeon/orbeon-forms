@@ -18,6 +18,7 @@ import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -50,6 +51,7 @@ import java.util.*;
 
 public class XMLUtils {
 
+    private static Logger logger = Logger.getLogger(XMLUtils.class);
 
     public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
@@ -57,33 +59,13 @@ public class XMLUtils {
 
     private static DocumentBuilderFactory documentBuilderFactory;
     private static Map documentBuilders = null;
-    
+
     private static SAXParserFactory nonValidatingXIncludeSAXParserFactory;
     private static SAXParserFactory validatingXIncludeSAXParserFactory;
     private static SAXParserFactory nonValidatingSAXParserFactory;
     private static SAXParserFactory validatingSAXParserFactory;
 
     private static FileItemFactory fileItemFactory;
-    
-    public static final org.xml.sax.ErrorHandler errorHandler = new ErrorHandler()
-    {
-        public void error( final org.xml.sax.SAXParseException e )
-        {
-            System.err.print( "Error: " );
-            e.printStackTrace();
-        }
-        public void fatalError( final org.xml.sax.SAXParseException e ) throws org.xml.sax.SAXParseException
-        {
-            System.err.print( "Fatal Error: " );
-            e.printStackTrace();
-            throw e;
-        }
-        public void warning( final org.xml.sax.SAXParseException e )
-        {
-            System.err.print( "Warning: " );
-            e.printStackTrace();
-        }
-    };
 
     static {
         try {
@@ -108,7 +90,7 @@ public class XMLUtils {
 
     /**
      * Create a new DocumentBuilder.
-     *
+     * <p/>
      * WARNING: Check how this is used in this file first before calling!
      */
     private static DocumentBuilder newDocumentBuilder() {
@@ -121,10 +103,10 @@ public class XMLUtils {
         }
     }
 
-    
+
     /**
      * Create a new SAX parser factory.
-     *
+     * <p/>
      * WARNING: Use this only in special cases. In general, use newSAXParser().
      */
     public static SAXParserFactory createSAXParserFactory(boolean validating, boolean handleXInclude) {
@@ -182,19 +164,17 @@ public class XMLUtils {
     }
 
     public static class ErrorHandler implements org.xml.sax.ErrorHandler {
-        public void error(SAXParseException exception)
-                throws SAXException {
-            throw new ValidationException("Error: " + exception.getMessage(), new LocationData(exception));
+        public void error(SAXParseException exception) throws SAXException {
+            // NOTE: We used to throw here, but we probably shouldn't.
+            logger.info("Error: " + exception);
         }
 
-        public void fatalError(SAXParseException exception)
-                throws SAXException {
-            throw new ValidationException("Fatal Error: " + exception.getMessage(), new LocationData(exception));
+        public void fatalError(SAXParseException exception) throws SAXException {
+            throw new ValidationException("Fatal error: " + exception.getMessage(), new LocationData(exception));
         }
 
-        public void warning(SAXParseException exception)
-                throws SAXException {
-            throw new ValidationException("Warning: " + exception.getMessage(), new LocationData(exception));
+        public void warning(SAXParseException exception) throws SAXException {
+            logger.info("Warning: " + exception);
         }
     }
 
@@ -275,7 +255,7 @@ public class XMLUtils {
         DocumentBuilder documentBuilder = (documentBuilders == null) ? null : (DocumentBuilder) documentBuilders.get(thread);
         // Try a first test outside the synchronized block
         if (documentBuilder == null) {
-            synchronized(documentBuilderFactory) {
+            synchronized (documentBuilderFactory) {
                 // Redo the test within the synchronized block
                 documentBuilder = (documentBuilders == null) ? null : (DocumentBuilder) documentBuilders.get(thread);
                 if (documentBuilder == null) {
@@ -329,14 +309,14 @@ public class XMLUtils {
 
     // Necessary for Saxon
     public static byte[] getDigest(NodeList nodeList) {
-        if(nodeList.getLength() == 0)
+        if (nodeList.getLength() == 0)
             throw new OXFException("No node supplied");
-        else if(nodeList.getLength() == 1)
-            return getDigest((Node)nodeList.item(0));
+        else if (nodeList.getLength() == 1)
+            return getDigest((Node) nodeList.item(0));
         else {
             Document doc = XMLUtils.createDocument();
             org.w3c.dom.Element root = doc.createElement("root");
-            for(int i = 0; i<nodeList.getLength(); i++) {
+            for (int i = 0; i < nodeList.getLength(); i++) {
                 Node n = nodeList.item(i);
                 root.appendChild(n.cloneNode(true));
             }
@@ -344,7 +324,6 @@ public class XMLUtils {
             return getDigest(doc);
         }
     }
-
 
 
     /**
@@ -369,7 +348,7 @@ public class XMLUtils {
      * This digester is based on some existing public document (not sure which). There are some
      * changes though. It is not clear anymore why we used that document as a base, as this is
      * purely internal.
-     *
+     * <p/>
      * The bottom line is that the digest should change whenever the infoset of the source XML
      * document changes.
      */
@@ -383,13 +362,13 @@ public class XMLUtils {
         /**
          * 4/6/2005 d : Previously we were using String.getBytes( "UnicodeBigUnmarked" ).  ( Believe
          * the code was copied from RFC 2803 ). This first tries to get a java.nio.Charset with
-         * the name if this fails it uses a sun.io.CharToByteConverter.  
-         * Now in the case of "UnicodeBigUnmarked" there is no such Charset so a 
+         * the name if this fails it uses a sun.io.CharToByteConverter.
+         * Now in the case of "UnicodeBigUnmarked" there is no such Charset so a
          * CharToByteConverter, utf-16be, is used.  Unfortunately this negative lookup is expensive.
-         * ( Costing us a full second in the 50thread/512MB test. )  
-         * The solution, of course, is just to use get the appropriate Charset and hold on to it. 
+         * ( Costing us a full second in the 50thread/512MB test. )
+         * The solution, of course, is just to use get the appropriate Charset and hold on to it.
          */
-        private static final Charset utf16BECharset = Charset.forName( "UTF-16BE" );
+        private static final Charset utf16BECharset = Charset.forName("UTF-16BE");
         /**
          * Encoder has state and therefore cannot be shared across threads.
          */
@@ -406,32 +385,32 @@ public class XMLUtils {
                 throw new OXFException(e);
             }
             charEncoder = utf16BECharset.newEncoder();
-            charBuff = java.nio.CharBuffer.allocate( 64 );
-            byteBuff = java.nio.ByteBuffer.allocate( 128 );
+            charBuff = java.nio.CharBuffer.allocate(64);
+            byteBuff = java.nio.ByteBuffer.allocate(128);
         }
 
-        private void ensureCharBuffRemaining( final int size ) {
-            if ( charBuff.remaining() < size ) {
-                final int cpcty = ( charBuff.capacity() + size ) * 2;
-                final java.nio.CharBuffer newChBuf = java.nio.CharBuffer.allocate( cpcty );
-                newChBuf.put( charBuff );
+        private void ensureCharBuffRemaining(final int size) {
+            if (charBuff.remaining() < size) {
+                final int cpcty = (charBuff.capacity() + size) * 2;
+                final java.nio.CharBuffer newChBuf = java.nio.CharBuffer.allocate(cpcty);
+                newChBuf.put(charBuff);
                 charBuff = newChBuf;
             }
         }
-        
+
         private void updateWithCharBuf() {
-            final int reqSize = ( int )charEncoder.maxBytesPerChar() * charBuff.position();
-            if ( byteBuff.capacity() < reqSize ) {
-                byteBuff = java.nio.ByteBuffer.allocate( 2 * reqSize );
+            final int reqSize = (int) charEncoder.maxBytesPerChar() * charBuff.position();
+            if (byteBuff.capacity() < reqSize) {
+                byteBuff = java.nio.ByteBuffer.allocate(2 * reqSize);
             }
-            
+
             // Make ready for read
             charBuff.flip();
 
-            final CoderResult cr = charEncoder.encode( charBuff, byteBuff, true );
+            final CoderResult cr = charEncoder.encode(charBuff, byteBuff, true);
             try {
 
-                if ( cr.isError() ) cr.throwException();
+                if (cr.isError()) cr.throwException();
 
                 // Make ready for read
                 byteBuff.flip();
@@ -439,14 +418,14 @@ public class XMLUtils {
                 final byte[] byts = byteBuff.array();
                 final int len = byteBuff.remaining();
                 final int strt = byteBuff.arrayOffset();
-                digest.update( byts, strt, len );
+                digest.update(byts, strt, len);
 
-            } catch ( final CharacterCodingException e ) {
-                throw new OXFException( e );
-            } catch ( java.nio.BufferOverflowException e ) {
-                throw new OXFException( e );
-            } catch ( java.nio.BufferUnderflowException e ) {
-                throw new OXFException( e );
+            } catch (final CharacterCodingException e) {
+                throw new OXFException(e);
+            } catch (java.nio.BufferOverflowException e) {
+                throw new OXFException(e);
+            } catch (java.nio.BufferUnderflowException e) {
+                throw new OXFException(e);
             } finally {
                 // Make ready for write
                 charBuff.clear();
@@ -454,26 +433,28 @@ public class XMLUtils {
             }
         }
 
-        private void updateWith( final String s ) {
-            addToCharBuff( s );
+        private void updateWith(final String s) {
+            addToCharBuff(s);
             updateWithCharBuf();
         }
-        private void updateWith( final char[] chArr, final int ofst, final int len ) {
-            ensureCharBuffRemaining( len );
-            charBuff.put( chArr, ofst, len );
+
+        private void updateWith(final char[] chArr, final int ofst, final int len) {
+            ensureCharBuffRemaining(len);
+            charBuff.put(chArr, ofst, len);
             updateWithCharBuf();
         }
-        
-        private void addToCharBuff( final char c ) {
-            ensureCharBuffRemaining( 1 );
-            charBuff.put( c );
+
+        private void addToCharBuff(final char c) {
+            ensureCharBuffRemaining(1);
+            charBuff.put(c);
         }
-        private void addToCharBuff( final String s ) {
+
+        private void addToCharBuff(final String s) {
             final int size = s.length();
-            ensureCharBuffRemaining( size );
-            charBuff.put( s );
+            ensureCharBuffRemaining(size);
+            charBuff.put(s);
         }
-        
+
         public byte[] getResult() {
             return digest.digest();
         }
@@ -492,15 +473,15 @@ public class XMLUtils {
 
         public void startPrefixMapping(String prefix, String uri)
                 throws SAXException {
-            
+
             digest.update((byte) ((NAMESPACE_CODE >> 24) & 0xff));
             digest.update((byte) ((NAMESPACE_CODE >> 16) & 0xff));
             digest.update((byte) ((NAMESPACE_CODE >> 8) & 0xff));
             digest.update((byte) (NAMESPACE_CODE & 0xff));
-            updateWith( prefix );
+            updateWith(prefix);
             digest.update((byte) 0);
             digest.update((byte) 0);
-            updateWith( uri );
+            updateWith(uri);
             digest.update((byte) 0);
             digest.update((byte) 0);
         }
@@ -508,7 +489,7 @@ public class XMLUtils {
         public void endPrefixMapping(String prefix)
                 throws SAXException {
         }
-        
+
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
                 throws SAXException {
@@ -516,13 +497,13 @@ public class XMLUtils {
             digest.update((byte) ((ELEMENT_CODE >> 16) & 0xff));
             digest.update((byte) ((ELEMENT_CODE >> 8) & 0xff));
             digest.update((byte) (ELEMENT_CODE & 0xff));
-            
-            addToCharBuff( '{' );
-            addToCharBuff( namespaceURI );
-            addToCharBuff( '}' );
-            addToCharBuff( localName );
+
+            addToCharBuff('{');
+            addToCharBuff(namespaceURI);
+            addToCharBuff('}');
+            addToCharBuff(localName);
             updateWithCharBuf();
-            
+
             digest.update((byte) 0);
             digest.update((byte) 0);
             int attCount = atts.getLength();
@@ -535,21 +516,21 @@ public class XMLUtils {
                 digest.update((byte) ((ATTRIBUTE_CODE >> 16) & 0xff));
                 digest.update((byte) ((ATTRIBUTE_CODE >> 8) & 0xff));
                 digest.update((byte) (ATTRIBUTE_CODE & 0xff));
-                
-                final String attURI = atts.getURI( i );
-                final String attNam = atts.getLocalName( i );
 
-                addToCharBuff( '{' );
-                addToCharBuff( attURI );
-                addToCharBuff( '}' );
-                addToCharBuff( attNam );
+                final String attURI = atts.getURI(i);
+                final String attNam = atts.getLocalName(i);
+
+                addToCharBuff('{');
+                addToCharBuff(attURI);
+                addToCharBuff('}');
+                addToCharBuff(attNam);
                 updateWithCharBuf();
-                
+
                 digest.update((byte) 0);
                 digest.update((byte) 0);
-                
-                final String val = atts.getValue( i );
-                updateWith( val );
+
+                final String val = atts.getValue(i);
+                updateWith(val);
             }
         }
 
@@ -563,9 +544,9 @@ public class XMLUtils {
             digest.update((byte) ((TEXT_CODE >> 16) & 0xff));
             digest.update((byte) ((TEXT_CODE >> 8) & 0xff));
             digest.update((byte) (TEXT_CODE & 0xff));
-            
-            updateWith( ch, start, length );
-            
+
+            updateWith(ch, start, length);
+
             digest.update((byte) 0);
             digest.update((byte) 0);
         }
@@ -580,14 +561,14 @@ public class XMLUtils {
             digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 16) & 0xff));
             digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 8) & 0xff));
             digest.update((byte) (PROCESSING_INSTRUCTION_CODE & 0xff));
-            
-            updateWith( target );
-            
+
+            updateWith(target);
+
             digest.update((byte) 0);
             digest.update((byte) 0);
-            
-            updateWith( data );
-            
+
+            updateWith(data);
+
             digest.update((byte) 0);
             digest.update((byte) 0);
         }
@@ -971,27 +952,30 @@ public class XMLUtils {
         str = StringUtils.replace(str, "'", "&#39;");
         return str;
     }
-    static public String toString( final Locator loc ) {
-        return loc.getSystemId()+ ", line " + loc.getLineNumber() + ", column " 
-               + loc.getColumnNumber();
+
+    static public String toString(final Locator loc) {
+        return loc.getSystemId() + ", line " + loc.getLineNumber() + ", column "
+                + loc.getColumnNumber();
     }
+
     /**
      * <!-- getAttribsFromDefaultNamespace -->
+     *
      * @param atts src attribs
      * @return new AttributesImpl containing  all attribs that were in src attribs and that were
      *         in the default name space.
      */
-    public static AttributesImpl getAttribsFromDefaultNamespace( final Attributes atts ) {
+    public static AttributesImpl getAttribsFromDefaultNamespace(final Attributes atts) {
         final AttributesImpl ret = new AttributesImpl();
         final int size = atts.getLength();
-        for ( int i =0; i < size; i++ ) {
-            final String ns = atts.getURI( i );
-            if ( !"".equals( ns ) ) continue;
-            final String lnam = atts.getLocalName( i );
-            final String qnam = atts.getQName( i );
-            final String typ = atts.getType( i );
-            final String val = atts.getValue( i );
-            ret.addAttribute( ns, lnam, qnam, typ, val );
+        for (int i = 0; i < size; i++) {
+            final String ns = atts.getURI(i);
+            if (!"".equals(ns)) continue;
+            final String lnam = atts.getLocalName(i);
+            final String qnam = atts.getQName(i);
+            final String typ = atts.getType(i);
+            final String val = atts.getValue(i);
+            ret.addAttribute(ns, lnam, qnam, typ, val);
         }
         return ret;
     }
@@ -1011,5 +995,4 @@ public class XMLUtils {
         newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, value);
         return newAttributes;
     }
-
 }

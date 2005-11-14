@@ -47,6 +47,8 @@ import java.util.Map;
 
 /**
  * Represents an XForms model submission instance.
+ *
+ * TODO: This badly needs to be modularized instead of being a soup of "ifs"!
  */
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHandlerContainer {
 
@@ -94,6 +96,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             action = submissionElement.attributeValue("action");
             method = submissionElement.attributeValue("method");
+            method = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(submissionElement, "method"));
+
             version = submissionElement.attributeValue("version");
 
             if (submissionElement.attributeValue("indent") != null) {
@@ -125,6 +129,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         }
     }
 
+    private boolean isGet() {
+        return method.equals("get") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "get"));
+    }
+
+    private boolean isPost() {
+        return method.equals("post") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
+    }
+
+    private boolean isPut() {
+        return method.equals("put") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "put"));
+    }
+
+    private boolean isMethodOptimizedLocalSubmission() {
+        return method.startsWith(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, ""))
+                && (isGet() || isPost() || isPut());
+    }
+
     public String getId() {
         return id;
     }
@@ -148,13 +169,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            boolean isDeferredSubmissionSecondPass = false;
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
 
                 final boolean isDeferredSubmission = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
-                final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+                isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
 
                 // Select node based on ref or bind
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -183,14 +205,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Check that there are no validation errors
                     final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                     if (!instanceSatisfiesValidRequired) {
-                        currentInstance.readOut();// FIXME: DEBUG
+//                        currentInstance.readOut();// FIXME: DEBUG
                         throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                     }
                 } else {
                     initialDocumentToSubmit = null;
                 }
 
-                // Deferred submission
+                // Deferred submission: end of the first pass
                 if (isDeferredSubmissionFirstPass) {
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setClientActiveSubmission(this);
@@ -265,7 +287,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Check that there are no validation errors
                     final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
                     if (!instanceSatisfiesValidRequired) {
-                        currentInstance.readOut();// FIXME: DEBUG
+//                        currentInstance.readOut();// FIXME: DEBUG
                         throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                     }
                 } else {
@@ -278,7 +300,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final byte[] serializedInstance;
                 final String serializedInstanceString;
                 {
-                    if (method.equals("post") || method.equals("put")) {
+                    if (isPost() || isPut()) {
 
                         try {
                             final Transformer identity = TransformerUtils.getIdentityTransformer();
@@ -295,7 +317,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
                         serializedInstanceString = null;
 
-                    } else if (method.equals("get")) {
+                    } else if (isGet()) {
 
                         // Perform "application/x-www-form-urlencoded" serialization
                         serializedInstanceString = createWwwFormUrlEncoded(documentToSubmit);
@@ -327,7 +349,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 boolean forwarded = false;
 
                 try {
-                    if (action.startsWith("/")) {
+                    if ((XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission()) && action.startsWith("/")) {
 
                         // TODO
                         //  && !externalContext.getRequest().getContainerType().equals("portlet")
@@ -345,12 +367,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                         try {
-                            if (method.equals("post") || method.equals("put") || method.equals("get")) {
+                            if (isPost() || isPut() || isGet()) {
 
                                 // Create requestAdapter depending on method
                                 final ForwardExternalContextRequestWrapper requestAdapter;
                                 {
-                                    if (method.equals("post") || method.equals("put"))
+                                    if (isPost() || isPut())
                                         requestAdapter= new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
                                             action, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
                                     else {
@@ -372,7 +394,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     requestDispatcher.include(requestAdapter, responseAdapter);
 
                                     // Get response information that needs to be forwarded
-                                    resultCode = responseAdapter.getResponseCode();
+                                    resultCode = responseAdapter.getResponseCode();// TODO: this is bad, because the code is actually not propagated from the other side. We should probably not use "optimized" submission here. 
     //                                resultMediaType = NetUtils.getContentTypeMediaType(responseAdapter.getContentType());
     //                                resultHeaders = responseAdapter.getHeaders();
                                     resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
@@ -404,7 +426,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             if (action.startsWith("/")) {
                                 // Case of "local" portlet submission
                                 final String requestURL = externalContext.getRequest().getRequestURL();
-                                submissionURL = URLFactory.createURL(requestURL, externalContext.getRequest().getContextPath() + actionString);
+                                submissionURL = URLFactory.createURL(requestURL, externalContext.getRequest().getContextPath() + actionString);//TODO: should be relative to actual page's request URL, and use xml:base as well!
                             } else if (NetUtils.urlHasProtocol(actionString)) {
                                 // Case of absolute URL
                                 submissionURL = URLFactory.createURL(actionString);
@@ -430,9 +452,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             urlConnection = (HttpURLConnection) submissionURL.openConnection();
 
-                            if (method.equals("post") || method.equals("put") || method.equals("get")) {
+                            if (isPost() || isPut() || isGet()) {
                                 urlConnection.setDoInput(true);
-                                urlConnection.setDoOutput(!method.equals("get")); // Only if POST / PUT
+                                urlConnection.setDoOutput(!isGet()); // Only if POST / PUT
 
                                 urlConnection.setRequestMethod(method.toUpperCase());
                                 urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
@@ -440,7 +462,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 urlConnection.connect();
 
                                 // Write request body
-                                if (!method.equals("get")) {
+                                if (!isGet()) {
                                     os = urlConnection.getOutputStream();
                                     os.write(serializedInstance);
                                 }
@@ -680,9 +702,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if (urlConnection != null)
                         urlConnection.disconnect();
                 }
-            } catch (Exception e) {
-                // Any exception will cause an error event to be dispatched
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
+            } catch (Throwable e) {
+                if (isDeferredSubmissionSecondPass && XFormsUtils.isOptimizePostAllSubmission()) {
+                    // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
+                    throw new OXFException(e);
+                } else {
+                    // Any exception will cause an error event to be dispatched
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
+                }
             }
 
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {

@@ -102,6 +102,8 @@ public class XFormsConstants {
     public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
     public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
     public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
+    public static final String XFORMS_OPTIMIZE_POST_ALL_PROPERTY = "oxf.xforms.optimize-post-all";
+    public static final String XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "oxf.xforms.optimize-local-submission";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";

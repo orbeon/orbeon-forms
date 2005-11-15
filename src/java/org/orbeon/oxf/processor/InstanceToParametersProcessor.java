@@ -56,7 +56,16 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
     private static final String INPUT_INSTANCE = "instance";
     private static final String INPUT_FILTER = "filter";
 
+    private boolean removeXXFormsAttributes;
+
     public InstanceToParametersProcessor() {
+        this(true);
+    }
+
+    protected InstanceToParametersProcessor(boolean removeXXFormsAttributes) {
+
+        this.removeXXFormsAttributes = removeXXFormsAttributes;
+
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_FILTER));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -107,7 +116,9 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     contentHandler.startDocument();
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
-                        XFormsUtils.removeInstanceAttributes(instance);
+                        // If all the nodes of the instance map to parameters, we don't output the instance parameter
+                        if (removeXXFormsAttributes)
+                            XFormsUtils.removeInstanceAttributes(instance);
                         outputParameter("$instance", XFormsUtils.encodeXMLAsDOM(pipelineContext, instance), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);

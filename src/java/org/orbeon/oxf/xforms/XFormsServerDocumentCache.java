@@ -22,6 +22,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
+import org.orbeon.oxf.xforms.processor.NewXFormsServer;
 
 /**
  * This cache stores mappings XFormsState -> XFormsContainingDocument into a global cache.
@@ -43,7 +44,7 @@ public class XFormsServerDocumentCache {
         return instance;
     }
 
-    public synchronized void add(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
+    public synchronized void add(PipelineContext pipelineContext, NewXFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance();
@@ -89,7 +90,7 @@ public class XFormsServerDocumentCache {
      * @param xformsState           state used to search cache
      * @return                      XFormsContainingDocument
      */
-    public synchronized XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
+    public synchronized XFormsContainingDocument find(PipelineContext pipelineContext, NewXFormsServer.XFormsState xformsState) {
 
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance();
@@ -122,7 +123,7 @@ public class XFormsServerDocumentCache {
         return containingDocument;
     }
 
-    private static ObjectPool createXFormsContainingDocumentPool(XFormsServer.XFormsState xformsState) {
+    private static ObjectPool createXFormsContainingDocumentPool(NewXFormsServer.XFormsState xformsState) {
         try {
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new CachedPoolableObjetFactory(pool, xformsState));
@@ -135,9 +136,9 @@ public class XFormsServerDocumentCache {
 
     private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
         private final ObjectPool pool;
-        private XFormsServer.XFormsState xformsState;
+        private NewXFormsServer.XFormsState xformsState;
 
-        public CachedPoolableObjetFactory(ObjectPool pool, XFormsServer.XFormsState xformsState) {
+        public CachedPoolableObjetFactory(ObjectPool pool, NewXFormsServer.XFormsState xformsState) {
             this.pool = pool;
             this.xformsState = xformsState;
         }

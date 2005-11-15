@@ -997,13 +997,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             final boolean doServerSideRedirect = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_FORWARD);
             final boolean doRedirectExitPortal = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_REDIRECT_PORTAL);
 
+            // TODO: we should probably optimize all the redirect handling below with a dedicated processor
             {
                 // Do redirect passing parameters from internalXUpdatedInstance without modifying URL
                 final ASTOutput parametersOutput;
                 if (isTransformedInstance) {
                     parametersOutput = new ASTOutput(null, "parameters");
                     // Pass parameters only if needed
-                    when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
+                    final QName instanceToParametersProcessor = (otherXForms != null)
+                            ? XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME
+                            : XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR2_QNAME;
+                    when.addStatement(new ASTProcessorCall(instanceToParametersProcessor) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));
@@ -1032,6 +1036,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
                 // Serialize the instance into the request if we are doing a server-side redirect
+                // TODO: do we still need this?
                 if (doServerSideRedirect) {
                     when.addStatement(new ASTProcessorCall(XMLConstants.SCOPE_SERIALIZER_PROCESSOR_QNAME) {{
                         Document config = null;

@@ -89,6 +89,10 @@
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
     </processor>
 
+    <processor name="oxf:instance-to-parameters-2">
+        <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor2"/>
+    </processor>
+
     <processor name="oxf:debug" uri="oxf/processor/debug">
         <class name="org.orbeon.oxf.processor.DebugProcessor"/>
     </processor>
@@ -441,6 +445,14 @@
 
     <processor name="oxf:xforms-server">
         <class name="org.orbeon.oxf.xforms.XFormsServer"/>
+    </processor>
+
+    <processor name="oxf:new-xforms-server">
+        <class name="org.orbeon.oxf.xforms.processor.NewXFormsServer"/>
+    </processor>
+
+    <processor name="oxf:xforms-to-xhtml">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
 
     <processor name="oxf:xforms-document-annotator">

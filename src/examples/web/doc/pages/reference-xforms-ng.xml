@@ -193,7 +193,7 @@
                     </p>
                 </section>
                 <section>
-                    <title>Deleting Rows</title>
+                    <title>Deleting Rows with the <code>xforms:delete</code> action</title>
                     <p>
                         <code>xforms:repeat</code> may be used purely for display purposes, but it
                         can also be used for interactively editing repeated data. This includes
@@ -217,7 +217,7 @@
                     </xml-source>
                 </section>
                 <section>
-                    <title>Inserting Rows</title>
+                    <title>Inserting Rows with the <code>xforms:insert</code> action</title>
                     <p>
                         <code>xforms:insert</code> is provided with a <code>nodeset</code> attribute
                         pointing to the homogenous collection into which the insertion must take
@@ -330,7 +330,7 @@
                     </note>
                 </section>
                 <section>
-                    <title>Setting the Current Index</title>
+                    <title>Setting the Current Index with the <code>xforms:setindex</code> action</title>
                     <p>
                         TODO
                     </p>

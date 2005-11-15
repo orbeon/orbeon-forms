@@ -40,17 +40,20 @@
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="client"/>
     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
-    
+
+    <!-- Other XForms options -->
+    <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
 
     <!--                               Profiling support.                                        -->
     <!-- 7/27/2005 d : Currently there are org.orbeon.oxf.processor.NetworkTrace and             -->
     <!--               org.orbeon.oxf.processor.StdOutTrace                                      -->
-    <!-- <property as="xs:NCName"    name="processor.trace"    value="org.orbeon.oxf.processor.NetworkTrace" /> -->
+     <!--<property as="xs:NCName"    name="processor.trace"    value="org.orbeon.oxf.processor.StdOutTrace" />-->
     
     <!-- Host for NetworkTrace.  Default is localhost. -->
-    <!-- <property as="xs:NMTOKEN"    name="processor.trace.host"    value="localhost"/>         -->
+     <!--<property as="xs:NMTOKEN"    name="processor.trace.host"    value="localhost"/>-->
     
     <!-- Port for NetworkTrace.  Default is 9191 -->
-    <!-- <property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9191"/>   -->
+     <!--<property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9191"/>-->
 
 </properties>

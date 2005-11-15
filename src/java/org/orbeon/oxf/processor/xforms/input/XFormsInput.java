@@ -79,7 +79,7 @@ public class XFormsInput extends ProcessorImpl {
                     throw new OXFException(e);
                 }
 
-                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
+                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
                     model.setInstanceDocument(pipelineContext, 0, contextInstance.getDocument());

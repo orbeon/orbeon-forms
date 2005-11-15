@@ -93,11 +93,15 @@
                         <p:input name="data" href="#annotated-view"/>
                         <p:output name="data" id="static-state"/>
                     </p:processor>
-                    <!--<p:processor name="oxf:sax-debugger">-->
-                        <!--<p:input name="data" href="#static-state1"/>-->
-                        <!--<p:output name="data" id="static-state" debug="xxxcontrols"/>-->
+
+                    <!-- New way -->
+                    <!--<p:processor name="oxf:xforms-to-xhtml">-->
+                        <!--<p:input name="annotated-document" href="#annotated-view"/>-->
+                        <!--<p:input name="static-state" href="#static-state"/>-->
+                        <!--<p:output name="document" id="xformed-data"/>-->
                     <!--</p:processor>-->
-                    <!-- Get initial instances -->
+
+                    <!-- Old way -->
                     <p:processor name="oxf:xforms-server">
                         <p:input name="static-state" href="#static-state"/>
                         <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->

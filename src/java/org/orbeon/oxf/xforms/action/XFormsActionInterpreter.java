@@ -738,6 +738,7 @@ public class XFormsActionInterpreter {
                     throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
             }
             final boolean doReplace = "replace".equals(showAttribute);
+            final String target = actionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
 
             if (ref != null && resource != null) {
                 // "If both are present, the action has no effect."
@@ -747,7 +748,7 @@ public class XFormsActionInterpreter {
                 final Node currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
-                    resolveLoadValue(pipelineContext, actionElement, doReplace, value);
+                    resolveLoadValue(pipelineContext, actionElement, doReplace, value, target);
                 } else {
                     // Should we do this here?
                     containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
@@ -755,7 +756,7 @@ public class XFormsActionInterpreter {
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {
                 // Use linking attribute
-                resolveLoadValue(pipelineContext, actionElement, doReplace, resource);
+                resolveLoadValue(pipelineContext, actionElement, doReplace, resource, target);
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else {
                 // "Either the single node binding attributes, pointing to a URI in the instance
@@ -767,7 +768,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void resolveLoadValue(PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value) {
+    private void resolveLoadValue(PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value, String target) {
 
         final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
 
@@ -803,7 +804,7 @@ public class XFormsActionInterpreter {
             }
         }
 
-        containingDocument.addClientLoad(externalURL, doReplace, isPortletLoad);
+        containingDocument.addClientLoad(externalURL, target, doReplace, isPortletLoad);
     }
 
     public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {

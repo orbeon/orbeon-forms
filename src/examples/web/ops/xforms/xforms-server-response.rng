@@ -177,6 +177,9 @@
                 <zeroOrMore>
                     <element name="xxforms:load">
                         <attribute name="resource"/>
+                        <optional>
+                            <attribute name="target"/>
+                        </optional>
                         <attribute name="show">
                             <choice>
                                 <value>replace</value>

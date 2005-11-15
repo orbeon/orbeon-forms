@@ -38,7 +38,7 @@
             </p>
             <warning>
                 <p>
-                    This section is a work in progress.
+                    This page is a work in progress.
                 </p>
             </warning>
         </section>
@@ -89,6 +89,304 @@
                 </p>
                 <p>
 
+                </p>
+            </section>
+            <a name="repeat"/>
+            <section>
+                <title>Repeating with <code>xforms:repeat</code></title>
+                <section>
+                    <title>Basics</title>
+                    <p>
+                        TODO: basic idea, homogeneous collection (what's allowed and not), how to
+                        handle last hidden element (plus question of validating that element), ways
+                        of updating such a collection (insert, delete, submit replace="instance").
+                    </p>
+                    <p>
+                        A very common requirement of user interfaces consists in repeating visual, such
+                        as rows in a table, entries in a list, etc. Those repeated sections usually have
+                        an homogeneous aspect: they all have the same or a very similar structure. For
+                        example, multiple table rows will differ only in the particular content they
+                        display in their cells. An example of this is an invoice made of lines with each
+                        a description, unit price, and quantity.
+                    </p>
+                    <p>
+                        XForms provides a very powerful mechanism to implement such repeated structures:
+                        the <code>xforms:repeat</code> element. You use <code>xforms:repeat</code>
+                        around XHTML elements or XForms controls. For example, to repeat a table row,
+                        you write:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:repeat>
+                            <xhtml:tr>
+                                ...
+                            </xhtml:tr>
+                        </xforms:repeat>
+                    </xml-source>
+                    <p>
+                        This is not enough to be functional code: you need to indicate to the
+                        <code>xforms:repeat</code> element how many repetitions must be performed. This
+                        is done not by supplying a simple count value, but by binding the the element to
+                        a node-set with the <code>node-set</code> attribute. Consider the following
+                        XForms instance:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="employees-instance">
+                            <employees>
+                                <employee>
+                                    <first-name>Alice</first-name>
+                                </employee>
+                                <employee>
+                                    <first-name>Bob</first-name>
+                                </employee>
+                                <employee>
+                                    <first-name>Marie</first-name>
+                                </employee>
+                            </employees>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        Assuming you want to produce one table row per employee, add the following
+                        <code>nodeset</code> attribute:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:repeat nodeset="instance('employees-instance')/employee">
+                            <xhtml:tr>
+                                ...
+                            </xhtml:tr>
+                        </xforms:repeat>
+                    </xml-source>
+                    <p>
+                        This produces automatically three <code>xhtml:tr</code> rows. Note that we
+                        explicitly use the XForms <code>instance()</code> function, but you may not have
+                        to do so if that instance is already in scope. Then you display in each row the
+                        content of the <code>first-name</code> element for each employee:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:repeat nodeset="instance('employees-instance')/employee">
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:output ref="first-name"/>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xforms:repeat>
+                    </xml-source>
+                    <p>
+                        This works because for each iteration, the <i>context node</i> for the
+                        <code>ref</code> attribute changes: during the first iteration, the context node
+                        is the first <code>employee</code> element of the XForms instance; during the
+                        second iteration, the second <code>employee</code> element, and so on.
+                    </p>
+                    <note>
+                        The <code>nodeset</code> attribute of <code>xforms:repeat</code> must point
+                        to a so-called <i>homogeneous collection</i>. Such a collection must consist
+                        of contiguous XML elements with same name and same namespace. XForms does
+                        not predict what happens if the node-set is not homogenous.
+                    </note>
+                    <p>
+                        TODO: screenshots.
+                    </p>
+                </section>
+                <section>
+                    <title>Repeat Index</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+                <section>
+                    <title>Deleting Rows</title>
+                    <p>
+                        <code>xforms:repeat</code> may be used purely for display purposes, but it
+                        can also be used for interactively editing repeated data. This includes
+                        allowing the user to delete and insert rows. Two XForms actions are used
+                        for this purpose: <code>xforms:delete</code> and <code>xforms:insert</code>.
+                    </p>
+                    <p>
+                        <code>xforms:delete</code> is provided with a <code>nodeset</code> attribute
+                        pointing to the homogenous collection into which the insertion must take
+                        place. It also has an <code>at</code> attribute, which contains an XPath
+                        expression returning the index of the element to delete. The following
+                        deletes the last element of the collection:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <comment> This deletes the last element of the collection </comment>
+                        <xforms:delete nodeset="employees" at="last()"/>
+                        <comment> This deletes the first element of the collection </comment>
+                        <xforms:delete nodeset="employees" at="1"/>
+                        <comment> This deletes the currently selected element of the collection (assuming the repeat id 'employee-repeat') </comment>
+                        <xforms:delete nodeset="employees" at="index('employee-repeat')"/>
+                    </xml-source>
+                </section>
+                <section>
+                    <title>Inserting Rows</title>
+                    <p>
+                        <code>xforms:insert</code> is provided with a <code>nodeset</code> attribute
+                        pointing to the homogenous collection into which the insertion must take
+                        place. <code>xforms:insert</code> then considers the <i>last</i> element of
+                        that collection (and all its content if any) as a <i>template</i> for the
+                        new element to insert: it duplicates it and inserts it into the homogenous
+                        collection at a position you specify. The last element of an homogeneous
+                        collection therefore always acts as a <i>template</i> for insertions:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <comment> This inserts a copy of the template before the last element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="last()" position="before"/>
+                        <comment> This inserts a copy of the template after the last element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="last()" position="after"/>
+                        <comment> This inserts a copy of the template before the first element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="1" position="before"/>
+                        <comment> This inserts a copy of the template after the first element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="1" position="after"/>
+                        <xforms:insert nodeset="employees" at="last()" position="after"/>
+                        <comment> This inserts a copy of the template before the currently selected element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="index('employee-repeat')" position="before"/>
+                        <comment> This inserts a copy of the template after the currently selected element of the collection </comment>
+                        <xforms:insert nodeset="employees" at="index('employee-repeat')" position="after"/>
+                    </xml-source>
+                    <p>
+                        The <code>at</code> attribute contains an XPath expression returning the
+                        index of the element before or after which the insertion must be performed.
+                        The <code>position</code> element contains either <code>after</code> or
+                        <code>before</code>, and specifies whether the insertion is performed before
+                        or after the element specified by the <code>at</code> attribute.
+                    </p>
+                    <p>
+                        It is important to note that while it is possible to delete the last element
+                        of an homogeneous collection, it becomes them impossible to insert a new
+                        element into that collection with XForms 1.0, since there is no longer a
+                        template element available in this case (save for using an XML submission
+                        with <code>replace="instance"</code>). This means that in general you design
+                        your collections so that there always at least one element in it.
+                    </p>
+                    <p>
+                        In case you want the user interface to visually appear empty empty when
+                        there is "no more" elements in the collection, you can use the tip provided
+                        below, which can be used in most situations. The idea is to consider that
+                        the last element of the collection is never displayed, but always used as a
+                        template for <code>xforms:insert</code>:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="employees-instance">
+                            <employees>
+                                <employee>
+                                    <first-name>Alice</first-name>
+                                </employee>
+                                <employee>
+                                    <first-name>Bob</first-name>
+                                </employee>
+                                <employee>
+                                    <first-name>Marie</first-name>
+                                </employee>
+                                <comment> This is a template used by xforms:insert </comment>
+                                <employee>
+                                    <first-name/>
+                                </employee>
+                            </employees>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        You do not want to display that template, however. Therefore you use an
+                        <code>xforms:repeat</code> element of the form:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:repeat nodeset="instance('employees-instance')/employee[position() &amp;lt; last()]">
+                            ...
+                        </xforms:repeat>
+                    </xml-source>
+                    <p>
+                        The <code>position() &amp;lt; last()</code> condition tells
+                        <code>xforms:repeat</code> to consider all the elements of the collection
+                        except the last one. This causes the repetition to display zero iteration
+                        when there is one element in the collection, one iteration when there are
+                        two, etc. The <code>xforms:insert</code> action, on the other hand, operates
+                        on the entire collection including the last element, so that that element
+                        can be duplicated:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:insert nodeset="employees" at="..." position="..."/>
+                    </xml-source>
+                    <p>
+                        Another solution involves using an <code>xforms:bind</code> element which
+                        makes the last element of the collection non-relevant. This achieves the
+                        same result, but requires extra code, so the tip above is usually
+                        preferred.
+                    </p>
+                    <p>
+                        Upon submission, some care must be taken with repeat template. For example,
+                        if the <code>first-name</code> element above is required, and the template
+                        contains an empty value as above, submission will fail.
+                        <code>xforsm:bind</code> statements must then also exclude the last element
+                        of the collection:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:bind nodeset="employee[position() &amp;lt; last()]/first-name" required="true()"/>
+                    </xml-source>
+                    <note>
+                        <p>
+                            If you are dealing with an XML document format which requires
+                            removing the last element of a collection, you have to post-process
+                            your XForms instance to remove such extra elements, and pre-process
+                            it to add such elements when initializing your XForms instance.
+                        </p>
+                    </note>
+                </section>
+                <section>
+                    <title>Setting the Current Index</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+                <section>
+                    <title>Events</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+                <section>
+                    <title>Heterogeneous-Looking Repeated Section</title>
+                    <p>
+                        TODO: use of relevant, switch.
+                    </p>
+                </section>
+                <section>
+                    <title>Nested Repeats</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+            </section>
+            <a name="submission"/>
+            <section>
+                <title>Submission</title>
+                <p>
+                    TODO
+                </p>
+                <p>
+                    Two properties control some aspects of XForms submission in OPS:
+                </p>
+                <xml-source>
+                    <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
+                </xml-source>
+                <p>
+                    If set to <code>true</code> (the default), OPS optimizes submissions with
+                    <code>replace="all"</code> by sending the response of the submission directly to
+                    the web browser. This however means that submission errors cannot be caught by
+                    XForms event handlers after OPS has started connecting to the submission URL,
+                    as should be the case following XForms 1.0. If set to <code>false</code>, OPS
+                    buffers the reply so that errors can be handled as per XForms 1.0. However, this
+                    solution is less efficient.
+                </p>
+                <xml-source>
+                    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
+                </xml-source>
+                <p>
+                    If set to <code>true</code> (the default), OPS optimizes "local" HTTP and HTTPS
+                    submissions, i.e. submissions performed to a URL controlled by OPS itself, by
+                    directly submitting using the Java Servlet API instead of actually using the
+                    HTTP protocol for the submission. If set to <code>false</code>, OPS always
+                    always uses the HTTP or HTTPS protocol, which is less efficient. If set to
+                    <code>false</code>, it is possible to specify the <code>xxforms:post</code>
+                    method instead of the <code>post</code> method on the
+                    <code>xforms:submission</code> element to force an optimized local submission.
                 </p>
             </section>
         </section>
@@ -830,6 +1128,16 @@
                                     Expired state information causes an XForms page to no longer
                                     function until it is reloaded.
                                 </p>
+                                <note>
+                                    With most servlet containers, it is possible to configure
+                                    session handling to passivate sessions out of the application
+                                    server memory to a persistent store. It is this way possible to
+                                    partially alleviate the drawback above by making sure that a
+                                    very large number of active but idle sessions can be kept, with
+                                    a minimum impact on application server memory. It is this way
+                                    also possible to make sure that sessions survive a servlet
+                                    container restart.
+                                </note>
                             </li>
                         </ul>
                         <note>
@@ -893,7 +1201,17 @@
             <section>
                 <title>Configuring Session Handling</title>
                 <p>
+                    This section is relevant when XForm state is stored into a session.
+                </p>
+                <p>
                     TODO: Configuration tips: expiration (web.xml), passivation? (Tomcat).
+                </p>
+                <p>
+                    Session passivation can be tightly controlled with Tomcat 5.5. Please refer to
+                    the <a
+                    href="http://tomcat.apache.org/tomcat-5.5-doc/config/manager.html">relevant
+                    Tomcat documentation</a> for more information. Other servlet containers may have
+                    similar relevant documentation.
                 </p>
             </section>
         </section>

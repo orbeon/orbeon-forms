@@ -105,7 +105,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
      * Indicates if the resource manager implementation suports write operations
      * @return true if write operations are allowed
      */
-    public boolean canWrite() {
+    public boolean canWrite(String key) {
         return true;
     }
 

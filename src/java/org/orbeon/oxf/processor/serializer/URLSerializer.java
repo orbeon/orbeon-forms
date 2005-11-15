@@ -18,11 +18,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.oxf.Handler;
-import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
@@ -37,22 +37,15 @@ import java.net.URLConnection;
 
 public class URLSerializer extends ProcessorImpl {
 
-//    private static Logger logger = LoggerFactory.createLogger(URLSerializer.class);
-
     public URLSerializer() {
-        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_CONFIG, URLGenerator.URL_NAMESPACE_URI));
-        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, URLGenerator.URL_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    public void start(PipelineContext context) {
+    public void start(PipelineContext pipelineContext) {
         try {
-            // first read the data input and cache the result
-            ProcessorInput dataInput = getInputByName(INPUT_DATA);
-            SAXStore store = new SAXStore();
-            dataInput.getOutput().read(context, store);
-
-            // then create the URL...
-            URL url = (URL) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new org.orbeon.oxf.processor.CacheableInputReader() {
+            // Create the URL from the configuration
+            final URL url = (URL) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new org.orbeon.oxf.processor.CacheableInputReader() {
                 public Object read(PipelineContext context, ProcessorInput input) {
                     try {
                         Document doc = readInputAsDOM4J(context, input);
@@ -65,29 +58,34 @@ public class URLSerializer extends ProcessorImpl {
             });
 
             if (Handler.PROTOCOL.equals(url.getProtocol())) {
-                ContentHandler handler = ResourceManagerWrapper.instance().getWriteContentHandler(url.getFile());
-                store.replay(handler);
+                // NOTE: This is probably done as an optimization. Is this really necessary?
+                final ContentHandler contentHandler = ResourceManagerWrapper.instance().getWriteContentHandler(url.getFile());
+                readInputAsSAX(pipelineContext, INPUT_DATA, contentHandler);
             } else {
-                // ...and open it
-                URLConnection conn = url.openConnection();
-                conn.setDoOutput(true);
-                conn.connect();
-                OutputStream os = conn.getOutputStream();
-
-                // Create an identity transformer and start the transformation
-                TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                identity.setResult(new StreamResult(os));
-                store.replay(identity);
-
-                // clean up
-                os.close();
-                if (conn instanceof HttpURLConnection)
-                    ((HttpURLConnection) conn).disconnect();
+                // Open the URL
+                final URLConnection conn = url.openConnection();
+                try {
+                    conn.setDoOutput(true);
+                    conn.connect();
+                    final OutputStream os = conn.getOutputStream();
+                    try {
+                        // Create an identity transformer and start the transformation
+                        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                        identity.setResult(new StreamResult(os));
+                        readInputAsSAX(pipelineContext, INPUT_DATA, identity);
+                    } finally {
+                        // Clean up
+                        if (os != null)
+                            os.close();
+                    }
+                } finally {
+                    // Clean up
+                    if (conn instanceof HttpURLConnection)
+                        ((HttpURLConnection) conn).disconnect();
+                }
             }
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
-
-
 }

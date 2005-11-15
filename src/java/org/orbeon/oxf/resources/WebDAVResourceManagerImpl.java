@@ -92,7 +92,7 @@ public class WebDAVResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    public boolean canWrite() {
+    public boolean canWrite(String key) {
         return false;
     }
 

@@ -109,8 +109,8 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * Indicates if the resource manager implementation suports write operations
      * @return true if write operations are allowed
      */
-    public boolean canWrite() {
-        return false;
+    public boolean canWrite(String key) {
+        return getRealPath(key) != null;
     }
 
     /**
@@ -119,7 +119,16 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return an output stream
      */
     public OutputStream getOutputStream(String key) {
-        throw new OXFException("Write Operation not supported");
+
+        final String realPath = getRealPath(key);
+        if (realPath == null)
+            throw new OXFException("Write Operation not supported");
+
+        try {
+            return new FileOutputStream(realPath);
+        } catch (FileNotFoundException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**
@@ -128,7 +137,15 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return  a writer
      */
     public Writer getWriter(String key) {
-        throw new OXFException("Write Operation not supported");
+        final String realPath = getRealPath(key);
+        if (realPath == null)
+            throw new OXFException("Write Operation not supported");
+
+        try {
+            return new FileWriter(realPath);
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**

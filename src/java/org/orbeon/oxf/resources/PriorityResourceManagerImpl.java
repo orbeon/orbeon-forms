@@ -152,12 +152,17 @@ public class PriorityResourceManagerImpl implements ResourceManager {
      * Indicates if the resource manager implementation suports write operations
      * @return true if write operations are allowed
      */
-    public boolean canWrite() {
-        return ((Boolean) delegate(new Operation() {
+    public boolean canWrite(final String key) {
+        final boolean[] result = new boolean[1];
+        delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
-                return new Boolean(resourceManager.canWrite());
+                // Logical "or"
+                result[0] |= resourceManager.canWrite(key);
+                return null;
             }
-        })).booleanValue();
+        });
+
+        return result[0];
     }
 
     /**
@@ -168,6 +173,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public OutputStream getOutputStream(final String key) {
         return (OutputStream) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
+                if (!resourceManager.canWrite(key))
+                    throw new ResourceNotFoundException("Try next resource manager.");
                 return resourceManager.getOutputStream(key);
             }
         });
@@ -181,6 +188,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public Writer getWriter(final String key) {
         return (Writer) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
+                if (!resourceManager.canWrite(key))
+                    throw new ResourceNotFoundException("Try next resource manager.");
                 return resourceManager.getWriter(key);
             }
         });
@@ -198,6 +207,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public ContentHandler getWriteContentHandler(final String key) {
         return (ContentHandler) delegate(new Operation() {
             public Object run(ResourceManager resourceManager) {
+                if (!resourceManager.canWrite(key))
+                    throw new ResourceNotFoundException("Try next resource manager.");
                 return resourceManager.getWriteContentHandler(key);
             }
         });

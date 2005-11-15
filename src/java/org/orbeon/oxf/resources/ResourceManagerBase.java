@@ -275,7 +275,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
             Writer writer = null;
             try {
                 writer = getWriter(key);
-                TransformerUtils.getIdentityTransformer().transform(new DocumentSource(document), new StreamResult(getWriter(key)));
+                TransformerUtils.getIdentityTransformer().transform(new DocumentSource(document), new StreamResult(writer));
             } finally {
                 if (writer != null) writer.close();
             }

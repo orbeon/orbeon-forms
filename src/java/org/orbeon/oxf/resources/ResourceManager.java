@@ -113,9 +113,10 @@ public interface ResourceManager {
 
     /**
      * Indicates if the resource manager implementation suports write operations
+     * @param key A Resource Manager key
      * @return true if write operations are allowed
      */
-    public boolean canWrite();
+    public boolean canWrite(String key);
 
     /**
      * Write the specified document in the Resource Manager

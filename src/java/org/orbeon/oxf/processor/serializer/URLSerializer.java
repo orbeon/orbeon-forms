@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -45,12 +46,12 @@ public class URLSerializer extends ProcessorImpl {
     public void start(PipelineContext pipelineContext) {
         try {
             // Create the URL from the configuration
-            final URL url = (URL) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new org.orbeon.oxf.processor.CacheableInputReader() {
+            final URL url = (URL) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                 public Object read(PipelineContext context, ProcessorInput input) {
                     try {
-                        Document doc = readInputAsDOM4J(context, input);
-                        String url = XPathUtils.selectStringValueNormalize(doc, "/config/url");
-                        return URLFactory.createURL(url.trim());
+                        final Document configDocument = readInputAsDOM4J(context, input);
+                        final String urlString = XPathUtils.selectStringValueNormalize(configDocument, "/config/url");
+                        return URLFactory.createURL(urlString.trim());
                     } catch (MalformedURLException e) {
                         throw new OXFException(e);
                     }

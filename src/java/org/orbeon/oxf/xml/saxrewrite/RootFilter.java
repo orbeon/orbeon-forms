@@ -23,58 +23,62 @@ import org.xml.sax.SAXException;
  * So if this is used as the initial state then the result is that the prologue and epilogue
  * are ignored while the root element is passed to the next state.  nextState is initialized to
  * this, consequently nothing interesting will happen unless setNext is called.
- * @author d
  */
 public class RootFilter extends State {
-    
+
     protected State nextState = this;
-    
+
     /**
      * <!-- RootFilter -->
      * Simple calls super(...)
-     * @see State2#State(State2, ContentHandler, Response, boolean, boolean)
-     * @author d
-     * @param rwrtURI 
+     *
      */
-    public RootFilter( final State stt, final ContentHandler cntntHnder ) {
-        super( stt, cntntHnder );
+    public RootFilter(final State stt, final ContentHandler cntntHnder) {
+        super(stt, cntntHnder);
     }
+
     /**
      * <!-- startElementStart -->
+     *
      * @return nextState
-     * @see RewriteState
-     * @author d
      */
     protected State startElementStart
-    ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-    throws SAXException {
-        return nextState == this ? this : nextState.startElement( ns, lnam, qnam, atts );
+            (final String ns, final String lnam, final String qnam, final Attributes atts)
+            throws SAXException {
+        return nextState == this ? this : nextState.startElement(ns, lnam, qnam, atts);
     }
-    public void setNextState( final State stt ) {
+
+    public void setNextState(final State stt) {
         nextState = stt;
     }
+
     /**
      * <!-- characters -->
+     *
      * @return this.  Does nothing else.
      */
-    public State characters( final char[] ch, final int strt, final int len ) 
-    throws SAXException {
+    public State characters(final char[] ch, final int strt, final int len)
+            throws SAXException {
         return this;
     }
+
     /**
      * <!-- ignorableWhitespace -->
+     *
      * @return this.  Does nothing else.
      */
-    public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
-    throws SAXException {
+    public State ignorableWhitespace(final char[] ch, final int strt, final int len)
+            throws SAXException {
         return this;
     }
+
     /**
      * <!-- processingInstruction -->
+     *
      * @return this.  Does nothing else.
      */
-    public State processingInstruction( final String trgt, final String dat ) 
-    throws SAXException {
+    public State processingInstruction(final String trgt, final String dat)
+            throws SAXException {
         return this;
     }
 }

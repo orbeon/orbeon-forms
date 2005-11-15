@@ -1378,18 +1378,45 @@ public class XFormsControls {
         /**
          * Return the list of repeat ids descendent of a given repeat id, null if none.
          */
-        public List getNestedRepeatIds(String repeatId) {
-            final Map repeatIdToRepeatControlInfo = getRepeatIdToRepeatControlInfo();
-            final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
-            final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
-            final List newChildren = repeatControlInfo.getChildren();
-            if (newChildren != null && newChildren.size() > 0 && index > 0) {
-                Map result = new HashMap();
-                visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
-                return new ArrayList(result.keySet());
-            } else {
-                return null;
-            }
+        public List getNestedRepeatIds(XFormsControls xformsControls, final String repeatId) {
+
+            final List result = new ArrayList();
+
+            xformsControls.visitAllControlStatic(new ControlElementVisitorListener() {
+
+                private boolean found;
+
+                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                    if (controlElement.getName().equals("repeat")) {
+
+                        if (!found) {
+                            // Not found yet
+                            if (repeatId.equals(controlElement.attributeValue("id")))
+                                found = true;
+                        } else {
+                            // We are within the searched repeat id
+                            result.add(controlElement.attributeValue("id"));
+                        }
+                    }
+                    return true;
+                }
+
+                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                    if (found) {
+                        if (repeatId.equals(controlElement.attributeValue("id")))
+                            found = false;
+                    }
+                    return true;
+                }
+
+                public void startRepeatIteration(int iteration) {
+                }
+
+                public void endRepeatIteration(int iteration) {
+                }
+            });
+
+            return result;
         }
 
         /**
@@ -2067,7 +2094,7 @@ public class XFormsControls {
         }
 
         public String getRepeatId() {
-            return getElement().attributeValue("id");
+            return getOriginalId();
         }
 
         public boolean equals(Object obj) {

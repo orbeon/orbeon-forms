@@ -302,7 +302,7 @@ public class XFormsActionInterpreter {
                                             currentControlsState.updateRepeatIndex(repeatId, index);
 
                                             // First step: set all children indexes to 0
-                                            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
+                                            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
                                             if (nestedRepeatIds != null) {
                                                 for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
                                                     final String nestedRepeatId = (String) j.next();
@@ -484,7 +484,7 @@ public class XFormsActionInterpreter {
                                             // Handle children
                                             if (reinitializeInner) {
                                                 // First step: set all children indexes to 0
-                                                final List nestedRepeatIds = xformsControls.getCurrentControlsState().getNestedRepeatIds(repeatId);
+                                                final List nestedRepeatIds = xformsControls.getCurrentControlsState().getNestedRepeatIds(xformsControls, repeatId);
                                                 if (nestedRepeatIds != null) {
                                                     for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
                                                         final String nestedRepeatId = (String) j.next();
@@ -848,7 +848,7 @@ public class XFormsActionInterpreter {
             // "The indexes for inner nested repeat collections are re-initialized to startindex."
             {
                 // First step: set all children indexes to 0
-                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
+                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
                 final Map nestedRepeatIdsMap = new HashMap();
                 if (nestedRepeatIds != null) {
                     for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {

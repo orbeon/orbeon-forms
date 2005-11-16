@@ -347,7 +347,7 @@ function xformsHandleValueChange(event) {
     var target = getEventTarget(event);
     // If this is an input field, set value on parent and send event on parent element
     if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
-        target.parentNode.valueSetByXForms = true;
+        target.parentNode.valueSetByXForms++;
         target.parentNode.value = target.value;
         target = target.parentNode;
     }
@@ -611,7 +611,6 @@ function xformsInitializeControlsUnder(root) {
                 var textfield = control.childNodes[1];
                 control.previousValue = textfield.value;
                 // Intercept custom JavaScript code changing control value
-                if (false) {
                 if (control.watch) {
                     // Firefox implements a watch() method
                     control.watch("value", function(property, oldvalue, newvalue) {
@@ -624,17 +623,18 @@ function xformsInitializeControlsUnder(root) {
                     });
                 } else {
                     // IE throws a propertychange event
+                    control.valueSetByXForms = 0;
                     xformsAddEventListener(control, "propertychange", function(event) {
                         if (event.propertyName == "value") {
                             var span = getEventTarget(event);
-                            if (!span.valueSetByXForms) {
-                                var textField = span.childNodes[1];
+                            var textField = span.childNodes[1];
+                            if (span.valueSetByXForms == 0 && textField.value != span.value) {
                                 textField.value = span.value;
-                                span.valueSetByXForms = true;
+                                span.valueSetByXForms++;
                                 span.value = span.previousValue;
                                 xformsDispatchEvent(textField, "change");
                             } else {
-                                span.valueSetByXForms = false;
+                                span.valueSetByXForms--;
                             }
                         }
                     });
@@ -647,7 +647,6 @@ function xformsInitializeControlsUnder(root) {
                         xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
                     }
                 });
-                }
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
             } else {
@@ -1231,7 +1230,7 @@ function xformsHandleResponse() {
                                                 xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.previousValue = newControlValue;
-                                                    documentElement.valueSetByXForms = true;
+                                                    documentElement.valueSetByXForms++;
                                                     documentElement.value = newControlValue;
                                                 }
                                                 if (inputField.value != newControlValue)

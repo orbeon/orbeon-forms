@@ -1459,8 +1459,10 @@ function xformsHandleResponse() {
                                 var loadElement = actionElement.childNodes[actionIndex];
                                 var resource = loadElement.getAttribute("resource");
                                 var show = loadElement.getAttribute("show");
+                                var target = loadElement.getAttribute("target");
                                 if (show == "replace") {
-                                    window.location.href = resource;
+                                    if (target == null) window.location.href = resource;
+                                    else window.open(resource, target);
                                     return;
                                 } else {
                                     window.open(resource, "_blank");

@@ -143,13 +143,10 @@ function xformsUpdateStyle(element) {
                     }
 
                     // Add listeners on control
-                    if (control.addEventListener) {
-                        control.addEventListener("focus", controlGetsFocus, false);
-                        control.addEventListener("blur", controlLoosesFocus, false);
-                    } else {
-                        control.attachEvent("onfocus", controlGetsFocus);
-                        control.attachEvent("onblur", controlLoosesFocus);
-            	    }
+                    var controlGeneratingEvent = xformsArrayContains(control.className.split(" "), "xforms-input")
+                        ? control.childNodes[1] : control;
+                    xformsAddEventListener(controlGeneratingEvent, "focus", controlGetsFocus);
+                    xformsAddEventListener(controlGeneratingEvent, "blur", controlLoosesFocus);
                 }
 
                 // Disable or enable hint depending if control is relevant

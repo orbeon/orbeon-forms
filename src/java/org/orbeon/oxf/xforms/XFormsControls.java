@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -1559,6 +1560,11 @@ public class XFormsControls {
         private String value;
         private String displayValue;
 
+        private String labelId;
+        private String helpId;
+        private String hintId;
+        private String alertId;
+
         private boolean readonly;
         private boolean required;
         private boolean relevant;
@@ -1580,7 +1586,21 @@ public class XFormsControls {
             if (element != null) {
                 originalId = element.attributeValue("id");
                 eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
+
+                labelId = getChildElementId(element, XFormsConstants.XFORMS_LABEL_QNAME);
+                helpId = getChildElementId(element, XFormsConstants.XFORMS_HELP_QNAME);
+                hintId = getChildElementId(element, XFormsConstants.XFORMS_HINT_QNAME);
+                alertId = getChildElementId(element, XFormsConstants.XFORMS_ALERT_QNAME);
             }
+        }
+
+        private String getChildElementId(Element element, QName qName) {
+            // Check that there is a current child element
+            Element childElement = element.element(qName);
+            if (childElement == null)
+                return null;
+
+            return childElement.attributeValue("id");
         }
 
         public void addChild(ControlInfo controlInfo) {
@@ -1635,6 +1655,22 @@ public class XFormsControls {
 
         public void setLabel(String label) {
             this.label = label;
+        }
+
+        public String getLabelId() {
+            return labelId;
+        }
+
+        public String getHintId() {
+            return hintId;
+        }
+
+        public String getHelpId() {
+            return helpId;
+        }
+
+        public String getAlertId() {
+            return alertId;
         }
 
         public String getName() {
@@ -1964,7 +2000,7 @@ public class XFormsControls {
             final String updatedValue;
             if (mediaTypeAttribute != null && mediaTypeAttribute.startsWith("image/")) {
                 final String type = getType();
-                if (type == null || type.equals(Dom4jUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
+                if (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
                     // Rewrite URI
 
                     final URI resolvedURI = XFormsUtils.resolveURI(getElement(), rawValue);

@@ -40,6 +40,7 @@
                     <xhtml:td class="{if (. = $selected-tab) then 'widget-tab-active' else 'widget-tab-inactive'}">
                         <xsl:value-of select="widget:label"/>
                         <xforms:trigger class="widget-tab-trigger">
+                            <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
                             <xforms:toggle ev:event="DOMActivate" case="{@id}"/>
                         </xforms:trigger>
                     </xhtml:td>

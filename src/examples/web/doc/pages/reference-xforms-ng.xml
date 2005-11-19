@@ -97,11 +97,6 @@
                 <section>
                     <title>Basics</title>
                     <p>
-                        TODO: basic idea, homogeneous collection (what's allowed and not), how to
-                        handle last hidden element (plus question of validating that element), ways
-                        of updating such a collection (insert, delete, submit replace="instance").
-                    </p>
-                    <p>
                         A very common requirement of user interfaces consists in repeating visual, such
                         as rows in a table, entries in a list, etc. Those repeated sections usually have
                         an homogeneous aspect: they all have the same or a very similar structure. For

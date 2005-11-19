@@ -49,6 +49,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import orbeon.apache.xml.utils.NamespaceSupport2;
+
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);
@@ -90,7 +92,7 @@ public class XMLUtils {
 
     /**
      * Create a new DocumentBuilder.
-     * <p/>
+     *
      * WARNING: Check how this is used in this file first before calling!
      */
     private static DocumentBuilder newDocumentBuilder() {
@@ -106,7 +108,7 @@ public class XMLUtils {
 
     /**
      * Create a new SAX parser factory.
-     * <p/>
+     *
      * WARNING: Use this only in special cases. In general, use newSAXParser().
      */
     public static SAXParserFactory createSAXParserFactory(boolean validating, boolean handleXInclude) {
@@ -149,6 +151,40 @@ public class XMLUtils {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    public static String prefixFromQName(String qName) {
+        final int colonIndex = qName.indexOf(':');
+        return (colonIndex == -1) ? "" : qName.substring(0, colonIndex);
+    }
+
+    public static String localNameFromQName(String qName) {
+        final int colonIndex = qName.indexOf(':');
+        return (colonIndex == -1) ? qName : qName.substring(colonIndex + 1);
+    }
+
+    /**
+     * Return "" if there is no prefix, null if the prefix is not mapped, a URI otherwise.
+     */
+    public static String uriFromQName(String qName, NamespaceSupport2 namespaceSupport) {
+        final String prefix = prefixFromQName(qName);
+        if ("".equals(prefix))
+            return "";
+        return namespaceSupport.getURI(prefix);
+    }
+
+    public static String buildQName(String prefix, String localname) {
+        return (prefix.equals("")) ? localname : prefix + ":" + localname;
+    }
+
+    /**
+     * Encode a URI and local name to an exploded QName (also known as a "Clark name") String.
+     */
+    public static String buildExplodedQName(String uri, String localname) {
+        if ("".equals(uri))
+            return localname;
+        else
+            return "{" + uri + "}" + localname;
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
@@ -348,7 +384,7 @@ public class XMLUtils {
      * This digester is based on some existing public document (not sure which). There are some
      * changes though. It is not clear anymore why we used that document as a base, as this is
      * purely internal.
-     * <p/>
+     *
      * The bottom line is that the digest should change whenever the infoset of the source XML
      * document changes.
      */
@@ -918,11 +954,8 @@ public class XMLUtils {
 
     public interface Attribute {
         public String getURI();
-
         public String getLocalName();
-
         public String getQName();
-
         public String getValue();
     }
 
@@ -959,8 +992,6 @@ public class XMLUtils {
     }
 
     /**
-     * <!-- getAttribsFromDefaultNamespace -->
-     *
      * @param atts src attribs
      * @return new AttributesImpl containing  all attribs that were in src attribs and that were
      *         in the default name space.

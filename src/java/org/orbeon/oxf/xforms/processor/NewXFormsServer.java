@@ -221,7 +221,7 @@ public class NewXFormsServer extends ProcessorImpl {
                 // Create and encode dynamic state
                 final String newEncodedDynamicState;
                 {
-                    final Document dynamicStateDocument = createDynamicStateDocument(containingDocument, currentControlsState, requireClientSubmission);
+                    final Document dynamicStateDocument = createDynamicStateDocument(containingDocument, requireClientSubmission);
                     newEncodedDynamicState = XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument);
                 }
                 final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
@@ -360,7 +360,9 @@ public class NewXFormsServer extends ProcessorImpl {
         }
     }
 
-    public static Document createDynamicStateDocument(XFormsContainingDocument containingDocument, XFormsControls.ControlsState currentControlsState, boolean[] requireClientSubmission) {
+    public static Document createDynamicStateDocument(XFormsContainingDocument containingDocument, boolean[] requireClientSubmission) {
+
+        final XFormsControls.ControlsState currentControlsState = containingDocument.getXFormsControls().getCurrentControlsState();
 
         final Document dynamicStateDocument = Dom4jUtils.createDocument();
         final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
@@ -442,7 +444,7 @@ public class NewXFormsServer extends ProcessorImpl {
         return dynamicStateDocument;
     }
 
-    private void diffControlsState(ContentHandlerHelper ch, List state1, List state2) {
+    public static void diffControlsState(ContentHandlerHelper ch, List state1, List state2) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -675,7 +677,7 @@ public class NewXFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsControls.RepeatControlInfo repeatControlInfo, int idSuffix) {
+    private static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsControls.RepeatControlInfo repeatControlInfo, int idSuffix) {
 
         final String repeatControlId = repeatControlInfo.getId();
         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);

@@ -26,7 +26,6 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -56,9 +55,9 @@ public class XFormsExtractor extends ProcessorImpl {
 
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
-                    private final String HTML_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "html");
-                    private final String HEAD_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "head");
-                    private final String BODY_QNAME = Dom4jUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
+                    private final String HTML_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "html");
+                    private final String HEAD_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "head");
+                    private final String BODY_QNAME = XMLUtils.buildExplodedQName(XMLConstants.XHTML_NAMESPACE_URI, "body");
 
                     private Locator locator;
 
@@ -162,9 +161,9 @@ public class XFormsExtractor extends ProcessorImpl {
 
                         // Remember first two levels of elements
                         if (level == 0) {
-                            element0 = Dom4jUtils.buildExplodedQName(uri, localname);
+                            element0 = XMLUtils.buildExplodedQName(uri, localname);
                         } else if (level == 1) {
-                            element1 = Dom4jUtils.buildExplodedQName(uri, localname);
+                            element1 = XMLUtils.buildExplodedQName(uri, localname);
                         } else if (level >= 2 && HTML_QNAME.equals(element0)) {
                             // We are under /xhtml:html
                              if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {

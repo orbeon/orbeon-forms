@@ -105,7 +105,7 @@ public class XFormsServerDocumentCache {
         if (pool == null) {
             // We don't add the pool to the cache here
             XFormsServer.logger.debug("XForms - containing document cache (getContainingDocument): did not find document pool in cache.");
-            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null);
+            containingDocument = NewXFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null);
         } else {
             // Get object from pool
             XFormsServer.logger.debug("XForms - containing document cache (getContainingDocument): found containing document pool in cache; getting document from pool.");
@@ -157,7 +157,7 @@ public class XFormsServerDocumentCache {
         public Object makeObject() throws Exception {
             // We create a new PipelineContext, because we have trouble passing it from
             // borrowObject() up to here; it is only used for statistics so that's ok
-            final XFormsContainingDocument result = XFormsServer.createXFormsContainingDocument(new PipelineContext(), xformsState, null);
+            final XFormsContainingDocument result = NewXFormsServer.createXFormsContainingDocument(new PipelineContext(), xformsState, null);
             result.setSourceObjectPool(pool);
             return result;
         }

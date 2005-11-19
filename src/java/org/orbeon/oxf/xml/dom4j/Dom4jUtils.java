@@ -430,17 +430,7 @@ public class Dom4jUtils {
      * Encode a QName to an exploded QName (also known as a "Clark name") String.
      */
     public static String qNameToexplodedQName(QName qName) {
-        return buildExplodedQName(qName.getNamespaceURI(), qName.getName());
-    }
-
-    /**
-     * Encode a URI and local name to an exploded QName (also known as a "Clark name") String.
-     */
-    public static String buildExplodedQName(String uri, String localname) {
-        if ("".equals(uri))
-            return localname;
-        else
-            return "{" + uri + "}" + localname;
+        return XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
 
     public static XPath createXPath(final String exprsn) throws InvalidXPathException {

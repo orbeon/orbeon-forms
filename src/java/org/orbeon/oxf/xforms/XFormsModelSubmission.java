@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -130,19 +131,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private boolean isGet() {
-        return method.equals("get") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "get"));
+        return method.equals("get") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "get"));
     }
 
     private boolean isPost() {
-        return method.equals("post") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
+        return method.equals("post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
     }
 
     private boolean isPut() {
-        return method.equals("put") || method.equals(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "put"));
+        return method.equals("put") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "put"));
     }
 
     private boolean isMethodOptimizedLocalSubmission() {
-        return method.startsWith(Dom4jUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, ""))
+        return method.startsWith(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, ""))
                 && (isGet() || isPost() || isPut());
     }
 

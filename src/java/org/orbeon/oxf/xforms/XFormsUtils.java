@@ -415,6 +415,16 @@ public class XFormsUtils {
         return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
+    public static boolean isAjaxShowLoadingIcon() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY, false).booleanValue();
+    }
+
+    public static boolean isAjaxShowErrors() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_AJAX_SHOW_ERRORS_PROPERTY, true).booleanValue();
+    }
+
     public static int getSessionCacheSize() {
         return OXFProperties.instance().getPropertySet().getInteger
                 (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();

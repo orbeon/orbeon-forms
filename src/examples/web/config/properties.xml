@@ -44,6 +44,8 @@
     <!-- Other XForms options -->
     <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
 
     <!--                               Profiling support.                                        -->
     <!-- 7/27/2005 d : Currently there are org.orbeon.oxf.processor.NetworkTrace and             -->

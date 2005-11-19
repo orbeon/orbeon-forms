@@ -22,7 +22,8 @@ public class ForwardingContentHandler implements ContentHandler {
     private ContentHandler contentHandler;
     private boolean forward;
 
-    public ForwardingContentHandler() {}
+    public ForwardingContentHandler() {
+    }
 
     public ForwardingContentHandler(ContentHandler contentHandler) {
         this(contentHandler, true);
@@ -95,9 +96,10 @@ public class ForwardingContentHandler implements ContentHandler {
         return contentHandler;
     }
 
-    public void setContentHandler( final ContentHandler cntntHndlr ) {
-        contentHandler = cntntHndlr;
-        if ( contentHandler == null ) forward = false;
+    public void setContentHandler(final ContentHandler contentHandler) {
+        this.contentHandler = contentHandler;
+        if (this.contentHandler == null)
+            forward = false;
     }
 
     protected boolean getForward() {

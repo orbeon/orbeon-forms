@@ -88,7 +88,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
 
-            // Crate xhtml:input
+            // Create xhtml:input
             {
                 final StringBuffer inputClasses = new StringBuffer();
                 if (typeClass != null) {

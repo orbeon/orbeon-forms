@@ -53,9 +53,13 @@ public class XHTMLBodyHandler extends HandlerBase {
         addElementHandler(new XFormsTriggerHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
         addElementHandler(new XFormsSubmitHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
         addElementHandler(new XFormsSecretHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+        addElementHandler(new XFormsTextareaHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        addElementHandler(new XFormsUploadHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
+        addElementHandler(new XFormsRangeHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+//        addElementHandler(new XFormsSelectHandler(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
+//        addElementHandler(new XFormsSelect1Handler(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
 
         /*
-                xforms:textarea
                 xforms:range
                 xforms:upload
 

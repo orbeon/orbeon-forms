@@ -47,8 +47,7 @@
     <!-- - - - - - - XForms controls - - - - - - -->
 
     <!-- Add classes to control elements reflecting model item properties -->
-    <xsl:template match="xforms:textarea | xforms:select | xforms:select1
-            | xforms:range" priority="3"><!-- | xforms:upload -->
+    <xsl:template match="xforms:select | xforms:select1" priority="3">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -79,8 +78,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xforms:textarea | xforms:select | xforms:select1
-            | xforms:range" priority="2"><!-- | xforms:upload -->
+    <xsl:template match="xforms:select | xforms:select1" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -99,51 +97,6 @@
             </xhtml:label>
         </xsl:if>
         <xsl:apply-templates select="xforms:hint"/>
-    </xsl:template>
-
-    <xsl:template match="xforms:textarea">
-        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
-
-        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:choose>
-            <xsl:when test="$generate-template">
-                <xhtml:textarea name="{$id}">
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-                </xhtml:textarea>
-            </xsl:when>
-            <xsl:otherwise>
-                <xhtml:textarea name="{$id}">
-                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
-                        <xsl:attribute name="disabled">disabled</xsl:attribute>
-                    </xsl:if>
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-                    <xsl:value-of select="xxforms:control($id)"/>
-                </xhtml:textarea>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="xforms:upload">
-        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
-
-        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:choose>
-            <xsl:when test="$generate-template">
-                <xhtml:input type="file" name="{$id}">
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-                </xhtml:input>
-            </xsl:when>
-            <xsl:otherwise>
-                <xhtml:input type="file" name="{$id}" value="{xxforms:control($id)}">
-                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
-                        <xsl:attribute name="disabled">disabled</xsl:attribute>
-                    </xsl:if>
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-                </xhtml:input>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <!-- Display as list of checkboxes / radio buttons -->
@@ -316,16 +269,6 @@
                     else $value-element/@help"/>
             </xsl:if>
         </xhtml:label>
-    </xsl:template>
-
-    <xsl:template match="xforms:range">
-        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:div>
-            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-range-casing'), $id)"/>
-            <xhtml:div class="xforms-range-track"/>
-            <xhtml:div class="xforms-range-slider"/>
-        </xhtml:div>
     </xsl:template>
 
     <!-- - - - - - - XForms repeat - - - - - - -->
@@ -523,14 +466,6 @@
             <xsl:message terminate="yes">Can't find control with id = '<xsl:value-of select="$id"/>'</xsl:message>
         </xsl:if>
         <xsl:sequence select="$control"/>
-    </xsl:function>
-
-    <xsl:function name="xxforms:is-date-or-time" as="xs:boolean">
-        <xsl:param name="type" as="xs:string?"/>
-        <xsl:value-of
-                select="$type = ('{http://www.w3.org/2001/XMLSchema}date',
-                    '{http://www.w3.org/2001/XMLSchema}dateTime',
-                    '{http://www.w3.org/2001/XMLSchema}time')"/>
     </xsl:function>
 
 </xsl:stylesheet>

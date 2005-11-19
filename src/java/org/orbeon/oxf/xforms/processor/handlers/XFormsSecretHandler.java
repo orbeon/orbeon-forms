@@ -21,7 +21,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:input.
+ * Handle xforms:secret.
  */
 public class XFormsSecretHandler extends XFormsValueControlHandler {
 
@@ -60,20 +60,17 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
             }
         }
 
-        // Create xhtml:span
+        // Create xhtml:input
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
         {
-            // Crate xhtml:input
-            {
-                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
-                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-                newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
+            newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
+            newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+            newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
+                    handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
-            }
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
         }
 
         // xforms:help

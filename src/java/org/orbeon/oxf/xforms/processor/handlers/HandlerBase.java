@@ -13,19 +13,17 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.xml.sax.helpers.AttributesImpl;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandler;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.ContentHandler;
-import orbeon.apache.xml.utils.NamespaceSupport2;
+import org.xml.sax.helpers.AttributesImpl;
 
 /**
  *
@@ -104,7 +102,7 @@ public abstract class HandlerBase extends ElementHandler {
         }
         // Create "class" attribute if necessary
         {
-            final StringBuffer sb = new StringBuffer(classes);
+            final StringBuffer sb = new StringBuffer((classes != null) ? classes : "");
             {
                 final String value = elementAttributes.getValue("class");
                 if (value != null) {

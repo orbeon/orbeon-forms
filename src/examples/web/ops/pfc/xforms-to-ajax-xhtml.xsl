@@ -49,7 +49,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:form id="xforms-form" class="xforms-form" action="/xforms-server-submit" method="POST" onsubmit="return false">
-                <xsl:if test="descendant::xforms:upload">
+                <xsl:if test="descendant::xforms:upload"><!-- TODO: [OPTIMIZATION NOTE] forward looking -->
                     <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
                 </xsl:if>
                 <!-- Store private information used by the client-side JavaScript -->
@@ -58,7 +58,7 @@
                 <xhtml:input type="hidden" name="$temp-dynamic-state" value=""/>
                 <!-- Store information about nested repeats hierarchy -->
                 <xsl:variable name="repeat-tree" as="xs:string*">
-                    <xsl:for-each select="//xforms:repeat">
+                    <xsl:for-each select="//xforms:repeat"><!-- TODO: [OPTIMIZATION NOTE] forward looking -->
                         <xsl:value-of select="if (position() > 1) then ',' else ''"/>
                         <xsl:variable name="parent-repeat" as="element()?" select="ancestor::xforms:repeat[1]"/>
                         <xsl:value-of select="@id"/>
@@ -192,7 +192,7 @@
         </xhtml:span>
     </xsl:template>
 
-    <xsl:template match="xforms:trigger">
+    <xsl:template match="xforms:trigger | xforms:submit">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -224,45 +224,7 @@
             <xsl:otherwise>
                 <xhtml:button type="button">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
-                </xhtml:button>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template match="xforms:submit">
-        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
-
-        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:variable name="label-value" select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
-
-        <xsl:choose>
-            <!-- Link appearance -->
-            <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
-                            and local-name-from-QName(xs:QName(@appearance)) = 'link'">
-                <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
-                <xhtml:a href="">
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
                     <xsl:value-of select="$label-value"/>
-                </xhtml:a>
-            </xsl:when>
-            <!-- Image appearance -->
-            <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
-                            and local-name-from-QName(xs:QName(@appearance)) = 'image'">
-                <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
-                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{$label-value}" >
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:copy-of select="xxforms:img/@* except (xxforms:img/@src, xxforms:img/@alt)"/>
-                </xhtml:input>
-            </xsl:when>
-            <!-- Default appearance (button) -->
-            <xsl:otherwise>
-                <xhtml:button type="button">
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-                    <xsl:value-of select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
                 </xhtml:button>
             </xsl:otherwise>
         </xsl:choose>
@@ -371,7 +333,7 @@
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
 
-            <xsl:for-each select=".//(xforms:itemset | xforms:item)">
+            <xsl:for-each select=".//(xforms:itemset | xforms:item)"><!-- TODO: [OPTIMIZATION NOTE] forward looking -->
                 <xsl:choose>
                     <xsl:when test="local-name() = 'itemset'">
                         <!-- There is an itemset -->
@@ -458,7 +420,7 @@
                 <xsl:attribute name="multiple">multiple</xsl:attribute>
             </xsl:if>
 
-            <xsl:for-each select=".//(xforms:itemset | xforms:item)">
+            <xsl:for-each select=".//(xforms:itemset | xforms:item)"><!-- TODO: [OPTIMIZATION NOTE] forward looking -->
                 <xsl:choose>
                     <xsl:when test="local-name() = 'itemset'">
                         <!-- There is an itemset -->

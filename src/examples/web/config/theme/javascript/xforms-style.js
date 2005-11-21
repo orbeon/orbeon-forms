@@ -90,7 +90,7 @@ function xformsUpdateStyle(element) {
             
             if (className == "xforms-output-html") {
                 if (element.firstChild != null)
-                    element.innerHTML = element.firstChild.data;
+                    element.innerHTML = xformsStringValue(element);
                 element.style.display = "inline";
             }
 

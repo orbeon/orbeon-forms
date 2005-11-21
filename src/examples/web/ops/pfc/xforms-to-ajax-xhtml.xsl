@@ -151,7 +151,7 @@
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
 
-        <xhtml:span>
+        <xhtml:div>
             <xsl:variable name="is-html"
                           select="local-name-from-QName(xs:QName(@appearance)) = 'html'
                                   and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
@@ -189,7 +189,7 @@
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
-        </xhtml:span>
+        </xhtml:div>
     </xsl:template>
 
     <xsl:template match="xforms:trigger | xforms:submit">

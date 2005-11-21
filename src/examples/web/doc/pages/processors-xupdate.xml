@@ -40,17 +40,16 @@
             <section>
                 <title>Origin</title>
                 <p>
-                    The <link href="http://www.xmldb.org/">XML:DB group</link>
-                    has been working on a specification for a language to
-                    describes how to update an XML document. The latest version
-                    of the <link
-                    href="http://www.xmldb.org/xupdate/xupdate-wd.html">XUpdate
-                    specification</link> was released in 2000 as a working
-                    draft. Since then, XUpdate has been used in a number of
-                    situations to update XML documents, in particular in XML
-                    databases like <link
-                    href="http://xml.apache.org/xindice/">Xindice</link> and
-                    <link href="http://www.x-hive.com/">X-Hive/DB</link>.
+                    The <link href="http://xmldb-org.sourceforge.net/">XML:DB group</link> has been
+                    working on a specification for a language to describes how to update an XML
+                    document. The latest version of the <link
+                    href="http://xmldb-org.sourceforge.net/xupdate/xupdate-wd.html">XUpdate
+                    specification</link> was released in 2000 as a working draft. Since then,
+                    XUpdate has been used in a number of situations to update XML documents, in
+                    particular in XML databases like <link
+                    href="http://exist.sourceforge.net/">eXist</link>, <link
+                    href="http://xml.apache.org/xindice/">Xindice</link> and <link
+                    href="http://www.x-hive.com/">X-Hive/DB</link>.
                 </p>
             </section>
             <section>
@@ -186,7 +185,7 @@
                 <title>Standard elements</title>
                 <p>
                     The elements below are defined in the <link
-                    href="http://www.xmldb.org/xupdate/xupdate-wd.html">XUpdate
+                    href="http://xmldb-org.sourceforge.net/xupdate/xupdate-wd.html">XUpdate
                     specification</link>.
                 </p>
                 <ul>

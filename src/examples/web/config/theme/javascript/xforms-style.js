@@ -237,8 +237,8 @@ function xformsUpdateStyle(element) {
                 var inputField = element.childNodes[1];
                 var showCalendar = element.childNodes[2];
 
-                if (!element.setupDone) {
-                    element.setupDone = true;
+                if (!element.styleListenerRegistered) {
+                    element.styleListenerRegistered = true;
 
                     // Assign ids to input field and icon for date picker
                     inputField.id = "input-" + element.id;

@@ -166,6 +166,7 @@
                             <name>Cache-Control</name>
                             <value>post-check=0, pre-check=0</value>
                         </header>
+                        <!-- NOTE: HTML converter specifies text/html content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>
@@ -197,6 +198,7 @@
                             <name>Cache-Control</name>
                             <value>post-check=0, pre-check=0</value>
                         </header>
+                        <!-- NOTE: HTML converter specifies text/html content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>
@@ -220,9 +222,25 @@
                             <name>Content-Disposition</name>
                             <value>attachment; filename=document.pdf</value>
                         </header>
+                        <!-- NOTE: XSL-FO converter specifies application/pdf content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>
+            </p:processor>
+        </p:when>
+        <!-- Non XML documents -->
+        <p:when test="/document[@xsi:type]">
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <header>
+                            <name>Cache-Control</name>
+                            <value>post-check=0, pre-check=0</value>
+                        </header>
+                        <!-- NOTE: use content-type specified on root element -->
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xformed-data"/>
             </p:processor>
         </p:when>
         <!-- No particular document format detected. Output plain XML. -->
@@ -244,7 +262,7 @@
                             <name>Cache-Control</name>
                             <value>post-check=0, pre-check=0</value>
                         </header>
-                        <content-type>application/xml</content-type>
+                        <!-- NOTE: XML converter specifies application/xml content-type -->
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

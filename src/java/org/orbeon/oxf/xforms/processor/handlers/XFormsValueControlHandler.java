@@ -33,9 +33,16 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
     private Attributes hintAttributes;
     private Attributes alertAttributes;
 
-
     protected XFormsValueControlHandler(HandlerContext handlerContext, boolean repeating) {
         super(handlerContext, repeating);
+    }
+
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        // Reset state, as this handler is reused
+        labelAttributes = null;
+        helpAttributes = null;
+        hintAttributes = null;
+        alertAttributes = null;
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -101,17 +108,20 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
                     classes.append(" xforms-alert-inactive");
             }
 
-            final AttributesImpl labelAttributes = getAttributes(labelHintHelpAlertAttributes, classes.toString(), null);
-            labelAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, parentId);
-
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
-            final ContentHandler contentHandler = handlerContext.getOutput();
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelAttributes);
-            if (!handlerContext.isGenerateTemplate() && value != null) {
-                contentHandler.characters(value.toCharArray(), 0, value.length());
-            }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
+            outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, value);
         }
+    }
+
+    public static void outputLabelHintHelpAlert(HandlerContext handlerContext, AttributesImpl labelHintHelpAlertAttributes, String parentId, String value) throws SAXException {
+        labelHintHelpAlertAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, parentId);
+
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
+        final ContentHandler contentHandler = handlerContext.getOutput();
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelHintHelpAlertAttributes);
+        if (!handlerContext.isGenerateTemplate() && value != null) {
+            contentHandler.characters(value.toCharArray(), 0, value.length());
+        }
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
     }
 }

@@ -35,6 +35,8 @@ public class XFormsTriggerHandler extends HandlerBase {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         controlAttributes = new AttributesImpl(attributes);
+
+        // Reset state, as this handler is reused
         xxformsImgAttributes = null;
     }
 

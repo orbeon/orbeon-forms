@@ -44,6 +44,10 @@ public class XHTMLBodyHandler extends HandlerBase {
 
     private String currentSwitchId;
 
+    private boolean justInGroupOrCase;
+    private String groupOrCaseId;
+    private boolean inGroupOrCaseLabel;
+
     public XHTMLBodyHandler(HandlerContext handlerContext) {
         super(handlerContext, false);
         xformsState = handlerContext.getXFormsState();
@@ -235,6 +239,9 @@ public class XHTMLBodyHandler extends HandlerBase {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 handlerContext.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveId));
 
+                justInGroupOrCase = localname.equals("group");
+                groupOrCaseId = attributes.getValue("id");
+
             } else if (localname.equals("case")) {
                 // xforms:case
 
@@ -255,11 +262,30 @@ public class XHTMLBodyHandler extends HandlerBase {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 handlerContext.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
+                justInGroupOrCase = true;
+                groupOrCaseId = attributes.getValue("id");
+
+            } else if (justInGroupOrCase && localname.equals("label")) {
+                // xforms:case or xforms:group label
+
+                final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
+                    ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, groupOrCaseId);
+                final String labelValue = handlerContext.isGenerateTemplate() ? null : controlInfo.getLabel();
+
+                final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
+                XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, groupOrCaseId, labelValue);
+
+                inGroupOrCaseLabel = true;
+
             } else {
                 super.startElement(uri, localname, qName, attributes);
+
+                justInGroupOrCase = false;
             }
         } else {
             super.startElement(uri, localname, qName, attributes);
+
+            justInGroupOrCase = false;
         }
     }
 
@@ -281,12 +307,23 @@ public class XHTMLBodyHandler extends HandlerBase {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 handlerContext.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
+            } else if (justInGroupOrCase && localname.equals("label")) {
+                // xforms:case or xforms:group label
+
+                inGroupOrCaseLabel = false;
+
             } else {
                 super.endElement(uri, localname, qName);
             }
         } else {
             super.endElement(uri, localname, qName);
         }
+        justInGroupOrCase = false;
+    }
+
+    public void characters(char[] chars, int start, int length) throws SAXException {
+        if (!inGroupOrCaseLabel)
+            super.characters(chars, start, length);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

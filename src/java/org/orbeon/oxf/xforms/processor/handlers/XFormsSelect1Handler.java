@@ -53,8 +53,15 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         elementAttributes = new AttributesImpl(attributes);
         effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        items = new ArrayList();
+
+        // Reset state, as this handler is reused
+        if (items != null)
+            items.clear();
+        else
+            items = new ArrayList();
         hasItemset = false;
+
+        super.start(uri, localname, qName, attributes);
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -280,11 +287,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsControls.ControlInfo controlInfo,
                                    boolean isMany, Item item) throws SAXException {
 
-        // xhtml:option
         final AttributesImpl optionAttributes = getAttributes(item.getAttributes(), null, null);
         optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName, optionAttributes);
 
+        // Figure out whether what items are selected
         final String value = item.getValue();
         if (!handlerContext.isGenerateTemplate() && controlInfo != null) {
 
@@ -301,8 +307,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 selected = controlInfo.getValue().equals(value);
             }
             if (selected)
-                reusableAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");
+                optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");
         }
+
+        // xhtml:option
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName, optionAttributes);
         final String label = item.getLabel();
         contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);

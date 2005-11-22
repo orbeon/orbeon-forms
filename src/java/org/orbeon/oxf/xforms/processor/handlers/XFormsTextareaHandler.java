@@ -33,6 +33,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         elementAttributes = new AttributesImpl(attributes);
+        super.start(uri, localname, qName, attributes);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

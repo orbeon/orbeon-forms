@@ -150,17 +150,16 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-
-        <xhtml:div>
-            <xsl:variable name="is-html"
-                          select="local-name-from-QName(xs:QName(@appearance)) = 'html'
-                                  and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
-            <xsl:variable name="is-image"
-                          select="starts-with(@mediatype, 'image/')" as="xs:boolean"/>
-            <xsl:variable name="html-class" as="xs:string?"
-                          select="if ($is-html) then 'xforms-output-html'
-                                  else if ($is-image) then 'xforms-output-image'
-                                  else ()"/>
+        <xsl:variable name="is-html"
+                      select="local-name-from-QName(xs:QName(@appearance)) = 'html'
+                              and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
+        <xsl:variable name="is-image"
+                      select="starts-with(@mediatype, 'image/')" as="xs:boolean"/>
+        <xsl:variable name="html-class" as="xs:string?"
+                      select="if ($is-html) then 'xforms-output-html'
+                              else if ($is-image) then 'xforms-output-image'
+                              else ()"/>
+        <xsl:element name="{if ($is-html) then 'xhtml:div' else 'xhtml:span'}">
             <xsl:choose>
                 <xsl:when test="$generate-template">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class), $id)"/>
@@ -189,7 +188,7 @@
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
-        </xhtml:div>
+        </xsl:element>
     </xsl:template>
 
     <xsl:template match="xforms:trigger | xforms:submit">

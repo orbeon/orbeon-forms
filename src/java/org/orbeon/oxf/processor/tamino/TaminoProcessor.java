@@ -32,15 +32,15 @@ public abstract class TaminoProcessor extends ProcessorImpl {
     private static final Logger logger = LoggerFactory.createLogger(TaminoProcessor.class);
     private static final Map ISOLATION_DEGREE_VALUES = new HashMap();
     private static final Map LOCK_MODE_VALUES = new HashMap();
+    private static final String ISOLATION_DEGREE_PROPERTY = "oxf.tamino.isolation-degree";
+    private static final String LOCK_MODE_PROPERTY = "oxf.tamino.lock-mode";
 
     public static final String TAMINO_CONFIG_URI = "http://www.orbeon.org/oxf/tamino-config";
     public static final String TAMINO_QUERY_URI = "http://www.orbeon.org/oxf/tamino-query";
 
-    private static final String URL_PROPERTY = "url";
-    private static final String USERNAME_PROPERTY = "username";
-    private static final String PASSWORD_PROPERTY = "password";
-    private static final String ISOLATION_DEGREE_PROPERTY = "isolation-degree";
-    private static final String LOCK_MODE_PROPERTY = "lock-mode";
+    public static final String URL_PROPERTY = "url";
+    public static final String USERNAME_PROPERTY = "username";
+    public static final String PASSWORD_PROPERTY = "password";
 
     protected static final String TAMINO_CONNECTION = TaminoProcessor.class.getName() + "_connection_";
 
@@ -85,7 +85,7 @@ public abstract class TaminoProcessor extends ProcessorImpl {
 
                 // Initialize isolation degree and lock mode as set in properties
                 {
-                    OXFProperties.PropertySet propertySet = getPropertySet();
+                    OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
                     TIsolationDegree isolationDegree = (TIsolationDegree)
                             ISOLATION_DEGREE_VALUES.get(propertySet.getString(ISOLATION_DEGREE_PROPERTY));
                     TLockMode lockMode = (TLockMode)

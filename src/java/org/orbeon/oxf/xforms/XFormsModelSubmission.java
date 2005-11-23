@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -175,9 +176,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
 
+                final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && isGet() && replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
+
                 final boolean isDeferredSubmission = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
-                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
-                isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName) && !isHandlingOptimizedGet;
+                isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass;
 
                 // Select node based on ref or bind
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -223,7 +226,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final Document documentToSubmit;
                 if (isDeferredSubmissionSecondPass) {
                     // Handle uploaded files if any
-                    final Element filesElement = ((XXFormsSubmissionEvent) event).getFilesElement();
+                    final Element filesElement = (event instanceof XXFormsSubmissionEvent) ? ((XXFormsSubmissionEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
                         for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
                             final Element parameterElement = (Element) i.next();
@@ -347,10 +350,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 HttpURLConnection urlConnection = null;
                 OutputStream os = null;
-                boolean forwarded = false;
+                boolean dontHandleResponse = false;
 
                 try {
-                    if ((XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission()) && action.startsWith("/")) {
+                    if (isHandlingOptimizedGet) {
+                        // GET with replace="all"
+
+                        // We can optimize and tell the client to load the URL
+                        final String actionString = action + ((action.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
+                        XFormsActionInterpreter.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null);
+                        dontHandleResponse = true;
+                    } else if ((XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission()) && action.startsWith("/")) {
 
                         // TODO
                         //  && !externalContext.getRequest().getContainerType().equals("portlet")
@@ -388,7 +398,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     // TODO: xforms-submit-done must be sent before the body is forwarded
                                     containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                     requestDispatcher.forward(requestAdapter, externalContext.getResponse());
-                                    forwarded = true;
+                                    dontHandleResponse = true;
                                 } else {
                                     // We must intercept the reply
                                     final ResponseAdapter responseAdapter = new ResponseAdapter();
@@ -501,7 +511,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     }
 
-                    if (!forwarded) {
+                    if (!dontHandleResponse) {
                         // Handle response
                         if (resultCode == 200) {
                             // Sucessful response

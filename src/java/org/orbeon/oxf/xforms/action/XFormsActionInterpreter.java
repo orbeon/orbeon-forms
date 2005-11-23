@@ -748,7 +748,7 @@ public class XFormsActionInterpreter {
                 final Node currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
-                    resolveLoadValue(pipelineContext, actionElement, doReplace, value, target);
+                    resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target);
                 } else {
                     // Should we do this here?
                     containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
@@ -756,7 +756,7 @@ public class XFormsActionInterpreter {
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {
                 // Use linking attribute
-                resolveLoadValue(pipelineContext, actionElement, doReplace, resource, target);
+                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target);
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else {
                 // "Either the single node binding attributes, pointing to a URI in the instance
@@ -768,7 +768,7 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void resolveLoadValue(PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value, String target) {
+    public static void resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value, String target) {
 
         final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
 

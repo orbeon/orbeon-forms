@@ -43,6 +43,7 @@
 
     <!-- Other XForms options -->
     <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="false"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>

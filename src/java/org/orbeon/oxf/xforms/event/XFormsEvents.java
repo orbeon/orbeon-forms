@@ -22,6 +22,7 @@ public class XFormsEvents {
     public static final String XXFORMS_INITIALIZE = "xxforms-initialize";
     public static final String XXFORMS_INITIALIZE_CONTROLS = "xxforms-initialize-controls";
     public static final String XXFORMS_INITIALIZE_STATE = "xxforms-initialize-state";
+    public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";
 
     // Custom submit event
     public static final String XXFORMS_SUBMIT = "xxforms-submit";

@@ -136,7 +136,7 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     }
 
     public void setStatus(int i) {
-        response.setStatus(i);
+            response.setStatus(i);
     }
 
     public void setStatus(int i, String clazz) {

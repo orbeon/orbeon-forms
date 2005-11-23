@@ -17,12 +17,15 @@ import org.orbeon.oxf.xml.ElementHandlerContext;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.processor.NewXFormsServer;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import orbeon.apache.xml.utils.NamespaceSupport2;
+
+import java.util.Stack;
 
 /**
  *
@@ -115,13 +118,83 @@ public class HandlerContext implements ElementHandlerContext {
         return controlElementAttributes.getValue("id") + getIdPostfix();
     }
 
+    private Stack repeatContextStack;
+
     public String getIdPostfix() {
-        // TODO
-        return "";
+        if (repeatContextStack == null || repeatContextStack.size() == 0)
+            return "";
+        else
+            return ((RepeatContext) repeatContextStack.peek()).getIdPostifx();
     }
 
     public boolean isGenerateTemplate() {
-        // TODO
-        return false;
+        if (repeatContextStack == null || repeatContextStack.size() == 0)
+            return false;
+        else
+            return ((RepeatContext) repeatContextStack.peek()).isGenerateTemplate();
+    }
+
+    public boolean isRepeatSelected() {
+        if (repeatContextStack == null || repeatContextStack.size() == 0)
+            return false;
+        else
+            return ((RepeatContext) repeatContextStack.peek()).isRepeatSelected();
+    }
+
+    public boolean isTopLevelRepeat() {
+        if (repeatContextStack == null || repeatContextStack.size() == 0)
+            return false;
+        else
+            return ((RepeatContext) repeatContextStack.peek()).isTopLevelRepeat();
+    }
+
+    public int countParentRepeats() {
+        return (repeatContextStack == null) ? 0 : repeatContextStack.size();
+    }
+
+    public void pushRepeatContext(boolean generateTemplate, int iteration, boolean topLevelRepeat, boolean repeatSelected) {
+
+        final String currentIdPostfix = getIdPostfix();
+        final String newIdPostfix = (currentIdPostfix.length() == 0)
+                ? "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iteration
+                : currentIdPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iteration;
+
+        if (repeatContextStack == null)
+            repeatContextStack = new Stack();
+        repeatContextStack.push(new RepeatContext(generateTemplate, newIdPostfix, topLevelRepeat, repeatSelected));
+    }
+
+    public void popRepeatContext() {
+        repeatContextStack.pop();
+    }
+
+    private static class RepeatContext {
+        private boolean generateTemplate;
+        private String idPostifx;
+        private boolean topLevelRepeat;
+        private boolean repeatSelected;
+
+        public RepeatContext(boolean generateTemplate, String idPostifx, boolean topLevelRepeat, boolean repeatSelected) {
+            this.generateTemplate = generateTemplate;
+            this.idPostifx = idPostifx;
+            this.topLevelRepeat = topLevelRepeat;
+            this.repeatSelected = repeatSelected;
+        }
+
+        public boolean isGenerateTemplate() {
+            return generateTemplate;
+        }
+
+        public String getIdPostifx() {
+            return idPostifx;
+        }
+
+        public boolean isRepeatSelected() {
+            return repeatSelected;
+        }
+
+        public boolean isTopLevelRepeat() {
+            return topLevelRepeat;
+        }
     }
 }

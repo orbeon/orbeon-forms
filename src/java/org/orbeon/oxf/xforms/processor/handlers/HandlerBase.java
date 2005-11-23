@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -51,6 +52,21 @@ public abstract class HandlerBase extends ElementHandler {
         this.namespaceSupport = handlerContext.getNamespaceSupport();
     }
 
+    protected void addAllControlHandlers() {
+        addElementHandler(new XFormsInputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
+        addElementHandler(new XFormsOutputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+        addElementHandler(new XFormsTriggerHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+        addElementHandler(new XFormsSubmitHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+        addElementHandler(new XFormsSecretHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+        addElementHandler(new XFormsTextareaHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        addElementHandler(new XFormsUploadHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
+        addElementHandler(new XFormsRangeHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+        addElementHandler(new XFormsSelectHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
+        addElementHandler(new XFormsSelect1Handler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
+
+        addElementHandler(new XFormsRepeatHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+    }
+
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControls.ControlInfo controlInfo) {
         if (controlInfo.isReadonly()) {
             // @disabled="disabled"
@@ -59,7 +75,7 @@ public abstract class HandlerBase extends ElementHandler {
     }
 
     public static void handleRelevantClass(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
-        if (!controlInfo.isRelevant()) {
+        if (controlInfo != null && !controlInfo.isRelevant()) {// TEMP, controlInfo should not be null
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-disabled");
@@ -67,7 +83,7 @@ public abstract class HandlerBase extends ElementHandler {
     }
 
     public static void handleReadOnlyClass(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
-        if (controlInfo.isReadonly()) {
+        if (controlInfo != null && controlInfo.isReadonly()) {// TEMP, controlInfo should not be null
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-readonly");

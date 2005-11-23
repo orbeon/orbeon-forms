@@ -52,26 +52,12 @@ public class XHTMLBodyHandler extends HandlerBase {
         super(handlerContext, false);
         xformsState = handlerContext.getXFormsState();
 
-        addElementHandler(new XFormsInputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
-        addElementHandler(new XFormsOutputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
-        addElementHandler(new XFormsTriggerHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
-        addElementHandler(new XFormsSubmitHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
-        addElementHandler(new XFormsSecretHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
-        addElementHandler(new XFormsTextareaHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
-        addElementHandler(new XFormsUploadHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
-        addElementHandler(new XFormsRangeHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
-        addElementHandler(new XFormsSelectHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
-        addElementHandler(new XFormsSelect1Handler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
-
-        /*
-
-                xforms:repeat
-        */
-
         setDoForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        addAllControlHandlers();
 
         final ContentHandler contentHandler = handlerContext.getOutput();
         contentHandler.startElement(uri, localname, qName, attributes);

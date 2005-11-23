@@ -24,19 +24,21 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsServer;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
+import org.orbeon.oxf.xml.ElementHandler;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
- * translation of XForm + XHTML.
+ * translation from the source XForms + XHTML.
  */
 public class XFormsToXHTML extends ProcessorImpl {
 
@@ -103,8 +105,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext, final XFormsContainingDocument containingDocument, final ContentHandler contentHandler, final NewXFormsServer.XFormsState xformsState) {
 
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
         readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT, new ForwardingContentHandler(contentHandler) {
 
             private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
@@ -129,10 +129,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                         bodyElementHandler.start(uri, localname, qName, attributes);
 
-                    } else if (localname.equals("head")) {
-                        super.startElement(uri, localname, qName, attributes);
-                        // TODO: TEMP
-//                        NewXFormsServer.diffControlsState(new ContentHandlerHelper(contentHandler), null, xformsControls.getCurrentControlsState().getChildren());
                     } else if (localname.equals("style")) {
                         super.startElement(uri, localname, qName, attributes);
                     } else {

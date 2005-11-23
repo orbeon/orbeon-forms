@@ -403,6 +403,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_OPTIMIZE_POST_ALL_PROPERTY, true).booleanValue();// default to true for backward compatibility
     }
 
+    public static boolean isOptimizeGetAllSubmission() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_OPTIMIZE_GET_ALL_PROPERTY, true).booleanValue();
+    }
+
     public static boolean isOptimizeLocalSubmission() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true).booleanValue();

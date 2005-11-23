@@ -269,7 +269,7 @@
                                 </xforms:trigger>
                             </div>
 
-                            <!-- Display posts -->
+                            <!-- Display comments -->
                             <xforms:group ref="comments/@show">
                                 <div>
                                     <xforms:group ref="instance('new-comment')">

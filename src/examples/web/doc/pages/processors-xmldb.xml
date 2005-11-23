@@ -28,16 +28,17 @@
                 structure cannot be mapped naturally to a relational database.
             </p>
             <p>
-                OPS integrates with the following XML databases:
+                OPS integrates with Tamino XML Server databases, as well as XML:DB databases such as
+                eXist.
             </p>
         </section>
         <section>
             <title>Tamino XML Server 4.1</title>
             <p>
                 Software AG's <a href="http://www.softwareag.com/tamino/">Tamino</a> provides a
-                complete XML storage solution. OPS allows you to easily store,
-                query, update, and delete documents in Tamino. The following sections describe the
-                four OPS processors for Tamino:
+                complete XML storage solution. OPS allows you to easily store, query, update, and
+                delete documents in Tamino. The following sections describe the four OPS processors
+                for Tamino.
             </p>
             <section>
                 <title>Configuration</title>
@@ -109,7 +110,7 @@
                             <interleave>
                                 <optional>
                                     <element name="url">
-                                        <data type="string"/>
+                                        <data type="anyURI"/>
                                     </element>
                                 </optional>
                                 <optional>
@@ -132,44 +133,76 @@
                 <section>
                     <title>System-Wide Configuration</title>
                     <p>
-                        The Tamino processor can be configured in the <link
-                        href="reference-properties">OPS Properties</link>, allowing all instances
-                        to share the same configuration. The following properties are allowed:
+                        The Tamino processors can be configured in the <link
+                        href="reference-properties">OPS properties file</link>, allowing all
+                        instances to share the same configuration. The following properties are
+                        allowed:
                     </p>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>url</code>
+                            </td>
+                            <td>
+                                <code>anyURI</code>
+                            </td>
+                            <td>Tamino Server URL.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>username</code>
+                            </td>
+                            <td>
+                                <code>string</code>
+                            </td>
+                            <td>Username to authenticate with the server.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>password</code>
+                            </td>
+                            <td>
+                                <code>string</code>
+                            </td>
+                            <td>Password to authenticate with the server.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>isolation-degree</code>
+                            </td>
+                            <td>
+                                <code>string</code>
+                            </td>
+                            <td>Isolation degree. This value is passed directly to Tamino.</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <code>lock-mode</code>
+                            </td>
+                            <td>
+                                <code>string</code>
+                            </td>
+                            <td>Lock mode. This value is passed directly to Tamino.</td>
+                        </tr>
+                    </table>
                     <p>
-                        <table>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <code>oxf.processor.tamino.url</code>
-                                </td>
-                                <td>Tamino Server URL</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <code>oxf.processor.tamino.username</code>
-                                </td>
-                                <td>Username to authenticate with the server</td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <code>oxf.processor.tamino.password</code>
-                                </td>
-                                <td>Password to authenticate with the server</td>
-                            </tr>
-                        </table>
+                        These properties as set for each Tamino processor as follows:
                     </p>
+                    <xml-source>
+                        <property as="xs:anyURI" processor-name="oxf:tamino-query" name="url" value="http://localhost/tamino/welcome_4_1_4"/>
+                    </xml-source>
                 </section>
-
             </section>
             <section>
                 <title>Queries</title>
                 <p>
-                    The TaminoQueryProcessor (<code>oxf:tamino-query</code>)
-                    processes queries either using Tamino's X-Query or W3C XQuery.
+                    The <code>oxf:tamino-query</code> processor processes queries either using
+                    Tamino's X-Query or W3C XQuery.
                 </p>
                 <section>
                     <title>
@@ -247,10 +280,10 @@
                 </section>
             </section>
             <section>
-                <title>Inserting</title>
+                <title>Insertions</title>
                 <p>
-                    The TaminoInsertProcessor (<code>oxf:tamino-insert</code>)
-                    allows you to insert a document in Tamino.
+                    The <code>oxf:tamino-insert</code> processor allows you to insert a document in
+                    Tamino.
                 </p>
                 <note>
                     You need to make sure that the document conforms to one of the registered
@@ -293,10 +326,10 @@
                 </section>
             </section>
             <section>
-                <title>Deleting</title>
+                <title>Deletions</title>
                 <p>
-                    The TaminoDeleteProcessor (uri: <code>oxf:tamino-delete</code>)
-                    allows you to remove documents from Tamino.
+                    The <code>oxf:tamino-delete</code> processor allows you to remove documents
+                    from Tamino.
                 </p>
                 <section>
                     <title>
@@ -329,12 +362,11 @@
                 </section>
             </section>
             <section>
-                <title>Updating</title>
+                <title>Updates</title>
                 <p>
-                    The TaminoUpdateProcessor (uri: <code>oxf:tamino-update</code>) allows
-                    you to update parts of documents directly inside Tamino. An extension of XQuery
-                    is used for that purpose. Refer to the Tamino documentation for more
-                    information.
+                    The <code>oxf:tamino-update</code> processor allows you to update parts of
+                    documents directly inside Tamino. An extension of XQuery is used for that
+                    purpose. Refer to the Tamino documentation for more information.
                 </p>
                 <section>
                     <title>
@@ -376,6 +408,12 @@
                     in the pipeline, the transaction in rolled back.
                 </p>
             </section>
+        </section>
+        <section>
+            <title>XML:DB Databases (eXist)</title>
+            <p>
+                TODO
+            </p>
         </section>
     </body>
 </document>

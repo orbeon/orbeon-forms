@@ -16,7 +16,7 @@
     <interleave>
         <optional>
             <element name="url">
-                <data type="string"/>
+                <data type="anyURI"/>
             </element>
         </optional>
         <optional>

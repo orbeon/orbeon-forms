@@ -135,8 +135,8 @@
                     <p>
                         The Tamino processors can be configured in the <link
                         href="reference-properties">OPS properties file</link>, allowing all
-                        instances to share the same configuration. The following properties are
-                        allowed:
+                        instances to share the same configuration. The following processor
+                        properties are allowed:
                     </p>
                     <table>
                         <tr>
@@ -171,9 +171,25 @@
                             </td>
                             <td>Password to authenticate with the server.</td>
                         </tr>
+                    </table>
+                    <p>
+                        These properties as set for each Tamino processor as follows:
+                    </p>
+                    <xml-source>
+                        <property as="xs:anyURI" processor-name="oxf:tamino-query" name="url" value="http://localhost/tamino/welcome_4_1_4"/>
+                    </xml-source>
+                    <p>
+                        The following global properties are allowed:
+                    </p>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
                         <tr>
                             <td>
-                                <code>isolation-degree</code>
+                                <code>oxf.tamino.isolation-degree</code>
                             </td>
                             <td>
                                 <code>string</code>
@@ -182,7 +198,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <code>lock-mode</code>
+                                <code>oxf.tamino.lock-mode</code>
                             </td>
                             <td>
                                 <code>string</code>
@@ -191,10 +207,10 @@
                         </tr>
                     </table>
                     <p>
-                        These properties as set for each Tamino processor as follows:
+                        These properties as set globally as follows:
                     </p>
                     <xml-source>
-                        <property as="xs:anyURI" processor-name="oxf:tamino-query" name="url" value="http://localhost/tamino/welcome_4_1_4"/>
+                        <property as="xs:string" name="oxf.tamino.lock-mode" value="..."/>
                     </xml-source>
                 </section>
             </section>

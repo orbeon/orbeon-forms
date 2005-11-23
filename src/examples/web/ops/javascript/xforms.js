@@ -30,7 +30,6 @@ var REPEAT_HIERARCHY_SEPARATOR_2 = "-";
 
 /* * * * * * Utility functions * * * * * */
 
-
 function xformsIsDefined(thing) {
     return typeof thing != "undefined";
 }
@@ -329,6 +328,35 @@ function xformsDisplayLoading(state) {
                 document.xformsLoadingNone.style.display = "block";
             break;
     }
+}
+
+// Gets a value stored in the hidden client-state input field
+function xformsGetFromClientState(key) {
+    var keyValues = document.xformsClientState.value.split("&");
+    for (var i = 0; i < keyValues.length; i = i + 2)
+        if (keyValues[i] == key)
+            return unescape(keyValues[i + 1]);
+    return null;
+}
+
+// Returns a value stored in the hidden client-state input field
+function xformsStoreInClientState(key, value) {
+    var keyValues = document.xformsClientState.value == ""? new Array() : document.xformsClientState.value.split("&");
+    var found = false;
+    // If we found the key, replace the value
+    for (var i = 0; i < keyValues.length; i = i + 2) {
+        if (keyValues[i] == key) {
+            keyValues[i + 1] = escape(value);
+            found = true;
+            break;
+        }
+    }
+    // If key is there already, replace it
+    if (!found) {
+        keyValues.push(key);
+        keyValues.push(escape(value));
+    }
+    document.xformsClientState.value = keyValues.join("&");
 }
 
 function xformsValueChanged(target, other) {
@@ -817,10 +845,10 @@ function xformsPageLoaded() {
                         if (element.name.indexOf("$dynamic-state") != -1) {
                             document.xformsDynamicState = element;
                         }
-                        if (element.name.indexOf("$temp-dynamic-state") != -1) {
-                            document.xformsTempDynamicState = element;
+                        if (element.name.indexOf("$client-state") != -1) {
+                            document.xformsClientState = element;
                             if (element.value == "")
-                                element.value = document.xformsDynamicState.value;
+                                xformsStoreInClientState("ajax-dynamic-state", document.xformsDynamicState.value);
                         }
                     }
                 }
@@ -857,6 +885,13 @@ function xformsPageLoaded() {
             var id = repeatInfo[0];
             var index = repeatInfo[1];
             document.xformsRepeatIndexes[id] = index;
+        }
+
+        // Ask server to resend events if this is not the first time load is called
+        if (xformsGetFromClientState("load-did-run") == null) {
+            xformsStoreInClientState("load-did-run", "true");
+        } else {
+            xformsFireEvents(new Array(xformsCreateEventArray(null, "xxforms-all-events-required", null, null)));
         }
     }
 }
@@ -1487,7 +1522,7 @@ function xformsHandleResponse() {
 
             // Store new dynamic state if that state did not trigger a post
             if (!newDynamicStateTriggersPost) {
-                document.xformsTempDynamicState.value = newDynamicState;
+                xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
             }
 
             xformsDisplayLoading("none");
@@ -1542,7 +1577,7 @@ function xformsExecuteNextRequest() {
 
             // Add dynamic state (element is just created and will be filled just before we send the request)
             var dynamicStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:dynamic-state");
-            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(document.xformsTempDynamicState.value));
+            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(xformsGetFromClientState("ajax-dynamic-state")));
             eventFiredElement.appendChild(dynamicStateElement);
 
             // Add action
@@ -1561,7 +1596,8 @@ function xformsExecuteNextRequest() {
                 var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
                 actionElement.appendChild(eventElement);
                 eventElement.setAttribute("name", eventName);
-                eventElement.setAttribute("source-control-id", target.id);
+                if (target != null)
+                    eventElement.setAttribute("source-control-id", target.id);
                 if (other != null)
                     eventElement.setAttribute("other-control-id", other.id);
                 if (value != null)

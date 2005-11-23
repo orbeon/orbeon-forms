@@ -70,9 +70,11 @@
                             <attribute name="name">
                                 <ref name="xformsActionName"/>
                             </attribute>
-                            <attribute name="source-control-id">
-                                <data type="string"/>
-                            </attribute>
+                            <optional>
+                                <attribute name="source-control-id">
+                                    <data type="string"/>
+                                </attribute>
+                            </optional>
                             <optional>
                                 <attribute name="other-control-id">
                                     <data type="string"/>

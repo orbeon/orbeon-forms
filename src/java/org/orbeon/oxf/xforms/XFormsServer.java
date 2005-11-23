@@ -190,7 +190,9 @@ public class XFormsServer extends ProcessorImpl {
                             // An event is passed
                             containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
                         } else if (!(sourceControlId == null && eventName == null)) {
-                            throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+                            // Do we have a case where no event name is passed?
+                            // Otherwise this test could just become: eventName == null
+                            //throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
                     }
                 }

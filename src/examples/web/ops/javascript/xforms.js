@@ -673,9 +673,17 @@ function xformsInitializeControlsUnder(root) {
                 // Intercept end-user pressing enter in text field
                 xformsAddEventListener(textfield, "keypress", function(event) {
                     if (event.keyCode == 10 || event.keyCode == 13) {
-                        xformsHandleValueChange(event);
                         var span = getEventTarget(event).parentNode;
+                        xformsHandleValueChange(event);
                         xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
+                        // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
+                        if (event.preventDefault) {
+                            // Firefox version
+                            event.preventDefault();
+                        } else {
+                            // IE version
+                            return false;
+                        }
                     }
                 });
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {

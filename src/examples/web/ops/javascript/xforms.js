@@ -383,7 +383,6 @@ function xformsHandleValueChange(event) {
     return true;
 }
 
-
 // Parameter is an array of arrays with each array containing:
 // new Array(target, eventName, value, incremental, other)
 function xformsFireEvents(events) {
@@ -644,9 +643,13 @@ function xformsInitializeControlsUnder(root) {
                     control.watch("value", function(property, oldvalue, newvalue) {
                         var span = this;
                         var textField = span.childNodes[1];
-                        span.value = newvalue;
-                        textField.value = newvalue;
-                        xformsDispatchEvent(textField, "change");
+                        if (span.valueSetByXForms == 0 && textField.value != span.value) {
+                            span.value = newvalue;
+                            textField.value = newvalue;
+                            xformsDispatchEvent(textField, "change");
+                        } else {
+                            span.valueSetByXForms--;
+                        }
                         return newvalue;
                     });
                 } else {
@@ -1208,10 +1211,17 @@ function xformsHandleResponse() {
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control was modified and we haven't even received the key event yet
+                                            // This can happen as the the keyup event is dispatched after the control.value is modified,
+                                            // and it is possible to receive a response from the server after the value is modified but
+                                            // before the keyup event is dispatched.
                                             var foundControlModified = false;
-                                            if (xformsIsDefined(documentElement.previousValue)
-                                                    && documentElement.previousValue != documentElement.value)
+                                            if (xformsArrayContains(documentElement.className.split(" "), "xforms-input")) {
+                                                if (documentElement.childNodes[1].value != documentElement.previousValue)
+                                                    foundControlModified = true;
+                                            } else if (xformsIsDefined(documentElement.previousValue)
+                                                    && documentElement.previousValue != documentElement.value) {
                                                 foundControlModified = true;
+                                            }
                                             // Check if this control has been modified while the event was processed
                                             if (!foundControlModified) {
                                                 for (var indexId = 0; indexId < document.xformsChangedIdsRequest.length; indexId++) {
@@ -1606,18 +1616,7 @@ function xformsExecuteNextRequest() {
             document.xformsEvents = new Array();
 
             // Reset changes, as changes are included in this bach of events
-            var newXFormsChangedIdsRequest = new Array();
-            for (var idIndex = 0; idIndex < document.xformsChangedIdsRequest.length; idIndex++) {
-                var controlId = document.xformsChangedIdsRequest[idIndex];
-                var control = document.getElementById(controlId);
-                // Keep textfields if their value has changed and we didn't get a notification yet
-                // It is not clear why the browser delays the call to our key listener
-                // for textfields but not for textareas
-                if (xformsArrayContains(control.className.split(" "), "xforms-input")
-                        && control.childNodes[1].value != control.value)
-                    newXFormsChangedIdsRequest.push(controlId);
-            }
-            document.xformsChangedIdsRequest = newXFormsChangedIdsRequest;
+            document.xformsChangedIdsRequest = new Array();
 
             requestDocument = eventFiredElement.ownerDocument;
         }

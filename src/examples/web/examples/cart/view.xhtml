@@ -35,16 +35,18 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:input ref="instance('item')">
-                <xforms:label>Enter an item:</xforms:label>
-            </xforms:input>
-            <xforms:trigger>
-                <xforms:label>Add to cart</xforms:label>
+            <xforms:group>
+                <xforms:input ref="instance('item')">
+                    <xforms:label>Enter an item:</xforms:label>
+                </xforms:input>
+                <xforms:trigger>
+                    <xforms:label>Add to cart</xforms:label>
+                </xforms:trigger>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:send submission="add"/>
                     <xforms:send submission="get"/>
                 </xforms:action>
-            </xforms:trigger>
+            </xforms:group>
             <xforms:trigger>
                 <xforms:label>Empty cart</xforms:label>
                 <xforms:action ev:event="DOMActivate">

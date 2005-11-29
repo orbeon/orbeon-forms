@@ -264,7 +264,8 @@
                                 <xforms:output value="' '"/>
                                 <!--<a href="{links/comments}">Comments [<xforms:output value="count(comments/comment)"/>]</a>-->
                                 <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label>Comments [<xforms:output value="count(comments/comment)"/>]</xforms:label>
+                                    <xforms:label>Comments</xforms:label>
+                                    <!--<xforms:label>Comments [<xforms:output value="count(comments/comment)"/>]</xforms:label>-->
                                     <xforms:load ev:event="DOMActivate" ref="links/comments"/>
                                 </xforms:trigger>
                             </div>

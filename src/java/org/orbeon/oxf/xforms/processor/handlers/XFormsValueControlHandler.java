@@ -28,6 +28,8 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class XFormsValueControlHandler extends HandlerBase {
 
+    private int level = 0;
+
     private Attributes labelAttributes;
     private Attributes helpAttributes;
     private Attributes hintAttributes;
@@ -38,7 +40,8 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Reset state, as this handler is reused
+        // Reset state, as this handler may be reused
+        level = 0;
         labelAttributes = null;
         helpAttributes = null;
         hintAttributes = null;
@@ -46,7 +49,9 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+        level++;
+        if (level == 1 && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+            // Handle direct children only
             if ("label".equals(localname)) {
                 labelAttributes = new AttributesImpl(attributes);
             } else if ("hint".equals(localname)) {
@@ -58,6 +63,11 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
             }
         }
         super.startElement(uri, localname, qName, attributes);
+    }
+
+    public void endElement(String uri, String localname, String qName) throws SAXException {
+        super.endElement(uri, localname, qName);
+        level--;
     }
 
     protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControls.ControlInfo controlInfo) throws SAXException {

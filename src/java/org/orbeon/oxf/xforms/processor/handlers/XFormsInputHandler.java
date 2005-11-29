@@ -99,8 +99,14 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
+
+                if (!handlerContext.isGenerateTemplate()) {
+                    final String value = controlInfo.getValue();
+                    reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
+                } else {
+                    reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
+                }
+
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
                         (inputClasses.length() > 0) ? inputClasses.toString() : "");// TODO: check whether like in the XSTL version we need to copy other classes as well
                 if (isReadOnly) {

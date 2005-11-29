@@ -33,10 +33,6 @@ public abstract class ElementHandlerNew extends ForwardingContentHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
     }
 
-    protected void repeatBody() throws SAXException {
-        // TODO
-    }
-
     public abstract boolean isRepeating();
 
     public abstract boolean isForwarding();

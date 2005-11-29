@@ -114,7 +114,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
         // Create "class" attribute if necessary
         {
-            final StringBuffer sb = new StringBuffer((classes != null) ? classes : "");
+            final StringBuffer sb = new StringBuffer();
+            // User-defined classes go first
             {
                 final String value = elementAttributes.getValue("class");
                 if (value != null) {
@@ -129,6 +130,14 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     if (sb.length() > 0)
                         sb.append(' ');
                     sb.append(value);
+                }
+            }
+            // XForms engine classes go next
+            {
+                if (classes != null) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(classes);
                 }
             }
             {

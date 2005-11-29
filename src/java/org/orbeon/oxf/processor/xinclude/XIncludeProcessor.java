@@ -53,6 +53,7 @@ public class XIncludeProcessor extends ProcessorImpl {
         final ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
+                final ContentHandler debugContentHandler = contentHandler;
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
 
                 // Try to cache URI references
@@ -60,7 +61,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         final URIReferences uriReferences = new URIReferences();
-                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
+                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, debugContentHandler, uriReferences, uriResolver));
                         wasRead[0] = true;
                         return uriReferences;
                     }
@@ -68,7 +69,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                 // Read if not already read
                 if (!wasRead[0]) {
-                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));
+                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, debugContentHandler, null, uriResolver));
                 }
             }
         };
@@ -88,9 +89,11 @@ public class XIncludeProcessor extends ProcessorImpl {
         private TransformerURIResolver uriResolver;
         private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
 
+        private boolean mustPushContext = true;
+
         private int level;
         private boolean inInclude;
-        private int includeLevel;
+        private int includeLevel = -1;
 
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver) {
             this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null);
@@ -111,22 +114,31 @@ public class XIncludeProcessor extends ProcessorImpl {
         }
 
         public void startDocument() throws SAXException {
-            if (topLevelContentHandler)
+            if (topLevelContentHandler) {
                 super.startDocument();
+            } else {
+                // Clean-up namespace mappings
+                sendClearStartPrefixMappings();
+            }
         }
 
         public void endDocument() throws SAXException {
-            if (topLevelContentHandler)
+            if (topLevelContentHandler) {
                 super.endDocument();
+            } else {
+                // Clean-up namespace mappings
+                sendClearEndPrefixMappings();
+            }
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-            namespaceSupport.pushContext();
+            if (mustPushContext)
+                namespaceSupport.pushContext();
+            else
+                mustPushContext = true;
 
             if (!topLevelContentHandler && level == 0) {
-                // Clean-up namespace mappings
-                sendStartPrefixMappings();
                 // Add or replace xml:base attribute
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", xmlBase);
             }
@@ -142,7 +154,6 @@ public class XIncludeProcessor extends ProcessorImpl {
                     // Start inclusion
 
                     inInclude = true;
-                    includeLevel = level;
 
                     final String href = attributes.getValue("href");
                     final String parse = attributes.getValue("parse");
@@ -175,6 +186,13 @@ public class XIncludeProcessor extends ProcessorImpl {
                     throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(locator));
                 }
 
+            } else if (includeLevel != -1 && level == includeLevel) {
+                // We are starting a sibling of an included element
+
+                // Send adjusted prefix mappings
+                sendRestoreStartPrefixMappings();
+
+                super.startElement(uri, localname, qName, attributes);
             } else {
                 super.startElement(uri, localname, qName, attributes);
             }
@@ -182,10 +200,10 @@ public class XIncludeProcessor extends ProcessorImpl {
             level++;
         }
 
-        private void sendStartPrefixMappings() throws SAXException {
+        private void sendClearStartPrefixMappings() throws SAXException {
             for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();
-                if (!namespacePrefix.startsWith("xml"))
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
                     super.startPrefixMapping(namespacePrefix, "");
             }
 
@@ -194,10 +212,10 @@ public class XIncludeProcessor extends ProcessorImpl {
                 super.startPrefixMapping("", "");
         }
 
-        private void sendEndPrefixMappings() throws SAXException {
+        private void sendClearEndPrefixMappings() throws SAXException {
             for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();
-                if (!namespacePrefix.startsWith("xml"))
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
                     super.endPrefixMapping(namespacePrefix);
             }
 
@@ -206,24 +224,70 @@ public class XIncludeProcessor extends ProcessorImpl {
                 super.endPrefixMapping("");
         }
 
+        private void sendRestoreStartPrefixMappings() throws SAXException {
+            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                    super.startPrefixMapping(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+            }
+
+            final String defaultNS = namespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0)
+                super.startPrefixMapping("", defaultNS);
+        }
+
+        private void sendRestoreEndPrefixMappings() throws SAXException {
+            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                    super.endPrefixMapping(namespacePrefix);
+            }
+
+            final String defaultNS = namespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0)
+                super.endPrefixMapping("");
+        }
+
         public void endElement(String uri, String localname, String qName) throws SAXException {
 
             level--;
 
-            namespaceSupport.popContext();
-
+            final boolean isEndingInclude;
             if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
-
+                if ("include".equals(localname)) {
+                    isEndingInclude = true;
+                } else {
+                    isEndingInclude = false;
+                }
             } else {
+                isEndingInclude = false;
                 super.endElement(uri, localname, qName);
             }
 
-            if (!topLevelContentHandler && level == 0) {
-                sendEndPrefixMappings();
+            if (isEndingInclude) {
+                // Remember that we included at this level
+                includeLevel = level;
+            } else if (includeLevel != -1) {
+                if (level == includeLevel) {
+                    // Clear adjusted namespace mappings
+                    sendRestoreEndPrefixMappings();
+                } else if (level < includeLevel) {
+                    // Clear include level indicator
+                    includeLevel = -1;
+                }
             }
+
+            namespaceSupport.popContext();
+            mustPushContext = true;
         }
 
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
+
+            if (mustPushContext) {
+                namespaceSupport.pushContext();
+                mustPushContext = false;
+            }
+
             namespaceSupport.declarePrefix(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         }

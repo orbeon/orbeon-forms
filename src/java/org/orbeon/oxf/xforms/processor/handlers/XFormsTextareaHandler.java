@@ -70,7 +70,8 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
             if (!handlerContext.isGenerateTemplate()) {
                 final String value = controlInfo.getValue();
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                if (value != null)
+                    contentHandler.characters(value.toCharArray(), 0, value.length());
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
         }

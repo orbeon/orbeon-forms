@@ -89,7 +89,7 @@ public class XFormsRepeatHandler extends HandlerBase {
 
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, false, isCurrentRepeatSelected);
-                repeatBody();
+                handlerContext.getController().repeatBody();
                 outputInterceptor.flushCharacters(true);
                 handlerContext.popRepeatContext();
             }
@@ -111,7 +111,18 @@ public class XFormsRepeatHandler extends HandlerBase {
 
             // Apply the content of the body for this iteration
             handlerContext.pushRepeatContext(true, 0, false, false);
-            repeatBody();
+            handlerContext.getController().repeatBody();
+            outputInterceptor.flushCharacters(true);
+            handlerContext.popRepeatContext();
+        }
+
+        if (outputInterceptor.getDelimiterNamespaceURI() == null) {
+            // No delimiter has been generated, try to find one!
+
+            outputInterceptor.setForward(false); // prevent interceptor to output anything
+
+            handlerContext.pushRepeatContext(true, 0, false, false);
+            handlerContext.getController().repeatBody();
             outputInterceptor.flushCharacters(true);
             handlerContext.popRepeatContext();
         }
@@ -143,7 +154,6 @@ public class XFormsRepeatHandler extends HandlerBase {
     }
 
     private class OutputInterceptor extends ForwardingContentHandler {
-        // TODO
 
         private String effectiveId;
         private String spanQName;
@@ -238,7 +248,7 @@ public class XFormsRepeatHandler extends HandlerBase {
         private Attributes getAttributesWithClass(Attributes originalAttributes) {
             String newClassAttribute = originalAttributes.getValue("class");
 
-            if (addedClasses.length() > 0) {
+            if (addedClasses != null && addedClasses.length() > 0) {
                 if (newClassAttribute == null) {
                     newClassAttribute = addedClasses.toString();
                 } else {

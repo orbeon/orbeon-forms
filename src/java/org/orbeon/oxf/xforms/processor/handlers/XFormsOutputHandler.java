@@ -128,7 +128,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             } else {
                 // Regular text case
                 final String value = controlInfo.getValue();
-                contentHandler.characters(value.toCharArray(), 0, value.length());
+                if (value != null)
+                    contentHandler.characters(value.toCharArray(), 0, value.length());
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

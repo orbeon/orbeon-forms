@@ -584,6 +584,7 @@ public class XFormsControls {
                         controlInfo = new OutputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("upload")) {
                         controlInfo = new UploadControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        result.setHasUpload(true);
                     } else {
                         controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
@@ -1300,6 +1301,7 @@ public class XFormsControls {
         private Map effectiveRepeatIdToIterations;
         private Map switchIdToSelectedCaseIdMap;
         private List valueControls;
+        private boolean hasUpload;
 
         public ControlsState() {
         }
@@ -1374,6 +1376,14 @@ public class XFormsControls {
 
         public Map getEffectiveRepeatIdToIterations() {
             return effectiveRepeatIdToIterations;
+        }
+
+        public boolean isHasUpload() {
+            return hasUpload;
+        }
+
+        public void setHasUpload(boolean hasUpload) {
+            this.hasUpload = hasUpload;
         }
 
         /**

@@ -13,10 +13,9 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
-import org.dom4j.Node;
 import org.dom4j.Document;
+import org.dom4j.Node;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -27,12 +26,12 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.ConstantLocator;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -508,7 +507,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private Locator locator;
         private URIReferences uriReferences = new URIReferences();
         private String systemId;
-        private final NamespaceSupport2 namespaces = new NamespaceSupport2();
+        private final NamespaceSupport3 namespaces = new NamespaceSupport3();
 
         public StylesheetForwardingContentHandler() {
             super();
@@ -535,12 +534,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
 
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
-            namespaces.declarePrefix(prefix, uri);
+            namespaces.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            namespaces.pushContext();
+            namespaces.startElement();
             // Save system id
             if (systemId == null && locator != null)
                 systemId = locator.getSystemId();
@@ -583,16 +582,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
         public void endElement(String uri, String localname, String qName) throws SAXException {
             super.endElement(uri, localname, qName);
-            namespaces.popContext();
+            namespaces.endElement();
         }
 
         public void endDocument() throws SAXException {
             super.endDocument();
-            namespaces.popContext();
         }
 
         public void startDocument() throws SAXException {
-            namespaces.pushContext();
             super.startDocument();
         }
 

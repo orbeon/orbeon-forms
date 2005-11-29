@@ -55,7 +55,7 @@ public class XHTMLBodyHandler extends HandlerBase {
 
         final String prefix = XMLUtils.prefixFromQName(qName);
 
-        final boolean hasUpload = false;// TODO
+        final boolean hasUpload = xformsControls.getCurrentControlsState().isHasUpload();
 
         // Create xhtml:form
         helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[]{

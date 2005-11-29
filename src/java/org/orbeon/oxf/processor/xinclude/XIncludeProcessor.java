@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.xinclude;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -21,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -83,13 +83,11 @@ public class XIncludeProcessor extends ProcessorImpl {
         private URIReferences uriReferences;
         private boolean topLevelContentHandler;
         private String xmlBase;
-        private NamespaceSupport2 paremtNamespaceSupport;
+        private NamespaceSupport3 paremtNamespaceSupport;
 
         private Locator locator;
         private TransformerURIResolver uriResolver;
-        private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
-
-        private boolean mustPushContext = true;
+        private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
         private int level;
         private boolean inInclude;
@@ -99,11 +97,11 @@ public class XIncludeProcessor extends ProcessorImpl {
             this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null);
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
             this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;
@@ -133,10 +131,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-            if (mustPushContext)
-                namespaceSupport.pushContext();
-            else
-                mustPushContext = true;
+            namespaceSupport.startElement();
 
             if (!topLevelContentHandler && level == 0) {
                 // Add or replace xml:base attribute
@@ -277,18 +272,12 @@ public class XIncludeProcessor extends ProcessorImpl {
                 }
             }
 
-            namespaceSupport.popContext();
-            mustPushContext = true;
+            namespaceSupport.endElement();
         }
 
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
 
-            if (mustPushContext) {
-                namespaceSupport.pushContext();
-                mustPushContext = false;
-            }
-
-            namespaceSupport.declarePrefix(prefix, uri);
+            namespaceSupport.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         }
 

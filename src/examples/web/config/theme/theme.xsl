@@ -39,8 +39,8 @@
                 <xhtml:script type="text/javascript" src="/config/theme/jscalendar/lang/calendar-en.js"/>
                 <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar-setup.js"/>
                 <!-- Other standard scripts/styles -->
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                 <xhtml:link rel="stylesheet" href="/config/theme/xforms.css" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                 <xhtml:script type="text/javascript" src="/config/theme/javascript/xforms-style.js"/>
                 <xhtml:script type="text/javascript" src="/ops/javascript/wz_tooltip.js"/>
                 <xhtml:script type="text/javascript" src="/ops/javascript/overlib_mini.js"/>

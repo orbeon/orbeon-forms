@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
+import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
@@ -34,7 +34,7 @@ public class XFormsElementContext extends XFormsControls {
     private Map repeatIdToIndex = new HashMap();
     private Stack elements = new Stack();
 
-    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
     private String encryptionPassword;
 
@@ -114,7 +114,7 @@ public class XFormsElementContext extends XFormsControls {
         return prefixToURI;
     }
 
-    public NamespaceSupport2 getNamespaceSupport() {
+    public NamespaceSupport3 getNamespaceSupport() {
         return namespaceSupport;
     }
 

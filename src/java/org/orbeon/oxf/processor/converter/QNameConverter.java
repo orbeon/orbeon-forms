@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.NamespaceSupport3;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -72,10 +72,10 @@ public class QNameConverter extends ProcessorImpl {
                 // Do the conversion
                 readInputAsSAX(context, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
-                    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+                    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                        namespaceSupport.pushContext();
+                        namespaceSupport.startElement();
                         if (config.matchURI == null || config.matchURI.equals(uri)) {
                             int colonIndex = qName.indexOf(':');
                             String prefix = (colonIndex == -1) ? "" : qName.substring(0, colonIndex);
@@ -133,11 +133,11 @@ public class QNameConverter extends ProcessorImpl {
                             // No match
                             super.endElement(uri, localname, qName);
                         }
-                        namespaceSupport.popContext();
+                        namespaceSupport.endElement();
                     }
 
                     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        namespaceSupport.declarePrefix(prefix, uri);
+                        namespaceSupport.startPrefixMapping(prefix, uri);
                         super.startPrefixMapping(prefix, uri);
                     }
 

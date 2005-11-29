@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -22,10 +21,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -67,7 +63,7 @@ public class XFormsExtractor extends ProcessorImpl {
                     private String element0;
                     private String element1;
 
-                    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+                    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
                     private boolean gotModel;
                     private boolean gotControl;
@@ -130,7 +126,7 @@ public class XFormsExtractor extends ProcessorImpl {
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-                        namespaceSupport.pushContext();
+                        namespaceSupport.startElement();
 
                         if (!inModel && !inControl) {
                             // Handle xml:base
@@ -258,8 +254,6 @@ public class XFormsExtractor extends ProcessorImpl {
                             super.endElement(uri, localname, qName);
                         }
 
-                        namespaceSupport.popContext();
-
                         if (inModel && level == modelLevel) {
                             // Leaving model
                             inModel = false;
@@ -273,6 +267,8 @@ public class XFormsExtractor extends ProcessorImpl {
                         if (!inModel && !inControl) {
                             xmlBaseStack.pop();
                         }
+
+                        namespaceSupport.endElement();
                     }
 
                     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -281,7 +277,7 @@ public class XFormsExtractor extends ProcessorImpl {
                     }
 
                     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        namespaceSupport.declarePrefix(prefix, uri);
+                        namespaceSupport.startPrefixMapping(prefix, uri);
                         if (inModel || inControl)
                             super.startPrefixMapping(prefix, uri);
                     }

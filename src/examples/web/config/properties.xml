@@ -37,7 +37,7 @@
     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
 
     <!-- XForms cache configuration -->
-    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="client"/>
+    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>
     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
 

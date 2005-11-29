@@ -1,6 +1,18 @@
+/**
+ *  Copyright (C) 2005 Orbeon, Inc.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the
+ *  GNU Lesser General Public License as published by the Free Software Foundation; either version
+ *  2.1 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
+ *
+ *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
 package org.orbeon.oxf.xml;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -21,20 +33,32 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     private Object elementHandlerContext;
     private DeferredContentHandler output;
     private Map handlerKeysToNames = new HashMap();
+    private Map uriHandlerKeysToNames = new HashMap();
 
     private Stack handlerInfos = new Stack();
     private HandlerInfo currentHandlerInfo;
     private boolean isFillingUpSAXStore;
 
-    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
     private Locator locator;
 
     private int level;
-    private boolean mustPushContext = true;
 
+    /**
+     * Register a handler. The handler can match on a URI + localname, or on URI only. URI
+     * matching has lower priority than URI + localname matching.
+     *
+     *
+     * @param handlerClassName
+     * @param uri
+     * @param localname
+     */
     public void registerHandler(String handlerClassName, String uri, String localname) {
-        handlerKeysToNames.put(XMLUtils.buildExplodedQName(uri, localname), handlerClassName);
+        if (localname != null)
+            handlerKeysToNames.put(XMLUtils.buildExplodedQName(uri, localname), handlerClassName);
+        else
+            uriHandlerKeysToNames.put(uri, handlerClassName);
     }
 
     public Object getElementHandlerContext() {
@@ -53,7 +77,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         this.output = output;
     }
 
-    public NamespaceSupport2 getNamespaceSupport() {
+    public NamespaceSupport3 getNamespaceSupport() {
         return namespaceSupport;
     }
 
@@ -77,19 +101,30 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         try {
-            if (mustPushContext)
-                namespaceSupport.pushContext();
-            else
-                mustPushContext = true;
+            namespaceSupport.startElement();
 
             if (!isFillingUpSAXStore) {
 //                namespaceSupport.pushContext();
 
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
                 final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
+
+                final ElementHandlerNew elementHandler;
                 if (handlerClassName != null) {
-                    // Found new handler
-                    final ElementHandlerNew elementHandler = getHandlerByClassName(handlerClassName);
+                    // Found handler
+                    elementHandler = getHandlerByClassName(handlerClassName);
+                } else {
+                    // Search for URI-based handler
+                    final String uriHandlerClassName = (String) uriHandlerKeysToNames.get(uri);
+                    if (uriHandlerClassName != null) {
+                        // Found handler
+                        elementHandler = getHandlerByClassName(uriHandlerClassName);
+                    } else {
+                        elementHandler = null;
+                    }
+                }
+
+                if (elementHandler != null) {
                     elementHandler.setContext(elementHandlerContext);
                     elementHandler.setForward(elementHandler.isForwarding());
                     elementHandler.setContentHandler(output);
@@ -107,6 +142,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                         elementHandler.start(uri, localname, qName, attributes);
                     }
                 } else {
+
                     super.startElement(uri, localname, qName, attributes);
                 }
             } else {
@@ -148,8 +184,7 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 //                    namespaceSupport.popContext();
             }
 
-            namespaceSupport.popContext();
-            mustPushContext = true;
+            namespaceSupport.endElement();
 
         } catch (Exception e) {
             throw new ValidationException(e, new LocationData(locator));
@@ -170,13 +205,8 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         try {
-            if (mustPushContext) {
-                namespaceSupport.pushContext();
-                mustPushContext = false;
-            }
-
             // Update global NamespaceSupport
-            namespaceSupport.declarePrefix(prefix, uri);
+            namespaceSupport.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         } catch (Exception e) {
             throw new ValidationException(e, new LocationData(locator));

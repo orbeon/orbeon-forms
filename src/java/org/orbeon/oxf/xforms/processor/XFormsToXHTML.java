@@ -29,7 +29,10 @@ import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -114,15 +117,72 @@ public class XFormsToXHTML extends ProcessorImpl {
         controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
         controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
 
-        controller.registerHandler(XFormsModelHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "model");
         controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
         controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
         controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
 
         controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
 
-        // Set final output
-        controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
+        // Set final output with output to filter remaining xforms:* elements
+        controller.setOutput(new DeferredContentHandlerImpl(new ForwardingContentHandler(contentHandler) {
+
+            private int level = 0;
+            private int xformsLevel = -1;
+
+            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+                if (xformsLevel == -1) {
+                    if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+                        xformsLevel = level;
+                    } else {
+                        super.startElement(uri, localname, qName, attributes);
+                    }
+                }
+
+                level++;
+            }
+
+            public void endElement(String uri, String localname, String qName) throws SAXException {
+                level--;
+
+                if (xformsLevel == level) {
+                    xformsLevel = -1;
+                } else if (xformsLevel == -1) {
+                    super.endElement(uri, localname, qName);
+                }
+            }
+
+            public void startPrefixMapping(String s, String s1) throws SAXException {
+                if (xformsLevel == -1)
+                    super.startPrefixMapping(s, s1);
+            }
+
+            public void endPrefixMapping(String s) throws SAXException {
+                if (xformsLevel == -1)
+                    super.endPrefixMapping(s);
+            }
+
+            public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
+                if (xformsLevel == -1)
+                    super.ignorableWhitespace(chars, start, length);
+            }
+
+            public void characters(char[] chars, int start, int length) throws SAXException {
+                if (xformsLevel == -1)
+                    super.characters(chars, start, length);
+            }
+
+            public void skippedEntity(String s) throws SAXException {
+                if (xformsLevel == -1)
+                    super.skippedEntity(s);
+            }
+
+            public void processingInstruction(String s, String s1) throws SAXException {
+                if (xformsLevel == -1)
+                    super.processingInstruction(s, s1);
+            }
+
+        }));
 
         controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, externalContext));
 

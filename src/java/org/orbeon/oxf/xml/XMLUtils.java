@@ -166,7 +166,7 @@ public class XMLUtils {
     /**
      * Return "" if there is no prefix, null if the prefix is not mapped, a URI otherwise.
      */
-    public static String uriFromQName(String qName, NamespaceSupport2 namespaceSupport) {
+    public static String uriFromQName(String qName, NamespaceSupport3 namespaceSupport) {
         final String prefix = prefixFromQName(qName);
         if ("".equals(prefix))
             return "";

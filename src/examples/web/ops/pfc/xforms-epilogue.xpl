@@ -1,5 +1,4 @@
-<!--
-    Copyright (C) 2005 Orbeon, Inc.
+<!--Copyright (C) 2005 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -84,6 +83,7 @@
                     <!-- Annotate elements in view with ids and alerts -->
                     <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
+                        <!--<p:input name="data" href="#data"/>-->
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
                     <!-- Extract models and controls for XForms server -->
@@ -95,24 +95,23 @@
                     </p:processor>
 
                     <!-- New way -->
-                    <!--<p:processor name="oxf:xforms-to-xhtml">-->
-                        <!--<p:input name="annotated-document" href="#annotated-view"/>-->
-                        <!--<p:input name="static-state" href="#static-state"/>-->
-                        <!--<p:output name="document" id="xformed-data"/>-->
-                    <!--</p:processor>-->
+                    <p:processor name="oxf:xforms-to-xhtml">
+                        <p:input name="annotated-document" href="#annotated-view"/>
+                        <p:input name="static-state" href="#static-state"/>
+                        <p:output name="document" ref="xformed-data" debug="xxxxformed"/>
+                    </p:processor>
 
                     <!-- Old way -->
-                    <p:processor name="oxf:xforms-server">
-                        <p:input name="static-state" href="#static-state"/>
-                        <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->
-                        <p:output name="response" id="response"/>
-                    </p:processor>
-                    <p:processor name="oxf:xslt">
-                        <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
-                        <p:input name="data" href="#annotated-view"/>
-                        <p:input name="response" href="#response"/>
-                        <p:output name="data" ref="xformed-data"/>
-                    </p:processor>
+                    <!--<p:processor name="oxf:old-xforms-server">-->
+                        <!--<p:input name="static-state" href="#static-state"/>-->
+                        <!--<p:output name="response" id="response"/>-->
+                    <!--</p:processor>-->
+                    <!--<p:processor name="oxf:xslt">-->
+                        <!--<p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>-->
+                        <!--<p:input name="data" href="#annotated-view"/>-->
+                        <!--<p:input name="response" href="#response"/>-->
+                        <!--<p:output name="data" ref="xformed-data"/>-->
+                    <!--</p:processor>-->
                 </p:when>
                 <p:otherwise>
                     <p:processor name="oxf:identity">

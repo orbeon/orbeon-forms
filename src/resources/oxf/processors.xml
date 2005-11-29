@@ -444,11 +444,11 @@
     </processor>
 
     <processor name="oxf:xforms-server">
-        <class name="org.orbeon.oxf.xforms.XFormsServer"/>
+        <class name="org.orbeon.oxf.xforms.processor.XFormsServer"/>
     </processor>
 
-    <processor name="oxf:new-xforms-server">
-        <class name="org.orbeon.oxf.xforms.processor.NewXFormsServer"/>
+    <processor name="oxf:old-xforms-server">
+        <class name="org.orbeon.oxf.xforms.XFormsServer"/>
     </processor>
 
     <processor name="oxf:xforms-to-xhtml">

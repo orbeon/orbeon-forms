@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.processor.NewXFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -94,7 +93,7 @@ public class XFormsServer extends ProcessorImpl {
         final Element filesElement;
         final Element actionElement;
         final XFormsContainingDocument containingDocument;
-        final NewXFormsServer.XFormsState xformsState;
+        final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState xformsState;
         final String requestPageGenerationId;
         final boolean isInitializationRun;
         if (hasRequestInput) {
@@ -132,7 +131,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     // We don't create the cache at this point as it may not be necessary
                     final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
-                    final NewXFormsServer.XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
+                    final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
 
                     // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                     if (sessionFormsState == null)
@@ -142,7 +141,7 @@ public class XFormsServer extends ProcessorImpl {
                 } else {
                     // State comes with request
                     requestPageGenerationId = null;
-                    xformsState = new NewXFormsServer.XFormsState(staticStateString, dynamicStateString);
+                    xformsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(staticStateString, dynamicStateString);
                 }
             }
 
@@ -154,19 +153,19 @@ public class XFormsServer extends ProcessorImpl {
                 } else  {
                     // If there are filesElement, then we know this was not cached
                     logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
-                    containingDocument = NewXFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+                    containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
                 }
             } else {
                 // Otherwise we recreate the containindg document from scratch
-                containingDocument = NewXFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+                containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
             }
             isInitializationRun = false;
         } else {
             // Use static-state input provided during initialization run
 
             final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
-            xformsState = new NewXFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
-            containingDocument = NewXFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, staticStateDocument);
+            xformsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
+            containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, staticStateDocument);
 
             filesElement = null;
             actionElement = null;
@@ -305,8 +304,8 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Encode dynamic state
-                        final String newEncodedDynamicState = XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument);
-                        final NewXFormsServer.XFormsState newXFormsState = new NewXFormsServer.XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
+                        final String newEncodedDynamicState = XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument);
+                        final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState newXFormsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
                         if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
@@ -352,7 +351,7 @@ public class XFormsServer extends ProcessorImpl {
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                            NewXFormsServer.diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                            org.orbeon.oxf.xforms.processor.XFormsServer.diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
                                     currentControlsState.getChildren());
 
                             ch.endElement();
@@ -429,7 +428,7 @@ public class XFormsServer extends ProcessorImpl {
                         {
                             final List loads = containingDocument.getClientLoads();
                             if (loads != null) {
-                                NewXFormsServer.outputLoadsInfo(ch, loads);
+                                org.orbeon.oxf.xforms.processor.XFormsServer.outputLoadsInfo(ch, loads);
                             }
                         }
 

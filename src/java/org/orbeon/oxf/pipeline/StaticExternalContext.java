@@ -82,7 +82,7 @@ public class StaticExternalContext {
     }
 
     public static String encodeXML(org.w3c.dom.Node node) {
-        return XFormsUtils.encodeXML(getStaticContext().getPipelineContext(), node);
+        return XFormsUtils.encodeXMLAsDOM(getStaticContext().getPipelineContext(), node);
     }
 
     public static org.w3c.dom.Node decodeXML(String encodedXML) {

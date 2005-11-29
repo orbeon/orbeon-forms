@@ -13,58 +13,54 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
  *
  */
-public abstract class HandlerBase extends ElementHandler {
+public abstract class HandlerBase extends ElementHandlerNew {
 
     // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
     // cannot be used; those should probably be in the XHTML namespace
     private static final String[] ATTRIBUTES_TO_COPY = {"accesskey", "tabindex", "style", "onchange"};
+
+    private boolean repeating;
+    private boolean forwarding;
 
     protected HandlerContext handlerContext;
     protected PipelineContext pipelineContext;
     protected XFormsContainingDocument containingDocument;
     protected ExternalContext externalContext;
 
-    private NamespaceSupport2 namespaceSupport;
     protected AttributesImpl reusableAttributes = new AttributesImpl();
 
-    protected HandlerBase(HandlerContext handlerContext, boolean repeating) {
-        super(handlerContext, repeating);
-        this.handlerContext = handlerContext;
+    protected HandlerBase(boolean repeating, boolean forwarding) {
+        this.repeating = repeating;
+        this.forwarding = forwarding;
+    }
+
+    public void setContext(Object context) {
+        this.handlerContext = (HandlerContext) context;
+
         this.pipelineContext = handlerContext.getPipelineContext();
         this.containingDocument = handlerContext.getContainingDocument();
         this.externalContext = handlerContext.getExternalContext();
-        this.namespaceSupport = handlerContext.getNamespaceSupport();
+
+        super.setContext(context);
     }
 
-    protected void addAllControlHandlers() {
-        addElementHandler(new XFormsInputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
-        addElementHandler(new XFormsOutputHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
-        addElementHandler(new XFormsTriggerHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
-        addElementHandler(new XFormsSubmitHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
-        addElementHandler(new XFormsSecretHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
-        addElementHandler(new XFormsTextareaHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
-        addElementHandler(new XFormsUploadHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
-        addElementHandler(new XFormsRangeHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
-        addElementHandler(new XFormsSelectHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
-        addElementHandler(new XFormsSelect1Handler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
+    public boolean isRepeating() {
+        return repeating;
+    }
 
-        addElementHandler(new XFormsRepeatHandler(handlerContext), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
+    public boolean isForwarding() {
+        return forwarding;
     }
 
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControls.ControlInfo controlInfo) {
@@ -161,6 +157,6 @@ public abstract class HandlerBase extends ElementHandler {
     }
 
     protected String uriFromQName(String qName) {
-        return XMLUtils.uriFromQName(qName, namespaceSupport);
+        return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
     }
 }

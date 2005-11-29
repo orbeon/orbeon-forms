@@ -29,8 +29,8 @@ public class XFormsTriggerHandler extends HandlerBase {
     private AttributesImpl xxformsImgAttributes;
     private AttributesImpl controlAttributes;
 
-    public XFormsTriggerHandler(HandlerContext handlerContext) {
-        super(handlerContext, false);
+    public XFormsTriggerHandler() {
+        super(false, false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -52,7 +52,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         // xforms:trigger and xforms:submit
 

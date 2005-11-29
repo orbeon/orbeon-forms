@@ -46,8 +46,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private boolean isInValue;
 
 
-    public XFormsSelect1Handler(HandlerContext context) {
-        super(context, false);
+    public XFormsSelect1Handler() {
+        super(false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -138,7 +138,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
 

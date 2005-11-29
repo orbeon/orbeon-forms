@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
  * xforms:select.
  */
 public class XFormsSelectHandler extends XFormsSelect1Handler {
-    public XFormsSelectHandler(HandlerContext context) {
-        super(context);
+    public XFormsSelectHandler() {
+        super();
     }
 }

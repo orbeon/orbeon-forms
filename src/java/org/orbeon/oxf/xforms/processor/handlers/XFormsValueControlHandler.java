@@ -33,8 +33,8 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
     private Attributes hintAttributes;
     private Attributes alertAttributes;
 
-    protected XFormsValueControlHandler(HandlerContext handlerContext, boolean repeating) {
-        super(handlerContext, repeating);
+    protected XFormsValueControlHandler(boolean repeating) {
+        super(repeating, false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -117,7 +117,7 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelHintHelpAlertAttributes);
         if (!handlerContext.isGenerateTemplate() && value != null) {
             contentHandler.characters(value.toCharArray(), 0, value.length());

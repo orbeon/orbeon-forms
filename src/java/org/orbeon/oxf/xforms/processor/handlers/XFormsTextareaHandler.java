@@ -27,8 +27,8 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
     private Attributes elementAttributes;
 
-    public XFormsTextareaHandler(HandlerContext context) {
-        super(context, false);
+    public XFormsTextareaHandler() {
+        super(false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -38,7 +38,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);

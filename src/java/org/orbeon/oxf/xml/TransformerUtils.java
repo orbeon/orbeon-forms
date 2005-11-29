@@ -258,7 +258,7 @@ public class TransformerUtils {
     /**
      * Transform a W3C DOM node into a dom4j document
      *
-     * @param   W3C DOM node
+     * @param   node    W3C DOM node
      * @return  dom4j document
      * @throws TransformerException
      */
@@ -272,7 +272,7 @@ public class TransformerUtils {
     /**
      * Transform a dom4j document into a W3C DOM document
      *
-     * @param   dom4j document
+     * @param   document dom4j document
      * @return  W3C DOM document
      * @throws TransformerException
      */

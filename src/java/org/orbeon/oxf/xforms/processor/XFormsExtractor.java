@@ -185,7 +185,7 @@ public class XFormsExtractor extends ProcessorImpl {
                                     gotModel = true;
 
                                     // Add xml:base on element
-                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", getCurrentBaseURI());
+                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
                                     sendStartPrefixMappings();
 
@@ -208,7 +208,7 @@ public class XFormsExtractor extends ProcessorImpl {
                                     gotControl = true;
 
                                     // Add xml:base on element
-                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", getCurrentBaseURI());
+                                    attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", getCurrentBaseURI());
 
                                     sendStartPrefixMappings();
                                 }

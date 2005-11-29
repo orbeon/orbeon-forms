@@ -128,7 +128,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 // Clean-up namespace mappings
                 sendStartPrefixMappings();
                 // Add or replace xml:base attribute
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "base", xmlBase);
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", xmlBase);
             }
 
             if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {

@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xforms.XFormsServer;
 
 
 /**

@@ -13,50 +13,39 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.ElementHandlerContext;
-import org.orbeon.oxf.xml.DeferredContentHandler;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.processor.NewXFormsServer;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
-import orbeon.apache.xml.utils.NamespaceSupport2;
 
 import java.util.Stack;
 
 /**
  *
  */
-public class HandlerContext implements ElementHandlerContext {
+public class HandlerContext {
 
-    private DeferredContentHandler output;
-
+    private ElementHandlerController controller;
     private PipelineContext pipelineContext;
     private XFormsContainingDocument containingDocument;
-    private NewXFormsServer.XFormsState xformsState;
+    private XFormsServer.XFormsState xformsState;
     private ExternalContext externalContext;
 
-    private NamespaceSupport2 namespaceSupport;
-
-    public HandlerContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NewXFormsServer.XFormsState xformsState, ExternalContext externalContext, NamespaceSupport2 namespaceSupport, DeferredContentHandler output) {
+    public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, ExternalContext externalContext) {
+        this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
         this.xformsState = xformsState;
         this.externalContext = externalContext;
-
-        this.namespaceSupport = namespaceSupport;
-        this.output = output;
     }
 
-    public DeferredContentHandler getOutput() {
-        return output;
-    }
-
-    public void setOutput(DeferredContentHandler output) {
-        this.output = output;
+    public ElementHandlerController getController() {
+        return controller;
     }
 
     public PipelineContext getPipelineContext() {
@@ -67,7 +56,7 @@ public class HandlerContext implements ElementHandlerContext {
         return containingDocument;
     }
 
-    public NewXFormsServer.XFormsState getXFormsState() {
+    public XFormsServer.XFormsState getXFormsState() {
         return xformsState;
     }
 
@@ -75,16 +64,12 @@ public class HandlerContext implements ElementHandlerContext {
         return externalContext;
     }
 
-    public NamespaceSupport2 getNamespaceSupport() {
-        return namespaceSupport;
-    }
-
     public String findXHTMLPrefix() {
-        final String prefix = namespaceSupport.getPrefix(XMLConstants.XHTML_NAMESPACE_URI);
+        final String prefix = controller.getNamespaceSupport().getPrefix(XMLConstants.XHTML_NAMESPACE_URI);
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.XHTML_NAMESPACE_URI.equals(namespaceSupport.getURI(""))) {
+        if (XMLConstants.XHTML_NAMESPACE_URI.equals(controller.getNamespaceSupport().getURI(""))) {
             return "";
         }
 
@@ -95,11 +80,11 @@ public class HandlerContext implements ElementHandlerContext {
     }
 
     public String findFormattingPrefix() {
-        final String prefix = namespaceSupport.getPrefix(XMLConstants.OPS_FORMATTING_URI);
+        final String prefix = controller.getNamespaceSupport().getPrefix(XMLConstants.OPS_FORMATTING_URI);
         if (prefix != null)
             return prefix;
 
-        if (XMLConstants.OPS_FORMATTING_URI.equals(namespaceSupport.getURI(""))) {
+        if (XMLConstants.OPS_FORMATTING_URI.equals(controller.getNamespaceSupport().getURI(""))) {
             return "";
         }
 
@@ -108,7 +93,7 @@ public class HandlerContext implements ElementHandlerContext {
 
     public String findNewPrefix() {
         int i = 0;
-        while (namespaceSupport.getURI("p" + i) != null) {
+        while (controller.getNamespaceSupport().getURI("p" + i) != null) {
             i++;
         }
         return "p" + i;
@@ -148,6 +133,13 @@ public class HandlerContext implements ElementHandlerContext {
             return ((RepeatContext) repeatContextStack.peek()).isTopLevelRepeat();
     }
 
+    public int getCurrentIteration() {
+        if (repeatContextStack == null || repeatContextStack.size() == 0)
+            return 0;
+        else
+            return ((RepeatContext) repeatContextStack.peek()).getIteration();
+    }
+
     public int countParentRepeats() {
         return (repeatContextStack == null) ? 0 : repeatContextStack.size();
     }
@@ -155,13 +147,20 @@ public class HandlerContext implements ElementHandlerContext {
     public void pushRepeatContext(boolean generateTemplate, int iteration, boolean topLevelRepeat, boolean repeatSelected) {
 
         final String currentIdPostfix = getIdPostfix();
-        final String newIdPostfix = (currentIdPostfix.length() == 0)
-                ? "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iteration
-                : currentIdPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iteration;
+        final String newIdPostfix;
+        if (generateTemplate) {
+            // No postfix is added for templates
+            newIdPostfix = "";
+        } else {
+            // Create postfix depending on whether we are appending to an existing postfix or not
+            newIdPostfix = (currentIdPostfix.length() == 0)
+                    ? "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iteration
+                    : currentIdPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iteration;
+        }
 
         if (repeatContextStack == null)
             repeatContextStack = new Stack();
-        repeatContextStack.push(new RepeatContext(generateTemplate, newIdPostfix, topLevelRepeat, repeatSelected));
+        repeatContextStack.push(new RepeatContext(generateTemplate, iteration, newIdPostfix, topLevelRepeat, repeatSelected));
     }
 
     public void popRepeatContext() {
@@ -170,12 +169,14 @@ public class HandlerContext implements ElementHandlerContext {
 
     private static class RepeatContext {
         private boolean generateTemplate;
+        private int iteration;
         private String idPostifx;
         private boolean topLevelRepeat;
         private boolean repeatSelected;
 
-        public RepeatContext(boolean generateTemplate, String idPostifx, boolean topLevelRepeat, boolean repeatSelected) {
+        public RepeatContext(boolean generateTemplate, int iteration, String idPostifx, boolean topLevelRepeat, boolean repeatSelected) {
             this.generateTemplate = generateTemplate;
+            this.iteration = iteration;
             this.idPostifx = idPostifx;
             this.topLevelRepeat = topLevelRepeat;
             this.repeatSelected = repeatSelected;
@@ -183,6 +184,10 @@ public class HandlerContext implements ElementHandlerContext {
 
         public boolean isGenerateTemplate() {
             return generateTemplate;
+        }
+
+        public int getIteration() {
+            return iteration;
         }
 
         public String getIdPostifx() {

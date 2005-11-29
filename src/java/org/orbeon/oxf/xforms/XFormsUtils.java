@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -23,18 +25,20 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
+import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.xml.sax.SAXException;
 
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.TransformerHandler;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -287,7 +291,7 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, org.w3c.dom.Node node) {
+    public static String encodeXMLAsDOM(PipelineContext pipelineContext, org.w3c.dom.Node node) {
 
         try {
             return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), getEncryptionKey());
@@ -296,7 +300,7 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXMLAsDOM(PipelineContext pipelineContext, Document instance) {
+    public static String encodeXML(PipelineContext pipelineContext, Document instance) {
         return encodeXML(pipelineContext, instance, getEncryptionKey());
     }
 
@@ -312,6 +316,32 @@ public class XFormsUtils {
                 result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
             return result;
         } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {
+        return encodeXML2(pipelineContext, instance, getEncryptionKey());
+    }
+
+    public static String encodeXML2(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
+        try {
+            final SAXStore saxStore = new SAXStore();
+            final SAXResult saxResult = new SAXResult(saxStore);
+            final Transformer identity = TransformerUtils.getIdentityTransformer();
+            identity.transform(new DocumentSource(instance), saxResult);
+
+            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(saxStore);
+
+            String result = Base64.encode(byteArrayOutputStream.toByteArray());
+            if (encryptionPassword != null)
+                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
+            return result;
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
@@ -348,6 +378,36 @@ public class XFormsUtils {
             XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false, false);
             return saxContentHandler.getDocument();
         } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML) {
+        return decodeXML2(pipelineContext, encodedXML, getEncryptionKey());
+    }
+
+    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+        try {
+            if (encryptionPassword != null)
+                encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
+            final ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
+            final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
+
+            final ObjectInputStream objectInputStream = new ObjectInputStream(gzipInputStream);
+            final SAXStore saxStore = (SAXStore) objectInputStream.readObject();
+
+            final DocumentResult documentResult = new DocumentResult();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(documentResult);
+            saxStore.replay(identity);
+
+            return documentResult.getDocument();
+
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } catch (ClassNotFoundException e) {
+            throw new OXFException(e);
+        } catch (SAXException e) {
             throw new OXFException(e);
         }
     }

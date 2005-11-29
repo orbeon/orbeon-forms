@@ -992,6 +992,24 @@ public class XMLUtils {
     }
 
     /**
+     * Tell whether a string is whitespace, empty ("") or null.
+     *
+     * This is borrowed from Apache commons since we are not using the latest Apache commons.
+     */
+    public static boolean isBlank(String str) {
+        int strLen;
+        if (str == null || (strLen = str.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if ((!Character.isWhitespace(str.charAt(i)))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param atts src attribs
      * @return new AttributesImpl containing  all attribs that were in src attribs and that were
      *         in the default name space.
@@ -1011,7 +1029,7 @@ public class XMLUtils {
         return ret;
     }
 
-    public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String localname, String value) {
+    public static Attributes addOrReplaceAttribute(Attributes attributes, String uri, String prefix, String localname, String value) {
         final AttributesImpl newAttributes = new AttributesImpl();
         for (int i = 0; i < attributes.getLength(); i++) {
             final String attributeURI = attributes.getURI(i);
@@ -1023,7 +1041,7 @@ public class XMLUtils {
             if (!(uri.equals(attributeURI) && localname.equals(attributeLocalname)))
                 newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
         }
-        newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, value);
+        newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
         return newAttributes;
     }
 }

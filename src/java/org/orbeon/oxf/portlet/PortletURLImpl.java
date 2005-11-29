@@ -162,7 +162,7 @@ public class PortletURLImpl implements PortletURL {
         // Append other container parameters
         final Document portalXFormsInstanceDocument = (Document) portalExternalContext.getRequest().getAttributesMap().get(XFormsInstance.REQUEST_PORTAL_INSTANCE_DOCUMENT);
         if (portalXFormsInstanceDocument != null) {
-            final String instanceString = XFormsUtils.encodeXMLAsDOM(portalPipelineContext, portalXFormsInstanceDocument);
+            final String instanceString = XFormsUtils.encodeXML(portalPipelineContext, portalXFormsInstanceDocument);
             try {
                 appendRawParameter(false, sb, "$instance", URLEncoder.encode(instanceString, "utf-8"));
             } catch (UnsupportedEncodingException e) {

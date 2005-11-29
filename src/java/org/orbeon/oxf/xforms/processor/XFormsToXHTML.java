@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -23,18 +22,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsServer;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
+import org.orbeon.oxf.xforms.processor.handlers.*;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -74,14 +69,14 @@ public class XFormsToXHTML extends ProcessorImpl {
         // XForms containing document
         final XFormsContainingDocument containingDocument;
         // This is the state after XForms initialization
-        final NewXFormsServer.XFormsState xformsState;
+        final XFormsServer.XFormsState xformsState;
         {
             final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
-            final NewXFormsServer.XFormsState initialXFormsState = new NewXFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
-            containingDocument = NewXFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, staticStateDocument);
+            final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
+            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, staticStateDocument);
 
-            final Document dynamicStateDocument = NewXFormsServer.createDynamicStateDocument(containingDocument, new boolean[1]);
-            xformsState = new NewXFormsServer.XFormsState(initialXFormsState.getStaticState(), XFormsUtils.encodeXMLAsDOM(pipelineContext, dynamicStateDocument));
+            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument, new boolean[1]);
+            xformsState = new XFormsServer.XFormsState(initialXFormsState.getStaticState(), XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument));
         }
 
         try {
@@ -103,69 +98,35 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext, final XFormsContainingDocument containingDocument, final ContentHandler contentHandler, final NewXFormsServer.XFormsState xformsState) {
+    private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext, final XFormsContainingDocument containingDocument, final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState) {
 
-        readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT, new ForwardingContentHandler(contentHandler) {
+        final ElementHandlerController controller = new ElementHandlerController();
 
-            private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
-            private HandlerContext handlerContext;
-            private ElementHandler bodyElementHandler;
+        // Register handlers on controller
+        controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input");
+        controller.registerHandler(XFormsOutputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output");
+        controller.registerHandler(XFormsTriggerHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger");
+        controller.registerHandler(XFormsSubmitHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit");
+        controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret");
+        controller.registerHandler(XFormsTextareaHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "textarea");
+        controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload");
+        controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range");
+        controller.registerHandler(XFormsSelectHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select");
+        controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1");
 
-            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        controller.registerHandler(XFormsModelHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "model");
+        controller.registerHandler(XFormsGroupHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group");
+        controller.registerHandler(XFormsSwitchHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch");
+        controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat");
 
-                namespaceSupport.pushContext();
+        controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
 
-                if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri)) {
+        // Set final output
+        controller.setOutput(new DeferredContentHandlerImpl(contentHandler));
 
-                    if (localname.equals("body")) {
-                        // xhtml:body
+        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, externalContext));
 
-                        // Hook-up the xhtml:body element handler
-                        handlerContext = new HandlerContext(pipelineContext, containingDocument,
-                                xformsState, externalContext, namespaceSupport, new DeferredContentHandlerImpl(contentHandler));
-
-                        bodyElementHandler = new XHTMLBodyHandler(handlerContext);
-                        setContentHandler(bodyElementHandler);
-
-                        bodyElementHandler.start(uri, localname, qName, attributes);
-
-                    } else if (localname.equals("style")) {
-                        super.startElement(uri, localname, qName, attributes);
-                    } else {
-                        super.startElement(uri, localname, qName, attributes);
-                    }
-
-                } else {
-                    super.startElement(uri, localname, qName, attributes);
-                }
-            }
-
-            public void endElement(String uri, String localname, String qName) throws SAXException {
-
-                if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri)) {
-                    if (localname.equals("body")) {
-                        // xhtml:body
-                        bodyElementHandler.end(uri, localname, qName);
-
-                        // Restore contentHandler
-                        setContentHandler(contentHandler);
-                    } else if (localname.equals("style")) {
-                        super.endElement(uri, localname, qName);
-                    } else {
-                        super.endElement(uri, localname, qName);
-                    }
-                } else {
-                    super.endElement(uri, localname, qName);
-                }
-
-                namespaceSupport.popContext();
-            }
-
-            public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                // Update global NamespaceSupport
-                namespaceSupport.declarePrefix(prefix, uri);
-                super.startPrefixMapping(prefix, uri);
-            }
-        });
+        // Process everything
+        readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT, controller);
     }
 }

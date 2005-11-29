@@ -19,14 +19,13 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsServerSessionCache;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.processor.NewXFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -40,26 +39,15 @@ public class XHTMLBodyHandler extends HandlerBase {
     private static final String SESSION_STATE_PREFIX = "session:";
 
     private ContentHandlerHelper helper;
-    private NewXFormsServer.XFormsState xformsState;
 
-    private String currentSwitchId;
-
-    private boolean justInGroupOrCase;
-    private String groupOrCaseId;
-    private boolean inGroupOrCaseLabel;
-
-    public XHTMLBodyHandler(HandlerContext handlerContext) {
-        super(handlerContext, false);
-        xformsState = handlerContext.getXFormsState();
-
-        setDoForward(true);
+    public XHTMLBodyHandler() {
+        super(false, true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        addAllControlHandlers();
-
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final XFormsServer.XFormsState xformsState = handlerContext.getXFormsState();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(uri, localname, qName, attributes);
         helper = new ContentHandlerHelper(contentHandler);
 
@@ -111,7 +99,7 @@ public class XHTMLBodyHandler extends HandlerBase {
                     "type", "hidden", "name", "$dynamic-state", "value", dynamicStateString
             });
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                    "type", "hidden", "name", "$temp-dynamic-state", "value", ""
+                    "type", "hidden", "name", "$client-state", "value", ""
             });
         }
 
@@ -203,120 +191,11 @@ public class XHTMLBodyHandler extends HandlerBase {
         }
     }
 
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            if (localname.equals("group") || localname.equals("switch")) {
-                // xforms:group and xforms:switch
-
-                final String effectiveId = handlerContext.getEffectiveId(attributes);
-                currentSwitchId = effectiveId;
-
-                final XFormsControls.ControlInfo controlInfo = ((XFormsControls.ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveId));
-
-                // Find classes to add
-                final StringBuffer classes = new StringBuffer("xforms-" + localname);
-                if (!handlerContext.isGenerateTemplate()) {
-                    HandlerBase.handleReadOnlyClass(classes, controlInfo);
-                    HandlerBase.handleRelevantClass(classes, controlInfo);
-                }
-
-                // Create xhtml:span
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                handlerContext.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveId));
-
-                justInGroupOrCase = localname.equals("group");
-                groupOrCaseId = attributes.getValue("id");
-
-            } else if (localname.equals("case")) {
-                // xforms:case
-
-                final String effectiveId = handlerContext.getEffectiveId(attributes);
-
-                // Find classes to add
-                final StringBuffer classes = new StringBuffer("xforms-" + localname);
-
-                final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
-
-                final Map switchIdToSelectedCaseIdMap = containingDocument.getXFormsControls().getCurrentControlsState().getSwitchIdToSelectedCaseIdMap();
-
-                final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(currentSwitchId);
-                final boolean isVisible = effectiveId.equals(selectedCaseId);
-                newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
-
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                handlerContext.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-
-                justInGroupOrCase = true;
-                groupOrCaseId = attributes.getValue("id");
-
-            } else if (justInGroupOrCase && localname.equals("label")) {
-                // xforms:case or xforms:group label
-
-                final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                    ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, groupOrCaseId);
-                final String labelValue = handlerContext.isGenerateTemplate() ? null : controlInfo.getLabel();
-
-                final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
-                XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, groupOrCaseId, labelValue);
-
-                inGroupOrCaseLabel = true;
-
-            } else {
-                super.startElement(uri, localname, qName, attributes);
-
-                justInGroupOrCase = false;
-            }
-        } else {
-            super.startElement(uri, localname, qName, attributes);
-
-            justInGroupOrCase = false;
-        }
-    }
-
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            if (localname.equals("group") || localname.equals("switch")) {
-                // xforms:group and xforms:switch
-
-                // Close xhtml:span
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                handlerContext.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-            } else if (localname.equals("case")) {
-                // xforms:case
-
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                handlerContext.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-            } else if (justInGroupOrCase && localname.equals("label")) {
-                // xforms:case or xforms:group label
-
-                inGroupOrCaseLabel = false;
-
-            } else {
-                super.endElement(uri, localname, qName);
-            }
-        } else {
-            super.endElement(uri, localname, qName);
-        }
-        justInGroupOrCase = false;
-    }
-
-    public void characters(char[] chars, int start, int length) throws SAXException {
-        if (!inGroupOrCaseLabel)
-            super.characters(chars, start, length);
-    }
-
     public void end(String uri, String localname, String qName) throws SAXException {
         // Close xhtml:form
         helper.endElement();
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
     }
 }

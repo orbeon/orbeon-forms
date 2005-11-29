@@ -30,8 +30,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
     private Attributes elementAttributes;
 
-    public XFormsOutputHandler(HandlerContext handlerContext) {
-        super(handlerContext, false);
+    public XFormsOutputHandler() {
+        super(false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -41,7 +41,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsControls.OutputControlInfo controlInfo = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControls.OutputControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);

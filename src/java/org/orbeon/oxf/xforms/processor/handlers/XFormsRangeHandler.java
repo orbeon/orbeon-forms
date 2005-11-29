@@ -27,8 +27,8 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
     private Attributes elementAttributes;
 
-    public XFormsRangeHandler(HandlerContext context) {
-        super(context, false);
+    public XFormsRangeHandler() {
+        super(false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -38,7 +38,7 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
-        final ContentHandler contentHandler = handlerContext.getOutput();
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);

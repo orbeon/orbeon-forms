@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xforms.processor.NewXFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -61,7 +61,7 @@ public class XFormsServerSessionCache {
         }
     }
 
-    public synchronized void add(String pageGenerationId, String requestId, NewXFormsServer.XFormsState xformsState) {
+    public synchronized void add(String pageGenerationId, String requestId, XFormsServer.XFormsState xformsState) {
 
         // Remove existing entry if possible
         {
@@ -101,7 +101,7 @@ public class XFormsServerSessionCache {
         currentCacheSize += stateSize;// TODO: not correct if we reuse static state String
     }
 
-    public synchronized NewXFormsServer.XFormsState find(String pageGenerationId, String requestId) {
+    public synchronized XFormsServer.XFormsState find(String pageGenerationId, String requestId) {
         final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(pageGenerationId);
         if (existingCacheEntry != null) {
             // Move to the front (is this useful in our use case?)
@@ -141,9 +141,9 @@ public class XFormsServerSessionCache {
     private static class CacheEntry {
         public String pageGenerationId;
         public String requestId;
-        public NewXFormsServer.XFormsState xformsState;
+        public XFormsServer.XFormsState xformsState;
 
-        public CacheEntry(String pageGenerationId, String requestId, NewXFormsServer.XFormsState xformsState) {
+        public CacheEntry(String pageGenerationId, String requestId, XFormsServer.XFormsState xformsState) {
             this.pageGenerationId = pageGenerationId;
             this.requestId = requestId;
             this.xformsState = xformsState;

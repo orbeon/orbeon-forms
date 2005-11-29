@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.orbeon.oxf.xml.DeferredContentHandler;
-
 /**
  *
  */

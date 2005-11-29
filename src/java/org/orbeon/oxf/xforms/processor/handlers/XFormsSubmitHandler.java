@@ -13,14 +13,11 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.ElementHandler;
-import org.orbeon.oxf.xml.ElementHandlerContext;
-
 /**
  * Handle xforms:submit.
  */
 public class XFormsSubmitHandler extends XFormsTriggerHandler {
-    public XFormsSubmitHandler(HandlerContext context) {
-        super(context);
+    public XFormsSubmitHandler() {
+        super();
     }
 }

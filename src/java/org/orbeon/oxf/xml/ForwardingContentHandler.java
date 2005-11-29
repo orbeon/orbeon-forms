@@ -19,7 +19,7 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
 public class ForwardingContentHandler implements ContentHandler {
-    private ContentHandler contentHandler;
+    private transient ContentHandler contentHandler;
     private boolean forward;
 
     public ForwardingContentHandler() {

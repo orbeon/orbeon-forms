@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
-import org.dom4j.io.DocumentResult;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -31,6 +30,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
 
@@ -306,9 +306,8 @@ public class XFormsUtils {
 
     public static String encodeXML(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
         try {
-            ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOutputStream = null;
-            gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+            final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
+            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
             gzipOutputStream.write(Dom4jUtils.domToString(instance, false, false).getBytes("utf-8"));
             gzipOutputStream.close();
             String result = Base64.encode(gzipByteArray.toByteArray());
@@ -325,6 +324,8 @@ public class XFormsUtils {
     }
 
     public static String encodeXML2(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
+        // NOTE: This is an attempt to implement an alternative way of encoding. It appears to be
+        // slower. Possibly manually serializing the SAXStore could yield better performance.
         try {
             final SAXStore saxStore = new SAXStore();
             final SAXResult saxResult = new SAXResult(saxStore);
@@ -332,8 +333,10 @@ public class XFormsUtils {
             identity.transform(new DocumentSource(instance), saxResult);
 
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream);
             objectOutputStream.writeObject(saxStore);
+            objectOutputStream.close();
 
             String result = Base64.encode(byteArrayOutputStream.toByteArray());
             if (encryptionPassword != null)
@@ -387,6 +390,8 @@ public class XFormsUtils {
     }
 
     public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+        // NOTE: This is an attempt to implement an alternative way of decoding. It appears to be
+        // slower. Possibly manually serializing the SAXStore could yield better performance.
         try {
             if (encryptionPassword != null)
                 encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
@@ -396,7 +401,7 @@ public class XFormsUtils {
             final ObjectInputStream objectInputStream = new ObjectInputStream(gzipInputStream);
             final SAXStore saxStore = (SAXStore) objectInputStream.readObject();
 
-            final DocumentResult documentResult = new DocumentResult();
+            final LocationDocumentResult documentResult = new LocationDocumentResult();
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
             identity.setResult(documentResult);
             saxStore.replay(identity);

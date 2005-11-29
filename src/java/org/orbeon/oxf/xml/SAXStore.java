@@ -61,7 +61,7 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
 
     private List stringBuffer = new ArrayList();
 
-    private Locator locator = null;
+    private transient Locator locator = null;
     private String systemId = null;
     private String publicId = null;
 

@@ -594,6 +594,12 @@
                     stylesheet, which is then executed. [TODO: Figure showing XInclude -> XSLT
                     processing.]
                 </note>
+                <note>
+                    Using XSLT for page views has an impact for debugging, as the output of XSLT
+                    transformations do not contain valuable location information. For performance
+                    and ease of debugging reasons, we recommend using static XHTML views with
+                    XInclude whenever possible.
+                </note>
             </section>
         </section>
         <section>

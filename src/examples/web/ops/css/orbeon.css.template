@@ -58,6 +58,7 @@ fieldset {
     border-top: 1px solid &medium-color;;
     border-left: 1px solid &medium-color;;
     border-right: 1px solid &medium-color;;
+    border-bottom: 1px solid &xlight-color;;
 }
 
 .widget-tab-active {
@@ -67,6 +68,7 @@ fieldset {
     text-align: center;
     padding-left: 1em;
     padding-right: 1em;
+    line-height: 1.5em;
 }
 
 .widget-tab-inactive {
@@ -76,6 +78,7 @@ fieldset {
     text-align: center;
     padding-left: 1em;
     padding-right: 1em;
+    line-height: 1.5em;
 }
 
 .widget-tabs-panel {

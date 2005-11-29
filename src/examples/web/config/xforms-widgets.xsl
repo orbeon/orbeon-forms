@@ -26,30 +26,51 @@
     <xsl:output name="xml" method="xml"/>
 
     <xsl:template match="widget:tabs">
-        <xhtml:table class="widget-tabs">
+        <xsl:variable name="tabs" as="element()*" select="widget:tab"/>
+        <xhtml:table class="widget-tabs" cellpadding="0" cellspacing="0" border="0">
             <xhtml:tr>
                 <xhtml:td class="widget-tab-spacer-side"/>
                 <!-- Tabs at the top -->
-                <xsl:variable name="selected-tab" as="element()" 
-                    select="if (widget:tab[@selected = 'true']) then widget:tab[@selected = 'true']
-                    else widget:tab[1]"/>
-                <xsl:for-each select="widget:tab">
+                <xsl:variable name="selected-tab-specified" as="xs:boolean" select="count(widget:tab[@selected = 'true']) = 1"/>
+                <xsl:for-each select="$tabs">
+                    <xsl:variable name="tab-id" as="xs:string" select="@id"/>
                     <xsl:if test="position() > 1">
                         <xhtml:td class="widget-tab-spacer-between"/>
                     </xsl:if>
-                    <xhtml:td class="{if (. = $selected-tab) then 'widget-tab-active' else 'widget-tab-inactive'}">
-                        <xsl:value-of select="widget:label"/>
-                        <xforms:trigger class="widget-tab-trigger">
-                            <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="{@id}"/>
-                        </xforms:trigger>
+                    <xhtml:td class="widget-tab">
+                        <xforms:switch>
+                            <!-- Case where this tab is inactive -->
+                            <xforms:case id="{$tab-id}-inactive">
+                                <xhtml:div class="widget-tab-inactive">
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:toggle case="{$tab-id}"/>
+                                            <xforms:toggle case="{$tab-id}-active"/>
+                                            <xsl:for-each select="$tabs[@id != $tab-id]">
+                                                <xforms:toggle case="{@id}-inactive"/>
+                                            </xsl:for-each>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </xhtml:div>
+                            </xforms:case>
+                            <!-- Case where this tab is active -->
+                            <xforms:case id="{$tab-id}-active">
+                                <xsl:if test="($selected-tab-specified and @selected = 'true') or position() = 1">
+                                    <xsl:attribute name="selected">true</xsl:attribute>
+                                </xsl:if>
+                                <xhtml:div class="widget-tab-active">
+                                    <xsl:value-of select="widget:label"/>
+                                </xhtml:div>
+                            </xforms:case>
+                        </xforms:switch>
                     </xhtml:td>
                 </xsl:for-each>
                 <xhtml:td class="widget-tab-spacer-side"/>
             </xhtml:tr>
             <!-- Main area with the switch -->
             <xhtml:tr>
-                <xhtml:td class="widget-tabs-panel" colspan="{count(widget:tab) * 2 + 1}">
+                <xhtml:td class="widget-tabs-panel" colspan="{count(widget:tab) * 4 + 1}">
                     <xforms:switch>
                         <xsl:for-each select="widget:tab">
                             <xforms:case>

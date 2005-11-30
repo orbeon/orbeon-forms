@@ -50,27 +50,27 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
 
         final AttributesImpl newAttributes;
-        final boolean isImage;
         final boolean isDateOrTime;
         final StringBuffer classes = new StringBuffer("xforms-control xforms-output");
+
+        final String appearanceValue = elementAttributes.getValue("appearance");
+        final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
+        final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
+
+        final String mediatypeValue = elementAttributes.getValue("mediatype");
+        final boolean isImage = mediatypeValue != null && mediatypeValue.startsWith("image/");
+        final boolean isHTML = ( mediatypeValue != null && mediatypeValue.equals("text/html"))
+                || (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "html".equals(appearanceLocalname));
+
+        if (isHTML) {
+            classes.append(" xforms-output-html");
+        } else if (isImage) {
+            classes.append(" xforms-output-image");
+        }
+
         if (!handlerContext.isGenerateTemplate()) {
 
-            final String appearanceValue = elementAttributes.getValue("appearance");
-            final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
-            final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
-
-            final String mediaType = controlInfo.getMediaTypeAttribute();
-
-            final boolean isHTML = appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "html".equals(appearanceLocalname);
-            isImage = mediaType != null && mediaType.startsWith("image/");
-
             // Find classes to add
-
-            if (isHTML) {
-                classes.append(" xforms-output-html");
-            } else if (isImage) {
-                classes.append(" xforms-output-image");
-            }
             isDateOrTime = isDateOrTime(controlInfo.getType());
             if (isDateOrTime) {
                 classes.append(" xforms-date");
@@ -81,7 +81,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, controlInfo);
         } else {
-            isImage = false;
             isDateOrTime = false;
 
             // Find classes to add

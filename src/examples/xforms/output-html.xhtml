@@ -32,14 +32,14 @@
     <xhtml:body>
         <xforms:repeat nodeset="node" id="nodes">
             <xhtml:div>
-                <xhtml:p>
+                <xhtml:div>
                     <xforms:input ref="." incremental="true" style="width: 20em">
                         <xforms:label>Text: </xforms:label>
                     </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
+                </xhtml:div>
+                <xhtml:div>
                     HTML: <xforms:output ref="." appearance="xxforms:html"/>
-                </xhtml:p>
+                </xhtml:div>
             </xhtml:div>
         </xforms:repeat>
         <xforms:trigger>

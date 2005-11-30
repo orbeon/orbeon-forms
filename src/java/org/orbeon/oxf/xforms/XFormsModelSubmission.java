@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -35,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
@@ -209,7 +211,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Check that there are no validation errors
                     final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                     if (!instanceSatisfiesValidRequired) {
-//                        currentInstance.readOut();// FIXME: DEBUG
+                        if (XFormsServer.logger.isDebugEnabled()) {
+                            final LocationDocumentResult documentResult = new LocationDocumentResult();
+                            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                            identity.setResult(documentResult);
+                            currentInstance.read(identity);
+                            final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
+
+                            XFormsServer.logger.debug("XForms - instance document or subset thereof cannot be submitted:\n" + documentString);
+                        }
                         throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                     }
                 } else {

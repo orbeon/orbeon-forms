@@ -686,6 +686,9 @@ function xformsInitializeControlsUnder(root) {
                         }
                     }
                 });
+                // Intercept incremental modifications
+                if (isIncremental) 
+                    xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
             } else {
@@ -694,8 +697,9 @@ function xformsInitializeControlsUnder(root) {
                 control.userModications = false;
                 // Register listeners
                 xformsAddEventListener(control, "change", xformsHandleValueChange);
-                if (isIncremental)
+                if (isIncremental) {
                     xformsAddEventListener(control, "keyup", xformsHandleValueChange);
+                }
             }
 
             // Register listener on focus in and out events

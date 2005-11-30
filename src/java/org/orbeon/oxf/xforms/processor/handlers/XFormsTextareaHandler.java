@@ -51,8 +51,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
             final StringBuffer classes = new StringBuffer("xforms-control xforms-textarea");
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleReadOnlyClass(classes, controlInfo);
-                handleRelevantClass(classes, controlInfo);
+                handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
                 handleReadOnlyAttribute(newAttributes, controlInfo);

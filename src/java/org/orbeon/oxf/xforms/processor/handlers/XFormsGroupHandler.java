@@ -43,8 +43,7 @@ public class XFormsGroupHandler extends HandlerBase {
         if (!handlerContext.isGenerateTemplate()) {
             groupControlInfo = ((XFormsControls.ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
 
-            HandlerBase.handleReadOnlyClass(classes, groupControlInfo);
-            HandlerBase.handleRelevantClass(classes, groupControlInfo);
+            HandlerBase.handleMIPClasses(classes, groupControlInfo);
         }
 
         // Create xhtml:span

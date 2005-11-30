@@ -75,8 +75,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             if (isDateOrTime) {
                 classes.append(" xforms-date");
             }
-            handleReadOnlyClass(classes, controlInfo);
-            handleRelevantClass(classes, controlInfo);
+            handleMIPClasses(classes, controlInfo);
 
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             handleReadOnlyAttribute(newAttributes, controlInfo);

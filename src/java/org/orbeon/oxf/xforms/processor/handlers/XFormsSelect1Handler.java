@@ -173,8 +173,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleReadOnlyClass(classes, controlInfo);
-                handleRelevantClass(classes, controlInfo);
+                handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
                 handleReadOnlyAttribute(newAttributes, controlInfo);

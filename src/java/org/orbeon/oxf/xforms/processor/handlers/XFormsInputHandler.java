@@ -55,8 +55,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 isDateOrTime = isDateOrTime(controlInfo.getType());
                 typeClass = isDateOrTime ? "xforms-type-date" : "xforms-type-string";
 
-                handleReadOnlyClass(classes, controlInfo);
-                handleRelevantClass(classes, controlInfo);
+                handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
                 handleReadOnlyAttribute(newAttributes, controlInfo);

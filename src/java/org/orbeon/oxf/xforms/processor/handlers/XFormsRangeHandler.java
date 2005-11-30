@@ -51,8 +51,7 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
             final StringBuffer classes = new StringBuffer("xforms-control xforms-range xforms-range-casing");
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleReadOnlyClass(classes, controlInfo);
-                handleRelevantClass(classes, controlInfo);
+                handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
                 handleReadOnlyAttribute(newAttributes, controlInfo);

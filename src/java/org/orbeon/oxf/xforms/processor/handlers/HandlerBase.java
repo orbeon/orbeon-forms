@@ -70,19 +70,23 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
     }
 
-    public static void handleRelevantClass(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
-        if (controlInfo != null && !controlInfo.isRelevant()) {// TEMP, controlInfo should not be null
-            if (sb.length() > 0)
-                sb.append(' ');
-            sb.append("xforms-disabled");
-        }
-    }
-
-    public static void handleReadOnlyClass(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
-        if (controlInfo != null && controlInfo.isReadonly()) {// TEMP, controlInfo should not be null
-            if (sb.length() > 0)
-                sb.append(' ');
-            sb.append("xforms-readonly");
+    public static void handleMIPClasses(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
+        if (controlInfo != null) {// TEMP, controlInfo should not be null
+            if (!controlInfo.isRelevant()) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-disabled");
+            }
+            if (controlInfo != null && controlInfo.isReadonly()) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-readonly");
+            }
+            if (controlInfo != null && controlInfo.isRequired()) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-required");
+            }
         }
     }
 

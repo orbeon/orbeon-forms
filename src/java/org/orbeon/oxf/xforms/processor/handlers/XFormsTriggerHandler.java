@@ -68,7 +68,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         final StringBuffer classes = new StringBuffer("xforms-control xforms-trigger");
         if (!handlerContext.isGenerateTemplate())
-            handleRelevantClass(classes, controlInfo);
+            handleMIPClasses(classes, controlInfo);
         final AttributesImpl newAttributes = getAttributes(controlAttributes, classes.toString(), effectiveId);
 
         if (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname))

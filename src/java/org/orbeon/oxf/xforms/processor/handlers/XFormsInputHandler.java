@@ -91,8 +91,9 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
             // Create xhtml:input
             {
-                final StringBuffer inputClasses = new StringBuffer();
+                final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
                 if (typeClass != null) {
+                    inputClasses.append(" ");
                     inputClasses.append(typeClass);
                 }
 

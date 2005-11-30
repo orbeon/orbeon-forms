@@ -176,7 +176,7 @@
     </head>
     <body>
 
-        <!--<xforms:output ref="instance('new-comment-validity')" appearance="xxforms:html"/>-->
+        <!--<xforms:output ref="instance('new-comment-validity')" mediatype="text/html"/>-->
 
         <table>
             <tr>
@@ -235,7 +235,7 @@
                             </h3>
                             <!-- Display post content -->
                             <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #eee">
-                                <xforms:output ref="content" appearance="xxforms:html"/>
+                                <xforms:output ref="content" mediatype="text/html"/>
                             </div>
                             <!-- Display post information and links -->
                             <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
@@ -414,7 +414,7 @@
                                                 </p>
                                                 <!-- Display comment content -->
                                                 <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
-                                                    <xforms:output ref="content" appearance="xxforms:html"/>
+                                                    <xforms:output ref="content" mediatype="text/html"/>
                                                 </div>
                                                 <!-- Display comment information and links -->
                                                 <div style="margin-left: 2em; padding: 1em; padding-top: 0em">
@@ -436,7 +436,7 @@
                                         <xforms:repeat nodeset="instance('main')/posts/day/post/comments/comment">
                                             <!-- Display comment content -->
                                             <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em">
-                                                <xforms:output ref="comment-info/content" appearance="xxforms:html"/>
+                                                <xforms:output ref="comment-info/content" mediatype="text/html"/>
                                             </div>
                                             <!-- Display comment information and links -->
                                             <div style="margin-left: 2em; padding: 1em; padding-top: 0em">

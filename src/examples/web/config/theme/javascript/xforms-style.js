@@ -56,29 +56,20 @@ function xformsUpdateStyle(element) {
             }
         }
         if (xformsIsDefined(required)) {
-            var elementsToUpdate = new Array(element);
             var classes = element.className.split(" ");
-            if (xformsArrayContains(classes, "xforms-input")) {
-                // For inputs, update class on child elements as well
-                for (var i = 0; i < element.childNodes.length; i++)
-                    elementsToUpdate.push(element.childNodes[i]);
-            }
-            // Update class on elements
-            for (var i = 0; i < elementsToUpdate.length; i++) {
-                if (required) {
-                    xformsAddClass(elementsToUpdate[i], "xforms-required");
-                    if (element.value == "") {
-                        xformsAddClass(elementsToUpdate[i], "xforms-required-empty");
-                        xformsRemoveClass(elementsToUpdate[i], "xforms-required-filled");
-                    } else {
-                        xformsAddClass(elementsToUpdate[i], "xforms-required-filled");
-                        xformsRemoveClass(elementsToUpdate[i], "xforms-required-empty");
-                    }
+            if (required) {
+                xformsAddClass(element, "xforms-required");
+                if (element.value == "") {
+                    xformsAddClass(element, "xforms-required-empty");
+                    xformsRemoveClass(element, "xforms-required-filled");
                 } else {
-                    xformsRemoveClass(elementsToUpdate[i], "xforms-required");
-                    xformsRemoveClass(elementsToUpdate[i], "xforms-required-filled");
-                    xformsRemoveClass(elementsToUpdate[i], "xforms-required-empty");
+                    xformsAddClass(element, "xforms-required-filled");
+                    xformsRemoveClass(element, "xforms-required-empty");
                 }
+            } else {
+                xformsRemoveClass(element, "xforms-required");
+                xformsRemoveClass(element, "xforms-required-filled");
+                xformsRemoveClass(element, "xforms-required-empty");
             }
         }
     }

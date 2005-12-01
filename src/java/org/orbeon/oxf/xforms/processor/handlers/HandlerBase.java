@@ -86,6 +86,11 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
+                if ("".equals(controlInfo.getValue()))
+                    sb.append(" xforms-required-empty");
+                else
+                    sb.append(" xforms-required-filled");
+
             }
         }
     }

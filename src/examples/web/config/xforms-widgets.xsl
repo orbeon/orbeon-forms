@@ -20,7 +20,7 @@
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="xforms xxforms xs saxon xhtml f">
+    exclude-result-prefixes="xforms xs saxon xhtml f">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:output name="xml" method="xml"/>
@@ -56,7 +56,7 @@
                             </xforms:case>
                             <!-- Case where this tab is active -->
                             <xforms:case id="{$tab-id}-active">
-                                <xsl:if test="($selected-tab-specified and @selected = 'true') or position() = 1">
+                                <xsl:if test="(not($selected-tab-specified) and position() = 1) or @selected = 'true'">
                                     <xsl:attribute name="selected">true</xsl:attribute>
                                 </xsl:if>
                                 <xhtml:div class="widget-tab-active">

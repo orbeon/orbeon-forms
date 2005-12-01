@@ -47,7 +47,7 @@
          <xforms:group ref="/form">
              <widget:tabs>
                 <widget:tab id="configuration">
-                    <widget:label>Configure It!</widget:label>
+                    <widget:label>Configure Chart</widget:label>
                     <table class="gridtable">
                         <tr>
                             <th>Categories and Values</th>
@@ -70,6 +70,7 @@
                                                 <xforms:input ref="value2"/>
                                             </td>
                                         </tr>
+                                        <tr/>
                                     </xforms:repeat>
                                 </table>
                                 <xforms:trigger>
@@ -242,7 +243,7 @@
                      </xforms:submit>
                 </widget:tab>
                 <widget:tab id="result" selected="true">
-                    <widget:label>View Chart!</widget:label>
+                    <widget:label>View Chart</widget:label>
                     <center>
                         <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="500" height="375"/>
                     </center>

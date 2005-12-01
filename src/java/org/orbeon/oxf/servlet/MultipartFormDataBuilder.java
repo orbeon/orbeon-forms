@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.common.OXFException;
 
 import java.util.Map;
 import java.util.Iterator;
@@ -69,49 +70,53 @@ public class MultipartFormDataBuilder {
     }
 
     public long getContentLength() {
-        long size = 0;
-        for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
-            Object value = parameters.get(key);
+        try {
+            long size = 0;
+            for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
+                String key = (String) i.next();
+                Object value = parameters.get(key);
 
-            String newKey = (parameterNameFilter != null) ? parameterNameFilter.filterParameterName(key) : key;
+                String newKey = (parameterNameFilter != null) ? parameterNameFilter.filterParameterName(key) : key;
 
-            if (newKey != null) {
-                if (value instanceof FileItem) {
-                    // File item
-                    FileItem f = (FileItem) value;
-                    size += 2 + boundary.length() + 2; // starting boundary + CRLF
-                    if (f.getName() != null) {
-                        size += contentDispositionFileString1.length() + contentDispositionFileString2.length() + contentDispositionFileString3.length() + 2; // Content-Disposition + CRLF
-                        size += f.getName().length(); // file name
-                    } else {
-                        size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
-                    }
-                    size += newKey.length(); // parameter name
-
-                    size += contentTypeString.length() + 2; // Content-Type + CRLF
-                    size += f.getContentType() != null ? f.getContentType().length() : "application/octet-stream".length(); // content type
-
-                    size += 2; // blank line
-                    size += f.getSize(); // file size
-                    size += 2; // blank line
-                } else {
-                    // Other form parameter
-                    String[] s = (String[]) value;
-                    for (int j = 0; j < s.length; j++) {
+                if (newKey != null) {
+                    if (value instanceof FileItem) {
+                        // File item
+                        FileItem f = (FileItem) value;
                         size += 2 + boundary.length() + 2; // starting boundary + CRLF
-                        size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
-                        size += newKey.length(); // parameter name
+                        if (f.getName() != null) {
+                            size += contentDispositionFileString1.length() + contentDispositionFileString2.length() + contentDispositionFileString3.length() + 2; // Content-Disposition + CRLF
+                            size += f.getName().getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // file name
+                        } else {
+                            size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
+                        }
+                        size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // parameter name
+
+                        size += contentTypeString.length() + 2; // Content-Type + CRLF
+                        size += f.getContentType() != null ? f.getContentType().length() : "application/octet-stream".length(); // content type
+
                         size += 2; // blank line
-                        size += s[j].length(); // value FIXME: FORM_ENCODING
+                        size += f.getSize(); // file size
                         size += 2; // blank line
+                    } else {
+                        // Other form parameter
+                        String[] s = (String[]) value;
+                        for (int j = 0; j < s.length; j++) {
+                            size += 2 + boundary.length() + 2; // starting boundary + CRLF
+                            size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
+                            size += newKey.getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // parameter name
+                            size += 2; // blank line
+                            size += s[j].getBytes(ServletExternalContext.DEFAULT_FORM_CHARSET).length; // value FIXME: FORM_ENCODING?
+                            size += 2; // blank line
+                        }
                     }
                 }
             }
-        }
-        size += 2 + boundary.length() + 2 + 2; // final boundary + CRLF
+            size += 2 + boundary.length() + 2 + 2; // final boundary + CRLF
 
-        return size;
+            return size;
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**
@@ -123,7 +128,8 @@ public class MultipartFormDataBuilder {
 
         // Write content
         {
-            Writer writer = new OutputStreamWriter(outputStream, "iso-8859-1");
+//            Writer writer = new OutputStreamWriter(outputStream, "iso-8859-1");
+            Writer writer = new OutputStreamWriter(outputStream, ServletExternalContext.DEFAULT_FORM_CHARSET);
 
             for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
                 String key = (String) i.next();

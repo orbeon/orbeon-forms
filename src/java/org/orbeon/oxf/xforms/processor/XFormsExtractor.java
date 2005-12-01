@@ -212,6 +212,10 @@ public class XFormsExtractor extends ProcessorImpl {
                                 if (inControl) {
                                     super.startElement(uri, localname, qName, attributes);
                                 }
+                            } else if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+                                if (inControl) {
+                                    super.startElement(uri, localname, qName, attributes);
+                                }
                             }
 
                             if (inModel) {
@@ -250,7 +254,7 @@ public class XFormsExtractor extends ProcessorImpl {
 
                         if (inModel) {
                             super.endElement(uri, localname, qName);
-                        } else if (inControl && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+                        } else if (inControl && (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri))) {
                             super.endElement(uri, localname, qName);
                         }
 

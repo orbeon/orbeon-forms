@@ -256,7 +256,7 @@ function xformsLog(text) {
         debugDiv.style.top = visibleHeight - (XFORMS_DEBUG_WINDOW_HEIGHT + 20) + "px";
 
         // Add "clear" button
-        var clear = document.createElement("button");
+        var clear = document.createElement("BUTTON");
         clear.appendChild(document.createTextNode("Clear"));
         debugDiv.appendChild(clear);
         document.body.insertBefore(debugDiv, document.body.firstChild);
@@ -687,7 +687,7 @@ function xformsInitializeControlsUnder(root) {
                     }
                 });
                 // Intercept incremental modifications
-                if (isIncremental) 
+                if (isIncremental)
                     xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
@@ -785,6 +785,13 @@ function xformsInitializeControlsUnder(root) {
                     if (xformsMessages != null)
                         xformsMessages.invalidCount++;
                 }
+            }
+
+            // Set initial values for disabled, readonly, and required
+            if (xformsArrayContains(classes, "xforms-control")) {
+                control.isRelevant = !xformsArrayContains(classes, "xforms-disabled");
+                control.isReadonly = xformsArrayContains(classes, "xforms-readonly");
+                control.isRequired = xformsArrayContains(classes, "xforms-required");
             }
 
             // Add style to element

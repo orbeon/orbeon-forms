@@ -69,6 +69,7 @@ fieldset {
     padding-left: 1em;
     padding-right: 1em;
     line-height: 1.5em;
+    white-space: nowrap;
 }
 
 .widget-tab-inactive {
@@ -79,6 +80,7 @@ fieldset {
     padding-left: 1em;
     padding-right: 1em;
     line-height: 1.5em;
+    white-space: nowrap;
 }
 
 .widget-tabs-panel {

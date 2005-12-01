@@ -114,6 +114,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public synchronized Map getParameterMap() {
             if (parameterMap == null) {
                 // Two conditions: file upload ("multipart/form-data") or not
+                final String formCharset = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET);
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
                     // Special handling for multipart/form-data
 
@@ -129,7 +130,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                             localRepeater = new ServletInputStreamRepeater(request);
 
                         // Decode the multipart data
-                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater);
+                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater, formCharset);
 
                         if (enableInputStreamSaving)
                             repeater = localRepeater;
@@ -145,9 +146,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 //                        String acceptCharset = nativeRequest.getHeader("accept-charset");
 //                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
 //                            nativeRequest.setCharacterEncoding("utf-8");
-                        String formCharset = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY);
-                        if (formCharset == null)
-                            formCharset = DEFAULT_FORM_CHARSET;
                         nativeRequest.setCharacterEncoding(formCharset);
                     } catch (UnsupportedEncodingException e) {
                         throw new OXFException(e);
@@ -315,12 +313,13 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
      * NOTE: This is used also by PortletExternalContext. Should probably remove this dependency
      * at some point.
      */
-    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater) {
+    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater, String encoding) {
 
         final Map uploadParameterMap = new HashMap();
         try {
             // Setup commons upload
             DiskFileUpload upload = new DiskFileUpload();
+            upload.setHeaderEncoding(encoding);
 
             // Read properties
             // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.

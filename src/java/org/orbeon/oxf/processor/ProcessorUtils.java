@@ -23,6 +23,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -45,8 +46,8 @@ public class ProcessorUtils {
     public static final Map supportedBinaryTypes = new HashMap();
 
     static {
-        supportedBinaryTypes.put(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(), XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
-        supportedBinaryTypes.put(XMLConstants.XS_ANYURI_QNAME.getQualifiedName(), XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
+        supportedBinaryTypes.put(XMLUtils.buildExplodedQName(XMLConstants.XS_BASE64BINARY_QNAME.getNamespaceURI(), XMLConstants.XS_BASE64BINARY_QNAME.getName()), "");
+        supportedBinaryTypes.put(XMLUtils.buildExplodedQName(XMLConstants.XS_ANYURI_QNAME.getNamespaceURI(), XMLConstants.XS_ANYURI_QNAME.getName()), "");
     }
 
     public static LocationData getElementLocationData(Element element) {

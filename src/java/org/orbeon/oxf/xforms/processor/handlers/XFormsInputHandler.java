@@ -92,7 +92,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             {
                 final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
                 if (typeClass != null) {
-                    inputClasses.append(" ");
+                    inputClasses.append(' ');
                     inputClasses.append(typeClass);
                 }
 

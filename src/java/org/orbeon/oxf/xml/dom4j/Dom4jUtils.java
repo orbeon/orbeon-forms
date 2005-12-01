@@ -430,7 +430,7 @@ public class Dom4jUtils {
      * Encode a QName to an exploded QName (also known as a "Clark name") String.
      */
     public static String qNameToexplodedQName(QName qName) {
-        return XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
+        return (qName == null) ? null : XMLUtils.buildExplodedQName(qName.getNamespaceURI(), qName.getName());
     }
 
     public static XPath createXPath(final String exprsn) throws InvalidXPathException {

@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
 import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.resources.OXFProperties;
 
 import javax.portlet.*;
 import java.io.*;
@@ -136,7 +137,8 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                     // Special handling for multipart/form-data
 
                     // Decode the multipart data
-                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null);
+                    final String formCharset = OXFProperties.instance().getPropertySet().getString(ServletExternalContext.DEFAULT_FORM_CHARSET_PROPERTY, ServletExternalContext.DEFAULT_FORM_CHARSET);
+                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null, formCharset);
 
                 } else {
                     // Just use native request parameters

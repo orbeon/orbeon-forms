@@ -195,7 +195,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, eventName, lastSourceControlId, otherControlId, lastValueChangeEventValue, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, null);
                                     // Remember new event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
@@ -203,7 +203,7 @@ public class XFormsServer extends ProcessorImpl {
                             } else {
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    containingDocument.executeExternalEvent(pipelineContext, eventName, lastSourceControlId, otherControlId, lastValueChangeEventValue, null);
+                                    containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, null);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }

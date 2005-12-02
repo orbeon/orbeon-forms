@@ -85,14 +85,18 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             } else if ("itemset".equals(localname)) {
                 // xforms:itemset
 
-                if (itemsetIdToItemsetInfoMap == null)
-                    itemsetIdToItemsetInfoMap = containingDocument.getXFormsControls().getItemsetFull();
+                if (!handlerContext.isGenerateTemplate()) {
+                    if (itemsetIdToItemsetInfoMap == null)
+                        itemsetIdToItemsetInfoMap = containingDocument.getXFormsControls().getItemsetFull();
 
-                final List itemsetInfos = (List) itemsetIdToItemsetInfoMap.get(effectiveId);
-                final Attributes itemsetAttributes = new AttributesImpl(attributes);
-                for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
-                    final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
-                    items.add(new Item(true, itemsetAttributes, itemsetInfo.getLabel(), itemsetInfo.getValue()));
+                    final List itemsetInfos = (List) itemsetIdToItemsetInfoMap.get(effectiveId);
+                    if (itemsetInfos != null) { // may be null when there is no item in the itemset
+                        final Attributes itemsetAttributes = new AttributesImpl(attributes);
+                        for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
+                            final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                            items.add(new Item(true, itemsetAttributes, itemsetInfo.getLabel(), itemsetInfo.getValue()));
+                        }
+                    }
                 }
 
                 hasItemset = true;
@@ -184,7 +188,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         if ("full".equals(appearanceLocalname)) {
-            // Create xhtml:input
+
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);

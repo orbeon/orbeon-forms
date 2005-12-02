@@ -290,6 +290,14 @@ function xformsLog(text) {
     debugDiv.innerHTML += text + " | ";
 }
 
+function xformsLogTime(text) {
+    return;
+    var oldTime = document.xformsTime;
+    var currentTime = new Date().getTime();
+    document.xformsTime = currentTime;
+    xformsLog((currentTime - oldTime) + ": " + text);
+}
+
 function xformsLogProperties(object) {
     var message = "[";
     var first = true;
@@ -383,6 +391,190 @@ function xformsHandleValueChange(event) {
     return true;
 }
 
+// Handle click on trigger
+function xformsHandleClick(event) {
+    var target = getEventTarget(event);
+    // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
+    if (xformsArrayContains(target.className.split(" "), "xforms-trigger"))
+        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)));
+    return false;
+}
+
+function xformsComputeSelectValue(select) {
+    var options = select.options;
+    var selectValue = "";
+    for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+        var option = options[optionIndex];
+        if (option.selected) {
+            if (selectValue != "") selectValue += " ";
+            selectValue += option.value;
+        }
+    }
+    select.selectValue = selectValue;
+}
+
+function xformsHandleSelectChanged(event) {
+    var select = getEventTarget(event);
+    xformsComputeSelectValue(select);
+    xformsFireEvents(new Array(xformsCreateEventArray(select, "xxforms-value-change-with-focus-change",
+        select.selectValue)));
+}
+
+function xformsHandleRangeMouseDown(event) {
+    document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
+    return false;
+}
+
+function xformsHandleRangeMouseUp(event) {
+    document.xformsCurrentRangeControl = null;
+    return false;
+}
+
+function xformsHandleRangeMouseMove(event) {
+    var rangeControl = document.xformsCurrentRangeControl;
+    if (rangeControl) {
+        // Compute range boundaries
+        var rangeStart = xformsGetElementPosition(rangeControl.track).left;
+        var rangeLength = rangeControl.track.clientWidth - rangeControl.slider.clientWidth;
+
+        // Compute value
+        var value = (event.clientX - rangeStart) / rangeLength;
+        if (value < 0) value = 0;
+        if (value > 1) value = 1;
+
+        // Compute slider position
+        var sliderPosition = event.clientX - rangeStart;
+        if (sliderPosition < 0) sliderPosition = 0;
+        if (sliderPosition > rangeLength) sliderPosition = rangeLength;
+        rangeControl.slider.style.left = sliderPosition;
+
+        // Notify server that value changed
+        rangeControl.value = value;
+        xformsValueChanged(rangeControl, null);
+    }
+
+    return false;
+}
+
+function xformsHandleOutputClick(event) {
+    var events = new Array();
+    var target = getEventTarget(event);
+    // In the case of appearance="xxforms:html, target can be an element inside
+    // the xforms-output, not the xforms-output itself. So we are here looking for the
+    // xforms-parent when necessary.
+    while (!xformsArrayContains(target.className.split(" "), "xforms-output"))
+        target = target.parentNode;
+    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+    xformsFireEvents(events);
+}
+
+function xformsHandleFirefoxValueChange(property, oldvalue, newvalue) {
+    var span = this;
+    var textField = span.childNodes[1];
+    if (span.valueSetByXForms == 0 && textField.value != span.value) {
+        span.value = newvalue;
+        textField.value = newvalue;
+        xformsDispatchEvent(textField, "change");
+    } else {
+        span.valueSetByXForms--;
+    }
+    return newvalue;
+}
+
+function xformsHandleIEValueChange(event) {
+    if (event.propertyName == "value") {
+        var span = getEventTarget(event);
+        var textField = span.childNodes[1];
+        if (span.valueSetByXForms == 0 && textField.value != span.value) {
+            textField.value = span.value;
+            span.valueSetByXForms++;
+            span.value = span.previousValue;
+            xformsDispatchEvent(textField, "change");
+        } else {
+            span.valueSetByXForms--;
+        }
+    }
+}
+
+function xformsHandleInputKeyPress(event) {
+    if (event.keyCode == 10 || event.keyCode == 13) {
+        var span = getEventTarget(event).parentNode;
+        xformsHandleValueChange(event);
+        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
+        // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
+        if (event.preventDefault) {
+            // Firefox version
+            event.preventDefault();
+        } else {
+            // IE version
+            return false;
+        }
+    }
+}
+
+// Focus out events are only handled when we have receive a focus in event.
+// Here we just save the event which will be handled when we receive a focus
+// in from the browser.
+function xformsHandleBlur(event) {
+    if (!document.xformsMaskFocusEvents) {
+        var target = getEventTarget(event);
+        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+            target = target.parentNode;
+        if (target != null)
+            document.xformsPreviousDOMFocusOut = target;
+    }
+}
+
+function xformsHandleFocus(event) {
+    if (!document.xformsMaskFocusEvents) {
+        var target = getEventTarget(event);
+        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+            target = target.parentNode;
+        var sendFocusEvents = target != null;
+
+        // We have just received a change event: try to combine both
+        if (sendFocusEvents && document.xformsPreviousValueChanged) {
+            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
+            document.xformsPreviousValueChanged = null;
+            if (eventSent)
+                document.xformsPreviousDOMFocusOut = null;
+            // If value changed didn't send anything, we still want to send the focus events
+            sendFocusEvents = !eventSent;
+        }
+
+        // Send focus events
+        if (sendFocusEvents) {
+            if (document.xformsPreviousDOMFocusOut) {
+                if (document.xformsPreviousDOMFocusOut != target) {
+                    var events = new Array();
+                    events.push(xformsCreateEventArray
+                        (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
+                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                    xformsFireEvents(events);
+                }
+                document.xformsPreviousDOMFocusOut = null;
+            } else {
+                if (document.xformsPreviousDOMFocusIn != target) {
+                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)));
+                }
+            }
+        }
+        document.xformsPreviousDOMFocusIn = target;
+    } else {
+        document.xformsMaskFocusEvents = false;
+    }
+}
+
+// Register listener on focus in and out events
+function xformsRegisterForFocusBlurEvents(control) {
+    if (!control.focusBlurEventListenerRegistered) {
+        control.focusBlurEventListenerRegistered = true;
+        xformsAddEventListener(control, "blur", xformsHandleBlur);
+        xformsAddEventListener(control, "focus", xformsHandleFocus);
+    }
+}
+
+
 // Parameter is an array of arrays with each array containing:
 // new Array(target, eventName, value, incremental, other)
 function xformsFireEvents(events) {
@@ -463,18 +655,21 @@ function xformsInitCheckesRadios(control) {
  */
 function xformsInitializeControlsUnder(root) {
 
+    xformsLogTime("Start xformsInitializeControlsUnder");
     // Gather all potential form controls
     var interestingTagNames = new Array("span", "button", "textarea", "input", "a", "label", "select", "td", "table", "div");
     var formsControls = new Array();
     for (var tagIndex = 0; tagIndex < interestingTagNames.length; tagIndex++) {
         var elements = root.getElementsByTagName(interestingTagNames[tagIndex]);
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++)
-            formsControls = formsControls.concat(elements[elementIndex]);
+            formsControls.push(elements[elementIndex]);
         if (root.tagName.toLowerCase() == interestingTagNames[tagIndex])
-            formsControls = formsControls.concat(root);
+            formsControls.push(root);
     }
 
+    var xformsElementCount = 0;
     // Go through potential form controls, add style, and register listeners
+    xformsLogTime("Total elements: " + formsControls.length);
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
 
         var control = formsControls[controlIndex];
@@ -522,85 +717,19 @@ function xformsInitializeControlsUnder(root) {
         }
 
         if (isXFormsElement) {
-
+            xformsElementCount++;
             if (isXFormsTrigger) {
                 // Handle click on trigger
-                control.onclick = function(event) {
-                    var target = getEventTarget(event);
-                    // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-                    if (xformsArrayContains(target.className.split(" "), "xforms-trigger"))
-                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)));
-                    return false;
-                };
+                control.onclick = xformsHandleClick;
             } else if (isXFormsCheckboxRadio) {
-
                 xformsInitCheckesRadios(control);
-
             } else if (isXFormsComboboxList) {
-
-                var computeSelectValue = function (select) {
-                    var options = select.options;
-                    var selectValue = "";
-                    for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                        var option = options[optionIndex];
-                        if (option.selected) {
-                            if (selectValue != "") selectValue += " ";
-                            selectValue += option.value;
-                        }
-                    }
-                    select.selectValue = selectValue;
-                };
-
-                var selectChanged = function (event) {
-                    var select = getEventTarget(event);
-                    computeSelectValue(select);
-                    xformsFireEvents(new Array(xformsCreateEventArray(select, "xxforms-value-change-with-focus-change",
-                        select.selectValue)));
-                };
-
                 // Register event listener on select
-                xformsAddEventListener(control, "change", selectChanged);
+                xformsAddEventListener(control, "change", xformsHandleSelectChanged);
                 // Compute the checkes value for the first time
-                computeSelectValue(control);
-
+                xformsComputeSelectValue(control);
             } else if (isXFormsRange) {
             
-                var rangeMouseDown = function (event) {
-                    document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
-                    return false;
-                };
-                
-                var rangeMouseUp = function (event) {
-                    document.xformsCurrentRangeControl = null;
-                    return false;
-                };
-                
-                var rangeMouseMove = function (event) {
-                    var rangeControl = document.xformsCurrentRangeControl;
-                    if (rangeControl) {
-                        // Compute range boundaries
-                        var rangeStart = xformsGetElementPosition(rangeControl.track).left;
-                        var rangeLength = rangeControl.track.clientWidth - rangeControl.slider.clientWidth;
-
-                        // Compute value
-                        var value = (event.clientX - rangeStart) / rangeLength;
-                        if (value < 0) value = 0;
-                        if (value > 1) value = 1;
-                        
-                        // Compute slider position
-                        var sliderPosition = event.clientX - rangeStart;
-                        if (sliderPosition < 0) sliderPosition = 0;
-                        if (sliderPosition > rangeLength) sliderPosition = rangeLength;
-                        rangeControl.slider.style.left = sliderPosition;
-                        
-                        // Notify server that value changed
-                        rangeControl.value = value;
-                        xformsValueChanged(rangeControl, null);
-                    }
-                    
-                    return false;
-                };
-                
                 if (!control.listenersRegistered) {
                     control.listenersRegistered = true;
                     control.mouseDown = false;
@@ -613,26 +742,16 @@ function xformsInitializeControlsUnder(root) {
                                 && xformsArrayContains(child.className.split(" "), "xforms-range-slider"))
                             control.slider = child;
                     }
-                    xformsAddEventListener(control.slider, "mousedown", rangeMouseDown);
+                    xformsAddEventListener(control.slider, "mousedown", xformsHandleRangeMouseDown);
                 }
                 
                 if (!document.xformsRangeListenerRegistered) {
                     document.xformsRangeListenerRegistered = true;
-                    xformsAddEventListener(document, "mousemove", rangeMouseMove);
-                    xformsAddEventListener(document, "mouseup", rangeMouseUp);
+                    xformsAddEventListener(document, "mousemove", xformsHandleRangeMouseMove);
+                    xformsAddEventListener(document, "mouseup", xformsHandleRangeMouseUp);
                 }
             } else if (isXFormsOutput) {
-                xformsAddEventListener(control, "click", function(event) {
-                    var events = new Array();
-                    var target = getEventTarget(event);
-                    // In the case of appearance="xxforms:html, target can be an element inside
-                    // the xforms-output, not the xforms-output itself. So we are here looking for the
-                    // xforms-parent when necessary.
-                    while (!xformsArrayContains(target.className.split(" "), "xforms-output"))
-                        target = target.parentNode;
-                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                    xformsFireEvents(events);
-                });
+                xformsAddEventListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
                 control.value = control.childNodes[1].value;
                 var textfield = control.childNodes[1];
@@ -640,52 +759,14 @@ function xformsInitializeControlsUnder(root) {
                 // Intercept custom JavaScript code changing control value
                 if (control.watch) {
                     // Firefox implements a watch() method
-                    control.watch("value", function(property, oldvalue, newvalue) {
-                        var span = this;
-                        var textField = span.childNodes[1];
-                        if (span.valueSetByXForms == 0 && textField.value != span.value) {
-                            span.value = newvalue;
-                            textField.value = newvalue;
-                            xformsDispatchEvent(textField, "change");
-                        } else {
-                            span.valueSetByXForms--;
-                        }
-                        return newvalue;
-                    });
+                    control.watch("value", xformsHandleFirefoxValueChange);
                 } else {
                     // IE throws a propertychange event
                     control.valueSetByXForms = 0;
-                    xformsAddEventListener(control, "propertychange", function(event) {
-                        if (event.propertyName == "value") {
-                            var span = getEventTarget(event);
-                            var textField = span.childNodes[1];
-                            if (span.valueSetByXForms == 0 && textField.value != span.value) {
-                                textField.value = span.value;
-                                span.valueSetByXForms++;
-                                span.value = span.previousValue;
-                                xformsDispatchEvent(textField, "change");
-                            } else {
-                                span.valueSetByXForms--;
-                            }
-                        }
-                    });
+                    xformsAddEventListener(control, "propertychange", xformsHandleIEValueChange);
                 }
                 // Intercept end-user pressing enter in text field
-                xformsAddEventListener(textfield, "keypress", function(event) {
-                    if (event.keyCode == 10 || event.keyCode == 13) {
-                        var span = getEventTarget(event).parentNode;
-                        xformsHandleValueChange(event);
-                        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
-                        // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
-                        if (event.preventDefault) {
-                            // Firefox version
-                            event.preventDefault();
-                        } else {
-                            // IE version
-                            return false;
-                        }
-                    }
-                });
+                xformsAddEventListener(textfield, "keypress", xformsHandleInputKeyPress);
                 // Intercept incremental modifications
                 if (isIncremental)
                     xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
@@ -702,71 +783,14 @@ function xformsInitializeControlsUnder(root) {
                 }
             }
 
-            // Register listener on focus in and out events
-            function registerForFocusBlurEvents(control) {
-                if (!control.focusBlurEventListenerRegistered) {
-                    control.focusBlurEventListenerRegistered = true;
-                    xformsAddEventListener(control, "blur", function(event) {
-                        // Focus out events are only handled when we have receive a focus in event.
-                        // Here we just save the event which will be handled when we receive a focus
-                        // in from the browser.
-                        if (!document.xformsMaskFocusEvents) {
-                            var target = getEventTarget(event);
-                            while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
-                                target = target.parentNode;
-                            if (target != null)
-                                document.xformsPreviousDOMFocusOut = target;
-                        }
-                    });
-                    xformsAddEventListener(control, "focus", function(event) {
-                        if (!document.xformsMaskFocusEvents) {
-                            var target = getEventTarget(event);
-                            while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
-                                target = target.parentNode;
-                            var sendFocusEvents = target != null;
-
-                            // We have just received a change event: try to combine both
-                            if (sendFocusEvents && document.xformsPreviousValueChanged) {
-                                var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
-                                document.xformsPreviousValueChanged = null;
-                                if (eventSent)
-                                    document.xformsPreviousDOMFocusOut = null;
-                                // If value changed didn't send anything, we still want to send the focus events
-                                sendFocusEvents = !eventSent;
-                            }
-
-                            // Send focus events
-                            if (sendFocusEvents) {
-                                if (document.xformsPreviousDOMFocusOut) {
-                                    if (document.xformsPreviousDOMFocusOut != target) {
-                                        var events = new Array();
-                                        events.push(xformsCreateEventArray
-                                            (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
-                                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                                        xformsFireEvents(events);
-                                    }
-                                    document.xformsPreviousDOMFocusOut = null;
-                                } else {
-                                    if (document.xformsPreviousDOMFocusIn != target) {
-                                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)));
-                                    }
-                                }
-                            }
-                            document.xformsPreviousDOMFocusIn = target;
-                        } else {
-                            document.xformsMaskFocusEvents = false;
-                        }
-                    });
-                }
-            }
             if (isXFormsCheckboxRadio) {
                 var inputs = control.getElementsByTagName("input");
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
                     var input = inputs[inputIndex];
-                    registerForFocusBlurEvents(input);
+                    xformsRegisterForFocusBlurEvents(input);
                 }
             } else {
-                registerForFocusBlurEvents(control);
+                xformsRegisterForFocusBlurEvents(control);
             }
 
             // Alert label next to the control
@@ -798,10 +822,13 @@ function xformsInitializeControlsUnder(root) {
             xformsUpdateStyle(control);
         }
     }
+    xformsLogTime("XForms elements: " + xformsElementCount);
 }
 
 function xformsPageLoaded() {
 
+    xformsLogTime("Start xformsPageLoaded");
+    window.start = new Date().getTime();
     if (document.getElementById("xforms-form")) {
 
         // Initialize tooltip library
@@ -916,6 +943,8 @@ function xformsPageLoaded() {
             xformsFireEvents(new Array(xformsCreateEventArray(null, "xxforms-all-events-required", null, null)));
         }
     }
+
+    xformsLogTime("End xformsPageLoaded");
 }
 
 function xformsGetLocalName(element) {
@@ -1574,7 +1603,6 @@ function xformsHandleResponse() {
             xformsReplaceNodeText(errorContainer, errorMessage);
             xformsDisplayLoading("error");
         } else {
-
             // The server didn't send valid XML
             document.xformsLoadingError.innerHTML = "Unexpected response received from server";
             xformsDisplayLoading("error");
@@ -1650,3 +1678,4 @@ function xformsExecuteNextRequest() {
 
 // Run xformsPageLoaded when the browser has finished loading the page
 xformsAddEventListener(window, "load", xformsPageLoaded);
+document.xformsTime = new Date().getTime();

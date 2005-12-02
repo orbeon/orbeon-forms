@@ -166,6 +166,12 @@ public class XFormsServer extends ProcessorImpl {
             if (actionElement != null) {
                 final List eventElements = actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME);
                 if (eventElements != null && eventElements.size() > 0) {
+                    // NOTE: We store here the last xxforms-value-change-with-focus-change event so
+                    // we can coalesce values in case several such events are sent for the same
+                    // control. The client should not send us such series of events, but currently
+                    // it may happen.
+                    String lastSourceControlId = null;
+                    String lastValueChangeEventValue = null;
                     for (Iterator i = eventElements.iterator(); i.hasNext();) {
                         final Element eventElement = (Element) i.next();
                         final String sourceControlId = eventElement.attributeValue("source-control-id");
@@ -174,13 +180,44 @@ public class XFormsServer extends ProcessorImpl {
                         final String value = eventElement.getText();
 
                         if (XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED.equals(eventName)) {
+                            // Special event telling us to resend the client all the events since initialization
                             allEvents = true;
                         } else if (sourceControlId != null && eventName != null) {
                             // An event is passed
-                            containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
+                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE) && otherControlId == null) {
+                                // xxforms-value-change-with-focus-change event
+                                if (lastSourceControlId == null) {
+                                    // Rember event
+                                    lastSourceControlId = sourceControlId;
+                                    lastValueChangeEventValue = value;
+                                } else if (lastSourceControlId.equals(sourceControlId)) {
+                                    // Update event
+                                    lastValueChangeEventValue = value;
+                                } else {
+                                    // Send old event
+                                    containingDocument.executeExternalEvent(pipelineContext, eventName, lastSourceControlId, otherControlId, lastValueChangeEventValue, null);
+                                    // Remember new event
+                                    lastSourceControlId = sourceControlId;
+                                    lastValueChangeEventValue = value;
+                                }
+                            } else {
+                                if (lastSourceControlId != null) {
+                                    // Send old event
+                                    containingDocument.executeExternalEvent(pipelineContext, eventName, lastSourceControlId, otherControlId, lastValueChangeEventValue, null);
+                                    lastSourceControlId = null;
+                                    lastValueChangeEventValue = null;
+                                }
+                                // Send new event
+                                containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
+                            }
                         } else if (!(sourceControlId == null && eventName == null)) {
                             throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                         }
+                    }
+                    // Flush stored event if needed
+                    if (lastSourceControlId != null) {
+                        // Send old event
+                        containingDocument.executeExternalEvent(pipelineContext, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, null);
                     }
                 }
             }

@@ -196,7 +196,7 @@
     color: gray;
 }
 
-input.xforms-required-empty {
+.xforms-required-empty input {
     border: 1px solid #f99;
     background: #fcc;
     padding-bottom: 3px;

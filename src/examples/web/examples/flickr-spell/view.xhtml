@@ -70,10 +70,10 @@
             </xhtml:li>
         </xhtml:ul>
         <xforms:group>
-            <xforms:send submission="spell" ev:event="xforms-value-changed"/>
             <xhtml:p>
                 <xforms:input ref="instance('input')/text" incremental="true">
                     <xforms:label>Type here: </xforms:label>
+                    <xforms:send submission="spell" ev:event="xforms-value-changed"/>
                 </xforms:input>
             </xhtml:p>
             <xhtml:p>

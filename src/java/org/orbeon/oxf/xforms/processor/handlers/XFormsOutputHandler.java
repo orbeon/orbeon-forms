@@ -59,7 +59,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final String mediatypeValue = elementAttributes.getValue("mediatype");
         final boolean isImage = mediatypeValue != null && mediatypeValue.startsWith("image/");
-        final boolean isHTML = ( mediatypeValue != null && mediatypeValue.equals("text/html"))
+        final boolean isHTML = (mediatypeValue != null && mediatypeValue.equals("text/html"))
                 || (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "html".equals(appearanceLocalname));
 
         if (isHTML) {
@@ -88,9 +88,10 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         // Create xhtml:span
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+        final String enclosingElementLocalname = isHTML ? "div" : "span";
+        final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         if (!handlerContext.isGenerateTemplate()) {
             if (isImage) {
                 // Case of image media type with URI
@@ -130,7 +131,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                     contentHandler.characters(value.toCharArray(), 0, value.length());
             }
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
 
         // xforms:help
         handleLabelHintHelpAlert(effectiveId, "help", controlInfo);

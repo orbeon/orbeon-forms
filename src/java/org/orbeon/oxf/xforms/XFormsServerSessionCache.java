@@ -31,7 +31,7 @@ public class XFormsServerSessionCache {
     private int currentCacheSize = 0;
 
     private Map keyToEntryMap = new HashMap();
-    private Map staticStateToEntryMap = new HashMap();
+//    private Map staticStateToEntryMap = new HashMap();
     private LinkedList linkedList = new LinkedList();
 
     public static XFormsServerSessionCache instance(ExternalContext.Session session, boolean create) {
@@ -62,25 +62,27 @@ public class XFormsServerSessionCache {
     }
 
     public synchronized void add(String pageGenerationId, String requestId, XFormsServer.XFormsState xformsState) {
+        addOne(pageGenerationId, xformsState.getStaticState());
+        addOne(requestId, xformsState.getDynamicState());
+    }
+
+    private void addOne(String key, String value) {
 
         // Remove existing entry if possible
         {
-            final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(pageGenerationId);
+            final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(key);
             if (existingCacheEntry != null) {
                 removeCacheEntry(existingCacheEntry);
-                final int stateSize = (existingCacheEntry.xformsState.getStaticState().length() + existingCacheEntry.xformsState.getDynamicState().length()) * 2;// TODO
-                XFormsServer.logger.debug("XForms - session cache: removed entry of " + stateSize + " bytes.");
+                final int size = existingCacheEntry.value.length() * 2;// TODO
+                XFormsServer.logger.debug("XForms - session cache: removed entry of " + size + " bytes.");
             }
         }
 
-        final String staticState = xformsState.getStaticState();
-        final String dynamicState = xformsState.getDynamicState();
-
         // Make room if needed
-        final int stateSize = (staticState.length() + dynamicState.length()) * 2;// TODO
+        final int size = value.length() * 2;// TODO
         final int cacheSizeBeforeExpire = currentCacheSize;
         int expiredCount = 0;
-        while (currentCacheSize != 0 && (currentCacheSize + stateSize) > maxSize) {
+        while (currentCacheSize != 0 && (currentCacheSize + size) > maxSize) {
             expireOne();
             expiredCount++;
         }
@@ -89,20 +91,30 @@ public class XFormsServerSessionCache {
            XFormsServer.logger.debug("XForms - session cache: expired " + expiredCount + " entries (" + (cacheSizeBeforeExpire - currentCacheSize) + " bytes).");
 
         // Add new element to cache
-        final CacheEntry newCacheEntry = new CacheEntry(pageGenerationId, requestId, xformsState);
+        final CacheEntry newCacheEntry = new CacheEntry(key, value);
 
         linkedList.addFirst(newCacheEntry);
-        keyToEntryMap.put(pageGenerationId, newCacheEntry);
+        keyToEntryMap.put(key, newCacheEntry);
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - session cache: added entry of " + stateSize + " bytes.");
+            XFormsServer.logger.debug("XForms - session cache: added entry of " + size + " bytes.");
 
         // Update cache size
-        currentCacheSize += stateSize;// TODO: not correct if we reuse static state String
+        currentCacheSize += size;// TODO: not correct if we reuse static state String
     }
 
     public synchronized XFormsServer.XFormsState find(String pageGenerationId, String requestId) {
-        final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(pageGenerationId);
+        final String staticState = findOne(pageGenerationId);
+        if (staticState == null)
+            return null;
+        final String dynamicState = findOne(requestId);
+        if (dynamicState == null)
+            return null;
+        return new XFormsServer.XFormsState(staticState, dynamicState);
+    }
+
+    private String findOne(String key) {
+        final CacheEntry existingCacheEntry = (CacheEntry) keyToEntryMap.get(key);
         if (existingCacheEntry != null) {
             // Move to the front (is this useful in our use case?)
             if (linkedList.getFirst() != existingCacheEntry) {
@@ -110,7 +122,7 @@ public class XFormsServerSessionCache {
                 linkedList.addFirst(existingCacheEntry);
             }
             XFormsServer.logger.debug("XForms - session cache: found and refreshed entry.");
-            return existingCacheEntry.xformsState;
+            return existingCacheEntry.value;
         } else {
             // Not found
             XFormsServer.logger.debug("XForms - session cache: did not find entry.");
@@ -119,13 +131,11 @@ public class XFormsServerSessionCache {
     }
 
     private void removeCacheEntry(CacheEntry existingCacheEntry) {
-        final String staticState = existingCacheEntry.xformsState.getStaticState();
-        final String dynamicState = existingCacheEntry.xformsState.getDynamicState();
 
-        final int stateSize = (staticState.length() + dynamicState.length()) * 2;// TODO
+        final int stateSize = existingCacheEntry.value.length() * 2;// TODO
 
         linkedList.remove(existingCacheEntry);
-        keyToEntryMap.remove(existingCacheEntry.pageGenerationId);
+        keyToEntryMap.remove(existingCacheEntry.key);
 
         // Update cache size
         currentCacheSize -= stateSize;
@@ -139,14 +149,12 @@ public class XFormsServerSessionCache {
     }
 
     private static class CacheEntry {
-        public String pageGenerationId;
-        public String requestId;
-        public XFormsServer.XFormsState xformsState;
+        public String key;
+        public String value;
 
-        public CacheEntry(String pageGenerationId, String requestId, XFormsServer.XFormsState xformsState) {
-            this.pageGenerationId = pageGenerationId;
-            this.requestId = requestId;
-            this.xformsState = xformsState;
+        public CacheEntry(String key, String value) {
+            this.key = key;
+            this.value = value;
         }
     }
 }

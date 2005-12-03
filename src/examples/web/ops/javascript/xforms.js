@@ -150,39 +150,29 @@ function xformsReplaceNodeText(node, text) {
     node.appendChild(textNode);
 }
 
-/**
-* Replace in a tree a placeholder by some other string in text nodes and attribute values
-*/
-function xformsStringReplace(node, placeholder, replacement) {
-
-    var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
-
-    function xformsStringReplaceWorker(node) {
-
-        function replace(text) {
-            var stringText = new String(text);
-            return stringText.replace(placeholderRegExp, replacement);
-        }
-
-        switch (node.nodeType) {
-            case ELEMENT_TYPE:
-                for (var i = 0; i < node.attributes.length; i++) {
-                    var newValue = replace(node.attributes[i].value);
-                    if (newValue != node.attributes[i].value)
-                        node.setAttribute(node.attributes[i].name, newValue);
-                }
-                for (var i = 0; i < node.childNodes.length; i++)
-                    xformsStringReplaceWorker(node.childNodes[i]);
-                break;
-            case TEXT_TYPE:
-                var newValue = replace(node.nodeValue);
-                if (newValue != node.nodeValue)
-                    node.nodeValue = newValue;
-                break;
-        }
+function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
+    switch (node.nodeType) {
+        case ELEMENT_TYPE:
+            for (var i = 0; i < node.attributes.length; i++) {
+                var newValue = new String(node.attributes[i].value).replace(replacement);
+                if (newValue != node.attributes[i].value)
+                    node.setAttribute(node.attributes[i].name, newValue);
+            }
+            for (var i = 0; i < node.childNodes.length; i++)
+                xformsStringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
+            break;
+        case TEXT_TYPE:
+            var newValue = new String(node.nodeValue).replace(replacement);
+            if (newValue != node.nodeValue)
+                node.nodeValue = newValue;
+            break;
     }
-    
-    xformsStringReplaceWorker(node);
+}
+
+// Replace in a tree a placeholder by some other string in text nodes and attribute values
+function xformsStringReplace(node, placeholder, replacement) {
+    var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
+    xformsStringReplaceWorker(node, placeholderRegExp, replacement);
 }
 
 function xformsAppendRepeatSuffix(id, suffix) {
@@ -291,7 +281,6 @@ function xformsLog(text) {
 }
 
 function xformsLogTime(text) {
-    return;
     var oldTime = document.xformsTime;
     var currentTime = new Date().getTime();
     document.xformsTime = currentTime;
@@ -598,20 +587,20 @@ function getEventTarget(event) {
     return event.srcElement ? event.srcElement : event.target;
 }
 
-function xformsInitCheckesRadios(control) {
-    function computeSpanValue(span) {
-        var inputs = span.getElementsByTagName("input");
-        var spanValue = "";
-        for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-            var input = inputs[inputIndex];
-            if (input.checked) {
-                if (spanValue != "") spanValue += " ";
-                spanValue += input.value;
-            }
+function xformsInitCheckesRadiosComputeSpanValue(span) {
+    var inputs = span.getElementsByTagName("input");
+    var spanValue = "";
+    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+        var input = inputs[inputIndex];
+        if (input.checked) {
+            if (spanValue != "") spanValue += " ";
+            spanValue += input.value;
         }
-        span.value = spanValue;
     }
+    span.value = spanValue;
+}
 
+function xformsInitCheckesRadios(control) {
     function inputSelected(event) {
         var checkbox = getEventTarget(event);
         var span = checkbox;
@@ -622,7 +611,7 @@ function xformsInitCheckesRadios(control) {
                 break;
             span = span.parentNode;
         }
-        computeSpanValue(span);
+        xformsInitCheckesRadiosComputeSpanValue(span);
         xformsFireEvents(new Array(xformsCreateEventArray
                 (span, "xxforms-value-change-with-focus-change", span.value, null)));
     }
@@ -633,7 +622,7 @@ function xformsInitCheckesRadios(control) {
         xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
 
     // Compute the checkes value for the first time
-    computeSpanValue(control);
+    xformsInitCheckesRadiosComputeSpanValue(control);
 }
 
 /**
@@ -655,7 +644,6 @@ function xformsInitCheckesRadios(control) {
  */
 function xformsInitializeControlsUnder(root) {
 
-    xformsLogTime("Start xformsInitializeControlsUnder");
     // Gather all potential form controls
     var interestingTagNames = new Array("span", "button", "textarea", "input", "a", "label", "select", "td", "table", "div");
     var formsControls = new Array();
@@ -669,7 +657,6 @@ function xformsInitializeControlsUnder(root) {
 
     var xformsElementCount = 0;
     // Go through potential form controls, add style, and register listeners
-    xformsLogTime("Total elements: " + formsControls.length);
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
 
         var control = formsControls[controlIndex];
@@ -822,7 +809,6 @@ function xformsInitializeControlsUnder(root) {
             xformsUpdateStyle(control);
         }
     }
-    xformsLogTime("XForms elements: " + xformsElementCount);
 }
 
 function xformsPageLoaded() {
@@ -957,6 +943,58 @@ function xformsGetLocalName(element) {
     }
 }
 
+function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
+    var idSuffixWithDepth = idSuffix;
+    for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
+         idSuffixWithDepth += REPEAT_HIERARCHY_SEPARATOR_2 + "1";
+    if (element.id)
+        element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
+    if (element.htmlFor)
+        element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+    // Remove references to hint, help, alert, label as they might have changed
+    if (xformsIsDefined(element.labelElement)) element.labelElement = null;
+    if (xformsIsDefined(element.hintElement)) element.hintElement = null;
+    if (xformsIsDefined(element.helpElement)) element.helpElement = null;
+    if (xformsIsDefined(element.alertElement)) element.alertElement = null;
+    if (xformsIsDefined(element.divId)) element.divId = null;
+    element.styleListenerRegistered = false;
+    for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+        var childNode = element.childNodes[childIndex];
+        if (childNode.nodeType == ELEMENT_TYPE) {
+            if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
+            xformsAddSuffixToIds(childNode, idSuffix, repeatDepth);
+            if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++
+        }
+    }
+}
+
+// Function to find the input element below a given node
+function xformsGetInputUnderNode(node) {
+    if (node.nodeType == ELEMENT_TYPE) {
+        if (node.tagName == "INPUT") {
+            return node;
+        } else {
+            for (var childIndex in node.childNodes) {
+                var result = xformsGetInputUnderNode(node.childNodes[childIndex]);
+                if (result != null) return result;
+            }
+        }
+    } else {
+        return null;
+    }
+}
+
+function xformsGetClassForReapeatId(repeatId) {
+    var depth = 1;
+    var currentRepeatId = repeatId;
+    while (true) {
+        currentRepeatId = document.xformsRepeatTreeChildToParent[currentRepeatId];
+        if (currentRepeatId == null) break;
+        depth = depth == 1 ? 2 : 1;
+    }
+    return "xforms-repeat-selected-item-" + depth;
+}
+
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
         var responseXML = document.xformsXMLHttpRequest.responseXML;
@@ -1006,31 +1044,7 @@ function xformsHandleResponse() {
                                                         // Save tag name to be used for delimiter
                                                         delimiterTagName = templateNode.tagName;
                                                         // Add suffix to all the ids
-                                                        function addSuffixToIds(element, idSuffix, repeatDepth) {
-                                                            var idSuffixWithDepth = idSuffix;
-                                                            for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-                                                                 idSuffixWithDepth += REPEAT_HIERARCHY_SEPARATOR_2 + "1";
-                                                            if (element.id)
-                                                                element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
-                                                            if (element.htmlFor)
-                                                                element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
-                                                            // Remove references to hint, help, alert, label as they might have changed
-                                                            if (xformsIsDefined(element.labelElement)) element.labelElement = null;
-                                                            if (xformsIsDefined(element.hintElement)) element.hintElement = null;
-                                                            if (xformsIsDefined(element.helpElement)) element.helpElement = null;
-                                                            if (xformsIsDefined(element.alertElement)) element.alertElement = null;
-                                                            if (xformsIsDefined(element.divId)) element.divId = null;
-                                                            element.styleListenerRegistered = false;
-                                                            for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                                                                var childNode = element.childNodes[childIndex];
-                                                                if (childNode.nodeType == ELEMENT_TYPE) {
-                                                                    if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
-                                                                    addSuffixToIds(childNode, idSuffix, repeatDepth);
-                                                                    if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++
-                                                                }
-                                                            }
-                                                        }
-                                                        addSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, 0);
+                                                        xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, 0);
                                                         // Remove "xforms-repeat-template" from classes on copy of element
                                                         var nodeCopyClasses = nodeCopy.className.split(" ");
                                                         var nodeCopyNewClasses = new Array();
@@ -1184,26 +1198,10 @@ function xformsHandleResponse() {
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
 
-                                        // Function to find the input element below a given node
-                                        function getInput(node) {
-                                            if (node.nodeType == ELEMENT_TYPE) {
-                                                if (node.tagName == "INPUT") {
-                                                    return node;
-                                                } else {
-                                                    for (var childIndex in node.childNodes) {
-                                                        var result = getInput(node.childNodes[childIndex]);
-                                                        if (result != null) return result;
-                                                    }
-                                                }
-                                            } else {
-                                                return null;
-                                            }
-                                        }
-
                                         // Remove content and store current checked value
                                         var valueToChecked = new Array();
                                         while (documentElement.childNodes.length > 0) {
-                                            var input = getInput(documentElement.firstChild);
+                                            var input = xformsGetInputUnderNode(documentElement.firstChild);
                                             valueToChecked[input.value] = input.checked;
                                             documentElement.removeChild(documentElement.firstChild);
                                         }
@@ -1219,7 +1217,7 @@ function xformsHandleResponse() {
                                                     itemElement.getAttribute("value"));
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement.getAttribute("value")] == true)
-                                                    getInput(templateClone).checked = true;
+                                                    xformsGetInputUnderNode(templateClone).checked = true;
                                                 documentElement.appendChild(templateClone);
                                             }
                                         }
@@ -1454,16 +1452,6 @@ function xformsHandleResponse() {
 
                             // Change highlighted section in repeat
                             case "repeat-indexes": {
-                                function getClassForReapeatId(repeatId) {
-                                    var depth = 1;
-                                    var currentRepeatId = repeatId;
-                                    while (true) {
-                                        currentRepeatId = document.xformsRepeatTreeChildToParent[currentRepeatId];
-                                        if (currentRepeatId == null) break;
-                                        depth = depth == 1 ? 2 : 1;
-                                    }
-                                    return "xforms-repeat-selected-item-" + depth;
-                                }
                                 var repeatIndexesElement = actionElement.childNodes[actionIndex];
                                 var newRepeatIndexes = new Array();
                                 // Extract data from server response
@@ -1496,7 +1484,7 @@ function xformsHandleResponse() {
                                                (cursor.className != "xforms-repeat-delimiter"
                                                && cursor.className != "xforms-repeat-begin-end")) {
                                             if (cursor.nodeType == ELEMENT_TYPE)
-                                                xformsRemoveClass(cursor, getClassForReapeatId(repeatId));
+                                                xformsRemoveClass(cursor, xformsGetClassForReapeatId(repeatId));
                                             cursor = cursor.nextSibling;
                                         }
                                     }
@@ -1517,7 +1505,7 @@ function xformsHandleResponse() {
                                                && cursor.className != "xforms-repeat-begin-end")) {
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 var classNameArray = cursor.className.split(" ");
-                                                classNameArray.push(getClassForReapeatId(repeatId));
+                                                classNameArray.push(xformsGetClassForReapeatId(repeatId));
                                                 cursor.className = classNameArray.join(" ");
                                             }
                                             cursor = cursor.nextSibling;

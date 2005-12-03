@@ -12,68 +12,118 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-function xformsUpdateStyle(element) {
+function xformsUpdateStyleLabel(label, message) {
+    if (xformsStringValue(label) != message) {
+        // Remove content of label
+        while (label.firstChild != null)
+            label.removeChild(label.firstChild);
+        // Add new message
+        label.appendChild(document.createTextNode(message));
+    }
+}
 
-    /**
-     * Updates an HTML label with a new message (used for XForms label, hint, and help).
-     */
-    function updateLabel(label, message) {
-        if (xformsStringValue(label) != message) {
-            // Remove content of label
-            while (label.firstChild != null)
-                label.removeChild(label.firstChild);
-            // Add new message
-            label.appendChild(document.createTextNode(message));
+function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required) {
+    if (xformsIsDefined(relevant)) {
+        if (relevant) xformsRemoveClass(element, "xforms-disabled")
+        else xformsAddClass(element, "xforms-disabled");
+    }
+    if (xformsIsDefined(readonly)) {
+        var classes = element.className.split(" ");
+        if (xformsArrayContains(classes, "xforms-input")) {
+            // XForms input
+            var displayValue = element.childNodes[0];
+            if (readonly) xformsAddClass(displayValue, "xforms-readonly");
+            else xformsRemoveClass(displayValue, "xforms-readonly");
+            var textField = element.childNodes[1];
+            if (readonly) textField.setAttribute("disabled", "disabled");
+            else textField.removeAttribute("disabled");
+            var showCalendar = element.childNodes[2];
+            if (readonly) xformsAddClass(showCalendar, "xforms-showcalendar-readonly");
+            else xformsRemoveClass(showCalendar, "xforms-showcalendar-readonly");
+        } else if (xformsArrayContains(classes, "xforms-output") || xformsArrayContains(classes, "xforms-group")) {
+            // XForms output and group
+            if (readonly) xformsAddClass(element, "xforms-readonly");
+            else xformsRemoveClass(element, "xforms-readonly");
+        } else {
+            // Other controls
+            if (readonly) element.setAttribute("disabled", "disabled");
+            else element.removeAttribute("disabled");
         }
     }
-
-    function updateRelevantReadonly(element, relevant, readonly, required) {
-        if (xformsIsDefined(relevant)) {
-            if (relevant) xformsRemoveClass(element, "xforms-disabled")
-            else xformsAddClass(element, "xforms-disabled");
-        }
-        if (xformsIsDefined(readonly)) {
-            var classes = element.className.split(" ");
-            if (xformsArrayContains(classes, "xforms-input")) {
-                // XForms input
-                var displayValue = element.childNodes[0];
-                if (readonly) xformsAddClass(displayValue, "xforms-readonly");
-                else xformsRemoveClass(displayValue, "xforms-readonly");
-                var textField = element.childNodes[1];
-                if (readonly) textField.setAttribute("disabled", "disabled");
-                else textField.removeAttribute("disabled");
-                var showCalendar = element.childNodes[2];
-                if (readonly) xformsAddClass(showCalendar, "xforms-showcalendar-readonly");
-                else xformsRemoveClass(showCalendar, "xforms-showcalendar-readonly");
-            } else if (xformsArrayContains(classes, "xforms-output") || xformsArrayContains(classes, "xforms-group")) {
-                // XForms output and group
-                if (readonly) xformsAddClass(element, "xforms-readonly");
-                else xformsRemoveClass(element, "xforms-readonly");
-            } else {
-                // Other controls
-                if (readonly) element.setAttribute("disabled", "disabled");
-                else element.removeAttribute("disabled");
-            }
-        }
-        if (xformsIsDefined(required)) {
-            var classes = element.className.split(" ");
-            if (required) {
-                xformsAddClass(element, "xforms-required");
-                if (element.value == "") {
-                    xformsAddClass(element, "xforms-required-empty");
-                    xformsRemoveClass(element, "xforms-required-filled");
-                } else {
-                    xformsAddClass(element, "xforms-required-filled");
-                    xformsRemoveClass(element, "xforms-required-empty");
-                }
-            } else {
-                xformsRemoveClass(element, "xforms-required");
+    if (xformsIsDefined(required)) {
+        var classes = element.className.split(" ");
+        if (required) {
+            xformsAddClass(element, "xforms-required");
+            if (element.value == "") {
+                xformsAddClass(element, "xforms-required-empty");
                 xformsRemoveClass(element, "xforms-required-filled");
+            } else {
+                xformsAddClass(element, "xforms-required-filled");
                 xformsRemoveClass(element, "xforms-required-empty");
             }
+        } else {
+            xformsRemoveClass(element, "xforms-required");
+            xformsRemoveClass(element, "xforms-required-filled");
+            xformsRemoveClass(element, "xforms-required-empty");
         }
     }
+}
 
+// What happens when control gets/looses focus
+function xformsSytleGetFocus(event) {
+    var target = getEventTarget(event);
+    if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
+        target = target.parentNode;
+    var hintLabel = target.nextSibling.nextSibling;
+    xformsRemoveClass(hintLabel, "xforms-hint");
+    xformsAddClass(hintLabel, "xforms-hint-active");
+}
+
+function xformsStyleLoosesFocus(event) {
+    var target = getEventTarget(event);
+    if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
+        target = target.parentNode;
+    var hintLabel = target.nextSibling.nextSibling;
+    xformsRemoveClass(hintLabel, "xforms-hint-active");
+    xformsAddClass(hintLabel, "xforms-hint");
+}
+
+function xformsHelpMouseOver(event) {
+    tt_Show(event, getEventTarget(event).divId, false, 0, false, false,
+        ttOffsetX, ttOffsetY, false, false, ttTemp);
+}
+
+function xformsCalendarUpdate(calendar) {
+    // Send notification to XForms engine
+    var inputField = calendar.params.inputField;
+    var element = inputField.parentNode;
+    element.value = inputField.value;
+    xformsValueChanged(element, false);
+}
+
+function xformsCalendarClick(event) {
+    // Call jscalendar handler only if this is date field
+    var target = getEventTarget(event);
+    // Event can be received on calendar picker span, or on the containing span
+    var span = target.childNodes.length == 0 ? target.parentNode : target
+    var inputField = span.childNodes[1];
+    if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
+            && !inputField.disabled)
+        span.xformsJscalendarOnClick();
+}
+
+function xformsSelect1CompactChanged(event) {
+    var target = getEventTarget(event);
+    target.selectedIndex = target.selectedIndex;
+}
+
+function xformsChangeHeightHandler() {
+    var lineNumber = element.value.split("\n").length;
+    if (lineNumber < 5) lineNumber = 5;
+    element.style.height = 3 + lineNumber * 1.1 + "em";
+}
+
+function xformsUpdateStyle(element) {
     if (element.className) {
         var classes = element.className.split(" ");
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
@@ -101,7 +151,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable label depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-hint") {
@@ -122,26 +172,15 @@ function xformsUpdateStyle(element) {
                 // Only add listener once
                 if (!element.styleListenerRegistered) {
                     element.styleListenerRegistered = true;
-
-                    // What happens when control gets/looses focus
-                    function controlGetsFocus() {
-                        xformsRemoveClass(element, "xforms-hint");
-                        xformsAddClass(element, "xforms-hint-active");
-                    }
-                    function controlLoosesFocus() {
-                        xformsRemoveClass(element, "xforms-hint-active");
-                        xformsAddClass(element, "xforms-hint");
-                    }
-
                     // Add listeners on control
                     var controlGeneratingEvent = xformsArrayContains(control.className.split(" "), "xforms-input")
                         ? control.childNodes[1] : control;
-                    xformsAddEventListener(controlGeneratingEvent, "focus", controlGetsFocus);
-                    xformsAddEventListener(controlGeneratingEvent, "blur", controlLoosesFocus);
+                    xformsAddEventListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
+                    xformsAddEventListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
                 }
 
                 // Disable or enable hint depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
             
             if (className == "xforms-help") {
@@ -182,17 +221,12 @@ function xformsUpdateStyle(element) {
                 // Only add listener once
                 if (!element.styleListenerRegistered) {
                     element.styleListenerRegistered = true;
-                    xformsAddEventListener(element, "mouseover", function(event) {
-                        tt_Show(event, getEventTarget(event).divId, false, 0, false, false,
-                            ttOffsetX, ttOffsetY, false, false, ttTemp);
-                    });
-                    xformsAddEventListener(element, "mouseout", function() {
-                        tt_Hide();
-                    });
+                    xformsAddEventListener(element, "mouseover", xformsHelpMouseOver);
+                    xformsAddEventListener(element, "mouseout", tt_Hide);
                 }
 
                 // Disable or enable help depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
@@ -220,7 +254,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable help depending if control is relevant
-                updateRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
             }
 
             if (className == "xforms-input") {
@@ -235,12 +269,6 @@ function xformsUpdateStyle(element) {
                     inputField.id = "input-" + element.id;
                     showCalendar.id = "showcalendar-" + element.id;
 
-                    function calendarUpdate() {
-                        // Send notification to XForms engine
-                        element.value = inputField.value;
-                        xformsValueChanged(element, false);
-                    }
-
                     // Setup calendar library
                     Calendar.setup({
                         inputField     :    inputField.id,
@@ -249,29 +277,18 @@ function xformsUpdateStyle(element) {
                         button         :    element.id,
                         singleClick    :    true,
                         step           :    1,
-                        onUpdate       :    calendarUpdate,
+                        onUpdate       :    xformsCalendarUpdate,
                         electric       :    true
                     });
 
-                    var jscalendarOnClick = element.onclick;
-                    element.onclick = function() {
-                        // Call jscalendar handler only if this is date field
-                        if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
-                                && !inputField.disabled)
-                            jscalendarOnClick();
-                    }
+                    element.xformsJscalendarOnClick = element.onclick;
+                    element.onclick = xformsCalendarClick;
                 }
             }
             
             if (className == "xforms-select1-compact") {
                 // Prevent end-user from selecting multiple values
-                
-                var select1CompactChanged = function (event) {
-                    var target = getEventTarget(event);
-                    target.selectedIndex = target.selectedIndex;
-                };
-                
-                xformsAddEventListener(element, "change", select1CompactChanged);
+                xformsAddEventListener(element, "change", xformsSelect1CompactChanged);
             }
 
             if (className == "xforms-trigger") {
@@ -286,19 +303,14 @@ function xformsUpdateStyle(element) {
             
             if (className == "wide-textarea") {
                 if (!element.changeHeightHandlerRegistered) {
-                    var changeHeightHandler = function () {
-                        var lineNumber = element.value.split("\n").length;
-                        if (lineNumber < 5) lineNumber = 5;
-                        element.style.height = 3 + lineNumber * 1.1 + "em";
-                    };
                     element.changeHeightHandlerRegistered = true;
-                    changeHeightHandler();
-                    xformsAddEventListener(element, "keyup", changeHeightHandler);
+                    xformsChangeHeightHandler();
+                    xformsAddEventListener(element, "keyup", xformsChangeHeightHandler);
                 }
             }
 
             // Update relevant
-            updateRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
+            xformsUpdateStyleRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             if (className == "widget-tabs" || className == "widget-tab-inactive"

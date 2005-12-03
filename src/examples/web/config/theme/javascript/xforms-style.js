@@ -309,9 +309,6 @@ function xformsUpdateStyle(element) {
                 }
             }
 
-            // Update relevant
-            xformsUpdateStyleRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
-
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             if (className == "widget-tabs" || className == "widget-tab-inactive"
                     || className == "widget-tab-active" || className == "widget-tab-spacer-side"
@@ -321,5 +318,8 @@ function xformsUpdateStyle(element) {
                     element.width = element.clientWidth;
             }
         }
+
+        // Update class on element based on its attributes
+        xformsUpdateStyleRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
     }
 }

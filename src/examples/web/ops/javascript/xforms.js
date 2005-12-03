@@ -281,6 +281,7 @@ function xformsLog(text) {
 }
 
 function xformsLogTime(text) {
+    return;
     var oldTime = document.xformsTime;
     var currentTime = new Date().getTime();
     document.xformsTime = currentTime;

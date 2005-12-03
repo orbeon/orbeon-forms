@@ -192,10 +192,6 @@
     display: none;
 }
 
-.xforms-readonly {
-    color: gray;
-}
-
 .xforms-required-empty input {
     border: 1px solid #f99;
     background: #fcc;

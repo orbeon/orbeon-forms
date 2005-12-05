@@ -149,9 +149,9 @@
     <test description="XSLT With Dependencies " name="oxf:test-script">
         <input name="config">
             <script>
-                <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <processor name="oxf:pipeline">
                     <input name="config">
-                        <p:config>
+                        <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                             <p:processor name="oxf:xinclude">
                                 <p:input name="config" href="cache/stylesheet2.xsl"/>
                                 <p:output name="data" id="stylesheet2"/>

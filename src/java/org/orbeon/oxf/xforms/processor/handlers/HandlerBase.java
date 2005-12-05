@@ -64,7 +64,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControls.ControlInfo controlInfo) {
-        // Nothing common so far
+        if (controlInfo != null && controlInfo.isReadonly()) {
+            // @disabled="disabled"
+            newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
+        }
     }
 
     public static void handleMIPClasses(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {

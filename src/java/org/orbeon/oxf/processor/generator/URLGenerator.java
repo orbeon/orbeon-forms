@@ -61,7 +61,7 @@ public class URLGenerator extends ProcessorImpl {
     private static final String DEFAULT_TEXT_ENCODING = "iso-8859-1";
 
     private static final boolean DEFAULT_VALIDATING = false;
-    private static final boolean DEFAULT_HANDLE_XINCLUDE = true;
+    public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_FORCE_ENCODING = false;
@@ -91,19 +91,29 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(String url) {
         try {
-            this.localConfigURIReferences = new ConfigURIReferences(new Config(URLFactory.createURL(url)));
-            addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+            init(URLFactory.createURL(url), DEFAULT_HANDLE_XINCLUDE);
+        } catch (MalformedURLException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public URLGenerator(String url, boolean handleXInclude) {
+        try {
+            init(URLFactory.createURL(url), handleXInclude);
         } catch (MalformedURLException e) {
             throw new OXFException(e);
         }
     }
 
     public URLGenerator(URL url) {
-        this.localConfigURIReferences = new ConfigURIReferences(new Config(url));
-        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+        init(url, DEFAULT_HANDLE_XINCLUDE);
     }
 
     public URLGenerator(URL url, boolean handleXInclude) {
+        init(url, handleXInclude);
+    }
+
+    private void init(URL url, boolean handleXInclude) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, handleXInclude));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }

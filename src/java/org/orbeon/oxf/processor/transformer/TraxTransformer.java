@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -116,7 +117,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Perform transformation
                     Transformer transformer = templates.newTransformer();
-                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, true));
+                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
                     transformer.transform(new SAXSource
                             (new ProcessorOutputXMLReader(context, dataInput.getOutput()), new InputSource()),
                              new SAXResult(contentHandler));

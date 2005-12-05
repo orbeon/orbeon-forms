@@ -145,7 +145,7 @@ public abstract class ProcessorImpl implements Processor {
             final Processor inputValidator = new MSVValidationProcessor(inputInfo.getSchemaURI());
 
             // Connect schema to validator
-            Processor schema = SchemaRepository.instance().getResourceGenerator(inputInfo.getSchemaURI());
+            Processor schema = SchemaRepository.instance().getURLGenerator(inputInfo.getSchemaURI());
             PipelineUtils.connect(schema, OUTPUT_DATA, inputValidator, MSVValidationProcessor.INPUT_SCHEMA);
             PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA, inputValidator, INPUT_CONFIG);
 

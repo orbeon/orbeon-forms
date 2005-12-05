@@ -63,7 +63,7 @@ public class LoggerFactory {
                 log4jConfigURL = OXFProperties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY_OLD);
 
             if (log4jConfigURL != null) {
-                Processor url = PipelineUtils.createURLGenerator(log4jConfigURL);
+                Processor url = PipelineUtils.createURLGenerator(log4jConfigURL, true);
                 DOMSerializer dom = new DOMSerializer();
                 PipelineUtils.connect(url, ProcessorImpl.OUTPUT_DATA, dom, ProcessorImpl.INPUT_DATA);
                 PipelineContext ctx = new PipelineContext();

@@ -54,7 +54,6 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
                 handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, controlInfo);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }

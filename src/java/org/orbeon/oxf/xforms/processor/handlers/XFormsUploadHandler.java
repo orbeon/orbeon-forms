@@ -50,11 +50,8 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
         {
             final StringBuffer classes = new StringBuffer("xforms-control xforms-upload");
             if (!handlerContext.isGenerateTemplate()) {
-
                 handleMIPClasses(classes, controlInfo);
-
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, controlInfo);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
@@ -69,6 +66,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
                     handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
 
+            handleReadOnlyAttribute(newAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
         }

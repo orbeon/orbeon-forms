@@ -37,10 +37,10 @@ public class XMLProcessorRegistry extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI));
     }
 
-    public void start( final PipelineContext ctxt ) {
+    public void start(final PipelineContext ctxt) {
         try {
-            final Node cfg = readInputAsDOM4J( ctxt, INPUT_CONFIG );
-            
+            final Node cfg = readInputAsDOM4J(ctxt, INPUT_CONFIG);
+
             for (Iterator i = XPathUtils.selectIterator(cfg, "/processors/processor | /processors/processors/processor"); i.hasNext();) {
                 Element processorElement = (Element) i.next();
 
@@ -96,7 +96,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                 if (instantiationDef != null) {
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
-                         public Processor createInstance(PipelineContext context) {
+                        public Processor createInstance(PipelineContext context) {
                             try {
                                 // Find base processor
                                 final QName processorQName = extractProcessorQName(instantiationDef);

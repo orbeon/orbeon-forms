@@ -160,7 +160,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 appearanceValue = "minimal";// default for xforms:select1
         }
         final String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
-        //final String appearanceURI = uriFromQName(appearanceValue);
+        final boolean isFull = "full".equals(appearanceLocalname);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
@@ -180,14 +180,13 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, controlInfo);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        if ("full".equals(appearanceLocalname)) {
+        if (isFull) {
 
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             {
@@ -228,6 +227,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if ("compact".equals(appearanceLocalname))
                 newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
+            handleReadOnlyAttribute(newAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
 
             final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
@@ -278,6 +278,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 }
             }
 
+            handleReadOnlyAttribute(reusableAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
             final String label = item.getLabel();
             contentHandler.characters(label.toCharArray(), 0, label.length());
@@ -307,7 +308,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     }
                 }
             } else {
-                selected = controlInfo.getValue().equals(value);
+                final String controlValue = controlInfo.getValue();
+                selected = controlValue != null && controlValue.equals(value);
             }
             if (selected)
                 optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");

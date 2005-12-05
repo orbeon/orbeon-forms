@@ -71,14 +71,12 @@ public class XFormsTriggerHandler extends HandlerBase {
             handleMIPClasses(classes, controlInfo);
         final AttributesImpl newAttributes = getAttributes(controlAttributes, classes.toString(), effectiveId);
 
-        if (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname))
-        {
+        if (appearanceValue != null
+                && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname)) {
             // Link appearance (xxforms:link)
 
             newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
 //                            newAttributes.addAttribute(XMLConstant., "href", "href", ContentHandlerHelper.CDATA, "");// TODO: probably needs f:url-norewrite="true"
-            if (!handlerContext.isGenerateTemplate())
-                handleReadOnlyAttribute(newAttributes, controlInfo);
 
             // xhtml:a
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -87,9 +85,8 @@ public class XFormsTriggerHandler extends HandlerBase {
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName);
 
-        } else
-        if (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "image".equals(appearanceLocalname))
-        {
+        } else if (appearanceValue != null
+                && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "image".equals(appearanceLocalname)) {
             // Image appearance
 
             newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "image");
@@ -117,6 +114,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:input
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "input");
+            handleReadOnlyAttribute(newAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName);
 
@@ -128,6 +126,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:button
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
+            handleReadOnlyAttribute(newAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);

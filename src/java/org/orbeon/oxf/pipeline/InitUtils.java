@@ -213,7 +213,7 @@ public class InitUtils {
             synchronized (PipelineEngineImpl.class) {
                 if (!processorDefinitionsInitialized) {
                     // Register inital processors with the default XML Processor Registry
-                    Processor processorDefinitions = PipelineUtils.createURLGenerator(DEFAULT_PROLOGUE);
+                    Processor processorDefinitions = PipelineUtils.createURLGenerator(DEFAULT_PROLOGUE, true);
                     Processor registry = new XMLProcessorRegistry();
                     PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 
@@ -224,7 +224,7 @@ public class InitUtils {
                     // If user defines a PROLOGUE_PROPERTY, overrides the defaults
                     String prologueSrc = OXFProperties.instance().getPropertySet().getString(PROLOGUE_PROPERTY);
                     if (prologueSrc != null) {
-                        processorDefinitions = PipelineUtils.createURLGenerator(prologueSrc);
+                        processorDefinitions = PipelineUtils.createURLGenerator(prologueSrc, true);
                         registry = new XMLProcessorRegistry();
                         PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 

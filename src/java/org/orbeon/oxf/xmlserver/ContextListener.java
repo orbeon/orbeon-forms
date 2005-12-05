@@ -45,7 +45,7 @@ public class ContextListener implements ServletContextListener {
                 final List xmlServerServiceDefinitions;
                 {
                     Processor configSource = PipelineUtils.createURLGenerator
-                            (event.getServletContext().getInitParameter(XML_SERVER_CONFIG));
+                            (event.getServletContext().getInitParameter(XML_SERVER_CONFIG), true);
                     ConfigProcessor serverConfigProcessor = new ConfigProcessor();
                     PipelineUtils.connect(configSource, ProcessorImpl.OUTPUT_DATA,
                             serverConfigProcessor, ProcessorImpl.INPUT_CONFIG);
@@ -77,7 +77,7 @@ public class ContextListener implements ServletContextListener {
                             public void onMessage(Message message) {
                                 try {
                                     // Create pipeline and connect config
-                                    Processor pipelineSource = PipelineUtils.createURLGenerator(service.getImplementation());
+                                    Processor pipelineSource = PipelineUtils.createURLGenerator(service.getImplementation(), true);
                                     PipelineProcessor pipelineProcessor = new PipelineProcessor();
                                     PipelineUtils.connect(pipelineSource, ProcessorImpl.OUTPUT_DATA,
                                             pipelineProcessor, ProcessorImpl.INPUT_CONFIG);

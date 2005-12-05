@@ -78,7 +78,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             handleMIPClasses(classes, controlInfo);
 
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-            handleReadOnlyAttribute(newAttributes, controlInfo);
         } else {
             isDateOrTime = false;
 
@@ -86,7 +85,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 
-        // Create xhtml:span
+        // Create xhtml:span or xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String enclosingElementLocalname = isHTML ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);

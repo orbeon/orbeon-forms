@@ -45,7 +45,7 @@ public class ConfigProcessor extends ProcessorImpl {
                 final Document pipelineDocument;
                 {
                     Processor pipelineURLGenerator = PipelineUtils.createURLGenerator
-                            (URLFactory.createURL(xmlServerConfigContext, implementation).toExternalForm());
+                            (URLFactory.createURL(xmlServerConfigContext, implementation).toExternalForm(), true);
                     DOMSerializer pipelineDOMSerializer = new DOMSerializer();
                     PipelineUtils.connect(pipelineURLGenerator, OUTPUT_DATA, pipelineDOMSerializer, INPUT_DATA);
                     pipelineDOMSerializer.start(context);

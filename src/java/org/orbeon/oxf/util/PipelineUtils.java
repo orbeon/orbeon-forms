@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.util;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -22,10 +24,10 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.xml.XMLConstants;
 
 public class PipelineUtils {
-    
-    private static void configDOMGenerator( final DOMGenerator dm ) {
-        dm.setId( "N/A" );
-        dm.setName( XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME );
+
+    private static void configDOMGenerator(final DOMGenerator dm) {
+        dm.setId("N/A");
+        dm.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME);
     }
 
     public static void connect(Processor producer, String outputName, Processor consumer, String inputName) {
@@ -35,17 +37,15 @@ public class PipelineUtils {
         input.setOutput(output);
     }
 
-    public static DOMGenerator createDOMGenerator
-    ( final org.dom4j.Element cfg, final String id, final Object v, final String sid ) {
-        final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
-        configDOMGenerator( ret );
+    public static DOMGenerator createDOMGenerator(final Element cfg, final String id, final Object v, final String sid) {
+        final DOMGenerator ret = new DOMGenerator(cfg, id, v, sid);
+        configDOMGenerator(ret);
         return ret;
     }
 
-    public static DOMGenerator createDOMGenerator
-    ( final org.dom4j.Document cfg, final String id, final Object v, final String sid ) {
-        final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
-        configDOMGenerator( ret );
+    public static DOMGenerator createDOMGenerator(final Document cfg, final String id, final Object v, final String sid) {
+        final DOMGenerator ret = new DOMGenerator(cfg, id, v, sid);
+        configDOMGenerator(ret);
         return ret;
     }
 
@@ -57,4 +57,10 @@ public class PipelineUtils {
         return new URLGenerator(urlStr);
     }
 
+    public static Processor createURLGenerator(String urlStr, boolean handleXInclude) {
+        if (urlStr == null || urlStr.equals(""))
+            throw new OXFException("Empty url string");
+
+        return new URLGenerator(urlStr, handleXInclude);
+    }
 }

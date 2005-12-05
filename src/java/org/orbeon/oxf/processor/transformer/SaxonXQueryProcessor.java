@@ -21,6 +21,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.resources.OXFProperties;
@@ -87,7 +88,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Configuration config = new Configuration();
                     {
                         config.setErrorListener(new StringErrorListener(logger));
-                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, true));
+                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
 
                         // Read attributes
                         Map attributes = null;

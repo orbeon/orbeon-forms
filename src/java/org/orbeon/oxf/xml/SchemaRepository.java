@@ -145,7 +145,7 @@ public class SchemaRepository {
         return instance;
     }
 
-    public Processor getResourceGenerator(String publicId) {
+    public Processor getURLGenerator(String publicId) {
         return PipelineUtils.createURLGenerator(getSchema(publicId));
     }
 

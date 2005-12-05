@@ -28,20 +28,81 @@
                 language for XML inclusions. It's main use is to specify that content from a target
                 XML document must be included at a certain place within a source XML document.
             </p>
+        </section>
+        <a name="ops-xinclude"/>
+        <section>
+            <title>Note About XInclude in Orbeon PresentationServer</title>
             <p>
-                There are two ways to use XInclude in OPS:
+                By default, XInclude processing is not automatic in OPS, and must be enabled
+                explicitly, except in a few cases described below.
             </p>
-            <ul>
-                <li>
-                    <p><b>At parsing time.</b> The XML parser included with OPS is able to process
-                    XInclude instructions when an XML file is being parsed (i.e. loaded) into
-                    OPS.</p>
-                </li>
-                <li>
-                    <p><b>With the XInclude processor.</b> The processor documented here allows to
-                    explicitly control the use of XInclude instructions.</p>
-                </li>
-            </ul>
+            <section>
+                <title>Explicit XInclude Handling</title>
+                <p>
+                    There are two ways to use XInclude explicitly in OPS:
+                </p>
+                <ul>
+                    <li>
+                        <p><b>At parsing time.</b> The XML parser included with OPS is able to process
+                        XInclude instructions when an XML file is being parsed (i.e. loaded) into OPS.
+                        This is usually controlled with the <a
+                        href="processors-generators-url#xml-mode">URL generator</a>.</p>
+                    </li>
+                    <li>
+                        <p><b>With the XInclude processor.</b> The processor documented here allows to
+                        explicitly control the use of XInclude instructions.</p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Implicit XInclude Handling</title>
+                <p>
+                    XInclude processing is implicit in the following cases:
+                </p>
+                <ul>
+                    <li>
+                        <p><b>Page Flow Controller (PFC) Components.</b> PFC page models, page
+                        views, and actions automatically go through XInclude processing. This in
+                        particular allows for using XInclude in static XHTML or dynamic XSLT page
+                        views. In this case, XInclude can make use of the special URIs
+                        <code>input:data</code> and <code>input:instance</code> to access data and
+                        instance documents fed to the page view.</p>
+                    </li>
+                    <li>
+                        <p><b>XPL Processor Definitions.</b> Processor definitions (usually stored
+                        in a file called <code>processors.xml</code>) may use XInclude.</p>
+                    </li>
+                    <li>
+                        <p><b>Logging Configuration.</b> Logging configuration (usually stored in a
+                        file called <code>log4j.xml</code>) may use XInclude.</p>
+                    </li>
+                </ul>
+                <p>
+                    It must be noted that, in particular, XInclude processing is <b>not</b>
+                    implicit in the following cases:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>XPL <code>href</code> attribute.</b> In the following example:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <p:input name="my-input-name" href="some-document.xml"/>
+                        </xml-source>
+                        <p>
+                            In this case, the content of <code>some-document.xml</code> will not be
+                            processed by XInclude before being sent to the
+                            <code>my-input-name</code> input.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XPL <code>schema-href</code> attribute.</b> Similarly, XML schemas do
+                            not go through XInclude processing.
+                        </p>
+                    </li>
+                </ul>
+            </section>
         </section>
         <section>
             <title>Inputs and Outputs</title>

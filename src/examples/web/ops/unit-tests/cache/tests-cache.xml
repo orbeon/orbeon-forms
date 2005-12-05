@@ -47,6 +47,7 @@
                     <input name="config">
                         <config>
                             <url>cache/document3.xml</url>
+                            <handle-xinclude>true</handle-xinclude>
                         </config>
                     </input>
                 </processor>

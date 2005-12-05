@@ -117,7 +117,9 @@ function xformsSelect1CompactChanged(event) {
     target.selectedIndex = target.selectedIndex;
 }
 
-function xformsChangeHeightHandler() {
+function xformsChangeHeightHandler(variant) {
+    window.v = variant;
+    var element = variant.tagName ? variant : getEventTarget(variant);
     var lineNumber = element.value.split("\n").length;
     if (lineNumber < 5) lineNumber = 5;
     element.style.height = 3 + lineNumber * 1.1 + "em";
@@ -304,7 +306,7 @@ function xformsUpdateStyle(element) {
             if (className == "wide-textarea") {
                 if (!element.changeHeightHandlerRegistered) {
                     element.changeHeightHandlerRegistered = true;
-                    xformsChangeHeightHandler();
+                    xformsChangeHeightHandler(element);
                     xformsAddEventListener(element, "keyup", xformsChangeHeightHandler);
                 }
             }

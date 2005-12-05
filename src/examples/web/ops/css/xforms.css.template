@@ -192,6 +192,13 @@
     display: none;
 }
 
+.xforms-input input {
+    border: 1px solid #7f9db9;
+    padding-bottom: 3px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
 .xforms-required-empty input {
     border: 1px solid #f99;
     background: #fcc;

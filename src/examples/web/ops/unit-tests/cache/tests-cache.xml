@@ -74,7 +74,7 @@
         </input>
     </test>
 
-    <test description="URL Generator Configuration Change" name="oxf:test-script" >
+    <test description="URL Generator Configuration Change" name="oxf:test-script">
         <input name="config">
             <script>
                 <!-- Initial config -->
@@ -146,32 +146,11 @@
         </input>
     </test>
 
-    <test description="XSLT With Dependencies " name="oxf:test-script">
+    <test description="XSLT With Dependencies " name="oxf:test-script" except="true">
         <input name="config">
             <script>
                 <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config">
-                        <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
-                            <p:processor name="oxf:xinclude">
-                                <p:input name="config" href="cache/stylesheet2.xsl"/>
-                                <p:output name="data" id="stylesheet2"/>
-                            </p:processor>
-                            <p:processor name="oxf:xinclude">
-                                <p:input name="config" href="cache/b-2.xml"/>
-                                <p:output name="data" id="b-2"/>
-                            </p:processor>
-                            <p:processor name="oxf:xinclude">
-                                <p:input name="config" href="cache/c-2.xml"/>
-                                <p:output name="data" id="c-2"/>
-                            </p:processor>
-                            <p:processor name="oxf:xslt">
-                                <p:input name="config" href="#stylesheet2"/>
-                                <p:input name="data" href="cache/document1.xml"/>
-                                <p:input name="my-input" href="#b-2"/>
-                                <p:input name="my-unused-input" href="#c-2"/>
-                            </p:processor>
-                        </p:config>
-                    </input>
+                    <input name="config" href="cache/xslt-with-dependencies.xpl"/>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>

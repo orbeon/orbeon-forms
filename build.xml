@@ -608,7 +608,7 @@ ${files}
         <delete dir="${build.dir}"/>
     </target>
 
-    <target name="orbeon-doc" depends="jars">
+    <target name="orbeon-doc" depends="jars,orbeon-css-templates">
         <mkdir dir="${build.doc.dir}/reference"/>
         <mkdir dir="${build.doc.dir}/reference/theme"/>
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
@@ -636,6 +636,8 @@ ${files}
                 <include name="pages/*.pdf"/>
             </fileset>
         </copy>
+        <copy file="${web-examples-src.dir}/config/theme/orbeon.css" toDir="${build.doc.dir}/reference/theme"/>
+        <copy file="${web-examples-src.dir}/config/theme/xforms.css" toDir="${build.doc.dir}/reference/theme"/>
         <copy todir="${build.doc.dir}" file="doc/OPS Tutorial.pdf"/>
     </target>
 

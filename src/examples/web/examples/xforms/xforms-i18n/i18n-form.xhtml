@@ -1,0 +1,61 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ui="http:/www.orbeon.com/example/ui">
+
+    <xhtml:head>
+        <xhtml:title>Internationalization</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="search">
+                <search>
+                    <query/>
+                </search>
+            </xforms:instance>
+            <xforms:instance id="i18n" src="http://localhost:8888/ops/direct/xforms-i18n/i18n-resources"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .search           { text-align: center; }
+            .query input      { width: 16em; }
+            .search-type      { margin-left: 1em; }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div class="search">
+            <xhtml:div><xhtml:img src="/images/search-logo.png" alt="Search logo"/></xhtml:div>
+            <xhtml:div>
+                <xhtml:b>
+                    <xforms:output ref="instance('i18n')/web"/>
+                </xhtml:b>
+                <xhtml:a href="#" class="search-type">
+                    <xforms:output ref="instance('i18n')/images"/>
+                </xhtml:a>
+                <xhtml:a href="#" class="search-type">
+                    <xforms:output ref="instance('i18n')/news"/>
+                </xhtml:a>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:input ref="query" class="query"/>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:trigger>
+                    <xforms:label ref="instance('i18n')/search"/>
+                </xforms:trigger>
+            </xhtml:div>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

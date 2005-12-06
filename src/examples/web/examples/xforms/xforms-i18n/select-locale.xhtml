@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ui="http:/www.orbeon.com/example/ui">
+
+    <xhtml:head>
+        <xhtml:title>Select Locale</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <locale></locale>
+            </xforms:instance>
+            <xforms:submission id="set-locale" action="/direct/xforms-i18n/set-locale" replace="instance" method="post"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:ul>
+            <xhtml:li>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>English</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref=".">en_US</xforms:setvalue>
+                        <xforms:send submission="set-locale"/>
+                        <xforms:load resource="/xforms-i18n/form"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:li>
+            <xhtml:li>
+                <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>日本語</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref=".">ja_JP</xforms:setvalue>
+                        <xforms:send submission="set-locale"/>
+                        <xforms:load resource="/xforms-i18n/form"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:li>
+        </xhtml:ul>
+    </xhtml:body>
+</xhtml:html>

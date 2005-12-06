@@ -69,23 +69,34 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
     }
 }
 
-// What happens when control gets/looses focus
 function xformsSytleGetFocus(event) {
     var target = getEventTarget(event);
     if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
         target = target.parentNode;
-    var hintLabel = target.nextSibling.nextSibling;
-    xformsRemoveClass(hintLabel, "xforms-hint");
-    xformsAddClass(hintLabel, "xforms-hint-active");
+    var hintLabel = target;
+    while (true) {
+        if (xformsArrayContains(hintLabel.className.split(" "), "xforms-hint") && hintLabel.htmlFor == target.id) {
+            xformsRemoveClass(hintLabel, "xforms-hint");
+            xformsAddClass(hintLabel, "xforms-hint-active");
+            break;
+        }
+        hintLabel = hintLabel.nextSibling;
+    }
 }
 
 function xformsStyleLoosesFocus(event) {
     var target = getEventTarget(event);
     if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
         target = target.parentNode;
-    var hintLabel = target.nextSibling.nextSibling;
-    xformsRemoveClass(hintLabel, "xforms-hint-active");
-    xformsAddClass(hintLabel, "xforms-hint");
+    var hintLabel = target;
+    while (true) {
+        if (xformsArrayContains(hintLabel.className.split(" "), "xforms-hint-active") && hintLabel.htmlFor == target.id) {
+            xformsRemoveClass(hintLabel, "xforms-hint-active");
+            xformsAddClass(hintLabel, "xforms-hint");
+            break;
+        }
+        hintLabel = hintLabel.nextSibling;
+    }
 }
 
 function xformsHelpMouseOver(event) {

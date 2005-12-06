@@ -11,29 +11,30 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:saxon="http://saxon.sf.net/"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="xforms xs saxon xhtml f">
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-    <xsl:output name="xml" method="xml"/>
+    <xsl:template match="@*|node()" priority="-100">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
 
     <xsl:template match="widget:tabs">
-        <xsl:variable name="tabs" as="element()*" select="widget:tab"/>
+        <xsl:variable name="tabs" select="widget:tab"/><!-- as="element()*"  -->
         <xhtml:table class="widget-tabs" cellpadding="0" cellspacing="0" border="0">
             <xhtml:tr>
                 <xhtml:td class="widget-tab-spacer-side"/>
                 <!-- Tabs at the top -->
-                <xsl:variable name="selected-tab-specified" as="xs:boolean" select="count(widget:tab[@selected = 'true']) = 1"/>
+                <xsl:variable name="selected-tab-specified" select="count(widget:tab[@selected = 'true']) = 1"/><!-- as="xs:boolean"  -->
                 <xsl:for-each select="$tabs">
-                    <xsl:variable name="tab-id" as="xs:string" select="@id"/>
+                    <xsl:variable name="tab-id" select="@id"/><!-- as="xs:string"  -->
                     <xsl:if test="position() > 1">
                         <xhtml:td class="widget-tab-spacer-between"/>
                     </xsl:if>
@@ -75,7 +76,7 @@
                         <xsl:for-each select="widget:tab">
                             <xforms:case>
                                 <xsl:copy-of select="@*"/>
-                                <xsl:apply-templates select="node() except widget:label"/>
+                                <xsl:apply-templates select="node()"/>
                             </xforms:case>
                         </xsl:for-each>
                     </xforms:switch>
@@ -83,5 +84,7 @@
             </xhtml:tr>
         </xhtml:table>
     </xsl:template>
+
+    <xsl:template match="widget:label"/>
     
 </xsl:stylesheet>

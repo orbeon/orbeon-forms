@@ -1108,15 +1108,55 @@
                         <xforms:output mediatype="image/*" ref="image-uri"/>
                     </xml-source>
                     <note>
-                        It is not yet possible to directly embed image data using the
-                        <code>base64Binary</code> type.
+                        It is not yet possible to directly embed image data in an XForms instance
+                        using the <code>xs:base64Binary</code> type.
                     </note>
                 </section>
                 <section>
                     <title>HTML Type</title>
                     <p>
-                        TODO
+                        When an <code>xforms:output</code> control has an optional
+                        <code>mediatype</code> attribute with value <code>text/html</code>, the
+                        value of the node to which the control is bound is interpreted as HTML
+                        content.
                     </p>
+                    <p>
+                         Consider the following XForms instance:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="my-instance">
+                            <form>
+                                <html-content>
+                                    This is in &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt;!
+                                </html-content>
+                            </form>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        You bind an <code>xforms:output</code> control to the
+                        <code>html-content</code> node as follows:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
+                    </xml-source>
+                    <p>
+                        This will display the result as HTML, as expected: "This is in in
+                        <b>bold</b>!". If the <code>mediatype</code> is not specified, the result
+                        would be instead: "This is in in &lt;b>bold&lt;/b>!".
+                    </p>
+                    <p>
+                        In the XForms instance, the HTML content must be escaped as text. On the
+                        other hand, the following content will not work as expected:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance>
+                            <form>
+                                <html-content>
+                                    This is in in <b>bold</b>!
+                                </html-content>
+                            </form>
+                        </xforms:instance>
+                    </xml-source>ZZ
                 </section>
             </section>
             <section>

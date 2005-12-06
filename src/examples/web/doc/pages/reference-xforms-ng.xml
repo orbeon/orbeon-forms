@@ -188,7 +188,7 @@
                     </p>
                 </section>
                 <section>
-                    <title>Deleting Rows with the <code>xforms:delete</code> action</title>
+                    <title>Deleting Rows with the <code>xforms:delete</code> Action</title>
                     <p>
                         <code>xforms:repeat</code> may be used purely for display purposes, but it
                         can also be used for interactively editing repeated data. This includes
@@ -212,7 +212,7 @@
                     </xml-source>
                 </section>
                 <section>
-                    <title>Inserting Rows with the <code>xforms:insert</code> action</title>
+                    <title>Inserting Rows with the <code>xforms:insert</code> Action</title>
                     <p>
                         <code>xforms:insert</code> is provided with a <code>nodeset</code> attribute
                         pointing to the homogenous collection into which the insertion must take
@@ -325,9 +325,64 @@
                     </note>
                 </section>
                 <section>
-                    <title>Setting the Current Index with the <code>xforms:setindex</code> action</title>
+                    <title>Setting the Current Index with the <code>xforms:setindex</code> Action</title>
                     <p>
                         TODO
+                    </p>
+                </section>
+                <section>
+                    <title>Using <code>xforms:trigger</code> to Execute Actions</title>
+                    <p>
+                        Insertions and deletions are typically performed when the user of the
+                        application presses a button, with the effect of adding a new repeated
+                        element before or after the currently selected element, or of deleting the
+                        currently selected element. You use an <code>xforms:trigger</code> control
+                        and the XPath <code>index()</code> function for that purpose:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Add</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert nodeset="employees" at="index('employee-repeat')" position="after"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        or:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Delete</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:delete nodeset="employees" at="index('employee-repeat')"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        Note that we use <code>xforms:action</code> as a container for
+                        <code>xforms:insert</code> and <code>xforms:delete</code>. Since there is
+                        only one action to execute, <code>xforms:action</code> is not necessary, but
+                        it may increase the legibility of the code. It is also possible to write:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Add</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="employees" at="index('employee-repeat')" position="after"/>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        or:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Delete</xforms:label>
+                            <xforms:delete ev:event="DOMActivate" nodeset="employees" at="index('employee-repeat')"/>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        Notice in that case how <code>ev:event="DOMActivate"</code> has been moved
+                        from the enclosing <code>xforms:action</code> to the
+                        <code>xforms:insert</code> and <code>xforms:delete</code> elements.
                     </p>
                 </section>
                 <section>
@@ -342,12 +397,109 @@
                         TODO: use of relevant, switch.
                     </p>
                 </section>
+                <a name="nested-repeats"/>
                 <section>
                     <title>Nested Repeats</title>
                     <p>
-                        TODO
+                        It is often desirable to nest repeat sections. Consider the following
+                        XForms instance representing a company containing departments, each
+                        containing a number of employees:
                     </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="departments">
+                            <departments>
+                                <department>
+                                    <name>Research and Development</name>
+                                    <employees>
+                                        <employee>
+                                            <first-name>John</first-name>
+                                        </employee>
+                                        <employee>
+                                            <first-name>Mary</first-name>
+                                        </employee>
+                                    </employees>
+                                </department>
+                                <department>
+                                    <name>Support</name>
+                                    <employees>
+                                        <employee>
+                                            <first-name>Anne</first-name>
+                                        </employee>
+                                        <employee>
+                                            <first-name>Mark</first-name>
+                                        </employee>
+                                        <employee>
+                                            <first-name>Sophie</first-name>
+                                        </employee>
+                                    </employees>
+                                </department>
+                            </departments>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        This document clearly contains two nested sections subject to repetition:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>Departments:</b> a node-set containing all the
+                                <code>department</code> elements can be referred to with the
+                                following XPath expression:
+                                <code>instance('departments')/department</code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Employees:</b> a node-set containing all the
+                                <code>employee</code> elements can be referred to with the following
+                                XPath expression:
+                                <code>instance('departments')/department/employees/employee</code>.
+                                However, if the <i>context node</i> of the XPath expression points
+                                to a particular <code>department</code> element, then the following
+                                <i>relative</i> XPath expression refers to all the
+                                <code>employee</code> elements under that <code>department</code>
+                                element: <code>employees/employee</code>.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Following the example above, here is how departments and employees can be
+                        represented in nested tables with XForms:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xhtml:table>
+                            <xforms:repeat nodeset="instance('departments')/department">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:output ref="name"/>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xhtml:table>
+                                            <xforms:repeat nodeset="employees/employee">
+                                                <xhtml:tr>
+                                                    <xhtml:td>
+                                                        <xforms:output ref="first-name"/>
+                                                    </xhtml:td>
+                                                </xhtml:tr>
+                                            </xforms:repeat>
+                                        </xhtml:table>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xforms:repeat>
+                        </xhtml:table>
+                    </xml-source>
                 </section>
+                <p>
+                    In the code above, the second <code>xforms:repeat</code>'s <code>nodeset</code>
+                    expression is interpreted relatively to the <code>department</code> element of
+                    the parent <code>xforms:repeat</code> for each iteration of the parent's
+                    repetition. During the first iteration of the parent, the "Research and
+                    Development" department is in scope, and <code>employees/employee</code> refers
+                    to the two employees of that department, John and Mary. During the second
+                    iteration of the parent, the "Support" department is in scope, and
+                    <code>employees/employee</code> refers to the three employees of that
+                    department, Anne, Mark and Sophie.
+                </p>
             </section>
             <a name="submission"/>
             <section>

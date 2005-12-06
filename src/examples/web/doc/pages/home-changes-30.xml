@@ -746,7 +746,7 @@
                     </li>
                     <li>
                         <p>
-                            <b>Colunn Iterator.</b> The SQL processor is now able to explicitly
+                            <b>Column Iterator.</b> The SQL processor is now able to explicitly
                             iterate over all the columns returned by a result-set with the
                             <code>sql:column-iterator</code> element. A column iterator can be used
                             under the <code>sql:result-set</code> element, or under the
@@ -838,7 +838,7 @@
                             </li>
                             <li>
                                 <code>column-name</code> is now the standard attribute name for
-                                identifying a colunn name on the <code>sql:get-column-*</code>,
+                                identifying a column name on the <code>sql:get-column-*</code>,
                                 <code>sql:get-column</code>, and <code>sql:group</code> elements.
                             </li>
                         </ul>

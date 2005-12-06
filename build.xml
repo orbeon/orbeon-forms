@@ -104,7 +104,7 @@
     <target name="init">
 
         <tstamp/>
-        <property name="version.number" value="3.0.beta3"/>
+        <property name="version.number" value="3.0.beta4"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>

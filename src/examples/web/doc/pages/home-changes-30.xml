@@ -20,40 +20,41 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <header>
-        <title>Changes in Version 3.0 BETA</title>
+        <title>Changes in Version 3.0 BETA 4</title>
     </header>
     <body>
         <a name="introduction"/>
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to OPS 3.0 BETA!
+                Welcome to Orbeon PresentationServer (OPS) 3.0 BETA 4!
             </p>
             <p>
                 OPS 3.0 features an XForms engine much improved over OPS 2.8's, significant
                 improvements in the Page Flow Controller, and much more!
             </p>
             <p>
-                The purpose of the OPS 3.0 BETA is to provide you with a first glimpse of the OPS
+                The purpose of an OPS 3.0 BETA is to provide you with a first glimpse of the OPS
                 3.0 functionality, while OPS developers keep ironing out the last bugs and finishing
                 up the documentation! During the beta period, we are looking for as much feedback as
-                possible related to all the aspects of the OPS 3.0 BETA release.
+                possible related to all the aspects of the OPS 3.0 BETA 4 release.
             </p>
             <p>
                 Please use the <a href="http://forge.objectweb.org/mail/?group_id=168">ops-users
-                mailing-list</a> for feedback about OPS 3.0 BETA.
+                mailing-list</a> for feedback about OPS 3.0 BETA 4.
             </p>
         </section>
         <a name="limitations"/>
         <section>
-            <title>Known Limitations of OPS 3.0 BETA</title>
+            <title>Known Limitations of OPS 3.0 BETA 4</title>
             <p>
                 The following limitations are known:
             </p>
             <ul>
                 <li>
                     <p>
-                        Initial generation of an XForms page may have poor performance.
+                        Initial generation of an XForms page may still have poor performance in some
+                        circumstances.
                     </p>
                 </li>
                 <li>
@@ -140,6 +141,37 @@
                     </p>
                 </li>
             </ul>
+        </section>
+        <section>
+            <title>Change Since OPS 3.0 BETA 3</title>
+            <p>
+                The following changes have been implemented since OPS 3.0 BETA 3:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Numerous XForms engine bug-fixes and improvements.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Documentation improvements.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Improved and reorganized examples.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        XForms engine initialization performance improvements.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The rest of this document describes changes made between OPS 2.8 and OPS 3.0.
+            </p>
         </section>
         <a name="xforms"/>
         <section>
@@ -1004,7 +1036,7 @@
         <section>
             <title>Other Changes</title>
             <p>
-                The following changes are new in OPS 3.0 BETA:
+                The following changes are new in OPS 3.0:
             </p>
             <ul>
                 <li>

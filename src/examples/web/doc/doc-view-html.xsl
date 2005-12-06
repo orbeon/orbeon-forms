@@ -52,9 +52,11 @@
                         </xhtml:span>
                     </xhtml:td></xhtml:tr>
                     <!-- Tabs -->
-                    <xhtml:tr><xhtml:td colspan="2">
-                        <xhtml:div class="tabs">&#160;</xhtml:div> <!-- Need to insert a space here for Safari -->
-                    </xhtml:td></xhtml:tr>
+                    <xhtml:tr>
+                        <xhtml:td colspan="2">
+                            <xhtml:div class="tabs">&#160;</xhtml:div> <!-- Need to insert a space here for Safari -->
+                        </xhtml:td>
+                    </xhtml:tr>
                     <xhtml:tr>
                         <!-- List of sections -->
                         <xhtml:td id="leftcontent" valign="top" width="1%">

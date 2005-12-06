@@ -78,7 +78,7 @@
             </xforms:instance>                
             
             <xforms:bind nodeset="instance('instance')">
-                <xforms:bind nodeset="age" constraint="number(.) >= 0 and number(.) le 150"/>
+                <xforms:bind nodeset="age" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
                 <xforms:bind nodeset="date" type="xs:date"/>
@@ -252,7 +252,7 @@
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:output ref="instance('country-details')" appearance="xxforms:html"/>
+                        <xforms:output ref="instance('country-details')" mediatype="text/html"/>
                     </xhtml:p>
                 </widget:tab>
             </widget:tabs>
@@ -271,7 +271,7 @@
                         </xforms:trigger>
                         <xforms:group>
                             <xforms:label>XForms instance</xforms:label>
-                            <xforms:output ref="instance('formatted')" appearance="xxforms:html"/>
+                            <xforms:output ref="instance('formatted')" mediatype="text/html"/>
                         </xforms:group>
                     </xforms:case>
                 </xforms:switch>

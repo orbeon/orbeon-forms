@@ -94,17 +94,17 @@
                         <p:output name="data" id="static-state"/>
                     </p:processor>
 
-                    <!-- New way -->
+                    <!-- Native XForms Initialization -->
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
                         <p:input name="static-state" href="#static-state"/>
                         <p:output name="document" ref="xformed-data"/>
                     </p:processor>
 
-                    <!-- Old way -->
+                    <!-- Legacy, XSLT-based XForms Initialization -->
                     <!--<p:processor name="oxf:old-xforms-server">-->
                         <!--<p:input name="static-state" href="#static-state"/>-->
-                        <!--<p:output name="response" id="response"/>-->
+                        <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->
                     <!--</p:processor>-->
                     <!--<p:processor name="oxf:xslt">-->
                         <!--<p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>-->

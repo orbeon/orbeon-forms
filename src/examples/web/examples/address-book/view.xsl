@@ -73,6 +73,7 @@
                 else if ($instance/action = 'delete') then 'Deleted record'
                 else 'Read records'"/>
         </p>
+        <!--
         <p>
             <a href="/address-book/test1">Test 1</a>
         </p>
@@ -88,5 +89,9 @@
         <p>
             <a href="/address-book/test5">Test 5</a>
         </p>
+        <p>
+            <a href="/address-book/test6">Test 6</a>
+        </p>
+        -->
     </body>
 </html>

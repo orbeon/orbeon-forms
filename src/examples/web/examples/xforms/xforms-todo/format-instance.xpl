@@ -30,7 +30,7 @@
                 <xsl:template match="@ui:*"/>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" id="instance-no-ui" debug="instance-no-ui"/>
+        <p:output name="data" id="instance-no-ui"/>
     </p:processor>
 
     <p:processor name="oxf:xslt">
@@ -50,7 +50,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="data" debug="result"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

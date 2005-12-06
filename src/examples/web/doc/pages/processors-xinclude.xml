@@ -43,14 +43,35 @@
                 </p>
                 <ul>
                     <li>
-                        <p><b>At parsing time.</b> The XML parser included with OPS is able to process
-                        XInclude instructions when an XML file is being parsed (i.e. loaded) into OPS.
-                        This is usually controlled with the <a
-                        href="processors-generators-url#xml-mode">URL generator</a>.</p>
+                        <p>
+                            <b>At parsing time.</b> The XML parser included with OPS is able to
+                            process XInclude instructions when an XML file is being parsed (i.e.
+                            loaded) into OPS. This is usually controlled with the <a
+                            href="processors-generators-url#xml-mode">URL generator</a>. Example:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <p:processor name="oxf:url-generator">
+                                <p:input name="config">
+                                    <config>
+                                        <url>oxf:/some-document.xml</url>
+                                        <handle-xinclude>true</handle-xinclude>
+                                    </config>
+                                </p:input>
+                                <p:output name="data" id="processed-document"/>
+                            </p:processor>
+                        </xml-source>
                     </li>
                     <li>
-                        <p><b>With the XInclude processor.</b> The processor documented here allows to
-                        explicitly control the use of XInclude instructions.</p>
+                        <p>
+                            <b>With the XInclude processor.</b> The processor documented here allows to
+                            explicitly control the use of XInclude instructions. Example:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <p:processor name="oxf:xinclude">
+                                <p:input name="config" href="oxf:/some-document.xml"/>
+                                <p:output name="data" id="processed-document"/>
+                            </p:processor>
+                        </xml-source>
                     </li>
                 </ul>
             </section>

@@ -63,8 +63,10 @@
                     </li>
                     <li>
                         <p>
-                            <b>With the XInclude processor.</b> The processor documented here allows to
-                            explicitly control the use of XInclude instructions. Example:
+                            <b>With the XInclude processor.</b> The processor documented here allows
+                            to explicitly control the use of XInclude instructions in any XML
+                            document, including documents that are not loaded with the URL
+                            generator, but dynamically generated. Example:
                         </p>
                         <xml-source show-namespaces="false">
                             <p:processor name="oxf:xinclude">
@@ -72,6 +74,9 @@
                                 <p:output name="data" id="processed-document"/>
                             </p:processor>
                         </xml-source>
+                        <p>
+                            This example is equivalent to the example using the URL generator.
+                        </p>
                     </li>
                 </ul>
             </section>

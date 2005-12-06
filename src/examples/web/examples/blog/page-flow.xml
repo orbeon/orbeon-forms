@@ -39,7 +39,7 @@
     <page path-info="/blog/format-comment" view="format-comment/format-comment-view.xpl"/>
 
     <!-- Users -->
-    <page path-info="/blog/admin/users" model="admin/edit-users/edit-users.xpl" view="admin/edit-users/edit-users.xsl"/>
+    <page path-info="/blog/admin/users" model="admin/edit-users/edit-users.xpl" view="admin/edit-users/edit-users.xhtml"/>
     <page path-info="/blog/admin/add-user" view="admin/edit-users/edit-users.xpl">
         <action action="admin/edit-users/add-user-action.xpl"/>
     </page>

@@ -13,8 +13,17 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <group description="Transformations" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2003/XInclude">
 
     <test description="Simple transformation" name="oxf:xslt">
         <input name="data">

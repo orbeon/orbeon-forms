@@ -146,11 +146,13 @@
         </input>
     </test>
 
-    <test description="XSLT With Dependencies " name="oxf:test-script" except="true">
+    <test description="XSLT With Dependencies " name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                    <input name="config" href="cache/xslt-with-dependencies.xpl"/>
+                    <!-- FIXME: xslt-with-dependencies.xpl (using ops:xinclude) causes an exception because a base URL cannot be found -->
+                    <!--<input name="config" href="cache/xslt-with-dependencies.xpl"/>-->
+                    <input name="config" href="cache/xslt-with-dependencies-2.xpl"/>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>

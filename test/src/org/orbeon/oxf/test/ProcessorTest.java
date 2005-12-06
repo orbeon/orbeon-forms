@@ -16,25 +16,21 @@ package org.orbeon.oxf.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.XMLProcessorRegistry;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -53,7 +49,6 @@ import java.util.*;
 
 public class ProcessorTest extends TestCase {
 
-    private static ResourceManager resourceManager;
     private static Context jndiContext;
     private static PipelineContext pipelineContext;
 
@@ -65,10 +60,10 @@ public class ProcessorTest extends TestCase {
     public static void main(String args[]) {
         junit.textui.TestRunner.run(ProcessorTest.suite());
     }
-    
+
     static {
         try {
-        	// Initialize log4j
+            // Initialize log4j
             LoggerFactory.initBasicLogger();
 
             jndiContext = new InitialContext();
@@ -82,7 +77,7 @@ public class ProcessorTest extends TestCase {
                     props.put(name, properties.getProperty(name));
             }
             ResourceManagerWrapper.init(props);
-            resourceManager = ResourceManagerWrapper.instance();
+            ResourceManager resourceManager = ResourceManagerWrapper.instance();
 
             OXFProperties.init("oxf:/ops/unit-tests/properties.xml");
             pipelineContext = new PipelineContext();
@@ -97,10 +92,10 @@ public class ProcessorTest extends TestCase {
             // Run registry.
             XMLProcessorRegistry registry = new XMLProcessorRegistry();
             final String fname = "processors.xml";
-            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J( fname );
+            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J(fname);
             final DOMGenerator config = PipelineUtils.createDOMGenerator
-                ( doc, fname, DOMGenerator.ZeroValidity, fname );
-            PipelineUtils.connect( config, "data", registry, "config" );
+                    (doc, fname, DOMGenerator.ZeroValidity, fname);
+            PipelineUtils.connect(config, "data", registry, "config");
             registry.start(pipelineContext);
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,17 +107,46 @@ public class ProcessorTest extends TestCase {
         String currentTestError = null;
         try {
             TestSuite suite = new TestSuite();
-            Document tests = resourceManager.getContentAsDOM4J(System.getProperty(TEST_CONFIG));
+
+            final boolean useParserXinclude = true;
+            final Document tests;
+            if (useParserXinclude) {
+                final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG), true);
+                final DOMSerializer domSerializer = new DOMSerializer();
+                PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
+                domSerializer.start(pipelineContext);
+                tests = domSerializer.getDocument(pipelineContext);
+            } else {
+                // Create processor
+                final QName xincludeProcessorName = XMLConstants.XINCLUDE_PROCESSOR_QNAME;
+                final ProcessorFactory xincludeProcessorFactory = ProcessorFactoryRegistry.lookup(xincludeProcessorName);
+                if (xincludeProcessorFactory == null)
+                    throw new OXFException("Cannot find processor factory with name '"
+                            + xincludeProcessorName.getNamespacePrefix() + ":" + xincludeProcessorName.getName() + "'");
+
+                final Processor xincludeProcessor = xincludeProcessorFactory.createInstance(pipelineContext);
+
+                // Connect input
+                final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG));
+                PipelineUtils.connect(urlGenerator, "data", xincludeProcessor, "config");
+
+                final DOMSerializer domSerializer = new DOMSerializer();
+                PipelineUtils.connect(xincludeProcessor, "data", domSerializer, "data");
+
+                final PipelineContext pipelineContext = new PipelineContext();
+                domSerializer.start(pipelineContext);
+                tests = domSerializer.getDocument(pipelineContext);
+            }
 
             // If there's a test with the "only" attribute, execute only this one
             Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[@only = 'true'][1] | /tests/group[@only = 'true']/test");
             if (!i.hasNext())
-                i = XPathUtils.selectIterator(tests, "/tests/group/test | /tests/test");
+                i = XPathUtils.selectIterator(tests, "/tests/group/test[not(@exclude = 'true')] | /tests/test[not(@exclude = 'true')]");
 
             for (; i.hasNext();) {
                 Element testNode = (Element) i.next();
                 Element groupNode = testNode.getParent();
-                if(testNode.attributeValue("ignore") != null)
+                if (testNode.attributeValue("ignore") != null)
                     continue;
                 String description = testNode.attributeValue("description", "");
                 if (groupNode.getName().equals("group")) {
@@ -252,7 +276,7 @@ public class ProcessorTest extends TestCase {
      * @param result List of String (URI)
      */
     synchronized private void getUsedNamespaces(List result, Element element) {
-        if(element != null) {
+        if (element != null) {
             if (!"".equals(element.getNamespaceURI()))
                 result.add(element.getNamespaceURI());
             for (Iterator i = element.attributes().iterator(); i.hasNext();) {
@@ -282,7 +306,7 @@ public class ProcessorTest extends TestCase {
         public void run() {
             int executionCount = 0;
             try {
-                for (;executionCount < REPEAT_COUNT; executionCount++) {
+                for (; executionCount < REPEAT_COUNT; executionCount++) {
                     // Create pipeline context
                     PipelineContext pipelineContext = new PipelineContext();
                     pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);

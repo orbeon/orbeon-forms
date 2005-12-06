@@ -14,8 +14,6 @@
 package org.orbeon.oxf.processor.pipeline.ast;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.ForEachProcessor;
@@ -38,8 +36,8 @@ public abstract class ASTNodeContainer {
     public void setNode(Node node) {
         this.node = node;
     }
-    
-    public void setLocationData( final LocationData locDat ) {
+
+    public void setLocationData(final LocationData locDat) {
         locationData = locDat;
     }
 
@@ -48,23 +46,25 @@ public abstract class ASTNodeContainer {
      * location of the node.  If no node and no location then return hull.
      */
     public LocationData getLocationData() {
-    	final LocationData ret;
-        if ( locationData != null ) {
+        final LocationData ret;
+        if (locationData != null) {
             ret = locationData;
-        } else if ( node == null ) {
-    	    ret = null;
-    	} else if ( node.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
-            ret = ( LocationData )( ( org.dom4j.Element )node ).getData();    
-        } else if ( node.getNodeType() == org.dom4j.Node.ATTRIBUTE_NODE ) {
-            ret = ( LocationData )( ( org.dom4j.Attribute )node ).getData();    
+        } else if (node == null) {
+            ret = null;
+        } else if (node.getNodeType() == org.dom4j.Node.ELEMENT_NODE) {
+            ret = (LocationData) ((org.dom4j.Element) node).getData();
+        } else if (node.getNodeType() == org.dom4j.Node.ATTRIBUTE_NODE) {
+            ret = (LocationData) ((org.dom4j.Attribute) node).getData();
         } else {
             ret = null;
         }
-    	return ret;
+        return ret;
     }
 
     public abstract void walk(ASTHandler handler);
-    public void walkChildren(ASTHandler handler) {};
+
+    public void walkChildren(ASTHandler handler) {
+    }
 
     protected void walk(List astNodes, ASTHandler handler) {
         for (Iterator i = astNodes.iterator(); i.hasNext();) {
@@ -178,10 +178,10 @@ public abstract class ASTNodeContainer {
                 if (forEach.getId() == null && forEach.getRef() == null) {
                     if (statementsIdInfo.getOutputRefs().size() != 0)
                         throw new ValidationException("The statements in a <for-each> cannot have output ref; they reference "
-                            + statementsIdInfo.getOutputRefs().toString(), forEach.getLocationData());
+                                + statementsIdInfo.getOutputRefs().toString(), forEach.getLocationData());
                 } else if (statementsIdInfo.getOutputRefs().size() != 1) {
                     throw new ValidationException("The statements in a <for-each> must have exactly one output ref; "
-                        + (statementsIdInfo.getOutputRefs().isEmpty() ? "this <for-each> has none" :
+                            + (statementsIdInfo.getOutputRefs().isEmpty() ? "this <for-each> has none" :
                             "this <for-each> defined: " + statementsIdInfo.getOutputRefs().toString()),
                             forEach.getLocationData());
                 } else {

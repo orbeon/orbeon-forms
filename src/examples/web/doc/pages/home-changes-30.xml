@@ -82,18 +82,7 @@
                 </li>
                 <li>
                     <p>
-                        The OPS Tutorial has not been updated for 3.0.
-                    </p>
-                </li>
-                <li>
-                    <p>
                         The OPS Blog example is not complete.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The Ajax-based XForms engine currently works with Mozilla Firefox and
-                        Microsoft Internet Explorer 6. Support for Opera and Safari is planned.
                     </p>
                 </li>
                 <li>
@@ -136,6 +125,18 @@
                 <li>
                     <p>
                         <code>xforms:message</code> only supports <code>level="modal"</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The Ajax-based XForms engine currently works with Mozilla Firefox and
+                        Microsoft Internet Explorer 6. Support for Opera and Safari is planned.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The Orbeon PresentationServer Tutorial has not been updated to reflect the
+                        new features and best practices of OPS 3.0.
                     </p>
                 </li>
             </ul>

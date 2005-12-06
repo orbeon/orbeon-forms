@@ -36,7 +36,7 @@
             <menu-item label="XForms Reference" href="reference-xforms"/>
             <menu-item label="XForms NG Reference" href="reference-xforms-ng"/>
             <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
-            <menu-item label="XForms Test Suite" href="reference-xforms-test-suite"/>
+            <!--<menu-item label="XForms Test Suite" href="reference-xforms-test-suite"/>-->
         </menu>
         <menu label="Page Flow">
             <menu-item label="Page Flow Controller" href="reference-page-flow"/>

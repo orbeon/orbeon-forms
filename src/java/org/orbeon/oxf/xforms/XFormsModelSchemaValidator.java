@@ -321,7 +321,12 @@ public class XFormsModelSchemaValidator {
             case Acceptor.STRING_IGNORE:
                 {
                     if (txt.length() > 0) {
-                        addSchemaError(elt, sr.str);
+//                        addSchemaError(elt, sr.str);
+                        // TODO: Check this! It is not clear whether this should actually be tested
+                        // as above. I have noticed that some documents that should pass validation
+                        // actually do not with the above, namely with <xsd:element> with no type
+                        // but the element actually containing character content. But is removing
+                        // the test correct?
                     }
                     dref.types = null;
                     break;

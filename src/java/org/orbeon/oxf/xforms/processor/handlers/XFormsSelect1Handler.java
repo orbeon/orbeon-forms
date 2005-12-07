@@ -268,7 +268,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     handlerContext.isGenerateTemplate() ? "" : item.getValue());
 
             final String value = item.getValue();
-            if (!handlerContext.isGenerateTemplate() && controlInfo != null) {
+            if (!handlerContext.isGenerateTemplate() && controlInfo != null && controlInfo.getValue() != null) {
                 for (final StringTokenizer st = new StringTokenizer(controlInfo.getValue()); st.hasMoreTokens();) {
                     final String token = st.nextToken();
                     if (token.equals(value)) {

@@ -154,7 +154,7 @@ function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
     switch (node.nodeType) {
         case ELEMENT_TYPE:
             for (var i = 0; i < node.attributes.length; i++) {
-                var newValue = new String(node.attributes[i].value).replace(replacement);
+                var newValue = new String(node.attributes[i].value).replace(placeholderRegExp, replacement);
                 if (newValue != node.attributes[i].value)
                     node.setAttribute(node.attributes[i].name, newValue);
             }
@@ -162,7 +162,7 @@ function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
                 xformsStringReplaceWorker(node.childNodes[i], placeholderRegExp, replacement);
             break;
         case TEXT_TYPE:
-            var newValue = new String(node.nodeValue).replace(replacement);
+            var newValue = new String(node.nodeValue).replace(placeholderRegExp, replacement);
             if (newValue != node.nodeValue)
                 node.nodeValue = newValue;
             break;

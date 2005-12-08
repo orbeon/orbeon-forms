@@ -3,7 +3,7 @@
 <portlet-app>
     <portlet>
         <portlet-name>OXFSimplePortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
@@ -29,7 +29,7 @@
     </portlet>
     <portlet>
         <portlet-name>OXFRSSPortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
@@ -65,7 +65,7 @@
     </portlet>
     <portlet>
         <portlet-name>OXFExamples</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}page-flow</value>

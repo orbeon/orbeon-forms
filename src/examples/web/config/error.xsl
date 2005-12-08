@@ -27,8 +27,8 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/utils.xsl"/>
 
-    <xsl:variable name="servlet-class" as="xs:string" select="'org.orbeon.oxf.servlet.OXFServlet'"/>
-    <xsl:variable name="portlet-class" as="xs:string" select="'org.orbeon.oxf.portlet.OXFPortlet'"/>
+    <xsl:variable name="servlet-class" as="xs:string" select="'org.orbeon.oxf.servlet.OPSServlet'"/>
+    <xsl:variable name="portlet-class" as="xs:string" select="'org.orbeon.oxf.portlet.OPSPortlet'"/>
 
     <xsl:template match="/">
         <html>

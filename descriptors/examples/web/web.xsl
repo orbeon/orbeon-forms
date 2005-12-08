@@ -151,7 +151,7 @@
                     </context-param>
                     <filter>
                         <filter-name>processor-filter</filter-name>
-                        <filter-class>org.orbeon.oxf.servlet.OXFServletFilter</filter-class>
+                        <filter-class>org.orbeon.oxf.servlet.OPSServletFilter</filter-class>
                     </filter>
                     <filter-mapping>
                         <filter-name>processor-filter</filter-name>
@@ -193,7 +193,7 @@
 
             <servlet>
                 <servlet-name>ops-main-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -217,7 +217,7 @@
 
             <servlet>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
                 <xsl:comment> Set main processor </xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>

@@ -14,12 +14,10 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.portlet.PortletExternalContext;
-import org.orbeon.oxf.portlet.OXFPortletDelegate;
+import org.orbeon.oxf.portlet.OPSPortletDelegate;
 import org.orbeon.oxf.common.OXFException;
 
 import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.RenderRequest;
 import javax.portlet.PortletException;
 import java.io.IOException;
 
@@ -36,7 +34,7 @@ public class PortletToExternalContextRequestDispatcherWrapper implements Externa
     public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
         // It is not possible to forward with the Portlet API, so we have to do something that is
         // proprietary to the OPS Portlet.
-        OXFPortletDelegate.forward(request, response);
+        OPSPortletDelegate.forward(request, response);
     }
 
     public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {

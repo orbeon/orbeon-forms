@@ -14,7 +14,7 @@
 <portlet-app>
     <portlet>
         <portlet-name>OXFExamplesPortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
@@ -41,7 +41,7 @@
     </portlet>
     <portlet>
         <portlet-name>OXFExamplesDocumentationPortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
@@ -68,7 +68,7 @@
     </portlet>
     <portlet>
         <portlet-name>OXFExamplesSourceCodePortlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OXFPortlet</portlet-class>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}page-flow</value>

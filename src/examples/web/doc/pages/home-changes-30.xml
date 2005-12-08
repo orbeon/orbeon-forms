@@ -1183,6 +1183,22 @@
                 </li>
                 <li>
                     <p>
+                        <b>Servlet and Portlet Classes</b>. Servlet and Portlet classes have been
+                        renamed as follows:
+                    </p>
+                    <ul>
+                        <li><code>OPSServlet</code> replaces <code>OXFServlet</code></li>
+                        <li><code>OPSPortlet</code> replaces <code>OXFPortlet</code></li>
+                        <li><code>OPSServletFilter</code> replaces <code>OXFServletFilter</code></li>
+                        <li><code>OPSServletContextListener</code> replaces <code>OXFServletContextListener</code></li>
+                        <li><code>OPSSessionListener</code> replaces <code>OXFSessionListener</code></li>
+                    </ul>
+                    <p>
+                        The old names still work for backward compatibility.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

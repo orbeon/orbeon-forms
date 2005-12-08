@@ -27,8 +27,8 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/utils.xsl"/>
 
-    <xsl:variable name="servlet-class" as="xs:string" select="'org.orbeon.oxf.servlet.OPSServlet'"/>
-    <xsl:variable name="portlet-class" as="xs:string" select="'org.orbeon.oxf.portlet.OPSPortlet'"/>
+    <xsl:variable name="servlet-classes" as="xs:string+" select="('org.orbeon.oxf.servlet.OPSServlet', 'org.orbeon.oxf.servlet.OXFServlet')"/>
+    <xsl:variable name="portlet-classes" as="xs:string+" select="('org.orbeon.oxf.portlet.OPSPortlet', 'org.orbeon.oxf.portlet.OPSPortlet')"/>
 
     <xsl:template match="/">
         <html>
@@ -56,7 +56,15 @@
                     <div class="label">Error Message</div>
                     <div class="content">
                         <p>
-                            <xsl:value-of select="/exceptions/exception[last()]/message"/>
+                            <xsl:variable name="message" as="xs:string" select="/exceptions/exception[last()]/message"/>
+                            <xsl:choose>
+                                <xsl:when test="normalize-space($message) != ''">
+                                    <xsl:value-of select="$message"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <i>[No error meessage provided.]</i>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </p>
                     </div>
                </div>
@@ -196,16 +204,16 @@
                             </xsl:for-each>
 
                             <xsl:variable name="has-portlet-servlet" as="xs:boolean"
-                                    select="stack-trace-elements/element/class-name = $servlet-class and stack-trace-elements/element/class-name = $portlet-class"/>
+                                    select="stack-trace-elements/element/class-name = $servlet-classes and stack-trace-elements/element/class-name = $portlet-classes"/>
 
                             <xsl:variable name="portlet-stack-trace" as="element()*"
-                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-class]/(., preceding-sibling::element) else ()"/>
+                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/(., preceding-sibling::element) else ()"/>
 
                             <xsl:variable name="servlet-stack-trace" as="element()*"
-                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-class]/following-sibling::element else stack-trace-elements/element"/>
+                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/following-sibling::element else stack-trace-elements/element"/>
 
                             <xsl:if test="$has-portlet-servlet">
-                                <xsl:for-each-group select="$portlet-stack-trace" group-ending-with="element[class-name = $portlet-class]">
+                                <xsl:for-each-group select="$portlet-stack-trace" group-ending-with="element[class-name = $portlet-classes]">
                                     <tr style="{$exception-style}">
                                         <th valign="top">Portlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
                                         <td>
@@ -226,7 +234,7 @@
                                     </tr>
                                 </xsl:for-each-group>
                             </xsl:if>
-                            <xsl:for-each-group select="$servlet-stack-trace" group-ending-with="element[class-name = $servlet-class]">
+                            <xsl:for-each-group select="$servlet-stack-trace" group-ending-with="element[class-name = $servlet-classes]">
                                 <tr style="{$exception-style}">
                                     <th valign="top">Servlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
                                     <td>

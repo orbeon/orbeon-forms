@@ -92,7 +92,7 @@ public class ProcessorService {
 
         try {
             // Run the processor
-            InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext);
+            InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, logger);
         } catch (Exception e) {
             // Something bad happened
             // Store the exception; needed if we are in a portlet
@@ -127,7 +127,7 @@ public class ProcessorService {
                 externalContext.getResponse().reset();
 
                 // Run the processor
-                InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext);
+                InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext, logger);
             } catch (Exception e) {
                 // Something bad happened
                 logger.error(e);

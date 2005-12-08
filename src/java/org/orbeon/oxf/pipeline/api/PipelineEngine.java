@@ -13,9 +13,11 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
+import org.apache.log4j.Logger;
+
 /**
  * Main pipeline engine interface.
  */
 public interface PipelineEngine {
-    public void executePipeline(ProcessorDefinition processorDefinition, ExternalContext externalContext, PipelineContext pipelineContext) throws Exception;
+    public void executePipeline(ProcessorDefinition processorDefinition, ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception;
 }

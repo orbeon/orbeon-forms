@@ -1176,6 +1176,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>Listeners</b>. The <a href="reference-listeners">Listeners</a>
+                        documentation has been updated to reflect the correct configuration
+                        parameters. Listeners now produce better logs.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

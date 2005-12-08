@@ -15,9 +15,11 @@ package org.orbeon.oxf.pipeline.api;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
 
 /**
  * ProcessorDefinition encapsulate a processor name and its associated inputs. A ProcessorDefinition
@@ -92,5 +94,22 @@ public class ProcessorDefinition {
      */
     public String getUri() {
         return uri;
+    }
+
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("[");
+        sb.append(Dom4jUtils.qNameToexplodedQName(getName()));
+        for (Iterator i = getEntries().entrySet().iterator(); i.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) i.next();
+            final String key = (String) currentEntry.getKey();
+            final Object value = currentEntry.getValue();
+
+            sb.append(", ");
+            sb.append(key);
+            sb.append(" -> ");
+            sb.append((value instanceof String) ? value.toString() : "[inline XML document]");
+        }
+        sb.append(']');
+        return sb.toString();
     }
 }

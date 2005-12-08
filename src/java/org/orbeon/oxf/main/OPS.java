@@ -176,7 +176,7 @@ public class OPS {
         try {
             // 7. Run the pipeline from the processor definition created earlier. An ExternalContext
             // is supplied for those processors using external contexts, such as most serializers.
-            PipelineEngineFactory.instance().executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext);
+            PipelineEngineFactory.instance().executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext, logger);
         } catch (Exception e) {
             // 8. Display exceptions if needed
             LocationData locationData = ValidationException.getRootLocationData(e);

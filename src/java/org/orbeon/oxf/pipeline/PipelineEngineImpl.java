@@ -17,16 +17,17 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineEngine;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.apache.log4j.Logger;
 
 /**
  * Default implementation of the PipelineEngine interface.
  */
 public class PipelineEngineImpl implements PipelineEngine {
-    public void executePipeline(ProcessorDefinition processorDefinition, ExternalContext externalContext, PipelineContext pipelineContext) throws Exception {
+    public void executePipeline(ProcessorDefinition processorDefinition, ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception {
         // Register processor definitions with the default XML Processor Registry. This defines the
         // mapping of processor names to class names.
         InitUtils.initializeProcessorDefinitions();
         // Run the processor
-        InitUtils.runProcessor(InitUtils.createProcessor(processorDefinition), externalContext, pipelineContext);
+        InitUtils.runProcessor(InitUtils.createProcessor(processorDefinition), externalContext, pipelineContext, logger);
     }
 }

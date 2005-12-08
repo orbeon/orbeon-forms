@@ -35,24 +35,26 @@ public class OPSSessionListenerDelegate implements HttpSessionListener {
     public static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.session-destroyed-processor.";
     public static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.session-destroyed-processor.input.";
 
+    public static final String LOG_MESSAGE_PREFIX = "Session Listener";
+
     public void sessionCreated(HttpSessionEvent event) {
-        HttpSession httpSession = event.getSession();
-        ServletContext servletContext = httpSession.getServletContext();
+        final HttpSession httpSession = event.getSession();
+        final ServletContext servletContext = httpSession.getServletContext();
         try {
-            InitUtils.run(servletContext, httpSession, INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
+            InitUtils.run(servletContext, httpSession, logger, LOG_MESSAGE_PREFIX, "Session created.", INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
         } catch (Exception e) {
-            logger.error("Exception when running session creation processor", OXFException.getRootThrowable(e));
+            logger.error(LOG_MESSAGE_PREFIX + " - Exception when running session creation processor.", OXFException.getRootThrowable(e));
             throw new OXFException(e);
         }
     }
 
     public void sessionDestroyed(HttpSessionEvent event) {
-        HttpSession httpSession = event.getSession();
-        ServletContext servletContext = httpSession.getServletContext();
+        final HttpSession httpSession = event.getSession();
+        final ServletContext servletContext = httpSession.getServletContext();
         try {
-            InitUtils.run(servletContext, httpSession, DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
+            InitUtils.run(servletContext, httpSession, logger, LOG_MESSAGE_PREFIX, "Session destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
         } catch (Exception e) {
-            logger.error("Exception when running session destruction processor", OXFException.getRootThrowable(e));
+            logger.error(LOG_MESSAGE_PREFIX + " - Exception when running session destruction processor.", OXFException.getRootThrowable(e));
             throw new OXFException(e);
         }
     }

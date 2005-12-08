@@ -22,11 +22,11 @@ import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
+import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class SchedulerProcessor extends ProcessorImpl {
+
     private static final Logger logger = LoggerFactory.createLogger(SchedulerProcessor.class);
 
     public static final String SCHEDULER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/scheduler";
@@ -194,7 +195,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         logger.info("Task: " + getName() + " won't run since it is already running");
                 } else {
                     setStatus(true);
-                    InitUtils.runProcessor(processor, externalContext, new PipelineContext());
+                    InitUtils.runProcessor(processor, externalContext, new PipelineContext(), logger);
                     setStatus(false);
                 }
             } catch (Exception e) {

@@ -27,7 +27,6 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.AttributesToMap;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.webapp.WebAppContext;
@@ -46,14 +45,12 @@ public class InitUtils {
     public static final String PROLOGUE_PROPERTY = "oxf.prologue";
     public static final String DEFAULT_PROLOGUE = "oxf:/processors.xml";
 
-    private static Logger logger = LoggerFactory.createLogger(InitUtils.class);
-
     private static boolean processorDefinitionsInitialized;
 
     /**
      * Run a processor with an ExternalContext.
      */
-    public static void runProcessor(Processor processor, ExternalContext externalContext, PipelineContext pipelineContext) throws Exception {
+    public static void runProcessor(Processor processor, ExternalContext externalContext, PipelineContext pipelineContext, Logger logger) throws Exception {
 
         // Record start time for this request
         long tsBegin = logger.isInfoEnabled() ? System.currentTimeMillis() : 0;
@@ -130,18 +127,18 @@ public class InitUtils {
     /**
      * Run a processor without ExternalContext. Should rarely be used!
      */
-    public static void runProcessor(Processor processor) throws Exception {
-        runProcessor(processor, null, new PipelineContext());
-    }
+//    public static void runProcessor(Processor processor) throws Exception {
+//        runProcessor(processor, null, new PipelineContext());
+//    }
 
     /**
      * Run a processor with a Servlet Context and an optional session.
      * <p/>
      * This is used for servlet context and session listeners.
      */
-    public static void runProcessor(Processor processor, ServletContext servletContext, HttpSession session) throws Exception {
+    public static void runProcessor(Processor processor, ServletContext servletContext, HttpSession session, Logger logger) throws Exception {
         ExternalContext externalContext = (servletContext != null) ? new ServletContextExternalContext(servletContext, session) : null;
-        runProcessor(processor, externalContext, new PipelineContext());
+        runProcessor(processor, externalContext, new PipelineContext(), logger);
     }
 
     /**
@@ -177,16 +174,33 @@ public class InitUtils {
         return processor;
     }
 
-    public static void run(ServletContext servletContext, HttpSession session, String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
+    /**
+     * Run a processor based on definitions found in properties or the web app context. This is
+     * useful for listeners. If a definition is not found, no exception is thrown.
+     *
+     * @param servletContext            required ServletContext instance
+     * @param session                   optional HttpSession object
+     * @param logger                    required logger
+     * @param logMessagePrefix          required prefix for log messages
+     * @param message                   optional message to display whether there is a processor to run or not
+     * @param uriNamePropertyPrefix     required prefix of the property or parameter containing the processor name
+     * @param processorInputProperty    required prefix of the properties or parameters containing processor input names
+     * @throws Exception
+     */
+    public static void run(ServletContext servletContext, HttpSession session, Logger logger, String logMessagePrefix, String message, String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
 
         // Make sure the Web app context is initialized
         try {
             WebAppContext.instance(servletContext);
         } catch (Exception e) {
-            Throwable rootThrowable = OXFException.getRootThrowable(e);
-            logger.error("Error initializing the WebAppContext", rootThrowable);
+            final Throwable rootThrowable = OXFException.getRootThrowable(e);
+            logger.error(logMessagePrefix + " - Error initializing the WebAppContext", rootThrowable);
             throw new OXFException(rootThrowable);
         }
+
+        // Log message if provided
+        if (message != null)
+            logger.info(logMessagePrefix + " - " + message);
 
         // Try to obtain a processor definition from the properties
         ProcessorDefinition processorDefinition
@@ -198,8 +212,9 @@ public class InitUtils {
 
         // Create and run processor
         if (processorDefinition != null) {
-            Processor processor = createProcessor(processorDefinition);
-            runProcessor(processor, servletContext, session);
+            logger.info(logMessagePrefix + " - About to run processor: " +  processorDefinition.toString());
+            final Processor processor = createProcessor(processorDefinition);
+            runProcessor(processor, servletContext, session, logger);
         }
         // Otherwise, just don't do anything
     }
@@ -278,7 +293,6 @@ public class InitUtils {
                     processorDefinition.addInput(name.substring(inputPropertyPrefix.length()), stringValue);
                 }
             }
-            logger.debug("Created processor definition from Servlet context parameters.");
         }
         return processorDefinition;
     }

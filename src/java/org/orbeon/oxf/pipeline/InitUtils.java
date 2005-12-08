@@ -36,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 
 public class InitUtils {
@@ -125,23 +126,6 @@ public class InitUtils {
     }
 
     /**
-     * Run a processor without ExternalContext. Should rarely be used!
-     */
-//    public static void runProcessor(Processor processor) throws Exception {
-//        runProcessor(processor, null, new PipelineContext());
-//    }
-
-    /**
-     * Run a processor with a Servlet Context and an optional session.
-     * <p/>
-     * This is used for servlet context and session listeners.
-     */
-    public static void runProcessor(Processor processor, ServletContext servletContext, HttpSession session, Logger logger) throws Exception {
-        ExternalContext externalContext = (servletContext != null) ? new ServletContextExternalContext(servletContext, session) : null;
-        runProcessor(processor, externalContext, new PipelineContext(), logger);
-    }
-
-    /**
      * Create a processor and connect its inputs to static URLs.
      */
     public static Processor createProcessor(ProcessorDefinition processorDefinition) {
@@ -187,7 +171,9 @@ public class InitUtils {
      * @param processorInputProperty    required prefix of the properties or parameters containing processor input names
      * @throws Exception
      */
-    public static void run(ServletContext servletContext, HttpSession session, Logger logger, String logMessagePrefix, String message, String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
+    public static void run(ServletContext servletContext, HttpSession session, Map localMap,
+                           Logger logger, String logMessagePrefix, String message,
+                           String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
 
         // Make sure the Web app context is initialized
         try {
@@ -202,9 +188,15 @@ public class InitUtils {
         if (message != null)
             logger.info(logMessagePrefix + " - " + message);
 
+        ProcessorDefinition processorDefinition = null;
+        // Try to obtain a local processor definition
+        if (localMap != null) {
+            processorDefinition = getDefinitionFromMap(localMap, uriNamePropertyPrefix, processorInputProperty);
+        }
+
         // Try to obtain a processor definition from the properties
-        ProcessorDefinition processorDefinition
-                = getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty);
+        if (processorDefinition == null)
+            processorDefinition = getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty);
 
         // Try to obtain a processor definition from the context
         if (processorDefinition == null)
@@ -214,7 +206,8 @@ public class InitUtils {
         if (processorDefinition != null) {
             logger.info(logMessagePrefix + " - About to run processor: " +  processorDefinition.toString());
             final Processor processor = createProcessor(processorDefinition);
-            runProcessor(processor, servletContext, session, logger);
+            final ExternalContext externalContext = (servletContext != null) ? new ServletContextExternalContext(servletContext, session) : null;
+            runProcessor(processor, externalContext, new PipelineContext(), logger);
         }
         // Otherwise, just don't do anything
     }

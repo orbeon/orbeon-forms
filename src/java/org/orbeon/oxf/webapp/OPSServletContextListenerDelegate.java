@@ -28,16 +28,16 @@ public class OPSServletContextListenerDelegate implements ServletContextListener
 
     private static Logger logger = LoggerFactory.createLogger(OPSServletContextListener.class);
 
-    public static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.context-initialized-processor.";
-    public static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.context-initialized-processor.input.";
-    public static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.context-destroyed-processor.";
-    public static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.context-destroyed-processor.input.";
+    private static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.context-initialized-processor.";
+    private static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.context-initialized-processor.input.";
+    private static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.context-destroyed-processor.";
+    private static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.context-destroyed-processor.input.";
 
-    public static final String LOG_MESSAGE_PREFIX = "Servlet Context Listener";
+    private static final String LOG_MESSAGE_PREFIX = "Servlet Context Listener";
 
     public void contextInitialized(ServletContextEvent event) {
         try {
-            InitUtils.run(event.getServletContext(), null, logger, LOG_MESSAGE_PREFIX, "Context initialized.", INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
+            InitUtils.run(event.getServletContext(), null, null, logger, LOG_MESSAGE_PREFIX, "Context initialized.", INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
         } catch (Exception e) {
             logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Servlet context initialization processor.", OXFException.getRootThrowable(e));
             throw new OXFException(e);
@@ -46,7 +46,7 @@ public class OPSServletContextListenerDelegate implements ServletContextListener
     
     public void contextDestroyed(ServletContextEvent event) {
         try {
-            InitUtils.run(event.getServletContext(), null, logger, LOG_MESSAGE_PREFIX, "Context destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
+            InitUtils.run(event.getServletContext(), null, null, logger, LOG_MESSAGE_PREFIX, "Context destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
         } catch (Exception e) {
             logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Servlet context destruction processor.", OXFException.getRootThrowable(e));
             throw new OXFException(e);

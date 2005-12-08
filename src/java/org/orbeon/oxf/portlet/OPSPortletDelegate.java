@@ -13,14 +13,16 @@
  */
 package org.orbeon.oxf.portlet;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.portlet.*;
 import java.io.IOException;
@@ -40,6 +42,13 @@ import java.util.Map;
  * manager.
  */
 public class OPSPortletDelegate extends GenericPortlet {
+
+    private static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.portlet-initialized-processor.";
+    private static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.portlet-initialized-processor.input.";
+    private static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.portlet-destroyed-processor.";
+    private static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.portlet-destroyed-processor.input.";
+
+    private static final String LOG_MESSAGE_PREFIX = "Portlet";
 
     private ProcessorService processorService;
 
@@ -99,7 +108,50 @@ public class OPSPortletDelegate extends GenericPortlet {
         } catch (Exception e) {
             throw new PortletException(OXFException.getRootThrowable(e));
         }
+
+        // Run listeners
+        try {
+            runListenerProcessor(new PortletInitMap(this), new PortletContextInitMap(portletContext), ProcessorService.logger,
+                    LOG_MESSAGE_PREFIX, "Portlet initialized.", INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
+        } catch (Exception e) {
+            ProcessorService.logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Portlet initialization processor.", OXFException.getRootThrowable(e));
+            throw new OXFException(e);
+        }
     }
+
+    private void runListenerProcessor(Map localMap, Map contextMap,
+                                             Logger logger, String logMessagePrefix, String message,
+                                             String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
+        // Log message if provided
+        if (message != null)
+            logger.info(logMessagePrefix + " - " + message);
+
+        ProcessorDefinition processorDefinition = null;
+        // Try to obtain a local processor definition
+        if (localMap != null) {
+            processorDefinition = InitUtils.getDefinitionFromMap(localMap, uriNamePropertyPrefix, processorInputProperty);
+        }
+
+        // Try to obtain a processor definition from the properties
+        if (processorDefinition == null)
+            processorDefinition = InitUtils.getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty);
+
+        // Try to obtain a processor definition from the context
+        if (processorDefinition == null)
+            processorDefinition = InitUtils.getDefinitionFromMap(contextMap, uriNamePropertyPrefix, processorInputProperty);
+
+        // Create and run processor
+        if (processorDefinition != null) {
+            logger.info(logMessagePrefix + " - About to run processor: " +  processorDefinition.toString());
+            final Processor processor = InitUtils.createProcessor(processorDefinition);
+
+            final ExternalContext externalContext = new PortletContextExternalContext(getPortletContext());
+            InitUtils.runProcessor(processor, externalContext, new PipelineContext(), logger);
+
+        }
+        // Otherwise, just don't do anything
+    }
+
     public void processAction(ActionRequest actionRequest, ActionResponse response) throws PortletException, IOException {
         // If we get a request for an action, we run the service without a
         // response. The result, if any, is stored into a buffer. Otherwise it
@@ -199,6 +251,16 @@ public class OPSPortletDelegate extends GenericPortlet {
     }
 
     public void destroy() {
+
+        // Run listeners
+        try {
+            runListenerProcessor(new PortletInitMap(this), new PortletContextInitMap(getPortletContext()), ProcessorService.logger, LOG_MESSAGE_PREFIX,
+                    "Portlet destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
+        } catch (Exception e) {
+            ProcessorService.logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Portlet destruction processor.", OXFException.getRootThrowable(e));
+            throw new OXFException(e);
+        }
+
         processorService.destroy();
     }
 

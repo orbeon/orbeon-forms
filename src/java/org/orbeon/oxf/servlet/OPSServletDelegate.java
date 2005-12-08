@@ -47,6 +47,13 @@ public class OPSServletDelegate extends HttpServlet {
 
     private static final String HTTP_DEFAULT_ACCEPT_METHODS = "get,post,head";
 
+    private static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.servlet-initialized-processor.";
+    private static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.servlet-initialized-processor.input.";
+    private static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.servlet-destroyed-processor.";
+    private static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.servlet-destroyed-processor.input.";
+
+    private static final String LOG_MESSAGE_PREFIX = "Servlet";
+
     private ProcessorService processorService;
 
     // Web application context instance shared between all components of a Web of Portlet application
@@ -58,7 +65,7 @@ public class OPSServletDelegate extends HttpServlet {
     public void init() throws ServletException {
         try {
             // Make sure the Web app context is initialized
-            ServletContext servletContext = getServletContext();
+            final ServletContext servletContext = getServletContext();
             webAppContext = WebAppContext.instance(servletContext);
 
             // Get main processor definition
@@ -111,6 +118,14 @@ public class OPSServletDelegate extends HttpServlet {
             processorService = new ProcessorService();
             processorService.init(mainProcessorDefinition, errorProcessorDefinition);
 
+            // Run listeners
+            try {
+                InitUtils.run(servletContext, null, new ServletInitMap(this), ProcessorService.logger, LOG_MESSAGE_PREFIX, "Servlet initialized.", INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
+            } catch (Exception e) {
+                ProcessorService.logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Servlet initialization processor.", OXFException.getRootThrowable(e));
+                throw new OXFException(e);
+            }
+
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));
         }
@@ -133,6 +148,16 @@ public class OPSServletDelegate extends HttpServlet {
     }
 
     public void destroy() {
+
+        // Run listeners
+        try {
+            final ServletContext servletContext = getServletContext();
+            InitUtils.run(servletContext, null, new ServletInitMap(this), ProcessorService.logger, LOG_MESSAGE_PREFIX, "Servlet destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
+        } catch (Exception e) {
+            ProcessorService.logger.error(LOG_MESSAGE_PREFIX + " - Exception when running Servlet destruction processor.", OXFException.getRootThrowable(e));
+            throw new OXFException(e);
+        }
+
         processorService.destroy();
         processorService = null;
         webAppContext = null;

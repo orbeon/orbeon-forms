@@ -212,6 +212,24 @@
                     <param-name>oxf.error-processor.input.config</param-name>
                     <param-value>oxf:/config/error.xpl</param-value>
                 </init-param>
+                <xsl:comment> Set initialization listener </xsl:comment>
+                <init-param>
+                    <param-name>oxf.servlet-initialized-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.servlet-initialized-processor.input.config</param-name>
+                    <param-value>oxf:/context/servlet-initialized.xpl</param-value>
+                </init-param>
+                <xsl:comment> Set destruction listener </xsl:comment>
+                <init-param>
+                    <param-name>oxf.servlet-destroyed-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.servlet-destroyed-processor.input.config</param-name>
+                    <param-value>oxf:/context/servlet-destroyed.xpl</param-value>
+                </init-param>
                 <load-on-startup>1</load-on-startup>
             </servlet>
 

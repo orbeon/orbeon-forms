@@ -50,7 +50,7 @@ public class ProcessorService {
 
     public static final String OXF_EXCEPTION = "oxf-exception";
 
-    private static Logger logger = LoggerFactory.createLogger(ProcessorService.class);
+    public static Logger logger = LoggerFactory.createLogger(ProcessorService.class);
 
     private boolean initialized;
 

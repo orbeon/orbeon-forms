@@ -135,7 +135,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <!-- JSF is disabled (will be re-enabled in a future release) -->
+            <!-- JSF is disabled (may be re-enabled in a future release) -->
             <!--
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'JSF example'"/>
@@ -173,10 +173,10 @@
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OXFServletContextListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OPSServletContextListener</listener-class>
                     </listener>
                     <listener>
-                        <listener-class>org.orbeon.oxf.webapp.OXFSessionListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OPSSessionListener</listener-class>
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>
@@ -275,7 +275,7 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <!-- JSF is disabled (will be re-enabled in a future release) -->
+            <!-- JSF is disabled (may be re-enabled in a future release) -->
             <!--
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'JSF example'"/>
@@ -321,7 +321,7 @@
                 <url-pattern>/chartDisplay</url-pattern>
             </servlet-mapping>
 
-            <!-- JSF is disabled (will be re-enabled in a future release) -->
+            <!-- JSF is disabled (may be re-enabled in a future release) -->
             <!--
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'JSF example'"/>

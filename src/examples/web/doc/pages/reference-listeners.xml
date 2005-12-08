@@ -19,135 +19,145 @@
         <title>Listeners</title>
     </header>
     <body>
-            <section>
-                <title>Servlet Context Listener</title>
-                <p>
-                    The OPS Servlet Context Listener allows configuring one
-                    processor to be called when the Servlet context is initialized, and one to be
-                    called when the Servlet context is destroyed. These processors are looked up in
-                    the following locations, in this order:
-                </p>
-                <ol>
-                    <li>
-                        <code>properties.xml</code>, for example:
-					    <xml-source>
+        <a name="servlet-context-listener"/>
+        <section>
+            <title>Servlet Context Listener</title>
+            <p>
+                The OPS Servlet Context Listener allows configuring one processor to be called
+                when the Servlet context is initialized, and one to be called when the Servlet
+                context is destroyed. These processors are looked up in the following locations, in
+                this order:
+            </p>
+            <ol>
+                <li>
+                    <code>properties.xml</code>:
+                    <xml-source>
 <properties>
-    <property type="string" name="oxf.context-initialized-processor.uri" value="oxf/processor/pipeline"/>
-    <property type="string" name="oxf.context-initialized-processor.input.config" value="oxf:/config/init.xpl"/>
-    <property type="string" name="oxf.context-destroyed-processor.uri" value="oxf/processor/pipeline"/>
-    <property type="string" name="oxf.context-destroyed-processor.input.config" value="oxf:/config/destroy.xpl"/>
+    <comment> Other properties</comment>
+    ...
+    <comment> Servlet Context Listener properties</comment>
+    <property as="xs:QName" name="oxf.context-initialized-processor.name" value="oxf:pipeline"/>
+    <property as="xs:anyURI" name="oxf.context-initialized-processor.input.config" value="oxf:/context/context-initialized.xpl"/>
+    <property as="xs:QName" name="oxf.context-destroyed-processor.name" value="oxf:pipeline"/>
+    <property as="xs:anyURI" name="oxf.context-destroyed-processor.input.config" value="oxf:/context/context-destroyed.xpl"/>
 </properties>
-					    </xml-source>
-                    </li>
-                    <li>
-                        The context parameters in <code>web.xml</code>, for example:
-					    <xml-source>
-<context-param>
-    <param-name>oxf.context-initialized-processor.uri</param-name>
-    <param-value>oxf/processor/pipeline</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.context-initialized-processor.input.config</param-name>
-    <param-value>oxf:/config/init.xpl</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.context-destroyed-processor.uri</param-name>
-    <param-value>oxf/processor/pipeline</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.context-destroyed-processor.input.config</param-name>
-    <param-value>oxf:/config/destroy.xpl</param-value>
-</context-param>
-					    </xml-source>
-                    </li>
-                </ol>
-                <p>
-                    Not every processor can be run from those pipelines, because the execution
-                    context is limited. In particular, you can't call processors like the Request
-                    generator, or any HTTP serializers. You have access to the Application context.
-                </p>
-                <p>
-                    For the OPS Servlet Context Listener to be called, you need to
-                    configure the following listener in your <code>web.xml</code>:
-                </p>
-                <xml-source>
-<listener>
-    <listener-class>org.orbeon.oxf.webapp.OXFServletContextListener</listener-class>
-</listener>
-                </xml-source>
-                <note>
+                    </xml-source>
+                </li>
+                <li>
                     <p>
-                        There are no default processors. If no processor is specified, no processor
-                        is run on context initialization or destruction. This allows configuring a
-                        listener with only an initialization pipeline, only a destruction pipeline,
-                        both, or none.
+                        Context parameters in <code>web.xml</code>:
                     </p>
-                </note>
-            </section>
-            <section>
-                <title>Session Listener</title>
+                    <xml-source>
+                        <context-param>
+                            <param-name>oxf.context-initialized-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.context-initialized-processor.input.config</param-name>
+                            <param-value>oxf:/context/context-initialized.xpl</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.context-destroyed-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.context-destroyed-processor.input.config</param-name>
+                            <param-value>oxf:/context/context-destroyed.xpl</param-value>
+                        </context-param>
+                    </xml-source>
+                </li>
+            </ol>
+            <p>
+                Not every processor can be run from those pipelines, because the execution context
+                is limited. In particular, you can't call processors like the Request generator or
+                the HTTP serializer. You do however have access to the Application context.
+            </p>
+            <p>
+                For the OPS Servlet Context Listener to be called, you need to
+                configure the following listener in your <code>web.xml</code>:
+            </p>
+            <xml-source>
+                <listener>
+                    <listener-class>org.orbeon.oxf.webapp.OPSServletContextListener</listener-class>
+                </listener>
+            </xml-source>
+            <note>
                 <p>
-                    The OPS Session Listener allows configuring one processor to be
-                   called when the Session is created, and one to be called when the Session is
-                   destroyed. These processors are looked up in the following locations, in this
-                   order:
+                    There are no default processors. If no processor is specified, no processor is
+                    run on context initialization or destruction. This allows configuring a listener
+                    with only an initialization pipeline, only a destruction pipeline, both, or
+                    none.
                 </p>
-                <ol>
-                    <li>
-                        <code>properties.xml</code>, for example:
-					    <xml-source>
-<properties>
-    <property type="string" name="oxf.session-created-processor.uri" value="oxf/processor/pipeline"/>
-    <property type="string" name="oxf.session-created-processor.input.config" value="oxf:/config/session-created.xpl"/>
-    <property type="string" name="oxf.session-destroyed-processor.uri" value="oxf/processor/pipeline"/>
-    <property type="string" name="oxf.session-destroyed-processor.input.config" value="oxf:/config/session-destroyed.xpl"/>
-</properties>
-					    </xml-source>
-                    </li>
-                    <li>
-                        The context parameters in <code>web.xml</code>, for example:
-					    <xml-source>
-<context-param>
-    <param-name>oxf.session-created-processor.uri</param-name>
-    <param-value>oxf/processor/pipeline</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.session-created-processor.input.config</param-name>
-    <param-value>oxf:/config/session-created.xpl</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.session-destroyed-processor.uri</param-name>
-    <param-value>oxf/processor/pipeline</param-value>
-</context-param>
-<context-param>
-    <param-name>oxf.session-destroyed-processor.input.config</param-name>
-    <param-value>oxf:/config/session-destroyed.xpl</param-value>
-</context-param>
-					    </xml-source>
-                    </li>
-                </ol>
-                <p>
-                    Not every processor can be run from those pipelines, because the execution
-                    context is limited. In particular, you can't call processors like the Request
-                    generator, or any HTTP serializers. You have access to the Application and
-                    Session contexts.
-                </p>
-                <p>
-                    For the OPS Session Listener to be called, you need to configure the
-                    following listener in your <code>web.xml</code>:
-                </p>
-                <xml-source>
-<listener>
-    <listener-class>org.orbeon.oxf.webapp.OXFSessionListener</listener-class>
-</listener>
-                </xml-source>
-                <note>
+            </note>
+        </section>
+        <a name="session-context-listener"/>
+        <section>
+            <title>Session Listener</title>
+            <p>
+                The OPS Session Listener allows configuring one processor to be called when the
+                Session is created, and one to be called when the Session is destroyed. These
+                processors are looked up in the following locations, in this order:
+            </p>
+            <ol>
+                <li>
+                    <code>properties.xml</code>:
+                    <xml-source>
+                        <properties>
+                            <comment> Other properties</comment>
+                            ...
+                            <comment> Session Listener properties</comment>
+                            <property as="xs:QName" name="oxf.session-created-processor.name" value="oxf:pipeline"/>
+                            <property as="xs:anyURI" name="oxf.session-created-processor.input.config" value="oxf:/context/session-created.xpl"/>
+                            <property as="xs:QName" name="oxf.session-destroyed-processor.name" value="oxf:pipeline"/>
+                            <property as="xs:anyURI" name="oxf.session-destroyed-processor.input.config" value="oxf:/context/session-destroyed.xpl"/>
+                        </properties>
+                    </xml-source>
+                </li>
+                <li>
                     <p>
-                        There are no default processors. If no processor is specified, no processor is
-                        run on session creation or destruction. This allows configuring a listener with
-                        only a creation pipeline, only a destruction pipeline, both, or none.
+                        Context parameters in <code>web.xml</code>:
                     </p>
-                </note>
-            </section>
+                    <xml-source>
+                        <context-param>
+                            <param-name>oxf.session-created-processor.name</param-name>
+                            <param-value>oxf:pipeline</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.session-created-processor.input.config</param-name>
+                            <param-value>oxf:/context/session-created.xpl</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.session-destroyed-processor.name</param-name>
+                            <param-value>oxf:pipeline</param-value>
+                        </context-param>
+                        <context-param>
+                            <param-name>oxf.session-destroyed-processor.input.config</param-name>
+                            <param-value>oxf:/context/session-destroyed.xpl</param-value>
+                        </context-param>
+                    </xml-source>
+                </li>
+            </ol>
+            <p>
+                Not every processor can be run from those pipelines, because the execution context
+                is limited. In particular, you can't call processors like the Request generator, or
+                any HTTP serializers. You have access to the Application and Session contexts.
+            </p>
+            <p>
+                For the OPS Session Listener to be called, you need to configure the following
+                listener in your <code>web.xml</code>:
+            </p>
+            <xml-source>
+                <listener>
+                    <listener-class>org.orbeon.oxf.webapp.OPSSessionListener</listener-class>
+                </listener>
+            </xml-source>
+            <note>
+                <p>
+                    There are no default processors. If no processor is specified, no processor is
+                    run on session creation or destruction. This allows configuring a listener with
+                    only a creation pipeline, only a destruction pipeline, both, or none.
+                </p>
+            </note>
+        </section>
     </body>
 </document>

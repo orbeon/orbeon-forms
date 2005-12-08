@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
@@ -59,6 +60,9 @@ public class XFormsTriggerHandler extends HandlerBase {
         final String effectiveId = handlerContext.getEffectiveId(controlAttributes);
 
         final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate() ? null : ((XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
+
+        if (!handlerContext.isGenerateTemplate() && controlInfo.getLabel() == null)
+            throw new OXFException("Missing label on xforms:trigger element.");// TODO: location data
 
         final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : controlInfo.getLabel();
 

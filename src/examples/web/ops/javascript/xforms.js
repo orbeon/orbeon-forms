@@ -207,18 +207,21 @@ function xformsFindRepeatDelimiter(repeatId, index) {
 
     var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
     var beginElement = document.getElementById(beginElementId);
-    if (! beginElement) return null;
+    if (! beginElement) throw "Cannot find element with id '" + beginElementId + "'";
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
-        while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter") {
+        while (cursor.nodeType != ELEMENT_TYPE || !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")) {
             cursor = cursor.nextSibling;
-            if (!cursor) return null;
+            if (!cursor)
+                throw "Cannot find element #" + index + " with class 'xforms-repeat-delimiter' after element with id '"
+                        + beginElementId + "'";
         }
         cursorPosition++;
         if (cursorPosition == index) break;
         cursor = cursor.nextSibling;
     }
+
     return cursor;
 }
 

@@ -1,0 +1,51 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ui="http:/www.orbeon.com/example/ui">
+
+    <xhtml:head>
+        <xhtml:title>Internationalization Registration</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <registration ui:valid="">
+                    <firstname ui:started-typing="false" ui:valid=""/>
+                    <lastname ui:started-typing="false" ui:valid=""/>
+                    <username ui:started-typing="false" ui:valid=""/>
+                    <password ui:started-typing="false" ui:valid=""/>
+                    <confirm ui:started-typing="false" ui:valid=""/>
+                    <email ui:started-typing="false" ui:valid=""/>
+                </registration>
+            </xforms:instance>
+            <xforms:instance id="i18n"><dummy/></xforms:instance>
+            <xforms:submission ref="instance('request-instance')" id="default-submission"
+                method="post" action="/direct/xforms-translate/post" replace="instance" instance="response-instance"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td align="left">First Name</xhtml:td>
+                <xhtml:td>
+                    <xforms:input ref="firstname">
+
+                    </xforms:input>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+    </xhtml:body>
+</xhtml:html>

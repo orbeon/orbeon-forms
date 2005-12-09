@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<i18n locale="en_US">
+    <text key="welcome">Welcome to the OPS Petstore</text>
+    <text key="pets">Pets</text>
+    <text key="fish">Fish</text>
+    <text key="dogs">Dogs</text>
+    <text key="reptiles">Reptiles</text>
+    <text key="cats">Cats</text>
+    <text key="birds">Birds</text>
+    <text key="home">Home</text>
+    <text key="web">Web</text>
+    <text key="pda">PDA</text>
+    <text key="cart-empty">Your Shopping Cart is Empty</text>
+    <text key="your-cart">Your Shopping Cart</text>
+    <text key="category-title">Products for this Category</text>
+    <text key="items-title">Items for this Product</text>
+    <text key="add-to-cart">Add to Cart</text>
+    <text key="list-price">List Price:</text>
+    <text key="search">Search</text>
+    <text key="cart">Cart</text>
+    <text key="update-cart">Update Cart</text>
+    <text key="remove">Remove</text>
+    <text key="subtotal">Subtotal:</text>
+    <text key="proceed-checkout">Proceed to Checkout</text>
+    <text key="sign-off">Sign Out</text>
+    <text key="sign-in">Sign In</text>
+    <text key="returning-customer">Are you a returning customer?</text>
+    <text key="yes">Yes</text>
+    <text key="username">User Name:</text>
+    <text key="password">Password:</text>
+    <text key="login-failed">
+        There were errors signing you in. The user name and password you entered
+        were not found in our records. Please try again.
+    </text>
+    <text key="order-complete">Your Order is Complete</text>
+    <text key="product">Product</text>
+    <text key="currency">$</text>
+    <text key="petstore-fictional">
+        The Java Pet Store Demo is a fictional sample application from the
+        J2EE BluePrints. For more information, visit the J2EE BluePrints Web
+        site at <a href="http://java.sun.com/j2ee/blueprints/">
+        <code>http://java.sun.com/j2ee/blueprints/</code></a>.
+    </text>
+</i18n>

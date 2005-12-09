@@ -88,19 +88,15 @@ tt_n = navigator.userAgent.toLowerCase();
 function tt_init() {
     tt_db = (document.compatMode && document.compatMode != "BackCompat") ? 
         document.documentElement : document.body? document.body : null;
+    // Browser flags
+    tt_op = !!(window.opera && document.getElementById),
+    tt_op6 = tt_op && !document.defaultView,
+    tt_op7 = tt_op && !tt_op6,
+    tt_ie = tt_n.indexOf("msie") != -1 && document.all && tt_db && !tt_op,
+    tt_n4 = (document.layers && typeof document.classes != tt_u) ? true : false,
+    tt_n6 = (!tt_op && document.defaultView && typeof document.defaultView.getComputedStyle != tt_u),
+    tt_w3c = !tt_ie && !tt_n6 && !tt_op && document.getElementById;
 }
-
-// Browser flags
-var tt_op = !!(window.opera && document.getElementById),
-tt_op6 = tt_op && !document.defaultView,
-tt_op7 = tt_op && !tt_op6,
-tt_ie = tt_n.indexOf("msie") != -1 && document.all && tt_db && !tt_op,
-tt_n4 = (document.layers && typeof document.classes != tt_u),
-tt_n6 = (!tt_op && document.defaultView && typeof document.defaultView.getComputedStyle != tt_u),
-tt_w3c = !tt_ie && !tt_n6 && !tt_op && document.getElementById;
-
-tt_n = "";
-
 
 function tt_Int(t_x)
 {
@@ -236,7 +232,7 @@ function tt_EvX(t_e)
 
 function tt_EvY(t_e)
 {
-	var t_y = tt_Int(t_e.pageY || t_e.clientY || 0) +
+    var t_y = tt_Int(t_e.pageY || t_e.clientY || 0) +
 		tt_Int(tt_ie? tt_db.scrollTop : 0);
 	if (tt_sup) t_y -= (tt_objH + tt_offY - 15);
 	else if (t_y > ylim || !tt_sub && t_y > ylim-24)
@@ -403,8 +399,8 @@ function tt_Show(t_e, t_id, t_sup, t_delay, t_fix, t_left, t_offx, t_offy, t_sta
 			tt_Int(window.pageYOffset || (tt_db? tt_db.scrollTop : 0) || 0) -
 			tt_objH - tt_offY;
 
-		tt_SetDivZ();
-		if (t_fix) tt_SetDivPos(tt_Int((t_fix = t_fix.split(','))[0]), tt_Int(t_fix[1]));
+        tt_SetDivZ();
+        if (t_fix) tt_SetDivPos(tt_Int((t_fix = t_fix.split(','))[0]), tt_Int(t_fix[1]));
 		else tt_SetDivPos(tt_EvX(t_e), tt_EvY(t_e));
 
 		var t_txt = 'tt_ShowDiv(\'true\');';
@@ -517,4 +513,4 @@ function tt_Init()
 	document.write(htm);
 }
 
-tt_Init();
+//tt_Init();

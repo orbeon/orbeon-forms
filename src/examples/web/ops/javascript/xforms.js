@@ -918,11 +918,13 @@ function xformsPageLoaded() {
         // Parse and store initial repeat indexes
         document.xformsRepeatIndexes = new Array();
         var repeatIndexesString = xformsStringValue(document.getElementById("xforms-repeat-indexes"));
+        repeatIndexesString = repeatIndexesString.split("\n").join(""); // Remove \n added by serializer
+
         var repeatIndexes = repeatIndexesString.split(",");
         for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
             var repeatInfo = repeatIndexes[repeatIndex].split(" ");
             var id = repeatInfo[0];
-            var index = repeatInfo[1];
+            var index = repeatInfo[repeatInfo.length - 1];
             document.xformsRepeatIndexes[id] = index;
         }
 

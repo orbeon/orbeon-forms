@@ -80,7 +80,9 @@ public class ScopeGenerator extends ScopeProcessorBase {
                         Object value = config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT
                                 ? externalContext.getRequest().getAttributesMap().get(config.getKey())
                                 : config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT
-                                ? externalContext.getSession(true).getAttributesMap().get(config.getKey())
+                                ? ((config.getSessionScope() == -1)
+                                    ? externalContext.getSession(true).getAttributesMap().get(config.getKey())
+                                    : externalContext.getSession(true).getAttributesMap(config.getSessionScope()).get(config.getKey()))
                                 : config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT
                                 ? externalContext.getAttributesMap().get(config.getKey())
                                 : null;

@@ -19,14 +19,11 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -43,8 +40,8 @@ import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
 
-import java.net.URL;
 import java.util.*;
+import java.net.URI;
 
 /**
  * Represents an XForms model.
@@ -448,7 +445,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 }
             });
         }
-        
+
         // Handle type MIP
         if (modelBind.getType() != null) {
 
@@ -692,41 +689,55 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             if (instances == null) {
                 // Build initial instance document
-                List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+                final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 if (instanceContainers.size() > 0) {
-                    // Support multiple instances
+                    // Iterate through all instances
                     int instancePosition = 0;
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
-                        final Element instanceContainer = (Element) i.next();
-                        final String srcAttribute = instanceContainer.attributeValue("src");
+                        final Element instanceContainerElement = (Element) i.next();
+                        final String srcAttribute = instanceContainerElement.attributeValue("src");
                         final Document instanceDocument;
                         //= ProcessorUtils.createDocumentFromEmbeddedOrHref(Element element, String urlString) {
                         if (srcAttribute == null) {
                             // Inline instance
-                            final List children = instanceContainer.elements();
+                            final List children = instanceContainerElement.elements();
                             if (children == null || children.size() == 0)
                                 throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                         } else {
                             // External instance
+                            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                            // TODO: Handle relative URLs
-//                            if (serverSideRelative) {
-//
-//                            } else {
-//
-//                            }
-//
-//
-//                            xxx
+                            final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
+                               && (externalContext.getRequest().getContainerType().equals("portlet")
+                                    || (externalContext.getRequest().getContainerType().equals("servlet")
+                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
 
-                            final LocationData locationData = (LocationData) instanceContainer.getData();
-                            final URL srcURL = ProcessorUtils.createRelativeURL(locationData, srcAttribute);
-                            final URLGenerator urlGenerator = new URLGenerator(srcURL);
-                            final DOMSerializer domSerializer = new DOMSerializer();
-                            PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
-                            domSerializer.start(pipelineContext);
-                            instanceDocument = domSerializer.getDocument(pipelineContext);
+                            final XFormsModelSubmission.ConnectionResult connectionResult;
+                            if (optimize) {
+                                // Use optimized local mode
+                                final URI resolvedURI = XFormsUtils.resolveURI(instanceContainerElement, srcAttribute);
+                                connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
+                            } else {
+                                // Connect using actual external protocol
+                                final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
+                                connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext, "get", resolvedURL, null, false, null, null);
+                            }
+
+                            try {
+                                // Handle connection errors
+                                if (connectionResult.resultCode != 200)
+                                    throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+
+                                // Read result as XML
+                                instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
+                            } catch (Exception e) {
+                                throw new OXFException(e);
+                            } finally {
+                                // Clean-up
+                                if (connectionResult != null)
+                                    connectionResult.close();
+                            }
                         }
                         setInstanceDocument(pipelineContext, instancePosition, instanceDocument);
                     }

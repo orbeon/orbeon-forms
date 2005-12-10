@@ -46,7 +46,10 @@ public class ScopeSerializer extends ScopeProcessorBase {
         if (config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT) {
             externalContext.getRequest().getAttributesMap().put(config.getKey(), store);
         } else if (config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT) {
-            externalContext.getSession(true).getAttributesMap().put(config.getKey(), store);
+            if (config.getSessionScope() == -1)
+                externalContext.getSession(true).getAttributesMap().put(config.getKey(), store);
+            else
+                externalContext.getSession(true).getAttributesMap(config.getSessionScope()).put(config.getKey(), store);
         } else if (config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT) {
             externalContext.getAttributesMap().put(config.getKey(), store);
         }

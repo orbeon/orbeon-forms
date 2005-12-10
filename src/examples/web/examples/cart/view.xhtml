@@ -28,9 +28,9 @@
             <xforms:instance id="cart">
                 <cart/>
             </xforms:instance>
-            <xforms:submission id="get" action="/direct/cart/get" ref="instance('item')" instance="cart" method="post" replace="instance"/>
-            <xforms:submission id="add" action="/direct/cart/add" ref="instance('item')" method="post" replace="instance"/>
-            <xforms:submission id="clear" action="/direct/cart/clear" ref="instance('item')" method="post" replace="instance"/>
+            <xforms:submission id="get" action="/direct/cart/get" ref="instance('item')" method="post" replace="instance" instance="cart"/>
+            <xforms:submission id="add" action="/direct/cart/add" ref="instance('item')" method="post" replace="none"/>
+            <xforms:submission id="clear" action="/direct/cart/clear" ref="instance('item')" method="post" replace="none"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -45,6 +45,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <xforms:send submission="add"/>
                     <xforms:send submission="get"/>
+                    <xforms:setvalue ref="instance('item')">a</xforms:setvalue>
                 </xforms:action>
             </xforms:group>
             <xforms:trigger>
@@ -52,11 +53,12 @@
                 <xforms:action ev:event="DOMActivate">
                     <xforms:send submission="clear"/>
                     <xforms:send submission="get"/>
+                    <xforms:setvalue ref="instance('item')">a</xforms:setvalue>
                 </xforms:action>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:ol>
-            <xforms:repeat nodeset="instance('cart')/item" id="mainRepeat">
+            <xforms:repeat nodeset="instance('cart')/item" id="main-repeat">
                 <xhtml:li><xforms:output ref="."/></xhtml:li>
             </xforms:repeat>
         </xhtml:ol>

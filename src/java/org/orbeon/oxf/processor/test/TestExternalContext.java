@@ -333,7 +333,7 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
-            return false;
+            return true;
         }
 
         public String getCharacterEncoding() {

@@ -15,10 +15,8 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.portlet.OPSPortletDelegate;
-import org.orbeon.oxf.common.OXFException;
 
 import javax.portlet.PortletRequestDispatcher;
-import javax.portlet.PortletException;
 import java.io.IOException;
 
 /**
@@ -38,10 +36,16 @@ public class PortletToExternalContextRequestDispatcherWrapper implements Externa
     }
 
     public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
-        try {
-            _dispatcher.include(new ExternalContextToPortletRenderRequestWrapper(request), new ExternalContextToPortletRenderResponseWrapper(response));
-        } catch (PortletException e) {
-            throw new OXFException(e);
-        }
+        // Using the RequestDispatcher actually only allows us to include servlet / JSP resources.
+        // Furthermore, it is not allowed to intercept the response by providing your own
+        // RenderResponse wrapper. This means that we just do local includes directly through our
+        // portlet.
+        OPSPortletDelegate.include(request, response);
+        
+//        try {
+//            _dispatcher.include(new ExternalContextToPortletRenderRequestWrapper(request), new ExternalContextToPortletRenderResponseWrapper(response));
+//        } catch (PortletException e) {
+//            throw new OXFException(e);
+//        }
     }
 }

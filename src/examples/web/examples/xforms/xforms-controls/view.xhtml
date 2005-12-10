@@ -99,9 +99,9 @@
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             
             <xforms:submission ref="instance('countries')" id="countries-submission" 
-                method="post" action="/direct/xforms-controls/update-countries" replace="instance"/>
+                method="post" action="/xforms-controls/update-countries" replace="instance"/>
             <xforms:submission ref="instance('country-details')" id="country-details-submission" 
-                method="post" action="/direct/xforms-controls/update-country-details" replace="instance"/>
+                method="post" action="/xforms-controls/update-country-details" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

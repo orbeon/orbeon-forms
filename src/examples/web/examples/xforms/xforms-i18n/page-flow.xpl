@@ -14,18 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param name="instance" type="input"/>
-
-    <!-- Store locale in session -->
-    <p:processor name="oxf:scope-serializer">
-        <p:input name="data" href="#instance"/>
-        <p:input name="config">
-            <config>
-                <key>locale</key>
-                <scope>session</scope>
-                <session-scope>application</session-scope>
-            </config>
-        </p:input>
+    <p:processor name="oxf:page-flow">
+        <p:input name="controller" href="page-flow.xml"/>
     </p:processor>
 
 </p:config>

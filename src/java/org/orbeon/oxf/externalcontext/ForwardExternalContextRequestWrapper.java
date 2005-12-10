@@ -51,6 +51,8 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         this.method = method;
         this.mediaType = mediaType;
         this.postData = postData;
+
+        initializeHeaders(request);
     }
 
     /**
@@ -60,6 +62,25 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         super(request);
         this.pathQuery = pathQuery;
         this.method = method;
+
+        initializeHeaders(request);
+    }
+
+    private void initializeHeaders(ExternalContext.Request request) {
+        // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
+        {
+            this.headerMap = new HashMap();
+            final Object header = request.getHeaderMap().get("cookie");
+            if (header != null)
+                headerMap.put("cookie", header);
+        }
+
+        {
+            this.headerValuesMap = new HashMap();
+            final Object headerValues = request.getHeaderValuesMap().get("cookie");
+            if (headerValues != null)
+                headerValuesMap.put("cookie", headerValues);
+        }
     }
 
     public int getContentLength() {
@@ -144,18 +165,10 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
 //    }
 
     public Map getHeaderMap() {
-        // TODO: filter headers (see ForwardHttpServletRequestWrapper)
-        if (headerMap == null) {
-            headerMap = new HashMap();
-        }
         return headerMap;
     }
 
     public Map getHeaderValuesMap() {
-        // TODO: filter headers (see ForwardHttpServletRequestWrapper)
-        if (headerValuesMap == null) {
-            headerValuesMap = new HashMap();
-        }
         return headerValuesMap;
     }
 

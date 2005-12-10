@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.scope;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -29,15 +30,19 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
     public static final String SCOPE_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/schemas/scope-config";
 
     protected ContextConfig readConfig(PipelineContext context) {
-        ContextConfig config = (ContextConfig) readCacheInputAsObject
+        //noinspection UnnecessaryLocalVariable
+        final ContextConfig config = (ContextConfig) readCacheInputAsObject
                 (context, getInputByName(ProcessorImpl.INPUT_CONFIG), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                Element rootElement = readInputAsDOM4J(context, input).getRootElement();
-                String contextName = rootElement.element("scope").getStringValue();
+                final Element rootElement = readInputAsDOM4J(context, input).getRootElement();
+                final String contextName = rootElement.element("scope").getStringValue();
+                final Element sessionScopeElement = rootElement.element("session-scope");
+                final String sessionScopeValue = (sessionScopeElement == null) ? null : sessionScopeElement.getStringValue();
                 return new ContextConfig("request".equals(contextName) ? REQUEST_CONTEXT
                         : "session".equals(contextName) ? SESSION_CONTEXT
                         : "application".equals(contextName) ? APPLICATION_CONTEXT
                         : -1,
+                        "application".equals(sessionScopeValue) ? ExternalContext.Session.APPLICATION_SCOPE : "portlet".equals(sessionScopeValue) ? ExternalContext.Session.PORTLET_SCOPE : -1,
                         rootElement.element("key").getStringValue(),
                         ProcessorUtils.selectBooleanValue(rootElement, "/*/test-ignore-stored-key-validity", false));
             }
@@ -47,17 +52,23 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
 
     protected static class ContextConfig {
         private int contextType;
+        private int sessionScope;
         private String key;
         private boolean testIgnoreStoredKeyValidity;
 
-        public ContextConfig(int contextType, String key, boolean testIgnoreInternalKeyValidity) {
+        public ContextConfig(int contextType, int sessionScope, String key, boolean testIgnoreInternalKeyValidity) {
             this.contextType = contextType;
+            this.sessionScope = sessionScope;
             this.key = key;
             this.testIgnoreStoredKeyValidity = testIgnoreInternalKeyValidity;
         }
 
         public int getContextType() {
             return contextType;
+        }
+
+        public int getSessionScope() {
+            return sessionScope;
         }
 
         public String getKey() {

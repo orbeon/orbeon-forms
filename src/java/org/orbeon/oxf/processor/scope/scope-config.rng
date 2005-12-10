@@ -17,13 +17,27 @@
         <element name="key">
             <data type="string"/>
         </element>
-        <element name="scope">
-            <choice>
-                <value>application</value>
-                <value>session</value>
-                <value>request</value>
-            </choice>
-        </element>
+        <choice>
+            <element name="scope">
+                <choice>
+                    <value>application</value>
+                    <value>request</value>
+                </choice>
+            </element>
+            <group>
+                <element name="scope">
+                    <value>session</value>
+                </element>
+                <optional>
+                    <element name="session-scope">
+                        <choice>
+                            <value>application</value>
+                            <value>portlet</value>
+                        </choice>
+                    </element>
+                </optional>
+            </group>
+        </choice>
         <optional>
             <element name="test-ignore-stored-key-validity">
                 <data type="boolean"/>

@@ -15,10 +15,10 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page path-info="/xforms-controls" view="view.xhtml"/>
-    <page path-info="/direct/xforms-controls/update-countries" model="update-countries.xpl"/>
-    <page path-info="/direct/xforms-controls/update-country-details" model="update-country-details.xpl"/>
+    <page path-info="/xforms-controls/update-countries" model="update-countries.xpl"/>
+    <page path-info="/xforms-controls/update-country-details" model="update-country-details.xpl"/>
 
-    <page path-info="/direct/xforms-controls/post" model="post.xpl"/><!-- For testing -->
+    <page path-info="/xforms-controls/post" model="post.xpl"/><!-- For testing -->
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -17,6 +17,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.OXFProperties;
@@ -478,6 +479,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true).booleanValue();
     }
 
+    public static boolean isOptimizeLocalInstanceLoads() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
+    }
+
     public static boolean isCacheSession() {
         final String propertyValue = OXFProperties.instance().getPropertySet().getString
                 (XFormsConstants.XFORMS_STATE_HANDLING_PROPERTY, XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE);
@@ -500,6 +506,44 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
     }
 
+    public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
+        final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
+
+        final URI resolvedURI = resolveURI(currentElement, value);
+        final String resolvedURISTring = resolvedURI.toString();
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+        final String externalURL;
+        // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
+        // runs in a servlet when processing these events!
+        if (!isPortletLoad) {
+            // XForms page was loaded from a servlet
+            if (doReplace) {
+                externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
+            } else {
+                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+            }
+        } else {
+            // XForms page was loaded from a portlet
+            if (doReplace) {
+                if (resolvedURI.getFragment() != null) {
+                    // Remove fragment if there is one, as it doesn't serve in a portlet
+                    try {
+                        externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+                    } catch (URISyntaxException e) {
+                        throw new OXFException(e);
+                    }
+                } else {
+                    externalURL = resolvedURISTring;
+                }
+            } else {
+                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+            }
+        }
+
+        return externalURL;
+    }
+
     public static interface InstanceWalker {
         public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData);
     }
@@ -518,7 +562,7 @@ public class XFormsUtils {
         // Collect xml:base values
         Element currentElement = element;
         do {
-            final String xmlBaseAttribute = element.attributeValue(XMLConstants.XML_BASE_QNAME);
+            final String xmlBaseAttribute = currentElement.attributeValue(XMLConstants.XML_BASE_QNAME);
             if (xmlBaseAttribute != null)
                 xmlBaseElements.add(xmlBaseAttribute);
             currentElement = currentElement.getParent();

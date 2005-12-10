@@ -18,19 +18,19 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.util.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of all the XForms actions.
@@ -769,43 +769,12 @@ public class XFormsActionInterpreter {
         }
     }
 
-    public static void resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element actionElement, boolean doReplace, String value, String target) {
+    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target) {
 
         final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
-
-        final URI resolvedURI = XFormsUtils.resolveURI(actionElement, value);
-        final String resolvedURISTring = resolvedURI.toString();
-        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-
-        final String externalURL;
-        // NOTE: Keep in mind that this is going to run from within a servlet, as the XForms server
-        // runs in a servlet when processing these events!
-        if (!isPortletLoad) {
-            // XForms page was loaded from a servlet
-            if (doReplace) {
-                externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
-            } else {
-                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
-            }
-        } else {
-            // XForms page was loaded from a portlet
-            if (doReplace) {
-                if (resolvedURI.getFragment() != null) {
-                    // Remove fragment if there is one, as it doesn't serve in a portlet
-                    try {
-                        externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
-                    } catch (URISyntaxException e) {
-                        throw new OXFException(e);
-                    }
-                } else {
-                    externalURL = resolvedURISTring;
-                }
-            } else {
-                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
-            }
-        }
-
+        final String externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, doReplace, value);
         containingDocument.addClientLoad(externalURL, target, doReplace, isPortletLoad);
+        return externalURL;
     }
 
     public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {

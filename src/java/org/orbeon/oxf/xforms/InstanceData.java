@@ -155,7 +155,7 @@ public class InstanceData implements Cloneable {
     }
 
     public String getSystemId() {
-        return locationData.getSystemID();
+        return (locationData == null) ? null : locationData.getSystemID();
     }
 
     public Iterator getSchemaErrorsMsgs() {

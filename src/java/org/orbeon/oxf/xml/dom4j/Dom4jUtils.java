@@ -27,8 +27,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.SAXParser;
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -102,53 +101,42 @@ public class Dom4jUtils {
             frmt.setNewlines(trm);
             frmt.setTrimText(trm);
         }
-        final String ret = domToString(brnch, frmt);
-        return ret;
+        return domToString(brnch, frmt);
     }
 
 
     /**
-     * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is not
-     * used since it creates work for GC ( because it relies on JAXP ).
+     * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it
+     * creates work for GC (because it relies on JAXP).
      */
-    public static Document parseText(final String s)
-            throws SAXException, DocumentException {
-        final java.io.StringReader strRdr = new java.io.StringReader(s);
-        final Document ret = read(strRdr);
-        return ret;
+    public static Document parseText(final String s) throws SAXException, DocumentException {
+        final StringReader stringReader = new StringReader(s);
+        return read(stringReader);
     }
 
-    public static Document read(final java.io.Reader rdr)
-            throws SAXException, DocumentException {
-        final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read(rdr);
-        return ret;
+    public static Document read(final Reader reader) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader();
+        return saxReader.read(reader);
     }
 
-    public static Document read(final java.io.Reader rdr, final String uri)
-            throws SAXException, DocumentException {
-        final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read(rdr, uri);
-        return ret;
+    public static Document read(final Reader reader, final String uri) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader();
+        return saxReader.read(reader, uri);
     }
 
-    public static Document read(final java.io.InputStream rdr)
-            throws SAXException, DocumentException {
-        final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read(rdr);
-        return ret;
+    public static Document read(final InputStream inputStream) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader();
+        return saxReader.read(inputStream);
     }
 
-    public static Document read(final java.io.InputStream rdr, final String uri)
-            throws SAXException, DocumentException {
-        final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read(rdr, uri);
-        return ret;
+    public static Document read(final InputStream inputStream, final String uri) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader();
+        return saxReader.read(inputStream, uri);
     }
 
     /**
-     * Removes the elements and text inside the given element, but not the
-     * attributes or namespace declarations on the element.
+     * Removes the elements and text inside the given element, but not the attributes or namespace
+     * declarations on the element.
      */
     public static void clearElementContent(final Element elt) {
         final java.util.List cntnt = elt.content();
@@ -164,15 +152,13 @@ public class Dom4jUtils {
 
     public static String makeSystemId(final Document d) {
         final Element e = d.getRootElement();
-        final String ret = makeSystemId(e);
-        return ret;
+        return makeSystemId(e);
     }
 
     public static String makeSystemId(final Element e) {
         final LocationData ld = (LocationData) e.getData();
         final String ldSid = ld == null ? null : ld.getSystemID();
-        final String ret = ldSid == null ? DOMGenerator.DefaultContext : ldSid;
-        return ret;
+        return ldSid == null ? DOMGenerator.DefaultContext : ldSid;
     }
 
     /*
@@ -198,34 +184,26 @@ public class Dom4jUtils {
         return buff.toString();
     }
 
-    public static String domToString
-            (final Element e, final boolean trm, final boolean cmpct) {
+    public static String domToString(final Element e, final boolean trm, final boolean cmpct) {
         final Branch cpy = e.createCopy();
-        final String ret = Dom4jUtils.domToString(cpy, trm, cmpct);
-        return ret;
+        return Dom4jUtils.domToString(cpy, trm, cmpct);
     }
 
     public static String domToString(final Element e) {
-        final String ret = domToString(e, true, false);
-        return ret;
+        return domToString(e, true, false);
     }
 
-    public static String domToString
-            (final Document d, final boolean trm, final boolean cmpct) {
+    public static String domToString(final Document d, final boolean trm, final boolean cmpct) {
         final Element relt = d.getRootElement();
-        final String ret = domToString(relt, trm, cmpct);
-        return ret;
+        return domToString(relt, trm, cmpct);
     }
 
     public static String domToString(final Document d) {
-        final String ret = domToString(d, true, false);
-        return ret;
+        return domToString(d, true, false);
     }
 
-    public static String domToString
-            (final Text txt, final boolean t, final boolean c) {
-        final String ret = txt.getText();
-        return ret;
+    public static String domToString(final Text txt, final boolean t, final boolean c) {
+        return txt.getText();
     }
 
     public static String domToString(final Text t) {
@@ -236,8 +214,7 @@ public class Dom4jUtils {
      * Checks type of n and, if apropriate, downcasts and returns
      * domToString( ( Type )n, t, c ).  Otherwise returns domToString( n, null )
      */
-    public static String domToString
-            (final Node n, final boolean t, final boolean c) {
+    public static String domToString(final Node n, final boolean t, final boolean c) {
         final String ret;
         switch (n.getNodeType()) {
             case Node.DOCUMENT_NODE: {
@@ -263,8 +240,7 @@ public class Dom4jUtils {
         return domToString(nd, true, false);
     }
 
-    public static DocumentSource getDocumentSource
-            (final Document d) {
+    public static DocumentSource getDocumentSource(final Document d) {
         /*
          * Saxon's error handler is expensive for the service it provides so we just use our 
          * singeton intead. 
@@ -436,38 +412,31 @@ public class Dom4jUtils {
     public static XPath createXPath(final String exprsn) throws InvalidXPathException {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final XPath ret = fctry.createXPath(exprsn);
-        return ret;
+        return fctry.createXPath(exprsn);
     }
 
     public static Text createText(final String txt) {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Text ret = fctry.createText(txt);
-        return ret;
+        return fctry.createText(txt);
     }
 
-    public static Element createElement
-            (final String qualifiedName, final String namespaceURI) {
+    public static Element createElement(final String qualifiedName, final String namespaceURI) {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Element ret = fctry.createElement(qualifiedName, namespaceURI);
-        return ret;
+        return fctry.createElement(qualifiedName, namespaceURI);
     }
 
-    public static Attribute createAttribute
-            (final Element elt, final QName nm, final String val) {
+    public static Attribute createAttribute(final Element elt, final QName nm, final String val) {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Attribute ret = fctry.createAttribute(elt, nm, val);
-        return ret;
+        return fctry.createAttribute(elt, nm, val);
     }
 
     public static Namespace createNamespace(final String pfx, final String uri) {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Namespace ret = fctry.createNamespace(pfx, uri);
-        return ret;
+        return fctry.createNamespace(pfx, uri);
     }
 
     /**
@@ -504,8 +473,7 @@ public class Dom4jUtils {
     public static Document createDocument() {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Document ret = fctry.createDocument();
-        return ret;
+        return fctry.createDocument();
     }
 
     /**

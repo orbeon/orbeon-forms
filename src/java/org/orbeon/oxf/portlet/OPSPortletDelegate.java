@@ -250,6 +250,17 @@ public class OPSPortletDelegate extends GenericPortlet {
         externalContext.getProcessorService().service(true, externalContext, externalContext.getPipelineContext());
     }
 
+    /**
+     * Include a request.
+     */
+    public static void include(ExternalContext.Request request, ExternalContext.Response response) {
+
+        // Create new external context and call service
+        final PipelineContext pipelineContext = new PipelineContext();
+        final PortletExternalContext externalContext = new PortletExternalContext(pipelineContext, request, response);
+        externalContext.getProcessorService().service(true, externalContext, externalContext.getPipelineContext());
+    }
+
     public void destroy() {
 
         // Run listeners

@@ -16,7 +16,7 @@
 
     <page path-info="/xforms-i18n" view="select-locale.xhtml"/>
     <page path-info="/xforms-i18n/form" view="i18n-form.xhtml"/>
-    <page path-info="/direct/xforms-i18n/i18n-resources" view="i18n-resources.xpl"/>
+    <page path-info="/xforms-i18n/i18n-resources" model="i18n-resources.xpl"/>
     <page path-info="/direct/xforms-i18n/set-locale" model="set-locale.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

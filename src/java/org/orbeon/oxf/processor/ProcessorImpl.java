@@ -511,8 +511,11 @@ public abstract class ProcessorImpl implements Processor {
      */
     protected void executeChildren(PipelineContext context, Runnable runnable) {
         addSelfAsParent(context);
-        runnable.run();
-        removeSelfAsParent(context);
+        try {
+            runnable.run();
+        } finally {
+            removeSelfAsParent(context);
+        }
     }
 
     /**
@@ -526,8 +529,11 @@ public abstract class ProcessorImpl implements Processor {
         // We cast this here to go arround a javac bug.
         ProcessorImpl castedThisPipelineProcessor = thisPipelineProcessor;
         castedThisPipelineProcessor.removeSelfAsParent(context);
-        runnable.run();
-        castedThisPipelineProcessor.addSelfAsParent(context);
+        try {
+            runnable.run();
+        } finally {
+            castedThisPipelineProcessor.addSelfAsParent(context);
+        }
     }
 
     protected static Object getParentState(final PipelineContext context) {
@@ -1361,11 +1367,6 @@ public abstract class ProcessorImpl implements Processor {
          */
         protected abstract byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState);
 
-        /**
-         *
-         * @param pipelineContext
-         * @return
-         */
         protected final DigestState getFilledOutState(PipelineContext pipelineContext) {
             // This is called from both readImpl and getLocalValidity. Based on the assumption that
             // a getKeyImpl will be followed soon by a readImpl if it fails, we compute key,

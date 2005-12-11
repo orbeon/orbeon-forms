@@ -47,71 +47,110 @@
         <xforms:group ref="instance('text')">
             <xforms:switch>
                 <xforms:case id="firstname" selected="true">
-                    <xhtml:p>Step 1 of 3</xhtml:p>
-                    <xhtml:p>
-                        <xforms:input ref="firstname" tabindex="1">
-                            <xforms:label class="fixed-width">First name:</xforms:label>
-                        </xforms:input>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger tabindex="2">
-                            <xforms:label>Next ></xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="lastname"/>
-                        </xforms:trigger>
-                    </xhtml:p>
+                    <xhtml:table cellpadding="3">
+                        <xhtml:tr>
+                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">1</font></xhtml:td>
+                            <xhtml:td colspan="1"><b>Step 1 of 4</b></xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input ref="firstname" tabindex="1">
+                                    <xforms:label class="fixed-width">First name:</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:trigger tabindex="2">
+                                    <xforms:label>Next ></xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
+                                </xforms:trigger>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
                 </xforms:case>
                 <xforms:case id="lastname">
-                    <xhtml:p>Step 2 of 3</xhtml:p>
-                    <xhtml:p>
-                        <xforms:input ref="lastname" tabindex="3">
-                            <xforms:label class="fixed-width">Last name:</xforms:label>
-                        </xforms:input>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger tabindex="4">
-                            <xforms:label>&lt; Previous</xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="firstname"/>
-                        </xforms:trigger>
-                        <xforms:trigger>
-                            <xforms:label>Next ></xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="age"/>
-                        </xforms:trigger>
-                    </xhtml:p>
+                    <xhtml:table cellpadding="3">
+                        <xhtml:tr>
+                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">2</font></xhtml:td>
+                            <xhtml:td colspan="1"><b>Step 2 of 4</b></xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input ref="lastname" tabindex="3">
+                                    <xforms:label class="fixed-width">Last name:</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:trigger tabindex="4">
+                                    <xforms:label>&lt; Previous</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="firstname"/>
+                                </xforms:trigger>
+                                <xforms:trigger>
+                                    <xforms:label>Next ></xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="age"/>
+                                </xforms:trigger>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
                 </xforms:case>
                 <xforms:case id="age">
-                    <xhtml:p>Step 3 of 3</xhtml:p>
-                    <xhtml:p>
-                        <xforms:input ref="age" incremental="true">
-                            <xforms:label class="fixed-width">Age:</xforms:label>
-                            <xforms:action ev:event="xforms-valid">
-                                <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
-                            </xforms:action>
-                            <xforms:action ev:event="xforms-invalid">
-                                <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:input>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger>
-                            <xforms:label>&lt; Previous</xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="lastname"/>
-                        </xforms:trigger>
-                        <xforms:trigger ref="instance('buttons-state')/finish">
-                            <xforms:label>Finish ></xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
-                        </xforms:trigger>
-                    </xhtml:p>
+                    <xhtml:table cellpadding="3">
+                        <xhtml:tr>
+                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">3</font></xhtml:td>
+                            <xhtml:td colspan="1"><b>Step 3 of 4</b></xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input ref="age" incremental="true">
+                                    <xforms:label class="fixed-width">Age:</xforms:label>
+                                    <xforms:action ev:event="xforms-valid">
+                                        <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
+                                    </xforms:action>
+                                    <xforms:action ev:event="xforms-invalid">
+                                        <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
+                                    </xforms:action>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:trigger>
+                                    <xforms:label>&lt; Previous</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
+                                </xforms:trigger>
+                                <xforms:trigger ref="instance('buttons-state')/finish">
+                                    <xforms:label>Finish ></xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
+                                </xforms:trigger>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
                 </xforms:case>
                 <xforms:case id="showinstance">
-                    <xhtml:p>You are done!</xhtml:p>
-                    <xhtml:p>The data you have entered has been collected in this XML document:</xhtml:p>
-                    <xforms:output ref="instance('formatted')" mediatype="text/html"/>
-                    <xhtml:p>
-                        <xforms:trigger>
-                            <xforms:label>Go back to start</xforms:label>
-                            <xforms:toggle ev:event="DOMActivate" case="firstname"/>
-                        </xforms:trigger>
-                    </xhtml:p>
+                    <xhtml:table cellpadding="3">
+                        <xhtml:tr>
+                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">4</font></xhtml:td>
+                            <xhtml:td colspan="1"><b>Step 4 of 4</b></xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xhtml:p>You are done!</xhtml:p>
+                                <xhtml:p>The data you have entered has been collected in this XML document:</xhtml:p>
+                                <xforms:output ref="instance('formatted')" mediatype="text/html"/>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:trigger>
+                                    <xforms:label>Go back to start</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="firstname"/>
+                                </xforms:trigger>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
                 </xforms:case>
             </xforms:switch>
         </xforms:group>

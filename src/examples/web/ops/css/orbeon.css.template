@@ -93,7 +93,7 @@ fieldset {
     padding-right: 2em;
 }
 
-.tt, textarea {
+.tt, textarea, code {
     font-family: Lucida Console, Courrier;
     font-size: 12px;
 }

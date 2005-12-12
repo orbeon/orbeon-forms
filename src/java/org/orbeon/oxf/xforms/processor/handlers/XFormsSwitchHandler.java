@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -24,9 +22,13 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Map;
 
 /**
- * Handle xhtml:group.
+ * Handle xforms:switch and xforms:case.
  */
 public class XFormsSwitchHandler extends XFormsGroupHandler {
+
+    private DeferredContentHandler currentSavedOutput;
+    private OutputInterceptor currentOutputInterceptor;
+    private String currentCaseEffectiveId;
 
     public XFormsSwitchHandler() {
     }
@@ -36,22 +38,37 @@ public class XFormsSwitchHandler extends XFormsGroupHandler {
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("case")) {
             // xforms:case
 
-            final String effectiveId = handlerContext.getEffectiveId(attributes);
+            currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
             // Find classes to add
             final StringBuffer classes = new StringBuffer("xforms-" + localname);
 
-            final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+            final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 
             final Map switchIdToSelectedCaseIdMap = containingDocument.getXFormsControls().getCurrentControlsState().getSwitchIdToSelectedCaseIdMap();
 
             final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(effectiveGroupId);
-            final boolean isVisible = effectiveId.equals(selectedCaseId);
+            final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId);
             newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+
+            // Place interceptor
+            currentSavedOutput = handlerContext.getController().getOutput();
+            currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
+                public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
+                    // Output begin delimiter
+                    outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
+                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                }
+            });
+
+            currentOutputInterceptor.setAddedClasses(new StringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
+
+            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(currentOutputInterceptor));
+            setContentHandler(handlerContext.getController().getOutput());
+
         } else {
             super.startElement(uri, localname, qName, attributes);
         }
@@ -62,9 +79,14 @@ public class XFormsSwitchHandler extends XFormsGroupHandler {
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("case")) {
             // xforms:case
 
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            // Restore output
+            handlerContext.getController().setOutput(currentSavedOutput);
+            setContentHandler(currentSavedOutput);
+
+            // Output end delimiter
+            currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
+                    currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+
         } else {
             super.endElement(uri, localname, qName);
         }

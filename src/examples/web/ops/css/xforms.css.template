@@ -192,6 +192,17 @@
     display: none;
 }
 
+.xforms-case-selected {
+}
+
+.xforms-case-deselected {
+    display: none;
+}
+
+.xforms-case-begin-end {
+    display: none;
+}
+
 .xforms-input input {
     border: 1px solid #7f9db9;
     padding-bottom: 3px;

@@ -1449,8 +1449,16 @@ function xformsHandleResponse() {
                                         var divElement = divsElement.childNodes[j];
                                         var controlId = divElement.getAttribute("id");
                                         var visibile = divElement.getAttribute("visibility") == "visible";
-                                        var documentElement = document.getElementById(controlId);
-                                        documentElement.style.display = visibile ? "block" : "none";
+
+                                        var cursor = document.getElementById("xforms-case-begin-" + controlId);
+                                        while (true) {
+                                            cursor = cursor.nextSibling;
+                                            if (cursor.nodeType == ELEMENT_TYPE) {
+                                                if (cursor.id == "xforms-case-end-" + controlId) break;
+                                                xformsAddClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
+                                                xformsRemoveClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
+                                            }
+                                        }
                                     }
                                 }
                                 break;

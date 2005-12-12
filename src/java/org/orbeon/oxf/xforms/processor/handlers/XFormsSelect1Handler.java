@@ -176,9 +176,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             classes.append(appearanceLocalname);
 
             if (!handlerContext.isGenerateTemplate()) {
-
                 handleMIPClasses(classes, controlInfo);
-
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
@@ -264,8 +262,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
-            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                    handlerContext.isGenerateTemplate() ? "" : item.getValue());
+            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
 
             final String value = item.getValue();
             if (!handlerContext.isGenerateTemplate() && controlInfo != null && controlInfo.getValue() != null) {

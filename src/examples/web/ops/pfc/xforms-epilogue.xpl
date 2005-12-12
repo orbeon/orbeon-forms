@@ -98,7 +98,7 @@
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
                         <p:input name="static-state" href="#static-state"/>
-                        <p:output name="document" ref="xformed-data"/>
+                        <p:output name="document" ref="xformed-data" debug="xxxstatic"/>
                     </p:processor>
 
                     <!-- Legacy, XSLT-based XForms Initialization -->

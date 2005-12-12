@@ -851,7 +851,7 @@
                     attribute on the <code>xforms:instance</code> element:
                 </p>
                 <xml-source show-namespaces="false">
-                    <xforms:instance src="my-instance.xml"/>
+                    <xforms:instance src="instance.xml"/>
                 </xml-source>
                 <p>
                     This feature allows for improved modularity by separating an XForms instance
@@ -872,26 +872,26 @@
                         <td rowspan="3">
                             <p>The following URI is loaded in a servlet:</p>
                             <p>
-                                <code>http://example.org/ops/my-page</code>
+                                <code>http://a.org/ops/page</code>
                             </p>
                         </td>
-                        <td><code>http://orbeon.com/my-instance</code></td>
-                        <td><code>http://orbeon.com/my-instance</code></td>
+                        <td><code>http://b.com/instance</code></td>
+                        <td><code>http://b.com/instance</code></td>
                         <td>
                             The absolute URL is left untouched. The XForms instance is loaded from
                             the absolute URL.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>/my-new-instance</code></td>
-                        <td><code>http://example.org/ops/my-new-instance</code></td>
+                        <td><code>/new-instance</code></td>
+                        <td><code>http://a.org/ops/new-instance</code></td>
                         <td>
                             Absolute paths resolve against the current servlet context.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>admin/my-instance</code></td>
-                        <td><code>http://example.org/ops/admin/my-instance</code></td>
+                        <td><code>admin/instance</code></td>
+                        <td><code>http://a.org/ops/admin/instance</code></td>
                         <td>
                             The relative path resolves against the original URL.
                         </td>
@@ -900,19 +900,19 @@
                         <td rowspan="3">
                             <p>The following path is loaded in a portlet:</p>
                             <p>
-                                <code>/my-example/my-page</code>
+                                <code>/example/page</code>
                             </p>
                         </td>
-                        <td><code>http://orbeon.com/my-instance</code></td>
-                        <td><code>http://orbeon.com/my-instance</code></td>
+                        <td><code>http://b.com/instance</code></td>
+                        <td><code>http://b.com/instance</code></td>
                         <td>
                             The absolute URL is left untouched. The XForms instance is loaded from
                             the absolute URL.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>/my-new-instance</code></td>
-                        <td><code>/my-new-instance</code></td>
+                        <td><code>/new-instance</code></td>
+                        <td><code>/new-instance</code></td>
                         <td>
                             The absolute path is used as is. The XForms instance is loaded from the
                             portlet. The developer must make sure that the path resolves to a PFC
@@ -920,8 +920,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td><code>admin/my-instance</code></td>
-                        <td><code>/my-example/admin/my-instance</code></td>
+                        <td><code>admin/instance</code></td>
+                        <td><code>/example/admin/instance</code></td>
                         <td>
                             The relative path is resolved against the original path. The XForms
                             instance is loaded from the portlet. The developer must make sure that
@@ -938,7 +938,7 @@
                     attribute on the <code>xforms:submission</code> element:
                 </p>
                 <xml-source show-namespaces="false">
-                    <xforms:submission action="/my-submission" ref="..."/>
+                    <xforms:submission action="/submission" ref="..."/>
                 </xml-source>
                 <p>
                     The following assumes that OPS runs in the /ops servlet context:
@@ -955,29 +955,29 @@
                         <td rowspan="3">
                             <p>The following URI is loaded in a servlet:</p>
                             <p>
-                                <code>http://example.org/ops/my-page</code>
+                                <code>http://a.org/ops/page</code>
                             </p>
                         </td>
-                        <td><code>http://orbeon.com/my-submission</code></td>
+                        <td><code>http://b.com/submission</code></td>
                         <td>N/A</td>
-                        <td><code>http://orbeon.com/my-submission</code></td>
+                        <td><code>http://b.com/submission</code></td>
                         <td>
                             The absolute URL is left untouched. The XForms submission is performed
                             on the absolute URL.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>/my-new-submission</code></td>
+                        <td><code>/new-submission</code></td>
                         <td>N/A</td>
-                        <td><code>http://example.org/ops/my-new-submission</code></td>
+                        <td><code>http://a.org/ops/new-submission</code></td>
                         <td>
                             Absolute paths resolve against the current servlet context.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>admin/my-submission</code></td>
+                        <td><code>admin/submission</code></td>
                         <td>N/A</td>
-                        <td><code>http://example.org/ops/admin/my-submission</code></td>
+                        <td><code>http://a.org/ops/admin/submission</code></td>
                         <td>
                             The relative path resolves against the original URL.
                         </td>
@@ -986,21 +986,21 @@
                         <td rowspan="5">
                             <p>The following path is loaded in a portlet:</p>
                             <p>
-                                <code>/my-example/my-page</code>
+                                <code>/example/page</code>
                             </p>
                         </td>
-                        <td><code>http://orbeon.com/my-submission</code></td>
+                        <td><code>http://b.com/submission</code></td>
                         <td>N/A</td>
-                        <td><code>http://orbeon.com/my-submission</code></td>
+                        <td><code>http://b.com/submission</code></td>
                         <td>
                             The absolute URL is left untouched. The XForms submission is performed
                             on the absolute URL.
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>/my-new-submission</code></td>
+                        <td rowspan="2"><code>/new-submission</code></td>
                         <td>Yes</td>
-                        <td><code>/my-new-submission</code></td>
+                        <td><code>/new-submission</code></td>
                         <td>
                             The absolute path is used as is. The XForms submission is performed on
                             the portlet.
@@ -1008,16 +1008,16 @@
                     </tr>
                     <tr>
                         <td>No</td>
-                        <td><code>http://example.org/ops/my-new-submission</code></td>
+                        <td><code>http://a.org/ops/new-submission</code></td>
                         <td>
                             The absolute path resolves against the current servlet context. The
                             submission is performed on the web application.
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>admin/my-submission</code></td>
+                        <td rowspan="2"><code>admin/submission</code></td>
                         <td>Yes</td>
-                        <td><code>/my-example/admin/my-submission</code></td>
+                        <td><code>/example/admin/submission</code></td>
                         <td>
                             The relative path is resolved against the original path. The XForms
                             submission is performed on the portlet.
@@ -1025,7 +1025,7 @@
                     </tr>
                     <tr>
                         <td>No</td>
-                        <td><code>http://example.org/ops/ my-example/admin/my-submission</code></td>
+                        <td><code>http://a.org/ops/ example/admin/submission</code></td>
                         <td>
                             The relative path resolves against the original path, then against the
                             the current servlet context. The submission is performed on the web
@@ -1064,12 +1064,12 @@
                         <td rowspan="6">
                             <p>The following URI is loaded in a servlet:</p>
                             <p>
-                                <code>http://example.org/ops/my-page</code>
+                                <code>http://a.org/ops/page</code>
                             </p>
                         </td>
-                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/software/</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/software/</code></td>
                         <td>
                             The absolute URL is left untouched. The new page replaces the existing
                             page.
@@ -1083,9 +1083,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td rowspan="2"><code>/new-page</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://example.org/ops/my-new-page</code></td>
+                        <td rowspan="2"><code>http://a.org/ops/new-page</code></td>
                         <td>
                             Absolute paths resolve against the current servlet context. The new page
                             replaces the existing page.
@@ -1101,7 +1101,7 @@
                     <tr>
                         <td rowspan="2"><code>admin/main-page</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://example.org/ops/admin/main-page</code></td>
+                        <td rowspan="2"><code>http://a.org/ops/admin/main-page</code></td>
                         <td>
                             The new page replaces the existing page.
                         </td>
@@ -1116,12 +1116,12 @@
                         <td rowspan="6">
                             <p>The following path is loaded in a portlet:</p>
                             <p>
-                                <code>/my-example/my-page</code>
+                                <code>/example/page</code>
                             </p>
                         </td>
-                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/software/</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://orbeon.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/software/</code></td>
                         <td>
                             This causes the application to load a page outside of the portlet,
                             replacing the entire portal.
@@ -1135,9 +1135,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td rowspan="2"><code>/new-page</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>/my-new-page</code></td>
+                        <td rowspan="2"><code>/new-page</code></td>
                         <td rowspan="2">
                             The resulting path is loaded within the portlet.
                         </td>
@@ -1148,7 +1148,7 @@
                     <tr>
                         <td rowspan="2"><code>admin/main-page</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>/my-example/admin/main-page</code></td>
+                        <td rowspan="2"><code>/example/admin/main-page</code></td>
                         <td rowspan="2">
                             The resulting path is loaded within the portlet.
                         </td>

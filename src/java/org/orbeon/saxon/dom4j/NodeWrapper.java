@@ -658,7 +658,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
      */
 
     public int getDocumentNumber() {
-        return parent.getDocumentNumber();
+        return getDocumentRoot().getDocumentNumber();
     }
 
     /**

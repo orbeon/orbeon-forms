@@ -101,6 +101,7 @@
                     <config>
                         <key>cart</key>
                         <scope>application|session|request</scope>
+                        <session-scope>application|portlet</session-scope>
                     </config>
                 </xml-source>
                 <table>
@@ -115,9 +116,10 @@
                     <tr>
                         <th>scope</th>
                         <td>
-                            The <code>&lt;scope></code> element specifies in what scope the document is
-                            to be retrieved from. The available scopes are:
-
+                            <p>
+                                The <code>&lt;scope></code> element specifies in what scope the
+                                document is to be retrieved from. The available scopes are:
+                            </p>
                             <ul>
                                 <li>
                                     <b>application</b> - The application scope starts when the Web
@@ -140,6 +142,32 @@
                                     a OPS application with legacy J2EE servlets.
                                 </li>
                             </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>session-scope</th>
+                        <td>
+                            <p>
+                                The <code>&lt;session-scope></code> element specifies in what
+                                session scope the document is to be retrieved from. This element is
+                                only allowed when the &lt;scope> element is set to
+                                <code>session</code>. The available session scopes are:
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>application</b> - access the entire application session. This
+                                    is always a valid value.
+                                </li>
+                                <li>
+                                    <b>portlet</b> - access the local portlet session. This is only
+                                    valid if the processor is run hithin a portlet.
+                                </li>
+                            </ul>
+                            <p>
+                                If the element is missing, a default value is used:
+                                <code>application</code> when the processor runs within a servlet,
+                                and <code>portlet</code> when the processor runs within a portlet.
+                            </p>
                         </td>
                     </tr>
                 </table>

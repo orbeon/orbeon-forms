@@ -83,9 +83,18 @@ public class XFormsSwitchHandler extends XFormsGroupHandler {
             handlerContext.getController().setOutput(currentSavedOutput);
             setContentHandler(currentSavedOutput);
 
-            // Output end delimiter
-            currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
+            if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
+                // Output end delimiter
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
                     currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            } else {
+                // Output start and end delimiter using xhtml:span
+                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
+                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
+            }
 
         } else {
             super.endElement(uri, localname, qName);

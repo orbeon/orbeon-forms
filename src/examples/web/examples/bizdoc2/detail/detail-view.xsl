@@ -27,12 +27,10 @@
         <xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
             <xforms:action ev:event="xforms-submit-done">
                 <xforms:setvalue ref="instance('main-instance')/message">Submission successful!</xforms:setvalue>
-                <xforms:toggle case="message"/>
                 <xforms:toggle case="ok-message"/>
             </xforms:action>
             <xforms:action ev:event="xforms-submit-error">
                 <xforms:setvalue ref="instance('main-instance')/message">Submission failed! Please correct errors first.</xforms:setvalue>
-                <xforms:toggle case="message"/>
                 <xforms:toggle case="error-message"/>
             </xforms:action>
             <xforms:action ev:event="xforms-insert">
@@ -111,32 +109,31 @@
                             <xforms:output ref="document-id"/>
                         </td>
                     </tr>
-                    <tr>
-                        <th align="right">Action</th>
-                        <td>
-                            <xforms:switch>
-                                <xforms:case id="no-message">
-                                    -
-                                </xforms:case>
-                                <xforms:case id="message">
-                                    <div>
-                                        <xforms:switch>
-                                            <xforms:case id="ok-message">
-                                                <span style="color: green">
-                                                    <xforms:output ref="message"/>
-                                                </span>
-                                            </xforms:case>
-                                            <xforms:case id="error-message">
-                                                <span style="color: red">
-                                                    <xforms:output ref="message"/>
-                                                </span>
-                                            </xforms:case>
-                                        </xforms:switch>
-                                    </div>
-                                </xforms:case>
-                            </xforms:switch>
-                        </td>
-                    </tr>
+                    <xforms:switch>
+                        <xforms:case id="no-message">
+                            <tr/>
+                        </xforms:case>
+                        <xforms:case id="ok-message">
+                            <tr>
+                                <th align="right">Message</th>
+                                <td>
+                                    <span style="color: green">
+                                        <xforms:output ref="message"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </xforms:case>
+                        <xforms:case id="error-message">
+                            <tr>
+                                <th align="right">Message</th>
+                                <td>
+                                    <span style="color: red">
+                                        <xforms:output ref="message"/>
+                                    </span>
+                                </td>
+                            </tr>
+                        </xforms:case>
+                    </xforms:switch>
                 </table>
 
                 <xforms:group ref="document">

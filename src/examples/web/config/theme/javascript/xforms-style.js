@@ -251,20 +251,16 @@ function xformsUpdateStyle(element) {
 
                 // Change alert status when necessary
                 if (xformsIsDefined(control.isValid)) {
-                    if (control.isValid) {
-                        xformsAddClass(element, "xforms-alert-inactive");
-                        xformsRemoveClass(element, "xforms-alert-active");
-                    } else {
-                        xformsAddClass(element, "xforms-alert-active");
-                        xformsRemoveClass(element, "xforms-alert-inactive");
-                    }
+                    xformsAddClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
+                    xformsRemoveClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
                 }
 
                 // Change message if necessary
-                if (control.alertMessage) {
-                    if (control.xformsMessageLabel)
-                        xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
-                }
+                if (control.alertMessage && control.xformsMessageLabel)
+                    xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
+
+                // Set title of label with content of label
+                element.title = xformsStringValue(element);
 
                 // Disable or enable help depending if control is relevant
                 xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);

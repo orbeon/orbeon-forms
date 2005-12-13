@@ -38,22 +38,25 @@ public class OutputInterceptor extends ForwardingContentHandler {
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        flushCharacters(false);
-
-        // The first element received determines the type of separator
-        checkDelimiters(uri, qName);
-
-        // Add or update classes on element if needed
-        super.startElement(uri, localname, qName, (level == 0) ? getAttributesWithClass(attributes) : attributes);
 
         level++;
+        final boolean topLevel = level == 1;
+
+        flushCharacters(false, topLevel);
+
+        // The first element received determines the type of separator
+        checkDelimiters(uri, qName, topLevel);
+
+        // Add or update classes on element if needed
+        super.startElement(uri, localname, qName, topLevel ? getAttributesWithClass(attributes) : attributes);
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
-        level--;
 
-        flushCharacters(false);
+        flushCharacters(false, false);
         super.endElement(uri, localname, qName);
+
+        level--;
     }
 
     public void characters(char[] chars, int start, int length) {
@@ -61,22 +64,23 @@ public class OutputInterceptor extends ForwardingContentHandler {
         isCharacters = true;
     }
 
-    public void flushCharacters(boolean finalFlush) throws SAXException {
+    public void flushCharacters(boolean finalFlush, boolean topLevel) throws SAXException {
 
         if (currentCharacters.length() > 0) {
 
             final String currentString = currentCharacters.toString();
             final char[] chars = currentString.toCharArray();
-            if (XMLUtils.isBlank(currentString) || level > 0) {
+            if (XMLUtils.isBlank(currentString) || !topLevel) {
                 // Just output whitespace as is
                 super.characters(chars, 0, chars.length);
             } else {
 
                 // The first element received determines the type of separator
-                checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName);
+                checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName, topLevel);
 
                 // Wrap any other text within an xhtml:span
-                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
+//                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
+                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, topLevel ? getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES) : XMLUtils.EMPTY_ATTRIBUTES);
                 super.characters(chars, 0, chars.length);
                 super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
@@ -86,12 +90,12 @@ public class OutputInterceptor extends ForwardingContentHandler {
         }
 
         if (finalFlush)
-            checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName);
+            checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName, topLevel);
     }
 
-    private void checkDelimiters(String uri, String qName) throws SAXException {
+    private void checkDelimiters(String uri, String qName, boolean topLevel) throws SAXException {
 
-        if (level == 0 && delimiterNamespaceURI == null) {
+        if (topLevel && delimiterNamespaceURI == null) {
             delimiterNamespaceURI = uri;
             delimiterPrefix = XMLUtils.prefixFromQName(qName);
             delimiterLocalName = XMLUtils.localNameFromQName(qName);

@@ -98,7 +98,7 @@ public class XFormsRepeatHandler extends HandlerBase {
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, false, isCurrentRepeatSelected);
                 handlerContext.getController().repeatBody();
-                outputInterceptor.flushCharacters(true);
+                outputInterceptor.flushCharacters(true, true);
                 handlerContext.popRepeatContext();
             }
         }
@@ -118,7 +118,7 @@ public class XFormsRepeatHandler extends HandlerBase {
             // Apply the content of the body for this iteration
             handlerContext.pushRepeatContext(true, 0, false, false);
             handlerContext.getController().repeatBody();
-            outputInterceptor.flushCharacters(true);
+            outputInterceptor.flushCharacters(true, true);
             handlerContext.popRepeatContext();
         }
 
@@ -129,7 +129,7 @@ public class XFormsRepeatHandler extends HandlerBase {
 
             handlerContext.pushRepeatContext(true, 0, false, false);
             handlerContext.getController().repeatBody();
-            outputInterceptor.flushCharacters(true);
+            outputInterceptor.flushCharacters(true, true);
             handlerContext.popRepeatContext();
         }
 

@@ -44,7 +44,14 @@
                             <xforms:case id="{$tab-id}-inactive">
                                 <xhtml:div class="widget-tab-inactive">
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
+                                        <xsl:choose>
+                                            <xsl:when test="widget:label/@ref">
+                                                <xforms:label ref="{widget:label/@ref}"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <xforms:label><xsl:value-of select="widget:label"/></xforms:label>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                         <xforms:action ev:event="DOMActivate">
                                             <xforms:toggle case="{$tab-id}"/>
                                             <xforms:toggle case="{$tab-id}-active"/>
@@ -61,7 +68,14 @@
                                     <xsl:attribute name="selected">true</xsl:attribute>
                                 </xsl:if>
                                 <xhtml:div class="widget-tab-active">
-                                    <xsl:value-of select="widget:label"/>
+                                    <xsl:choose>
+                                        <xsl:when test="widget:label/@ref">
+                                            <xforms:output ref="{widget:label/@ref}"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="widget:label"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xhtml:div>
                             </xforms:case>
                         </xforms:switch>

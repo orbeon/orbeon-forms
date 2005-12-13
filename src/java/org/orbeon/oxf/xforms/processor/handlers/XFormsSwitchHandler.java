@@ -79,6 +79,8 @@ public class XFormsSwitchHandler extends XFormsGroupHandler {
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("case")) {
             // xforms:case
 
+            currentOutputInterceptor.flushCharacters(true, true);
+
             // Restore output
             handlerContext.getController().setOutput(currentSavedOutput);
             setContentHandler(currentSavedOutput);

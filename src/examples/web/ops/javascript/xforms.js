@@ -1491,15 +1491,17 @@ function xformsHandleResponse() {
                                 // Unhighlight items at old indexes
                                 for (var repeatId in newRepeatIndexes) {
                                     var oldIndex = document.xformsRepeatIndexes[repeatId];
-                                    var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
-                                    if (oldItemDelimiter != null) {
-                                        cursor = oldItemDelimiter.nextSibling;
-                                        while (cursor.nodeType != ELEMENT_TYPE ||
-                                               (cursor.className != "xforms-repeat-delimiter"
-                                               && cursor.className != "xforms-repeat-begin-end")) {
-                                            if (cursor.nodeType == ELEMENT_TYPE)
-                                                xformsRemoveClass(cursor, xformsGetClassForReapeatId(repeatId));
-                                            cursor = cursor.nextSibling;
+                                    if (oldIndex != 0) {
+                                        var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
+                                        if (oldItemDelimiter != null) {
+                                            cursor = oldItemDelimiter.nextSibling;
+                                            while (cursor.nodeType != ELEMENT_TYPE ||
+                                                   (cursor.className != "xforms-repeat-delimiter"
+                                                   && cursor.className != "xforms-repeat-begin-end")) {
+                                                if (cursor.nodeType == ELEMENT_TYPE)
+                                                    xformsRemoveClass(cursor, xformsGetClassForReapeatId(repeatId));
+                                                cursor = cursor.nextSibling;
+                                            }
                                         }
                                     }
                                 }

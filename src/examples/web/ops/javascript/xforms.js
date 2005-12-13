@@ -1044,7 +1044,8 @@ function xformsHandleResponse() {
                                                 // Locate end of the repeat
                                                 var templateRepeatEnd = document.getElementById("repeat-end-" + repeatId);
                                                 var templateNode = templateRepeatEnd.previousSibling;
-                                                while (templateNode.className != "xforms-repeat-delimiter") {
+                                                while (!(templateNode.nodeType == ELEMENT_TYPE
+                                                         && xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-delimiter"))) {
                                                     var nodeCopy = templateNode.cloneNode(true);
                                                     if (templateNode.nodeType == ELEMENT_TYPE) {
                                                         // Save tag name to be used for delimiter
@@ -1078,7 +1079,7 @@ function xformsHandleResponse() {
                                                     // Top level repeat: contains a template
                                                     var repeatEnd = document.getElementById("repeat-end-" + repeatId);
                                                     var cursor = repeatEnd;
-                                                    while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter")
+                                                    while (cursor.nodeType != ELEMENT_TYPE || !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter"))
                                                         cursor = cursor.previousSibling;
                                                     afterInsertionPoint = cursor;
                                                 } else {
@@ -1115,7 +1116,7 @@ function xformsHandleResponse() {
                                                 if (parentIndexes == "") {
                                                     // Top-level repeat: need to go over template
                                                     while (lastElementToDelete.nodeType != ELEMENT_TYPE
-                                                            || lastElementToDelete.className != "xforms-repeat-delimiter")
+                                                            || !xformsArrayContains(lastElementToDelete.className.split(" "), "xforms-repeat-delimiter"))
                                                         lastElementToDelete = lastElementToDelete.previousSibling;
                                                     lastElementToDelete = lastElementToDelete.previousSibling;
                                                 }
@@ -1124,7 +1125,7 @@ function xformsHandleResponse() {
                                             for (var countIndex = 0; countIndex < count; countIndex++) {
                                                 while (true) {
                                                     var wasDelimiter = lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                        && lastElementToDelete.className == "xforms-repeat-delimiter";
+                                                        && xformsArrayContains(lastElementToDelete.className.split(" "), "xforms-repeat-delimiter");
                                                     var previous = lastElementToDelete.previousSibling;
                                                     lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                     lastElementToDelete = previous;
@@ -1426,8 +1427,9 @@ function xformsHandleResponse() {
                                             var relevant = repeatIterationElement.getAttribute("relevant") == "true";
                                             // Remove or add xforms-disabled on elements after this delimiter
                                             var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
-                                            while (cursor.className != "xforms-repeat-delimiter"
-                                                        && cursor.className != "xforms-repeat-begin-end") {
+                                            while (!(cursor.nodeType == ELEMENT_TYPE &&
+                                                     (xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
+                                                        || xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end")))) {
                                                 if (cursor.nodeType == ELEMENT_TYPE) {
                                                     if (relevant) xformsRemoveClass(cursor, "xforms-disabled");
                                                     else xformsAddClass(cursor, "xforms-disabled");
@@ -1496,8 +1498,8 @@ function xformsHandleResponse() {
                                         if (oldItemDelimiter != null) {
                                             cursor = oldItemDelimiter.nextSibling;
                                             while (cursor.nodeType != ELEMENT_TYPE ||
-                                                   (cursor.className != "xforms-repeat-delimiter"
-                                                   && cursor.className != "xforms-repeat-begin-end")) {
+                                                   (!xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
+                                                   && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end"))) {
                                                 if (cursor.nodeType == ELEMENT_TYPE)
                                                     xformsRemoveClass(cursor, xformsGetClassForReapeatId(repeatId));
                                                 cursor = cursor.nextSibling;
@@ -1517,8 +1519,8 @@ function xformsHandleResponse() {
                                         var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                         cursor = newItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
-                                               (cursor.className != "xforms-repeat-delimiter"
-                                               && cursor.className != "xforms-repeat-begin-end")) {
+                                               (!xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
+                                               && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end"))) {
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 var classNameArray = cursor.className.split(" ");
                                                 classNameArray.push(xformsGetClassForReapeatId(repeatId));

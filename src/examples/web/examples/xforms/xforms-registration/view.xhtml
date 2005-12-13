@@ -16,34 +16,105 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:ui="http:/www.orbeon.com/example/ui">
+    xmlns:ui="http:/www.example.org/ui">
 
     <xhtml:head>
-        <xhtml:title>Internationalization Registration</xhtml:title>
+        <xhtml:title>Registration</xhtml:title>
         <xforms:model>
             <xforms:instance>
-                <registration ui:valid="">
-                    <firstname ui:started-typing="false" ui:valid=""/>
-                    <lastname ui:started-typing="false" ui:valid=""/>
-                    <username ui:started-typing="false" ui:valid=""/>
-                    <password ui:started-typing="false" ui:valid=""/>
-                    <confirm ui:started-typing="false" ui:valid=""/>
-                    <email ui:started-typing="false" ui:valid=""/>
+                <registration ui:signup-trigger="">
+                    <firstname ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="true" ui:is-password="false" ui:label="First Name" ui:error="First name is required"/>
+                    <lastname ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="true" ui:is-password="false" ui:label="Last Name" ui:error="Last name is required"/>
+                    <username ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="true" ui:is-password="false" ui:label="Username" ui:error="Minimum is 2 characters"/>
+                    <password ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="false" ui:is-password="true" ui:label="Password" ui:error="Minimum is 5 characters"/>
+                    <confirm ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="false" ui:is-password="true" ui:label="Confirm Passoword" ui:error="Passwords do not match"/>
+                    <email ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="true" ui:is-password="false" ui:label="Email Address" ui:error="Invalid email address"/>
                 </registration>
             </xforms:instance>
-            <xforms:instance id="i18n"><dummy/></xforms:instance>
-            <xforms:submission ref="instance('request-instance')" id="default-submission"
-                method="post" action="/direct/xforms-translate/post" replace="instance" instance="response-instance"/>
+            <xforms:bind nodeset="/registration">
+                <!-- Define when values are valid -->
+                <xforms:bind nodeset="firstname/@ui:valid | lastname/@ui:valid" calculate=".. != ''"/>
+                <xforms:bind nodeset="username/@ui:valid" calculate="string-length(..) > 2"/>
+                <xforms:bind nodeset="password/@ui:valid" calculate="string-length(..) > 5"/>
+                <xforms:bind nodeset="confirm/@ui:valid" calculate=".. = ../../password"/>
+                <xforms:bind nodeset="email/@ui:valid" calculate="matches(.., '^.+@.+\..+$')"/>
+                <xforms:bind nodeset="*">
+                    <!-- Define when to hide the valid and invalid icons for all fields -->
+                    <xforms:bind nodeset="@ui:show-valid" relevant="../@ui:started-typing = 'true' and ../@ui:valid = 'true'"/>
+                    <xforms:bind nodeset="@ui:show-invalid" relevant="../@ui:started-typing = 'true' and ../@ui:valid = 'false'"/>
+                    <!-- Define which control (text or password) to display -->
+                    <xforms:bind nodeset="@ui:is-text | @ui:is-password" relevant=". = 'true'"/>
+                </xforms:bind>
+                <!-- The trigger is active if everything is valid -->
+                <xforms:bind nodeset="@ui:signup-trigger" readonly="count(../*[@ui:valid = 'false']) > 0"/>
+            </xforms:bind>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .table {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+            .line {
+                padding-top: .2em;
+                padding-bottom: .2em;
+            }
+            .label {
+                text-align: right;
+                font-weight: bold;
+                color: #222;
+                padding-right: 1em;
+            }
+            .input-text input { width: 15em; }
+            .input-password { width: 15em; }
+            .valid {
+                background:url("../images/round-valid.gif") no-repeat 0px 0px;
+                padding-left: 18px;
+            }
+            .invalid {
+                background:url("../images/round-invalid.gif") no-repeat 0px 0px;
+                padding-left: 18px;
+                font-weight: bold;
+                color: #EA5200;
+            }
+            .signup {
+                padding-top: .5em;
+            }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:table>
+        <xhtml:table class="table">
+            <xforms:repeat nodeset="*">
+                <xhtml:tr class="line">
+                    <xhtml:td align="left" class="label line">
+                        <xforms:output ref="@ui:label"/>
+                    </xhtml:td>
+                    <xhtml:td class="line">
+                        <xforms:group>
+                            <xforms:setvalue ref="@ui:started-typing" ev:event="xforms-value-changed">true</xforms:setvalue>
+                            <xforms:group ref="@ui:is-text">
+                                <xforms:input ref=".." incremental="true" class="input-text"/>
+                            </xforms:group>
+                            <xforms:group ref="@ui:is-password">
+                                <xforms:secret ref=".." incremental="true" class="input-password"/>
+                            </xforms:group>
+                        </xforms:group>
+                    </xhtml:td>
+                    <xhtml:td class="line">
+                        <xforms:group ref="@ui:show-valid" class="valid"/>
+                        <xforms:group ref="@ui:show-invalid" class="invalid">
+                            <xforms:output ref="../@ui:error"/>
+                        </xforms:group>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
             <xhtml:tr>
-                <xhtml:td align="left">First Name</xhtml:td>
-                <xhtml:td>
-                    <xforms:input ref="firstname">
-
-                    </xforms:input>
+                <xhtml:td/>
+                <xhtml:td class="signup">
+                    <xforms:output ref="@ui:signup-trigger"/>
+                    <xforms:trigger ref="@ui:signup-trigger">
+                        <xforms:label>Signup</xforms:label>
+                        <xforms:message ev:event="DOMActivate" level="modal">Thank you for signing up.</xforms:message>
+                    </xforms:trigger>
                 </xhtml:td>
             </xhtml:tr>
         </xhtml:table>

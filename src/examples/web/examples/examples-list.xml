@@ -60,6 +60,7 @@
         <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>
         <example id="xforms-wizard-pfc" path="xforms/xforms-wizard-pfc" label="Wizard with PFC" xforms-ng="true"/>
         <example id="xforms-i18n" path="xforms/xforms-i18n" label="Internationalization" xforms-ng="true"/>
+        <example id="xforms-registration" path="xforms/xforms-registration" label="Registration" xforms-ng="true"/>
         <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
         <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>

@@ -26,29 +26,36 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:p>
-            Step 3 of 3
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="user/age">
-                <xforms:label class="fixed-width">Age:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>&lt; Previous</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="action">previous</xforms:setvalue>
-                    <xforms:send submission="main"/>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Finish ></xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="action">finish</xforms:setvalue>
-                    <xforms:send submission="main"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
+        <xhtml:table cellpadding="3">
+            <xhtml:tr>
+                <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">3</font></xhtml:td>
+                <xhtml:td colspan="1"><b>Step 3 of 4</b></xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:input ref="user/age">
+                        <xforms:label class="fixed-width">Age:</xforms:label>
+                    </xforms:input>
+                </xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:trigger>
+                        <xforms:label>&lt; Previous</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="action">previous</xforms:setvalue>
+                            <xforms:send submission="main"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label>Finish ></xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="action">finish</xforms:setvalue>
+                            <xforms:send submission="main"/>
+                        </xforms:action>
+                    </xforms:trigger>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
     </xhtml:body>
 </xhtml:html>

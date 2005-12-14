@@ -51,7 +51,7 @@
                     <remove-child/>
                 </triggers>
             </xforms:instance>
-            <xforms:bind nodeset="/form/document/claim:claim">
+            <xforms:bind nodeset="document/claim:claim">
                 
                 <!-- Add some required elements -->
                 <xforms:bind nodeset="claim:insured-info">

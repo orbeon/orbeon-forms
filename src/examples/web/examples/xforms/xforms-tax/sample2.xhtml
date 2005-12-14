@@ -99,22 +99,22 @@
             </xforms:instance>
 
             <!-- Section 2 -->
-            <xforms:bind nodeset="/f1040ez/section02/line01" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line02" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line03" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line04" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line05" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line06" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section02/line04"
+            <xforms:bind nodeset="section02/line01" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line02" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line03" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line04" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line05" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line06" type="xsd:decimal"/>
+            <xforms:bind nodeset="section02/line04"
                 calculate="/f1040ez/section02/line01 + /f1040ez/section02/line02 + /f1040ez/section02/line03"/>
-            <xforms:bind nodeset="/f1040ez/section02/line06"
+            <xforms:bind nodeset="section02/line06"
                 calculate="if(number(/f1040ez/section02/line05) &gt; number(/f1040ez/section02/line04)) then 0 else /f1040ez/section02/line04 - /f1040ez/section02/line05"/>
 
             <!-- Section 3 -->
-            <xforms:bind nodeset="/f1040ez/section03/line07" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section03/line08a" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section03/line08b" type="xsd:decimal"/>
-            <xforms:bind nodeset="/f1040ez/section03/line09"
+            <xforms:bind nodeset="section03/line07" type="xsd:decimal"/>
+            <xforms:bind nodeset="section03/line08a" type="xsd:decimal"/>
+            <xforms:bind nodeset="section03/line08b" type="xsd:decimal"/>
+            <xforms:bind nodeset="section03/line09"
                 calculate="/f1040ez/section03/line07 + /f1040ez/section03/line08a"/>
         </xforms:model>
 

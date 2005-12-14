@@ -516,7 +516,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void handleChildrenBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
         // Handle children binds
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                modelBind.getCurrentNode() == null ? documentWrapper : documentWrapper.wrap(modelBind.getCurrentNode()),
+                documentWrapper.wrap(modelBind.getCurrentNode() == null
+                        ? ((Document) documentWrapper.getUnderlyingNode()).getRootElement()
+                        : modelBind.getCurrentNode()),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
                 null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
@@ -541,7 +543,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void iterateNodeSet(PipelineContext pipelineContext, DocumentWrapper documentWrapper,
                                 ModelBind modelBind, NodeHandler nodeHandler) {
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                modelBind.getCurrentNode() == null ? documentWrapper : documentWrapper.wrap(modelBind.getCurrentNode()),
+                documentWrapper.wrap(modelBind.getCurrentNode() == null
+                        ? ((Document) documentWrapper.getUnderlyingNode()).getRootElement()
+                        : modelBind.getCurrentNode()),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
                 null, xformsFunctionLibrary);

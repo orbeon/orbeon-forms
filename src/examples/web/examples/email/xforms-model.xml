@@ -76,14 +76,14 @@
         </form>
     </xforms:instance>
     <!-- Constraints -->
-    <xforms:bind nodeset="/form/message/smtp-host" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/form/message/from/email" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/form/message/to/email" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/form/message/subject" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/form/message/body/part[2]/part/html/body/p[2]" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="message/smtp-host" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="message/from/email" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="message/to/email" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="message/subject" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="message/body/part[2]/part/html/body/p[2]" constraint="normalize-space(.) != ''"/>
     <!-- Calculation to create the plain text version and HTML title -->
-    <xforms:bind nodeset="/form/message/body/part[1]" calculate="string(/form/message/body/part[2]/part/html/body/p[1])"/>
-    <xforms:bind nodeset="/form/message/body/part[2]/part/html/head/title" calculate="string(/form/message/subject)"/>
+    <xforms:bind nodeset="message/body/part[1]" calculate="string(/form/message/body/part[2]/part/html/body/p[1])"/>
+    <xforms:bind nodeset="message/body/part[2]/part/html/head/title" calculate="string(/form/message/subject)"/>
     <!-- Mark irrelevant nodes (to support optional fields) -->
-    <xforms:bind nodeset="/form/message/cc" relevant="normalize-space(/form/message/cc/email) != ''"/>
+    <xforms:bind nodeset="message/cc" relevant="normalize-space(/form/message/cc/email) != ''"/>
 </xforms:model>

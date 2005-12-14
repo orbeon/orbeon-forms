@@ -31,11 +31,11 @@
                     <email ui:started-typing="false" ui:valid="" ui:show-valid="" ui:show-invalid="" ui:is-text="true" ui:is-password="false" ui:label="Email Address" ui:error="Invalid email address"/>
                 </registration>
             </xforms:instance>
-            <xforms:bind nodeset="/registration">
+            <xforms:bind nodeset=".">
                 <!-- Define when values are valid -->
                 <xforms:bind nodeset="firstname/@ui:valid | lastname/@ui:valid" calculate=".. != ''"/>
-                <xforms:bind nodeset="username/@ui:valid" calculate="string-length(..) > 2"/>
-                <xforms:bind nodeset="password/@ui:valid" calculate="string-length(..) > 5"/>
+                <xforms:bind nodeset="username/@ui:valid" calculate="string-length(..) >= 2"/>
+                <xforms:bind nodeset="password/@ui:valid" calculate="string-length(..) >= 5"/>
                 <xforms:bind nodeset="confirm/@ui:valid" calculate=".. = ../../password"/>
                 <xforms:bind nodeset="email/@ui:valid" calculate="matches(.., '^.+@.+\..+$')"/>
                 <xforms:bind nodeset="*">

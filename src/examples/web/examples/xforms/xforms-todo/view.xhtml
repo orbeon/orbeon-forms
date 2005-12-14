@@ -63,7 +63,7 @@
                     method="post" action="/direct/xforms-todo/format-instance"
                     replace="instance" instance="formatted-instance"/>
             <!-- Rules that apply to the data entered by the user -->
-            <xforms:bind nodeset="/lists/list" relevant="count(following-sibling::list) > 0">
+            <xforms:bind nodeset="list" relevant="count(following-sibling::list) > 0">
                 <xforms:bind nodeset="@description" readonly="count(../todo) > 1 and count(../todo[@done = '']) = 1"/>
                 <xforms:bind nodeset="todo" relevant="count(following-sibling::todo) > 0">
                     <xforms:bind nodeset="@description" readonly="../@done = 'true'"/>

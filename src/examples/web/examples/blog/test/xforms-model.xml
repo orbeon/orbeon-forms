@@ -22,9 +22,9 @@
             <value3/>
         </form>
     </xforms:instance>
-    <xforms:bind nodeset="/form/check/value1" calculate="if (. castable as xs:integer) then . else 17"/>
-    <xforms:bind nodeset="/form/check/value2" calculate="if (. castable as xs:integer) then . else 99"/>
+    <xforms:bind nodeset="value1" calculate="if (. castable as xs:integer) then . else 17"/>
+    <xforms:bind nodeset="value2" calculate="if (. castable as xs:integer) then . else 99"/>
 
-    <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and . = ../value1 + ../value2"/>
+    <xforms:bind nodeset="value3" constraint=". castable as xs:positiveInteger and . = ../value1 + ../value2"/>
     <xforms:submission method="post"/>
 </xforms:model>

@@ -62,7 +62,7 @@
                                     <xsl:value-of select="$message"/>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <i>[No error meessage provided.]</i>
+                                    <i>[No error message provided.]</i>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </p>

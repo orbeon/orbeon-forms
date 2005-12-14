@@ -251,15 +251,19 @@
                 </widget:tab>
                 <widget:tab id="chart-input">
                     <widget:label>XML Configuration</widget:label>
-                    <f:xml-source>
-                         <xsl:copy-of select="doc('input:instance')/form/chart"/>
-                     </f:xml-source>
+                    <xhtml:div>
+                         <f:xml-source>
+                             <xsl:copy-of select="doc('input:instance')/form/chart"/>
+                         </f:xml-source>
+                    </xhtml:div>
                 </widget:tab>
                 <widget:tab id="data-input">
                     <widget:label>XML Data</widget:label>
-                    <f:xml-source>
-                         <xsl:copy-of select="doc('input:instance')/form/data"/>
-                     </f:xml-source>
+                    <xhtml:div>
+                        <f:xml-source>
+                             <xsl:copy-of select="doc('input:instance')/form/data"/>
+                        </f:xml-source>
+                    </xhtml:div>
                 </widget:tab>
             </widget:tabs>
          </xforms:group>

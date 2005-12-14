@@ -295,8 +295,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         final XFormsEventTarget eventTarget;
         {
             final Object eventTargetObject = getObjectById(pipelineContext, controlId);
-            if (!(eventTargetObject instanceof XFormsEventTarget))
-                throw new OXFException("Event target id '" + controlId + "' is not an XFormsEventTarget.");
+            if (!(eventTargetObject instanceof XFormsEventTarget)) {
+                if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
+                    throw new OXFException("Event target id '" + controlId + "' is not an XFormsEventTarget.");
+                } else {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring client event with invalid control id: " + controlId);
+                    }
+                    return;
+                }
+            }
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
@@ -304,13 +312,20 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         final XFormsEventTarget otherEventTarget;
         {
             final Object otherEventTargetObject = (otherControlId == null) ? null : getObjectById(pipelineContext, otherControlId);
-            if (otherEventTargetObject == null)
+            if (otherEventTargetObject == null) {
                 otherEventTarget = null;
-            else if (!(otherEventTargetObject instanceof XFormsEventTarget))
-                throw new OXFException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.");
-            else
+            } else if (!(otherEventTargetObject instanceof XFormsEventTarget)) {
+                if (XFormsUtils.isExceptionOnInvalidClientControlId()) {
+                    throw new OXFException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.");
+                } else {
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - ignoring client event with invalid second control id: " + otherControlId);
+                    }
+                    return;
+                }
+            } else {
                 otherEventTarget = (XFormsEventTarget) otherEventTargetObject;
-
+            }
         }
 
         // Create event

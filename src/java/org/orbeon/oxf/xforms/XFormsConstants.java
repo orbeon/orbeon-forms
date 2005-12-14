@@ -108,6 +108,7 @@ public class XFormsConstants {
     public static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "oxf.xforms.optimize-local-instance-loads";
     public static final String XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY = "oxf.xforms.ajax.show-loading-icon";
     public static final String XFORMS_AJAX_SHOW_ERRORS_PROPERTY = "oxf.xforms.ajax.show-errors";
+    public static final String XFORMS_EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY = "oxf.xforms.exception-invalid-client-control";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";

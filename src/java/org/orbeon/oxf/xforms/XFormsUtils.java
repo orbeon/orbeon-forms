@@ -491,6 +491,11 @@ public class XFormsUtils {
         return propertyValue.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
+    public static boolean isExceptionOnInvalidClientControlId() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY, false).booleanValue();
+    }
+
     public static boolean isAjaxShowLoadingIcon() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY, false).booleanValue();

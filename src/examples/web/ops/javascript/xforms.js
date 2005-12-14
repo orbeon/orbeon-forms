@@ -1452,7 +1452,10 @@ function xformsHandleResponse() {
                                         var controlId = divElement.getAttribute("id");
                                         var visibile = divElement.getAttribute("visibility") == "visible";
 
-                                        var cursor = document.getElementById("xforms-case-begin-" + controlId);
+                                        var caseBeginId = "xforms-case-begin-" + controlId;
+                                        var cursor = document.getElementById(caseBeginId);
+                                        if (cursor == null)
+                                            throw "Can not find element with id '" + caseBeginId + "'";
                                         while (true) {
                                             cursor = cursor.nextSibling;
                                             if (cursor.nodeType == ELEMENT_TYPE) {

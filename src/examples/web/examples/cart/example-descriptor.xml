@@ -17,67 +17,60 @@
     <description >
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This example illustrates the use of the Scope generator and Scope serializer. The
-                <a href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
+                This example illustrates the use of the Scope generator and Scope serializer. The <a
+                href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
                 generator</a> retrieves an XML Document from a Request, Session or Application
-                context and sends it to a pipeline. The <a
-                href="/doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
-                serializer</a> stores an XML document to a Request, Session or Application context.
+                contex. The <a href="/doc/processors-serializers#ContextSerializer"
+                f:url-type="resource">Scope serializer</a> stores an XML document to a Request,
+                Session or Application context. This example uses these processors to implement a
+                simple shopping cart that allows you to add text lines to the session and clear
+                them. Here is an illustration of XML document stored in the session:
+                <f:xml-source>
+                    <cart>
+                        <item>First</item>
+                        <item>Second</item>
+                        <item>Third</item>
+                    </cart>
+                </f:xml-source>
             </p>
             <p>
-                This example implements a simple shopping cart. You can add a string to the session and
-                clear it. The application shows the objects currently in the session. It involves the
-                following files:
+                The following files are involved:
             </p>
             <ul>
                 <p>
                     <li>
-                        <a href="/goto-source/cart/form.xml" f:url-type="resource">form.xml</a>.
-                        This XForms model describes two fields: <code>text</code> which contains the
-                        string entered by the user, and <code>action</code> indicates which button
-                        has been activated.
-                    </li>
-                </p>
-
-                <p>
-                    <li>
-                        <a href="/goto-source/cart/model.xpl" f:url-type="resource">model.xpl</a>.
-                        A Scope generator gets the XML document stored under the <code>cart</code>
-                        key. Here is an example of a cart document stored in the session:
-                        <f:xml-source>
-                            <cart>
-                                <item>First</item>
-                                <item>Second</item>
-                                <item>Third</item>
-                            </cart>
-                        </f:xml-source>
+                        <a href="/goto-source/cart/get.xpl" f:url-type="resource">get.xpl</a>. This
+                        XPL pipeline is executed upon accessing the <code>/direct/cart/get</code>
+                        path. A Scope generator retrieves the XML document stored under the
+                        <code>cart</code> key.
                     </li>
                 </p>
 
                 <p>
                     <li>
                         <a href="/goto-source/cart/add.xpl" f:url-type="resource">add.xpl</a>. This
-                        pipeline is called if the <code>action</code> field in the XForms instance
-                        is set to the value <code>add</code>. The document currently stored in the
-                        session is copied, and the new value is added to the document. Finally, the
-                        Scope serializer stores the resulting document in the session.
+                        XPL pipeline is executed upon accessing the <code>/direct/cart/add</code>
+                        path. The document currently stored in the session is copied, and the new
+                        value is added to the document. Finally, the Scope serializer stores the
+                        resulting document in the session.
                     </li>
                 </p>
 
                 <p>
                     <li>
                         <a href="/goto-source/cart/clear.xpl" f:url-type="resource">clear.xpl</a>.
-                        This pipeline is called if the <code>action</code> field in the XForms
-                        instance is set to the value <code>clear</code>. The document currently
-                        stored in the session is emptied, leaving only a root element.
+                        This XPL pipeline is executed upon accessing the
+                        <code>/direct/cart/clear</code> path. The document currently stored in the
+                        session is emptied, leaving only a root element.
                     </li>
                 </p>
 
                 <p>
                     <li>
                         <a href="/goto-source/cart/view.xhtml" f:url-type="resource">view.xhtml</a>.
-                        Finally, the view converts the cart document into HTML. XForms controls are
-                        used to display the buttons and the text fields.
+                        The page view is implemented with XForms and is in charge of performing
+                        various XForms submissions to the paths above. It uses
+                        <code>xforms:repeat</code> to iterate through cart entries and display them.
                     </li>
                 </p>
             </ul>

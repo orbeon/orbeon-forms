@@ -933,18 +933,45 @@
                 <p>Check the following:</p>
                 <ol>
                     <li>
-                        Make you don't have any "Address already in use" error in the Console view
-                        when you start the application server. If you do, it means that you already
-                        have another application (other program, or other OPS
-                        application maybe deployed in the same application server) using the same
-                        port. On Windows, you can use <a
-                        href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
-                        to determine what application is using the port you mention in the
-                        <code>log4j.xml</code>.
+                        <p>
+                            Make you don't have any "Address already in use" error in the Console
+                            view when you start the application server. If you do, it means that you
+                            already have another application (other program, or other OPS
+                            application maybe deployed in the same application server) using the
+                            same port. On Windows, you can use <a
+                            href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
+                            to determine what application is using the port you mention in the
+                            <code>log4j.xml</code>.
+                        </p>
                     </li>
                     <li>
-                        Make sure you don't have any filter setup in Logging Events view by
-                        right-clicking on the "down arrow" icon and selecting "Filters".
+                        <p>
+                            Make sure you don't have any filter setup in Logging Events view by
+                            right-clicking on the "down arrow" icon and selecting "Filters".
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            To populate the Logging Events view, Studio connects to log4j, and
+                            log4j listens on the port specified in the log4j.xml file.
+                        </p>
+                        <p>
+                            There is nothing the Studio preferences to tell Studio to port it should
+                            connect. Instead, Studio finds the port by looking at all the log4j.xml
+                            files you have in all the open projects. It will then try to connect to
+                            all the ports specified those files.
+                        </p>
+                        <p>
+                            If log4j was able to listen on the port specified in your log4j.xml (see
+                            point 1 above) and still no messages appear in the Logging Events view,
+                            that might be because Studio cannot find your log4j.xml. So make sure
+                            that this file is in an open project defined in the Studio. Also note
+                            that if you modify this file outside of Eclipse with an external
+                            program, Studio won't pick up that modification. In that case, in the
+                            Navigator view, right click on the project that contains your log4j.xml
+                            and choose Refresh. Right after this, events should start to appear in
+                            the Logging Event view as you load pages in the browser.
+                        </p>
                     </li>
                 </ol>
             </section>

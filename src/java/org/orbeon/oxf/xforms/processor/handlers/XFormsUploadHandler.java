@@ -64,7 +64,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
             newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
             newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                    handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
+                    handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue() != null ? controlInfo.getValue() : "");
 
             handleReadOnlyAttribute(newAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);

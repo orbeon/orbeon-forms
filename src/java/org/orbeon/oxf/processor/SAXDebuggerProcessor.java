@@ -105,7 +105,7 @@ public class SAXDebuggerProcessor extends ProcessorImpl {
             StringBuffer message = new StringBuffer("startElement('" + uri + "', '" + localname + "', '" + qName + "'");
             for (int i = 0; i < attributes.getLength(); i++)
                 message.append(", ('" + attributes.getURI(i) + "', '" + attributes.getLocalName(i)
-                        + "', '" + attributes.getQName(i) + "')");
+                        + "', '" + attributes.getQName(i) + "', '" + attributes.getValue(i) + "')");
             message.append(")");
             logger.info(message.toString());
             super.startElement(uri, localname, qName, attributes);

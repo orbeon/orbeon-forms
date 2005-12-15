@@ -15,7 +15,7 @@
     <title>Email</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <div xmlns="http://www.w3.org/1999/xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://orbeon.org/oxf/xml/formatting">
             <p>
                 This example illustrates the use of the <a href="/doc/processors-messaging-email"
                 f:url-type="resource">Email processor</a>.

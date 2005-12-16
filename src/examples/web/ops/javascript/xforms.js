@@ -1038,20 +1038,29 @@ function xformsHandleResponse() {
                                             var parentIndexes = copyRepeatTemplateElement.getAttribute("parent-indexes");
                                             var idSuffix = copyRepeatTemplateElement.getAttribute("id-suffix");
                                             // Put nodes of the template in an array
-                                            var delimiterTagName = null;
                                             var templateNodes = new Array();
                                             {
                                                 // Locate end of the repeat
+                                                var delimiterTagName = null;
                                                 var templateRepeatEnd = document.getElementById("repeat-end-" + repeatId);
                                                 var templateNode = templateRepeatEnd.previousSibling;
-                                                while (!(templateNode.nodeType == ELEMENT_TYPE
+                                                var nestedRepeatLevel = 0;
+                                                while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
                                                          && xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-delimiter"))) {
                                                     var nodeCopy = templateNode.cloneNode(true);
                                                     if (templateNode.nodeType == ELEMENT_TYPE) {
                                                         // Save tag name to be used for delimiter
                                                         delimiterTagName = templateNode.tagName;
+                                                        // Decrement nestedRepeatLevel when we we exit a nested repeat
+                                                        if (xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-begin-end") &&
+                                                                templateNode.id.indexOf("repeat-begin-") == 0)
+                                                            nestedRepeatLevel--;
                                                         // Add suffix to all the ids
-                                                        xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, 0);
+                                                        xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
+                                                        // Increment nestedRepeatLevel when we enter a nested repeat
+                                                        if (xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-begin-end") &&
+                                                                templateNode.id.indexOf("repeat-end-") == 0)
+                                                            nestedRepeatLevel++;
                                                         // Remove "xforms-repeat-template" from classes on copy of element
                                                         var nodeCopyClasses = nodeCopy.className.split(" ");
                                                         var nodeCopyNewClasses = new Array();
@@ -1078,9 +1087,12 @@ function xformsHandleResponse() {
                                                 if (parentIndexes == "") {
                                                     // Top level repeat: contains a template
                                                     var repeatEnd = document.getElementById("repeat-end-" + repeatId);
-                                                    var cursor = repeatEnd;
-                                                    while (cursor.nodeType != ELEMENT_TYPE || !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter"))
+                                                    var cursor = repeatEnd.previousSibling;
+                                                    while (!(cursor.nodeType == ELEMENT_TYPE
+                                                            && xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
+                                                            && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-template"))) {
                                                         cursor = cursor.previousSibling;
+                                                    }
                                                     afterInsertionPoint = cursor;
                                                 } else {
                                                     // Nested repeat: does not contain a template
@@ -1092,10 +1104,14 @@ function xformsHandleResponse() {
                                             for (var templateNodeIndex in templateNodes) {
                                                 templateNode = templateNodes[templateNodeIndex];
                                                 afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
-                                                if (templateNode.nodeType == ELEMENT_TYPE) {
-                                                    xformsInitializeControlsUnder(templateNode);
-                                                }
                                             }
+                                            // Initialize style on copied node
+                                            for (var templateNodeIndex in templateNodes) {
+                                                templateNode = templateNodes[templateNodeIndex];
+                                                if (templateNode.nodeType == ELEMENT_TYPE)
+                                                    xformsInitializeControlsUnder(templateNode);
+                                            }
+
                                             break;
                                         }
 
@@ -1261,6 +1277,8 @@ function xformsHandleResponse() {
                                             var displayValue = controlElement.getAttribute("display-value");
                                             var type = controlElement.getAttribute("type");
                                             var documentElement = document.getElementById(controlId);
+                                            if (documentElement == null)
+                                                xformsLog(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control was modified and we haven't even received the key event yet

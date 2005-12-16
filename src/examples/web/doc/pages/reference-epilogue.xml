@@ -469,6 +469,21 @@
                     </li>
                     <li>
                         <p>
+                            <b>Binary and text documents:</b> if the document root is
+                            <code>document</code> and has an <code>xsi:type</code> attribute:
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The encapsulated binary or text document is sent as per the
+                                    semantic described in <a href="reference-formats">Non-XML
+                                    Documents</a>.
+                                </p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
                             <b>Plain XML:</b> in all other cases:
                         </p>
                         <ol>

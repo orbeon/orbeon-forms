@@ -37,10 +37,10 @@
                 <title>How does Orbeon PresentationServer compare with Apache Cocoon?</title>
 
                     <p>
-                        OPS is similar to Cocoon in many respects but also presents many
+                        OPS is similar to Cocoon in some respects but also presents many
                         differences. For more information, see our <a
-                        href="http://www.orbeon.com/community/cocoon">OPS and
-                        Cocoon</a> comparison matrix.
+                        href="http://www.orbeon.com/community/cocoon">OPS and Cocoon</a> comparison
+                        matrix.
                     </p>
 
             </section>
@@ -956,10 +956,10 @@
                             log4j listens on the port specified in the log4j.xml file.
                         </p>
                         <p>
-                            There is nothing the Studio preferences to tell Studio to port it should
-                            connect. Instead, Studio finds the port by looking at all the log4j.xml
-                            files you have in all the open projects. It will then try to connect to
-                            all the ports specified those files.
+                            There is nothing in the Studio preferences to tell Studio to which port
+                            it should connect. Instead, Studio finds the port by looking at all the
+                            log4j.xml files you have in all the open projects. It will then try to
+                            connect to all the ports specified those files.
                         </p>
                         <p>
                             If log4j was able to listen on the port specified in your log4j.xml (see

@@ -448,7 +448,7 @@
     </processor>
 
     <processor name="oxf:old-xforms-server">
-        <class name="org.orbeon.oxf.xforms.XFormsServer"/>
+        <class name="org.orbeon.oxf.xforms.OldXFormsServer"/>
     </processor>
 
     <processor name="oxf:xforms-to-xhtml">

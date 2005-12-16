@@ -22,15 +22,15 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
-import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -307,18 +307,20 @@ public class XFormsServer extends ProcessorImpl {
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
 
                 // Output new controls values and associated information
+                final Map itemsetsFull1 = new HashMap();
+                final Map itemsetsFull2 = new HashMap();
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
                     if (!allEvents) {
                         // Common case
-                        diffControlsState(ch, xFormsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren());
+                        diffControlsState(ch, xFormsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2);
                     } else {
                         // Reload / back case
                         final XFormsContainingDocument initialContainingDocument
                                     = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null, null);
 
-                        diffControlsState(ch, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren());
+                        diffControlsState(ch, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2);
                     }
 
                     ch.endElement();
@@ -364,7 +366,11 @@ public class XFormsServer extends ProcessorImpl {
                 // Output itemset information
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-                    outputItemsets(ch, xFormsControls.getItemsetUpdate());
+
+                    // Diff itemset information
+                    final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
+
+                    outputItemsets(ch, itemsetUpdate);
                     ch.endElement();
                 }
 
@@ -407,6 +413,33 @@ public class XFormsServer extends ProcessorImpl {
         } catch (SAXException e) {
             throw new OXFException(e);
         }
+    }
+
+    public static Map diffItemsets(Map itemsetsFull1, Map itemsetsFull2) {
+        Map itemsetUpdate;
+        if (itemsetsFull2 == null) {
+            // There is no update in the first place
+            itemsetUpdate = null;
+        } else if (itemsetsFull1 == null) {
+            // There was nothing before, return update
+            itemsetUpdate = itemsetsFull2;
+        } else {
+            // Merge differences
+            itemsetUpdate = new HashMap();
+
+            for (Iterator i = itemsetsFull2.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String itemsetId = (String) currentEntry.getKey();
+                final List newItems = (List) currentEntry.getValue();
+
+                final List existingItems = (List) itemsetsFull1.get(itemsetId);
+                if (existingItems == null || !existingItems.equals(newItems)) {
+                    // No existing items or new items are different from existing items
+                    itemsetUpdate.put(itemsetId, newItems);
+                }
+            }
+        }
+        return itemsetUpdate;
     }
 
     public static Document createDynamicStateDocument(XFormsContainingDocument containingDocument, boolean[] requireClientSubmission) {
@@ -493,7 +526,7 @@ public class XFormsServer extends ProcessorImpl {
         return dynamicStateDocument;
     }
 
-    public static void diffControlsState(ContentHandlerHelper ch, List state1, List state2) {
+    public static void diffControlsState(ContentHandlerHelper ch, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -640,6 +673,24 @@ public class XFormsServer extends ProcessorImpl {
                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
                     }
                 }
+
+                // Handle itemsets
+                if (controlInfo2 instanceof XFormsControls.Select1ControlInfo || controlInfo2 instanceof XFormsControls.SelectControlInfo) {
+                    final XFormsControls.Select1ControlInfo selectControlInfo1 = (XFormsControls.Select1ControlInfo) controlInfo1;
+                    final XFormsControls.Select1ControlInfo selectControlInfo2 = (XFormsControls.Select1ControlInfo) controlInfo2;
+
+                    if (itemsetsFull1 != null && selectControlInfo1 != null) {
+                        final Object items = selectControlInfo1.getItemset();
+                        if (items != null)
+                            itemsetsFull1.put(selectControlInfo1.getId(), items);
+                    }
+
+                    if (itemsetsFull2 != null && selectControlInfo2 != null) {
+                        final Object items = selectControlInfo2.getItemset();
+                        if (items != null)
+                            itemsetsFull2.put(selectControlInfo2.getId(), items);
+                    }
+                }
             }
 
             // 2: Check children if any
@@ -659,7 +710,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(ch, children1, controlInfo2.getChildren());
+                        diffControlsState(ch, children1, controlInfo2.getChildren(), itemsetsFull1, itemsetsFull2);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -669,10 +720,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(ch, children1, children2.subList(0, size1));
+                        diffControlsState(ch, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2);
 
                         // Issue new values for new iterations
-                        diffControlsState(ch, null, children2.subList(size1, size2));
+                        diffControlsState(ch, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -686,7 +737,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(ch, children1.subList(0, size2), children2);
+                        diffControlsState(ch, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2);
                     }
                 } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && controlInfo1 == null) {
 
@@ -701,7 +752,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, null, children2);
+                    diffControlsState(ch, null, children2, itemsetsFull1, itemsetsFull2);
 
                 } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && children1 == null) {
 
@@ -716,11 +767,11 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, null, children2);
+                    diffControlsState(ch, null, children2, itemsetsFull1, itemsetsFull2);
 
                 } else {
                     // Other grouping controls
-                    diffControlsState(ch, children1, children2);
+                    diffControlsState(ch, children1, children2, itemsetsFull1, itemsetsFull2);
                 }
             }
         }

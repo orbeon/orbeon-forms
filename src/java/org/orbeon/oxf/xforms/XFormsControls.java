@@ -46,13 +46,9 @@ public class XFormsControls {
 
     private Locator locator;
 
-    private Map itemsetIdToItemsetInfoMap;// TODO: this may be also refactored into ControlsState
-
     private boolean initialized;
     private ControlsState initialControlsState;
     private ControlsState currentControlsState;
-
-    private Map itemsetIdToItemsetInfoUpdateMap;
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
@@ -202,8 +198,6 @@ public class XFormsControls {
             } else {
                 // Rebuild controls state
 
-                // Initialize itemset information
-                itemsetIdToItemsetInfoMap = getItemsetInfo(pipelineContext, null);
                 // Get initial controls state information
                 initialControlsState = buildControlsState(pipelineContext);
                 currentControlsState = initialControlsState;
@@ -578,6 +572,10 @@ public class XFormsControls {
                         controlInfo = new InputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("repeat")) {
                         controlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                    } else if (controlName.equals("select")) {
+                        controlInfo = new SelectControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                    } else if (controlName.equals("select1")) {
+                        controlInfo = new Select1ControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("submit")) {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("output")) {
@@ -608,6 +606,11 @@ public class XFormsControls {
                         if ("true".equals(selectedAttribute))
                             switchIdToSelectedCaseIdMap.put(switchId, effectiveControlId);
                     }
+                }
+
+                // Handle xforms:itemset
+                if (controlInfo instanceof SelectControlInfo || controlInfo instanceof Select1ControlInfo) {
+                    ((Select1ControlInfo) controlInfo).evaluateItemsets(pipelineContext);
                 }
 
                 // Get control children values
@@ -781,93 +784,10 @@ public class XFormsControls {
     }
 
     /**
-     * Compute all default xforms:itemset information.
-     */
-    private Map getItemsetInfo(final PipelineContext pipelineContext, final XFormsModel model) {
-        final Map[] resultMap = new Map[1];
-        visitAllControlsHandleRepeat(pipelineContext, new ControlElementVisitorListener() {
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                final String controlName = controlElement.getName();
-                if (controlName.equals("select") || controlName.equals("select1")) {
-
-                    final Element itemsetElement = controlElement.element(XFormsConstants.XFORMS_ITEMSET_QNAME);
-
-                    // TODO: Find solution to xforms:item, xforms:itemset and xforms:choices combination
-                    if (itemsetElement != null) {
-                        final String selectControlId = effectiveControlId;
-
-                        // Iterate through the collection
-                        pushBinding(pipelineContext, itemsetElement);
-                        {
-                            final BindingContext currentBindingContext = getCurrentContext();
-
-                            if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                                final List items = new ArrayList();
-                                final List currentNodeSet = getCurrentNodeset();
-                                if (currentNodeSet != null) {
-                                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
-
-                                        // Push "artificial" binding with just current node in nodeset
-                                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
-                                        {
-                                            // Handle children of xforms:itemset
-
-                                            pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
-                                            final String label = getCurrentSingleNodeValue();
-                                            popBinding();
-                                            final Element valueCopyElement;
-                                            {
-                                                final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                                valueCopyElement = (valueElement != null)
-                                                    ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
-                                            }
-                                            pushBinding(pipelineContext, valueCopyElement);
-                                            final String value = getCurrentSingleNodeValue();;
-                                            // TODO: handle xforms:copy
-                                            items.add(new ItemsetInfo(selectControlId, label, value));
-
-                                            popBinding();
-                                        }
-                                        contextStack.pop();
-                                    }
-                                }
-                                if (resultMap[0] == null)
-                                    resultMap[0] = new HashMap();
-                                resultMap[0].put(selectControlId, items);
-                            }
-                        }
-                        popBinding();
-                    }
-                }
-
-                return true;
-            }
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                return true;
-            }
-
-            public void startRepeatIteration(int iteration) {
-            }
-
-            public void endRepeatIteration(int iteration) {
-            }
-        });
-        return resultMap[0];
-    }
-
-    /**
      * Perform a refresh of the controls for a given model
      */
     public void refreshForModel(final PipelineContext pipelineContext, final XFormsModel model) {
-
-        // Get xforms:itemset info for this model
-        final Map result = getItemsetInfo(pipelineContext, model);
-
-        if (itemsetIdToItemsetInfoUpdateMap == null) {
-            itemsetIdToItemsetInfoUpdateMap = result;
-        } else {
-            itemsetIdToItemsetInfoUpdateMap.putAll(result);
-        }
+        // NOP
     }
 
     /**
@@ -1044,44 +964,6 @@ public class XFormsControls {
                 handleControlInfo(controlInfoVisitorListener, controlInfo.getChildren());
                 controlInfoVisitorListener.endVisitControl(controlInfo);
             }
-        }
-    }
-
-    /**
-     * Get full xforms:itemset information.
-     */
-    public Map getItemsetFull() {
-        return (itemsetIdToItemsetInfoUpdateMap != null) ? itemsetIdToItemsetInfoUpdateMap : itemsetIdToItemsetInfoMap;
-    }
-
-    /**
-     * Get xforms:itemset information to update.
-     */
-    public Map getItemsetUpdate() {
-
-        if (itemsetIdToItemsetInfoUpdateMap == null) {
-            // There is no update in the first place
-            return null;
-        } else if (itemsetIdToItemsetInfoMap == null) {
-            // There was nothing before, return update
-            return itemsetIdToItemsetInfoUpdateMap;
-        } else {
-            // Merge differences
-            final Map result = new HashMap();
-
-            for (Iterator i = itemsetIdToItemsetInfoUpdateMap.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String itemsetId = (String) currentEntry.getKey();
-                final List newItems = (List) currentEntry.getValue();
-
-                final List existingItems = (List) itemsetIdToItemsetInfoMap.get(itemsetId);
-                if (existingItems == null || !existingItems.equals(newItems)) {
-                    // No existing items or new items are different from existing items
-                    result.put(itemsetId, newItems);
-                }
-            }
-
-            return result;
         }
     }
 
@@ -1970,6 +1852,76 @@ public class XFormsControls {
 
         public void evaluateDisplayValue(PipelineContext pipelineContext) {
             evaluateDisplayValue(pipelineContext, format);
+        }
+    }
+
+    /**
+     * Represents an xforms:select1 control.
+     */
+    public class Select1ControlInfo extends ControlInfo {
+
+        private List items;
+
+        public Select1ControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
+        }
+
+        public void evaluateItemsets(PipelineContext pipelineContext) {
+
+            // Find itemset element if any
+            // TODO: Handle multiple itemsets, xforms:case, and mixed xforms:item / xforms:itemset
+            final Element itemsetElement = getElement().element(XFormsConstants.XFORMS_ITEMSET_QNAME);
+
+            if (itemsetElement != null) {
+                pushBinding(pipelineContext, itemsetElement); // when entering this method, binding must be on control
+                final BindingContext currentBindingContext = getCurrentContext();
+
+                //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
+                items = new ArrayList();
+                final List currentNodeSet = getCurrentNodeset();
+                if (currentNodeSet != null) {
+                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
+
+                        // Push "artificial" binding with just current node in nodeset
+                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
+                        {
+                            // Handle children of xforms:itemset
+
+                            pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                            final String label = getCurrentSingleNodeValue();
+                            popBinding();
+                            final Element valueCopyElement;
+                            {
+                                final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                valueCopyElement = (valueElement != null)
+                                    ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
+                            }
+                            pushBinding(pipelineContext, valueCopyElement);
+                            final String value = getCurrentSingleNodeValue();;
+                            // TODO: handle xforms:copy
+                            items.add(new ItemsetInfo(getId(), label, value));
+
+                            popBinding();
+                        }
+                        contextStack.pop();
+                    }
+                }
+                popBinding();
+            }
+        }
+
+        public List getItemset() {
+            return items;
+        }
+    }
+
+    /**
+     * Represents an xforms:select control.
+     */
+    public class SelectControlInfo extends Select1ControlInfo {
+
+        public SelectControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
         }
     }
 

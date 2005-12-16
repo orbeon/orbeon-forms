@@ -33,8 +33,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private Attributes elementAttributes;
     private String effectiveId;
 
-    private Map itemsetIdToItemsetInfoMap;
-
     private List items;
     private Attributes itemAttributes;
     private StringBuffer labelStringBuffer;
@@ -86,10 +84,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 // xforms:itemset
 
                 if (!handlerContext.isGenerateTemplate()) {
-                    if (itemsetIdToItemsetInfoMap == null)
-                        itemsetIdToItemsetInfoMap = containingDocument.getXFormsControls().getItemsetFull();
 
-                    final List itemsetInfos = (List) itemsetIdToItemsetInfoMap.get(effectiveId);
+                    final XFormsControls.Select1ControlInfo controlInfo
+                            = (XFormsControls.Select1ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+
+                    final List itemsetInfos = (List) controlInfo.getItemset();
                     if (itemsetInfos != null) { // may be null when there is no item in the itemset
                         final Attributes itemsetAttributes = new AttributesImpl(attributes);
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {

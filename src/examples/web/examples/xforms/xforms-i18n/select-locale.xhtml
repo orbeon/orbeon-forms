@@ -43,6 +43,16 @@
             </xhtml:li>
             <xhtml:li>
                 <xforms:trigger appearance="xxforms:link">
+                    <xforms:label>Français</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref=".">fr_FR</xforms:setvalue>
+                        <xforms:send submission="set-locale"/>
+                        <xforms:load resource="/xforms-i18n/form"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:li>
+            <xhtml:li>
+                <xforms:trigger appearance="xxforms:link">
                     <xforms:label>日本語</xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:setvalue ref=".">ja_JP</xforms:setvalue>

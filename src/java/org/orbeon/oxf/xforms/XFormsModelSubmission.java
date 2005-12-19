@@ -494,10 +494,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
                                                     final Map intialRepeatIdToIndex = currentControlsState.getDefaultRepeatIdToIndex();
                                                     final Map effectiveRepeatIdToIterations = currentControlsState.getEffectiveRepeatIdToIterations();
-                                                    if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0)
-                                                    {
-                                                        for (Iterator i = previousRepeatIdToIndex.entrySet().iterator(); i.hasNext();)
-                                                        {
+                                                    if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
+                                                        for (Iterator i = previousRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                                                             final Map.Entry currentEntry = (Map.Entry) i.next();
                                                             final String repeatId = (String) currentEntry.getKey();
                                                             final Integer previouslIndex = (Integer) currentEntry.getValue();
@@ -505,8 +503,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 //                                                            final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
                                                             final Integer newIterations = (Integer) effectiveRepeatIdToIterations.get(repeatId);
 
-                                                            if (previouslIndex.intValue() == 0 && newIterations.intValue() > 0)
-                                                            {
+                                                            if (previouslIndex.intValue() == 0 && newIterations.intValue() > 0) {
                                                                 // Set index to defaul value
                                                                 final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
 //                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, initialRepeatIndex.toString());
@@ -521,6 +518,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                                 final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
                                                                 currentControlsState.updateRepeatIndex(repeatId, initialRepeatIndex.intValue());
                                                             }
+                                                            // TODO: Adjust controls ids that could have gone out of bounds?
+                                                            // adjustRepeatIndexes(pipelineContext, xformsControls);
                                                         }
                                                     }
                                                 }

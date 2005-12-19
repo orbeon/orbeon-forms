@@ -34,6 +34,8 @@ import java.util.Map;
 
 /**
  * Implementation of all the XForms actions.
+ *
+ * TODO: Separate actions into different classes for more modularity.
  */
 public class XFormsActionInterpreter {
 
@@ -350,6 +352,9 @@ public class XFormsActionInterpreter {
                     }
                 });
 
+                // Adjust controls ids that could have gone out of bounds
+                adjustRepeatIndexes(pipelineContext, xformsControls);
+
                 // "4. If the insert is successful, the event xforms-insert is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
 
@@ -383,9 +388,8 @@ public class XFormsActionInterpreter {
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
                 final Element elementToRemove;
-                final int deletionIndex;
                 final List siblingElements;
-                final int actualIndex;
+                final int actualIndexInCollection;
                 {
                     final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
                             xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
@@ -401,17 +405,18 @@ public class XFormsActionInterpreter {
                     if (tempDeletionIndex < 1)
                         tempDeletionIndex = 1;
 
-                    deletionIndex = tempDeletionIndex;
-
                     // Find actual deletion point
                     elementToRemove = (Element) collectionToUpdate.get(tempDeletionIndex - 1);
                     final Element parentElement = elementToRemove.getParent();
                     siblingElements = parentElement.elements();
-                    actualIndex = siblingElements.indexOf(elementToRemove);
+                    actualIndexInCollection = siblingElements.indexOf(elementToRemove);
                 }
 
                 // Get current repeat indexes
                 final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
+
+                // Rebuild ControlsState
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
 
                 // Find updates to repeat indexes
                 final Map repeatIndexUpdates = new HashMap();
@@ -445,9 +450,14 @@ public class XFormsActionInterpreter {
                                                 newIndex = 0;
                                                 reinitializeInner = false;
                                             } else {
+                                                // Current index for this repeat
                                                 final int currentIndex = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
-                                                if (currentIndex == deletionIndex) {
-                                                    if (deletionIndex == repeatNodeSet.size()) {
+
+                                                // Index of deleted element for this repeat
+                                                final int deletionIndexInRepeat = repeatNodeSet.indexOf(elementToRemove) + 1;
+
+                                                if (currentIndex == deletionIndexInRepeat) {
+                                                    if (deletionIndexInRepeat == repeatNodeSet.size()) {
 
                                                         // o "When the last remaining item in the collection is removed,
                                                         // the index position becomes 0."
@@ -471,7 +481,7 @@ public class XFormsActionInterpreter {
                                                     // "The index should point to the same node
                                                     // after a delete as it did before the delete"
 
-                                                    if (currentIndex < deletionIndex) {
+                                                    if (currentIndex < deletionIndexInRepeat) {
                                                         newIndex = currentIndex;
                                                     } else {
                                                         newIndex = currentIndex - 1;
@@ -513,21 +523,20 @@ public class XFormsActionInterpreter {
                 });
 
                 // Then only perform the deletion
-                siblingElements.remove(actualIndex);
-
-                // Rebuild ControlsState
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-                final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+                siblingElements.remove(actualIndexInCollection);
 
                 // Update affected repeat index information
                 if (repeatIndexUpdates.size() > 0) {
                     for (Iterator i = repeatIndexUpdates.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
-                        currentControlsState.updateRepeatIndex((String) currentEntry.getKey(), ((Integer) currentEntry.getValue()).intValue());
+                        xformsControls.getCurrentControlsState().updateRepeatIndex((String) currentEntry.getKey(), ((Integer) currentEntry.getValue()).intValue());
                     }
                 }
 
-                // Update children repeats information
+                // Rebuild ControlsState
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+                // Handle children - second step
                 xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
                     public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
@@ -548,7 +557,7 @@ public class XFormsActionInterpreter {
                                     if (newIndex > repeatNodeSet.size())
                                         newIndex = repeatNodeSet.size();
 
-                                    currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                                    xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, newIndex);
                                     //currentControlsState.updateRepeatIndex(repeatId, 1);
 
                                     // NOTE: XForms 1.0 2nd edition actually says "To re-initialize
@@ -565,8 +574,11 @@ public class XFormsActionInterpreter {
                     }
                 });
 
+                // Adjust controls ids that could have gone out of bounds
+                adjustRepeatIndexes(pipelineContext, xformsControls);
+
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
-                containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent(currentInstance, atAttribute));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(currentInstance, atAttribute));
 
                 if (actionContext != null) {
                     // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
@@ -769,6 +781,46 @@ public class XFormsActionInterpreter {
         }
     }
 
+    /**
+     * Adjust controls ids that could have gone out of bounds.
+     *
+     * What we do here is that we bring back the index within bounds. The spec does not cover this
+     * scenario.
+     */
+    public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls) {
+
+        // Rebuild before iterating
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
+        xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+
+            public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+                    // Found an xforms:repeat
+                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                    final String repeatId = repeatControlInfo.getOriginalId();
+
+                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+                    if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                        // Node-set is non-empty
+
+                        final int currentIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
+                        if (currentIndex < 1)
+                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, 1);
+                        else if (currentIndex > repeatNodeSet.size())
+                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, repeatNodeSet.size());
+
+                    } else {
+                        // Node-set is empty, make sure index is set to 0
+                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, 0);
+                    }
+                }
+            }
+
+            public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+            }
+        });
+    }
+
     public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target) {
 
         final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
@@ -829,6 +881,9 @@ public class XFormsActionInterpreter {
                     }
                 }
 
+                // Rebuild ControlsState
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
+
                 // Second step: update non-empty repeat indexes to the appropriate value
                 currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
@@ -861,6 +916,8 @@ public class XFormsActionInterpreter {
                 });
             }
 
+            // Adjust controls ids that could have gone out of bounds
+            adjustRepeatIndexes(pipelineContext, xformsControls);
         }
 
         // TODO: "The implementation data structures for tracking computational dependencies are

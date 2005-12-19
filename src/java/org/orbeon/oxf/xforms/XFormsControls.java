@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -320,7 +321,10 @@ public class XFormsControls {
             final List repeatChildren = repeatControlInfo.getChildren();
             final List currentNodeset = getCurrentNodeset();
 
-            if (repeatChildren.size() != currentNodeset.size())
+            final int repeatChildrenSize = (repeatChildren == null) ? 0 : repeatChildren.size();
+            final int currentNodesetSize = (currentNodeset == null) ? 0 : currentNodeset.size();
+
+            if (repeatChildrenSize != currentNodesetSize)
                 throw new IllegalStateException("repeatChildren and newNodeset have different sizes.");
 
             // Push "artificial" binding with just current node in nodeset
@@ -1809,6 +1813,9 @@ public class XFormsControls {
                             public void endVisitControl(ControlInfo controlInfo) {
                             }
                         }, firstAncestorRepeatControlInfo);
+
+                        // Adjust controls ids that could have gone out of bounds
+                        XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, XFormsControls.this);
 
                         // After changing indexes, must recalculate
                         // NOTE: The <setindex> action is supposed to "The implementation data

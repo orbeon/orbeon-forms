@@ -70,7 +70,7 @@
     </section>
     <section label="Document-Centric Apps">
         <example id="bizdoc2" label="&quot;BizDoc&quot; NG" xforms-ng="true"/>
-        <example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>
+        <!--<example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>-->
         <example id="blog" label="The OPS Blog" xforms-ng="true"/>
     </section>
     <section label="Cool Stuff">

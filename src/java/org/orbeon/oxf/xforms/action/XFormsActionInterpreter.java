@@ -317,6 +317,31 @@ public class XFormsActionInterpreter {
                                             break;
                                         }
                                     }
+
+                                    if (foundControl == null) {
+                                        // Still not found a control. Make sure the bounds of this
+                                        // xforms:repeat are correct for the rest of the visit.
+
+                                        final int adjustedNewIndex;
+                                        {
+                                            final int newIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
+
+                                            // Adjust bounds if necessary
+                                            if (newIndex < 1)
+                                                adjustedNewIndex = 1;
+                                            else if (newIndex > repeatNodeSet.size())
+                                                adjustedNewIndex = repeatNodeSet.size();
+                                            else
+                                                adjustedNewIndex = newIndex;
+                                        }
+
+                                        // Set index
+                                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, adjustedNewIndex);
+                                    }
+
+                                } else {
+                                    // Make sure the index is set to zero when the node-set is empty
+                                    currentControlsState.updateRepeatIndex(repeatId, 0);
                                 }
                             } else {
                                 // This is a child xforms:repeat of a matching xforms:repeat
@@ -339,6 +364,11 @@ public class XFormsActionInterpreter {
                                         newIndex = repeatNodeSet.size();
 
                                     currentControlsState.updateRepeatIndex(repeatId, newIndex);
+                                } else {
+                                    // Make sure the index is set to zero when the node-set is empty
+                                    // (although this should already have been done above by the
+                                    // enclosing xforms:repeat)
+                                    currentControlsState.updateRepeatIndex(repeatId, 0);
                                 }
                             }
                         }
@@ -351,9 +381,6 @@ public class XFormsActionInterpreter {
                         }
                     }
                 });
-
-                // Adjust controls ids that could have gone out of bounds
-                adjustRepeatIndexes(pipelineContext, xformsControls);
 
                 // "4. If the insert is successful, the event xforms-insert is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
@@ -533,49 +560,8 @@ public class XFormsActionInterpreter {
                     }
                 }
 
-                // Rebuild ControlsState
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-
-                // Handle children - second step
-                xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
-
-                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
-                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
-                            // Found an xforms:repeat
-                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
-                            final String repeatId = repeatControlInfo.getOriginalId();
-
-                            if (nestedRepeatIndexUpdates.get(repeatId) != null) {
-                                // Found nested repeat id to update
-
-                                final List repeatNodeSet = xformsControls.getCurrentNodeset();
-                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
-                                    int newIndex = repeatControlInfo.getStartIndex();
-
-                                    if (newIndex < 1)
-                                        newIndex = 1;
-                                    if (newIndex > repeatNodeSet.size())
-                                        newIndex = repeatNodeSet.size();
-
-                                    xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, newIndex);
-                                    //currentControlsState.updateRepeatIndex(repeatId, 1);
-
-                                    // NOTE: XForms 1.0 2nd edition actually says "To re-initialize
-                                    // a repeat means to change the index to 0 if it is empty,
-                                    // otherwise 1." However, for, xforms:insert, we are supposed to
-                                    // update to startindex. Here, for now, we decide to use
-                                    // startindex for consistency.
-                                }
-                            }
-                        }
-                    }
-
-                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
-                    }
-                });
-
                 // Adjust controls ids that could have gone out of bounds
-                adjustRepeatIndexes(pipelineContext, xformsControls);
+                adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIndexUpdates);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(currentInstance, atAttribute));
@@ -788,6 +774,10 @@ public class XFormsActionInterpreter {
      * scenario.
      */
     public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls) {
+        adjustRepeatIndexes(pipelineContext, xformsControls, null);
+    }
+
+    public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls, final Map forceUpdate) {
 
         // Rebuild before iterating
         xformsControls.rebuildCurrentControlsState(pipelineContext);
@@ -800,14 +790,39 @@ public class XFormsActionInterpreter {
                     final String repeatId = repeatControlInfo.getOriginalId();
 
                     final List repeatNodeSet = xformsControls.getCurrentNodeset();
+
                     if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
                         // Node-set is non-empty
 
-                        final int currentIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
-                        if (currentIndex < 1)
-                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, 1);
-                        else if (currentIndex > repeatNodeSet.size())
-                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, repeatNodeSet.size());
+                        final int adjustedNewIndex;
+                        {
+                            final int newIndex;
+                            if (forceUpdate != null && forceUpdate.get(repeatId) != null) {
+                                // Force update of index to start index
+                                newIndex = repeatControlInfo.getStartIndex();
+
+                                // NOTE: XForms 1.0 2nd edition actually says "To re-initialize
+                                // a repeat means to change the index to 0 if it is empty,
+                                // otherwise 1." However, for, xforms:insert, we are supposed to
+                                // update to startindex. Here, for now, we decide to use
+                                // startindex for consistency.
+
+                            } else {
+                                // Just use current index
+                                newIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
+                            }
+
+                            // Adjust bounds if necessary
+                            if (newIndex < 1)
+                                adjustedNewIndex = 1;
+                            else if (newIndex > repeatNodeSet.size())
+                                adjustedNewIndex = repeatNodeSet.size();
+                            else
+                                adjustedNewIndex = newIndex;
+                        }
+
+                        // Set index
+                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, adjustedNewIndex);
 
                     } else {
                         // Node-set is empty, make sure index is set to 0
@@ -835,11 +850,6 @@ public class XFormsActionInterpreter {
         } else {
 
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-            // Rebuild ControlsState if needed as we are going to make some changes
-            if (xformsControls.getCurrentControlsState() == xformsControls.getInitialControlsState())
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-
             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
             final int index = Integer.parseInt(indexString);
@@ -881,43 +891,9 @@ public class XFormsActionInterpreter {
                     }
                 }
 
-                // Rebuild ControlsState
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-
-                // Second step: update non-empty repeat indexes to the appropriate value
-                currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
-
-                    public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
-                        if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
-                            // Found an xforms:repeat
-                            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
-                            final String repeatId = repeatControlInfo.getOriginalId();
-
-                            if (nestedRepeatIdsMap.get(repeatId) != null) {
-                                // Found nested repeat id to update
-
-                                final List repeatNodeSet = xformsControls.getCurrentNodeset();
-                                if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
-                                    int newIndex = repeatControlInfo.getStartIndex();
-
-                                    if (newIndex < 1)
-                                        newIndex = 1;
-                                    if (newIndex > repeatNodeSet.size())
-                                        newIndex = repeatNodeSet.size();
-
-                                    currentControlsState.updateRepeatIndex(repeatId, newIndex);
-                                }
-                            }
-                        }
-                    }
-
-                    public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
-                    }
-                });
+                // Adjust controls ids that could have gone out of bounds
+                adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
             }
-
-            // Adjust controls ids that could have gone out of bounds
-            adjustRepeatIndexes(pipelineContext, xformsControls);
         }
 
         // TODO: "The implementation data structures for tracking computational dependencies are
@@ -931,6 +907,10 @@ public class XFormsActionInterpreter {
 
     private void setBindingContext(final PipelineContext pipelineContext, String eventHandlerContainerId, Element actionElement) {
 
+        // Rebuild controls state before using setBinding()
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+        // Get "fresh" event handler containier
         final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
 
         if (eventHandlerContainer instanceof XFormsControls.ControlInfo) {

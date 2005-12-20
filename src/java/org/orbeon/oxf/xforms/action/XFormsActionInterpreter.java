@@ -65,7 +65,7 @@ public class XFormsActionInterpreter {
         }
 
         // Set binding context
-        setBindingContext(pipelineContext, eventHandlerContainer.getId(), actionElement);
+        setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
 
         final String actionEventName = actionElement.getName();
 
@@ -138,7 +138,7 @@ public class XFormsActionInterpreter {
             }
             if (newActionContext != null) {
                 // Binding context has to be reset as it may have been modified by sub-actions
-                setBindingContext(pipelineContext, eventHandlerContainer.getId(), actionElement);
+                setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
                 final XFormsModel model = xformsControls.getCurrentModel();
 
                 // Process deferred behavior
@@ -390,7 +390,7 @@ public class XFormsActionInterpreter {
                     actionContext.setAll(true);
                 } else {
                     // Binding context has to be reset as the controls have been updated
-                    setBindingContext(pipelineContext, eventHandlerContainer.getId(), actionElement);
+                    setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
                     final XFormsModel model = xformsControls.getCurrentModel();
                     // Send events directly
                     containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
@@ -571,7 +571,7 @@ public class XFormsActionInterpreter {
                     actionContext.setAll(true);
                 } else {
                     // Binding context has to be reset as the controls have been updated
-                    setBindingContext(pipelineContext, eventHandlerContainer.getId(), actionElement);
+                    setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
                     final XFormsModel model = xformsControls.getCurrentModel();
                     // Send events directly
                     containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
@@ -905,7 +905,9 @@ public class XFormsActionInterpreter {
         }
     }
 
-    private void setBindingContext(final PipelineContext pipelineContext, String eventHandlerContainerId, Element actionElement) {
+    private static void setBindingContext(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {
+
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
         // Rebuild controls state before using setBinding()
         xformsControls.rebuildCurrentControlsState(pipelineContext);

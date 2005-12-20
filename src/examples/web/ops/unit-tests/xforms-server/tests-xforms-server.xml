@@ -41,8 +41,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="5"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="5"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls" href="xforms-server/xforms-calculator-controls.xml"/>
                     <p:input name="models">
@@ -123,8 +125,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="5"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="5"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls" href="xforms-server/xforms-calculator-controls.xml"/>
                     <p:input name="models">
@@ -486,8 +490,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="3"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="3"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls">
                         <controls>
@@ -578,8 +584,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="3"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="3"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls">
                         <controls>
@@ -948,8 +956,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
@@ -1038,8 +1048,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls">
                         <controls
@@ -1116,8 +1128,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="id124·1"/>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls">
                         <controls
@@ -1194,8 +1208,10 @@
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
-                    <p:input name="event">
-                        <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id125·1-1" other-control-id="id125·3-2">Hello!</xxforms:event>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id125·1-1" other-control-id="id125·3-2">Hello!</xxforms:event>
+                        </xxforms:action>
                     </p:input>
                     <p:input name="controls">
                         <controls
@@ -1481,6 +1497,71 @@
                     <xxf:control-values>
                         <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type="{http://www.w3.org/2001/XMLSchema}date" display-value="October 11, 2005">2005-10-11</xxf:control>
                         <xxf:control id="id2" readonly="false" required="false" relevant="true" valid="true" type="{http://www.w3.org/2001/XMLSchema}date" display-value="11. Oktober 2005">2005-10-11</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <!-- This test makes sure that in case the value of a control is changed by the client, but then
+         an action resets that value to the same value as the original value, then the proper response is sent. -->
+    <test description="Test for xforms:setvalue to same initial value" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id123">Hello!</xxforms:event>
+                            <xxforms:event name="DOMActivate" source-control-id="id124"/>
+                        </xxforms:action>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls xmlns:xforms="http://www.w3.org/2002/xforms"
+                                  xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:input ref="instance('main')" id="id123"/>
+                            <xforms:trigger id="id124">
+                                <xforms:setvalue ev:event="DOMActivate" ref="instance('main')" id="id125">existing value</xforms:setvalue>
+                            </xforms:trigger>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:model>
+                                <xforms:instance id="main">
+                                    <value/>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <instances>
+                            <value>existing value</value>
+                        </instances>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <value>existing value</value>
+                        </instances>
+                        <divs/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="id123">existing value</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:itemsets/>

@@ -1,7 +1,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:exslt="http://exslt.org/common"
     xmlns:xslt="http://xml.apache.org/xslt"
-    exclude-result-prefixes="xalan xslt">
+    exclude-result-prefixes="exsl xslt">
 
     <!-- Target can be: devel, war, install -->
     <xsl:param name="target"/>
@@ -406,7 +406,7 @@
         <xsl:choose>
             <xsl:when test="$commented">
                 <xsl:comment>
-                    <xsl:for-each select="xalan:nodeset($content)/*">
+                    <xsl:for-each select="exslt:node-set($content)/*">
                         <xsl:call-template name="to-text">
                             <xsl:with-param name="node" select="."/>
                         </xsl:call-template>
@@ -414,7 +414,7 @@
                 </xsl:comment>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:copy-of select="xalan:nodeset($content)/*"/>
+                <xsl:copy-of select="exslt:node-set($content)/*"/>
             </xsl:otherwise>
         </xsl:choose>
         <xsl:comment>

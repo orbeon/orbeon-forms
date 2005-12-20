@@ -340,7 +340,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)
             || XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)
             || XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)
-            || XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
+            || XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) { // TODO: check if xforms-value-changed is actually ever sent by client
 
             // These are events we allow directly from the client and actually handle
 
@@ -348,6 +348,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change
+
+            // What we want to do here is set the value on the initial controls state, as the value
+            // has already been changed on the client. This means that this event(s) must be the
+            // first to come!
 
             final XXFormsValueChangeWithFocusChangeEvent concreteEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
 
@@ -360,11 +364,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
             // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
 
-            // Set current context to control
-            xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) concreteEvent.getTargetObject());
+            {
+                // Set current context to control
+                final XFormsControls.ControlInfo valueControlInfo = (XFormsControls.ControlInfo) concreteEvent.getTargetObject();
+                xformsControls.setBinding(pipelineContext, valueControlInfo);
 
-            // Set value into the instance
-            XFormsInstance.setValueForNode(pipelineContext, xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue(), null);
+                // Set value into the instance
+                XFormsInstance.setValueForNode(pipelineContext, xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue(), null);
+
+                // Update this particular control's value
+                valueControlInfo.evaluateValue(pipelineContext);
+                valueControlInfo.evaluateDisplayValue(pipelineContext);
+            }
+
+            // Make sure controls are not in the initial state before sending events
+            xformsControls.rebuildCurrentControlsState(pipelineContext);
 
             // Recalculate and revalidate
             final XFormsModel model = xformsControls.getCurrentModel();

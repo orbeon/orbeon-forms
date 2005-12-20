@@ -88,13 +88,9 @@
 
     <!-- Display a dashed box -->
     <xsl:template match="f:box">
-        <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 2em; width: 100%">
-            <tr>
-                <td class="dashedbox">
-                    <xsl:apply-templates/>
-                </td>
-            </tr>
-        </table>
+        <div class="dashedbox">
+            <xsl:apply-templates/>
+        </div>
     </xsl:template>
 
     <!-- Display tabs -->

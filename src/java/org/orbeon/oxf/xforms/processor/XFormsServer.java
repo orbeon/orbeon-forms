@@ -201,8 +201,6 @@ public class XFormsServer extends ProcessorImpl {
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
                                 }
-                                // Remember id of control of which value changed
-                                valueChangeControlIds.put(sourceControlId, "");
                             } else {
                                 if (lastSourceControlId != null) {
                                     // Send old event
@@ -212,6 +210,11 @@ public class XFormsServer extends ProcessorImpl {
                                 }
                                 // Send new event
                                 containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
+                            }
+
+                            if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
+                                // Remember id of control of which value changed
+                                valueChangeControlIds.put(sourceControlId, "");
                             }
                         } else if (!(sourceControlId == null && eventName == null)) {
                             throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");

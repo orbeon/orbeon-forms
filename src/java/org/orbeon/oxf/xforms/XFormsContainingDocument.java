@@ -380,20 +380,33 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Make sure controls are not in the initial state before sending events
             xformsControls.rebuildCurrentControlsState(pipelineContext);
 
-            // Recalculate and revalidate
-            final XFormsModel model = xformsControls.getCurrentModel();
-            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+            {
+                // Reset current context to control (necessary after rebuild)
+                final XFormsControls.ControlInfo valueControlInfo
+                        = (XFormsControls.ControlInfo) getObjectById(pipelineContext,
+                                ((XFormsControls.ControlInfo) concreteEvent.getTargetObject()).getId());
+                xformsControls.setBinding(pipelineContext, valueControlInfo);
 
-            // Handle focus change DOMFocusOut / DOMFocusIn
-            if (concreteEvent.getOtherTargetObject() != null) {
-                // We have a focus change (otherwise, the focus is assumed to remain the same)
-                dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
-                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
+                // Recalculate and revalidate
+                final XFormsModel model = xformsControls.getCurrentModel();
+                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
+                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+
+                // Handle focus change DOMFocusOut / DOMFocusIn
+                if (concreteEvent.getOtherTargetObject() != null) {
+
+                    final XFormsControls.ControlInfo otherTargetControlInfo
+                        = (XFormsControls.ControlInfo) getObjectById(pipelineContext,
+                                ((XFormsControls.ControlInfo) concreteEvent.getOtherTargetObject()).getId());
+
+                    // We have a focus change (otherwise, the focus is assumed to remain the same)
+                    dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(valueControlInfo));
+                    dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetControlInfo));
+                }
+
+                // Refresh (this will send update events)
+                dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
             }
-
-            // Refresh (this will send update events)
-            dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // Internal submission event

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -171,7 +170,7 @@ public class XFormsExtractor extends ProcessorImpl {
                                     modelLevel = level;
 
                                     if (gotControl)
-                                        throw new OXFException("/xhtml:html/xhtml:head//xforms:model occurred after /xhtml:html/xhtml:body//xforms:*");
+                                        throw new ValidationException("/xhtml:html/xhtml:head//xforms:model occurred after /xhtml:html/xhtml:body//xforms:*", new LocationData(locator));
 
                                     if (!gotModel) {
                                         outputFirstElementIfNeeded();
@@ -213,6 +212,12 @@ public class XFormsExtractor extends ProcessorImpl {
                                     super.startElement(uri, localname, qName, attributes);
                                 }
                             } else if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+
+                                if (BODY_QNAME.equals(element1)) {// NOTE: This test is a little harsh, as the user may use xxforms:* elements for examples, etc.
+                                    if (!("img".equals(localname) || "size".equals(localname)))
+                                        throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+                                }
+
                                 if (inControl) {
                                     super.startElement(uri, localname, qName, attributes);
                                 }

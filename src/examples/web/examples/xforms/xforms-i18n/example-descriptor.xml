@@ -12,24 +12,40 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>Translate This</title>
+    <title>Internationalization</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <div xmlns="http://www.w3.org/1999/xhtml">
+        <div xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xforms="http://www.w3.org/2002/xforms">
             <p>
-                This translates on the fly the text that you type. Keystrokes are intercepted on the
-                browser with Javascript code, which builds an XML document with the text typed so
-                far and sends it to OPS, which run a pipeline. Because this example is written with
-                XForms, you actually do not have to worry about writing any Javascript: you just use
-                XForms constructs. The pipeline makes standard HTTP request to the Google Language
-                Tool page, essentially simulating a user filling submitting a form on their site.
-                Then the pipeline extracts the outcome of the translation and sends it back to the
-                browser in an XML document. When the browser receives this information, it displays
-                it in the read-only text field.
+                This example shows how you can internationalize your XForms application and localize
+                it in different languages. The first page of the example allows you to chose between
+                a language or locale. Upon selection, the locale is submitted to an XML service
+                which stores it into the user's server-side session. When loaded, the second page
+                includes localized resources by loading an external XForms instance:
             </p>
+            <f:xml-source show-namespaces="false">
+                <xforms:instance id="i18n" src="i18n-resources"/>
+            </f:xml-source>
             <p>
-                <img src="/examples/xforms/xforms-translate/diagram.png"/>
+                The URL <code>i18n-resources</code> resolves to an XML service which retrieves the
+                correct XML instance based on the locale stored into the user's server-side
+                session. The resources XML document looks like this:
             </p>
+            <f:xml-source show-namespaces="false">
+                <resources xmlns="">
+                    <web>Web</web>
+                    <images>Images</images>
+                    <news>News</news>
+                    <search>Search</search>
+                </resources>
+            </f:xml-source>
+            <p>
+                The XForms page can then access resources using constructs like the following:
+            </p>
+            <f:xml-source show-namespaces="false">
+                <xforms:output ref="instance('i18n')/web"/>
+                <xforms:label ref="instance('i18n')/search"/>
+            </f:xml-source>
         </div>
     </description>
 </example-descriptor>

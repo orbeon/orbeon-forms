@@ -17,15 +17,15 @@
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This translates on the fly the text that you type. Keystrokes are intercepted on the
-                browser with Javascript code, which builds an XML document with the text typed so
-                far and sends it to OPS, which run a pipeline. Because this example is written with
-                XForms, you actually do not have to worry about writing any Javascript: you just use
-                XForms constructs. The pipeline makes standard HTTP request to the Google Language
-                Tool page, essentially simulating a user filling submitting a form on their site.
-                Then the pipeline extracts the outcome of the translation and sends it back to the
-                browser in an XML document. When the browser receives this information, it displays
-                it in the read-only text field.
+                This example translates on the fly the text that you type. Keystrokes are
+                intercepted on the browser with Javascript code, which builds an XML document with
+                the text typed so far and sends it to OPS, which run a pipeline. Because this
+                example is written with XForms, you actually do not have to worry about writing any
+                Javascript: you just use XForms constructs. The pipeline makes standard HTTP request
+                to the Google Language Tool page, essentially simulating a user filling submitting a
+                form on their site. Then the pipeline extracts the outcome of the translation and
+                sends it back to the browser in an XML document. When the browser receives this
+                information, it displays it in the read-only text field.
             </p>
             <p>
                 <img src="/examples/xforms/xforms-translate/diagram.png"/>

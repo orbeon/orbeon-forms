@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>Translate This</title>
+    <title>Registration Form</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">
@@ -25,9 +25,8 @@
             </p>
             <p>
                 This example shows how you can implement custom error handling in XForms by adding
-                annotations to the instance, using model item properties, and using
-                <code>&lt;xforms:group></code> and <code>&lt;xforms:output></code> in the HTML to
-                display errors in the HTML.
+                annotations to the instance and using model item properties,
+                <code>&lt;xforms:group></code> and <code>&lt;xforms:output></code>.
             </p>
         </div>
     </description>

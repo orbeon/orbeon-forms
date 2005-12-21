@@ -367,6 +367,15 @@
                             Be sure to check your types and "required" model item properties.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            The <code>xxforms:choose</code>, <code>xxforms:when</code> and
+                            <code>xxforms:otherwise</code> constructs are no longer supported with
+                            the new XForms engine. Instead, use relevance and
+                            <code>xforms:group</code> or <code>xforms:switch</code> /
+                            <code>xforms:case</code>.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <a name="xforms-migration"/>

@@ -88,14 +88,6 @@
         <setvalue ref="/form/category" parameter="category"/>
     </page>
 
-    <!-- Home Page for a user -->
-    <page path-info="/blog/([^/]+)" matcher="oxf:perl5-matcher"
-          xforms="user-home/user-home-xforms-model.xml"
-          model="user-home/user-home-model.xpl"
-          view="user-home/user-home-view.xsl">
-        <setvalue ref="/form/username" matcher-group="1"/>
-    </page>
-
     <!-- Home Page -->
     <page path-info="/blog" matcher="oxf:perl5-matcher" model="home/home-model.xpl" view="home/home-view.xsl"/>
 

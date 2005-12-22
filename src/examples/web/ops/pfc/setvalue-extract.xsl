@@ -39,35 +39,66 @@
         <xsl:apply-templates/>
     </xsl:template>
 
-    <xsl:template match="node()[generate-id() = $param-nodes-ids]">
-        <xsl:variable name="param-index" select="index-of($param-nodes-ids, generate-id())" as="xs:integer"/>
-        <xsl:copy>
-            <xsl:copy-of select="@*"/>
-            <xsl:choose>
-                <xsl:when test="$setvalues[$param-index]/@parameter">
-                    <!-- Parameter name -->
-                    <xsl:variable name="parameter" select="$request-info/parameters/parameter[name = $setvalues[$param-index]/@parameter]" as="element()?"/>
-                    <xsl:choose>
-                        <!-- Set the value only if the parameter is present -->
-                        <xsl:when test="$parameter">
-                            <xsl:value-of select="string-join($parameter/value, ' ')"/>
-                        </xsl:when>
-                        <!-- Otherwise just leave whatever was there -->
-                        <xsl:otherwise>
-                            <xsl:apply-templates/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:when test="$setvalues[$param-index]/@matcher-group">
-                    <!-- Matcher group index -->
-                    <xsl:value-of select="$matcher-results[xs:integer($setvalues[$param-index]/@matcher-group)]"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <!-- Backward compatibility mode -->
-                    <xsl:value-of select="$matcher-results[$param-index]"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:copy>
+    <!-- Case of element -->
+    <xsl:template match="*[generate-id() = $param-nodes-ids]">
+        <xsl:variable name="value" select="function:getvalue(.)" as="xs:string?"/>
+        <xsl:choose>
+            <xsl:when test="$value">
+                <xsl:copy>
+                    <xsl:copy-of select="@*"/>
+                    <xsl:value-of select="$value"/>
+                </xsl:copy>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
+
+    <!-- Case of attribute -->
+    <xsl:template match="@*[generate-id() = $param-nodes-ids]">
+        <xsl:variable name="value" select="function:getvalue(.)" as="xs:string?"/>
+        <xsl:choose>
+            <xsl:when test="$value">
+                <xsl:attribute name="{name()}">
+                    <xsl:value-of select="$value"/>
+                </xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:function name="function:getvalue" as="xs:string?">
+        <xsl:param name="current" as="item()"/><!-- element or attribute -->
+        <xsl:variable name="param-index" select="index-of($param-nodes-ids, generate-id($current))" as="xs:integer"/>
+
+        <xsl:choose>
+            <xsl:when test="$setvalues[$param-index]/@parameter">
+                <!-- Parameter name -->
+                <xsl:variable name="parameter" select="$request-info/parameters/parameter[name = $setvalues[$param-index]/@parameter]" as="element()?"/>
+                <xsl:choose>
+                    <!-- Set the value only if the parameter is present -->
+                    <xsl:when test="$parameter">
+                        <xsl:value-of select="string-join($parameter/value, ' ')"/>
+                    </xsl:when>
+                    <!-- Otherwise just leave whatever was there -->
+                    <xsl:otherwise>
+                        <xsl:copy-of select="()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:when test="$setvalues[$param-index]/@matcher-group">
+                <!-- Matcher group index -->
+                <xsl:value-of select="$matcher-results[xs:integer($setvalues[$param-index]/@matcher-group)]"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Backward compatibility mode -->
+                <xsl:value-of select="$matcher-results[$param-index]"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:function>
 
 </xsl:stylesheet>

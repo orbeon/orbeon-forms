@@ -24,7 +24,7 @@ import org.xml.sax.ContentHandler;
 import java.util.*;
 
 /**
- * Context in which control elements are executed.
+ * Context in which control elements are executed (this is XForms Classic only).
  */
 public class XFormsElementContext extends XFormsControls {
 

@@ -634,14 +634,25 @@ public class XFormsActionInterpreter {
             }
 
             // Find actual target
-            final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(newEventTargetId);
-            if (newEventTargetEffectiveId == null)
-                throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + newEventTargetId);
-            final Object newTargetObject = containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
+            final Object xformsEventTarget;
+            {
+                final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetId);
+                if (tempXFormsEventTarget != null) {
+                    // Object with this id exists 
+                    xformsEventTarget = tempXFormsEventTarget;
+                } else {
+                    // Otherwise, try effective id
+                    final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(newEventTargetId);
+                    xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
+                }
+            }
 
-            if (newTargetObject instanceof XFormsEventTarget) {
+            if (xformsEventTarget == null)
+                throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + newEventTargetId);
+
+            if (xformsEventTarget instanceof XFormsEventTarget) {
                 // This can be anything
-                containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(newEventName, (XFormsEventTarget) newTargetObject, newEventBubbles, newEventCancelable));
+                containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(newEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable));
             } else {
                 throw new OXFException("Invalid event target for id: " + newEventTargetId);
             }

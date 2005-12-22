@@ -72,7 +72,7 @@
         <p:otherwise>
             <!-- TODO: put here processor detecting XForms model -->
             <p:choose href="#data">
-                <!-- Test for new XForms engine -->
+                <!-- Test for NG XForms engine -->
                 <p:when test="//xforms:model"><!-- TODO: test on result of processor above -->
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
@@ -100,16 +100,8 @@
                         <p:input name="static-state" href="#static-state"/>
                         <p:output name="document" ref="xformed-data"/>
                     </p:processor>
-
-                    <!-- Legacy, XSLT-based XForms Initialization -->
-                    <!--<p:processor name="oxf:old-xforms-server">-->
-                        <!--<p:input name="static-state" href="#static-state"/>-->
-                        <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->
-                    <!--</p:processor>-->
-                    <!--<p:processor name="oxf:xslt">-->
-                        <!--<p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>-->
-                        <!--<p:input name="data" href="#annotated-view"/>-->
-                        <!--<p:input name="response" href="#response"/>-->
+                    <!--<p:processor name="oxf:sax-debugger">-->
+                        <!--<p:input name="data" href="#xformed-data-debug"/>-->
                         <!--<p:output name="data" ref="xformed-data"/>-->
                     <!--</p:processor>-->
                 </p:when>

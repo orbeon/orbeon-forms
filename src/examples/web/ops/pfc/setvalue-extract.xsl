@@ -28,7 +28,7 @@
     <xsl:variable name="request-info" select="doc('input:request-info')/*" as="element()"/>
 
     <!-- Nodes pointed to by setvalues -->
-    <!-- FIXME: Somehow we get a list of nodes from function:evaluate(); the last one appears to be the one we are looking fore -->
+    <!-- FIXME: Somehow we get a list of nodes from function:evaluate(); the last one appears to be the one we are looking for -->
     <xsl:variable name="param-nodes" as="node()*"
                   select="for $i in $setvalues return function:evaluate($instance, $i/@ref, $i/namespace::node())[last()]"/>
 

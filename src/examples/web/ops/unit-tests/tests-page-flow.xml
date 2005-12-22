@@ -14,6 +14,70 @@
 -->
 <group description="Page Flow" xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
+    <test description="Setvalues 1 (with elements and attributes)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-extract.xsl"/>
+        <input name="data">
+            <form username-2="">
+                <username/>
+                <blog-id/>
+                <count>10</count>
+                <post-id/>
+                <format/>
+                <category/>
+                <other>
+                    <element format-2=""/>
+                </other>
+            </form>
+        </input>
+        <input name="request-info">
+            <request>
+                <parameters>
+                    <parameter>
+                        <name>format</name>
+                        <value>rss</value>
+                    </parameter>
+                    <parameter>
+                        <name>category</name>
+                        <value>13</value>
+                    </parameter>
+                </parameters>
+            </request>
+        </input>
+        <input name="matcher-result">
+            <matcher-result>
+                <group>orbeon</group>
+                <group>CB2BAE93-3FB9-EC0E-CD12-79AAA2DC5314</group>
+                <group>B59D3F50-AE5C-15AB-BDA7-21892E05CAF5#comments</group>
+            </matcher-result>
+        </input>
+        <input name="setvalues">
+            <params xmlns="http://www.orbeon.com/oxf/controller">
+                <!-- Test for elements -->
+                <setvalue ref="/form/username" matcher-group="1"/>
+                <setvalue ref="/form/blog-id" matcher-group="2"/>
+                <setvalue ref="/form/post-id" matcher-group="3"/>
+                <setvalue ref="/form/format" parameter="format"/>
+                <setvalue ref="/form/category" parameter="category"/>
+                <!-- Test for attributes -->
+                <setvalue ref="/form/@username-2" matcher-group="1"/>
+                <setvalue ref="/form/other/element/@format-2" parameter="format"/>
+            </params>
+        </input>
+        <output name="data">
+            <form username-2="orbeon">
+                <username>orbeon</username>
+                <blog-id>CB2BAE93-3FB9-EC0E-CD12-79AAA2DC5314</blog-id>
+                <count>10</count>
+                <post-id>B59D3F50-AE5C-15AB-BDA7-21892E05CAF5#comments</post-id>
+                <format>rss</format>
+                <category>13</category>
+                <other>
+                    <element format-2="rss"/>
+                </other>
+            </form>
+        </output>
+    </test>
+
     <test description="Reverse Setvalues 1 (legacy)" name="oxf:unsafe-xslt">
         <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
         <input name="data">

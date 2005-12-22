@@ -12,9 +12,67 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xhtml:head><xhtml:title>XForms Credit Card Verifier</xhtml:title></xhtml:head>
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xhtml:head>
+        <xhtml:title>XForms Credit Card Verifier</xhtml:title>
+        <xforms:model id="main-model">
+
+            <xforms:instance id="credit-card-instance">
+                <credit-card>
+                    <type>visa</type>
+                    <number/>
+                    <expiration-month/>
+                    <expiration-year/>
+                    <verification-code/>
+                    <valid>false</valid>
+                </credit-card>
+            </xforms:instance>
+
+            <!-- Validate credit card number -->
+            <xforms:bind nodeset="number" type="xs:integer" constraint="
+                (
+                    (/credit-card/type = 'visa'
+                        and (string-length(/credit-card/number) = 13 or string-length(/credit-card/number) = 16)
+                        and starts-with(/credit-card/number, '4'))
+                    or (/credit-card/type = 'mastercard'
+                        and string-length(/credit-card/number) = 16
+                        and (starts-with(/credit-card/number, '51') or starts-with(/credit-card/number, '52')
+                            or starts-with(/credit-card/number, '53') or starts-with(/credit-card/number, '54')
+                            or starts-with(/credit-card/number, '55')))
+                    or (/credit-card/type = 'amex'
+                        and string-length(/credit-card/number) = 15
+                        and (starts-with(/credit-card/number, '34') or starts-with(/credit-card/number, '37')))
+                )
+                and
+                    (for $mult-number in
+                        string-join(
+                            for $i in 1 to string-length(/credit-card/number) return
+                            for $digit in substring(/credit-card/number, $i, 1) return
+                            if ($i mod 2 = 1) then xs:string(xs:integer($digit) * 2) else $digit,
+                            ''
+                        )
+                    return
+                        for $sum in
+                            sum(
+                                for $i in 1 to string-length($mult-number)
+                                return xs:integer(substring($mult-number, $i, 1))
+                            )
+                        return $sum mod 10 = 0)
+                "/>
+
+            <!-- Check expiration month/year -->
+            <xforms:bind nodeset="expiration-month"
+                    constraint=". castable as xs:integer and . >= 1 and 12 >= ."/>
+            <xforms:bind nodeset="expiration-year"
+                    constraint=". castable as xs:positiveInteger and string-length(.) = 4"/>
+
+            <!-- Only display verification code for Visa and MasterCard -->
+            <xforms:bind nodeset="verification-code" relevant="../type = 'visa' or ../type = 'mastercard'"
+                    constraint="/credit-card/type = ('visa', 'mastercard') and . castable as xs:positiveInteger"/>
+
+        </xforms:model>
+    </xhtml:head>
     <xhtml:body>
         <xforms:group ref="/credit-card">
             <table border="0" cellpadding="2" cellspacing="0">
@@ -62,23 +120,13 @@
                     </td>
                 </tr>
                 <tr>
-                    <td align="right">Verification code:</td>
+                    <td align="right">
+                        <xforms:group ref="verification-code">
+                            Verification code:
+                        </xforms:group>
+                    </td>
                     <td>
                         <xforms:input ref="verification-code" xhtml:style="width: 3em"/>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">Card valid:</td>
-                    <td>
-                        <b><xforms:output ref="valid"/></b>
-                    </td>
-                </tr>
-                <tr>
-                    <td/>
-                    <td>
-                        <xforms:submit>
-                            <xforms:label>Verify</xforms:label>
-                        </xforms:submit>
                     </td>
                 </tr>
             </table>

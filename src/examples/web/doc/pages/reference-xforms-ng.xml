@@ -36,11 +36,11 @@
                 provides an introduction to XForms concepts and explains how to use XForms in your
                 OPS application.
             </p>
-            <warning>
+            <note>
                 <p>
                     This page is a work in progress.
                 </p>
-            </warning>
+            </note>
         </section>
         <section>
             <title>Introduction to XForms</title>
@@ -1607,6 +1607,79 @@
                     <code>employees/employee</code> refers to the three employees of that
                     department, Anne, Mark and Sophie.
                 </p>
+            </section>
+            <a name="xforms-actions"/>
+            <section>
+                <title>Actions</title>
+                <p>
+                    TODO
+                </p>
+                <a name="xforms-setvalue"/>
+                <section>
+                    <title>Setting Instance Values with the <code>xforms:setvalue</code> Action</title>
+                    <p>
+                        TODO
+                    </p>
+                    <xml-source>
+                        <xforms:trigger>
+                            <xforms:label>Submit</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="clicked">my-button</xforms:setvalue>
+                                <xforms:setvalue ref="flavor" value="concat('van', 'illa')"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        There are two ways of providing the value to set with
+                        <code>&lt;xforms:setvalue></code>. The first one specifies the value as a
+                        literal enclosed in the <code>&lt;xforms:setvalue></code> element. The second
+                        possibility uses the <code>value</code> attribute: the content of the attribute
+                        is an XPath expression evaluated in the context of the node the
+                        <code>xforms:setvalue</code> element is bound (through the <code>ref</code>
+                        attribute). The content of the node pointed to by the <code>ref</code>
+                        attribute will be set with the result of the XPath expression provided in the
+                        <code>value</code> attribute.
+                    </p>
+                </section>
+                <a name="xforms-message"/>
+                <section>
+                    <title>Displaying Message with the <code>xforms:message</code> Action</title>
+                    <p>
+                        The XForms message action displays a message to the user. OPS being a
+                        server-side XForms implementation. <img print-format="pdf"
+                        src="pages/reference-xforms-message.png" style="clear: both; float: right"/>
+                        TODO: check this for 3.0.
+                    </p>
+                    <p>
+                        Typically, the content of the <code>message</code> element is the message to
+                        render. It can also come from the binding attributes (<code>ref</code> or
+                        <code>bind</code>), or from the linking attribute (<code>src</code>). The order
+                        of preference is the following:
+                    </p>
+                    <ul>
+                        <li>Binding attributes</li>
+                        <li>Linking attribute</li>
+                        <li>Inline text</li>
+                    </ul>
+                    <note>
+                        <ul>
+                            <li>The only value currently supported for the <code>level</code>
+                            attribute is <code>modal</code>. This attribute is optional.</li>
+                            <li>When using the linking attribute (<code>src</code>), the value must
+                            be an absolute URL, starting with <code>oxf:</code>, <code>http:</code>
+                            or other supported protocols.</li>
+                        </ul>
+                    </note>
+                    <xml-source show-namespaces="false">
+                        <xforms:trigger>
+                            <xforms:label>Test</xforms:label>
+                            <xforms:message ev:event="DOMActivate" ref="taste"/>
+                        </xforms:trigger>
+                    </xml-source>
+                    <p>
+                        TODO: cover other actions
+                    </p>
+                </section>
             </section>
             <a name="xforms-submission"/>
             <section>

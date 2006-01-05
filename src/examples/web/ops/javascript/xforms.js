@@ -464,12 +464,10 @@ function xformsHandleOutputClick(event) {
 function xformsHandleFirefoxValueChange(property, oldvalue, newvalue) {
     var span = this;
     var textField = span.childNodes[1];
-    if (span.valueSetByXForms == 0 && textField.value != span.value) {
+    if (span.valueSetByXForms == 0 && textField.value != newvalue) {
         span.value = newvalue;
         textField.value = newvalue;
         xformsDispatchEvent(textField, "change");
-    } else {
-        span.valueSetByXForms--;
     }
     return newvalue;
 }
@@ -483,8 +481,6 @@ function xformsHandleIEValueChange(event) {
             span.valueSetByXForms++;
             span.value = span.previousValue;
             xformsDispatchEvent(textField, "change");
-        } else {
-            span.valueSetByXForms--;
         }
     }
 }
@@ -747,13 +743,13 @@ function xformsInitializeControlsUnder(root) {
                 control.value = control.childNodes[1].value;
                 var textfield = control.childNodes[1];
                 control.previousValue = textfield.value;
+                control.valueSetByXForms = 0;
                 // Intercept custom JavaScript code changing control value
                 if (control.watch) {
                     // Firefox implements a watch() method
                     control.watch("value", xformsHandleFirefoxValueChange);
                 } else {
                     // IE throws a propertychange event
-                    control.valueSetByXForms = 0;
                     xformsAddEventListener(control, "propertychange", xformsHandleIEValueChange);
                 }
                 // Intercept end-user pressing enter in text field

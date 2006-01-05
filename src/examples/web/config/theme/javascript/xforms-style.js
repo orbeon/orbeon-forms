@@ -81,6 +81,7 @@ function xformsSytleGetFocus(event) {
             break;
         }
         hintLabel = hintLabel.nextSibling;
+        if (hintLabel == null) break;
     }
 }
 
@@ -96,6 +97,7 @@ function xformsStyleLoosesFocus(event) {
             break;
         }
         hintLabel = hintLabel.nextSibling;
+        if (hintLabel == null) break;
     }
 }
 
@@ -116,7 +118,7 @@ function xformsCalendarClick(event) {
     // Call jscalendar handler only if this is date field
     var target = getEventTarget(event);
     // Event can be received on calendar picker span, or on the containing span
-    var span = target.childNodes.length == 0 ? target.parentNode : target
+    var span = target.childNodes.length != 3 ? target.parentNode : target
     var inputField = span.childNodes[1];
     if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
             && !inputField.disabled)

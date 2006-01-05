@@ -145,7 +145,11 @@ function xformsUpdateStyle(element) {
             if (className == "xforms-output-html") {
                 if (element.firstChild != null)
                     element.innerHTML = xformsStringValue(element);
-                element.style.display = "inline";
+            }
+
+            if (className == "xforms-output-html-initial") {
+                // Make the content of the element visible
+                xformsRemoveClass(element, "xforms-output-html-initial");
             }
 
             if (className == "xforms-label") {

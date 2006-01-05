@@ -64,6 +64,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         if (isHTML) {
             classes.append(" xforms-output-html");
+            classes.append(" xforms-output-html-initial");
         } else if (isImage) {
             classes.append(" xforms-output-image");
         }
@@ -87,6 +88,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         // Create xhtml:span or xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        // For IE we need to generate a div here for IE, which doesn't support working with innterHTML on spans.
         final String enclosingElementLocalname = isHTML ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 

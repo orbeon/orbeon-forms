@@ -2773,7 +2773,29 @@
         <section>
             <title>Javascript Integration</title>
             <p>
-                TODO: Describe how you can use your own Javascript to set values to XForms controls.
+                While XForms gets you a long way towards creating a dynamic user-friendly user
+                interface, there are some dynamic behaviors of the user interface that cannot be
+                implemented with XForms, and that you might want to implement directly in
+                JavaScript. We describe here how your JavaScript code can interact with XForms and
+                in particular how you can have access to the value of an XForms control.
+            </p>
+            <p>
+                With the current version of PresentationServer, accessing the value of a control is
+                only supported for <code>&lt;xforms:input></code>. If you want to access the value
+                of another control, add an <code>&lt;xforms:input></code> with <code>style="display:
+                none"</code> bound to the same node as that control and access the
+                <code>&lt;xforms:input></code>.
+            </p>
+            <p>
+                In JavaScript, you obtain a reference to the element representing the control with
+                <code>var control = document.getElementById('myControl')</code> where
+                <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
+                id="myControl"></code>. You can read the current value of the control with
+                <code>control.value</code> and set the value of the control assigning a value to
+                <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
+                do such an assignment the value of the node in the instance is updated, the
+                <code>xforms-value-changed</code> event thrown, and all the standard XForms
+                processing happens (validation, recalculation, etc).
             </p>
         </section>
     </body>

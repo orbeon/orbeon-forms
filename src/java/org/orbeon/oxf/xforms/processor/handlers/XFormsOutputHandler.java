@@ -73,9 +73,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
             // Find classes to add
             isDateOrTime = isDateOrTime(controlInfo.getType());
-            if (isDateOrTime) {
-                classes.append(" xforms-date");
-            }
             handleMIPClasses(classes, controlInfo);
 
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);

@@ -96,9 +96,13 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static boolean isDateOrTime(String type) {
-        return "{http://www.w3.org/2001/XMLSchema}date".equals(type)
+        return isDate(type)
                 || "{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)
                 || "{http://www.w3.org/2001/XMLSchema}time".equals(type);
+    }
+
+    public static boolean isDate(String type) {
+        return "{http://www.w3.org/2001/XMLSchema}date".equals(type);
     }
 
     protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String id) {

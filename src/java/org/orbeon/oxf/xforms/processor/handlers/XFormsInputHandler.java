@@ -47,19 +47,19 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
 
         final AttributesImpl newAttributes;
-        final boolean isDateOrTime;
+        final boolean isDate;
         final String typeClass;
         {
             final StringBuffer classes = new StringBuffer("xforms-control xforms-input");
             if (!handlerContext.isGenerateTemplate()) {
-                isDateOrTime = isDateOrTime(controlInfo.getType());
-                typeClass = isDateOrTime ? "xforms-type-date" : "xforms-type-string";
+                isDate = isDate(controlInfo.getType());
+                typeClass = isDate ? "xforms-type-date" : "xforms-type-string";
 
                 handleMIPClasses(classes, controlInfo);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             } else {
-                isDateOrTime = false;
+                isDate = false;
                 typeClass = null;
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
@@ -80,7 +80,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                if (!handlerContext.isGenerateTemplate() && isDateOrTime) {
+                if (!handlerContext.isGenerateTemplate() && isDate) {
                     final String value = controlInfo.getDisplayValue();
                     contentHandler.characters(value.toCharArray(), 0, value.length());
                 }

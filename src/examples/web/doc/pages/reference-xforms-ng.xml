@@ -1351,7 +1351,6 @@
                         want to have at least one element in your collections.
                     </p>
                     <p>
-
                         In case you want the user interface to visually appear empty empty when
                         there is "no more" elements in the collection, you can use the tip provided
                         below, which can be used in most situations. The idea is to consider that
@@ -2761,7 +2760,7 @@
                 </p>
             </section>
         </section>
-        <a name="xforms-JavaScript"/>
+        <a name="xforms-javascript"/>
         <section>
             <title>JavaScript Integration</title>
             <p>

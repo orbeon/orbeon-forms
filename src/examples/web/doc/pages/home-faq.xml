@@ -35,173 +35,26 @@
             <a name="compare-cocoon"/>
             <section>
                 <title>How does Orbeon PresentationServer compare with Apache Cocoon?</title>
-
-                    <p>
-                        OPS is similar to Cocoon in some respects but also presents many
-                        differences. For more information, see our <a
-                        href="http://www.orbeon.com/community/cocoon">OPS and Cocoon</a> comparison
-                        matrix.
-                    </p>
-
-            </section>
-            <a name="xml-pipeline"/>
-            <section>
-                <title>What is an XML pipeline and why do I care?</title>
-
-                    <p>
-                        XML pipelining is an approach to processing XML where the inputs and outputs of
-                        multiple processing steps (e.g., XSLT transformations) are connected together
-                        using a pipeline metaphor. Orbeon has implemented an XML pipeline engine in Java
-                        that executes a declarative XML pipelining language called <a
-                        href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XPL</a>.
-                    </p>
-                    <p>
-                        "Programming" pipelines using declarative XML instead of writing procedural
-                        code results in a significant increase in productivity for tasks that require
-                        high volume or complex XML processing. XML documents enter a pipeline, are
-                        efficiently processed by one or more processors as specified by XPL
-                        instructions, and are then output for further processing, display, or storage.
-                        XPL features advanced capabilities such as document aggregation, conditionals
-                        ("if" conditions), loops, schema validation, caching, and sub-pipelines.
-                    </p>
-                    <p>
-                        XML pipelines are built up from smaller components called XML processors. An
-                        XML processor is a software component which consumes and produces XML documents.
-                        New XML processors are most often written in Java, but most often developers do
-                        not need to write their own processors because the engine provides a
-                        comprehensive library. Example processors include an XSLT processor, database
-                        processors that interface with both SQL and native XML databases, and a
-                        serializer processor that writes XML documents to disk. XPL orchestrates these
-                        to create business logic, similar to the way Java code "orchestrates" Java
-                        object method calls.
-                    </p>
-
-            </section>
-            <a name="what-is-xpl"/>
-            <section>
-                <title>What is XPL?</title>
-
-                    <p>
-                        At the core of OPS lies a powerful XML processing engine that
-                        natively speaks the <a
-                        href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XML Pipeline
-                        Language (XPL)</a>. XPL is a declarative language for processing XML using a
-                        pipeline metaphor. XML documents enter a pipeline, are efficiently processed by
-                        one or more processors as specified by XPL instructions, and are then output for
-                        further processing, display, or storage. XPL features advanced capabilities such
-                        as document aggregation, conditionals ("if" conditions), loops, schema
-                        validation, and sub-pipelines.
-                    </p>
-                    <p>
-                        The Orbeon XPL pipeline engine used in OPS is designed for
-                        low-memory consumption and supports transparent caching.
-                    </p>
-
-            </section>
-            <a name="xml-processor"/>
-            <section>
-                <title>What is an XML processor?</title>
-
-                    <p>
-                        The term XML processor is commonly used to refer to XML parsers. In the context
-                        of OPS, the term
-                        <i>XML processor</i> is used to refer to
-                        any software component consuming and/or producing XML documents. An XML
-                        processor can also simply be called an
-                        <i>XML component</i>.
-                    </p>
-
-            </section>
-            <a name="xml-pipeline-looks"/>
-            <section>
-                <title>What does an XML pipeline look like?</title>
-
-                    <p>
-                        This particular example illustrates a simple 2-stage XPL pipeline that
-                        performs an XSLT transformation on an XML document that is located on disk,
-                        and then writes the result back to a another file on disk. For more details
-                        about XPL, please see the <a href="/ops/doc/reference-xpl-pipelines">XPL and
-                        Pipelines reference documentation</a>, or the <a
-                        href="OPS Tutorial.pdf">OPS tutorial</a>.
-                    </p>
-                    <div class="image">
-                        <img width="482" height="310" src="pages/2-stage-pipeline.png"/>
-                        <div class="legend">2-Stage XPL Pipeline Diagram</div>
-                    </div>
-                    <br/>
-                    <div class="image">
-                        <img src="pages/2-stage-pipeline-code.png"/>
-                        <div class="legend">2-Stage Pipeline XPL Code</div>
-                    </div>
-
-            </section>
-            <a name="xpl-spec"/>
-            <section>
-                <title>Is there a specification for XPL?</title>
                 <p>
-                    As of February 2005, a <a
-                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">draft
-                    specification</a> has been completed amd submitted to W3C. It serves as a basis
-                    of discussion for an XPL 1.0 specification.
+                    OPS is similar to Cocoon in some respects but also presents many differences,
+                    in particular XForms support. For more information, see our <a
+                    href="http://www.orbeon.com/community/cocoon">OPS and Cocoon</a> comparison
+                    matrix.
                 </p>
-            </section>
-            <a name="xpl-impl"/>
-            <section>
-                <title>Is anybody free to implement XPL?</title>
-                <p>Yes.</p>
             </section>
             <a name="compare-model2x"/>
             <section>
                 <title>How does OPS compare with Model 2X?</title>
-
-                    <p>
-                        Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to
-                        Web applications. Model 2X builds on top of Model 2 and replaces the JSP layer
-                        with XML and XSLT. Model 2X was first described in an
-                        <a
-                            href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
-                        published by JavaWorld in February 2002. OPS can be used to
-                        implement Model 2X and much more. For more information, please refer to the
-                        <a href="/ops/doc/">OPS User Guide</a>.
-                    </p>
-
-            </section>
-            <a name="xpointer-support"/>
-            <section>
-                <title>How much of the XPointer specification does XPL support?</title>
-
-                    <p>
-                        OPS supports a subset of <a
-                        href="http://www.w3.org/TR/xptr-xpointer/">XPointer</a>. You can use the
-                        XPointer <code>document#xpointer(/xpath/expression)</code> syntax to extract a
-                        nodeset from a document.
-                    </p>
-
-            </section>
-            <a name="xslt-params"/>
-            <section>
-                <title>How can I pass parameters to an XSLT stylesheet?</title>
-
-                    <p>
-                        It is possible by importing the stylesheet within another
-                        stylesheet, as follows:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
-                            <p:input name="data" href="..."/>
-                            <p:input name="config">
-                                <xsl:stylesheet version="2.0"
-                                    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                                    <comment>This is the stylesheet to pass parameters to</comment>
-                                    <xsl:import href="tour.xsl"/>
-                                    <comment>Here we assign a value to the "start" parameter</comment>
-                                    <xsl:param name="start" select="'a1'"/>
-                                </xsl:stylesheet>
-                            </p:input>
-                            <p:output name="data" id="..."/>
-                        </p:processor>
-                    </xml-source>
-
+                <p>
+                    Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to
+                    Web applications. Model 2X builds on top of Model 2 and replaces the JSP layer
+                    with XML and XSLT. Model 2X was first described in an
+                    <a
+                        href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
+                    published by JavaWorld in February 2002. OPS can be used to
+                    implement Model 2X and much more. For more information, please refer to the
+                    <a href="/ops/doc/">OPS User Guide</a>.
+                </p>
             </section>
             <a name="xslt-processor"/>
             <section>
@@ -245,183 +98,12 @@
                     project if necessary.
                 </p>
             </section>
-            <a name="caching"/>
-            <section>
-                <title>How does caching work in OPS?</title>
-                <p>
-                    Caching mechanisms should have no impact on the behavior of a system, except
-                    for a gain in performance. This is also the principle followed by the
-                    OPS cache: when you develop an application with
-                    OPS, you should be able to ignore that caching takes place. This
-                    may be all you want to know about caching in OPS!
-                </p>
-                <p>
-                    To get a better understanding of the underlying mechanism,
-                    consider the example below:
-                </p>
-                <div class="image">
-                    <img src="pages/faq-caching.png" width="461" height="154"/>
-                </div>
-                <p>
-                    Let's assume the following:
-                </p>
-                <ul>
-                    <li>The XSLT processor's
-                        <code>config</code> input is an XSLT stylesheet on disk
-                    </li>
-                    <li>The XSLT processor's
-                        <code>data</code> input is an XML file on disk
-                    </li>
-                    <li>
-                        The XSLT stylesheet does not contain imports, includes,
-                        the document() function, or calls to Java code.
-                    </li>
-                </ul>
-                <p>
-                    Under those assumptions, the XSLT transformation does not
-                    have side effects, which means that if neither the XSLT
-                    stylesheet
-                    (
-                    <code>config</code> input) nor the input XML
-                    document (
-                    <code>data</code> input) change, the output of the
-                    transformation will be the same.
-                </p>
-                <p>
-                    If you were to keep the result of the transformation,
-                    knowing that both inputs have not changed since the last
-                    time you generated that output, you wouldn't have to
-                    actually run the transformation again: you could just reuse
-                    the result you already have. This is the basic of caching in
-                    OPS.
-                </p>
-                <p>
-                    In this example, the result of the XSLT transformation is
-                    used to create an XUpdate processor configuration, which is
-                    an XUpdate program that will be interpreted or compiled by
-                    the XUpdate processor. Instead of keeping the result of the
-                    XSLT transformation as an XML document, the XUpdate
-                    processor can cache the compiled XUpdate program. Compared
-                    to a solution where the XML document is cached, this
-                    technique saves memory by not keeping the XML document in
-                    cache, and saves processing power by preventing the XUpdate
-                    processor to recompile its program.
-                </p>
-                <p>
-                    Therefore, if neither the XSLT transformer's
-                    <code>config</code> nor
-                    <code>data</code> input has changed, the XUpdate processor can keep the
-                    same program in the OPS object cache, saving an XSLT stylesheet
-                    compilation, an XSLT transformation, and an XUpdate program compilation.
-                </p>
-                <p>
-                    The same mechanism applies to the XSLT transformer configuration: the compiled
-                    XSLT stylesheet can be kept in the OPS object cache. And if the
-                    output of the XUpdate transformation is sent to an HTML serializer, the HTML
-                    output could be cached as well.
-                </p>
-                <p>
-                    In general, OPS does not unnecessarily cache the XML
-                    documents passed between processors. Instead, it caches the
-                    result of time-consuming operations, as illustrated above.
-                </p>
-                <p>
-                    Some cases are more complex than the example shown here. For
-                    example in the case of XSLT 1.0, OPS handles caching and
-                    dependencies related to imports, includes as well as the
-                    XPath
-                    <code>document()</code> function when the URL passed
-                    to the function is static. Some processors, like the SQL
-                    processors, never allow their output to be cached.
-                </p>
-            </section>
-            <a name="debug-attr-perf"/>
-            <section>
-                <title>
-                    Do debug attributes make my application slower?
-                </title>
-                <p>
-                    The OPS cache avoids executing the parts of a pipeline that do
-                    not need to be re-evaluated. However when the a debug attribute is set, the
-                    point where the attribute is set needs to be evaluated so that meaningful data
-                    can be displayed. This can cause the performance to degrade. Debug attributes
-                    should be removed in production.
-                </p>
-            </section>
-            <a name="debug-disable"/>
-            <section>
-                <title>Can I disable debug attributes globally?</title>
-                <p>
-                    Not at this time.
-                </p>
-            </section>
             <a name="file-upload"/>
             <section>
                 <title>How can I perform a file upload?</title>
                 <p>
                     Check the <a href="/ops/doc/reference-xforms-ng">XForms upload control</a> and
                     the <a href="/ops/goto-example/xforms-upload">XForms upload example</a>
-                </p>
-            </section>
-            <a name="xpl-name-id"/>
-            <section>
-                <title>When invoking a processor in XPL, what is the difference between a name and an id?</title>
-                <p>
-                    Processors can be compared to functions in traditional programming languages.
-                    Processors (just like functions) have inputs (arguments) and outputs (return
-                    values). Each input and output has a <i>name</i>. The name is part of the
-                    processor's interface. For instance, using an informal function-like notation,
-                    the XSLT processor interface is:
-                </p>
-                <blockquote>
-                    <code>(data) = xslt(data, config)</code>
-                </blockquote>
-                <p>
-                    since the XSLT processor has 2 inputs named <code>data</code> and
-                    <code>config</code>, and one output named <code>data</code>.
-                </p>
-                <p>
-                    The interface to a processor is the contract that defines what inputs and
-                    outputs do. If you are using an existing processor, for example the XSLT
-                    transformer, you have to use the names declared by that processor. To know what
-                    names you must use, you have to consult the documentation for each processor. We
-                    have tried to be consistent and to use "config" and "data" as often as possible.
-                    You can for example call the XSLT transformer like this:
-                </p>
-                <xml-source show-namespaces="false">
-                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
-                        <p:input name="config" href="stylesheet.xsl"/>
-                        <p:input name="data" href="input.xml"/>
-                        <p:output name="data" id="my-output"/>
-                    </p:processor>
-                </xml-source>
-                <p>
-                    A pipeline can also be viewed as a processor. If that pipeline decides to
-                    export inputs and outputs, it must do so using the <code>&lt;p:param
-                    name="..."/></code> syntax. This defines its interface. You can compare this to
-                    writing your own method in Java, as opposed to using an existing method. The
-                    difference is that in Java, you address method parameters by position when you
-                    call a method. In XPL, you always address them by name. Therefore it is
-                    important to use the right name when you call a processor (or a pipeline).
-                </p>
-                <p>
-                    This also applies to the cases where the Web Application Controller calls your
-                    own pipelines: the PFC has to know the names of the inputs and outputs to
-                    connect to. Therefore, you have to use the names ( <code>data</code> and
-                    <code>instance</code>) <a
-                    href="http://www.orbeon.com/ops/doc/processors-controller">documented</a>.
-                </p>
-                <p>
-                    If you implement a pipeline or write a new processor in Java, and you don't
-                    have any external naming constraints (such as the ones defined by the PFC, or
-                    if somebody expects to call your pipeline using names defined in advance), you
-                    are free to use any name.
-                </p>
-                <p>
-                    In XPL an <i>id</i> can be assigned to an output when invoking a processor. This
-                    id can then be used latter on in the same pipeline to refer to that specific
-                    output, and for instance connect it to the input of another processor. Ids are
-                    similar to variable names in most programming languages.
                 </p>
             </section>
             <a name="dom4j-illegal-add"/>
@@ -820,36 +502,56 @@
                     See also the OPS <a href="reference-xforms-ng#introduction">XForms Introduction</a> section.
                 </p>
             </section>
-
+            <a name="xforms-compliance"/>
             <section>
                 <title>How much of the XForms specification does OPS support?</title>
                 <p>
-                    The XForms specification assumes that XForms is implemented on the client-side.
-                    Ideally an XForms implementation would be implemented in a web browser, and
-                    until XForms becomes standard on mainstream browsers, XForms-based applications
-                    need to use server-side implementations, such as the one implemented by the
-                    OPS. It is believed that using server-side implementation is a
-                    great migration path towards XForms.
+                    The OPS implementation is based on the <a
+                    href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
+                    October 2003). OPS 3.0's XForms NG engine is close to supporting all of the
+                    XForms 1.0 specification. For more detailed information on what features are
+                    supported in the latest version of OPS, see the <a
+                    href="reference-xforms-compliance">XForms conformance matrix</a> section of the
+                    documentation.
+                </p>
+            </section>
+            <a name="xforms-server-side"/>
+            <section>
+                <title>What is a server-side XForms implementation?</title>
+                <p>
+                    The XForms specification assumes that XForms is implemented on the client-side,
+                    that is natively within a web browser. Until XForms becomes standard on
+                    mainstream browsers, XForms-based applications can use server-side
+                    implementations (that delegate a good part of the XForms processing to
+                    server-side code), or hybrid implementations, that share XForms processing
+                    between server-side code and client-side code and rely on Ajax technology.
+                    Orbeon PresentationServer features such a hybrid implementation. We believe that
+                    using hybrid implementation is the best possible migration path towards XForms.
                 </p>
                 <p>
                     A server-side implementation of XForms translates your forms described in terms
-                    of the XForms specification into HTML forms. It also creates one or more XML
-                    documents, the <i>XForms instances</i>, based on the data entered by the
-                    end-user with a browser. The following diagram shows a high-level overview of
-                    the architecture of a server-side XForms implementation:
+                    of the XForms specification into HTML, CSS and JavaScript code understood by
+                    your web browser. The following diagram shows a high-level overview of the
+                    architecture of a hybrid XForms implementation:
                 </p>
                 <div class="image">
-                    <img width="600" height="380" src="pages/faq-xforms.png"/>
-                    <div class="legend">Server-Side XForms</div>
+                    <img width="620" height="454" src="pages/xforms-hybrid.png"/>
+                    <div class="legend">Hybrid XForms</div>
                 </div>
                 <p>
-                    The OPS implementation is based on the <a
-                    href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
-                    October 2003). For more detailed information on what features are supported in
-                    the latest version of OPS, see the <a
-                    href="/ops/doc/reference-xforms-compliance">XForms conformance matrix</a>
-                    section of the documentation.
+                    For more information about server-side XForms, we refer you to this article we
+                    presented at the XTech 2005 conference:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            <a href="http://www.orbeon.com/ops/xtech">Are Server-Side XForms
+                            Engines the Future of XForms?</a> (see also the <a
+                            href="http://www.idealliance.org/proceedings/xtech05/papers/03-08-03/">pre-conference
+                            proceedings</a>, which contain an out of date version of the article)
+                        </p>
+                    </li>
+                </ul>
             </section>
             <a name="xforms-classic-ng"/>
             <section>
@@ -912,8 +614,9 @@
             <section added="2005-05-21">
                 <title>My XForms upload doesn't work. What can I do?</title>
                 <p>
-                    With OPS 2.8 or earlier, make sure that you have the correct submission method
-                    and encoding in your XForms model:
+                    With OPS 2.8 or earlier, or if you are using XForms Classic with OPS 3.0, make
+                    sure that you have the correct submission method and encoding in your XForms
+                    model:
                 </p>
                 <p>
                     <xml-source>
@@ -921,7 +624,313 @@
                     </xml-source>
                 </p>
                 <p>
-                    With OPS 3.0 [TODO].
+                    With OPS 3.0 and XForms NG, uploaded files can only be retrieved with a
+                    submission with <code>replace="all"</code>.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>XML pipelines (XPL) FAQ</title>
+            <a name="xml-pipeline"/>
+            <section>
+                <title>What is an XML pipeline and why do I care?</title>
+                <p>
+                    XML pipelining is an approach to processing XML where the inputs and outputs of
+                    multiple processing steps (e.g., XSLT transformations) are connected together
+                    using a pipeline metaphor. Orbeon has implemented an XML pipeline engine in Java
+                    that executes a declarative XML pipelining language called <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XPL</a>.
+                </p>
+                <p>
+                    "Programming" pipelines using declarative XML instead of writing procedural
+                    code results in a significant increase in productivity for tasks that require
+                    high volume or complex XML processing. XML documents enter a pipeline, are
+                    efficiently processed by one or more processors as specified by XPL
+                    instructions, and are then output for further processing, display, or storage.
+                    XPL features advanced capabilities such as document aggregation, conditionals
+                    ("if" conditions), loops, schema validation, caching, and sub-pipelines.
+                </p>
+                <p>
+                    XML pipelines are built up from smaller components called XML processors. An
+                    XML processor is a software component which consumes and produces XML documents.
+                    New XML processors are most often written in Java, but most often developers do
+                    not need to write their own processors because the engine provides a
+                    comprehensive library. Example processors include an XSLT processor, database
+                    processors that interface with both SQL and native XML databases, and a
+                    serializer processor that writes XML documents to disk. XPL orchestrates these
+                    to create business logic, similar to the way Java code "orchestrates" Java
+                    object method calls.
+                </p>
+            </section>
+            <a name="what-is-xpl"/>
+            <section>
+                <title>What is XPL?</title>
+                <p>
+                    At the core of OPS lies a powerful XML processing engine that
+                    natively speaks the <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XML Pipeline
+                    Language (XPL)</a>. XPL is a declarative language for processing XML using a
+                    pipeline metaphor. XML documents enter a pipeline, are efficiently processed by
+                    one or more processors as specified by XPL instructions, and are then output for
+                    further processing, display, or storage. XPL features advanced capabilities such
+                    as document aggregation, conditionals ("if" conditions), loops, schema
+                    validation, and sub-pipelines.
+                </p>
+                <p>
+                    The Orbeon XPL pipeline engine used in OPS is designed for
+                    low-memory consumption and supports transparent caching.
+                </p>
+            </section>
+            <a name="xml-processor"/>
+            <section>
+                <title>What is an XML processor?</title>
+                <p>
+                    The term XML processor is commonly used to refer to XML parsers. In the context
+                    of OPS, the term
+                    <i>XML processor</i> is used to refer to
+                    any software component consuming and/or producing XML documents. An XML
+                    processor can also simply be called an
+                    <i>XML component</i>.
+                </p>
+            </section>
+            <a name="xml-pipeline-looks"/>
+            <section>
+                <title>What does an XML pipeline look like?</title>
+                <p>
+                    This particular example illustrates a simple 2-stage XPL pipeline that
+                    performs an XSLT transformation on an XML document that is located on disk,
+                    and then writes the result back to a another file on disk. For more details
+                    about XPL, please see the <a href="/ops/doc/reference-xpl-pipelines">XPL and
+                    Pipelines reference documentation</a>, or the <a
+                    href="OPS Tutorial.pdf">OPS tutorial</a>.
+                </p>
+                <div class="image">
+                    <img width="482" height="310" src="pages/2-stage-pipeline.png"/>
+                    <div class="legend">2-Stage XPL Pipeline Diagram</div>
+                </div>
+                <br/>
+                <div class="image">
+                    <img src="pages/2-stage-pipeline-code.png"/>
+                    <div class="legend">2-Stage Pipeline XPL Code</div>
+                </div>
+            </section>
+            <a name="xpl-spec"/>
+            <section>
+                <title>Is there a specification for XPL?</title>
+                <p>
+                    As of February 2005, a <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">draft
+                    specification</a> has been completed amd submitted to W3C. It serves as a basis
+                    of discussion for an XPL 1.0 specification.
+                </p>
+            </section>
+            <a name="xpl-impl"/>
+            <section>
+                <title>Is anybody free to implement XPL?</title>
+                <p>Yes.</p>
+            </section>
+            <a name="xpointer-support"/>
+            <section>
+                <title>How much of the XPointer specification does XPL support?</title>
+                <p>
+                    OPS supports a subset of <a
+                    href="http://www.w3.org/TR/xptr-xpointer/">XPointer</a>. You can use the
+                    XPointer <code>document#xpointer(/xpath/expression)</code> syntax to extract a
+                    nodeset from a document.
+                </p>
+            </section>
+            <a name="xslt-params"/>
+            <section>
+                <title>How can I pass parameters to an XSLT stylesheet?</title>
+                <p>
+                    It is possible by importing the stylesheet within another
+                    stylesheet, as follows:
+                </p>
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:input name="data" href="..."/>
+                        <p:input name="config">
+                            <xsl:stylesheet version="2.0"
+                                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                <comment>This is the stylesheet to pass parameters to</comment>
+                                <xsl:import href="tour.xsl"/>
+                                <comment>Here we assign a value to the "start" parameter</comment>
+                                <xsl:param name="start" select="'a1'"/>
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:output name="data" id="..."/>
+                    </p:processor>
+                </xml-source>
+            </section>
+            <a name="caching"/>
+            <section>
+                <title>How does caching work in OPS?</title>
+                <p>
+                    Caching mechanisms should have no impact on the behavior of a system, except
+                    for a gain in performance. This is also the principle followed by the
+                    OPS cache: when you develop an application with
+                    OPS, you should be able to ignore that caching takes place. This
+                    may be all you want to know about caching in OPS!
+                </p>
+                <p>
+                    To get a better understanding of the underlying mechanism,
+                    consider the example below:
+                </p>
+                <div class="image">
+                    <img src="pages/faq-caching.png" width="461" height="154"/>
+                </div>
+                <p>
+                    Let's assume the following:
+                </p>
+                <ul>
+                    <li>The XSLT processor's
+                        <code>config</code> input is an XSLT stylesheet on disk
+                    </li>
+                    <li>The XSLT processor's
+                        <code>data</code> input is an XML file on disk
+                    </li>
+                    <li>
+                        The XSLT stylesheet does not contain imports, includes,
+                        the document() function, or calls to Java code.
+                    </li>
+                </ul>
+                <p>
+                    Under those assumptions, the XSLT transformation does not
+                    have side effects, which means that if neither the XSLT
+                    stylesheet
+                    (
+                    <code>config</code> input) nor the input XML
+                    document (
+                    <code>data</code> input) change, the output of the
+                    transformation will be the same.
+                </p>
+                <p>
+                    If you were to keep the result of the transformation,
+                    knowing that both inputs have not changed since the last
+                    time you generated that output, you wouldn't have to
+                    actually run the transformation again: you could just reuse
+                    the result you already have. This is the basic of caching in
+                    OPS.
+                </p>
+                <p>
+                    In this example, the result of the XSLT transformation is
+                    used to create an XUpdate processor configuration, which is
+                    an XUpdate program that will be interpreted or compiled by
+                    the XUpdate processor. Instead of keeping the result of the
+                    XSLT transformation as an XML document, the XUpdate
+                    processor can cache the compiled XUpdate program. Compared
+                    to a solution where the XML document is cached, this
+                    technique saves memory by not keeping the XML document in
+                    cache, and saves processing power by preventing the XUpdate
+                    processor to recompile its program.
+                </p>
+                <p>
+                    Therefore, if neither the XSLT transformer's
+                    <code>config</code> nor
+                    <code>data</code> input has changed, the XUpdate processor can keep the
+                    same program in the OPS object cache, saving an XSLT stylesheet
+                    compilation, an XSLT transformation, and an XUpdate program compilation.
+                </p>
+                <p>
+                    The same mechanism applies to the XSLT transformer configuration: the compiled
+                    XSLT stylesheet can be kept in the OPS object cache. And if the
+                    output of the XUpdate transformation is sent to an HTML serializer, the HTML
+                    output could be cached as well.
+                </p>
+                <p>
+                    In general, OPS does not unnecessarily cache the XML
+                    documents passed between processors. Instead, it caches the
+                    result of time-consuming operations, as illustrated above.
+                </p>
+                <p>
+                    Some cases are more complex than the example shown here. For
+                    example in the case of XSLT 1.0, OPS handles caching and
+                    dependencies related to imports, includes as well as the
+                    XPath
+                    <code>document()</code> function when the URL passed
+                    to the function is static. Some processors, like the SQL
+                    processors, never allow their output to be cached.
+                </p>
+            </section>
+            <a name="debug-attr-perf"/>
+            <section>
+                <title>
+                    Do debug attributes make my application slower?
+                </title>
+                <p>
+                    The OPS cache avoids executing the parts of a pipeline that do
+                    not need to be re-evaluated. However when the a debug attribute is set, the
+                    point where the attribute is set needs to be evaluated so that meaningful data
+                    can be displayed. This can cause the performance to degrade. Debug attributes
+                    should be removed in production.
+                </p>
+            </section>
+            <a name="debug-disable"/>
+            <section>
+                <title>Can I disable debug attributes globally?</title>
+                <p>
+                    Not at this time.
+                </p>
+            </section>
+            <a name="xpl-name-id"/>
+            <section>
+                <title>When invoking a processor in XPL, what is the difference between a name and an id?</title>
+                <p>
+                    Processors can be compared to functions in traditional programming languages.
+                    Processors (just like functions) have inputs (arguments) and outputs (return
+                    values). Each input and output has a <i>name</i>. The name is part of the
+                    processor's interface. For instance, using an informal function-like notation,
+                    the XSLT processor interface is:
+                </p>
+                <blockquote>
+                    <code>(data) = xslt(data, config)</code>
+                </blockquote>
+                <p>
+                    since the XSLT processor has 2 inputs named <code>data</code> and
+                    <code>config</code>, and one output named <code>data</code>.
+                </p>
+                <p>
+                    The interface to a processor is the contract that defines what inputs and
+                    outputs do. If you are using an existing processor, for example the XSLT
+                    transformer, you have to use the names declared by that processor. To know what
+                    names you must use, you have to consult the documentation for each processor. We
+                    have tried to be consistent and to use "config" and "data" as often as possible.
+                    You can for example call the XSLT transformer like this:
+                </p>
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:input name="config" href="stylesheet.xsl"/>
+                        <p:input name="data" href="input.xml"/>
+                        <p:output name="data" id="my-output"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    A pipeline can also be viewed as a processor. If that pipeline decides to
+                    export inputs and outputs, it must do so using the <code>&lt;p:param
+                    name="..."/></code> syntax. This defines its interface. You can compare this to
+                    writing your own method in Java, as opposed to using an existing method. The
+                    difference is that in Java, you address method parameters by position when you
+                    call a method. In XPL, you always address them by name. Therefore it is
+                    important to use the right name when you call a processor (or a pipeline).
+                </p>
+                <p>
+                    This also applies to the cases where the Web Application Controller calls your
+                    own pipelines: the PFC has to know the names of the inputs and outputs to
+                    connect to. Therefore, you have to use the names ( <code>data</code> and
+                    <code>instance</code>) <a
+                    href="http://www.orbeon.com/ops/doc/processors-controller">documented</a>.
+                </p>
+                <p>
+                    If you implement a pipeline or write a new processor in Java, and you don't
+                    have any external naming constraints (such as the ones defined by the PFC, or
+                    if somebody expects to call your pipeline using names defined in advance), you
+                    are free to use any name.
+                </p>
+                <p>
+                    In XPL an <i>id</i> can be assigned to an output when invoking a processor. This
+                    id can then be used latter on in the same pipeline to refer to that specific
+                    output, and for instance connect it to the input of another processor. Ids are
+                    similar to variable names in most programming languages.
                 </p>
             </section>
         </section>

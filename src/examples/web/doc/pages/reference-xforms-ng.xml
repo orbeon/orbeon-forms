@@ -399,12 +399,12 @@
                     <p>
                         You describe each one of those rules with an <code>&lt;xforms:bind></code>
                         element in the XForms model. Rules apply to elements and attributes in the
-                        XForms instance. You specify the elements and attributes each rule applies to
-                        with an XPath expression in the mandatory <code>nodeset</code> attribute. In
-                        addition to the <code>nodeset</code> attribute you want to have at least one
-                        attribute specifying the essence of the rule. We go over the exhaustive list of
-                        all the possible attributes later in this section, but first let's see how we
-                        can express the above rules for the Credit Card Verifier form:
+                        XForms instance. You specify the elements and attributes each rule applies
+                        to with an XPath expression in the mandatory <code>nodeset</code> attribute.
+                        In addition to the <code>nodeset</code> attribute you want to have at least
+                        one attribute specifying the essence of the rule. We go over the all the
+                        possible attributes later in this section, but first let's see how we can
+                        express the above rules for the Credit Card Verifier form:
                     </p>
                     <ol>
                         <li>
@@ -667,13 +667,12 @@
                     <ul>
                         <li>
                             <p>
-                                The value displayed by an XForms control comes from the content of
-                                an element or attribute (or node) of the XForms instance. When you
-                                declare a control, you bind it to a node of your XForms instance
-                                with an XPath expression in the <code>ref</code> attribute. For
-                                instance you can declare a text field bound to the
-                                <code>&lt;number></code> element, which a child of
-                                <code>&lt;credit-card></code>, with:
+                                The value displayed by an XForms control comes from a node of the
+                                XForms instance. When you declare a control, you bind it to a node
+                                of your XForms instance with an XPath expression in the
+                                <code>ref</code> attribute. For instance this text field a text
+                                field is bound to the <code>&lt;number></code> element, which a
+                                child of <code>&lt;credit-card></code>:
                             </p>
                             <xml-source show-namespaces="false">
                                 <xforms:input ref="/credit-card/number"/>
@@ -966,11 +965,9 @@
                         In the examples above, the labels and values for the <code>select</code> and
                         <code>select1</code> controls are declared in the control element with
                         multiple <code>&lt;xforms:item></code> elements. Alternatively the
-                        label/value pairs can be pulled out from the instance, instead of being
-                        declared in XForms control. As shown in the code below from the <a
-                        href="/goto-example/xforms-controls">XForms Controls</a> example, you do
-                        this by using the <code>&lt;xforms:itemset></code> element, instead of using
-                        <code>&lt;xforms:item></code> elements:
+                        label/value pairs can be pulled out from the instance. You do this with an
+                        <code>&lt;xforms:itemset></code> element (instead of
+                        <code>&lt;xforms:item></code> elements):
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:select1 ref="country" appearance="compact">
@@ -1008,13 +1005,10 @@
                             <th>Alert</th>
                             <td>
                                 <img src="pages/reference-xforms-alert.png"/>
-                                <p>
-                                    TODO: upgrade image for 3.0.
-                                </p>
                             </td>
                             <td>
                                 <p>
-                                    In each control you can specify an error message that will be
+                                    In each control you can specify an error message that can be
                                     displayed if the value entered by the user triggers a validation
                                     error.
                                 </p>
@@ -1032,8 +1026,9 @@
                             </td>
                             <td>
                                 <p>
-                                    You can specify a hint on each control, which is displayed in a
-                                    tooltip when the mouse is positioned over the control.
+                                    You can specify a hint on each control, which is displayed next
+                                    to the control and becomes highlighted when the control is
+                                    selected.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:textarea ref="textarea">
@@ -1050,8 +1045,9 @@
                             <td>
                                 <p>
                                     If you specify a help message for a control, an icon with a
-                                    question mark is displayed next to the control. A pop-up window will
-                                    display the help message when the end-user clicks on the control.
+                                    question mark is displayed next to the control. A pop-up shows
+                                    the help message when you position the mouse cursor over the
+                                    icon.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:input ref="date" class="xforms-date">
@@ -1106,15 +1102,16 @@
                     </xml-source>
                     <p>
                         The <code>file</code> element is the element storing the result of the file
-                        upload. There are two ways of storing such a result:
+                        upload. The result can be stored in two ways:
                     </p>
                     <ul>
-                        <li>As a URL, by specifying the type <code>xs:anyURI</code>.</li>
-                        <li>As Base64-encoded text, by specifying the type
-                        <code>xs:base64Binary</code>. Base64 is a mechanism to encode any binary data
-                        using a 65-character subset of US-ASCII. Using this mechanism allows embedding
-                        binary data into XML documents, at the typical cost of taking 50% more space
-                        than the original binary data. For more information, please refer to the <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
+                        <li>As a URL, by specifying the type <code>xs:anyURI</code>.</li> <li>As
+                        Base64-encoded text, by specifying the type <code>xs:base64Binary</code>.
+                        Base64 is a mechanism to encode any binary data using a 65-character subset
+                        of US-ASCII. Using this mechanism allows embedding binary data into XML
+                        documents, at the typical cost of taking 50% more space than the original
+                        binary data. For more information, please refer to the <a
+                        href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
                     </ul>
                     <note>
                         <p>
@@ -1198,12 +1195,12 @@
                 <section>
                     <title>Basics</title>
                     <p>
-                        A very common requirement of user interfaces consists in repeating visual, such
-                        as rows in a table, entries in a list, etc. Those repeated sections usually have
-                        an homogeneous aspect: they all have the same or a very similar structure. For
-                        example, multiple table rows will differ only in the particular content they
-                        display in their cells. An example of this is an invoice made of lines with each
-                        a description, unit price, and quantity.
+                        A very common requirement of user interfaces consists in repeating visual
+                        elements, such as rows in a table or entries in a list. Those repeated
+                        sections usually have an homogeneous aspect: they all have the same or a
+                        very similar structure. For example, multiple table rows will differ only in
+                        the particular content they display in their cells. An example of this is an
+                        invoice made of lines with each a description, unit price, and quantity.
                     </p>
                     <p>
                         XForms provides a very powerful mechanism to implement such repeated structures:
@@ -1222,7 +1219,7 @@
                         This is not enough to be functional code: you need to indicate to the
                         <code>xforms:repeat</code> element how many repetitions must be performed. This
                         is done not by supplying a simple count value, but by binding the the element to
-                        a node-set with the <code>node-set</code> attribute. Consider the following
+                        a node-set with the <code>nodeset</code> attribute. Consider the following
                         XForms instance:
                     </p>
                     <xml-source>
@@ -1278,16 +1275,15 @@
                         of contiguous XML elements with same name and same namespace. XForms does
                         not predict what happens if the node-set is not homogenous.
                     </note>
-                    <p>
-                        TODO: screenshots.
-                    </p>
                 </section>
+                <!--
                 <section>
                     <title>Repeat Index</title>
                     <p>
                         TODO
                     </p>
                 </section>
+                -->
                 <section>
                     <title>Deleting Rows with the <code>xforms:delete</code> Action</title>
                     <p>
@@ -1300,8 +1296,8 @@
                         <code>xforms:delete</code> is provided with a <code>nodeset</code> attribute
                         pointing to the homogenous collection into which the insertion must take
                         place. It also has an <code>at</code> attribute, which contains an XPath
-                        expression returning the index of the element to delete. The following
-                        deletes the last element of the collection:
+                        expression returning the index of the element to delete. See how
+                        <code>xforms:delete</code> is used in these 3 scenarios:
                     </p>
                     <xml-source show-namespaces="false">
                         <comment> This deletes the last element of the collection </comment>
@@ -1315,7 +1311,7 @@
                 <section>
                     <title>Inserting Rows with the <code>xforms:insert</code> Action</title>
                     <p>
-                        <code>xforms:insert</code> is provided with a <code>nodeset</code> attribute
+                        <code>xforms:insert</code> has a <code>nodeset</code> attribute
                         pointing to the homogenous collection into which the insertion must take
                         place. <code>xforms:insert</code> then considers the <i>last</i> element of
                         that collection (and all its content if any) as a <i>template</i> for the
@@ -1347,13 +1343,14 @@
                     </p>
                     <p>
                         It is important to note that while it is possible to delete the last element
-                        of an homogeneous collection, it becomes them impossible to insert a new
+                        of an homogeneous collection, it becomes then impossible to insert a new
                         element into that collection with XForms 1.0, since there is no longer a
                         template element available in this case (save for using an XML submission
-                        with <code>replace="instance"</code>). This means that in general you design
-                        your collections so that there always at least one element in it.
+                        with <code>replace="instance"</code>). This means that in general you will
+                        want to have at least one element in your collections.
                     </p>
                     <p>
+                        
                         In case you want the user interface to visually appear empty empty when
                         there is "no more" elements in the collection, you can use the tip provided
                         below, which can be used in most situations. The idea is to consider that

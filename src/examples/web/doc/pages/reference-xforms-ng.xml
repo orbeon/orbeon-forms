@@ -50,7 +50,7 @@
                     XForms 1.0 has been designed by the W3C based on experience with HTML forms. It
                     was promoted to the rank of W3C Recommendation in October 2003, and a <a
                     href="http://www.w3.org/TR/2005/PER-xforms-20051006/">second edition</a> of the
-                    specification has been released in October 2005. As of Decebmer 2005, Mainstream
+                    specification has been released in October 2005. As of December 2005, mainstream
                     browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not support
                     XForms natively, although XForms support in Mozilla is under way and plugins are
                     available for Internet Explorer. However you can already leverage the benefits
@@ -276,11 +276,14 @@
                     </li>
                 </ul>
                 <p>
-                    After submitting an XHTML + XForms file, the result, or errors, should display. Use
-                    your browser's "Back" button to return to the main XForms Sandbox page, or use a
-                    bookmark.
+                    After submitting an XHTML + XForms file, the result, or errors, should display.
+                    If you have changed your local XForms file, reloads that page in your browser
+                    and this will upload again your local XForms file and the XForms Sandbox will
+                    run the new version. To select another file to upload use your browser quotes
+                    "back" button to return to the main XForms sandbox page.
                 </p>
             </section>
+            <!--
             <section>
                 <title>Integrating XForms in OPS</title>
                 <p>
@@ -288,18 +291,10 @@
                     dynamic page, PFC and MVC, submissions, services, proxy mode, etc.
                 </p>
             </section>
+            -->
         </section>
         <section>
             <title>Programming With XForms 1.0</title>
-            <section>
-                <title></title>
-                <p>
-                    TODO
-                </p>
-                <p>
-
-                </p>
-            </section>
             <a name="xforms-model"/>
             <section>
                 <title>XForms Model</title>

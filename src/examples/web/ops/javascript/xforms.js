@@ -1339,7 +1339,8 @@ function xformsHandleResponse() {
                                                 var datePicker = documentElement.childNodes[2];
 
                                                 // Populate values
-                                                xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
+                                                if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")) 
+                                                    xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.previousValue = newControlValue;
                                                     documentElement.valueSetByXForms++;

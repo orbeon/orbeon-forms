@@ -319,6 +319,19 @@
                             <code>&lt;xu:message>&lt;xu:copy-of select="/*"/>&lt;/xu:message></code>.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            <code>&lt;xu:error></code> – The XUpdate program is interrupted as an
+                            exception is thrown with the result of the evaluation of the element
+                            content.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xu:namespace></code> – Adds a namespace declaration on the
+                            current element, just like the XSLT <code>&lt;xsl:namespace></code>.
+                        </p>
+                    </li>
                 </ul>
             </section>
             <section>
@@ -349,6 +362,28 @@
                             both <code>&lt;xu:value-of&gt;</code> and
                             <code>&lt;xu:copy-of&gt;</code> as in XSLT.
                         </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="xpath"/>
+            <section>
+                <title>XPath</title>
+                <p>
+                    In a number of places you can use XPath expressions. In addition to standard
+                    XPath 1.0, you can use the following list of extension functions:
+                </p>
+                <ul>
+                    <li>
+                        The XPath 2.0 function <code>get-namespace-uri-for-prefix()</code>
+                        is supported (the XPath engine is still 1.0 compliant, not
+                        2.0).
+                    </li>
+                    <li>
+                        <code>evaluate(xpath, namespaces, nodeset)</code> – Evaluates the
+                        first string argument as an XPath expression in the context of the
+                        third nodeset argument. Any prefix used in the XPath expression must
+                        be defined in the second argument, which is a nodeset of namespace
+                        nodes.
                     </li>
                 </ul>
             </section>

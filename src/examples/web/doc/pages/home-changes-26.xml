@@ -28,7 +28,7 @@
                 <p>
                     The XForms Upload control has been fixed. It comes with an <a
                     href="/goto-example/xforms-upload">example</a> and is documented in the <a
-                    href="/doc/reference-xforms#upload">XForms reference documentation</a>.
+                    href="/doc/reference-xforms-ng#upload">XForms reference documentation</a>.
                 </p>
             </section>
             <section>
@@ -36,7 +36,7 @@
                 <p>
                    Two new extension controls provide a mechanism to selectively enable markup and other XForms controls depending of
                    the values stored in the XForms instance. The syntax is modeled after the XSLT language:
-                   <code>if</code> and <code>choose/when/otherwise</code>. See the <a href="reference-xforms#conditionals">XForms Conditionals</a>
+                   <code>if</code> and <code>choose/when/otherwise</code>. See the <a href="reference-xforms-ng#conditionals">XForms Conditionals</a>
                    documentation for more information.
                 </p>
             </section>
@@ -48,7 +48,7 @@
                     (<code>&lt;xforms:select</code> and <code>&lt;xforms:select1></code>) when
                     you want the list of items the end-user has to pick from to come from the
                     instance, instead of being listed in view. For more details, see the <a
-                    href=" reference-xforms#xforms-controls">XForms controls</a> documentation
+                    href=" reference-xforms-ng#xforms-controls">XForms controls</a> documentation
                     and the <a href="../goto-example/xforms-selection">Selection Controls</a>
                     example.
                 </p>
@@ -61,7 +61,7 @@
                     <code>&lt;xforms:help></code>, and <code>&lt;xforms:hint></code> to have the
                     displayed message come from the instance instead of being specified in the
                     view. For more details, see the <a
-                    href="reference-xforms#label-alert-help-hint">Label, Alert, Help, and
+                    href="reference-xforms-ng#label-alert-help-hint">Label, Alert, Help, and
                     Hint</a> documentation.
                 </p>
             </section>

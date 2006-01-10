@@ -83,7 +83,7 @@
                             <code>xxforms:appearance</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <a href="/doc/reference-xforms">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
                         </td>
                     </tr>
                     <tr>
@@ -330,7 +330,7 @@
                         <td style="white-space: nowrap">
                             <a href="http://www.w3.org/TR/2003/REC-xforms-20031014/">XForms 1.0</a>
                             <br/>
-                            <a href="/doc/reference-xforms">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
                         </td>
                     </tr>
                     <tr>
@@ -343,7 +343,7 @@
                             <code>ev:event</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <a href="/doc/reference-xforms">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
                         </td>
                     </tr>
                     <tr>

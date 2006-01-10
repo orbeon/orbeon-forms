@@ -136,7 +136,7 @@
                 <title>&lt;xforms:message></title>
                 <p>
                     <code>&lt;xforms:message></code> is now supported. This lets you display a message in a dialog when 
-                    a submit control is clicked. See the <a href="reference-xforms#message-action">message 
+                    a submit control is clicked. See the <a href="reference-xforms-ng#message-action">message
                     action</a> documentation for more details.
                 </p>
             </section>

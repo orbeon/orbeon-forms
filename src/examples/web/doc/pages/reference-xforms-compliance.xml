@@ -32,7 +32,7 @@
                 Orbeon PresentationServer (OPS)'s form handling is based on the <a
                 href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
                 describes in details the current level of compliance of each XForms 1.0 feature.
-                Please visit the <a href="reference-xforms">XForms reference documentation</a> for
+                Please visit the <a href="reference-xforms-ng">XForms reference documentation</a> for
                 more information about using XForms with OPS.
             </p>
             <warning>

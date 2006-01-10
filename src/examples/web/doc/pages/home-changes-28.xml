@@ -84,7 +84,7 @@
                         override the annotations added by the XForms engine on the instance. Those
                         annotations should be considered read-only. Instead, to instruct the XForms
                         engine that a given node is invalid, use the method described in the <a
-                        href="reference-xforms#custom-validation">Custom Validation</a> section of
+                        href="reference-xforms-ng#custom-validation">Custom Validation</a> section of
                         the XForms reference. The benefit of this method is that it does not require
                         the use of proprietary XForms extensions and that it can be used on elements
                         as well as attributes.

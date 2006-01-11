@@ -259,8 +259,9 @@
                     <li>
                         <p>
                             <b>Extension functions.</b> The XForms engine supports the
-                            <code>xxforms:call-xpl()</code> extension function to call arbitrary XPL
-                            programs from XForms.
+                            <code>xxforms:call-xpl()</code> <a
+                            href="reference-xforms-ng#ops-extensions">extension function</a> to
+                            call arbitrary XPL programs from XForms.
                         </p>
                     </li>
                     <li>

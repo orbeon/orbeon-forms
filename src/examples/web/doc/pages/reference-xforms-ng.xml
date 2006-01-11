@@ -36,11 +36,6 @@
                 provides an introduction to XForms concepts and explains how to use XForms in your
                 OPS application.
             </p>
-            <note>
-                <p>
-                    This page is a work in progress.
-                </p>
-            </note>
         </section>
         <a name="introduction"/>
         <section>
@@ -1422,12 +1417,14 @@
                         </p>
                     </note>
                 </section>
+                <!--
                 <section>
                     <title>Setting the Current Index with the <code>xforms:setindex</code> Action</title>
                     <p>
                         TODO
                     </p>
                 </section>
+                -->
                 <section>
                     <title>Using <code>xforms:trigger</code> to Execute Actions</title>
                     <p>
@@ -1483,18 +1480,22 @@
                         <code>xforms:insert</code> and <code>xforms:delete</code> elements.
                     </p>
                 </section>
+                <!--
                 <section>
                     <title>Events</title>
                     <p>
                         TODO
                     </p>
                 </section>
+                -->
+                <!--
                 <section>
                     <title>Heterogeneous-Looking Repeated Section</title>
                     <p>
                         TODO: use of relevant, switch.
                     </p>
                 </section>
+                -->
                 <a name="xforms-nested-repeats"/>
                 <section>
                     <title>Nested Repeats</title>
@@ -1602,14 +1603,21 @@
             <a name="xforms-actions"/>
             <section>
                 <title>Actions</title>
-                <p>
-                    TODO
-                </p>
                 <a name="xforms-setvalue"/>
                 <section>
                     <title>Setting Instance Values with the <code>xforms:setvalue</code> Action</title>
                     <p>
-                        TODO
+                        There are two ways of providing the value to set with
+                        <code>&lt;xforms:setvalue></code>. The first one specifies the value as a
+                        literal enclosed in the <code>&lt;xforms:setvalue></code> element. The
+                        second possibility uses the <code>value</code> attribute: the content of the
+                        attribute is an XPath expression evaluated in the context of the node the
+                        <code>xforms:setvalue</code> element is bound (through the <code>ref</code>
+                        attribute). The content of the node pointed to by the <code>ref</code>
+                        attribute will be set with the result of the XPath expression provided in
+                        the <code>value</code> attribute. The example below and uses two
+                        <code>&lt;xforms:setvalue></code>, each one providing the new value in a
+                        different way.
                     </p>
                     <xml-source>
                         <xforms:trigger>
@@ -1620,17 +1628,6 @@
                             </xforms:action>
                         </xforms:trigger>
                     </xml-source>
-                    <p>
-                        There are two ways of providing the value to set with
-                        <code>&lt;xforms:setvalue></code>. The first one specifies the value as a
-                        literal enclosed in the <code>&lt;xforms:setvalue></code> element. The second
-                        possibility uses the <code>value</code> attribute: the content of the attribute
-                        is an XPath expression evaluated in the context of the node the
-                        <code>xforms:setvalue</code> element is bound (through the <code>ref</code>
-                        attribute). The content of the node pointed to by the <code>ref</code>
-                        attribute will be set with the result of the XPath expression provided in the
-                        <code>value</code> attribute.
-                    </p>
                 </section>
                 <a name="xforms-message"/>
                 <section>
@@ -1639,7 +1636,6 @@
                         The XForms message action displays a message to the user. OPS being a
                         server-side XForms implementation. <img print-format="pdf"
                         src="pages/reference-xforms-message.png" style="clear: both; float: right"/>
-                        TODO: check this for 3.0.
                     </p>
                     <p>
                         Typically, the content of the <code>message</code> element is the message to
@@ -1667,22 +1663,16 @@
                             <xforms:message ev:event="DOMActivate" ref="taste"/>
                         </xforms:trigger>
                     </xml-source>
-                    <p>
-                        TODO: cover other actions
-                    </p>
                 </section>
             </section>
             <a name="xforms-submission"/>
             <section>
                 <title>Submission</title>
                 <p>
-                    TODO
-                </p>
-                <p>
                     Two properties control some aspects of XForms submission in OPS:
                 </p>
                 <xml-source>
-                    <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
+                    <property as="xs:boolean" name="oxf.xforms.optimize-post-all" value="true"/>
                 </xml-source>
                 <p>
                     If set to <code>true</code> (the default), OPS optimizes submissions with
@@ -1694,19 +1684,25 @@
                     solution is less efficient.
                 </p>
                 <xml-source>
-                    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
+                    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission" value="true"/>
                 </xml-source>
-                <p>
-                    If set to <code>true</code> (the default), OPS optimizes "local" HTTP and HTTPS
-                    submissions, i.e. submissions performed to a URL controlled by OPS itself, by
-                    directly submitting using the Java Servlet API instead of actually using the
-                    HTTP protocol for the submission. If set to <code>false</code>, OPS always
-                    always uses the HTTP or HTTPS protocol, which is less efficient. If set to
-                    <code>false</code>, it is possible to specify the <code>xxforms:post</code>
-                    method instead of the <code>post</code> method on the
-                    <code>xforms:submission</code> element to force an optimized local submission.
-                </p>
+                <ul>
+                    <li>
+                        If set to <code>true</code> (the default), OPS optimizes "local" HTTP and
+                        HTTPS submissions, i.e. submissions performed to a URL controlled by OPS
+                        itself, by directly submitting using the Java Servlet API instead of
+                        actually using the HTTP protocol for the submission.
+                    </li>
+                    <li>
+                        If set to <code>false</code>, OPS always always uses the HTTP or HTTPS
+                        protocol, which is less efficient. In this case, it is possible to specify
+                        the <code>xxforms:post</code> method instead of the <code>post</code> method
+                        on the <code>xforms:submission</code> element to force an optimized local
+                        submission.
+                    </li>
+                </ul>
             </section>
+            <!--
             <a name="xforms-switch"/>
             <section>
                 <title>The XForms Switch Module</title>
@@ -1714,6 +1710,7 @@
                     TODO
                 </p>
             </section>
+            -->
         </section>
         <section>
             <title>Formatting</title>
@@ -1728,8 +1725,13 @@
                 </p>
                 <p>
                     OPS provides an extension attribute, <code>xxforms:format</code>, for that
-                    purpose. <code>xxforms:format</code> must contain an XPath expression, and also
-                    supports the following XSLT 2.0 functions:
+                    purpose. <code>xxforms:format</code> must contain an XPath 2.0 expression. In
+                    your XPath expression you can use all the XPath 2.0 functions, including those
+                    for date manipulation (<a
+                    href="http://www.w3.org/TR/2005/CR-xpath-functions-20051103/#durations-dates-times">external
+                    documentation</a>). However since XPath 2.0 functions don't provide any facility
+                    for date and time formatting, you can in this attribute also use the following
+                    XSLT 2.0 functions:
                 </p>
                 <ul>
                     <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
@@ -1932,6 +1934,7 @@
                 </note>
             </section>
         </section>
+        <!--
         <section>
             <title>XSLT or XForms?</title>
             <p>
@@ -1943,6 +1946,7 @@
                 TODO
             </p>
         </section>
+        -->
         <a name="xforms-relative-paths"/>
         <section>
             <title>Relative Paths</title>
@@ -2056,8 +2060,7 @@
                         <td><code>http://b.com/instance</code></td>
                         <td><code>http://b.com/instance</code></td>
                         <td>
-                            The absolute URL is left untouched. The XForms instance is loaded from
-                            the absolute URL.
+                            Absolute URLs are left untouched.
                         </td>
                     </tr>
                     <tr>
@@ -2084,8 +2087,7 @@
                         <td><code>http://b.com/instance</code></td>
                         <td><code>http://b.com/instance</code></td>
                         <td>
-                            The absolute URL is left untouched. The XForms instance is loaded from
-                            the absolute URL.
+                            Absolute URLs are left untouched.
                         </td>
                     </tr>
                     <tr>
@@ -2346,6 +2348,7 @@
                 </p>
             </section>
         </section>
+        <!--
         <section>
             <title>Labels, Hints, Alerts, Help Messages</title>
             <p>
@@ -2353,12 +2356,15 @@
                 labels should not be used.
             </p>
         </section>
+        -->
+        <!--
         <section>
             <title>Using XML Schema for Validation</title>
             <p>
                 TODO: basics, additional XForms constraints, tips for repeating elements
             </p>
         </section>
+        -->
         <section>
             <title>XForms and Services</title>
             <section>
@@ -2375,12 +2381,13 @@
                     to the submission.
                 </note>
                 <p>
-                    The XForms submission featuer practically allows forms to call XML services.
+                    The XForms submission feature practically allows forms to call XML services.
                     Those services are accessible through an XML API, which means that a request is
                     performed by sending an XML document to the service, and a response consists of
                     an XML document as well.
                 </p>
             </section>
+            <!--
             <section>
                 <title>Calling Services</title>
                 <p>
@@ -2405,6 +2412,7 @@
                     TODO
                 </p>
             </section>
+            -->
         </section>
         <section>
             <title>Extensions</title>
@@ -2419,27 +2427,28 @@
                 <section>
                     <title>Image Types</title>
                     <p>
-                         When the following conditions are met for an <code>xforms:output</code>
-                         control:
+                         For the <code>&lt;xforms:output></code> control to display an image, you
+                         need to:
                     </p>
                     <ul>
                         <li>
                             <p>
-                                The control has an <code>mediatype</code> attribute referring to an
+                                Have a <code>mediatype</code> attribute on the
+                                <code>&lt;xforms:output></code>. That attribute must refer to an
                                 image, such as <code>image/*</code> or <code>image/jpeg</code>.
                             </p>
                         </li>
                        <li>
                             <p>
-                                The value is provided to the <code>xforms:output</code> control
-                                with the <code>value</code> attribute, or with a single-node binding
-                                to a node without type or with an <code>xs:anyURI</code> type.
+                                Use the <code>value</code> attribute on
+                                <code>&lt;xforms:output></code> or bind to the control to a node
+                                without type or with an <code>xs:anyURI</code> type.
                             </p>
                         </li>
                    </ul>
                     <p>
-                        The resulting value is interpreted as URI pointing to an image. The image is
-                        loaded where the <code>xforms:output</code> is located. When a single-node
+                        The resulting value is interpreted a URI pointing to an image. The image
+                        will display in place of the <code>xforms:output</code>. When a single-node
                         binding is used, it is possible to dynamically change the image pointed to.
                         For example:
                     </p>
@@ -2504,10 +2513,10 @@
                     <note>
                         When using a <code>mediatype="text/html"</code>, an HTML
                         <code>&lt;div></code> element will be generated by the XForms engine to hold
-                        the HTML data from the instance. As in HTML a <code>&lt;div></code> cannot
-                        be embedded into ad <code>&lt;p></code>, if you have a
-                        <code>mediatype="text/html"</code> on an <code>&lt;xforms:output></code>
-                        control, you should not put that control into a <code>&lt;xhtml:p></code>.
+                        the HTML data. As in HTML a <code>&lt;div></code> cannot
+                        be embedded into a <code>&lt;p></code>, if you have a
+                        <code>&lt;xforms:output mediatype="text/html"></code> control, you should
+                        not put that control into a <code>&lt;xhtml:p></code>.
                     </note>
                 </section>
             </section>
@@ -2529,6 +2538,7 @@
                         <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
                     </ul>
                 </section>
+                <a name="ops-extensions"/>
                 <section>
                     <title>OPS Extensions</title>
                     <p>
@@ -2536,7 +2546,56 @@
                     </p>
                     <ul>
                         <li>
-                            <p><code>xxforms:call-xpl()</code> TODO</p>
+                            <p>
+                                <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as
+                                xs:string*, $inputElements as element()*, $outputNames as
+                                xs:string+)</code>.
+                            </p>
+                            <p>
+                                This function lets you call an XPL pipeline.
+                            </p>
+                            <ol>
+                                <li>
+                                    The first argument, <code>$XPLurl</code>, is the URL of the
+                                    pipeline. It must be an absoluate URL.
+                                </li>
+                                <li>
+                                    The second argument, <code>$inputNames</code>, is a
+                                    sequence strings, each one representing the name of an input of the
+                                    pipeline that you want to connect.
+                                </li>
+                                <li>
+                                    The third argument, <code>$inputElements</code>, is a sequence
+                                    of elements to be used as input for the pipeline. The
+                                    <code>$inputNames</code> and <code>$inputElements</code>
+                                    sequences must have the same length. For each element in
+                                    <code>$inputElements</code>, a document is created and
+                                    connected to an input of the pipeline. Elements are matched to
+                                    input name by position, for instance the element at position 3
+                                    of <code>$inputElements</code> is connected to the input with
+                                    the name specified at position 3 in <code>$inputNames</code>.
+                                </li>
+                                <li>
+                                    The fourth argument, <code>$outputNames</code>, is a sequence
+                                    of output names to read.
+                                </li>
+                                <li>
+                                    The function returns a sequence of elements corresponding the
+                                    output of the pipeline. The returned sequence will have the same
+                                    length as <code>$outputNames</code> and will correspond to the
+                                    pipeline output with the name specified on
+                                    <code>$outputNames</code> based on position.
+                                </li>
+                            </ol>
+                            <p>
+                                The example below shows a call to the <code>xxforms:call-xpl</code>
+                                function:
+                            </p>
+                            <p>
+                                <code>xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl',
+                                ('input', 'xpath'), (instance('instance')/input,
+                                instance('instance')/xpath), 'formatted-output')/*, 'html')</code>
+                            </p>
                         </li>
                     </ul>
                 </section>
@@ -2640,15 +2699,20 @@
                                 <p>
                                     Resulting HTML page are smaller. HTML pages increase in size as
                                     more XForms controls are used, but they don't increase in size
-                                    proportionally to the size of XForms instances. This means that
-                                    very large XForms instances can be processed without impacting
-                                    client-server performance.
+                                    proportionally to the size of XForms instances.
                                 </p>
                             </li>
                             <li>
                                 <p>
                                     Small amounts of data circulate between the client browser and
                                     the OPS XForms server.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    This means that very large XForms instances can be processed
+                                    without any impact on the amount of data that is transmitted
+                                    between the client and the server.
                                 </p>
                             </li>
                         </ul>
@@ -2658,20 +2722,22 @@
                         <ul>
                             <li>
                                 <p>
-                                    The OPS server is stateful. It requires server memory to store
-                                    state information in a session even when no request is being
-                                    processed. The server must be configured to determine how much
-                                    state information is kept in a session, how long session take to
-                                    expire, etc.
+                                    The OPS XForms server needs to be stateful. It uses server
+                                    memory to store state information in a session even when no
+                                    request is being processed. The server must be configured to
+                                    determine how much state information is kept in a session, how
+                                    long session take to expire, etc. This creates additional demand
+                                    for resources on the server and complicates the task of
+                                    tuning the server.
                                 </p>
                             </li>
                             <li>
                                 <p>
-                                    State information can expire if the server is restarted (in case
-                                    session information is not restored), or when sessions expire,
-                                    even if the client browser is still displaying the page.
-                                    Expired state information causes an XForms page to no longer
-                                    function until it is reloaded.
+                                    State information can become unavailable when sessions expire or
+                                    when the server is restarted (unless you setup the server to
+                                    persist session information). When state information becomes
+                                    unavailable for a page, that page will no longer function unless
+                                    it is reloaded.
                                 </p>
                                 <note>
                                     With most servlet containers, it is possible to configure
@@ -2704,7 +2770,7 @@
                 </p>
                 <xml-source>
                     <comment> Store state in the session </comment>
-                    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>
+                    <property as="xs:string"  name="oxf.xforms.state-handling" value="session"/>
                 </xml-source>
                 <p>
                     The global configuration can be overridden for each page by setting the
@@ -2737,12 +2803,15 @@
                     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
                 </xml-source>
             </section>
+            <!--
             <section>
                 <title>Handling the Browser's Back Button</title>
                 <p>
                     TODO: Explain what OPS does and how different browsers behave.
                 </p>
             </section>
+            -->
+            <!--
             <section>
                 <title>Configuring Session Handling</title>
                 <p>
@@ -2759,36 +2828,43 @@
                     similar relevant documentation.
                 </p>
             </section>
+            -->
         </section>
         <a name="xforms-javascript"/>
         <section>
             <title>JavaScript Integration</title>
-            <p>
-                While XForms gets you a long way towards creating a dynamic user-friendly user
-                interface, there are some dynamic behaviors of the user interface that cannot be
-                implemented with XForms, and that you might want to implement directly in
-                JavaScript. We describe here how your JavaScript code can interact with XForms and
-                in particular how you can have access to the value of an XForms control.
-            </p>
-            <p>
-                In JavaScript, you obtain a reference to the element representing the control with
-                <code>var control = document.getElementById('myControl')</code> where
-                <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
-                id="myControl"></code>. You can read the current value of the control with
-                <code>control.value</code> and set the value of the control assigning a value to
-                <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
-                do such an assignment the value of the node in the instance is updated, the
-                <code>xforms-value-changed</code> event thrown, and all the standard XForms
-                processing happens (validation, recalculation, etc).
-            </p>
-            <p>
-                Currently, accessing the value of a control is only supported for
-                <code>&lt;xforms:input></code>. If you want to access the value of another control,
-                a workaround consists in adding an <code>&lt;xforms:input></code> with
-                <code>style="display: none"</code> bound to the same node as that control, and
-                accessing the <code>&lt;xforms:input></code>'s id to change the value of the node
-                and therefore indirectly the other control's value.
-            </p>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    While XForms gets you a long way towards creating a dynamic user-friendly user
+                    interface, there are some dynamic behaviors of the user interface that cannot be
+                    implemented with XForms, and that you might want to implement directly in
+                    JavaScript. We describe here how your JavaScript code can interact with XForms and
+                    in particular how you can have access to the value of an XForms control.
+                </p>
+            </section>
+            <section>
+                <title>Accessing The Value XForms Controls</title>
+                <p>
+                    In JavaScript, you obtain a reference to the element representing the control with
+                    <code>var control = document.getElementById('myControl')</code> where
+                    <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
+                    id="myControl"></code>. You can read the current value of the control with
+                    <code>control.value</code> and set the value of the control assigning a value to
+                    <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
+                    do such an assignment the value of the node in the instance is updated, the
+                    <code>xforms-value-changed</code> event thrown, and all the standard XForms
+                    processing happens (validation, recalculation, etc).
+                </p>
+                <note>
+                    Currently, accessing the value of a control is only supported for
+                    <code>&lt;xforms:input></code>. If you want to access the value of another control,
+                    a workaround consists in adding an <code>&lt;xforms:input></code> with
+                    <code>style="display: none"</code> bound to the same node as that control, and
+                    accessing the <code>&lt;xforms:input></code>'s id to change the value of the node
+                    and therefore indirectly the other control's value.
+                </note>
+            </section>
         </section>
     </body>
 </document>

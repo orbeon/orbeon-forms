@@ -953,6 +953,8 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
         element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
     if (element.htmlFor)
         element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
+    if (element.name)
+        element.name= xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
     // Remove references to hint, help, alert, label as they might have changed
     if (xformsIsDefined(element.labelElement)) element.labelElement = null;
     if (xformsIsDefined(element.hintElement)) element.hintElement = null;

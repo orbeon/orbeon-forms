@@ -566,6 +566,86 @@
         </section>
         <section>
             <title>Other Orbeon PresentationServer FAQ</title>
+            <a name="performance"/>
+            <section>
+                <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
+                <p>
+                    First of all, there are a few things you should make sure of:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Do not run your code in the examples portal.</b> The OPS examples
+                            portal (i.e. the home page of OPS, which lists all the OPS examples),
+                            while convenient to run examples, is not implemented optimally and
+                            relies on portlets which cause overhead. The first thing to do is make
+                            sure that your code runs outside of the examples portal, i.e. that your
+                            page flow entries are present in the main page flow file
+                            (<code>resources/page-flow.xml</code>).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Customize the standard epilogue.</b> The <a
+                            href="reference-epilogue">standard OPS epilogue</a> can be optimized for
+                            your own needs. For example, if you do not use <a
+                            href="#xforms-classic-ng">XForms Classic</a>, you can remove the test
+                            for the XForms classic engine; if you do not use "widgets", you can
+                            remove the inclusion of <code>xforms-widgets.xsl</code>; if you are not
+                            using portlets (which is likely), you can remove the test for portlets.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Make sure you remove all your XPL <code>debug</code> attributes.</b>
+                            While using <code>debug</code> attributes is one of the best ways to
+                            debug XPL pipelines, those also have an impact on performance as they
+                            locally disable XPL caching and also require time to serialize XML
+                            documents to your logger. For performance testing and production, always
+                            remove all the <code>debug</code> attributes.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Don't serve your static files through OPS.</b> It is overkill to
+                            serve static files such as static images through OPS, which is optimized
+                            to run XPL pipelines. Instead, use your servlet container's facilities
+                            for serving static files, or even better, use a simple web server such
+                            as <a href="http://httpd.apache.org/">Apache Server</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Use a performance analysis tool.</b> To obtain your numbers, use a
+                            tool such as <a href="http://jakarta.apache.org/jmeter/">Apache
+                            JMeter</a>. Be sure to warm up your Java VM first and to let the tool
+                            run for a significant number of sample before recording your performance
+                            numbers.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Make sure of what you are measuring.</b> If you are testing the
+                            performance of an application that talks to a database or backend
+                            services, be sure to be able to determine how much time your front-end
+                            or presentation layer, versus your backend and data layers, are
+                            respectively taking.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Orbeon does not provide performance figures at this point, due to the number of
+                    different possible scenarios, the differences between hardware platforms, and
+                    the different expectations of users. We believe that the best way to tackle
+                    performance questions is to go beyond theory and work on a small but
+                    representative prototype. Orbeon can help you build that prototype, a task often
+                    done in just a few days. Upon completion of the prototype, you can evaluate
+                    whether the performance of the prototype is satisfying or not, and if not Orbeon
+                    can help you determine whether and how performance can be improved. The final
+                    appreciation belongs to you.
+                </p>
+            </section>
+            <a name="xslt-perf"/>
             <a name="xslt-processor"/>
             <section>
                 <title>What is the recommended XSLT transformer for OPS?</title>

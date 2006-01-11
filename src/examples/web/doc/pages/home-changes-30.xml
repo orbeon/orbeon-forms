@@ -80,7 +80,7 @@
                 <li>
                     <p>
                         The Ajax-based XForms engine currently works with Mozilla Firefox and
-                        Microsoft Internet Explorer 6. Support for Opera and Safari is planned.
+                        Microsoft Internet Explorer 6. Support for Safari and Opera is planned.
                     </p>
                 </li>
                 <li>
@@ -348,10 +348,9 @@
                 </warning>
                 <p>
                     When migrating an application from XForms Classic to XForms NG, a series of
-                    tasks need to be performed, due to the fact that the OPS XForms engine is now
-                    much closer from the XForms 1.0 specification. The following list attemps to
-                    describe the most common aspects of the migration. It does not intend to be
-                    inclusive:
+                    tasks need to be performed, as the OPS XForms engine is now much closer from
+                    the XForms 1.0 specification. The following list attemps to describe the most
+                    common aspects of the migration. It does not intend to be inclusive:
                 </p>
                 <ul>
                     <li>
@@ -1096,7 +1095,7 @@
                 <li>
                     <p>
                         <b>HTML Documentation.</b> The OPS User Guide in static HTML format, broken
-                        OPS 2.8, is now working correctly. This format allows you to consult the
+                        in OPS 2.8, is now working correctly. This format allows you to consult the
                         documentation offline without running OPS or without accessing the online
                         documentation.
                     </p>

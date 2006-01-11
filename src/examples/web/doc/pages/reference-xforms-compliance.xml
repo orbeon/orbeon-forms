@@ -35,14 +35,15 @@
                 Please visit the <a href="reference-xforms-ng">XForms reference documentation</a> for
                 more information about using XForms with OPS.
             </p>
-            <warning>
-                <p>
-                    This section has not yet been updated for OPS 3.0 BETA.
-                </p>
-            </warning>
         </section>
         <section>
             <title>Compliance Matrix</title>
+            <warning>
+                <p>
+                    This section has not yet been updated for OPS 3.0.
+                </p>
+            </warning>
+            <!--
             <table>
                 <tr>
                     <th colspan="3">XForms Specification Section</th>
@@ -929,6 +930,7 @@
                     &partial;
                 </tr>
             </table>
+            -->
         </section>
     </body>
 </document>

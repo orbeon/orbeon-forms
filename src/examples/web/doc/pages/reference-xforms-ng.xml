@@ -36,6 +36,29 @@
                 provides an introduction to XForms concepts and explains how to use XForms in your
                 OPS application.
             </p>
+            <note>
+                <p>
+                    This document is considered a work in progress. While it does cover some
+                    generic features of XForms, it focuses before all on features specific to the
+                    OPS XForms engine. For more information about XForms, please refer to the
+                    following resources:
+                </p>
+                <ul>
+                    <li>
+                        <a href="http://www.w3.org/TR/2005/PER-xforms-20051006/">XForms 1.0 (second
+                        edition) W3C Proposed Edited Recommendation</a>
+                    </li>
+                    <li>
+                        <a href="http://xformsinstitute.com/essentials/">XForms Essentials</a>, by
+                        Micah Dubinko (also at <a
+                        href="http://www.amazon.com/gp/product/0596003692/">Amazon</a>).
+                    </li>
+                    <li>
+                        XForms: XML Powered Web Forms, by T. V. Raman (also at <a
+                        href="http://www.amazon.com/gp/product/0321154991/">Amazon</a>).
+                    </li>
+                </ul>
+            </note>
         </section>
         <a name="introduction"/>
         <section>
@@ -60,7 +83,8 @@
                 <p>
                     For more information about the whys and therefores of server-side XForms, please
                     read our article, <i>Are Server-Side XForms Engines the Future of XForms?</i>
-                    (<a href="http://idealliance.org/proceedings/xtech05/papers/03-08-03/">original
+                    (<a
+                    href="http://idealliance.org/proceedings/xtech05/papers/03-08-03/">pre-conference
                     version</a> and <a href="http://www.orbeon.com/ops/xtech">updated version</a>).
                 </p>
             </section>
@@ -1923,8 +1947,9 @@
                     It is possible to use XInclude instructions in a dynamic XSLT page view as well.
                     In this case, it is important to note that XInclude instructions are processed
                     before XSLT instructions, i.e. the result of XInclude instructions is an XSLT
-                    stylesheet, which is then executed. [TODO: Figure showing XInclude -> XSLT
-                    processing.]
+                    stylesheet, which is then executed.
+
+                    <!--[TODO: Figure showing XInclude -> XSLT processing.]-->
                 </note>
                 <note>
                     Using XSLT for page views has an impact for debugging, as the output of XSLT

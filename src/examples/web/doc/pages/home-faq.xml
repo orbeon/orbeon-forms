@@ -33,7 +33,7 @@
         <section>
             <title>General Orbeon PresentationServer FAQ</title>
             <a name="what-is"/>
-            <section>
+            <section added="2006-01-10">
                 <title>What is Orbeon PresentationServer?</title>
                 <p>
                     Orbeon PresentationServer (OPS) is an open source J2EE-based platform for
@@ -74,12 +74,14 @@
                 <p>
                     Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to
                     Web applications. Model 2X builds on top of Model 2 and replaces the JSP layer
-                    with XML and XSLT. Model 2X was first described in an
-                    <a
-                        href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
-                    published by JavaWorld in February 2002. OPS can be used to implement Model 2X
-                    and much more. For more information, please refer to the <a href=".">OPS User
-                    Guide</a>.
+                    with XML and XSLT. Model 2X was first described in an <a
+                    href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
+                    Orbeon published by JavaWorld in February 2002. A variant of the concept using
+                    JavaServer Faces was <a
+                    href="http://www.theserverside.com/articles/article.tss?l=BestBothWorlds">published</a>
+                    in TheServerSide in 2003. OPS can be used to implement Model 2X and much more,
+                    but the current focus of the platform remains XForms technology. For more
+                    information, please refer to the <a href=".">OPS User Guide</a>.
                 </p>
             </section>
         </section>
@@ -106,14 +108,15 @@
                     <li>Clear separation between data captured and presentation (separation of concerns)</li>
                     <li>Flexible, structured XML-based data model: define your data model as an XML document, then create forms accessing the data</li>
                     <li>Built-in facilities for validation and data integrity based on XML Schema and/or assertions</li>
-                    <li>Declarative approach requiring less / no scripting at all</li>
+                    <li>Declarative approach requiring less / no scripting at all, in particular thanks to declarative events and actions</li>
                     <li>Ease of internationalization</li>
                     <li>Support for a variety of devices</li>
                     <li>W3C standard</li>
                     <li>Not tied to a particular platform or language such as Java or .NET</li>
                 </ul>
                 <p>
-                    See also the OPS <a href="reference-xforms-ng#introduction">XForms Introduction</a> section.
+                    See also the OPS <a href="reference-xforms-ng#introduction">XForms
+                    Introduction</a> section.
                 </p>
             </section>
             <a name="xforms-compliance"/>
@@ -130,7 +133,7 @@
                 </p>
             </section>
             <a name="xforms-server-side"/>
-            <section>
+            <section added="2006-01-10">
                 <title>What is a server-side XForms implementation?</title>
                 <p>
                     The XForms specification assumes that XForms is implemented on the client-side,
@@ -168,7 +171,7 @@
                 </ul>
             </section>
             <a name="xforms-classic-ng"/>
-            <section>
+            <section added="2006-01-10">
                 <title>What are the XForms Classic and XForms NG engnes?</title>
                 <p>
                     Up to version 2.8, OPS featured a pure server-side XForms engine with limited
@@ -184,7 +187,7 @@
                 </p>
             </section>
             <a name="xforms-classic-or-ng"/>
-            <section>
+            <section added="2006-01-10">
                 <title>How do I know which XForms engine I am using?</title>
                 <p>
                     If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are
@@ -196,7 +199,7 @@
                 </p>
             </section>
             <a name="xforms-classic-deprecation"/>
-            <section>
+            <section added="2006-01-10">
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
                     The XForms Classic engine has been kept only for backward compatibility. It is
@@ -249,6 +252,18 @@
                 <p>
                     With OPS 3.0 and XForms NG, uploaded files can only be retrieved with a
                     submission with <code>replace="all"</code>.
+                </p>
+            </section>
+            <a name="xforms-jsp-mix"/>
+            <section added="2006-01-11">
+                <title>Can I mix and match XForms and JSP?</title>
+                <p>
+                    Yes, you can use JSP alongside XForms, even within the same web app. You can
+                    "call" JSP by redirecting or forwarding using the <a
+                    href="processors-other#redirect-processor">Redirect processor</a>. You can also
+                    use the Servlet Include generator to include the content produced by a JSP.
+                    Finally, you can use the Servlet Filter generator and implement JSP
+                    post-processing with OPS.
                 </p>
             </section>
         </section>
@@ -567,7 +582,7 @@
         <section>
             <title>Other Orbeon PresentationServer FAQ</title>
             <a name="performance"/>
-            <section>
+            <section added="2006-01-11">
                 <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
                 <p>
                     First of all, there are a few things you should make sure of:
@@ -1048,6 +1063,15 @@
                 <p>
                     To reach valid conclusions about performance, run a tool like <a
                     href="http://jakarta.apache.org/jmeter/">Apache JMeter</a> on your application.
+                </p>
+            </section>
+            <a name="session-sharing"/>
+            <section added="2006-01-11">
+                <title>Can JSP or other servlets share a session with OPS?</title>
+                <p>
+                    Yes, the <a href="processors-serializers#scope-serializer">Scope serializer</a>
+                    and <a href="processors-generators#scope-generator">Scope generator</a> simply
+                    use the Servlet (or Portlet) session to store and retrieve information.
                 </p>
             </section>
         </section>

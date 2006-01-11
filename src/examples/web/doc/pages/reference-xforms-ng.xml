@@ -2582,11 +2582,11 @@
                             <ol>
                                 <li>
                                     The first argument, <code>$XPLurl</code>, is the URL of the
-                                    pipeline. It must be an absoluate URL.
+                                    pipeline. It must be an absolute URL.
                                 </li>
                                 <li>
-                                    The second argument, <code>$inputNames</code>, is a
-                                    sequence strings, each one representing the name of an input of the
+                                    The second argument, <code>$inputNames</code>, is a sequence of
+                                    strings, each one representing the name of an input of the
                                     pipeline that you want to connect.
                                 </li>
                                 <li>
@@ -2616,11 +2616,11 @@
                                 The example below shows a call to the <code>xxforms:call-xpl</code>
                                 function:
                             </p>
-                            <p>
-                                <code>xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl',
+                            <xml-source>
+                                xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl',
                                 ('input', 'xpath'), (instance('instance')/input,
-                                instance('instance')/xpath), 'formatted-output')/*, 'html')</code>
-                            </p>
+                                instance('instance')/xpath), 'formatted-output')/*, 'html')
+                            </xml-source>
                         </li>
                     </ul>
                 </section>

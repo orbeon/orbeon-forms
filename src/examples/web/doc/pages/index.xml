@@ -80,23 +80,29 @@
                     </p>
                 </li>
             </ul>
+            <!--
             <p>
                 It is highly recommended to follow the <a href="OPS Tutorial.pdf">OPS
                 Tutorial</a> to get started with developing applications with OPS, and to refer to
                 the User Guide as a reference.
             </p>
+            <note>
+                <p>
+                    The OPS Tutorial has not yet been updated to reflect the latest changes in OPS
+                    3.0.
+                </p>
+            </note>
+            -->
         </section>
 
         <section>
             <title>Prerequisites</title>
-
             <p>
                 This guide should be accessible to anyone with some experience developing simple web
-                applications. It is helpful to understand the basics of XML, Extensible Stylesheet
-                Language Transformations (XSLT), and XForms before reading this documentation. For
-                more information, consult the following sources as a starting point:
+                applications, but it is helpful to understand the basics of XML, Extensible
+                Stylesheet Language Transformations (XSLT), and XForms beforehand. For more
+                information, consult the following sources as a starting point:
             </p>
-
             <ul>
                 <li>
                     <p>
@@ -114,12 +120,10 @@
                     </p>
                 </li>
             </ul>
-
             <p>
-                In addition to online resources, many books about these 
-                technologies are available in printed form.
+                In addition to online resources, many books about these technologies are available
+                in printed form.
             </p>
-
         </section>
 
     </body>

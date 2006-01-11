@@ -28,9 +28,10 @@
         <menu-item label="Installing" href="intro-install"/>
         <menu-item label="Frequently Asked Questions" href="home-faq" printed-book="false"/>
     </menu>
-    <menu label="Tutorial">
-        <menu-item label="Tutorial" href="/doc/pages/OPS Tutorial.pdf" printed-book="false"/>
-    </menu>
+    <!-- Tutorial commented out until we upgrade to a 3.0 version -->
+    <!--<menu label="Tutorial">-->
+        <!--<menu-item label="Tutorial" href="/doc/pages/OPS Tutorial.pdf" printed-book="false"/>-->
+    <!--</menu>-->
     <menu label="Core Technologies Reference">
         <menu label="XForms">
             <menu-item label="XForms Reference" href="reference-xforms-ng"/>
@@ -124,9 +125,9 @@
     <menu label="Internals">
     </menu>
     -->
-    <menu label="Obsolete">
-        <menu-item label="XForms Internal" href="internals-xforms" printed-book="false"/>
-        <menu-item label="XUpdate JAXP Support" href="integration-xupdate" printed-book="false"/>
+    <!--<menu label="Obsolete">-->
+        <!--<menu-item label="XForms Internal" href="internals-xforms" printed-book="false"/>-->
+        <!--<menu-item label="XUpdate JAXP Support" href="integration-xupdate" printed-book="false"/>-->
 <!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
-    </menu>
+    <!--</menu>-->
 </book>

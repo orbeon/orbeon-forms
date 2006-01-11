@@ -19,7 +19,7 @@
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
-        <title>The XML Pipeline Definition Language (XPL)</title>
+        <title>Introduction to the XML Pipeline Definition Language (XPL)</title>
     </header>
     <body>
         <section>

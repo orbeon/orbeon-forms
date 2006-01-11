@@ -32,6 +32,7 @@
                 eXist.
             </p>
         </section>
+        <a name="tamino"/>
         <section>
             <title>Tamino XML Server 4.1</title>
             <p>
@@ -425,11 +426,17 @@
                 </p>
             </section>
         </section>
+        <a name="xmldb"/>
         <section>
             <title>XML:DB Databases (eXist)</title>
+            <note>
+                This documentation has not yet been written.
+            </note>
+            <!--
             <p>
                 TODO
             </p>
+            -->
         </section>
     </body>
 </document>

@@ -18,86 +18,35 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2003/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
-        <title>Changes in Version 3.0 BETA 4</title>
+        <title>Changes in Version 3.0</title>
     </header>
     <body>
         <a name="introduction"/>
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon PresentationServer (OPS) 3.0 BETA 4!
+                Welcome to Orbeon PresentationServer (OPS) 3.0!
             </p>
             <p>
                 OPS 3.0 features an XForms engine much improved over OPS 2.8's, significant
                 improvements in the Page Flow Controller, and much more!
             </p>
+            <!--
             <p>
                 The purpose of an OPS 3.0 BETA is to provide you with a first glimpse of the OPS
                 3.0 functionality, while OPS developers keep ironing out the last bugs and finishing
                 up the documentation! During the beta period, we are looking for as much feedback as
                 possible related to all the aspects of the OPS 3.0 BETA 4 release.
             </p>
+            -->
             <p>
-                Please use the <a href="http://forge.objectweb.org/mail/?group_id=168">ops-users
-                mailing-list</a> for feedback about OPS 3.0 BETA 4.
+                This document describes changes made between OPS 2.8 and OPS 3.0.
             </p>
         </section>
         <a name="limitations"/>
-        <section>
-            <title>Known Limitations of OPS 3.0 BETA 4</title>
-            <p>
-                The following limitations are known:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        Initial generation of an XForms page may still have poor performance in some
-                        circumstances.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Not all the OPS examples have been updated to reflect the new XForms engine
-                        capabilities.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The OPS reference XForms documentation has not yet been updated to reflect
-                        all the changes in OPS 3.0. Please refer to the "XForms NG" examples for
-                        details.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The OPS reference XForms compliance matrix has not yet been updated to
-                        reflect all the changes in OPS 3.0.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Migration documentation from 2.8 to 3.0 is not complete yet.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The OPS Blog example is not complete.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        This release has only been tested with Tomcat.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The PDF version of the User Guide does not have page numbers.
-                    </p>
-                </li>
-            </ul>
-        </section>
         <section>
             <title>Known Limitations of OPS 3.0</title>
             <p>
@@ -140,37 +89,50 @@
                         new features and best practices of OPS 3.0.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        Initial generation of an XForms page may still have poor performance in some
+                        circumstances.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Not all the OPS examples have been updated to reflect the new XForms engine
+                        capabilities.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS reference XForms documentation is a work in progress. Please refer
+                        to the "XForms NG" examples for details.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS reference XForms compliance matrix has not yet been updated to
+                        reflect all the changes in OPS 3.0.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Migration documentation from 2.8 to 3.0 is not complete yet.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS Blog example is not complete.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The PDF version of the User Guide does not have page numbers.
+                    </p>
+                </li>
             </ul>
-        </section>
-        <section>
-            <title>Change Since OPS 3.0 BETA 3</title>
             <p>
-                The following changes have been implemented since OPS 3.0 BETA 3:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        Numerous XForms engine bug-fixes and improvements.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Documentation improvements.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Improved and reorganized examples.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        XForms engine initialization performance improvements.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                The rest of this document describes changes made between OPS 2.8 and OPS 3.0.
+                Please also visit the <a href="http://forge.objectweb.org/tracker/?group_id=168">OPS
+                bug tracker</a> on the ObjectWeb Forge, and report and discuss issues in the <a
+                href="http://forge.objectweb.org/mail/?group_id=168">ops-users mailing-list</a>.
             </p>
         </section>
         <a name="xforms"/>
@@ -185,7 +147,8 @@
                     new XForms examples, in particular the <a
                     href="/goto-example/xforms-controls">XForms Controls</a>, the <a
                     href="/goto-example/bizdoc2">BizDoc NG</a> example, and the <a
-                    href="/goto-example/xforms-sandbox">XForms Sandbox</a> example.
+                    href="/goto-example/xforms-sandbox">XForms Sandbox</a> example. XForms
+                    improvements in OPS 3.0 include but are not limited to:
                 </p>
                 <ul>
                     <li>
@@ -219,7 +182,7 @@
                     <li>
                         <p>
                             <b>XForms event model.</b> The XForms engine supports the XForms event
-                            model, most XForms events and all XForms actions.
+                            model, including most XForms events and XForms actions.
                         </p>
                     </li>
                     <li>
@@ -231,7 +194,7 @@
                     </li>
                     <li>
                         <p>
-                            <b>XForms switch module.</b> The XForms engine fully supports the XForms
+                            <b>XForms switch module.</b> The XForms engine supports the XForms
                             switch module.
                         </p>
                     </li>
@@ -245,9 +208,10 @@
                     <li>
                         <p>
                             <b>XForms submission.</b> The XForms engine supports submitting forms as
-                            <code>application/xml</code>, including to external applications. Support
-                            for <code>replace="instance"</code>, <code>replace="all"</code>, and
-                            <code>replace="none"</code> is included.
+                            <code>application/xml</code> with HTTP POST and
+                            <code>application/x-www-form-urlencoded</code> with HTTP GET (including
+                            to external applications). Support for <code>replace="instance"</code>,
+                            <code>replace="all"</code>, and <code>replace="none"</code> is included.
                         </p>
                     </li>
                     <li>
@@ -260,8 +224,8 @@
                         <p>
                             <b>Extension functions.</b> The XForms engine supports the
                             <code>xxforms:call-xpl()</code> <a
-                            href="reference-xforms-ng#ops-extensions">extension function</a> to
-                            call arbitrary XPL programs from XForms.
+                            href="reference-xforms-ng#ops-extensions">extension function</a> to call
+                            arbitrary XPL programs from XForms, as well as some eXforms functions.
                         </p>
                     </li>
                     <li>
@@ -290,25 +254,15 @@
                         <p>
                             <b>Other changes.</b> The XForms engine supports the <code>value</code>
                             attribute on <code>xforms:output</code>, handles inheritance of model item
-                            properties, and includes numerous bug fixes.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: document (X)HTML attributes supported on XForms elements: id, class,
-                            navindex, accesskey, plus tabindex, style, and how to handle other
-                            attributes (xhtml:*).
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: document event + instance logging.
+                            properties, and includes numerous improvements and bug fixes.
                         </p>
                     </li>
                 </ul>
+                <!--
                 <p>
                     TODO: link to updated XForms conformance map.
                 </p>
+                -->
             </section>
             <section>
                 <title>Incompatible changes</title>
@@ -393,67 +347,159 @@
                     </p>
                 </warning>
                 <p>
-                    This is a list of tasks to accomplish and possible caveats:
+                    When migrating an application from XForms Classic to XForms NG, a series of
+                    tasks need to be performed, due to the fact that the OPS XForms engine is now
+                    much closer from the XForms 1.0 specification. The following list attemps to
+                    describe the most common aspects of the migration. It does not intend to be
+                    inclusive:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            For a given <code>&lt;page&gt;</code> element: if your OPS 2.8 XForms
-                            model is static (which is usually the case), copy it under your XHTML
-                            page view's <code>xhtml:head</code> element. Then remove the
-                            <code>xforms</code> attribute from the <code>&lt;page&gt;</code>
-                            element. You can then remove the file containing your XForms model.
+                            <b>XForms model migration.</b> For a given <code>&lt;page&gt;</code>
+                            element: if your OPS 2.8 XForms model is static (which is usually the
+                            case), copy it under your XHTML page view's <code>xhtml:head</code>
+                            element. Then remove the <code>xforms</code> attribute from the
+                            <code>&lt;page&gt;</code> element. You can then remove the file
+                            containing your XForms model.
                         </p>
+                        <xml-source show-namespaces="false">
+                            <xhtml:head>
+                                <xhtml:title>My Title</xhtml:title>
+                                <xforms:model id="my-model">
+                                    <xforms:instance id="main">
+                                        ...
+                                    </xforms:instance>
+                                    ...
+                                </xforms:model>
+                            </xhtml:head>
+                        </xml-source>
                         <p>
                             Another possibility is to keep your XForms model file, and to XInclude
                             that file in your XHTML page view under the <code>xhtml:head</code>
-                            element. Here again, you must remove the <code>xforms</code> attribute
+                            element.
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xhtml:head>
+                                <xhtml:title>My Title</xhtml:title>
+                                <xi:include href="my-model.xml"/>
+                            </xhtml:head>
+                        </xml-source>
+                        <p>
+                            Here again, you must remove the <code>xforms</code> attribute
                             from the <code>&lt;page&gt;</code> element.
                         </p>
-                    </li>
-                    <!--
-                    <li>
                         <p>
-                            With OPS 2.8,
+                            If your XForms model is dynamic, then you can use XSLT in your page
+                            view to dynamically produce the model:
                         </p>
-                    </li>
-                    -->
-                    <li>
+                        <xml-source show-namespaces="false">
+                            <xhtml:head>
+                                <xhtml:title>My Title</xhtml:title>
+                                <xforms:model id="my-model">
+                                    <xforms:instance id="main">
+                                        <form>
+                                            <name>
+                                                <xsl:value-of select="doc('input:data')/*/my-name"/>
+                                            </name>
+                                            ...
+                                        </form>
+                                    </xforms:instance>
+                                    ...
+                                </xforms:model>
+                            </xhtml:head>
+                        </xml-source>
                         <p>
-                            TODO: point to XForms Instance Initialization documentation, and explain
-                            how this was different with Classic.
+                            The PFC now provides XML submissions on the page models, views and
+                            actions' <code>instance</code> inputs. This allows for easily building
+                            dynamic XForms models from an XML submission, including an XForms
+                            submission, which was difficult to do before. In the example above, the
+                            current XML submission can be accessed from XSLT in the page view with
+                            <code>doc('input:instance')</code>.
                         </p>
-                    </li>
-                    <li>
                         <p>
-                            TODO: xforms:submission and xforms:submit (id, action, method).
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: handling submissions: there are no longer roundtrips which are
-                            visible to the PFC for xforms:repeat, etc.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: instance validation (remove from PFC, do it with XForms).
-                            Question of custom instance validation.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: converting dynamic XForms models.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            TODO: using events.
+                            For more information, visit the XForms Reference's <a
+                            href="reference-xforms-ng#xforms-instance-initialization">XForms
+                            Instance Initialization</a> section and the Page Flow Controller's <a
+                            href="reference-page-flow#xml-submission">XML Submission</a> section.
                         </p>
                     </li>
                     <li>
                         <p>
-                            TODO: more?
+                            <b>Required attributes.</b> Some controls now require certain
+                            attributes, as per the XForms 1.0 specification. In particular:
+                        </p>
+                        <ul>
+                            <li>
+                                <code>xforms:submit</code> now requires a <code>submission</code>
+                                attribute.
+                            </li>
+                            <li>
+                                XForms actions, including <code>xforms:setvalue</code>, need an
+                                <code>ev:event</code> attribute, or need to be enclosed within and
+                                <code>xforms:action</code> element with an <code>ev:event</code>
+                                attribute.
+                            </li>
+                            <li>
+                                The <code>xforms:submission</code> element now requires an
+                                <code>id</code> attribute to be useful (by being referred from the
+                                <code>submission</code> attribute of <code>xforms:submit</code> or
+                                <code>xforms:send</code>). Attributes <code>action</code> and
+                                <code>method</code> are also mandatory.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Validation processing model.</b> As per the XForms specification,
+                            invalid XForms instances, or XForms instances with missing required
+                            elements cannot be submitted and instead throw
+                            <code>xforms-submit-error</code> events. This means that there is no
+                            longer a need to check on <code>xxforms:valid</code> attributes in the
+                            page flow to determine whether a submitted XForms instance is valid or
+                            not.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Page flow roundtrips.</b> <code>xforms:repeat</code> updates (threw
+                            actions such as <code>xforms:insert</code> and
+                            <code>xforms:delete</code>) are no longer visible in the page flow. With
+                            XForms Classic, upon inserting or deleting a row with those actions,
+                            the entire form would be submitted, giving an opportunity to the page
+                            flow to intercept and regenerate the page. With XForms NG, these
+                            actions operate within the XForms engine.
+                        </p>
+                        <p>
+                            Use XForms submissions with <code>replace="none"</code> or
+                            <code>replace="instance"</code> if you need to submit an XForms instance
+                            to the page flow before or after performing such actions.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms events and actions.</b> Many operations can now be performed
+                            with XForms events an actions, rather than using
+                            <code>xforms:setvalue</code> in an <code>xforms:submit</code> and then
+                            performing a complete submission.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XML services and page flow.</b> Because the XForms engine now
+                            operates completely separately from the page flow, XForms pages must now
+                            explicitly perform XForms submissions to interact with pages defined in
+                            your page flow.
+                        </p>
+                        <p>
+                            In particular, when using an XForms submission with
+                            <code>replace="none"</code> or <code>replace="instance"</code>, the page
+                            flow can now be used to implement <i>XML services</i>, that is services
+                            that receive XML (through the XForms submission) and produce XML as a
+                            result. Such services are implemented in your page flow as usual with
+                            <code>&lt;page></code> elements, and differ with regular pages only in
+                            that they either do not return any result, or return an XML document as
+                            result as opposed to return a complete HTML page.
                         </p>
                     </li>
                 </ul>
@@ -551,11 +597,13 @@
                             example.
                         </p>
                     </li>
+                    <!--
                     <li>
                         <p>
                             Tracing: TODO
                         </p>
                     </li>
+                    -->
                 </ul>
             </section>
             <section>
@@ -634,10 +682,6 @@
                     <code>oxf:xalan</code>.
                 </p>
             </note>
-            <p>
-                TODO: document the fact that transformation is separate from serialization with
-                OPS. See XML serializer.
-            </p>
         </section>
         <a name="xquery"/>
         <section>
@@ -936,20 +980,20 @@
         <a name="file-serializer"/>
         <section>
             <title>File Serializer</title>
-            <p>
-                The File serializer now works like the HTTP serializer: it only accepts <a
-                href="reference-formats">text and binary</a> documents as input, and no longer
-                handles conversions to XML, HTML, XHTML or text. To serialize to a file XML, HTML,
-                XHTML or plain text, connect the <a href="processors-converters"> XML, HTML or Text
-                converters</a> to the File serializer.
-            </p>
-            <p>
-                The legacy, deprecated File serializer is still available as
-                <code>oxf:legacy-file-serializer</code>.
-            </p>
-            <p>
-                 [TODO: MARK INCOMPATIBLE CHANGE]
-            </p>
+            <section>
+                <title>Incompatible changes</title>
+                <p>
+                    The File serializer now works like the HTTP serializer: it only accepts <a
+                    href="reference-formats">text and binary</a> documents as input, and no longer
+                    handles conversions to XML, HTML, XHTML or text. To serialize to a file XML, HTML,
+                    XHTML or plain text, connect the <a href="processors-converters"> XML, HTML or Text
+                    converters</a> to the File serializer.
+                </p>
+                <p>
+                    The legacy, deprecated File serializer is still available as
+                    <code>oxf:legacy-file-serializer</code>.
+                </p>
+            </section>
         </section>
         <a name="error-reporting"/>
         <section>
@@ -1088,11 +1132,13 @@
                         manager can be configured with or without a sandbox.
                     </p>
                 </li>
+                <!--
                 <li>
                     <p>
                         <b>PDF Processors.</b> TODO
                     </p>
                 </li>
+                -->
                 <li>
                     <p>
                         <b>Directory Scanner Processor.</b> The purpose of the <a
@@ -1127,15 +1173,6 @@
                         <code>http://www.w3.org/2002/xforms/controls</code> and for the
                         <code>config</code> input of <code>oxf:portlet-include</code> the URI is
                         <code>http://orbeon.org/oxf/xml/portlet-include</code>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Request Generator</b>. The <a
-                        href="processors-generators-request">Request Generator</a> used to return a
-                        constructed path for the <code>path-info</code> parameter. It now correctly
-                        returns the Servlet API's path info. To get a complete path, use
-                        <code>request-path</code> instead. [TODO: MARK INCOMPATIBLE CHANGE]
                     </p>
                 </li>
                 <li>
@@ -1207,9 +1244,21 @@
                         The old names still work for backward compatibility.
                     </p>
                 </li>
+            </ul>
+        </section>
+        <section>
+            <title>Other Incompatible changes</title>
+            <p>
+                The following incompatible changes are new in OPS 3.0:
+            </p>
+            <ul>
                 <li>
                     <p>
-                        TODO
+                        <b>Request Generator</b>. The <a
+                        href="processors-generators-request">Request Generator</a> used to return a
+                        constructed path for the <code>path-info</code> parameter. It now correctly
+                        returns the Servlet API's path info. To get a complete path, use
+                        <code>request-path</code> instead.
                     </p>
                 </li>
             </ul>

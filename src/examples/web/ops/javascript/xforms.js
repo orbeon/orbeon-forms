@@ -1470,11 +1470,16 @@ function xformsHandleResponse() {
                                         var visibile = divElement.getAttribute("visibility") == "visible";
 
                                         var caseBeginId = "xforms-case-begin-" + controlId;
-                                        var cursor = document.getElementById(caseBeginId);
-                                        if (cursor == null)
-                                            throw "Can not find element with id '" + caseBeginId + "'";
-                                        while (true) {
-                                            cursor = cursor.nextSibling;
+                                        var caseBegin = document.getElementById(caseBeginId);
+                                        if (caseBegin == null) throw "Can not find element with id '" + caseBeginId + "'";
+                                        var caseBeginParent = caseBegin.parentNode;
+                                        var foundCaseBegin = false;
+                                        for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
+                                            var cursor = caseBeginParent.childNodes[childId];
+                                            if (!foundCaseBegin) {
+                                                if (cursor.id == caseBegin.id) foundCaseBegin = true;
+                                                else continue;
+                                            }
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 if (cursor.id == "xforms-case-end-" + controlId) break;
                                                 xformsAddClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");

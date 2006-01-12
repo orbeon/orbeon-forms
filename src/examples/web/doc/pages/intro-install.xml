@@ -26,7 +26,6 @@
     <body>
         <section>
             <title>Downloading</title>
-
             <p>
             	Orbeon PresentationServer (OPS) can be downloaded from
                 <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
@@ -34,25 +33,23 @@
         </section>
         <section>
             <title>System Requirements</title>
-
             <p>
                 To install OPS you need an application server that runs on Java version 1.4.1 (or
                 later) and implements the Servlet API 2.3 (or later). OPS is supported on the
                 following application servers:
             </p>
-
             <ul>
                 <li>Apache Tomcat 4.1.31 with JDK 1.4.2</li>
-                <li>Apache Tomcat 5.0.28 with JDK 1.4.2</li>
                 <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
                 <li>BEA WebLogic Server 7 and 8.1</li>
                 <li>IBM WebSphere 6</li>
-                <li>JOnAS 4.3.2</li>
+                <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
                 <li>&jboss-vers;</li>
             </ul>
-
-            <p>Please contact us if you have questions about support for other application servers
-            or versions.</p>
+            <p>
+                Please contact us if you have questions about support for other application servers
+                or versions.
+            </p>
         </section>
         <section>
             <title>Installing OPS on Apache Tomcat</title>

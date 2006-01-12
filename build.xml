@@ -664,7 +664,6 @@ ${files}
             <fileset dir="${war.dir}"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <exclude name="**/*.eps"/>
-                <exclude name="**/*.pdf"/>
                 <exclude name="**/*.jsp"/>
                 <exclude name="**/*.cdr"/>
                 <exclude name="**/*.cpl"/>

@@ -1358,7 +1358,7 @@ function xformsHandleResponse() {
                                                         xformsAddClass(child, "xforms-type-date");
                                                         xformsRemoveClass(child, "xforms-type-string");
                                                     }
-                                                } else if (type != null && type == "") {
+                                                } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date") {
                                                     for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
                                                         var child = documentElement.childNodes[childIndex];
                                                         xformsAddClass(child, "xforms-type-string");

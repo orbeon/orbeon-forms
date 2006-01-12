@@ -21,7 +21,7 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config">
             <parameter xsl:version="2.0" xmlns:urlencoder="java:java.net.URLEncoder" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:value-of select="urlencoder:encode(urlencoder:encode(context:encodeXML(/*), 'utf-8'), 'utf-8')"/>
+                <xsl:value-of select="urlencoder:encode(context:encodeXML(/*), 'utf-8')"/>
             </parameter>
         </p:input>
         <p:input name="data" href="#instance"/>

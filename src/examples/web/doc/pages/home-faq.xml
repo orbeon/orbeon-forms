@@ -581,11 +581,12 @@
         </section>
         <section>
             <title>Other Orbeon PresentationServer FAQ</title>
-            <a name="performance"/>
+            <a name="performance-tuning"/>
             <section added="2006-01-11">
-                <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
+                <title>How can I improve the performance of my OPS application?</title>
                 <p>
-                    First of all, there are a few things you should make sure of:
+                    We provide below a list of tips that you might find helpful to improve the
+                    performance of your OPS application.
                 </p>
                 <ul>
                     <li>
@@ -648,6 +649,10 @@
                         </p>
                     </li>
                 </ul>
+            </section>
+            <a name="performance-numbers"/>
+            <section added="2006-01-11">
+                <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
                 <p>
                     Orbeon does not provide performance figures at this point, due to the number of
                     different possible scenarios, the differences between hardware platforms, and

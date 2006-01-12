@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.NetUtils;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -32,7 +33,7 @@ import java.util.Map;
  * ExternalContext.Response object and can be overrided using ResponseWrapper. Other methods
  * directly forward to the native response.
  */
-public class ExternalContextToHttpServletResponseWrapper implements HttpServletResponse {
+public class ExternalContextToHttpServletResponseWrapper extends HttpServletResponseWrapper {
 
     private ExternalContext.Response response;
     private HttpServletResponse nativeResponse;
@@ -40,6 +41,7 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     private ServletOutputStream servletOutputStream;
 
     public ExternalContextToHttpServletResponseWrapper(ExternalContext.Response response) {
+        super((HttpServletResponse) response.getNativeResponse());
         this.response = response;
         if (response.getNativeResponse() instanceof HttpServletResponse)
             this.nativeResponse = (HttpServletResponse) response.getNativeResponse();

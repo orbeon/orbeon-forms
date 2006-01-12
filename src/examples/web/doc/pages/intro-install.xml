@@ -35,13 +35,13 @@
             <title>System Requirements</title>
             <p>
                 To install OPS you need an application server that runs on Java version 1.4.1 (or
-                later) and implements the Servlet API 2.3 (or later). OPS is supported on the
+                later) and implements the Servlet API 2.3 (or later). OPS has been tested on the
                 following application servers:
             </p>
             <ul>
                 <li>Apache Tomcat 4.1.31 with JDK 1.4.2</li>
                 <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
-                <li>BEA WebLogic Server 7 and 8.1</li>
+                <li>BEA WebLogic Server 9.1</li>
                 <li>IBM WebSphere 6</li>
                 <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
                 <li>&jboss-vers;</li>
@@ -238,8 +238,87 @@
             </ol>
         </section>
         <section>
-            <title>Installing OPS on BEA WebLogic 7 and 8.1</title>
-
+            <title>Installing OPS on BEA WebLogic 9.1</title>
+            <ol>
+                <li>
+                    <p>
+                        Select a directory where you want to store your web application. Let's
+                        assume the path you chose is <code>C:/WebApps/ops</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> into <code>C:/WebApps/ops</code>. There should
+                        now be a directory called <code>WEB-INF</code> under
+                        <code>C:/WebApps/ops</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Start WebLogic's adminstration console.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use the console to install a new Web application. When prompted to select a
+                        WAR file, point to the directory <code>C:/WebApps/ops</code>. When prompted
+                        for a context path, choose a value such as <code>ops</code>. Complete the
+                        installation and start the web application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        You should now be able to access the OPS examples by pointing your browser
+                        to the address of your WebLogic server followed by the context path you
+                        chose, for example: <code>http://localhost:7001/ops/</code>.
+                    </p>
+                </li>
+                <!--
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
+                    <ol>
+                        <li>
+                            <p>
+                                Open <code>C:/WebApps/ops/WEB-INF/web.xml</code> and
+                                uncomment the lines between <code>&lt;!- - Uncomment this for the
+                                authentication example - -></code> and <code>&lt;!- - End
+                                authentication example - -></code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Open <code>C:/WebApps/ops/WEB-INF/weblogic.xml</code> and
+                                uncomment the lines between <code>&lt;!- - Uncomment this for the
+                                authentication example - -></code> and <code>&lt;!- - End
+                                authentication example - -></code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Open the WebLogic Console.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Create a new user named <code>admin</code> with a password of your
+                                choice.
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                -->
+            </ol>
+        </section>
+        <section>
+            <title>Installing OPS on BEA WebLogic 7.0 and 8.1</title>
+            <warning>
+                <p>
+                    OPS 3.0 hasn't been tested with these versions of WebLogic, but you may want to
+                    try the following instructions for OPS 2.8.
+                </p>
+            </warning>
             <ol>
                 <p><li>Assume that <code>DOMAIN</code> represents your WebLogic domain directory
                 (typically <code>c:\bea\user_projects</code>). Create a new directory:

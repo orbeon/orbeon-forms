@@ -96,11 +96,10 @@ or in this distribution under:
 OPS has been tested on the following application servers:
 
     * Apache Tomcat 4.1.31 with JDK 1.4.2
-    * Apache Tomcat 5.0.25 alpha with JDK 1.4.2
-    * Apache Tomcat 5.5.4 with JDK 1.4.2 and JDK 1.5.0
-    * BEA WebLogic Server 8.1
-    * IBM WebSphere 5.1
-    * JOnAS 4.3.2
+    * Apache Tomcat 5.5.4 with JDK 1.5.0
+    * BEA WebLogic Server 9.1
+    * IBM WebSphere 6
+    * JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)
     * JBoss 3.2.7 and 4.0.1sp1
 
 
@@ -123,7 +122,7 @@ under the root directory OPS_HOME/:
       resources, and demo samples reside.
 
     * doc: this directory contains the OPS documentation as static
-      HTML files, as well as the tutorial in PDF format
+      HTML files, as well as the OPS 2.8 tutorial in PDF format
       ("doc/OPS Tutorial.pdf").
 
     * cli-examples: this directory contains command line examples.
@@ -150,6 +149,7 @@ For information about compiling OPS, please visit:
 
   http://www.orbeon.com/community/getting-involved
 
+
 ****************************************
 7. More Information
 ****************************************
@@ -165,7 +165,11 @@ Here are some pointers to useful information related to this release.
 
         http://www.objectweb.org/wws/info/ops-users
 
-    * For commercial support and licensing alternatives, please contact:
+    * For commercial support and licensing alternatives, please visit:
+
+        http://www.orbeon.com/services/
+
+      or contact us at:
 
         info@orbeon.com
 

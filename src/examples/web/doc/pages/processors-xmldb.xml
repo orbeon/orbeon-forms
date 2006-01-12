@@ -131,6 +131,7 @@
                         </element>
                     </xml-source>
                 </section>
+                <a name="tamino-properties"/>
                 <section>
                     <title>System-Wide Configuration</title>
                     <p>
@@ -174,10 +175,12 @@
                         </tr>
                     </table>
                     <p>
-                        These properties as set for each Tamino processor as follows:
+                        These properties are set as follows:
                     </p>
                     <xml-source>
                         <property as="xs:anyURI" processor-name="oxf:tamino-query" name="url" value="http://localhost/tamino/welcome_4_1_4"/>
+                        <property as="xs:string" processor-name="oxf:tamino-query" name="username" value="..."/>
+                        <property as="xs:string" processor-name="oxf:tamino-query" name="password" value="..."/>
                     </xml-source>
                     <p>
                         The following global properties are allowed:
@@ -189,28 +192,31 @@
                             <th>Description</th>
                         </tr>
                         <tr>
+                            <td><code>oxf.tamino.isolation-degree</code></td>
+                            <td><code>string</code></td>
                             <td>
-                                <code>oxf.tamino.isolation-degree</code>
+                                Isolation degree. Possible values are:
+                                <code>uncommittedDocument</code>, <code>committedCommand</code>,
+                                <code>stableCursor</code>, <code>stableDocument</code>,
+                                <code>serializable</code>. See the Tamino documentation for more
+                                details on the isolation degree.
                             </td>
-                            <td>
-                                <code>string</code>
-                            </td>
-                            <td>Isolation degree. This value is passed directly to Tamino.</td>
                         </tr>
                         <tr>
+                            <td><code>oxf.tamino.lock-mode</code></td>
+                            <td><code>string</code></td>
                             <td>
-                                <code>oxf.tamino.lock-mode</code>
+                                Lock mode. Possible values are <code>unprotected</code>,
+                                <code>shared</code>, <code>protected</code>. See the Tamino
+                                documentation for more details on the lock mode.
                             </td>
-                            <td>
-                                <code>string</code>
-                            </td>
-                            <td>Lock mode. This value is passed directly to Tamino.</td>
                         </tr>
                     </table>
                     <p>
-                        These properties as set globally as follows:
+                        These properties as set as follows:
                     </p>
                     <xml-source>
+                        <property as="xs:string" name="oxf.tamino.isolation-degree" value="..."/>
                         <property as="xs:string" name="oxf.tamino.lock-mode" value="..."/>
                     </xml-source>
                 </section>

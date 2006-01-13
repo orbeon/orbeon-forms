@@ -175,6 +175,10 @@ function xformsStringReplace(node, placeholder, replacement) {
     xformsStringReplaceWorker(node, placeholderRegExp, replacement);
 }
 
+function xformsNormalizeEndlines(text) {
+    return text.replace(new RegExp("\\r", "g"), "");
+}
+
 function xformsAppendRepeatSuffix(id, suffix) {
     if (suffix == "")
         return id;
@@ -1367,8 +1371,8 @@ function xformsHandleResponse() {
                                                 }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
-                                                // Other controls that have a value (textfield, etc)
-                                                if (documentElement.value != newControlValue) {
+                                                // Textarea, password
+                                                if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {
                                                     documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
                                                 }

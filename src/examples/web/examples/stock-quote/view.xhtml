@@ -36,7 +36,7 @@
         <xforms:group>
             <xhtml:p>
                 Enter stock symbol (e.g. IBM):
-                <xforms:input ref="/symbol"/>
+                <xforms:input ref="."/>
                 <xsl:text>&#160;</xsl:text>
                 <xforms:trigger>
                     <xforms:label>Get Stock Price</xforms:label>
@@ -50,32 +50,29 @@
         <xforms:switch>
             <xforms:case id="initial"/>
             <xforms:case id="response">
-                <xhtml:p>Response:</xhtml:p>
-                <xhtml:p><xforms:output value="local-name(instance('quote')/*)"/></xhtml:p>
-                <xhtml:p><xforms:output value="namespace-uri(instance('quote')/*)"/></xhtml:p>
-                <xforms:group ref="instance('quote')/StockQuote">
+                <xforms:group ref="instance('quote')/*:StockQuote">
                     <xhtml:table class="gridtable">
                         <xhtml:tr>
                             <xhtml:th>Stock symbol</xhtml:th>
-                            <xhtml:td><xforms:output ref="Symbol"/></xhtml:td>
+                            <xhtml:td><xforms:output value="*:Symbol"/></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:th>Company name</xhtml:th>
-                            <xhtml:td><xforms:output ref="Company"/></xhtml:td>
+                            <xhtml:td><xforms:output value="*:Company"/></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:th>Price</xhtml:th>
                             <xhtml:td>
-                                <xforms:output value="substring-before(substring-after(Price, '&lt;b>'), '&lt;/b>')"/>
+                                <xforms:output value="substring-before(substring-after(*:Price, '&lt;b>'), '&lt;/b>')"/>
                             </xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:th>Open amount</xhtml:th>
-                            <xhtml:td><xforms:output ref="Open"/></xhtml:td>
+                            <xhtml:td><xforms:output ref="*:Open"/></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:th>Day range</xhtml:th>
-                            <xhtml:td><xforms:output ref="DayRange"/></xhtml:td>
+                            <xhtml:td><xforms:output ref="*:DayRange"/></xhtml:td>
                         </xhtml:tr>
                     </xhtml:table>
                 </xforms:group>

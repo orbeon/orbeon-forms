@@ -315,6 +315,84 @@
                     property should not be enabled on a production system.
                 </p>
             </section>
+            <section>
+                <title>processor.trace</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Specify the name of a class that implements the interface
+                                <code>org.orbeon.oxf.pipeline.api.PipelineContext.Trace</code>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:NCName</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <note>
+                    <p>
+                        OPS ships with two implementations of Trace,
+                        <code>org.orbeon.oxf.processor.NetworkTrace</code> and
+                        <code>org.orbeon.oxf.processor.StdOutTrace</code>.
+                        <code>NetworkTrace</code> sends profiling information to Studio which the
+                        displays the data in the trace views.  <code>StdOutTrace</code> simply
+                        dumps profiling information to standard out.
+                    </p>
+                </note>
+            </section>
+            <section>
+                <title>processor.trace.host</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Specify the host name that
+                                <code>org.orbeon.oxf.processor.NetworkTrace</code> will send data
+                                to.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:NMTOKEN</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>localhost</td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+            <section>
+                <title>processor.trace.host</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Specify the port that
+                                <code>org.orbeon.oxf.processor.NetworkTrace</code> will send data
+                                to.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:nonNegativeInteger</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>9191</td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
         </section>
         <a name="java-processor"/>
         <section>
@@ -592,99 +670,6 @@
             <p>
                 The test properties can easily be commented out for deployment.
             </p>
-        </section>
-        <section>
-            <title>XPL Profiling Properties</title>
-            <section>
-                <title>Trace Class</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Name</th>
-                            <td><code>processor.trace</code></td>
-                        </tr>
-                        <tr>
-                            <th>Purpose</th>
-                            <td>
-                                Specify the name of a class that implements the interface 
-                                <code>org.orbeon.oxf.pipeline.api.PipelineContext.Trace</code>.  
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td><code>xs:NCName</code></td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>None</td>
-                        </tr>
-                    </table>
-                </p>
-                <note>
-                    <p>
-                        OPS ships with two implementations of Trace, 
-                        <code>org.orbeon.oxf.processor.NetworkTrace</code> and 
-                        <code>org.orbeon.oxf.processor.StdOutTrace</code>.  
-                        <code>NetworkTrace</code> sends profiling information to Studio which the 
-                        displays the data in the trace views.  <code>StdOutTrace</code> simply 
-                        dumps profiling information to standard out.
-                    </p>
-                </note>
-            </section>
-            <section>
-                <title>Network Trace Host</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Name</th>
-                            <td><code>processor.trace.host</code></td>
-                        </tr>
-                        <tr>
-                            <th>Purpose</th>
-                            <td>
-                                Specify the host name that 
-                                <code>org.orbeon.oxf.processor.NetworkTrace</code> will send data 
-                                to.
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td><code>xs:NMTOKEN</code></td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>localhost</td>
-                        </tr>
-                    </table>
-                </p>
-            </section>
-            <section>
-                <title>Network Trace Port</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Name</th>
-                            <td><code>processor.trace.host</code></td>
-                        </tr>
-                        <tr>
-                            <th>Purpose</th>
-                            <td>
-                                Specify the port that 
-                                <code>org.orbeon.oxf.processor.NetworkTrace</code> will send data 
-                                to.
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td><code>xs:nonNegativeInteger</code></td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>9191</td>
-                        </tr>
-                    </table>
-                </p>
-            </section>
         </section>
     </body>
 </document>

@@ -673,9 +673,6 @@ ${files}
                 <exclude name="oxfmark/**"/>
                 <exclude name="struts-view/**"/>
             </zipfileset>
-            <zipfileset dir="doc" prefix="WEB-INF/resources/doc/pages">
-                <include name="OPS Tutorial.pdf"/>
-            </zipfileset>
         </zip>
     </target>
 

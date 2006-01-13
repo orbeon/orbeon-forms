@@ -638,6 +638,7 @@ ${files}
         <copy file="${war.dir}/WEB-INF/resources/config/theme/orbeon.css" toDir="${build.doc.dir}/reference/theme"/>
         <copy file="${war.dir}/WEB-INF/resources/config/theme/xforms.css" toDir="${build.doc.dir}/reference/theme"/>
         <copy todir="${build.doc.dir}" file="doc/OPS Tutorial.pdf"/>
+        <copy todir="${build.doc.dir}" file="doc/OPS User Guide.pdf"/>
     </target>
 
     <target name="orbeon-pdf-doc" depends="jars">

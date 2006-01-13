@@ -80,7 +80,7 @@
         <example id="spellchecker" label="Google Spell Checker"/>
         <example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>
         <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
-        <example id="yim" label="Instant Messaging"/>
+        <!--<example id="yim" label="Instant Messaging"/>-->
     </section>
     <section label="Query &amp; Transformation">
         <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>

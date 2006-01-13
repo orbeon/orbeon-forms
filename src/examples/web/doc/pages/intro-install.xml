@@ -489,6 +489,7 @@
                 <code>DOMAIN</code>).</li></p>
             </ol>
         </section>
+        <a name="websphere"/>
         <section>
             <title>Installing OPS on IBM WebSphere 6</title>
             <ol>
@@ -496,7 +497,11 @@
                     <p>
                         Launch WebSphere server.
                         <ul>
-                            <li>On Windows go to Control Panel, Administrative Tools, Services.</li>
+                            <li>
+                                On Windows go to Control Panel, Administrative Tools, Services.
+                                Look for IBM WebSphere Application Server and make sure it is
+                                started.
+                            </li>
                             <li>
                                 On Linux/UNIX, assuming that <code>WSAS_HOME</code> represents the
                                 location of your WebSphere installation, run

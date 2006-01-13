@@ -16,7 +16,7 @@
     Please contact Orbeon at info@orbeon.com for more information.
 -->
 <!DOCTYPE document [
-    <!ENTITY jboss-vers "JBoss 3.2.7 and 4.0">
+    <!ENTITY jboss-vers "JBoss 4.0">
     <!ELEMENT document (ANY)>
 ]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -799,7 +799,7 @@
                 </li>
                 <li>
                     <p>
-                        If you are using JBoss 4.0, edit
+                        Edit
                         <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat55.sar/META-INF/jboss-service.xml</code>
                          and change the value in
                         <code>&lt;attribute name="UseJBossWebLoader"></code> from <code>false</code> to

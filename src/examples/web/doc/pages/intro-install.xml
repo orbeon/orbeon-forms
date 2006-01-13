@@ -16,7 +16,7 @@
     Please contact Orbeon at info@orbeon.com for more information.
 -->
 <!DOCTYPE document [
-    <!ENTITY jboss-vers "JBoss 3.2.7 and 4.0.1sp1">
+    <!ENTITY jboss-vers "JBoss 3.2.7 and 4.0">
     <!ELEMENT document (ANY)>
 ]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -525,12 +525,18 @@
                         <ul>
                             <li>Click on Applications / Install New Application.</li>
                             <li>
-                                Upload <code>ops.war</code> and follow the wizard. We will
-                                assume that you chose <code>/ops</code> as context root.
+                                Select the <code>ops.war</code> to upload, choose a context path
+                                like <code>/ops</code> (from now on we will assume this was your
+                                choice).
+                            </li>
+                            <li>
+                                Hit "next" until you get to the end of the wizard, then hit
+                                "finish". You can leave the defaults everywhere while going through
+                                the wizard.
                             </li>
                             <li>Save the configuration.</li>
                             <li>Click on Applications / Enterprise Applications.</li>
-                            <li>Select <code>orbeon_war</code> and click on the "start" button.</li>
+                            <li>Select <code>ops_war</code> and click on the "start" button.</li>
                         </ul>
                     </p>
                 </li>
@@ -745,51 +751,81 @@
         <section>
             <title>Installing OPS on &jboss-vers;</title>
             <ol>
-                <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
-                installation: create a new <code>JBOSS_HOME/server/default/deploy/ops.war</code>
-                directory.</li>
-
-                <li>Unzip <code>ops.war</code> in the <code>ops.war</code> directory you just
-                created.</li>
-
-                <li>If you are using JBoss 4.0.0, edit
-                <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat50.sar/META-INF/jboss-service.xml</code>
-                and change the value in <code>&lt;attribute name="UseJBossWebLoader"></code> from
-                <code>false</code> to <code>true</code>.</li>
-                
-                <li>Start JBoss by running <code>JBOSS_HOME/bin/run.bat</code> (or
-                <code>run.sh</code> on UNIX).</li>
                 <li>
-                    Optionally, to run the authentication sample:
-                    <ol>
-                        <li>
-                            Open
-                            <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/web.xml</code>
-                            and uncomment the <code>security-constraint</code>,
-                           <code>login-config</code> and <code>security-role</code>
-                           declarations at the end of the file.
-                        </li>
-                        <li>
-                            Open <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/jboss-web.xml</code>
-                            and uncomment the <code>security-domain</code> element near the end of 
-                            bottom of the file.
-                        </li>
-                        <li>
-                            Open <code>JBOSS_HOME/server/default/conf/login-config.xml</code> and
-                            add the following aplication policy to the list of policies :
-                            <xml-source>
-                                <application-policy name = "orbeon-demo">
-                                   <authentication>
-                                      <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
-                                         flag = "required">
-                                         <module-option name="usersProperties">orbeon-demo-users.properties</module-option>
-                                         <module-option name="rolesProperties">orbeon-demo-roles.properties</module-option>
-                                      </login-module>
-                                   </authentication>
-                                </application-policy>
-                            </xml-source>
-                        </li>
-                    </ol>
+                    <p>
+                        Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
+                        installation: create a new
+                        <code>JBOSS_HOME/server/default/deploy/ops.war</code> directory.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>ops.war</code> directory you just
+                        created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        If you are using JBoss 4.0, edit
+                        <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat55.sar/META-INF/jboss-service.xml</code>
+                         and change the value in
+                        <code>&lt;attribute name="UseJBossWebLoader"></code> from <code>false</code> to
+                        <code>true</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Start JBoss by running <code>JBOSS_HOME/bin/run.bat</code> (or
+                        <code>run.sh</code> on UNIX).
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Run an modify the examples.
+                        <ul>
+                            <li>Go to <code>http://localhost:8080/ops/</code></li>
+                            <li>
+                                You can modify the examples resources as the application sever is
+                                running and see the results of your modifications on the fly. The
+                                resources are stored under
+                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/resources</code>.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Optionally, to run the authentication sample:
+                        <ul>
+                            <li>
+                                Open
+                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/web.xml</code>
+                                and uncomment the <code>security-constraint</code>,
+                               <code>login-config</code> and <code>security-role</code>
+                               declarations at the end of the file.
+                            </li>
+                            <li>
+                                Open <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/jboss-web.xml</code>
+                                and uncomment the <code>security-domain</code> element near the end of
+                                bottom of the file.
+                            </li>
+                            <li>
+                                Open <code>JBOSS_HOME/server/default/conf/login-config.xml</code> and
+                                add the following aplication policy to the list of policies :
+                                <xml-source>
+                                    <application-policy name = "orbeon-demo">
+                                       <authentication>
+                                          <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
+                                             flag = "required">
+                                             <module-option name="usersProperties">orbeon-demo-users.properties</module-option>
+                                             <module-option name="rolesProperties">orbeon-demo-roles.properties</module-option>
+                                          </login-module>
+                                       </authentication>
+                                    </application-policy>
+                                </xml-source>
+                            </li>
+                        </ul>
+                    </p>
                 </li>
             </ol>
         </section>

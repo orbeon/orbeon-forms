@@ -41,7 +41,7 @@
             </config>
         </p:input>
         <p:input name="call" href="#call"/>
-        <p:output name="data" ref="data" debug="result"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

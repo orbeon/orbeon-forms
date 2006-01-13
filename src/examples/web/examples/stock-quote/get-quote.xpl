@@ -18,7 +18,7 @@
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param type="input" name="instance" debug="instance"/>
+    <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:xslt">
@@ -41,7 +41,7 @@
             </config>
         </p:input>
         <p:input name="call" href="#call"/>
-        <p:output name="data" ref="data" debug="result"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

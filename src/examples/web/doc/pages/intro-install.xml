@@ -34,14 +34,14 @@
         <section>
             <title>System Requirements</title>
             <p>
-                To install OPS you need an application server that runs on Java version 1.4.1 (or
+                To install OPS you need an application server that runs on Java version 1.4.2 (or
                 later) and implements the Servlet API 2.3 (or later). OPS has been tested on the
                 following application servers:
             </p>
             <ul>
-                <li>Apache Tomcat 4.1.31 with JDK 1.4.2</li>
-                <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
-                <li>BEA WebLogic Server 9.1</li>
+                <li>Apache Tomcat 4.1.31 (JDK 1.4.2)</li>
+                <li>Apache Tomcat 5.5.4 (JDK 1.5.0)</li>
+                <li>BEA WebLogic Server 9.1 (JRockit)</li>
                 <li>IBM WebSphere 6</li>
                 <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
                 <li>&jboss-vers;</li>
@@ -53,25 +53,38 @@
         </section>
         <section>
             <title>Installing OPS on Apache Tomcat</title>
-
             <ol>
-                <li><p>Assuming that <code>TOMCAT_HOME</code> represents the location of your
-                Tomcat installation: create a new <code>TOMCAT_HOME/webapps/orbeon</code>
-                directory.</p></li>
+                <li>
+                    <p>
+                        Assuming that <code>TOMCAT_HOME</code> represents the location of your
+                        Tomcat installation: create a new <code>TOMCAT_HOME/webapps/ops</code>
+                        directory.
+                    </p>
+                </li>
 
-                <li><p>Unzip <code>ops.war</code> in the <code>orbeon</code> directory you just
-                created.</p></li>
-
-                <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
-                <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
-                <code>server/lib</code>. This way Xerces will be available to Tomcat, but it won't
-                override the version of Xerces and standard XML APIs that comes with OPS.</p></li>
-
-                <li><p>You can now start Tomcat, and access
-                <code>http://localhost:8080/orbeon/</code> to test your installation (replacing
-                <code>localhost</code> and <code>8080</code> with the host name and port number of
-                your Tomcat installation), or perform one of the optional installation steps
-                below.</p></li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>ops</code> directory you just
+                        created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        With Tomcat 5, move <code>xercesImpl.jar</code> and
+                        <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
+                        <code>server/lib</code>. This way Xerces will be available to Tomcat, but it
+                        won't override the version of Xerces and standard XML APIs that comes with
+                        OPS.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        You can now start Tomcat, and access <code>http://localhost:8080/ops/</code>
+                        to test your installation (replacing <code>localhost</code> and
+                        <code>8080</code> with the host name and port number of your Tomcat
+                        installation if different from the default), or perform one of the optional
+                        installation steps below.</p>
+                    </li>
 
 <!--
                 <li><p>Optionally, configure a datasource to use the SQL examples
@@ -143,24 +156,25 @@
                     </ol></p>
                 </li>
 -->
-                <li><p>Optionally, to run the authentication example:
-
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
                     <ol>
-                        <li>Open
-                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code>
-                        and uncomment the <code>security-constraint</code>,
-                        <code>login-config</code> and <code>security-role</code>
-                        declarations at the end of the file.</li>
-
-                        <li>Open <code>TOMCAT_HOME/conf/server.xml</code> and
-                        uncomment the following declaration: <code>&lt;Realm
-                        className="org.apache.catalina.realm.MemoryRealm"
-                        /&gt;</code></li>
-
-                        <li>Edit
-                        <code>TOMCAT_HOME/conf/tomcat-users.xml</code> and
-                        replace the content of this by with:
-
+                        <li>
+                            Open <code>TOMCAT_HOME/webapps/ops/WEB-INF/web.xml</code> and
+                            uncomment the <code>security-constraint</code>,
+                            <code>login-config</code> and <code>security-role</code> declarations at
+                            the end of the file.
+                        </li>
+                        <li>
+                            Open <code>TOMCAT_HOME/conf/server.xml</code> and uncomment the
+                            following declaration: <code>&lt;Realm
+                            className="org.apache.catalina.realm.MemoryRealm" /&gt;</code>
+                        </li>
+                        <li>
+                            Edit <code>TOMCAT_HOME/conf/tomcat-users.xml</code> and replace the
+                            content of this by with:
                             <xml-source>
                                 <tomcat-users>
                                   <role rolename="administrator"/>
@@ -168,7 +182,7 @@
                                 </tomcat-users>
                             </xml-source>
                         </li>
-                    </ol></p>
+                    </ol>
                 </li>
 
                <!--
@@ -320,46 +334,57 @@
                 </p>
             </warning>
             <ol>
-                <p><li>Assume that <code>DOMAIN</code> represents your WebLogic domain directory
-                (typically <code>c:\bea\user_projects</code>). Create a new directory:
-                <code>DOMAIN\applications\orbeon</code>.</li></p>
-
-                <p><li>Unzip <code>ops.war</code> in the <code>orbeon</code>
-                directory you just created.</li></p>
-
-                <p><li>Edit the <code>startWeblogic.cmd</code> (in
-                <code>DOMAIN</code>) and change <code>set STARTMODE=true</code>
-                to <code>set STARTMODE=false</code>. This starts WebLogic in
-                development mode. In development mode, WebLogic automatically
-                loads and deploys the content of the <code>application</code>
-                directory. If you don't want to start the server in development
-                mode, you have to explicitly declare a Web application in the
-                <code>config.xml</code>.</li></p>
-
-                <p><li>To improve performance on WebLogic (<b>highly recommended!</b>):
-
-                    <p><ol>
-                        <li>Start WebLogic (e.g. with
-                        <code>startWebLogic.cmd</code>)</li>
-
-                        <li>Make sure you can access the OPS examples with your
-                        browser (by going to
-                        <code>http://localhost:7001/orbeon/</code>)</li>
-
-                        <li>Stop WebLogic</li>
-
-                        <li>Open the <code>config.xml</code> file in an editor.
-                        Look for the <code>&lt;WebAppComponent
-                        Name="orbeon"&gt;</code> element and add the attribute:
-                        <code>ServletReloadCheckSecs="-1"</code>. This will
-                        prevent WebLogic from checking if a servlet has changed
-                        in the application and will make OPS <i>much</i>
-                        faster.</li>
-                    </ol></p>
-                </li></p>
+                <li>
+                    <p>
+                        Assume that <code>DOMAIN</code> represents your WebLogic domain directory
+                        (typically <code>c:\bea\user_projects</code>). Create a new directory:
+                        <code>DOMAIN\applications\orbeon</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>orbeon</code> directory you just
+                        created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Edit the <code>startWeblogic.cmd</code> (in <code>DOMAIN</code>) and
+                        change <code>set STARTMODE=true</code> to <code>set
+                        STARTMODE=false</code>. This starts WebLogic in development mode. In
+                        development mode, WebLogic automatically loads and deploys the content of
+                        the <code>application</code> directory. If you don't want to start the
+                        server in development mode, you have to explicitly declare a Web application
+                        in the <code>config.xml</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        To improve performance on WebLogic (<b>highly recommended!</b>):
+                    </p>
+                    <ol>
+                        <li>
+                            Start WebLogic (e.g. with <code>startWebLogic.cmd</code>)
+                        </li>
+                        <li>
+                            Make sure you can access the OPS examples with your browser (by going
+                            to <code>http://localhost:7001/orbeon/</code>)
+                        </li>
+                        <li>
+                            Stop WebLogic
+                        </li>
+                        <li>
+                            Open the <code>config.xml</code> file in an editor. Look for the
+                            <code>&lt;WebAppComponent Name="orbeon"&gt;</code> element and add the
+                            attribute: <code>ServletReloadCheckSecs="-1"</code>. This will prevent
+                            WebLogic from checking if a servlet has changed in the application and
+                            will make OPS <i>much</i> faster.
+                        </li>
+                    </ol>
+                </li>
 
 <!--
-                <p><li>Optionally, configure a datasource to use the SQL examples
+                <li><p>Optionally, configure a datasource to use the SQL examples
                 using the bundled HSQLDB database:
 
                     <p><ol>
@@ -405,26 +430,31 @@
                         <li>Go to the <code>Targets</code> tab and deploy the
                         data source.</li>
                     </ol></p>
-                </li></p>
+                </p></li>
 -->
 
-                <p><li>Optionally, to run the authentication example:
-
-                    <p><ol>
-                        <li>Open
-                        <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code>
-                        and uncomment the <code>security-constraint</code>,
-                        <code>login-config</code> and <code>security-role</code>
-                        declarations at the end of the file.</li>
-
-                        <li>Go to the WebLogic Console with a browser.</li>
-
-                        <li>Create a new user named <code>admin</code> with a
-                        password of your choice.</li>
-                    </ol></p>
-                </li></p>
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
+                    <ol>
+                        <li>
+                            Open <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code> and
+                            uncomment the <code>security-constraint</code>,
+                            <code>login-config</code> and <code>security-role</code> declarations at
+                            the end of the file.
+                        </li>
+                        <li>
+                            Go to the WebLogic Console with a browser.
+                        </li>
+                        <li>
+                            Create a new user named <code>admin</code> with a password of your
+                            choice.
+                        </li>
+                    </ol>
+                </li>
                 <!--
-                <p><li>Optionally, to run the JSF example (tested with
+                <li><p>Optionally, to run the JSF example (tested with
                 WebLogic 7.0. and 8.1):
                     <p><ol>
                         <li>
@@ -482,11 +512,14 @@
                             <code>-Djavax.faces.tree.TreeFactory=org.orbeon.faces.renderkit.TreeFactoryImpl</code>.
                         </li>
                     </ol></p>
-                </li></p>
+                </p></li>
                 -->
-                <p><li>Once OPS is properly installed, you can start WebLogic as
-                usual with the <code>startWeblogic.cmd</code> script (in
-                <code>DOMAIN</code>).</li></p>
+                <li>
+                    <p>
+                        Once OPS is properly installed, you can start WebLogic as usual with the
+                        <code>startWeblogic.cmd</code> script (in <code>DOMAIN</code>).
+                    </p>
+                </li>
             </ol>
         </section>
         <a name="websphere"/>
@@ -566,11 +599,11 @@
                 <li>
                      Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:
                      <ul>
-                         <p><li>
+                         <li><p>
                              Extract the
                              <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OPS
                              WAR file, and save it on WebSphere's directory.
-                         </li></p>
+                         </p></li>
 
                        <p>  <li>
                              In the administrative console, go to the Resources
@@ -578,9 +611,9 @@
                              add the HSQLDB JAR to the
                              <code>classpath</code> option and put
                              <code>org.hsqldb.jdbcDataSource</code> in the Implementation Class field.
-                         </li></p>
+                         </p></li>
 
-                         <p><li>
+                         <li><p>
                              Create a new datasource, using the following information:
                              <p><table>
                                  <tr>
@@ -601,11 +634,11 @@
                                      <td><code>sa</code></td>
                                  </tr>
                              </table></p>
-                         </li></p>
+                         </p></li>
 
-                         <p><li>
+                         <li><p>
                              Save the configuration.
-                         </li></p>
+                         </p></li>
 
                      </ul>
                  </li>
@@ -637,16 +670,16 @@
 <!--                       <p> <li>-->
 <!--                            Extract the <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OXF-->
 <!--                            WAR file, and save it on your hard drive.-->
-<!--                        </li></p>-->
+<!--                        </p></li>-->
 <!---->
-<!--                       <p><li>-->
+<!--                       <li><p>-->
 <!--                            Open-->
 <!--                            <code>domains/domain1/server1/config/server.xml</code>,-->
 <!--                            locate the <code>/server/java-config</code> element and-->
 <!--                            change the <code>server-classpath</code> attribute to include the path to the HSQLDB JAR.-->
-<!--                        </li></p>-->
+<!--                        </p></li>-->
 <!---->
-<!--                        <p><li>-->
+<!--                        <li><p>-->
 <!--                            In the same file, add the following snippet to initialize the JDBC DataSource:-->
 <!--                            <xml-source>-->
 <!--                                <resources>-->
@@ -658,7 +691,7 @@
 <!--                                </resources>-->
 <!--                            </xml-source>-->
 <!--                        </li> </p>-->
-<!--                        <p><li>Save <code>server.xml</code> and start the server.</li></p>-->
+<!--                        <li><p>Save <code>server.xml</code> and start the server.</p></li>-->
 <!--                    </ul>-->
 <!--                    <li>Optionally, to run the authentication example:-->
 <!---->
@@ -899,6 +932,7 @@
 <!--                </li>-->
 <!--            </ol>-->
 <!--        </section>-->
+        <!--
         <a name="tutorial"/>
         <section>
             <title>Running the BizDoc Application from the OPS Tutorial</title>
@@ -908,13 +942,8 @@
                 href="http://www.orbeon.com/community/downloads">Installing Example
                 Applications</a> from the Orbeon web site.
             </p>
-<!--            <p>-->
-<!--                Access the application using the <code>/orbeon-bizdoc/</code> path from web browser.-->
-<!--                For example, if you application server is running on your local host on port 8080,-->
-<!--                enter <code>http://localhost:8080/orbeon-bizdoc/</code> in the URL bar of your web-->
-<!--                browser.-->
-<!--            </p>-->
         </section>
+        -->
         <a name="security"/>
         <section>
             <title>Security</title>

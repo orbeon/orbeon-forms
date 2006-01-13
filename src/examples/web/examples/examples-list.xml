@@ -113,7 +113,7 @@
     <section label="Calling Web Services">
         <example id="quotes" label="Famous Quotes"/>
         <example id="ca-traffic" label="California Traffic"/>
-        <example id="stock-quote" label="Stock Quote"/>
+        <example id="stock-quote" label="Stock Quote" xforms-ng="true"/>
     </section>
     <section label="Messaging">
         <example id="email" label="Sending Email"/>

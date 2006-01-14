@@ -339,7 +339,7 @@
                     an XSLT transformation on an XML document that is located on disk, and then
                     writes the result back to a another file on disk. For more details about XPL,
                     please see the <a href="reference-xpl-pipelines">XPL and Pipelines reference
-                    documentation</a>, or the <a href="OPS Tutorial.pdf">OPS tutorial</a>.
+                    documentation</a>, or the <a href="/doc/pages/OPS Tutorial.pdf">OPS tutorial</a>.
                 </p>
                 <div class="image">
                     <img width="482" height="310" src="pages/2-stage-pipeline.png"/>

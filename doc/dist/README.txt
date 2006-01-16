@@ -27,9 +27,9 @@ For more information, visit:
 1. About Orbeon PresentationServer
 ****************************************
 
-Orbeon PresentationServer (OPS) is an open source J2EE-based platform
-for XML-centric web applications. OPS is built around XHTML, XForms,
-XSLT, XML pipelines, and Web Services, which makes it ideal for
+Orbeon PresentationServer (OPS) is an open source Java-based server
+platform for XML-centric web applications. OPS is built around XHTML,
+XForms, XSLT, XML pipelines, and Web Services, which makes it ideal for
 applications that capture, process and present XML data.
 
 Unlike other popular web application frameworks like Struts or WebWork

@@ -150,33 +150,12 @@
                 </p>
 
                 <p>
-                    OPS uses an efficient caching system. OPS
-                    automatically determines what can be cached and when to expire objects. The
-                    cache has a default size of 200, meaning that it can hold 200 objects. This size
-                    is reasonable for most applications. A bigger cache tends to make the
-                    application faster, but it uses more memory. To tune the cache, start the Java
-                    VM with the <code>-verbose:gc</code> option. Then with the application under
-                    typical load, look at the server logs and monitor:
-                </p>
-
-                <ul>
-                    <li>How often full garbage collections happen</li>
-                    <li>The value of the "success rate" reported by OPS after each page is generated</li>
-                </ul>
-
-                <p>
-                    The "success rate" is the percentage of the objects needed to generate the pages
-                    that were found in the cache. The closer this value is to 100%, the better. If
-                    the success rate is too low (say below 70% with a mostly static site), then the
-                    cache size should be increased. If full garbage collections happen too often,
-                    then the VM heap size should be increased. On the other hand, if the success
-                    rate is acceptable and garbage collections do not happen too often, you can
-                    consider reducing the size of the cache and maybe even the heap size.
-                </p>
-
-                <p>
-                    Tuning the VM heap size and cache size is not always needed and in most cases
-                    the default values are acceptable.
+                    OPS uses an efficient caching system. OPS automatically determines what can be
+                    cached and when to expire objects. The cache has a default size of 200, meaning
+                    that it can hold 200 objects. This size is reasonable for most applications. A
+                    bigger cache tends to make the application faster, but it uses more memory. To
+                    tune the cache size, see the suggestions in the <a
+                    href="integration-tuning#ops-cache">Performance and Tuning</a> section.
                 </p>
             </section>
             <section>

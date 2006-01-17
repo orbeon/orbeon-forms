@@ -157,6 +157,20 @@
                     see how they impact performance.
                 </p>
             </section>
+            <section>
+                <title>Consider server-side XForms state handling</title>
+                <p>
+                    The state of the XForms engine can be either stored on the server, or sent to
+                    the client and exchanged with the server with each request. By default, the
+                    XForms state is stored on the client. This option works in most cases and
+                    doesn't require any tuning. However, you might want to consider storing the
+                    XForms state on the server if your XForms instances are getting large or if your
+                    users have low bandwidth connection to the server. See the <a
+                    href="reference-xforms-ng#xforms-state-handling">XForms reference</a> for the
+                    benefits and drawback of each option and for details on how to configure state
+                    handling.
+                </p>
+            </section>
         </section>
         <section>
             <title>Tunning your application</title>
@@ -192,13 +206,19 @@
                     modification can drastically improve performance.
                 </p>
             </section>
-            <!-- TODO
             <section>
-                <title>XSLT tuning (some stylesheet are inefficient)</title>
+                <title>Tune your XSLT code</title>
                 <p>
+                    Some operations in XSLT or XPath can be very expensive. This in particular the
+                    case for XPath expressions where the engine has to go through the whole input
+                    document to evaluate the expression. Consider this XPath expression:
+                    <code>//person</code>. To evaluate it, the engine iterates over every
+                    element in the document looking for a <code>&lt;person></code>. If you know that
+                    given the structure of the document, a person is inside a department, which is
+                    in a company, you can rewrite this as <code>/company/department/person</code>,
+                    which will run more efficiently.
                 </p>
             </section>
-            -->
             <!-- TODO
             <section>
                 <title>New XPL profiling support in OPS</title>
@@ -270,3 +290,4 @@
         </section>
     </body>
 </document>
+

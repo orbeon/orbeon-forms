@@ -51,11 +51,11 @@
                 <title>Allocate a large heap but don't cause swapping</title>
                 <p>
                     The larger the heap, the faster your application will be get. This for two
-                    reasons: first, JVM garbage collector works more efficiently with a larger heap,
-                    and second, this enables you to increase the size of the OPS cache (more on this
-                    later) which will also improve the performance of your application. However,
-                    don't use a heap size so large that it would cause swapping, as this would then
-                    drastically reduce the performance of your application.
+                    reasons: first, the JVM garbage collector works more efficiently with a larger
+                    heap, and second, this enables you to increase the size of the OPS cache (more
+                    on this later) which will also improve the performance of your application.
+                    However, don't use a heap size so large that it would cause swapping, as this
+                    would then drastically reduce the performance of your application.
                 </p>
                 <p>
                     We recommend that you first set the heap size based on how much memory the
@@ -106,7 +106,9 @@
                     significant amount of time in certain cases where the network from which the
                     request originated is badly configured. In most case, the application server is
                     doing DNS lookups for "aesthetic reasons": that is to able to in include in the
-                    logs the name of the client's machines, instead of their IP address. So we
+                    logs the name of the client's machines, instead of their IP address (note that
+                    web analysis tools can usually do this reverse DNS lookup much more efficiently
+                    when analysing log files subsequently, typically on a daily basis). So we
                     recommend you change the configuration of your application server to disable DNS
                     lookup, which is in general enabled by default.
                 </p>
@@ -115,7 +117,8 @@
                     href="http://tomcat.apache.org/tomcat-5.0-doc/config/http.html">external
                     documentation</a>), look for the <code>enableLookups</code> attribute on the
                     <code>&lt;Connector></code> element and set it to <code>false</code>. If the
-                    attribute is not present, add it as the default value is <code>true</code>.
+                    attribute is not present, add it and set it to <code>false</code> (the default
+                    value is <code>true</code>).
                 </p>
             </section>
         </section>
@@ -140,11 +143,11 @@
                     above to set your heap size. Then, adding the <code>-verbosegc</code> parameter,
                     monitor how the heap usage varies under typical load. In particular, pay a close
                     attention to how much memory is freed by a full GC done when the memory used
-                    gets close the heap size. Note that a full GC will not get rid of objects in
-                    the OPS cache. So assuming your heap size is 2GB, if after getting close to 2GB
-                    a full GC brings back the heap usage to 0.5GB, as the cached objects are
-                    included in those 0.5GB, it means you can and should to increase the size of
-                    your OPS cache.
+                    gets close the heap size. Note that a full GC will <i>not</i> get rid of
+                    objects in the OPS cache. So assuming your heap size is 2GB, if after getting
+                    close to 2GB a full GC brings back the heap usage to 0.5GB, as the cached
+                    objects are included in those 0.5GB, it means you can and should to increase the
+                    size of your OPS cache.
                 </p>
                 <p>
                     However, you should not increase the size to a point where a full GC can only
@@ -167,7 +170,7 @@
                     XForms state on the server if your XForms instances are getting large or if your
                     users have low bandwidth connection to the server. See the <a
                     href="reference-xforms-ng#xforms-state-handling">XForms reference</a> for the
-                    benefits and drawback of each option and for details on how to configure state
+                    benefits and drawbacks of each option and for details on how to configure state
                     handling.
                 </p>
             </section>
@@ -205,6 +208,13 @@
                     to do only one tenth of the work they were doing before. Cleary this type of
                     modification can drastically improve performance.
                 </p>
+               <p>
+                    If you are required to work with large documents, also consider using an XML
+                    database such as the open source <a
+                    href="http://exist.sourceforge.net/">eXist</a> database, and delegate complex
+                    queries to the database: this should be more efficient than continually
+                    retrieving large XML documents and processing them in OPS.
+               </p>
             </section>
             <section>
                 <title>Tune your XSLT code</title>
@@ -212,11 +222,11 @@
                     Some operations in XSLT or XPath can be very expensive. This in particular the
                     case for XPath expressions where the engine has to go through the whole input
                     document to evaluate the expression. Consider this XPath expression:
-                    <code>//person</code>. To evaluate it, the engine iterates over every
-                    element in the document looking for a <code>&lt;person></code>. If you know that
-                    given the structure of the document, a person is inside a department, which is
-                    in a company, you can rewrite this as <code>/company/department/person</code>,
-                    which will run more efficiently.
+                    <code>//person</code>. To evaluate it, the engine iterates over every element in
+                    the document looking for a <code>&lt;person></code>. If you know that given the
+                    structure of the document, a person is inside a department, which is in a
+                    company, you can rewrite this as <code>/company/department/person</code>, which
+                    will typically run more efficiently.
                 </p>
             </section>
             <section>

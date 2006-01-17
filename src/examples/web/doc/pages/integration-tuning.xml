@@ -219,13 +219,26 @@
                     which will run more efficiently.
                 </p>
             </section>
-            <!-- TODO
             <section>
-                <title>New XPL profiling support in OPS</title>
+                <title>Enable XPL profiling</title>
                 <p>
+                    XPL profiling has been introduced with OPS 3.0 to give you detailed information
+                    on how much time is being spent in each processor involved to generate a web
+                    page. When enabled, for each HTTP request, the XPL profiler will output a tree
+                    with all the processor calls. Each node of the tree represents the execution of
+                    a processor. When a processor starts other processors, those are represented as
+                    child nodes in the tree. With each node, the profiler outputs 2 numbers: the
+                    first is for the time spent specifically by this processor; the second is for
+                    the time spent cumulatively by this processor and all its children; both are in
+                    milliseconds.
+                </p>
+                <p>
+                    By default, XPL profiling is disabled. To enable XPL profiling, configure
+                    <code>processor.trace</code>, <code>processor.trace.host</code>, and
+                    <code>processor.trace.port</code> as described in the <a
+                    href="reference-properties#trace">properties documentation</a>.
                 </p>
             </section>
-            -->
             <section>
                 <title>Do not run your code in the examples portal</title>
                 <p>

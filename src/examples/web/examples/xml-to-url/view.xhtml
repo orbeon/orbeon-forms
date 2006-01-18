@@ -23,15 +23,9 @@
     <xhtml:head>
         <xhtml:title>XML to URL</xhtml:title>
         <xforms:model>
-            <xforms:instance id="xml">
-                <xi:include href="oxf:/examples/xml-to-url/sample.xml"/>
-            </xforms:instance>
-            <xforms:instance id="soap-request">
-                <xi:include href="oxf:/examples/xml-to-url/soap-request.xml"/>
-            </xforms:instance>
-            <xforms:instance id="soap-response">
-                <xi:include href="oxf:/examples/xml-to-url/soap-response.xml"/>
-            </xforms:instance>
+            <xforms:instance id="xml" src="oxf:/examples/xml-to-url/sample.xml"/>
+            <xforms:instance id="soap-request" src="oxf:/examples/xml-to-url/soap-request.xml"/>
+            <xforms:instance id="soap-response" src="oxf:/examples/xml-to-url/soap-response.xml"/>
             <xforms:submission ref="instance('soap-request')" id="send-request"
                 method="post" action="/direct/xml-to-url/url" replace="instance" instance="soap-response"/>
             <xforms:bind nodeset="instance('soap-request')/env:Body/orbeon:xml" calculate="instance('xml')"/>

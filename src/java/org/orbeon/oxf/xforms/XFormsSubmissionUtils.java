@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.net.HttpURLConnection;
+import java.net.URLConnection;
 
 /**
  * Utilities for XForms submission processing.
@@ -158,16 +159,20 @@ public class XFormsSubmissionUtils {
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
-        if (scheme.equals("http") || scheme.equals("https")) {
+        if (scheme.equals("http") || scheme.equals("https") || (isGet(method) && (scheme.equals("file") || scheme.equals("oxf")))) {
             // http MUST be supported
             // https SHOULD be supported
+            // file SHOULD be supported
             try {
-                final HttpURLConnection urlConnection = (HttpURLConnection) submissionURL.openConnection();
+                final URLConnection urlConnection = submissionURL.openConnection();
+                final HttpURLConnection httpURLConnection = (urlConnection instanceof HttpURLConnection) ? (HttpURLConnection) urlConnection : null;
                 if (isPost(method) || isPut(method) || isGet(method)) {
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(!isGet(method)); // Only if POST / PUT
 
-                    urlConnection.setRequestMethod(method.toUpperCase());
+                    if (httpURLConnection != null) {
+                        httpURLConnection.setRequestMethod(method.toUpperCase());
+                    }
                     if (!isGet(method))
                         urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
 
@@ -210,13 +215,13 @@ public class XFormsSubmissionUtils {
                                 }
                             }
 
-                            if (urlConnection != null)
-                                urlConnection.disconnect();
+                            if (httpURLConnection != null)
+                                httpURLConnection.disconnect();
                         }
                     };
 
                     // Get response information that needs to be forwarded
-                    connectionResult.resultCode = urlConnection.getResponseCode();
+                    connectionResult.resultCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
                     final String contentType = urlConnection.getContentType();
                     connectionResult.resultMediaType = NetUtils.getContentTypeMediaType(contentType);
                     connectionResult.resultHeaders = urlConnection.getHeaderFields();
@@ -238,10 +243,9 @@ public class XFormsSubmissionUtils {
             } catch (IOException e) {
                 throw new OXFException(e);
             }
-        } else if (scheme.equals("file")) {
+        } else if (!isGet(method) && (scheme.equals("file") || scheme.equals("oxf"))) {
             // TODO
-            // SHOULD be supported
-            // Question: should support oxf: as well?
+            // SHOULD be supported (should probably support oxf: as well)
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
         } else if (scheme.equals("mailto")) {
             // TODO

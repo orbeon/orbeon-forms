@@ -280,8 +280,7 @@
                                         <xforms:trigger>
                                             <xforms:label>Back</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="/form/action">back</xforms:setvalue>
-                                                <xforms:send submission="main"/>
+                                                <xforms:load resource="/bizdoc2"/>
                                             </xforms:action>
                                         </xforms:trigger>
                                         <xforms:trigger>

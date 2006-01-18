@@ -279,9 +279,7 @@
                                         </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Back</xforms:label>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:load resource="/bizdoc2"/>
-                                            </xforms:action>
+                                            <xforms:load ev:event="DOMActivate" resource="/bizdoc2"/>
                                         </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Next</xforms:label>

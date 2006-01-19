@@ -1,0 +1,333 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <title>OPS Forms Example</title>
+        <!--<xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">-->
+        <xforms:model id="main-model">
+
+            <!-- The XForms instance with application data -->
+            <xforms:instance id="main-instance">
+                <xi:include href="../schema/empty-instance.xml"/>
+            </xforms:instance>
+
+            <xforms:bind nodeset="dmv:personal-information">
+                <xforms:bind nodeset="dmv:name/dmv:last-name" constraint="string-length() &lt;= 20"/>
+                <xforms:bind nodeset="dmv:driver-license-number" constraint="string-length() &lt;= 8"/>
+                <xforms:bind nodeset="dmv:name/dmv:first-name" constraint="string-length() &lt;= 10"/>
+                <xforms:bind nodeset="dmv:name/dmv:initial" constraint="string-length() &lt;= 1"/>
+                <xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>
+            </xforms:bind>
+
+        </xforms:model>
+        <style type="text/css">
+            th { padding: 1em; text-align: left }
+            .dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694; }
+            .dmv-last-name input { width: 20em}
+            .dmv-driver-license-number input { width: 8em}
+            .dmv-first-name input { width: 10em}
+            .dmv-initial input { width: 1.5em}
+            .dmv-street-number input { width: 5em}
+            .dmv-street-name-1 input { width: 21em}
+            .dmv-street-name-2 input { width: 22em}
+            .dmv-city input { width: 22em}
+            .dmv-state input { width: 2em}
+            .dmv-zip input { width: 5em}
+            .dmv-plate-number input { width: 8em}
+            .dmv-vin input { width: 17em}
+            .dmv-company-name input { width: 22em}
+            .dmv-street-number-name input { width: 22em}
+            .xforms-label { margin-right: 1em }
+        </style>
+    </head>
+    <body>
+
+        <div class="maincontent">
+            <xforms:group ref="instance('main-instance')">
+
+                <table>
+                    <tr>
+                        <th colspan="2">
+                            <img src="/examples/forms/images/dmv0-small.png" alt="DMV" align="left"/>
+                            <span>Notice of Change of Address</span>
+                        </th>
+                    </tr>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:personal-information">
+                        <tr>
+                            <th rowspan="2">
+                                Personal<br/>
+                                Information<br/>
+                                <img src="/examples/forms/images/dmv1-small.png" alt="Personal Information"/>
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:name/dmv:last-name" class="dmv-last-name">
+                                    <xforms:label>Last Name</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:driver-license-number" class="dmv-driver-license-number">
+                                    <xforms:label>Driver License / Id Card No.</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:group ref="dmv:name">
+                                    <xforms:input ref="dmv:first-name" class="dmv-first-name">
+                                        <xforms:label>First Name</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input ref="dmv:initial" xhtml:size="2" class="dmv-initial">
+                                        <xforms:label>Initial</xforms:label>
+                                    </xforms:input>
+                                </xforms:group>
+                                <xforms:input ref="dmv:birth-date">
+                                    <xforms:label>Birth Date</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:voter-address-change">
+                        <tr>
+                            <th>
+                                Voter Change<br/>
+                                of Address<br/>
+                            </th>
+                            <td>
+                                <xforms:select ref="dmv:change-address" appearance="full">
+                                    <xforms:label>Mark this box if you do not want to change your voting address</xforms:label>
+                                    <xforms:item>
+                                        <xforms:label></xforms:label>
+                                        <xforms:value>N</xforms:value>
+                                    </xforms:item>
+                                </xforms:select>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:new-residence-address">
+                        <tr>
+                            <th rowspan="3">
+                                New or Correct<br/>
+                                Residence<br/>
+                                Address<br/>
+                                <img src="/examples/forms/images/dmv2-small.png" alt="New or Correct Residence Address"/>
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                    <xforms:label>Street Number Only</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                    <xforms:label>Street Name 1</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                    <xforms:label>Apt. No</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                    <xforms:label>Street Name 2</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:city" class="dmv-city">
+                                    <xforms:label>City</xforms:label>
+                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                </xforms:input>
+                                <xforms:input ref="dmv:state" class="dmv-state">
+                                    <xforms:label>State</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:zip" class="dmv-zip">
+                                    <xforms:label>Zip Code</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:new-mailing-address">
+                        <tr>
+                            <th rowspan="3">
+                                New or Correct<br/>
+                                Residence<br/>
+                                Address<br/>
+                                <img src="/examples/forms/images/dmv3-small.png" alt="New or Correct Mailing Address"/>
+                                <br/>
+                                If different From<br/>
+                                Residence Address
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                    <xforms:label>Street Number Only</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                    <xforms:label>Street Name 1</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                    <xforms:label>Apt. No</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                    <xforms:label>Street Name 2</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:city" class="dmv-city">
+                                    <xforms:label>City</xforms:label>
+                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                </xforms:input>
+                                <xforms:input ref="dmv:state" class="dmv-state">
+                                    <xforms:label>State</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:zip" class="dmv-zip">
+                                    <xforms:label>Zip Code</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:vehicles">
+                        <tr>
+                            <th>
+                                Vehicles,<br/>
+                                Vessels, or<br/>
+                                Placards<br/>
+                                Owned By You<br/>
+                                <br/>
+                                Use Additional<br/>
+                                Forms If Necessary
+                            </th>
+                            <td>
+                                <xforms:repeat nodeset="dmv:vehicle">
+                                    <xforms:input ref="dmv:plate-number" class="dmv-plate-number">
+                                        <xforms:label>California Plate / CF / Placard No.</xforms:label>
+                                    </xforms:input>
+                                    <xforms:input ref="dmv:vin" class="dmv-vin">
+                                        <xforms:label>Last 17 Positions of Vehicle Id or Vessel Hull Id Number</xforms:label>
+                                    </xforms:input>
+                                    <xforms:select ref="dmv:leased" appearance="full">
+                                        <xforms:label>Check If Leased</xforms:label>
+                                        <xforms:item>
+                                            <xforms:label></xforms:label>
+                                            <xforms:value>Y</xforms:value>
+                                        </xforms:item>
+                                    </xforms:select>
+                                    <br/>
+                                </xforms:repeat>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:leased-vehicles">
+                        <tr>
+                            <th>
+                                Leased Vehicles
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:company-name" class="dmv-company-name">
+                                    <xforms:label>Leasing Company's Name</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:vehicle-location">
+                        <tr>
+                            <th rowspan="3">
+                                Location of<br/>
+                                Trailer Coach<br/>
+                                or Vessel<br/>
+                                <br/>
+                                If different From<br/>
+                                Residence Address
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                    <xforms:label>Street Number Only</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                    <xforms:label>Street Name 1</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                    <xforms:label>Street Name 2</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <xforms:input ref="dmv:city" class="dmv-city">
+                                    <xforms:label>City</xforms:label>
+                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                </xforms:input>
+                                <xforms:input ref="dmv:county" class="dmv-county">
+                                    <xforms:label>County</xforms:label>
+                                    <!--<xforms:hint>Do Not Abbreviate</xforms:hint>-->
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <xforms:group ref="dmv:old-address">
+                        <tr>
+                            <th>
+                                Old Address
+                            </th>
+                            <td>
+                                <xforms:input ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
+                                    <xforms:label>Street Number / Name</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:city" class="dmv-city">
+                                    <xforms:label>City</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:state" class="dmv-state">
+                                    <xforms:label>State</xforms:label>
+                                </xforms:input>
+                                <xforms:input ref="dmv:zip" class="dmv-zip">
+                                    <xforms:label>Zip</xforms:label>
+                                </xforms:input>
+                            </td>
+                        </tr>
+                    </xforms:group>
+                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                </table>
+
+                <xforms:input ref="dmv:signature/dmv:date">
+                    <xforms:label>Date</xforms:label>
+                </xforms:input>
+
+            </xforms:group><!-- ref="instance('main-instance')" -->
+        </div>
+    </body>
+</html>
+

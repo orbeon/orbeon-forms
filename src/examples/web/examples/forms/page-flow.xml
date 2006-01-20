@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2006 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -16,7 +16,7 @@
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
 
-    <!-- Files to serve directly (for standalone operation) -->
+    <!-- ========== Files to serve directly ========== -->
     <files path-info="*.gif"/>
     <files path-info="*.css"/>
     <files path-info="*.js"/>
@@ -27,17 +27,30 @@
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>
 
+    <!-- ========== Pages ========== -->
+
     <page id="detail" path-info="/dmv/detail" view="detail/detail-view.xhtml">
 
     </page>
 
-    <!-- Home (for standalone operation) -->
-    <!--<page id="home" path-info="/">-->
-        <!--<action>-->
-            <!--<result page="summary"/>-->
-        <!--</action>-->
-    <!--</page>-->
+    <!-- ========== Services ========== -->
 
+    <!-- Read services -->
+    <page id="list-documents" path-info="/dmv/service/lists-documents" view="services/list-documents.xpl"/>
+    <page id="read-document" path-info="/dmv/service/read-document" view="services/read-document.xpl"/>
+
+    <!-- Update services -->
+    <page id="save-document" path-info="/dmv/service/save-document">
+        <action action="services/save-document.xpl"/>
+    </page>
+    <page id="delete-document" path-info="/dmv/service/delete-document">
+        <action action="services/delete-document.xpl"/>
+    </page>
+    <page id="delete-all-documents" path-info="/dmv/service/delete-all-documents">
+        <action action="services/delete-all-documents.xpl"/>
+    </page>
+
+    <!-- ========== Epilogue ========== -->
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

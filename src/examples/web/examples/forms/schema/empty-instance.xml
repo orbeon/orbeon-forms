@@ -52,6 +52,11 @@
             <vin/>
             <leased/>
         </vehicle>
+        <vehicle>
+            <plate-number/>
+            <vin/>
+            <leased/>
+        </vehicle>
     </vehicles>
     <leased-vehicles>
         <company-name/>
@@ -73,7 +78,4 @@
         <state/>
         <zip/>
     </old-address>
-    <signature>
-        <date/>
-    </signature>
 </form>

@@ -23,25 +23,52 @@
 
     <head>
         <title>OPS Forms Example</title>
+        <!-- Main XForms model -->
         <!--<xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">-->
         <xforms:model id="main-model">
 
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
-                <xi:include href="../schema/empty-instance.xml"/>
+                <document-info xmlns="">
+                    <document-id/>
+                    <document>
+                        <xi:include href="../schema/empty-instance.xml"/>
+                    </document>
+                </document-info>
             </xforms:instance>
 
-            <xforms:bind nodeset="dmv:personal-information">
-                <xforms:bind nodeset="dmv:name/dmv:last-name" constraint="string-length() &lt;= 20"/>
-                <xforms:bind nodeset="dmv:driver-license-number" constraint="string-length() &lt;= 8"/>
-                <xforms:bind nodeset="dmv:name/dmv:first-name" constraint="string-length() &lt;= 10"/>
-                <xforms:bind nodeset="dmv:name/dmv:initial" constraint="string-length() &lt;= 1"/>
-                <xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>
+            <xforms:instance id="control-instance">
+                <control xmlns="">
+                    <vehicle-insert-trigger/>
+                    <vehicle-delete-trigger/>
+                    <save-trigger/>
+                    <back-trigger/>
+                </control>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')/dmv:vehicles/dmv:vehicle) >= 4"/>
+                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')/dmv:vehicles/dmv:vehicle) &lt;= 2"/>
             </xforms:bind>
 
+            <!-- TODO: use schema -->
+            <xforms:bind nodeset="dmv:personal-information">
+                <!--<xforms:bind nodeset="dmv:name/dmv:last-name" constraint="string-length() &lt;= 20"/>-->
+                <!--<xforms:bind nodeset="dmv:driver-license-number" constraint="string-length() &lt;= 8"/>-->
+                <!--<xforms:bind nodeset="dmv:name/dmv:first-name" constraint="string-length() &lt;= 10"/>-->
+                <!--<xforms:bind nodeset="dmv:name/dmv:initial" constraint="string-length() &lt;= 1"/>-->
+<!---->
+                <!--<xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>-->
+            </xforms:bind>
+
+            <xforms:submission id="save-submission" method="post" replace="none" action="/dmv/service/save-document"/>
+
         </xforms:model>
+
+        <!-- Styling -->
         <style type="text/css">
             th { padding: 1em; text-align: left }
+            td { vertical-align: top }
             .dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694; }
             .dmv-last-name input { width: 20em}
             .dmv-driver-license-number input { width: 8em}
@@ -63,7 +90,7 @@
     <body>
 
         <div class="maincontent">
-            <xforms:group ref="instance('main-instance')">
+            <xforms:group ref="instance('main-instance')/document/*">
 
                 <table>
                     <tr>
@@ -225,22 +252,49 @@
                                 Forms If Necessary
                             </th>
                             <td>
-                                <xforms:repeat nodeset="dmv:vehicle">
-                                    <xforms:input ref="dmv:plate-number" class="dmv-plate-number">
-                                        <xforms:label>California Plate / CF / Placard No.</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input ref="dmv:vin" class="dmv-vin">
-                                        <xforms:label>Last 17 Positions of Vehicle Id or Vessel Hull Id Number</xforms:label>
-                                    </xforms:input>
-                                    <xforms:select ref="dmv:leased" appearance="full">
-                                        <xforms:label>Check If Leased</xforms:label>
-                                        <xforms:item>
-                                            <xforms:label></xforms:label>
-                                            <xforms:value>Y</xforms:value>
-                                        </xforms:item>
-                                    </xforms:select>
-                                    <br/>
-                                </xforms:repeat>
+                                <table>
+                                    <tr>
+                                        <th>California Plate / CF / Placard No.</th>
+                                        <th>Vehicle Id or Vessel Hull Id Number</th>
+                                        <th>Check If Leased</th>
+                                    </tr>
+                                    <xforms:repeat nodeset="dmv:vehicle[position() &lt; last()]" id="vehicles-repeat">
+                                        <tr>
+                                            <td>
+                                                <xforms:input ref="dmv:plate-number" class="dmv-plate-number">
+                                                    <xforms:label/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input ref="dmv:vin" class="dmv-vin">
+                                                    <xforms:label/>
+                                                    <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
+                                                </xforms:input>
+                                            </td>
+                                            <td align="center">
+                                                <xforms:select ref="dmv:leased" appearance="full">
+                                                    <xforms:label/>
+                                                    <xforms:item>
+                                                        <xforms:label></xforms:label>
+                                                        <xforms:value>Y</xforms:value>
+                                                    </xforms:item>
+                                                </xforms:select>
+                                            </td>
+                                        </tr>
+                                    </xforms:repeat>
+                                </table>
+                                <xforms:trigger ref="instance('control-instance')/vehicle-insert-trigger">
+                                    <xforms:label>Add</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:insert nodeset="instance('main-instance')/dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                <xforms:trigger ref="instance('control-instance')/vehicle-delete-trigger">
+                                    <xforms:label>Remove</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:delete nodeset="instance('main-instance')/dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
+                                    </xforms:action>
+                                </xforms:trigger>
                             </td>
                         </tr>
                     </xforms:group>
@@ -300,13 +354,17 @@
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:old-address">
                         <tr>
-                            <th>
+                            <th rowspan="2">
                                 Old Address
                             </th>
                             <td>
                                 <xforms:input ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
                                     <xforms:label>Street Number / Name</xforms:label>
                                 </xforms:input>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <xforms:input ref="dmv:city" class="dmv-city">
                                     <xforms:label>City</xforms:label>
                                 </xforms:input>
@@ -322,11 +380,20 @@
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                 </table>
 
-                <xforms:input ref="dmv:signature/dmv:date">
-                    <xforms:label>Date</xforms:label>
-                </xforms:input>
+                <xforms:trigger ref="instance('control-instance')/save-trigger">
+                    <xforms:label>Save</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:send submission="save-submission"/>
+                    </xforms:action>
+                </xforms:trigger>
+
+                <xforms:trigger ref="instance('control-instance')/back-trigger">
+                    <xforms:label>Back</xforms:label>
+                    <xforms:load ev:event="DOMActivate" resource="/dmv/summary"/>
+                </xforms:trigger>
 
             </xforms:group><!-- ref="instance('main-instance')" -->
+
         </div>
     </body>
 </html>

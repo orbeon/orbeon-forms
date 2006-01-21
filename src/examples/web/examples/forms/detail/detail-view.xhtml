@@ -47,8 +47,8 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')/dmv:vehicles/dmv:vehicle) >= 4"/>
-                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')/dmv:vehicles/dmv:vehicle) &lt;= 2"/>
+                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
+                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
             </xforms:bind>
 
             <!-- TODO: use schema -->
@@ -102,33 +102,39 @@
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:personal-information">
                         <tr>
-                            <th rowspan="2">
+                            <th>
                                 Personal<br/>
                                 Information<br/>
                                 <img src="/examples/forms/images/dmv1-small.png" alt="Personal Information"/>
                             </th>
                             <td>
-                                <xforms:input ref="dmv:name/dmv:last-name" class="dmv-last-name">
-                                    <xforms:label>Last Name</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:driver-license-number" class="dmv-driver-license-number">
-                                    <xforms:label>Driver License / Id Card No.</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:group ref="dmv:name">
-                                    <xforms:input ref="dmv:first-name" class="dmv-first-name">
-                                        <xforms:label>First Name</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input ref="dmv:initial" xhtml:size="2" class="dmv-initial">
-                                        <xforms:label>Initial</xforms:label>
-                                    </xforms:input>
-                                </xforms:group>
-                                <xforms:input ref="dmv:birth-date">
-                                    <xforms:label>Birth Date</xforms:label>
-                                </xforms:input>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:name/dmv:last-name" class="dmv-last-name">
+                                                <xforms:label>Last Name</xforms:label>
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:driver-license-number" class="dmv-driver-license-number">
+                                                <xforms:label>Driver License / Id Card No.</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:group ref="dmv:name">
+                                                <xforms:input ref="dmv:first-name" class="dmv-first-name">
+                                                    <xforms:label>First Name</xforms:label>
+                                                </xforms:input>
+                                                <xforms:input ref="dmv:initial" xhtml:size="2" class="dmv-initial">
+                                                    <xforms:label>Initial</xforms:label>
+                                                </xforms:input>
+                                            </xforms:group>
+                                            <xforms:input ref="dmv:birth-date">
+                                                <xforms:label>Birth Date</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:group>
@@ -153,50 +159,60 @@
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:new-residence-address">
                         <tr>
-                            <th rowspan="3">
+                            <th>
                                 New or Correct<br/>
                                 Residence<br/>
                                 Address<br/>
                                 <img src="/examples/forms/images/dmv2-small.png" alt="New or Correct Residence Address"/>
                             </th>
                             <td>
-                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
-                                    <xforms:label>Street Number Only</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
-                                    <xforms:label>Street Name 1</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:apt" class="dmv-apt-number">
-                                    <xforms:label>Apt. No</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
-                                    <xforms:label>Street Name 2</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:city" class="dmv-city">
-                                    <xforms:label>City</xforms:label>
-                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
-                                </xforms:input>
-                                <xforms:input ref="dmv:state" class="dmv-state">
-                                    <xforms:label>State</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:zip" class="dmv-zip">
-                                    <xforms:label>Zip Code</xforms:label>
-                                </xforms:input>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                <xforms:label>Street Number Only</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                <xforms:label>Street Name 1</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                                <xforms:label>Apt. No</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                <xforms:label>Street Name 2</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <xforms:input ref="dmv:city" class="dmv-city">
+                                                <xforms:label>City</xforms:label>
+                                                <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:state" class="dmv-state">
+                                                <xforms:label>State</xforms:label>
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:zip" class="dmv-zip">
+                                                <xforms:label>Zip Code</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:group>
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:new-mailing-address">
                         <tr>
-                            <th rowspan="3">
+                            <th>
                                 New or Correct<br/>
                                 Residence<br/>
                                 Address<br/>
@@ -206,36 +222,46 @@
                                 Residence Address
                             </th>
                             <td>
-                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
-                                    <xforms:label>Street Number Only</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
-                                    <xforms:label>Street Name 1</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:apt" class="dmv-apt-number">
-                                    <xforms:label>Apt. No</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
-                                    <xforms:label>Street Name 2</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:city" class="dmv-city">
-                                    <xforms:label>City</xforms:label>
-                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
-                                </xforms:input>
-                                <xforms:input ref="dmv:state" class="dmv-state">
-                                    <xforms:label>State</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:zip" class="dmv-zip">
-                                    <xforms:label>Zip Code</xforms:label>
-                                </xforms:input>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                <xforms:label>Street Number Only</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                <xforms:label>Street Name 1</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                                <xforms:label>Apt. No</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                <xforms:label>Street Name 2</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <xforms:input ref="dmv:city" class="dmv-city">
+                                                <xforms:label>City</xforms:label>
+                                                <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:state" class="dmv-state">
+                                                <xforms:label>State</xforms:label>
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:zip" class="dmv-zip">
+                                                <xforms:label>Zip Code</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:group>
@@ -286,13 +312,13 @@
                                 <xforms:trigger ref="instance('control-instance')/vehicle-insert-trigger">
                                     <xforms:label>Add</xforms:label>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert nodeset="instance('main-instance')/dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+                                        <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
                                     </xforms:action>
                                 </xforms:trigger>
                                 <xforms:trigger ref="instance('control-instance')/vehicle-delete-trigger">
                                     <xforms:label>Remove</xforms:label>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:delete nodeset="instance('main-instance')/dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
+                                        <xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
                                     </xforms:action>
                                 </xforms:trigger>
                             </td>
@@ -314,7 +340,7 @@
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:vehicle-location">
                         <tr>
-                            <th rowspan="3">
+                            <th>
                                 Location of<br/>
                                 Trailer Coach<br/>
                                 or Vessel<br/>
@@ -323,57 +349,73 @@
                                 Residence Address
                             </th>
                             <td>
-                                <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
-                                    <xforms:label>Street Number Only</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
-                                    <xforms:label>Street Name 1</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
-                                    <xforms:label>Street Name 2</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:city" class="dmv-city">
-                                    <xforms:label>City</xforms:label>
-                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
-                                </xforms:input>
-                                <xforms:input ref="dmv:county" class="dmv-county">
-                                    <xforms:label>County</xforms:label>
-                                    <!--<xforms:hint>Do Not Abbreviate</xforms:hint>-->
-                                </xforms:input>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                <xforms:label>Street Number Only</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                <xforms:label>Street Name 1</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                <xforms:label>Street Name 2</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <xforms:input ref="dmv:city" class="dmv-city">
+                                                <xforms:label>City</xforms:label>
+                                                <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:county" class="dmv-county">
+                                                <xforms:label>County</xforms:label>
+                                                <!--<xforms:hint>Do Not Abbreviate</xforms:hint>-->
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:group>
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:old-address">
                         <tr>
-                            <th rowspan="2">
+                            <th>
                                 Old Address
                             </th>
                             <td>
-                                <xforms:input ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
-                                    <xforms:label>Street Number / Name</xforms:label>
-                                </xforms:input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <xforms:input ref="dmv:city" class="dmv-city">
-                                    <xforms:label>City</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:state" class="dmv-state">
-                                    <xforms:label>State</xforms:label>
-                                </xforms:input>
-                                <xforms:input ref="dmv:zip" class="dmv-zip">
-                                    <xforms:label>Zip</xforms:label>
-                                </xforms:input>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
+                                                <xforms:label>Street Number / Name</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="dmv:city" class="dmv-city">
+                                                <xforms:label>City</xforms:label>
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:state" class="dmv-state">
+                                                <xforms:label>State</xforms:label>
+                                            </xforms:input>
+                                            <xforms:input ref="dmv:zip" class="dmv-zip">
+                                                <xforms:label>Zip</xforms:label>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:group>

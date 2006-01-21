@@ -29,6 +29,10 @@
 
     <!-- ========== Pages ========== -->
 
+    <page id="summary" path-info="/dmv/summary" model="summary/summary-model.xpl" view="summary/summary-view.xhtml">
+
+    </page>
+
     <page id="detail" path-info="/dmv/detail" view="detail/detail-view.xhtml">
 
     </page>

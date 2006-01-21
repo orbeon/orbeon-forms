@@ -88,11 +88,10 @@
         </style>
     </head>
     <body>
-
-        <div class="maincontent">
+        <div>
             <xforms:group ref="instance('main-instance')/document/*">
 
-                <table>
+                <table style="border: 2px solid #e9d3e6">
                     <tr>
                         <th colspan="2">
                             <img src="/examples/forms/images/dmv0-small.png" alt="DMV" align="left"/>
@@ -419,7 +418,7 @@
                             </td>
                         </tr>
                     </xforms:group>
-                    <tr><td colspan="2" class="dmv-hr"/></tr>
+                    <!--<tr><td colspan="2" class="dmv-hr"/></tr>-->
                 </table>
 
                 <xforms:trigger ref="instance('control-instance')/save-trigger">

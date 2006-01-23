@@ -31,16 +31,12 @@
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
                 <xi:include href="input:data"/>
-                <!--<document-info xmlns="">-->
-                    <!--<document-id/>-->
-                    <!--<document>-->
-                        <!--<xi:include href="../schema/empty-instance.xml"/>-->
-                    <!--</document>-->
-                <!--</document-info>-->
             </xforms:instance>
 
             <xforms:instance id="control-instance">
                 <control xmlns="">
+                    <message/>
+                    <data-status/>
                     <vehicle-insert-trigger/>
                     <vehicle-delete-trigger/>
                     <save-trigger/>
@@ -49,6 +45,8 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="save-trigger" relevant="../data-status = 'dirty'"/>
+                <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
                 <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
                 <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
             </xforms:bind>
@@ -62,7 +60,17 @@
                 <!--<xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>-->
             </xforms:bind>
 
-            <xforms:submission id="save-submission" method="post" replace="none" action="/forms/service/save-document"/>
+            <xforms:submission id="save-submission" method="post" replace="none" action="/forms/service/save-document">
+                <xforms:action ev:event="xforms-submit-done">
+                    <xforms:setvalue ref="instance('control-instance')/message">Save successful!</xforms:setvalue>
+                    <xforms:setvalue ref="instance('control-instance')/data-status"></xforms:setvalue>
+                    <xforms:toggle case="ok-message"/>
+                </xforms:action>
+                <xforms:action ev:event="xforms-submit-error">
+                    <xforms:setvalue ref="instance('control-instance')/message">Save failed!</xforms:setvalue>
+                    <xforms:toggle case="error-message"/>
+                </xforms:action>
+            </xforms:submission>
 
         </xforms:model>
     </head>
@@ -98,7 +106,7 @@
                         </xforms:group>
                     </td>
                     <td>
-                        <xforms:group ref="instance('control-instance')/save-trigger">
+                        <xforms:group ref="instance('control-instance')/back-trigger">
                             <xforms:load ev:event="DOMActivate" resource="/forms"/>
                             <xforms:trigger appearance="xxforms:image">
                                 <xforms:label>Return to Forms List</xforms:label>
@@ -109,40 +117,31 @@
                             </xforms:trigger>
                         </xforms:group>
                     </td>
-                    <!--<td>-->
-                        <!--<xforms:group ref="instance('control-instance')/non-empty">-->
-                            <!--<xforms:action ev:event="DOMActivate">-->
-                                <!--<xforms:recalculate/>-->
-                                <!--<xforms:load ref="instance('control-instance')/xml-detail-uri"/>-->
-                            <!--</xforms:action>-->
-                            <!--<xforms:trigger appearance="xxforms:image">-->
-                                <!--<xforms:label>View Selected As XML</xforms:label>-->
-                                <!--<xxforms:img src="/images/view-xml.gif"/>-->
-                            <!--</xforms:trigger>-->
-                            <!--<xforms:trigger appearance="xxforms:link">-->
-                                <!--<xforms:label>View Selected As XML</xforms:label>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xforms:group>-->
-                    <!--</td>-->
-                    <!--<td>-->
-                        <!--<xforms:group ref="instance('control-instance')/non-empty">-->
-                            <!--<xforms:action ev:event="DOMActivate">-->
-                                <!--<xforms:recalculate/>-->
-                                <!--<xforms:load ref="instance('control-instance')/pdf-detail-uri"/>-->
-                            <!--</xforms:action>-->
-                            <!--<xforms:trigger appearance="xxforms:image">-->
-                                <!--<xforms:label>View Selected As PDF</xforms:label>-->
-                                <!--<xxforms:img src="/images/pdf.png"/>-->
-                            <!--</xforms:trigger>-->
-                            <!--<xforms:trigger appearance="xxforms:link">-->
-                                <!--<xforms:label>View Selected As PDF</xforms:label>-->
-                            <!--</xforms:trigger>-->
-                        <!--</xforms:group>-->
-                    <!--</td>-->
+                    <td>
+                        <xforms:switch>
+                            <xforms:case id="no-message">
+                                <span/>
+                            </xforms:case>
+                            <xforms:case id="ok-message">
+                                <span style="color: green">
+                                    <xforms:output ref="instance('control-instance')/message"/>
+                                </span>
+                            </xforms:case>
+                            <xforms:case id="error-message">
+                                <span style="color: red">
+                                    <xforms:output ref="instance('control-instance')/message"/>
+                                </span>
+                            </xforms:case>
+                        </xforms:switch>
+                    </td>
                 </tr>
             </table>
 
             <xforms:group ref="instance('main-instance')/document/*">
+                <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
+                <xforms:action ev:event="xforms-value-changed">
+                    <xforms:setvalue ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
+                </xforms:action>
 
                 <table style="border: 2px solid #e9d3e6">
                     <xforms:group ref="dmv:personal-information">

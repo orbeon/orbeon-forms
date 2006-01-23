@@ -21,7 +21,9 @@
         <driver-license-number>B123456</driver-license-number>
         <birth-date>1972-11-06</birth-date>
     </personal-information>
-    <voter-address-change/>
+    <voter-address-change>
+        <change-address/>
+    </voter-address-change>
     <new-residence-address>
         <street>
             <number>123</number>
@@ -47,8 +49,8 @@
     <vehicles>
         <vehicle>
             <plate-number>4BTG095</plate-number>
-            <vin>1234abcd5678efgh</vin>
-            <leased/>
+            <vin>1234ABCD5678EFGH</vin>
+            <leased>Y</leased>
         </vehicle>
         <vehicle>
             <plate-number/>
@@ -76,7 +78,4 @@
         <state/>
         <zip/>
     </old-address>
-    <signature>
-        <date/>
-    </signature>
 </form>

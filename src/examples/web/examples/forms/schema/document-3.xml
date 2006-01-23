@@ -14,53 +14,43 @@
 <form xmlns="http://orbeon.org/oxf/examples/dmv">
     <personal-information>
         <name>
-            <first-name>John</first-name>
-            <initial>A</initial>
-            <last-name>Smith</last-name>
+            <first-name>Alicia</first-name>
+            <initial>M</initial>
+            <last-name>Martin</last-name>
         </name>
-        <driver-license-number>B987695</driver-license-number>
-        <birth-date>1983-03-03</birth-date>
+        <driver-license-number>B314159</driver-license-number>
+        <birth-date>1980-12-31</birth-date>
     </personal-information>
     <voter-address-change>
-        <change-address>N</change-address>
+        <change-address/>
     </voter-address-change>
     <new-residence-address>
         <street>
-            <number>456</number>
-            <name-1>Pine Avenue</name-1>
+            <number>100</number>
+            <name-1>Mash Road</name-1>
             <name-2/>
         </street>
-        <apt>1818</apt>
-        <city>San Francisco</city>
-        <state>CA</state>
-        <zip>94102</zip>
+        <apt></apt>
+        <city>San Giovanni</city>
+        <state>AL</state>
+        <zip>10001</zip>
     </new-residence-address>
     <new-mailing-address>
         <street>
-            <number>123</number>
-            <name-1>Oak Avenue</name-1>
+            <number></number>
+            <name-1></name-1>
             <name-2/>
         </street>
-        <apt>212</apt>
-        <city>Mountain View</city>
-        <state>CA</state>
-        <zip>94041</zip>
+        <apt></apt>
+        <city></city>
+        <state></state>
+        <zip></zip>
     </new-mailing-address>
     <vehicles>
         <vehicle>
-            <plate-number>1CCD412</plate-number>
-            <vin>53585987654321031</vin>
-            <leased>Y</leased>
-        </vehicle>
-        <vehicle>
-            <plate-number>3TRE787</plate-number>
-            <vin>14393483498123400</vin>
-            <leased></leased>
-        </vehicle>
-        <vehicle>
-            <plate-number>6QWA76</plate-number>
-            <vin>34756976067146047</vin>
-            <leased>Y</leased>
+            <plate-number>3BBB319</plate-number>
+            <vin>85987654321031535</vin>
+            <leased/>
         </vehicle>
         <vehicle>
             <plate-number/>
@@ -69,7 +59,7 @@
         </vehicle>
     </vehicles>
     <leased-vehicles>
-        <company-name>CA Leasing Co.</company-name>
+        <company-name/>
     </leased-vehicles>
     <vehicle-location>
         <street>

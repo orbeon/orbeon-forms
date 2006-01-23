@@ -195,7 +195,7 @@
                 <table class="gridtable">
                     <tr>
                         <th>No.</th>
-                        <th>Date</th>
+                        <th>Saved</th>
                         <th>Name</th>
                         <th>Birth Date</th>
                         <th>DL / ID Card No.</th>
@@ -219,10 +219,11 @@
                                 <xforms:output value="dmv:personal-information/dmv:driver-license-number"/>
                             </td>
                             <td>
-                                <xforms:output value="concat(dmv:vehicle/dmv:plate-number, ' / ', dmv:vehicle/dmv:vin)"/>
+                                <xforms:output value="dmv:vehicle/dmv:plate-number"/>
                             </td>
                         </tr>
                     </xforms:repeat>
+                    <tr/><!-- This is to work around a bug in IE -->
                 </table>
 
                 <p>
@@ -236,7 +237,7 @@
                 <table class="gridtable">
                     <tr>
                         <th>No.</th>
-                        <th>Date</th>
+                        <th>Saved</th>
                         <th>Name</th>
                         <th>Birth Date</th>
                         <th>DL / ID Card No.</th>

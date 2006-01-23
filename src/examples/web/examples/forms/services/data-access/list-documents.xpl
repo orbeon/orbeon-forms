@@ -26,7 +26,9 @@
                 xquery version "1.0";
                 <document-infos>
                     {
-                        for $d in /document-info return
+                        for $d in /document-info
+                            order by xs:dateTime($d/document-date) descending
+                            return
                             <document-info>
                                 {$d/document-id, $d/document-date}
                                 <document>

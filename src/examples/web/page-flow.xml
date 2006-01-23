@@ -44,11 +44,11 @@
     <!-- Standalone Counter example -->
     <page path-info="/counter*" model="/examples/counter/page-flow.xpl"/>
 
+    <!-- Standalone Forms example -->
+    <page path-info="/forms*" model="/examples/forms/page-flow.xpl"/>
+
     <!-- Standalone BizDoc 2 example -->
     <page path-info="/bizdoc2*" model="/examples/bizdoc2/page-flow.xpl"/>
-
-    <!-- Standalone BizDoc example -->
-    <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 
     <!-- Standalone Address Book 2 example -->
     <page path-info="/address-book2*" model="/examples/address-book2/page-flow.xpl"/>
@@ -74,11 +74,11 @@
     <!-- Standalone XForms Dynamic Image example -->
     <page path-info="/xforms-dynamic-image*" model="/examples/xforms/xforms-dynamic-image/page-flow.xpl"/>
 
+    <!-- Standalone XForms i18n example -->
+    <page path-info="/xforms-i18n*" model="/examples/xforms/xforms-i18n/page-flow.xpl"/>
+
     <!-- Standalone PDF Upload example (contribution) -->
     <page path-info="/pdf-upload*" model="/examples/pdf/pdf-upload/page-flow.xpl"/>
-
-    <!-- Standalone PDF Template example -->
-    <page path-info="/pdf-template*" model="/examples/pdf/pdf-template/page-flow.xpl"/>
 
     <!-- Struts and JSF -->
     <page path-info="/faces/*" model="/jsf/config/model.xpl"/>

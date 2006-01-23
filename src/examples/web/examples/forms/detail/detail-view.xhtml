@@ -62,7 +62,7 @@
                 <!--<xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>-->
             </xforms:bind>
 
-            <xforms:submission id="save-submission" method="post" replace="none" action="/dmv/service/save-document"/>
+            <xforms:submission id="save-submission" method="post" replace="none" action="/forms/service/save-document"/>
 
         </xforms:model>
     </head>
@@ -99,7 +99,7 @@
                     </td>
                     <td>
                         <xforms:group ref="instance('control-instance')/save-trigger">
-                            <xforms:load ev:event="DOMActivate" resource="/dmv/summary"/>
+                            <xforms:load ev:event="DOMActivate" resource="/forms"/>
                             <xforms:trigger appearance="xxforms:image">
                                 <xforms:label>Return to Forms List</xforms:label>
                                 <xxforms:img src="/images/back.gif"/>

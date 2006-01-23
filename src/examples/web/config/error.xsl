@@ -59,7 +59,25 @@
                             <xsl:variable name="message" as="xs:string" select="/exceptions/exception[last()]/message"/>
                             <xsl:choose>
                                 <xsl:when test="normalize-space($message) != ''">
-                                    <xsl:value-of select="$message"/>
+                                    <xsl:choose>
+                                        <xsl:when test="starts-with($message, 'Condition failed for every branch of choose') and contains($message, '/request/request-path,')">
+                                            <!-- Handle specific message for PFC -->
+                                            <xsl:text>Requested path doesn't match any existing page flow entry:</xsl:text>
+                                            <xsl:variable name="parts1" select="tokenize(substring-after($message, '('), '\)[^\)]+\(')" as="xs:string*"/>
+                                            <xsl:variable name="parts2" select="for $i in $parts1 return concat(if (contains($i, ',')) then 'Suffix: ' else 'Path: ', substring-before(substring-after($i, ''''), ''''))"/>
+                                            <ul>
+                                                <xsl:for-each select="$parts2">
+                                                    <li>
+                                                        <xsl:value-of select="."/>
+                                                    </li>
+                                                </xsl:for-each>
+                                            </ul>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Handle any other message -->
+                                            <xsl:value-of select="$message"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <i>[No error message provided.]</i>

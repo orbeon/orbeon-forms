@@ -21,6 +21,7 @@
     <body>
         <section>
             <title>Introduction</title>
+            <img src="/images/ops30.png" style="border: 0px; float: right" width="276" height="75"/>
             <p>
                 Welcome to the reference documentation for the Orbeon PresentationServer (OPS)
                 platform.

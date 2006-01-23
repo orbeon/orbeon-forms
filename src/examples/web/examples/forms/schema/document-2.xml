@@ -15,7 +15,7 @@
     <personal-information>
         <name>
             <first-name>John</first-name>
-            <initial/>
+            <initial>A</initial>
             <last-name>Smith</last-name>
         </name>
         <driver-license-number>B98765</driver-license-number>
@@ -28,7 +28,7 @@
             <name-1>Pine Avenue</name-1>
             <name-2/>
         </street>
-        <apt/>
+        <apt>1818</apt>
         <city>San Francisco</city>
         <state>CA</state>
         <zip>94102</zip>
@@ -39,7 +39,7 @@
             <name-1>Oak Avenue</name-1>
             <name-2/>
         </street>
-        <apt/>
+        <apt>212</apt>
         <city>Mountain View</city>
         <state>CA</state>
         <zip>94041</zip>
@@ -47,17 +47,17 @@
     <vehicles>
         <vehicle>
             <plate-number>1CCD412</plate-number>
-            <vin>535859876543210</vin>
+            <vin>53585987654321031</vin>
             <leased/>
         </vehicle>
         <vehicle>
             <plate-number>3TRE787</plate-number>
-            <vin>143934834981234</vin>
+            <vin>14393483498123400</vin>
             <leased/>
         </vehicle>
         <vehicle>
             <plate-number>6QWA76</plate-number>
-            <vin>347597606746047</vin>
+            <vin>34756976067146047</vin>
             <leased/>
         </vehicle>
         <vehicle>

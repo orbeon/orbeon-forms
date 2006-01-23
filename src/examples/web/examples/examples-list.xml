@@ -69,6 +69,7 @@
         <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
     </section>
     <section label="Document-Centric Apps">
+        <example id="forms" label="&quot;DMV Forms&quot;" xforms-ng="true"/>
         <example id="bizdoc2" label="&quot;BizDoc&quot;" xforms-ng="true"/>
         <!--<example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>-->
         <example id="blog" label="The OPS Blog" xforms-ng="true"/>
@@ -98,7 +99,6 @@
         <example id="imageserver" label="Image Transformations"/>
         <!--<example id="excel" label="Excel Import / Export"/>-->
         <example id="pdf-upload" path="pdf/pdf-upload" label="PDF Extraction"/>
-        <example id="pdf-template" path="pdf/pdf-template" label="PDF Templates"/>
     </section>
     <section label="Database Access">
         <example id="address-book2" label="Address Book NG" xforms-ng="true"/>

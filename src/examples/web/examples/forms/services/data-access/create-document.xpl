@@ -17,7 +17,7 @@
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
           xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <p:param name="document-info" type="input" schema-href="document-info.rng" debug="xxx2"/>
+    <p:param name="document-info" type="input" schema-href="document-info.rng"/>
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#document-info"/>
@@ -26,6 +26,9 @@
                 <document-id>
                     <xsl:value-of select="uuid:createPseudoUUID()"/>
                 </document-id>
+                <document-date>
+                    <xsl:value-of select="current-dateTime()"/>
+                </document-date>
                 <xsl:copy-of select="/document-info/document"/>
             </document-info>
         </p:input>

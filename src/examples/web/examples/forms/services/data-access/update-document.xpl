@@ -28,6 +28,9 @@
                     <xu:update select="/document-info[document-id = '{/document-info/document-id}']/document">
                         <xsl:copy-of select="/document-info/document/*"/>
                     </xu:update>
+                    <xu:update select="/document-info[document-id = '{/document-info/document-id}']/document-date">
+                        <xsl:value-of select="current-dateTime()"/>
+                    </xu:update>
                 </xu:modifications>
             </xdb:update>
         </p:input>

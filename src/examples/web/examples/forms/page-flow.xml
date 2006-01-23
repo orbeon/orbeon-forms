@@ -33,19 +33,37 @@
 
     </page>
 
-    <page id="detail" path-info="/dmv/detail" view="detail/detail-view.xhtml">
+    <page id="detail" path-info="/dmv/detail"
+          default-submission="detail/parameters.xml"
+          model="detail/detail-model.xpl"
+          view="detail/detail-view.xhtml">
+        <setvalue ref="/parameters/document-id" parameter="document-id"/>
+    </page>
 
+    <page id="xml-detail" path-info="/dmv/xml-detail"
+          default-submission="detail/parameters.xml"
+          model="detail/xml-detail-model.xpl">
+        <setvalue ref="/parameters/document-id" parameter="document-id"/>
+    </page>
+
+    <page id="pdf-detail" path-info="/dmv/pdf-detail"
+          default-submission="detail/parameters.xml"
+          model="detail/pdf-detail-model.xpl">
+        <setvalue ref="/parameters/document-id" parameter="document-id"/>
     </page>
 
     <!-- ========== Services ========== -->
 
     <!-- Read services -->
-    <page id="list-documents" path-info="/dmv/service/lists-documents" view="services/list-documents.xpl"/>
+    <page id="list-documents" path-info="/dmv/service/list-documents" view="services/list-documents.xpl"/>
     <page id="read-document" path-info="/dmv/service/read-document" view="services/read-document.xpl"/>
 
     <!-- Update services -->
     <page id="save-document" path-info="/dmv/service/save-document">
         <action action="services/save-document.xpl"/>
+    </page>
+    <page id="import-documents" path-info="/dmv/service/import-documents">
+        <action action="services/import-documents.xpl"/>
     </page>
     <page id="delete-document" path-info="/dmv/service/delete-document">
         <action action="services/delete-document.xpl"/>

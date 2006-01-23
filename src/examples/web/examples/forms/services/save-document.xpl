@@ -15,7 +15,7 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <p:param name="instance" type="input" debug="xxxinstance"/>
+    <p:param name="instance" type="input"/>
 
     <!-- Retrieve existing document if possible -->
     <p:processor name="oxf:pipeline">
@@ -30,14 +30,14 @@
             <!-- Document exists already, call the data access layer to update it -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="data-access/update-document.xpl"/>
-                <p:input name="document-info" href="#instance" debug="xxx1"/>
+                <p:input name="document-info" href="#instance"/>
             </p:processor>
         </p:when>
         <p:otherwise>
             <!-- Document does not exist, call the data access layer to insert it -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="data-access/create-document.xpl"/>
-                <p:input name="document-info" href="#instance" debug="xxx2"/>
+                <p:input name="document-info" href="#instance"/>
             </p:processor>
         </p:otherwise>
     </p:choose>

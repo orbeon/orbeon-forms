@@ -23,18 +23,20 @@
 
     <head>
         <title>OPS Forms Example</title>
+        <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
         <!--<xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">-->
         <xforms:model id="main-model">
 
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
-                <document-info xmlns="">
-                    <document-id/>
-                    <document>
-                        <xi:include href="../schema/empty-instance.xml"/>
-                    </document>
-                </document-info>
+                <xi:include href="input:data"/>
+                <!--<document-info xmlns="">-->
+                    <!--<document-id/>-->
+                    <!--<document>-->
+                        <!--<xi:include href="../schema/empty-instance.xml"/>-->
+                    <!--</document>-->
+                <!--</document-info>-->
             </xforms:instance>
 
             <xforms:instance id="control-instance">
@@ -57,48 +59,92 @@
                 <!--<xforms:bind nodeset="dmv:driver-license-number" constraint="string-length() &lt;= 8"/>-->
                 <!--<xforms:bind nodeset="dmv:name/dmv:first-name" constraint="string-length() &lt;= 10"/>-->
                 <!--<xforms:bind nodeset="dmv:name/dmv:initial" constraint="string-length() &lt;= 1"/>-->
-<!---->
                 <!--<xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>-->
             </xforms:bind>
 
             <xforms:submission id="save-submission" method="post" replace="none" action="/dmv/service/save-document"/>
 
         </xforms:model>
-
-        <!-- Styling -->
-        <style type="text/css">
-            th { padding: 1em; text-align: left }
-            td { vertical-align: top }
-            .dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694; }
-            .dmv-last-name input { width: 20em}
-            .dmv-driver-license-number input { width: 8em}
-            .dmv-first-name input { width: 10em}
-            .dmv-initial input { width: 1.5em}
-            .dmv-street-number input { width: 5em}
-            .dmv-street-name-1 input { width: 21em}
-            .dmv-street-name-2 input { width: 22em}
-            .dmv-city input { width: 22em}
-            .dmv-state input { width: 2em}
-            .dmv-zip input { width: 5em}
-            .dmv-plate-number input { width: 8em}
-            .dmv-vin input { width: 17em}
-            .dmv-company-name input { width: 22em}
-            .dmv-street-number-name input { width: 22em}
-            .xforms-label { margin-right: 1em }
-        </style>
     </head>
     <body>
+
+        <table>
+            <tr>
+                <td style="vertical-align: middle">
+                    <img src="/examples/forms/images/dmv0-small.png" alt="DMV"/>
+                </td>
+                <td style="vertical-align: middle">
+                    <span class="dmv-title">Notice of Change of Address</span>
+                </td>
+            </tr>
+        </table>
+
         <div>
+
+            <table class="dmv-actions-table">
+                <tr>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/save-trigger">
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:send submission="save-submission"/>
+                            </xforms:action>
+                            <xforms:trigger appearance="xxforms:image">
+                                <xforms:label>Save Document</xforms:label>
+                                <xxforms:img src="/images/save.gif"/>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="xxforms:link">
+                                <xforms:label>Save Document</xforms:label>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </td>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/save-trigger">
+                            <xforms:load ev:event="DOMActivate" resource="/dmv/summary"/>
+                            <xforms:trigger appearance="xxforms:image">
+                                <xforms:label>Return to Forms List</xforms:label>
+                                <xxforms:img src="/images/back.gif"/>
+                            </xforms:trigger>
+                            <xforms:trigger appearance="xxforms:link">
+                                <xforms:label>Return to Forms List</xforms:label>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </td>
+                    <!--<td>-->
+                        <!--<xforms:group ref="instance('control-instance')/non-empty">-->
+                            <!--<xforms:action ev:event="DOMActivate">-->
+                                <!--<xforms:recalculate/>-->
+                                <!--<xforms:load ref="instance('control-instance')/xml-detail-uri"/>-->
+                            <!--</xforms:action>-->
+                            <!--<xforms:trigger appearance="xxforms:image">-->
+                                <!--<xforms:label>View Selected As XML</xforms:label>-->
+                                <!--<xxforms:img src="/images/view-xml.gif"/>-->
+                            <!--</xforms:trigger>-->
+                            <!--<xforms:trigger appearance="xxforms:link">-->
+                                <!--<xforms:label>View Selected As XML</xforms:label>-->
+                            <!--</xforms:trigger>-->
+                        <!--</xforms:group>-->
+                    <!--</td>-->
+                    <!--<td>-->
+                        <!--<xforms:group ref="instance('control-instance')/non-empty">-->
+                            <!--<xforms:action ev:event="DOMActivate">-->
+                                <!--<xforms:recalculate/>-->
+                                <!--<xforms:load ref="instance('control-instance')/pdf-detail-uri"/>-->
+                            <!--</xforms:action>-->
+                            <!--<xforms:trigger appearance="xxforms:image">-->
+                                <!--<xforms:label>View Selected As PDF</xforms:label>-->
+                                <!--<xxforms:img src="/images/pdf.png"/>-->
+                            <!--</xforms:trigger>-->
+                            <!--<xforms:trigger appearance="xxforms:link">-->
+                                <!--<xforms:label>View Selected As PDF</xforms:label>-->
+                            <!--</xforms:trigger>-->
+                        <!--</xforms:group>-->
+                    <!--</td>-->
+                </tr>
+            </table>
+
             <xforms:group ref="instance('main-instance')/document/*">
 
                 <table style="border: 2px solid #e9d3e6">
-                    <tr>
-                        <th colspan="2">
-                            <img src="/examples/forms/images/dmv0-small.png" alt="DMV" align="left"/>
-                            <span>Notice of Change of Address</span>
-                        </th>
-                    </tr>
-                    <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:personal-information">
                         <tr>
                             <th>
@@ -420,18 +466,6 @@
                     </xforms:group>
                     <!--<tr><td colspan="2" class="dmv-hr"/></tr>-->
                 </table>
-
-                <xforms:trigger ref="instance('control-instance')/save-trigger">
-                    <xforms:label>Save</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:send submission="save-submission"/>
-                    </xforms:action>
-                </xforms:trigger>
-
-                <xforms:trigger ref="instance('control-instance')/back-trigger">
-                    <xforms:label>Back</xforms:label>
-                    <xforms:load ev:event="DOMActivate" resource="/dmv/summary"/>
-                </xforms:trigger>
 
             </xforms:group><!-- ref="instance('main-instance')" -->
 

@@ -1,0 +1,35 @@
+/*
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+
+th { padding: 1em; text-align: left }
+td { vertical-align: top }
+.dmv-title { font-family: verdana; font-size: 24pt; font-weight: bold; font-style: italic }
+.dmv-actions-table td { white-space: nowrap; vertical-align: middle;}
+.dmv-actions-table input { vertical-align: middle;}
+.dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694; }
+.dmv-last-name input { width: 20em}
+.dmv-driver-license-number input { width: 8em}
+.dmv-first-name input { width: 10em}
+.dmv-initial input { width: 1.5em}
+.dmv-street-number input { width: 5em}
+.dmv-street-name-1 input { width: 21em}
+.dmv-street-name-2 input { width: 22em}
+.dmv-city input { width: 22em}
+.dmv-state input { width: 2em}
+.dmv-zip input { width: 5em}
+.dmv-plate-number input { width: 8em}
+.dmv-vin input { width: 17em}
+.dmv-company-name input { width: 22em}
+.dmv-street-number-name input { width: 22em}
+.xforms-label { margin-right: 1em }

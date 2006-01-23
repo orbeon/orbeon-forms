@@ -24,20 +24,20 @@
         <p:input name="query">
             <xdb:query collection="/db/ops/dmv-example" create-collection="true">
                 xquery version "1.0";
-                <result>
+                <document-infos>
                     {
                         for $d in /document-info return
                             <document-info>
-                                {$d/document-id}
+                                {$d/document-id, $d/document-date}
                                 <document>
                                     {
-                                    $d//dmv:name,
+                                    $d//dmv:personal-information,
                                     $d//dmv:vehicle[1]
                                     }
                                 </document>
                             </document-info>
                     }
-                </result>
+                </document-infos>
             </xdb:query>
         </p:input>
         <p:output name="data" ref="documents"/>

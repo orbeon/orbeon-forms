@@ -38,13 +38,13 @@
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
     </page>
 
-    <page id="xml-detail" path-info="/forms/xml-detail"
+    <page id="xml-detail" path-info="/direct/forms/xml-detail"
           default-submission="detail/parameters.xml"
           model="detail/xml-detail-model.xpl">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
     </page>
 
-    <page id="pdf-detail" path-info="/forms/pdf-detail"
+    <page id="pdf-detail" path-info="/direct/forms/pdf-detail"
           default-submission="detail/parameters.xml"
           model="detail/pdf-detail-model.xpl">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>

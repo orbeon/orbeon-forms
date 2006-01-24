@@ -52,11 +52,6 @@
             <vin/>
             <leased/>
         </vehicle>
-        <vehicle>
-            <plate-number/>
-            <vin/>
-            <leased/>
-        </vehicle>
     </vehicles>
     <leased-vehicles>
         <company-name/>

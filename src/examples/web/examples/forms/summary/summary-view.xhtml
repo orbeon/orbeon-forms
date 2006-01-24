@@ -64,9 +64,9 @@
                 <xforms:bind nodeset="detail-uri"
                              calculate="concat('/forms/detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="xml-detail-uri"
-                             calculate="concat('/forms/xml-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/direct/forms/xml-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="pdf-detail-uri"
-                             calculate="concat('/forms/pdf-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/direct/forms/pdf-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
 
                 <xforms:bind id="non-empty-bind" nodeset="non-empty" relevant="count(instance('main-instance')/document-info) > 0"/>
                 <xforms:bind id="empty-bind" nodeset="empty" relevant="count(instance('main-instance')/document-info) = 0"/>

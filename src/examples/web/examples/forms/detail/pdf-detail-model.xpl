@@ -23,7 +23,7 @@
     </p:processor>
 
     <p:processor name="oxf:pdf-template">
-        <p:input name="instance" href="#document-info" debug="xxx"/>
+        <p:input name="instance" href="#document-info"/>
         <p:input name="model">
             <config xmlns:dmv="http://orbeon.org/oxf/examples/dmv">
                 <template href="oxf:/examples/forms/dmv14.pdf"/><!-- show-grid="true" -->

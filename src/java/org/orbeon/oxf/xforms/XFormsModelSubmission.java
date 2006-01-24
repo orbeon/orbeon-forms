@@ -189,28 +189,38 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final Document initialDocumentToSubmit;
                 if (!isDeferredSubmissionSecondPass) {
                     // Create document to submit
-                    initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                    final Document backupInstanceDocument = currentInstance.getDocument();
+                    try {
+                        initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                        currentInstance.setInstanceDocument(initialDocumentToSubmit);
 
-                    // Revalidate instance
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
-                    // TODO: The "false" attribute is no longer used. The above will cause events to be
-                    // sent out. Check if the validation state can really change. If so, find a
-                    // solution.
-                    // "no notification events are marked for dispatching due to this operation"
+                        // Revalidate instance
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
+                        // TODO: The "false" attribute is no longer used. The above will cause events to be
+                        // sent out. Check if the validation state can really change. If so, find a
+                        // solution.
+                        // "no notification events are marked for dispatching due to this operation"
 
-                    // Check that there are no validation errors
-                    final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
-                    if (!instanceSatisfiesValidRequired) {
-                        if (XFormsServer.logger.isDebugEnabled()) {
-                            final LocationDocumentResult documentResult = new LocationDocumentResult();
-                            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                            identity.setResult(documentResult);
-                            currentInstance.read(identity);
-                            final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
+                        // Check that there are no validation errors
+                        final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
+                        if (!instanceSatisfiesValidRequired) {
+                            {
+                                currentInstance.readOut();
+                                ;
+                            }
+                            if (XFormsServer.logger.isDebugEnabled()) {
+                                final LocationDocumentResult documentResult = new LocationDocumentResult();
+                                final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                                identity.setResult(documentResult);
+                                currentInstance.read(identity);
+                                final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
 
-                            XFormsServer.logger.debug("XForms - instance document or subset thereof cannot be submitted:\n" + documentString);
+                                XFormsServer.logger.debug("XForms - instance document or subset thereof cannot be submitted:\n" + documentString);
+                            }
+                            throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
-                        throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
+                    } finally {
+                        currentInstance.setInstanceDocument(backupInstanceDocument);
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -280,20 +290,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                    final Document backupInstanceDocument = currentInstance.getDocument();
+                    try {
+                        documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                        currentInstance.setInstanceDocument(documentToSubmit);
 
-                    // Revalidate instance
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
-                    // TODO: The "false" attribute is no longer used. The above will cause events to be
-                    // sent out. Check if the validation state can really change. If so, find a
-                    // solution.
-                    // "no notification events are marked for dispatching due to this operation"
+                        // Revalidate instance
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
+                        // TODO: The "false" attribute is no longer used. The above will cause events to be
+                        // sent out. Check if the validation state can really change. If so, find a
+                        // solution.
+                        // "no notification events are marked for dispatching due to this operation"
 
-                    // Check that there are no validation errors
-                    final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
-                    if (!instanceSatisfiesValidRequired) {
-//                        currentInstance.readOut();// FIXME: DEBUG
-                        throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
+                        // Check that there are no validation errors
+                        final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
+                        if (!instanceSatisfiesValidRequired) {
+    //                        currentInstance.readOut();// FIXME: DEBUG
+                            throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
+                        }
+                    } finally {
+                        currentInstance.setInstanceDocument(backupInstanceDocument);
                     }
                 } else {
                     // Don't recreate document
@@ -637,7 +653,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 private final void checkInstanceData(Node node) {
                     if (nodeToDetach[0] == null) {
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
                         // Check "relevant" MIP and remove non-relevant nodes
                         {
                             final BooleanModelItemProperty relevantMIP = instanceData.getRelevant();

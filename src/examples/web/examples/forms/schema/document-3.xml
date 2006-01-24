@@ -52,11 +52,6 @@
             <vin>85987654321031535</vin>
             <leased/>
         </vehicle>
-        <vehicle>
-            <plate-number/>
-            <vin/>
-            <leased/>
-        </vehicle>
     </vehicles>
     <leased-vehicles>
         <company-name/>
@@ -72,10 +67,10 @@
     </vehicle-location>
     <old-address>
         <street>
-            <number-name/>
+            <number-name>Mountain Road</number-name>
         </street>
-        <city/>
-        <state/>
-        <zip/>
+        <city>Great Peak</city>
+        <state>CO</state>
+        <zip>11223</zip>
     </old-address>
 </form>

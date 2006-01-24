@@ -62,11 +62,6 @@
             <vin>34756976067146047</vin>
             <leased>Y</leased>
         </vehicle>
-        <vehicle>
-            <plate-number/>
-            <vin/>
-            <leased/>
-        </vehicle>
     </vehicles>
     <leased-vehicles>
         <company-name>CA Leasing Co.</company-name>
@@ -82,10 +77,10 @@
     </vehicle-location>
     <old-address>
         <street>
-            <number-name/>
+            <number-name>1 Ocean Blvd.</number-name>
         </street>
-        <city/>
-        <state/>
-        <zip/>
+        <city>Monterey</city>
+        <state>CA</state>
+        <zip>93940</zip>
     </old-address>
 </form>

@@ -25,8 +25,15 @@
         <title>OPS Forms Example</title>
         <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
-        <!--<xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">-->
-        <xforms:model id="main-model">
+        <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd">
+            <xforms:action ev:event="xforms-ready">
+                <!-- Create template for dmv:vehicle repeat -->
+                <xforms:insert nodeset="//dmv:vehicle" at="last()" position="after"/>
+                <xforms:setvalue ref="//dmv:vehicle[last()]/dmv:plate-number"/>
+                <xforms:setvalue ref="//dmv:vehicle[last()]/dmv:vin"/>
+                <xforms:setvalue ref="//dmv:vehicle[last()]/dmv:leased"/>
+                <xforms:setindex repeat="vehicles-repeat" index="1"/>
+            </xforms:action>
 
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
@@ -41,6 +48,8 @@
                     <vehicle-delete-trigger/>
                     <save-trigger/>
                     <back-trigger/>
+                    <different-mailing-address/>
+                    <clear-mailing-address/>
                 </control>
             </xforms:instance>
 
@@ -49,21 +58,26 @@
                 <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
                 <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
                 <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
+                <xforms:bind nodeset="different-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:new-mailing-address) = ''"/>
+                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:new-mailing-address) != ''"/>
             </xforms:bind>
 
-            <!-- TODO: use schema -->
-            <xforms:bind nodeset="dmv:personal-information">
-                <!--<xforms:bind nodeset="dmv:name/dmv:last-name" constraint="string-length() &lt;= 20"/>-->
-                <!--<xforms:bind nodeset="dmv:driver-license-number" constraint="string-length() &lt;= 8"/>-->
-                <!--<xforms:bind nodeset="dmv:name/dmv:first-name" constraint="string-length() &lt;= 10"/>-->
-                <!--<xforms:bind nodeset="dmv:name/dmv:initial" constraint="string-length() &lt;= 1"/>-->
-                <!--<xforms:bind nodeset="dmv:birth-date" type="xs:date" required="true()"/>-->
+            <xforms:bind nodeset="//dmv:personal-information">
+                <!-- Date types -->
+                <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                <!-- Display new mailing address if explicity required or if non-empty -->
+                <xforms:bind nodeset="//dmv:new-mailing-address" relevant="instance('control-instance')/different-mailing-address = 'Y' or normalize-space(.) != ''"/>
+                <!-- Do not consider last vehicle for validation -->
+                <xforms:bind nodeset="//dmv:vehicle[position() = last()]" relevant="false()"/>
+                <!-- Don't care about xml:base -->
+                <xforms:bind nodeset="//@xml:base" relevant="false()"/>
             </xforms:bind>
 
-            <xforms:submission id="save-submission" method="post" replace="none" action="/forms/service/save-document">
+            <xforms:submission id="save-submission" ref="instance('main-instance')"
+                               method="post" replace="none" action="/forms/service/save-document">
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message">Save successful!</xforms:setvalue>
-                    <xforms:setvalue ref="instance('control-instance')/data-status"></xforms:setvalue>
+                    <xforms:setvalue ref="instance('control-instance')/data-status"/>
                     <xforms:toggle case="ok-message"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
@@ -76,63 +90,13 @@
     </head>
     <body>
 
-        <table>
-            <tr>
-                <td style="vertical-align: middle">
-                    <img src="/examples/forms/images/dmv0-small.png" alt="DMV"/>
-                </td>
-                <td style="vertical-align: middle">
-                    <span class="dmv-title">Notice of Change of Address</span>
-                </td>
-            </tr>
-        </table>
-
-        <div>
-
-            <table class="dmv-actions-table">
+            <table>
                 <tr>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/save-trigger">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:send submission="save-submission"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Save Document</xforms:label>
-                                <xxforms:img src="/images/save.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>Save Document</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
+                    <td style="vertical-align: middle">
+                        <img src="/examples/forms/images/dmv0-small.png" alt="DMV"/>
                     </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/back-trigger">
-                            <xforms:load ev:event="DOMActivate" resource="/forms"/>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Return to Forms List</xforms:label>
-                                <xxforms:img src="/images/back.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>Return to Forms List</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:switch>
-                            <xforms:case id="no-message">
-                                <span/>
-                            </xforms:case>
-                            <xforms:case id="ok-message">
-                                <span style="color: green">
-                                    <xforms:output ref="instance('control-instance')/message"/>
-                                </span>
-                            </xforms:case>
-                            <xforms:case id="error-message">
-                                <span style="color: red">
-                                    <xforms:output ref="instance('control-instance')/message"/>
-                                </span>
-                            </xforms:case>
-                        </xforms:switch>
+                    <td style="vertical-align: middle">
+                        <span class="dmv-title">Notice of Change of Address</span>
                     </td>
                 </tr>
             </table>
@@ -143,7 +107,58 @@
                     <xforms:setvalue ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
                 </xforms:action>
 
-                <table style="border: 2px solid #e9d3e6">
+                <table class="dmv-main-table">
+                    <tr>
+                        <td colspan="2">
+                            <table class="dmv-actions-table">
+                                <tr>
+                                    <td>
+                                        <xforms:group ref="instance('control-instance')/save-trigger">
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:send submission="save-submission"/>
+                                            </xforms:action>
+                                            <xforms:trigger appearance="xxforms:image">
+                                                <xforms:label>Save Document</xforms:label>
+                                                <xxforms:img src="/images/save.gif"/>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="xxforms:link">
+                                                <xforms:label>Save Document</xforms:label>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                    </td>
+                                    <td>
+                                        <xforms:group ref="instance('control-instance')/back-trigger">
+                                            <xforms:load ev:event="DOMActivate" resource="/forms"/>
+                                            <xforms:trigger appearance="xxforms:image">
+                                                <xforms:label>Return to Forms List</xforms:label>
+                                                <xxforms:img src="/images/back.gif"/>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="xxforms:link">
+                                                <xforms:label>Return to Forms List</xforms:label>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                    </td>
+                                    <td>
+                                        <xforms:switch>
+                                            <xforms:case id="no-message">
+                                                <span/>
+                                            </xforms:case>
+                                            <xforms:case id="ok-message">
+                                                <span style="color: green">
+                                                    <xforms:output ref="instance('control-instance')/message"/>
+                                                </span>
+                                            </xforms:case>
+                                            <xforms:case id="error-message">
+                                                <span style="color: red">
+                                                    <xforms:output ref="instance('control-instance')/message"/>
+                                                </span>
+                                            </xforms:case>
+                                        </xforms:switch>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
                     <xforms:group ref="dmv:personal-information">
                         <tr>
                             <th>
@@ -254,18 +269,24 @@
                         </tr>
                     </xforms:group>
                     <tr><td colspan="2" class="dmv-hr"/></tr>
-                    <xforms:group ref="dmv:new-mailing-address">
-                        <tr>
-                            <th>
-                                New or Correct<br/>
-                                Residence<br/>
-                                Address<br/>
-                                <img src="/examples/forms/images/dmv3-small.png" alt="New or Correct Mailing Address"/>
-                                <br/>
-                                If different From<br/>
-                                Residence Address
-                            </th>
-                            <td>
+                    <tr>
+                        <th>
+                            New or Correct<br/>
+                            Mailing<br/>
+                            Address<br/>
+                            <img src="/examples/forms/images/dmv3-small.png" alt="New or Correct Mailing Address"/>
+                        </th>
+                        <td>
+
+                            <xforms:select ref="instance('control-instance')/different-mailing-address" appearance="full">
+                                <xforms:label>Check if Mailing Address is Different From Residence Address</xforms:label>
+                                <xforms:item>
+                                    <xforms:label></xforms:label>
+                                    <xforms:value>Y</xforms:value>
+                                </xforms:item>
+                            </xforms:select>
+
+                            <xforms:group ref="dmv:new-mailing-address">
                                 <table>
                                     <tr>
                                         <td>
@@ -305,10 +326,26 @@
                                             </xforms:input>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <xforms:trigger appearance="xxforms:link" ref="instance('control-instance')/clear-mailing-address">
+                                                <xforms:label>Clear Address</xforms:label>
+                                                <xforms:action ev:event="DOMActivate" >
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:number"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:name-1"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:name-2"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:apt"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:city"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:state"/>
+                                                    <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:zip"/>
+                                                </xforms:action>
+                                            </xforms:trigger>
+                                        </td>
+                                    </tr>
                                 </table>
-                            </td>
-                        </tr>
-                    </xforms:group>
+                            </xforms:group>
+                        </td>
+                    </tr>
                     <tr><td colspan="2" class="dmv-hr"/></tr>
                     <xforms:group ref="dmv:vehicles">
                         <tr>
@@ -322,7 +359,7 @@
                                 Forms If Necessary
                             </th>
                             <td>
-                                <table>
+                                <table class="dmv-gridtable">
                                     <tr>
                                         <th>California Plate / CF / Placard No.</th>
                                         <th>Vehicle Id or Vessel Hull Id Number</th>
@@ -352,19 +389,56 @@
                                             </td>
                                         </tr>
                                     </xforms:repeat>
+                                    <tr/><!-- This is to work around a bug in IE -->
                                 </table>
-                                <xforms:trigger ref="instance('control-instance')/vehicle-insert-trigger">
-                                    <xforms:label>Add</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
-                                    </xforms:action>
-                                </xforms:trigger>
-                                <xforms:trigger ref="instance('control-instance')/vehicle-delete-trigger">
-                                    <xforms:label>Remove</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
-                                    </xforms:action>
-                                </xforms:trigger>
+
+                                <!-- Advance version of the triggers -->
+                                <table class="dmv-actions-table">
+                                    <tr>
+                                        <td>
+                                            <xforms:group ref="instance('control-instance')/vehicle-insert-trigger">
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+                                                </xforms:action>
+                                                <xforms:trigger appearance="xxforms:image">
+                                                    <xforms:label>Add Vehicle</xforms:label>
+                                                    <xxforms:img src="/images/add.gif"/>
+                                                </xforms:trigger>
+                                                <xforms:trigger appearance="xxforms:link">
+                                                    <xforms:label>Add Vehicle</xforms:label>
+                                                </xforms:trigger>
+                                            </xforms:group>
+                                        </td>
+                                        <td>
+                                            <xforms:group ref="instance('control-instance')/vehicle-delete-trigger">
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
+                                                </xforms:action>
+                                                <xforms:trigger appearance="xxforms:image">
+                                                    <xforms:label>Delete Vehicle</xforms:label>
+                                                    <xxforms:img src="/images/remove.gif"/>
+                                                </xforms:trigger>
+                                                <xforms:trigger appearance="xxforms:link">
+                                                    <xforms:label>Delete Vehicle</xforms:label>
+                                                </xforms:trigger>
+                                            </xforms:group>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <!-- Simple version of the triggers -->
+                                <!--<xforms:trigger ref="instance('control-instance')/vehicle-insert-trigger">-->
+                                    <!--<xforms:label>Add</xforms:label>-->
+                                    <!--<xforms:action ev:event="DOMActivate">-->
+                                        <!--<xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>-->
+                                    <!--</xforms:action>-->
+                                <!--</xforms:trigger>-->
+                                <!--<xforms:trigger ref="instance('control-instance')/vehicle-delete-trigger">-->
+                                    <!--<xforms:label>Remove</xforms:label>-->
+                                    <!--<xforms:action ev:event="DOMActivate">-->
+                                        <!--<xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>-->
+                                    <!--</xforms:action>-->
+                                <!--</xforms:trigger>-->
                             </td>
                         </tr>
                     </xforms:group>
@@ -389,7 +463,7 @@
                                 Trailer Coach<br/>
                                 or Vessel<br/>
                                 <br/>
-                                If different From<br/>
+                                If Different From<br/>
                                 Residence Address
                             </th>
                             <td>
@@ -468,7 +542,6 @@
 
             </xforms:group><!-- ref="instance('main-instance')" -->
 
-        </div>
     </body>
 </html>
 

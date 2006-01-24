@@ -52,11 +52,6 @@
             <vin>1234ABCD5678EFGH</vin>
             <leased>Y</leased>
         </vehicle>
-        <vehicle>
-            <plate-number/>
-            <vin/>
-            <leased/>
-        </vehicle>
     </vehicles>
     <leased-vehicles>
         <company-name/>
@@ -72,10 +67,10 @@
     </vehicle-location>
     <old-address>
         <street>
-            <number-name/>
+            <number-name>321 Oak Avenue</number-name>
         </street>
-        <city/>
-        <state/>
-        <zip/>
+        <city>Mountain view</city>
+        <state>CA</state>
+        <zip>94041</zip>
     </old-address>
 </form>

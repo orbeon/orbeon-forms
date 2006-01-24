@@ -96,164 +96,167 @@
             </tr>
         </table>
 
-        <div style="border: 2px solid #e9d3e6; padding: 1em">
-
-            <table class="dmv-actions-table">
-                <tr>
-                    <td>
-                        <xforms:group>
-                            <xforms:load ev:event="DOMActivate" resource="/forms/detail"/>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>New Document</xforms:label>
-                                <xxforms:img src="/images/add.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>New Document</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/empty">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:send submission="import-documents-submission"/>
-                                <xforms:send submission="list-documents-submission"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Import Test Documents</xforms:label>
-                                <xxforms:img src="/images/add-all.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>Import Test Documents</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/non-empty">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:recalculate/>
-                                <xforms:load ref="instance('control-instance')/detail-uri"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Edit Selected</xforms:label>
-                                <xxforms:img src="/images/edit.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>Edit Selected</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/non-empty">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('main-instance')/document-info[index('documents-repeat')]/document-id"/>
-                                <xforms:send submission="delete-document-submission"/>
-                                <xforms:send submission="list-documents-submission"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Delete Selected</xforms:label>
-                                <xxforms:img src="/images/remove.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>Delete Selected</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/non-empty">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:recalculate/>
-                                <xforms:load ref="instance('control-instance')/xml-detail-uri"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>View Selected As XML</xforms:label>
-                                <xxforms:img src="/images/view-xml.gif"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>View Selected As XML</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                    <td>
-                        <xforms:group ref="instance('control-instance')/non-empty">
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:recalculate/>
-                                <xforms:load ref="instance('control-instance')/pdf-detail-uri"/>
-                            </xforms:action>
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>View Selected As PDF</xforms:label>
-                                <xxforms:img src="/images/pdf.png"/>
-                            </xforms:trigger>
-                            <xforms:trigger appearance="xxforms:link">
-                                <xforms:label>View Selected As PDF</xforms:label>
-                            </xforms:trigger>
-                        </xforms:group>
-                    </td>
-                </tr>
-            </table>
-
-            <xforms:group ref="instance('control-instance')/non-empty">
-                <table class="gridtable">
-                    <tr>
-                        <th>No.</th>
-                        <th>Saved</th>
-                        <th>Name</th>
-                        <th>Birth Date</th>
-                        <th>DL / ID Card No.</th>
-                        <th>Vehicle Information</th>
-                    </tr>
-                    <xforms:repeat nodeset="instance('main-instance')/document-info/document" id="documents-repeat">
+        <table class="dmv-main-table">
+            <tr>
+                <td>
+                    <table class="dmv-actions-table">
                         <tr>
                             <td>
-                                <xforms:output value="count(../preceding-sibling::*) + 1"/>
+                                <xforms:group>
+                                    <xforms:load ev:event="DOMActivate" resource="/forms/detail"/>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>New Document</xforms:label>
+                                        <xxforms:img src="/images/add.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>New Document</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                             <td>
-                                <xforms:output ref="../document-date"/>
+                                <xforms:group ref="instance('control-instance')/empty">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:send submission="import-documents-submission"/>
+                                        <xforms:send submission="list-documents-submission"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>Import Test Documents</xforms:label>
+                                        <xxforms:img src="/images/add-all.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>Import Test Documents</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                             <td>
-                                <xforms:output value="concat(dmv:personal-information/dmv:name/dmv:first-name, ' ', dmv:personal-information/dmv:name/dmv:initial, ' ', dmv:personal-information/dmv:name/dmv:last-name)"/>
+                                <xforms:group ref="instance('control-instance')/non-empty">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:recalculate/>
+                                        <xforms:load ref="instance('control-instance')/detail-uri"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>Edit Selected</xforms:label>
+                                        <xxforms:img src="/images/edit.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>Edit Selected</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                             <td>
-                                <xforms:output ref="dmv:personal-information/dmv:birth-date"/>
+                                <xforms:group ref="instance('control-instance')/non-empty">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('main-instance')/document-info[index('documents-repeat')]/document-id"/>
+                                        <xforms:send submission="delete-document-submission"/>
+                                        <xforms:send submission="list-documents-submission"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>Delete Selected</xforms:label>
+                                        <xxforms:img src="/images/remove.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>Delete Selected</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                             <td>
-                                <xforms:output value="dmv:personal-information/dmv:driver-license-number"/>
+                                <xforms:group ref="instance('control-instance')/non-empty">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:recalculate/>
+                                        <xforms:load ref="instance('control-instance')/xml-detail-uri"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>View Selected As XML</xforms:label>
+                                        <xxforms:img src="/images/view-xml.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>View Selected As XML</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                             <td>
-                                <xforms:output value="dmv:vehicle/dmv:plate-number"/>
+                                <xforms:group ref="instance('control-instance')/non-empty">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:recalculate/>
+                                        <xforms:load ref="instance('control-instance')/pdf-detail-uri"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>View Selected As PDF</xforms:label>
+                                        <xxforms:img src="/images/pdf.png"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>View Selected As PDF</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
                             </td>
                         </tr>
-                    </xforms:repeat>
-                    <tr/><!-- This is to work around a bug in IE -->
-                </table>
+                    </table>
 
-                <p>
-                    Selected: <xforms:output value="index('documents-repeat')"/> of
-                    <xforms:output value="count(instance('main-instance')/document-info)"/>
-                </p>
+                    <xforms:group ref="instance('control-instance')/non-empty">
+                        <table class="dmv-gridtable">
+                            <tr>
+                                <th>No.</th>
+                                <th>Saved</th>
+                                <th>Name</th>
+                                <th>Birth Date</th>
+                                <th>DL / ID Card No.</th>
+                                <th>Vehicle Information</th>
+                            </tr>
+                            <xforms:repeat nodeset="instance('main-instance')/document-info/document" id="documents-repeat">
+                                <tr>
+                                    <td>
+                                        <xforms:output value="count(../preceding-sibling::*) + 1"/>
+                                    </td>
+                                    <td>
+                                        <xforms:output ref="../document-date"/>
+                                    </td>
+                                    <td>
+                                        <xforms:output value="concat(dmv:personal-information/dmv:name/dmv:first-name, ' ', dmv:personal-information/dmv:name/dmv:initial, ' ', dmv:personal-information/dmv:name/dmv:last-name)"/>
+                                    </td>
+                                    <td>
+                                        <xforms:output ref="dmv:personal-information/dmv:birth-date"/>
+                                    </td>
+                                    <td>
+                                        <xforms:output value="dmv:personal-information/dmv:driver-license-number"/>
+                                    </td>
+                                    <td>
+                                        <xforms:output value="dmv:vehicle/dmv:plate-number"/>
+                                    </td>
+                                </tr>
+                            </xforms:repeat>
+                            <tr/><!-- This is to work around a bug in IE -->
+                        </table>
 
-            </xforms:group>
+                        <p>
+                            Selected: <xforms:output value="index('documents-repeat')"/> of
+                            <xforms:output value="count(instance('main-instance')/document-info)"/>
+                        </p>
 
-            <xforms:group ref="instance('control-instance')/empty">
-                <table class="gridtable">
-                    <tr>
-                        <th>No.</th>
-                        <th>Saved</th>
-                        <th>Name</th>
-                        <th>Birth Date</th>
-                        <th>DL / ID Card No.</th>
-                        <th>Vehicle Information</th>
-                    </tr>
-                    <tr>
-                        <td colspan="6">
-                            <i>
-                                No form found.<br/>Please press the "Import Test Documents"
-                                button to get started.
-                            </i>
-                        </td>
-                    </tr>
-                </table>
-            </xforms:group>
+                    </xforms:group>
 
-        </div>
+                    <xforms:group ref="instance('control-instance')/empty">
+                        <table class="dmv-gridtable">
+                            <tr>
+                                <th>No.</th>
+                                <th>Saved</th>
+                                <th>Name</th>
+                                <th>Birth Date</th>
+                                <th>DL / ID Card No.</th>
+                                <th>Vehicle Information</th>
+                            </tr>
+                            <tr>
+                                <td colspan="6">
+                                    <i>
+                                        No form found.<br/>Please press the "Import Test Documents"
+                                        button to get started.
+                                    </i>
+                                </td>
+                            </tr>
+                        </table>
+                    </xforms:group>
+
+                </td>
+            </tr>
+        </table>
     </body>
 </html>

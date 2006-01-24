@@ -204,10 +204,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
-                            {
-                                currentInstance.readOut();
-                                ;
-                            }
                             if (XFormsServer.logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();

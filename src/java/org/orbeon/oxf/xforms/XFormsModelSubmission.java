@@ -610,7 +610,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {
         final String actionString = action + ((action.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
-        final String resultURL = XFormsActionInterpreter.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null);
+        final String resultURL = XFormsActionInterpreter.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;
         return connectionResult;

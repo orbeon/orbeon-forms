@@ -225,10 +225,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms load to send to the client.
      */
-    public void addClientLoad(String resource, String target, boolean isReplace, boolean isPortletLoad) {
+    public void addClientLoad(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad) {
         if (loads == null)
             loads = new ArrayList();
-        loads.add(new Load(resource, target, isReplace, isPortletLoad));
+        loads.add(new Load(resource, target, urlType, isReplace, isPortletLoad));
     }
 
     /**
@@ -241,12 +241,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public static class Load {
         private String resource;
         private String target;
+        private String urlType;
         private boolean isReplace;
         private boolean isPortletLoad;
 
-        public Load(String resource, String target, boolean replace, boolean portletLoad) {
+        public Load(String resource, String target, String urlType, boolean replace, boolean portletLoad) {
             this.resource = resource;
             this.target = target;
+            this.urlType = urlType;
             isReplace = replace;
             isPortletLoad = portletLoad;
         }
@@ -257,6 +259,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         public String getTarget() {
             return target;
+        }
+
+        public String getUrlType() {
+            return urlType;
         }
 
         public boolean isReplace() {

@@ -163,7 +163,7 @@
                                 <xforms:group ref="instance('control-instance')/non-empty">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
-                                        <xforms:load ref="instance('control-instance')/xml-detail-uri"/>
+                                        <xforms:load ref="instance('control-instance')/xml-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xforms:label>View Selected As XML</xforms:label>
@@ -178,7 +178,7 @@
                                 <xforms:group ref="instance('control-instance')/non-empty">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
-                                        <xforms:load ref="instance('control-instance')/pdf-detail-uri"/>
+                                        <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xforms:label>View Selected As PDF</xforms:label>

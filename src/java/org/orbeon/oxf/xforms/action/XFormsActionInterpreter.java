@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
+import org.dom4j.Namespace;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -25,6 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -749,6 +751,7 @@ public class XFormsActionInterpreter {
             }
             final boolean doReplace = "replace".equals(showAttribute);
             final String target = actionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
+            final String urlType = actionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
 
             if (ref != null && resource != null) {
                 // "If both are present, the action has no effect."
@@ -758,7 +761,7 @@ public class XFormsActionInterpreter {
                 final Node currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
-                    resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target);
+                    resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType);
                 } else {
                     // Should we do this here?
                     containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
@@ -766,7 +769,7 @@ public class XFormsActionInterpreter {
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {
                 // Use linking attribute
-                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target);
+                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType);
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else {
                 // "Either the single node binding attributes, pointing to a URI in the instance
@@ -847,11 +850,11 @@ public class XFormsActionInterpreter {
         });
     }
 
-    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target) {
+    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target, String urlType) {
 
         final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
-        final String externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, doReplace, value);
-        containingDocument.addClientLoad(externalURL, target, doReplace, isPortletLoad);
+        final String externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, (!isPortletLoad) ? doReplace : !"resource".equals(urlType), value);
+        containingDocument.addClientLoad(externalURL, target, urlType, doReplace, isPortletLoad);
         return externalURL;
     }
 

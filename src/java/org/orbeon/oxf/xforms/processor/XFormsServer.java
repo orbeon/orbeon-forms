@@ -514,7 +514,7 @@ public class XFormsServer extends ProcessorImpl {
                     for (Iterator i = loads.iterator(); i.hasNext();) {
                         final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
 
-                        if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource())) {
+                        if (load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
                             // We need to submit the event so that the portlet can load the new path
                             final Element eventElement = dynamicStateElement.addElement("event");
                             eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
@@ -815,7 +815,7 @@ public class XFormsServer extends ProcessorImpl {
         for (Iterator i = loads.iterator(); i.hasNext();) {
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
 
-            if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()))) {
+            if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
                         new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new" });
             }

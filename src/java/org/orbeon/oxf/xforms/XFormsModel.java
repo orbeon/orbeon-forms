@@ -639,7 +639,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create Schema validator only if we have schemas specified
         if (modelElement.attributeValue("schema") != null && schemaValidator == null) {
             schemaValidator = new XFormsModelSchemaValidator();
-            schemaValidator.loadSchemas(pipelineContext, modelElement);
+            schemaValidator.loadSchemas(pipelineContext, containingDocument, modelElement);
         }
     }
 

@@ -129,33 +129,7 @@ public class XFormsSubmissionUtils {
 
         // Compute submission URL
         final URL submissionURL;
-        try {
-            final String actionString;
-            {
-                final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                if (serializedInstanceString != null) {
-                    if (action.indexOf('?') == -1)
-                        updatedActionStringBuffer.append('?');
-                    else
-                        updatedActionStringBuffer.append('&');
-                    updatedActionStringBuffer.append(serializedInstanceString);
-                }
-                actionString = updatedActionStringBuffer.toString();
-            }
-
-            if (actionString.startsWith("/")) {
-                // Case of path absolute
-                final String requestURL = externalContext.getRequest().getRequestURL();
-                submissionURL = URLFactory.createURL(requestURL, actionString);
-            } else if (NetUtils.urlHasProtocol(actionString)) {
-                // Case of absolute URL
-                submissionURL = URLFactory.createURL(actionString);
-            } else {
-                throw new OXFException("xforms:submission: invalid action: " + actionString);
-            }
-        } catch (MalformedURLException e) {
-            throw new OXFException("xforms:submission: invalid action: " + action, e);
-        }
+        submissionURL = createURL(action, serializedInstanceString, externalContext);
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -254,6 +228,38 @@ public class XFormsSubmissionUtils {
         } else {
             throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
         }
+    }
+
+    public static URL createURL(String action, String searchString, ExternalContext externalContext) {
+        URL resultURL;
+        try {
+            final String actionString;
+            {
+                final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
+                if (searchString != null) {
+                    if (action.indexOf('?') == -1)
+                        updatedActionStringBuffer.append('?');
+                    else
+                        updatedActionStringBuffer.append('&');
+                    updatedActionStringBuffer.append(searchString);
+                }
+                actionString = updatedActionStringBuffer.toString();
+            }
+
+            if (actionString.startsWith("/")) {
+                // Case of path absolute
+                final String requestURL = externalContext.getRequest().getRequestURL();
+                resultURL = URLFactory.createURL(requestURL, actionString);
+            } else if (NetUtils.urlHasProtocol(actionString)) {
+                // Case of absolute URL
+                resultURL = URLFactory.createURL(actionString);
+            } else {
+                throw new OXFException("Invalid URL: " + actionString);
+            }
+        } catch (MalformedURLException e) {
+            throw new OXFException("Invalid URL: " + action, e);
+        }
+        return resultURL;
     }
 
     public static boolean isGet(String method) {

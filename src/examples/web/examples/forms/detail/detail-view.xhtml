@@ -135,7 +135,9 @@
         </table>
 
         <xforms:group ref="instance('main-instance')/document/*">
+            <!-- Clear messages upon user moving around in the form -->
             <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
+            <!-- Mark that data has changed -->
             <xforms:action ev:event="xforms-value-changed">
                 <xforms:setvalue ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
             </xforms:action>
@@ -333,7 +335,7 @@
                                         </xforms:action>
                                         <xforms:trigger appearance="xxforms:image">
                                             <xforms:label>Clear Address</xforms:label>
-                                            <xxforms:img src="/images/recycle.png"/>
+                                            <xxforms:img src="/images/recycle-green.png"/>
                                         </xforms:trigger>
                                         <xforms:trigger appearance="xxforms:link">
                                             <xforms:label>Clear Address</xforms:label>

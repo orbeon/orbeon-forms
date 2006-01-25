@@ -32,6 +32,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -47,7 +48,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -354,19 +354,23 @@ public class XFormsModelSchemaValidator {
     /**
      * Load XForms model schemas.
      */
-    public void loadSchemas(final PipelineContext pipelineContext, Element modelElement) {
+    public void loadSchemas(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element modelElement) {
         if (!isSkipInstanceSchemaValidation()) {
-            String schemaURI = modelElement.attributeValue("schema");
-            if (schemaURI != null) {
-                // Resolve URI
-                String systemID = ((LocationData) modelElement.getData()).getSystemID();
-                try {
-                    schemaURI = URLFactory.createURL(systemID, schemaURI).toString();
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+            final String schemaURIs = modelElement.attributeValue("schema");
+            if (schemaURIs != null) {
+
+                final String schemaURI = schemaURIs;// TODO: check for multiple schemas
+
+                // External instance
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+                // Resolve URL
+                // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
+                final String resolvedURLString = XFormsUtils.resolveURL(containingDocument, pipelineContext, modelElement, false, schemaURI);
+                final URL resolvedURL = XFormsSubmissionUtils.createURL(resolvedURLString, null, externalContext);
+
                 // Load associated grammar
-                schemaGrammar = loadGrammar(pipelineContext, schemaURI);
+                schemaGrammar = loadGrammar(pipelineContext, resolvedURL.toExternalForm());
             }
         }
     }

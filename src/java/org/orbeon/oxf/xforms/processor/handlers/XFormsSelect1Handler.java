@@ -314,7 +314,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         // xhtml:option
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName, optionAttributes);
         final String label = item.getLabel();
-        contentHandler.characters(label.toCharArray(), 0, label.length());
+        if (label != null)
+            contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);
     }
 

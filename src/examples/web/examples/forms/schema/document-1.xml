@@ -24,7 +24,7 @@
     <voter-address-change>
         <change-address/>
     </voter-address-change>
-    <new-residence-address>
+    <address type="residence">
         <street>
             <number>123</number>
             <name-1>Oak Avenue</name-1>
@@ -34,18 +34,7 @@
         <city>Mountain View</city>
         <state>CA</state>
         <zip>94041</zip>
-    </new-residence-address>
-    <new-mailing-address>
-        <street>
-            <number/>
-            <name-1/>
-            <name-2/>
-        </street>
-        <apt/>
-        <city/>
-        <state/>
-        <zip/>
-    </new-mailing-address>
+    </address>
     <vehicles>
         <vehicle>
             <plate-number>4BTG095</plate-number>

@@ -26,6 +26,8 @@
         <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
         <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd">
+
+            <!-- This action performs initializations necessary upon initialization -->
             <xforms:action ev:event="xforms-ready">
                 <!-- Create template for dmv:vehicle repeat -->
                 <xforms:insert nodeset="//dmv:vehicle" at="last()" position="after"/>
@@ -33,6 +35,17 @@
                 <xforms:setvalue ref="//dmv:vehicle[last()]/dmv:vin"/>
                 <xforms:setvalue ref="//dmv:vehicle[last()]/dmv:leased"/>
                 <xforms:setindex repeat="vehicles-repeat" index="1"/>
+            </xforms:action>
+
+            <!-- This action clears all the fields of the mailing address -->
+            <xforms:action ev:event="dmv-clear-mailing-address">
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-1"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-2"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:apt"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:city"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:state"/>
+                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:zip"/>
             </xforms:action>
 
             <!-- The XForms instance with application data -->
@@ -48,7 +61,8 @@
                     <vehicle-delete-trigger/>
                     <save-trigger/>
                     <back-trigger/>
-                    <different-mailing-address/>
+                    <add-mailing-address/>
+                    <remove-mailing-address/>
                     <clear-mailing-address/>
                 </control>
             </xforms:instance>
@@ -79,15 +93,14 @@
                 <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
                 <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
                 <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
-                <xforms:bind nodeset="different-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:new-mailing-address) = ''"/>
-                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:new-mailing-address) != ''"/>
+                <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
+                <xforms:bind nodeset="remove-mailing-address" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
+                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
             </xforms:bind>
 
             <xforms:bind nodeset="//dmv:personal-information">
                 <!-- Date types -->
                 <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
-                <!-- Display new mailing address if explicity required or if non-empty -->
-                <xforms:bind nodeset="//dmv:new-mailing-address" relevant="instance('control-instance')/different-mailing-address = 'Y' or normalize-space(.) != ''"/>
                 <!-- Do not consider last vehicle for validation -->
                 <xforms:bind nodeset="//dmv:vehicle[position() = last()]" relevant="false()"/>
                 <!-- Don't care about xml:base -->
@@ -236,7 +249,7 @@
                     </tr>
                 </xforms:group>
                 <tr><td colspan="2" class="dmv-hr"/></tr>
-                <xforms:group ref="dmv:new-residence-address">
+                <xforms:group ref="dmv:address[@type = 'residence']">
                     <tr>
                         <th>
                             New or Correct<br/>
@@ -298,15 +311,55 @@
                     </th>
                     <td>
 
-                        <xforms:select ref="instance('control-instance')/different-mailing-address" appearance="full">
-                            <xforms:label>Check if Mailing Address is Different From Residence Address</xforms:label>
-                            <xforms:item>
-                                <xforms:label></xforms:label>
-                                <xforms:value>Y</xforms:value>
-                            </xforms:item>
-                        </xforms:select>
+                        <table class="dmv-actions-table">
+                            <tr>
+                                <td>
+                                    <xforms:group ref="instance('control-instance')/remove-mailing-address">
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:delete nodeset="instance('main-instance')//dmv:address[@type = 'mailing']" at="last()"/>
+                                        </xforms:action>
+                                        <xforms:trigger appearance="xxforms:image">
+                                            <xforms:label>Remove Mailing Address</xforms:label>
+                                            <xxforms:img src="/images/remove.gif"/>
+                                        </xforms:trigger>
+                                        <xforms:trigger appearance="xxforms:link">
+                                            <xforms:label>Remove Mailing Address</xforms:label>
+                                        </xforms:trigger>
+                                    </xforms:group>
 
-                        <xforms:group ref="dmv:new-mailing-address">
+                                    <xforms:group ref="instance('control-instance')/clear-mailing-address">
+                                        <xforms:action ev:event="DOMActivate" >
+                                            <xforms:dispatch name="dmv-clear-mailing-address" target="main-model"/>
+                                        </xforms:action>
+                                        <xforms:trigger appearance="xxforms:image">
+                                            <xforms:label>Clear Address</xforms:label>
+                                            <xxforms:img src="/images/remove.gif"/>
+                                        </xforms:trigger>
+                                        <xforms:trigger appearance="xxforms:link">
+                                            <xforms:label>Clear Address</xforms:label>
+                                        </xforms:trigger>
+                                    </xforms:group>
+                                </td>
+                                <td>
+                                    <xforms:group ref="instance('control-instance')/add-mailing-address" >
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:insert nodeset="instance('main-instance')//dmv:address[@type = 'residence']" at="last()" position="after"/>
+                                            <xforms:setvalue ref="instance('main-instance')//dmv:address[2]/@type">mailing</xforms:setvalue>
+                                            <xforms:dispatch name="dmv-clear-mailing-address" target="main-model"/>
+                                        </xforms:action>
+                                        <xforms:trigger appearance="xxforms:image">
+                                            <xforms:label>Add Mailing Address</xforms:label>
+                                            <xxforms:img src="/images/add.gif"/>
+                                        </xforms:trigger>
+                                        <xforms:trigger appearance="xxforms:link">
+                                            <xforms:label>Add Mailing Address</xforms:label>
+                                        </xforms:trigger>
+                                    </xforms:group>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <xforms:group ref="dmv:address[@type = 'mailing']">
                             <table>
                                 <tr>
                                     <td>
@@ -344,22 +397,6 @@
                                         <xforms:input ref="dmv:zip" class="dmv-zip">
                                             <xforms:label>Zip Code</xforms:label>
                                         </xforms:input>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                        <xforms:trigger appearance="xxforms:link" ref="instance('control-instance')/clear-mailing-address">
-                                            <xforms:label>Clear Address</xforms:label>
-                                            <xforms:action ev:event="DOMActivate" >
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:number"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:name-1"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:street/dmv:name-2"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:apt"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:city"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:state"/>
-                                                <xforms:setvalue ref="instance('main-instance')/document/*/dmv:new-mailing-address/dmv:zip"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
                                     </td>
                                 </tr>
                             </table>

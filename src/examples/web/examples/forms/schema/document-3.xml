@@ -24,7 +24,7 @@
     <voter-address-change>
         <change-address/>
     </voter-address-change>
-    <new-residence-address>
+    <address type="residence">
         <street>
             <number>100</number>
             <name-1>Mash Road</name-1>
@@ -34,18 +34,7 @@
         <city>San Giovanni</city>
         <state>AL</state>
         <zip>10001</zip>
-    </new-residence-address>
-    <new-mailing-address>
-        <street>
-            <number></number>
-            <name-1></name-1>
-            <name-2/>
-        </street>
-        <apt></apt>
-        <city></city>
-        <state></state>
-        <zip></zip>
-    </new-mailing-address>
+    </address>
     <vehicles>
         <vehicle>
             <plate-number>3BBB319</plate-number>

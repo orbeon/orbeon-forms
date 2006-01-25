@@ -44,44 +44,35 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="new-residence-address">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="street">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element type="xs:string" name="number"/>
-                                        <xs:element type="dmv:requiredNonEmptyString" name="name-1"/>
-                                        <xs:element type="xs:string" name="name-2"/>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element type="xs:string" name="apt"/>
-                            <xs:element type="dmv:requiredNonEmptyString" name="city"/>
-                            <xs:element name="state" type="dmv:state"/>
-                            <xs:element name="zip" type="dmv:zip"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="new-mailing-address">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="street">
-                                <xs:complexType>
-                                    <xs:sequence>
-                                        <xs:element type="xs:string" name="number"/>
-                                        <xs:element type="dmv:requiredNonEmptyString" name="name-1"/>
-                                        <xs:element type="xs:string" name="name-2"/>
-                                    </xs:sequence>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element type="xs:string" name="apt"/>
-                            <xs:element type="dmv:requiredNonEmptyString" name="city"/>
-                            <xs:element name="state" type="dmv:state"/>
-                            <xs:element name="zip" type="dmv:zip"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
+                <xs:sequence minOccurs="1" maxOccurs="2">
+                    <xs:element name="address">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="street">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element type="xs:string" name="number"/>
+                                            <xs:element type="dmv:requiredNonEmptyString" name="name-1"/>
+                                            <xs:element type="xs:string" name="name-2"/>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element type="xs:string" name="apt"/>
+                                <xs:element type="dmv:requiredNonEmptyString" name="city"/>
+                                <xs:element name="state" type="dmv:state"/>
+                                <xs:element name="zip" type="dmv:zip"/>
+                            </xs:sequence>
+                            <xs:attribute name="type">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="residence"/>
+                                        <xs:enumeration value="mailing"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:attribute>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
                 <xs:element name="vehicles">
                     <xs:complexType>
                         <xs:sequence minOccurs="0" maxOccurs="3">
@@ -163,7 +154,7 @@
 
     <xs:simpleType name="initial">
         <xs:restriction base="xs:string">
-            <xs:pattern value="([A-Z])+"/>
+            <xs:pattern value="([A-Z])?"/>
         </xs:restriction>
     </xs:simpleType>
 

@@ -24,9 +24,11 @@ public class BreakpointKey {
     private int line;
 
     public BreakpointKey(LocationData locationData) {
-        this.systemId = locationData.getSystemID();
-        this.line = locationData.getLine();
-        this.column = locationData.getCol();
+        if (locationData != null) {
+            this.systemId = locationData.getSystemID();
+            this.line = locationData.getLine();
+            this.column = locationData.getCol();
+        }
     }
 
     public BreakpointKey(String systemId, int line, int column) {

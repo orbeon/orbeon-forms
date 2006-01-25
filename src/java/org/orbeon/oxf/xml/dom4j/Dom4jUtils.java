@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -490,6 +491,12 @@ public class Dom4jUtils {
     }
 
     public static LocationData getLocationData(final int dpth) {
+        // Enable this with a property for debugging only, as it is time consuming
+        if (!OXFProperties.instance().getPropertySet().getBoolean
+                ("oxf.debug.enable-java-location-data", false).booleanValue())
+            return null;
+
+        // Compute stack trace and extract useful information
         final Exception e = new Exception();
         final StackTraceElement[] stkTrc = e.getStackTrace();
         final int dpthToUse = dpth + 1;

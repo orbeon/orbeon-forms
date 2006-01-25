@@ -1263,7 +1263,7 @@
                 <p:param name="instance" type="output"/>
                 <p:processor name="oxf:xforms-input">
                     <p:input name="model">
-                        <xforms:model schema="form.xsd">
+                        <xforms:model schema="oxf:/ops/unit-tests/form.xsd">
                             <xforms:instance>
                                 <instance>
                                     <a>35</a>
@@ -1313,7 +1313,7 @@
                 <p:param name="result" type="output"/>
                 <p:processor name="oxf:xforms-output">
                     <p:input name="model">
-                        <xforms:model schema="form-attributes.xsd">
+                        <xforms:model schema="oxf:/ops/unit-tests/form-attributes.xsd">
                             <xforms:instance>
                                 <instance/>
                             </xforms:instance>
@@ -1400,7 +1400,7 @@
             <a><a/><a/></a>
         </input>
         <input name="xforms-model">
-            <xforms:model schema="form-attributes.xsd">
+            <xforms:model schema="oxf:/ops/unit-tests/form-attributes.xsd">
                 <xforms:instance>
                     <instance>
                         <a a="1">1</a>

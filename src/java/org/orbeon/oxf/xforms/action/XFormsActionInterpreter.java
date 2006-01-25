@@ -852,7 +852,7 @@ public class XFormsActionInterpreter {
 
     public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target, String urlType) {
 
-        final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
+        final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
         final String externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, (!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType)), value);
         containingDocument.addClientLoad(externalURL, target, urlType, doReplace, isPortletLoad);
         return externalURL;

@@ -512,7 +512,7 @@ public class XFormsUtils {
     }
 
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
-        final boolean isPortletLoad = containingDocument.getContainerType().equals("portlet");
+        final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 
         final URI resolvedURI = resolveURI(currentElement, value);
         final String resolvedURISTring = resolvedURI.toString();

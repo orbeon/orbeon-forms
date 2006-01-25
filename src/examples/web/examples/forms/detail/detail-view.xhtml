@@ -110,13 +110,13 @@
         </xforms:model>
     </head>
     <body>
-        <table>
+        <table class="dmv-title-table">
             <tr>
-                <td style="vertical-align: middle">
+                <td>
                     <img src="/examples/forms/images/dmv0-small.png" alt="DMV"/>
                 </td>
-                <td style="vertical-align: middle">
-                    <span class="dmv-title">Notice of Change of Address</span>
+                <td>
+                    Notice of Change of Address
                 </td>
             </tr>
         </table>
@@ -164,12 +164,12 @@
                                             <span/>
                                         </xforms:case>
                                         <xforms:case id="ok-message">
-                                            <span style="color: green">
+                                            <span class="dmv-message-positive">
                                                 <xforms:output ref="instance('control-instance')/message"/>
                                             </span>
                                         </xforms:case>
                                         <xforms:case id="error-message">
-                                            <span style="color: red">
+                                            <span class="dmv-message-negative">
                                                 <xforms:output ref="instance('control-instance')/message"/>
                                             </span>
                                         </xforms:case>
@@ -412,11 +412,11 @@
                                 <tr/><!-- This is to work around a bug in IE -->
                             </table>
 
-                            <!--
+                            <!-- TODO: Fix bug in xforms:repeat to enable this
                             <xforms:repeat nodeset="instance('plate-instance')/plate[1]">
-                                <table>
+                                <table class="dmv-plate-table">
                                     <tr>
-                                        <td background="/examples/forms/images/platetahoe_small.jpg" style="width: 100px; height: 51px; text-align: center">
+                                        <td>
                                             <span style="position: relative; top: 15px">
                                                 <xforms:repeat nodeset="character[. != '']">
                                                     <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', ., '_small.gif')"/>
@@ -573,7 +573,6 @@
                         </td>
                     </tr>
                 </xforms:group>
-                <!--<tr><td colspan="2" class="dmv-hr"/></tr>-->
             </table>
 
         </xforms:group><!-- ref="instance('main-instance')" -->

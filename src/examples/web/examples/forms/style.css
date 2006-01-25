@@ -14,7 +14,6 @@
 
 th { padding: 1em; text-align: left }
 td { vertical-align: top }
-.dmv-title { font-family: verdana; font-size: 24pt; font-weight: bold; font-style: italic }
 .dmv-main-table { border: 2px solid #e9d3e6 }
 .dmv-actions-table td { white-space: nowrap; vertical-align: middle;}
 .dmv-actions-table input { vertical-align: middle;}
@@ -36,4 +35,8 @@ td { vertical-align: top }
 .dmv-gridtable { border-collapse: collapse }
 .dmv-gridtable th { background-color: #e9d3e6; text-align: center; padding: .3em; border: 1px solid #8e3694 }
 .dmv-gridtable td { padding: .3em; border: 1px solid #8e3694; margin: 0px }
+.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; text-align: center }
+.dmv-title-table td { vertical-align: middle; font-family: verdana; font-size: 24pt; font-weight: bold; font-style: italic  }
+.dmv-message-positive { color: green }
+.dmv-message-negative { color: red }
 .xforms-label { margin-right: 1em }

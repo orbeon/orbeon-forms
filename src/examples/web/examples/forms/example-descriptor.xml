@@ -15,8 +15,30 @@
     <title>OPS Forms Example</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
-        <p xmlns="http://www.w3.org/1999/xhtml">
-            [TODO]
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example handles web forms with XForms. It illustrates:
+            </p>
+            <ul>
+                <li>
+                    <p>Using XForms to represent and display form data.</p>
+                </li>
+                <li>
+                    <p>Using XForms's XML Schema support to validate form data.</p>
+                </li>
+                <li>
+                    <p>Using XForms to retrieve and save data from XML services.</p>
+                </li>
+                <li>
+                    <p>Producing forms in formats, such as HTML, XML or PDF.</p>
+                </li>
+                <li>
+                    <p>Navigating between pages with page flow and XForms.</p>
+                </li>
+                <li>
+                    <p>And much more!</p>
+                </li>
+            </ul>
+        </div>
     </description>
 </example-descriptor>

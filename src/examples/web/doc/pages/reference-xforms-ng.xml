@@ -2261,7 +2261,7 @@
                     <tr>
                         <th>Base URI<br/>(External URL or <code>xml:base</code> attributes)</th>
                         <th>Initial URI<br/>(<code>resource</code> or Single-Node Binding)</th>
-                        <th><code>show</code></th>
+                        <th><code>show</code><br/><code>f:url-type</code></th>
                         <th>Resolved URI</th>
                         <th>Comment</th>
                     </tr>
@@ -2318,7 +2318,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="6">
+                        <td rowspan="8">
                             <p>The following path is loaded in a portlet:</p>
                             <p>
                                 <code>/example/page</code>
@@ -2340,26 +2340,44 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>/new-page</code></td>
+                        <td rowspan="3"><code>/new-page</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>/new-page</code></td>
-                        <td rowspan="2">
+                        <td><code>/new-page</code></td>
+                        <td>
                             The resulting path is loaded within the portlet.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>new</code></td>
-                    </tr>
-                    <tr>
-                        <td rowspan="2"><code>admin/main-page</code></td>
-                        <td><code>replace</code></td>
-                        <td rowspan="2"><code>/example/admin/main-page</code></td>
-                        <td rowspan="2">
-                            The resulting path is loaded within the portlet.
+                        <td><code>replace</code><br/><code>f:url-type="resource"</code></td>
+                        <td><code>http://a.org/ops/new-page</code></td>
+                        <td>
+                            The resulting path is loaded in the same window outside the portal.
                         </td>
                     </tr>
                     <tr>
                         <td><code>new</code></td>
+                        <td><code>http://a.org/ops/new-page</code></td>
+                        <td>
+                            The resulting path is loaded in a new window.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><code>admin/main-page</code></td>
+                        <td><code>replace</code></td>
+                        <td><code>/example/admin/main-page</code></td>
+                        <td>
+                            The resulting path is loaded within the portlet.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><code>replace</code><br/><code>f:url-type="resource"</code></td>
+                        <td><i>undefined</i></td>
+                        <td><i>undefined</i></td>
+                    </tr>
+                    <tr>
+                        <td><code>new</code></td>
+                        <td><i>undefined</i></td>
+                        <td><i>undefined</i></td>
                     </tr>
                 </table>
             </section>

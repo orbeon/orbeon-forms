@@ -22,6 +22,7 @@
                 <name>document-1.xml</name>
                 <name>document-2.xml</name>
                 <name>document-3.xml</name>
+                <name>document-4.xml</name>
             </documents>
         </p:input>
         <p:output name="data" id="documents"/>

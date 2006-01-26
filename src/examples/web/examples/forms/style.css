@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
 
-th { padding: 1em; text-align: left }
+th { padding: 1em; text-align: left; vertical-align: top }
 td { vertical-align: top }
 .dmv-main-table { border: 2px solid #e9d3e6 }
 .dmv-actions-table td { white-space: nowrap; vertical-align: middle;}

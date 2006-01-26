@@ -17,20 +17,14 @@ package org.orbeon.oxf.xforms.mip;
 
 public abstract class BooleanModelItemProperty implements Cloneable {
 
-    private boolean isSet = false;
     private boolean value;
 
     public BooleanModelItemProperty() {
         value = getDefaultValue();
     }
 
-//    public void unSet() {
-//        isSet = false;
-//    }
-
     public void set(boolean value) {
         this.value = value;
-        isSet = true;
     }
 
     public boolean get() {
@@ -40,12 +34,6 @@ public abstract class BooleanModelItemProperty implements Cloneable {
     public boolean hasChangedFromDefault() {
         return get() != getDefaultValue();
     }
-
-//    public boolean isSet() {
-//        // FIXME: This should tell whether the MIP has been modified by a bind, but currently this
-//        // may not always be correct.
-//        return isSet;
-//    }
 
     protected abstract boolean getDefaultValue();
 

@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action;
 
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.Namespace;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -211,6 +208,7 @@ public class XFormsActionInterpreter {
             // 9.3.5 The insert Element
             final String atAttribute = actionElement.attributeValue("at");
             final String positionAttribute = actionElement.attributeValue("position");
+            final String originAttribute = actionElement.attributeValue("origin");
 
             // Set current binding in order to evaluate the current nodeset
             // "1. The homogeneous collection to be updated is determined by evaluating the Node Set Binding."
@@ -225,9 +223,17 @@ public class XFormsActionInterpreter {
                 // be inserted."
                 final Element clonedElement;
                 {
-                    final Element lastElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
-                    clonedElement = (Element) lastElement.createCopy();
-                    XFormsUtils.setInitialDecoration(clonedElement);
+                    if (originAttribute == null) {
+                        final Element lastElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
+                        clonedElement = (Element) lastElement.createCopy();
+                        XFormsUtils.setInitialDecoration(clonedElement);
+                    } else {
+                        xformsControls.pushBinding(pipelineContext, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+                        final Element templateElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Elemewnt
+                        clonedElement = templateElement.createCopy();
+                        XFormsUtils.setInitialDecoration(clonedElement);
+                        xformsControls.popBinding();
+                    }
                 }
 
                 // "Finally, this newly created node is inserted into the instance data at the location
@@ -252,7 +258,7 @@ public class XFormsActionInterpreter {
                 final Element indexElement = (Element) collectionToBeUpdated.get(insertionIndex - 1);
 
                 final Element parentElement = indexElement.getParent();
-                final List siblingElements = parentElement.elements();
+                final List siblingElements = parentElement.content();
                 final int actualIndex = siblingElements.indexOf(indexElement);
 
                 // Prepare insertion of new element
@@ -870,7 +876,7 @@ public class XFormsActionInterpreter {
 
             final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
             final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
-
+xxx test on repeatControlInfo == null xxx
             if (index <= 0) {
                 // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
                 // and the index is set to 1."

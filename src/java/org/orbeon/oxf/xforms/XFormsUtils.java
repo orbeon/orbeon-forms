@@ -156,7 +156,7 @@ public class XFormsUtils {
                     localInstanceData.markValueChanged();
                 }
             }
-        });
+        }, false);
     }
 
     /**
@@ -261,21 +261,22 @@ public class XFormsUtils {
     }
 
     /**
-     * Iterate through all data nodes of the instance document and call the walker on each of them.
+     * Iterate through nodes of the instance document and call the walker on each of them.
      *
      * @param instanceDocument
      * @param instanceWalker
+     * @param allNodes          all the nodes, otherwise only data nodes
      */
-    public static void iterateInstanceData(Document instanceDocument, InstanceWalker instanceWalker) {
-        iterateInstanceData(instanceDocument.getRootElement(), instanceWalker);
+    public static void iterateInstanceData(Document instanceDocument, InstanceWalker instanceWalker, boolean allNodes) {
+        iterateInstanceData(instanceDocument.getRootElement(), instanceWalker, allNodes);
     }
 
-    private static void iterateInstanceData(Element element, InstanceWalker instanceWalker) {
+    private static void iterateInstanceData(Element element, InstanceWalker instanceWalker, boolean allNodes) {
 
         final List childrenElements = element.elements();
 
-        // We should probably not "walk" an element which contains elements
-        if (childrenElements.size() == 0)
+        // We "walk" an element which contains elements only if allNodes == true
+        if (allNodes || childrenElements.size() == 0)
             instanceWalker.walk(element, getLocalInstanceData(element), getInheritedInstanceData(element));
 
         // "walk" current element's attributes
@@ -287,7 +288,7 @@ public class XFormsUtils {
         if (childrenElements.size() != 0) {
             for (Iterator i = childrenElements.iterator(); i.hasNext();) {
                 final Element child = (Element) i.next();
-                iterateInstanceData(child, instanceWalker);
+                iterateInstanceData(child, instanceWalker, allNodes);
             }
         }
     }

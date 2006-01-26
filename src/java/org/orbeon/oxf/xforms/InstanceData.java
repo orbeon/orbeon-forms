@@ -186,6 +186,12 @@ public class InstanceData implements Cloneable {
             schemaErrors.clear();
     }
 
+    public void clearOtherState() {
+        relevant.set(relevant.getDefaultValue());
+        readonly.set(readonly.getDefaultValue());
+        required.set(required.getDefaultValue(), null);
+    }
+
     public void clearInstanceDataEventState() {
         previousRequiredState = getRequired().get();
         previousRelevantState = getRelevant().get();

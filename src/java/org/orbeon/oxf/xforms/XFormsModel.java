@@ -345,7 +345,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         // Mark node
                         final boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
                         instanceData.updateRequired(required, node, modelBind.getId());
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -369,7 +369,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     try {
                         boolean relevant = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
                         instanceData.getRelevant().set(relevant);
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -396,7 +396,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         boolean readonly = ((Boolean) expr.evaluateSingle()).booleanValue();
 
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
                         instanceData.getReadonly().set(readonly);
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -862,7 +862,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             localInstanceData.clearInstanceDataEventState();
                         }
                     }
-                });
+                }, false);
             }
         }
     }
@@ -875,6 +875,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (instances != null) {
             // NOTE: we do not correctly handle computational dependencies, but it doesn't hurt
             // to evaluate "calculate" binds before the other binds.
+
+            // Clear state
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                    public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
+                        if (localInstanceData != null) {
+                            localInstanceData.clearOtherState();
+                        }
+                    }
+                }, true);
+            }
 
             // Apply calculate binds
             applyCalculateBinds(pipelineContext);
@@ -895,7 +906,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             localInstanceData.clearValidationState();
                         }
                     }
-                });
+                }, true);
             }
 
             // Run validation
@@ -932,6 +943,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (xformsControls != null) {
 
             // Build list of events to send
+            // TODO: should reverse way this is doing, and iterate through controls instead of iterating through instance nodes
             final List eventsToDispatch = new ArrayList();
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
@@ -984,7 +996,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             }
                         }
                     }
-                });
+                }, false);
             }
 
             // Clear InstanceData event state

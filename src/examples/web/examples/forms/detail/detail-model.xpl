@@ -30,16 +30,17 @@
         </p:when>
         <p:otherwise>
             <!-- Just produce empty document template -->
-            <p:processor name="oxf:xinclude">
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="config">
-                    <document-info>
-                        <document-id/>
+                    <document-info xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
+                        <document-id><xsl:value-of select="uuid:createPseudoUUID()"/></document-id>
                         <document-date/>
                         <document>
-                            <xi:include href="../schema/empty-instance.xml"/>
+                            <xsl:copy-of select="doc('../schema/empty-instance.xml')"/>
                         </document>
                     </document-info>
                 </p:input>
+                <p:input name="data"><dummy/></p:input>
                 <p:output name="data" ref="data"/>
             </p:processor>
         </p:otherwise>

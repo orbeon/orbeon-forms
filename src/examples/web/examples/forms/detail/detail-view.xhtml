@@ -48,11 +48,26 @@
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:zip"/>
             </xforms:action>
 
-            <!-- The XForms instance with application data -->
+            <!-- Main XForms instance -->
             <xforms:instance id="main-instance">
                 <xi:include href="input:data"/>
             </xforms:instance>
 
+            <xforms:bind nodeset="instance('main-instance')">
+                <!-- Metadata -->
+                <xforms:bind nodeset="document-date" calculate="current-dateTime()"/>
+                <!-- Business data -->
+                <xforms:bind nodeset="//dmv:personal-information">
+                    <!-- Date types -->
+                    <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                    <!-- Do not consider last vehicle for validation -->
+                    <xforms:bind nodeset="//dmv:vehicle[position() = last()]" relevant="false()"/>
+                    <!-- Don't care about xml:base -->
+                    <xforms:bind nodeset="//@xml:base" relevant="false()"/>
+                </xforms:bind>
+            </xforms:bind>
+
+            <!-- XForms instance for widget control information -->
             <xforms:instance id="control-instance">
                 <control xmlns="">
                     <message/>
@@ -67,6 +82,17 @@
                 </control>
             </xforms:instance>
 
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="save-trigger" relevant="../data-status = 'dirty'"/>
+                <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
+                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
+                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
+                <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
+                <xforms:bind nodeset="remove-mailing-address" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
+                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
+            </xforms:bind>
+
+            <!-- XForms instance for license plate information -->
             <xforms:instance id="plate-instance">
                 <control xmlns="">
                     <plate>
@@ -88,25 +114,7 @@
                 <!--<xforms:bind nodeset="plate[3]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[3], count(preceding-sibling::character) + 1, 1)"/>-->
             </xforms:bind>
 
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="save-trigger" relevant="../data-status = 'dirty'"/>
-                <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
-                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 4"/>
-                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt;= 2"/>
-                <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
-                <xforms:bind nodeset="remove-mailing-address" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
-                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
-            </xforms:bind>
-
-            <xforms:bind nodeset="//dmv:personal-information">
-                <!-- Date types -->
-                <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
-                <!-- Do not consider last vehicle for validation -->
-                <xforms:bind nodeset="//dmv:vehicle[position() = last()]" relevant="false()"/>
-                <!-- Don't care about xml:base -->
-                <xforms:bind nodeset="//@xml:base" relevant="false()"/>
-            </xforms:bind>
-
+            <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
                                method="post" replace="none" action="/forms/service/save-document">
                 <xforms:action ev:event="xforms-submit-done">
@@ -207,6 +215,7 @@
                                     <td>
                                         <xforms:input ref="dmv:name/dmv:last-name" class="dmv-last-name">
                                             <xforms:label>Last Name</xforms:label>
+                                            <xforms:help>The last name</xforms:help>
                                         </xforms:input>
                                         <xforms:input ref="dmv:driver-license-number" class="dmv-driver-license-number">
                                             <xforms:label>Driver License / Id Card No.</xforms:label>

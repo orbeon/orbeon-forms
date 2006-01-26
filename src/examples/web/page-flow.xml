@@ -80,6 +80,9 @@
     <!-- Standalone PDF Upload example (contribution) -->
     <page path-info="/pdf-upload*" model="/examples/pdf/pdf-upload/page-flow.xpl"/>
 
+    <!-- Java profiler  -->
+    <page path-info="/profiler/*" model="/examples/profiler/page-flow.xpl"/>
+
     <!-- Struts and JSF -->
     <page path-info="/faces/*" model="/jsf/config/model.xpl"/>
     <page path-info="/examples/jsf*" model="/jsf/config/model.xpl"/>

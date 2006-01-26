@@ -118,12 +118,12 @@
             <xforms:submission id="save-submission" ref="instance('main-instance')"
                                method="post" replace="none" action="/forms/service/save-document">
                 <xforms:action ev:event="xforms-submit-done">
-                    <xforms:setvalue ref="instance('control-instance')/message">Save successful!</xforms:setvalue>
+                    <xforms:setvalue ref="instance('control-instance')/message">Saving was successful!</xforms:setvalue>
                     <xforms:setvalue ref="instance('control-instance')/data-status"/>
                     <xforms:toggle case="ok-message"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
-                    <xforms:setvalue ref="instance('control-instance')/message">Save failed!</xforms:setvalue>
+                    <xforms:setvalue ref="instance('control-instance')/message">Saving failed! Please check for errors in your form.</xforms:setvalue>
                     <xforms:toggle case="error-message"/>
                 </xforms:action>
             </xforms:submission>
@@ -213,11 +213,12 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:name/dmv:last-name" class="dmv-last-name">
+                                        <xforms:input incremental="true" ref="dmv:name/dmv:last-name" class="dmv-last-name">
                                             <xforms:label>Last Name</xforms:label>
                                             <!--<xforms:help>The last name</xforms:help>-->
+                                            <xforms:alert>Last name must contain only letters, '-' and be 20 characters at most.</xforms:alert>
                                         </xforms:input>
-                                        <xforms:input ref="dmv:driver-license-number" class="dmv-driver-license-number">
+                                        <xforms:input incremental="true" ref="dmv:driver-license-number" class="dmv-driver-license-number">
                                             <xforms:label>Driver License / Id Card No.</xforms:label>
                                         </xforms:input>
                                     </td>
@@ -225,14 +226,14 @@
                                 <tr>
                                     <td>
                                         <xforms:group ref="dmv:name">
-                                            <xforms:input ref="dmv:first-name" class="dmv-first-name">
+                                            <xforms:input incremental="true" ref="dmv:first-name" class="dmv-first-name">
                                                 <xforms:label>First Name</xforms:label>
                                             </xforms:input>
-                                            <xforms:input ref="dmv:initial" xhtml:size="2" class="dmv-initial">
+                                            <xforms:input incremental="true" ref="dmv:initial" xhtml:size="2" class="dmv-initial">
                                                 <xforms:label>Initial</xforms:label>
                                             </xforms:input>
                                         </xforms:group>
-                                        <xforms:input ref="dmv:birth-date">
+                                        <xforms:input incremental="true" ref="dmv:birth-date">
                                             <xforms:label>Birth Date</xforms:label>
                                         </xforms:input>
                                     </td>
@@ -272,38 +273,38 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
                                             <xforms:label>Street Number Only</xforms:label>
                                         </xforms:input>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
                                             <xforms:label>Street Name 1</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                        <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
                                             <xforms:label>Apt. No</xforms:label>
                                         </xforms:input>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
                                             <xforms:label>Street Name 2</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <xforms:input ref="dmv:city" class="dmv-city">
+                                        <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
                                             <xforms:label>City</xforms:label>
                                             <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                         </xforms:input>
-                                        <xforms:input ref="dmv:state" class="dmv-state">
+                                        <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
                                             <xforms:label>State</xforms:label>
                                         </xforms:input>
-                                        <xforms:input ref="dmv:zip" class="dmv-zip">
+                                        <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                             <xforms:label>Zip Code</xforms:label>
                                         </xforms:input>
                                     </td>
@@ -374,38 +375,38 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
                                             <xforms:label>Street Number Only</xforms:label>
                                         </xforms:input>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
                                             <xforms:label>Street Name 1</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:apt" class="dmv-apt-number">
+                                        <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
                                             <xforms:label>Apt. No</xforms:label>
                                         </xforms:input>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
                                             <xforms:label>Street Name 2</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <xforms:input ref="dmv:city" class="dmv-city">
+                                        <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
                                             <xforms:label>City</xforms:label>
                                             <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                         </xforms:input>
-                                        <xforms:input ref="dmv:state" class="dmv-state">
+                                        <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
                                             <xforms:label>State</xforms:label>
                                         </xforms:input>
-                                        <xforms:input ref="dmv:zip" class="dmv-zip">
+                                        <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                             <xforms:label>Zip Code</xforms:label>
                                         </xforms:input>
                                     </td>
@@ -436,12 +437,12 @@
                                 <xforms:repeat nodeset="dmv:vehicle[position() &lt; last()]" id="vehicles-repeat">
                                     <tr>
                                         <td>
-                                            <xforms:input ref="dmv:plate-number" class="dmv-plate-number" incremental="true">
+                                            <xforms:input incremental="true" ref="dmv:plate-number" class="dmv-plate-number">
                                                 <xforms:label/>
                                             </xforms:input>
                                         </td>
                                         <td>
-                                            <xforms:input ref="dmv:vin" class="dmv-vin">
+                                            <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
                                                 <xforms:label/>
                                                 <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
                                             </xforms:input>
@@ -533,7 +534,7 @@
                             Leased Vehicles
                         </th>
                         <td>
-                            <xforms:input ref="dmv:company-name" class="dmv-company-name">
+                            <xforms:input incremental="true" ref="dmv:company-name" class="dmv-company-name">
                                 <xforms:label>Leasing Company's Name</xforms:label>
                             </xforms:input>
                         </td>
@@ -554,12 +555,12 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:number" class="dmv-street-number">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
                                             <xforms:label>Street Number Only</xforms:label>
                                         </xforms:input>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
                                             <xforms:label>Street Name 1</xforms:label>
                                         </xforms:input>
                                     </td>
@@ -568,18 +569,18 @@
                                     <td>
                                     </td>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
                                             <xforms:label>Street Name 2</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <xforms:input ref="dmv:city" class="dmv-city">
+                                        <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
                                             <xforms:label>City</xforms:label>
                                             <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                         </xforms:input>
-                                        <xforms:input ref="dmv:county" class="dmv-county">
+                                        <xforms:input incremental="true" ref="dmv:county" class="dmv-county">
                                             <xforms:label>County</xforms:label>
                                             <!--<xforms:hint>Do Not Abbreviate</xforms:hint>-->
                                         </xforms:input>
@@ -599,20 +600,20 @@
                             <table>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
+                                        <xforms:input incremental="true" ref="dmv:street/dmv:number-name" class="dmv-street-number-name">
                                             <xforms:label>Street Number / Name</xforms:label>
                                         </xforms:input>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <xforms:input ref="dmv:city" class="dmv-city">
+                                        <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
                                             <xforms:label>City</xforms:label>
                                         </xforms:input>
-                                        <xforms:input ref="dmv:state" class="dmv-state">
+                                        <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
                                             <xforms:label>State</xforms:label>
                                         </xforms:input>
-                                        <xforms:input ref="dmv:zip" class="dmv-zip">
+                                        <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                             <xforms:label>Zip</xforms:label>
                                         </xforms:input>
                                     </td>

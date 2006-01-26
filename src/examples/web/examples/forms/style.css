@@ -39,4 +39,5 @@ td { vertical-align: top }
 .dmv-title-table td { vertical-align: middle; font-family: verdana; font-size: 24pt; font-weight: bold; font-style: italic  }
 .dmv-message-positive { color: green }
 .dmv-message-negative { color: red }
+.dmv-main-table td { white-space: nowrap }
 .xforms-label { margin-right: 1em }

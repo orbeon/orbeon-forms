@@ -54,12 +54,15 @@
         <city/>
         <county/>
     </vehicle-location>
-    <old-address>
+    <address type="old">
         <street>
-            <number-name>321 Oak Avenue</number-name>
+            <number>321</number>
+            <name-1>Oak Avenue</name-1>
+            <name-2/>
         </street>
+        <apt/>
         <city>Mountain view</city>
         <state>CA</state>
         <zip>94041</zip>
-    </old-address>
+    </address>
 </form>

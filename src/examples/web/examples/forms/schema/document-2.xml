@@ -75,12 +75,15 @@
         <city/>
         <county/>
     </vehicle-location>
-    <old-address>
+    <address type="old">
         <street>
-            <number-name>1 Ocean Blvd.</number-name>
+            <number>1</number>
+            <name-1>Ocean Blvd.</name-1>
+            <name-2/>
         </street>
+        <apt/>
         <city>Monterey</city>
         <state>CA</state>
         <zip>93940</zip>
-    </old-address>
+    </address>
 </form>

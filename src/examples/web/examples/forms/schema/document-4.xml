@@ -54,12 +54,15 @@
         <city/>
         <county/>
     </vehicle-location>
-    <old-address>
+    <address type="old">
         <street>
-            <number-name>65 Mariposa St.</number-name>
+            <number>65</number>
+            <name-1>Mariposa St.</name-1>
+            <name-2/>
         </street>
+        <apt/>
         <city>San jose</city>
         <state>CA</state>
         <zip>95101</zip>
-    </old-address>
+    </address>
 </form>

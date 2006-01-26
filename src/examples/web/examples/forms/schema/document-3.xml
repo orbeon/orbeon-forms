@@ -54,12 +54,15 @@
         <city/>
         <county/>
     </vehicle-location>
-    <old-address>
+    <address type="old">
         <street>
-            <number-name>Mountain Road</number-name>
+            <number></number>
+            <name-1>Mountain Road</name-1>
+            <name-2/>
         </street>
+        <apt/>
         <city>Great Peak</city>
         <state>CO</state>
         <zip>11223</zip>
-    </old-address>
+    </address>
 </form>

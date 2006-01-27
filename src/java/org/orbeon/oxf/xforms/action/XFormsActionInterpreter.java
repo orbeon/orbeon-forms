@@ -876,7 +876,10 @@ public class XFormsActionInterpreter {
 
             final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
             final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
-xxx test on repeatControlInfo == null xxx
+
+            if (repeatControlInfo == null)
+                throw new OXFException("Invalid repeat id: " + repeatId);
+
             if (index <= 0) {
                 // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
                 // and the index is set to 1."

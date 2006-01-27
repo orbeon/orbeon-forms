@@ -82,7 +82,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // Send an error if needed and return immediately
                 int errorCode = config.errorCode;
-                if (errorCode != DEFAULT_ERROR_CODE) {
+                if (errorCode != DEFAULT_ERROR_CODE) { 
                     response.sendError(errorCode);
                     return;
                 }

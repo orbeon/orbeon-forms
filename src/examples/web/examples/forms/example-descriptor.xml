@@ -12,38 +12,84 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>OPS Forms Example</title>
+    <title>DMV Forms Example</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
+            <img src="/examples/forms/images/dmv-forms-logo.png" alt="DMV" align="right"/>
             <p>
-                This example handles web forms with XForms. It illustrates some best practices of
-                XForms and Orbeon Presentation Server, among others:
+                The DMV Forms example illustrates some of the best practices of XForms and Orbeon
+                Presentation Server to create web forms by leveraging a real-life example. Among
+                other things, it tackles:
             </p>
             <ul>
                 <li>
-                    <p>Using XForms to represent and display form data.</p>
+                    <p>
+                        <b>Using XForms to capture and display form data.</b> XForms was designed
+                        primarily to replace HTML forms, and of course it shines at capturing and
+                        displaying form data. In this example, we illustrate how to use XForms
+                        control to capture simple text data, dates, and checkboxes.
+                    </p>
                 </li>
                 <li>
-                    <p>Using XForms's XML Schema support to validate form data.</p>
+                    <p>
+                        <b>Using XML Schema to validate form data.</b> Data validation is a strong
+                        requirement of online forms. By using XForms's XML Schema support, you can
+                        write validation constraints once and use them both on the client and on
+                        the server. We also show how you can use other XForms constraints for
+                        example to ensure that certain fields are required.
+                    </p>
                 </li>
                 <li>
-                    <p>Using XForms to retrieve and save data from XML services.</p>
+                    <p>
+                        <b>Using XForms to retrieve and save data from XML services.</b> XForms is
+                        fully XML-aware, not only in its syntax, but in the way it communicates with
+                        the external world. This example retrieves and stores data through XML
+                        services thanks to the XForms submission facilities.
+                    </p>
                 </li>
                 <li>
-                    <p>Using <code>xforms:repeat</code> to repeat homogeneous data sections.</p>
+                    <p>
+                        <b>Repeating homogeneous data sections.</b> Repeated sections are common in
+                        forms. In this example we show how you can easily insert new rows and delete
+                        existing rows in a repeated section, using <code>xforms:repeat</code>,
+                        <code>xforms:insert</code> and <code>xforms:delete</code>.
+                    </p>
                 </li>
                 <li>
-                    <p>Producing forms in different formats such as HTML, XML or PDF.</p>
+                    <p>
+                        <b>Producing forms in different formats such as HTML, XML or PDF.</b>
+                        Storing form data in XML format makes it easy to exchange between systems.
+                        This example allows you to easily look at the resulting XML document. It
+                        also features a full template-based PDF export, which allows you to print an
+                        official resulting form. The PDF faciliaties are available in Orbeon
+                        PresentationServer.
+                    </p>
                 </li>
                 <li>
-                    <p>Implementing XML services quickly with the Page Flow Controler, XPL and the eXist XML database.</p>
+                    <p>
+                        <b>Implementing XML services.</b> Many technologies and platforms can be
+                        used to implement services, and Orbeon PresentationServer does not focus on
+                        services but on the presentation. However, we show how, with the Page Flow
+                        Controler, XPL and the eXist XML database, you can quickly implement XML
+                        services.
+                    </p>
                 </li>
                 <li>
-                    <p>Navigating between pages with page flow and XForms.</p>
+                    <p>
+                        <b>Navigating between pages with page flow and XForms.</b> XForms pages
+                        rarely exist in a vacuum, and are often part of a flow of pages. Here we
+                        show how you can easily go back and forth between a summary and detail page
+                        while passing information in the process.
+                    </p>
                 </li>
                 <li>
-                    <p>Externalizing resources to facilitate maintenance and localization.</p>
+                    <p>
+                        <b>Externalizing resources.</b> In order to facilitate maintenance and
+                        localization, externalizing text resources is often a good idea if not a
+                        must. We show how easy it is to do this with XForms so as to be fully
+                        prepared to localize your application.
+                    </p>
                 </li>
             </ul>
         </div>

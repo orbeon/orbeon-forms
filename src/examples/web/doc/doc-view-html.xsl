@@ -65,63 +65,65 @@
                                 <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                             </xhtml:ul>
                         </xhtml:td>
-                        <xhtml:td class="maincontent" valign="top" width="99%">
-                            <!-- Title -->
-                            <xhtml:h1><xsl:value-of select="/document/header/title"/></xhtml:h1>
-                            <!-- TOC  -->
-                            <xhtml:div id="mainbody">
-                                <xhtml:div class="minitoc">
-                                    <xhtml:ul>
-                                        <xsl:for-each select="/document/body/section">
-                                            <xsl:variable name="anchor" 
-                                                select="if (local-name(preceding-sibling::*[1]) = 'a') 
-                                                then preceding-sibling::a[1]/@name else generate-id()"/>
-                                            <xhtml:li>
-                                                <xsl:number level="single" count="section" format="1. "/>
-                                                <xhtml:a href="#{$anchor}">
-                                                    <xsl:value-of select="title"/>
-                                                </xhtml:a>
-                                                <!-- Second level -->
-                                                <xsl:if test="section">
-                                                    <xhtml:ul>
-                                                        <xsl:variable name="subsection-count" select="count(section)"/>
-                                                        <xsl:for-each select="section">
-                                                            <xsl:variable name="anchor" 
-                                                                select="if (local-name(preceding-sibling::*[1]) = 'a')
-                                                                then preceding-sibling::a[1]/@name else generate-id()"/>
-                                                            <xhtml:li>
-                                                                <xsl:number level="multiple" count="section" format="1.1. "/>
-                                                                <xhtml:a href="#{$anchor}">
-                                                                    <xsl:value-of select="title"/>
-                                                                </xhtml:a>
-                                                                <!-- Third -->
-                                                                <xsl:if test="section">
-                                                                    <xhtml:ul>
-                                                                        <xsl:variable name="subsubsection-count" select="count(section)"/>
-                                                                        <xsl:for-each select="section">
-                                                                            <xsl:variable name="anchor" 
-                                                                                select="if (local-name(preceding-sibling::*[1]) = 'a')
-                                                                                then preceding-sibling::a[1]/@name else generate-id()"/>
-                                                                            <xhtml:li>
-                                                                                <xsl:number level="multiple" count="section" format="1.1.1. "/>
-                                                                                <xhtml:a href="#{$anchor}">
-                                                                                    <xsl:value-of select="title"/>
-                                                                                </xhtml:a>
-                                                                            </xhtml:li>
-                                                                        </xsl:for-each>
-                                                                    </xhtml:ul>
-                                                                </xsl:if>
-                                                            </xhtml:li>
-                                                        </xsl:for-each>
-                                                    </xhtml:ul>
-                                                </xsl:if>
-                                            </xhtml:li>
-                                        </xsl:for-each>
-                                    </xhtml:ul>
+                        <xhtml:td id="maincontent">
+                            <xhtml:div class="maincontent">
+                                <!-- Title -->
+                                <xhtml:h1><xsl:value-of select="/document/header/title"/></xhtml:h1>
+                                <!-- TOC  -->
+                                <xhtml:div id="mainbody">
+                                    <xhtml:div class="minitoc">
+                                        <xhtml:ul>
+                                            <xsl:for-each select="/document/body/section">
+                                                <xsl:variable name="anchor"
+                                                    select="if (local-name(preceding-sibling::*[1]) = 'a')
+                                                    then preceding-sibling::a[1]/@name else generate-id()"/>
+                                                <xhtml:li>
+                                                    <xsl:number level="single" count="section" format="1. "/>
+                                                    <xhtml:a href="#{$anchor}">
+                                                        <xsl:value-of select="title"/>
+                                                    </xhtml:a>
+                                                    <!-- Second level -->
+                                                    <xsl:if test="section">
+                                                        <xhtml:ul>
+                                                            <xsl:variable name="subsection-count" select="count(section)"/>
+                                                            <xsl:for-each select="section">
+                                                                <xsl:variable name="anchor"
+                                                                    select="if (local-name(preceding-sibling::*[1]) = 'a')
+                                                                    then preceding-sibling::a[1]/@name else generate-id()"/>
+                                                                <xhtml:li>
+                                                                    <xsl:number level="multiple" count="section" format="1.1. "/>
+                                                                    <xhtml:a href="#{$anchor}">
+                                                                        <xsl:value-of select="title"/>
+                                                                    </xhtml:a>
+                                                                    <!-- Third -->
+                                                                    <xsl:if test="section">
+                                                                        <xhtml:ul>
+                                                                            <xsl:variable name="subsubsection-count" select="count(section)"/>
+                                                                            <xsl:for-each select="section">
+                                                                                <xsl:variable name="anchor"
+                                                                                    select="if (local-name(preceding-sibling::*[1]) = 'a')
+                                                                                    then preceding-sibling::a[1]/@name else generate-id()"/>
+                                                                                <xhtml:li>
+                                                                                    <xsl:number level="multiple" count="section" format="1.1.1. "/>
+                                                                                    <xhtml:a href="#{$anchor}">
+                                                                                        <xsl:value-of select="title"/>
+                                                                                    </xhtml:a>
+                                                                                </xhtml:li>
+                                                                            </xsl:for-each>
+                                                                        </xhtml:ul>
+                                                                    </xsl:if>
+                                                                </xhtml:li>
+                                                            </xsl:for-each>
+                                                        </xhtml:ul>
+                                                    </xsl:if>
+                                                </xhtml:li>
+                                            </xsl:for-each>
+                                        </xhtml:ul>
+                                    </xhtml:div>
                                 </xhtml:div>
+                                <!-- Body -->
+                                <xsl:apply-templates select="/document/body/*"/>
                             </xhtml:div>
-                            <!-- Body -->
-                            <xsl:apply-templates select="/document/body/*"/>
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
@@ -160,7 +162,9 @@
             <xsl:number level="multiple" count="section" format="1.1.1. "/>
             <xsl:value-of select="title"/>
         </xhtml:h2>
-        <xsl:apply-templates select="* except title"/>
+        <div class="ops-doc-section">
+            <xsl:apply-templates select="* except title"/>
+        </div>
     </xsl:template>
 
     <xsl:template match="section[count(ancestor::section) = 1]">
@@ -169,7 +173,9 @@
             <xsl:number level="multiple" count="section" format="1.1. "/>
             <xsl:value-of select="title"/>
         </xhtml:h3>
-        <xsl:apply-templates select="* except title"/>
+        <div class="ops-doc-section">
+            <xsl:apply-templates select="* except title"/>
+        </div>
     </xsl:template>
 
     <xsl:template match="section[count(ancestor::section) = 2]">
@@ -178,7 +184,9 @@
             <xsl:number level="multiple" count="section" format="1.1.1. "/>
             <xsl:value-of select="title"/>
         </xhtml:h4>
-        <xsl:apply-templates select="* except title"/>
+        <div class="ops-doc-section">
+            <xsl:apply-templates select="* except title"/>
+        </div>
     </xsl:template>
 
     <xsl:template match="note | notes | warning | fixme">
@@ -253,12 +261,6 @@
             <xsl:if test="@bgcolor"><xsl:attribute name="bgcolor"><xsl:value-of select="@bgcolor"/></xsl:attribute></xsl:if>
             <xsl:apply-templates/>
         </xhtml:table>
-    </xsl:template>
-    
-    <xsl:template match="*[parent::section]" priority="2">
-        <xhtml:div id="mainbody">
-            <xsl:next-match/>
-        </xhtml:div>
     </xsl:template>
 
 </xsl:stylesheet>

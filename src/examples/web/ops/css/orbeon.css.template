@@ -126,6 +126,9 @@ fieldset {
     background: white;
     border-left: 1px solid &light-color;;
     border-right: 1px solid &dark-color;;
+    vertical-align: top;
+    width: 99%;
+    line-height: 13pt;
 }
 
 .cleaner {
@@ -188,7 +191,6 @@ h1 {
     margin-right: -0.8em;
     border-bottom: solid 1px &dark-color;;
     font-size: 10pt;
-    line-height: 180%;
 }
 
 .subtab {
@@ -344,8 +346,10 @@ a:hover {
 }
 
 #mainbody {
-    padding-left: 1em;
-    padding-right: 1em;
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    padding: .5em;
 }
 
 .box {
@@ -431,6 +435,10 @@ a:hover {
     margin-left: 2em;
     padding-left: 0em;
     border-left: 0em;
+}
+
+.ops-doc-section {
+    padding-left: 1em;
 }
 
 ul {

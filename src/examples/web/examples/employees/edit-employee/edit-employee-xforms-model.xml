@@ -14,7 +14,7 @@
     limitations under the License.
 -->
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
-        schema="form-schema.xsd">
+        schema="oxf:/examples/employees/edit-employee/form-schema.xsd">
     <xforms:instance>
         <form>
             <action/>

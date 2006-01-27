@@ -11,7 +11,7 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" schema="highway.rng">
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" schema="oxf:/examples/ca-traffic/highway.rng">
     <xforms:instance>
         <highway/>
     </xforms:instance>

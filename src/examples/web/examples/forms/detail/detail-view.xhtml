@@ -27,10 +27,6 @@
         <!-- Main XForms model -->
         <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd">
 
-            <!-- This action performs initializations necessary upon initialization -->
-            <xforms:action ev:event="xforms-ready">
-            </xforms:action>
-
             <!-- This action clears all the fields of the mailing address -->
             <xforms:action ev:event="dmv-clear-mailing-address">
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>
@@ -58,11 +54,29 @@
 
             <xforms:bind nodeset="instance('main-instance')">
                 <!-- Metadata -->
-                <xforms:bind nodeset="document-date" calculate="current-dateTime()"/>
+                <xforms:bind nodeset="document-date" calculate="current-dateTime()" type="xs:dateTime"/>
                 <!-- Business data -->
-                <xforms:bind nodeset="//dmv:personal-information">
-                    <!-- Date types -->
-                    <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                <xforms:bind nodeset="//dmv:form">
+                    <xforms:bind nodeset="dmv:personal-information">
+                        <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                        <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
+                        <xforms:bind nodeset="dmv:driver-license-number | dmv:birth-date" required="true()"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="dmv:address-information">
+                        <xforms:bind nodeset="dmv:address">
+                            <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                            <xforms:bind nodeset="dmv:city | dmv:state | dmv:zip" required="true()"/>
+                        </xforms:bind>
+                    </xforms:bind>
+                    <xforms:bind nodeset="dmv:vehicle-information">
+                        <xforms:bind nodeset="dmv:vehicles/dmv:vehicle">
+                            <xforms:bind nodeset="dmv:plate-number | dmv:vin" required="true()"/>
+                        </xforms:bind>
+                        <xforms:bind nodeset="dmv:vehicle-address">
+                            <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                            <xforms:bind nodeset="dmv:city | dmv:county" required="true()"/>
+                        </xforms:bind>
+                    </xforms:bind>
                 </xforms:bind>
                 <!-- Don't care about xml:base -->
                 <xforms:bind nodeset="//@xml:base" relevant="false()"/>

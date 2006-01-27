@@ -105,11 +105,11 @@
                                 <xforms:group>
                                     <xforms:load ev:event="DOMActivate" resource="/forms/detail"/>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>New Document</xforms:label>
+                                        <xforms:label>New Form</xforms:label>
                                         <xxforms:img src="/images/add.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>New Document</xforms:label>
+                                        <xforms:label>New Form</xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -193,6 +193,10 @@
                     </table>
 
                     <xforms:group ref="instance('control-instance')/non-empty">
+                        <p>
+                            <i>Please select a form in order to perform an operation, or select
+                            "New Form" to create a new blank form.</i>
+                        </p>
                         <table class="dmv-gridtable">
                             <tr>
                                 <th>No.</th>

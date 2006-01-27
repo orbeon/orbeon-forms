@@ -17,7 +17,8 @@
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This example handles web forms with XForms. It illustrates:
+                This example handles web forms with XForms. It illustrates some best practices of
+                XForms and Orbeon Presentation Server, among others:
             </p>
             <ul>
                 <li>
@@ -30,13 +31,19 @@
                     <p>Using XForms to retrieve and save data from XML services.</p>
                 </li>
                 <li>
-                    <p>Producing forms in formats, such as HTML, XML or PDF.</p>
+                    <p>Using <code>xforms:repeat</code> to repeat homogeneous data sections.</p>
+                </li>
+                <li>
+                    <p>Producing forms in different formats such as HTML, XML or PDF.</p>
+                </li>
+                <li>
+                    <p>Implementing XML services quickly with the Page Flow Controler, XPL and the eXist XML database.</p>
                 </li>
                 <li>
                     <p>Navigating between pages with page flow and XForms.</p>
                 </li>
                 <li>
-                    <p>And much more!</p>
+                    <p>Externalizing resources to facilitate maintenance and localization.</p>
                 </li>
             </ul>
         </div>

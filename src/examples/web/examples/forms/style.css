@@ -11,7 +11,6 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 */
-
 th { padding: 1em; padding-top: 0px; text-align: left; vertical-align: top }
 td { vertical-align: top }
 .dmv-main-table { border: 2px solid #e9d3e6 }
@@ -38,7 +37,7 @@ td { vertical-align: top }
 .dmv-gridtable th { background-color: #e9d3e6; text-align: center; padding: .3em; border: 1px solid #8e3694 }
 .dmv-gridtable td { padding: .3em; border: 1px solid #8e3694; margin: 0px }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; text-align: center }
-.dmv-title-table td { vertical-align: middle; font-family: verdana; font-size: 24pt; font-weight: bold; font-style: italic  }
+.dmv-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana }
 .dmv-message-positive { color: green }
 .dmv-message-negative { color: red }
 .dmv-main-table td { white-space: nowrap }

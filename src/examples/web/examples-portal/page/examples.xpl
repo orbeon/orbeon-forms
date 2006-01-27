@@ -217,42 +217,44 @@
                                             </xhtml:ul>
                                         </xf:group>
                                     </xhtml:td>
-                                    <xhtml:td class="maincontent" valign="top" width="99%">
-                                        <!-- Title -->
-                                        <h1>
-                                            <xsl:choose>
-                                                <xsl:when test="$visible-portlet/portlet:portlet-title">
-                                                    <xsl:value-of select="$visible-portlet/portlet:portlet-title"/>
-                                                </xsl:when>
-                                                <xsl:otherwise>[Untitled]</xsl:otherwise>
-                                            </xsl:choose>
-                                        </h1>
-                                        <xhtml:table width="100%" cellpadding="0" cellspacing="0" border="0"><xhtml:tr><xhtml:td id="mainbody">
-                                            <!-- Body -->
-                                            <xsl:if test="not($visible-portlet/@window-state = 'minimized')">
-                                                <!-- Encapsulate everything in a div that makes sure URLs won't be rewritten further -->
-                                                <xhtml:div f:url-norewrite="true" portlet:is-portlet-content="true">
-                                                    <xsl:choose>
-                                                        <xsl:when test="$visible-portlet/portlet:body/html">
-                                                            <!-- When parsing text/html with Tidy, we will have a root HTML element -->
-                                                            <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/link"/>
-                                                            <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/script"/>
-                                                            <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/style"/>
-    
-                                                            <xsl:apply-templates select="$visible-portlet/portlet:body//body[1]/node()">
-                                                                <xsl:with-param name="portlet-id" select="$visible-portlet/@id" tunnel="yes"/>
-                                                            </xsl:apply-templates>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <!-- Otherwise, just assume it is a fragment -->
-                                                            <xsl:apply-templates select="$visible-portlet/portlet:body/node()">
-                                                                <xsl:with-param name="portlet-id" select="$visible-portlet/@id" tunnel="yes"/>
-                                                            </xsl:apply-templates>
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                </xhtml:div>
-                                            </xsl:if>
-                                        </xhtml:td></xhtml:tr></xhtml:table>
+                                    <xhtml:td id="maincontent" valign="top" width="99%">
+                                        <xhtml:div class="maincontent">
+                                            <!-- Title -->
+                                            <xhtml:h1>
+                                                <xsl:choose>
+                                                    <xsl:when test="$visible-portlet/portlet:portlet-title">
+                                                        <xsl:value-of select="$visible-portlet/portlet:portlet-title"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>[Untitled]</xsl:otherwise>
+                                                </xsl:choose>
+                                            </xhtml:h1>
+                                            <xhtml:table width="100%" cellpadding="0" cellspacing="0" border="0"><xhtml:tr><xhtml:td id="mainbody">
+                                                <!-- Body -->
+                                                <xsl:if test="not($visible-portlet/@window-state = 'minimized')">
+                                                    <!-- Encapsulate everything in a div that makes sure URLs won't be rewritten further -->
+                                                    <xhtml:div f:url-norewrite="true" portlet:is-portlet-content="true">
+                                                        <xsl:choose>
+                                                            <xsl:when test="$visible-portlet/portlet:body/html">
+                                                                <!-- When parsing text/html with Tidy, we will have a root HTML element -->
+                                                                <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/link"/>
+                                                                <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/script"/>
+                                                                <xsl:copy-of select="$visible-portlet/portlet:body//head[1]/style"/>
+
+                                                                <xsl:apply-templates select="$visible-portlet/portlet:body//body[1]/node()">
+                                                                    <xsl:with-param name="portlet-id" select="$visible-portlet/@id" tunnel="yes"/>
+                                                                </xsl:apply-templates>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <!-- Otherwise, just assume it is a fragment -->
+                                                                <xsl:apply-templates select="$visible-portlet/portlet:body/node()">
+                                                                    <xsl:with-param name="portlet-id" select="$visible-portlet/@id" tunnel="yes"/>
+                                                                </xsl:apply-templates>
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xhtml:div>
+                                                </xsl:if>
+                                            </xhtml:td></xhtml:tr></xhtml:table>
+                                        </xhtml:div>
                                     </xhtml:td>
                                 </xhtml:tr>
                             </xhtml:table>

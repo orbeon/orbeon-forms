@@ -19,7 +19,6 @@ body {
 body, input, button, table {
     font-family: Arial, Helvetica, Geneva, sans-serif;
     font-size: 9pt;
-    line-height: 13pt;
 }
 
 th {
@@ -122,15 +121,11 @@ fieldset {
     background-color: &xlight-color;;
 }
 
-.maincontent {
+#maincontent {
     margin:0px;
     background: white;
     border-left: 1px solid &light-color;;
     border-right: 1px solid &dark-color;;
-}
-
-.maincontent .maincontent {
-    border: none;
 }
 
 .cleaner {
@@ -178,6 +173,7 @@ h1 {
     letter-spacing: .1em;
     font-weight: bold;
     clear: both;
+    line-height: 13pt;
 }
 
 .subtabs {

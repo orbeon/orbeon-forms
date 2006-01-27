@@ -15,6 +15,7 @@
 th { padding: 1em; padding-top: 0px; text-align: left; vertical-align: top }
 td { vertical-align: top }
 .dmv-main-table { border: 2px solid #e9d3e6 }
+.dmv-main-table th p { text-align: center }
 .dmv-actions-table td { white-space: nowrap; vertical-align: middle;}
 .dmv-actions-table input { vertical-align: middle;}
 .dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694; }

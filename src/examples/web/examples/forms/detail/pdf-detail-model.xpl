@@ -42,6 +42,7 @@
 
                 <field left-position="108.5" top-position="255" spacing="15.9" font-family="Courier" font-size="14" size="5" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:street/dmv:number"/>
                 <field left-position="204.5" top-position="255" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:street/dmv:name-1"/>
+                <field left-position="204.5" top-position="279" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:street/dmv:name-2"/>
                 <field left-position="108.5" top-position="288" spacing="15.9" font-family="Courier" font-size="14" size="4" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:apt"/>
                 <field left-position="108.5" top-position="318" spacing="15.9" font-family="Courier" font-size="14" size="22" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:city"/>
                 <field left-position="471" top-position="318" spacing="15.9" font-family="Courier" font-size="14" size="2" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'residence']/dmv:state"/>
@@ -49,6 +50,7 @@
 
                 <field left-position="108.5" top-position="354" spacing="15.9" font-family="Courier" font-size="14" size="5" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>
                 <field left-position="204.5" top-position="354" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:street/dmv:name-1"/>
+                <field left-position="204.5" top-position="378" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:street/dmv:name-2"/>
                 <field left-position="108.5" top-position="387" spacing="15.9" font-family="Courier" font-size="14" size="4" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:apt"/>
                 <field left-position="108.5" top-position="417" spacing="15.9" font-family="Courier" font-size="14" size="22" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:city"/>
                 <field left-position="471" top-position="417" spacing="15.9" font-family="Courier" font-size="14" size="2" ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'mailing']/dmv:state"/>
@@ -65,6 +67,26 @@
                 <field left-position="549" top-position="512.5" spacing="15.9" font-family="Courier" font-size="14" size="1" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicles/dmv:vehicle[3]/dmv:leased"/>
 
                 <field left-position="108.5" top-position="547" spacing="15.9" font-family="Courier" font-size="14" size="22" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:leased-vehicles/dmv:company-name"/>
+
+                <field left-position="108.5" top-position="582" spacing="15.9" font-family="Courier" font-size="14" size="5" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicle-address/dmv:street/dmv:number"/>
+                <field left-position="204.5" top-position="582" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicle-address/dmv:street/dmv:name-1"/>
+                <field left-position="204.5" top-position="606" spacing="15.9" font-family="Courier" font-size="14" size="21" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicle-address/dmv:street/dmv:name-2"/>
+                <field left-position="108.5" top-position="638" spacing="15.9" font-family="Courier" font-size="14" size="16" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicle-address/dmv:city"/>
+                <field left-position="375" top-position="638" spacing="15.9" font-family="Courier" font-size="14" size="14" ref="/document-info/document/dmv:form/dmv:vehicle-information/dmv:vehicle-address/dmv:county"/>
+
+                <field left-position="108.5" top-position="670" spacing="7" font-family="Courier" font-size="10" size="49"
+                       ref="concat(/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:street/dmv:number, ' ',
+                                   /document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:street/dmv:name-1, ' ',
+                                   /document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:street/dmv:name-2)"/>
+
+                <field left-position="334" top-position="670" spacing="7" font-family="Courier" font-size="10" size="27"
+                       ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:city"/>
+
+                <field left-position="466" top-position="670" spacing="7" font-family="Courier" font-size="10" size="27"
+                       ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:state"/>
+
+                <field left-position="530" top-position="670" spacing="7" font-family="Courier" font-size="10" size="27"
+                       ref="/document-info/document/dmv:form/dmv:address-information/dmv:address[@type = 'old']/dmv:zip"/>
 
                 <field left-position="435" top-position="750.2" spacing="15.9" font-family="Courier" font-size="14" size="10"
                        ref="concat(substring(/document-info/document-date, 6, 2), ' ',

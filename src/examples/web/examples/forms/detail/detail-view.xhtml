@@ -464,57 +464,6 @@
                                 Forms If Necessary
                             </th>
                             <td>
-                                <table class="dmv-gridtable">
-                                    <tr>
-                                        <th>California Plate / CF / Placard No.</th>
-                                        <th>Vehicle Id or Vessel Hull Id Number</th>
-                                        <th>Check If Leased</th>
-                                    </tr>
-                                    <xforms:repeat nodeset="dmv:vehicle" id="vehicles-repeat">
-                                        <tr>
-                                            <td>
-                                                <xforms:input incremental="true" ref="dmv:plate-number" class="dmv-plate-number">
-                                                    <xforms:label/>
-                                                    <xforms:alert ref="instance('messages-instance')/alerts/plate-number"/>
-                                                </xforms:input>
-                                            </td>
-                                            <td>
-                                                <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
-                                                    <xforms:label/>
-                                                    <xforms:alert ref="instance('messages-instance')/alerts/vin"/>
-                                                    <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
-                                                </xforms:input>
-                                            </td>
-                                            <td align="center">
-                                                <xforms:select ref="dmv:leased" appearance="full">
-                                                    <xforms:label/>
-                                                    <xforms:item>
-                                                        <xforms:label></xforms:label>
-                                                        <xforms:value>Y</xforms:value>
-                                                    </xforms:item>
-                                                </xforms:select>
-                                            </td>
-                                        </tr>
-                                    </xforms:repeat>
-                                    <tr/><!-- This is to work around a bug in IE -->
-                                </table>
-
-                                <!-- TODO: Fix bug in xforms:repeat to enable this
-                                <xforms:repeat nodeset="instance('plate-instance')/plate[1]">
-                                    <table class="dmv-plate-table">
-                                        <tr>
-                                            <td>
-                                                <span style="position: relative; top: 15px">
-                                                    <xforms:repeat nodeset="character[. != '']">
-                                                        <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', ., '_small.gif')"/>
-                                                    </xforms:repeat>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </xforms:repeat>
-                                -->
-
                                 <!-- Advanced version of the triggers -->
                                 <table class="dmv-actions-table">
                                     <tr>
@@ -565,6 +514,57 @@
                                         <!--<xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>-->
                                     <!--</xforms:action>-->
                                 <!--</xforms:trigger>-->
+
+                                <table class="dmv-gridtable">
+                                    <tr>
+                                        <th>California Plate / CF / Placard No.</th>
+                                        <th>Vehicle Id or Vessel Hull Id Number</th>
+                                        <th>Check If Leased</th>
+                                    </tr>
+                                    <xforms:repeat nodeset="dmv:vehicle" id="vehicles-repeat">
+                                        <tr>
+                                            <td>
+                                                <xforms:input incremental="true" ref="dmv:plate-number" class="dmv-plate-number">
+                                                    <xforms:label/>
+                                                    <xforms:alert ref="instance('messages-instance')/alerts/plate-number"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
+                                                    <xforms:label/>
+                                                    <xforms:alert ref="instance('messages-instance')/alerts/vin"/>
+                                                    <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
+                                                </xforms:input>
+                                            </td>
+                                            <td align="center">
+                                                <xforms:select ref="dmv:leased" appearance="full">
+                                                    <xforms:label/>
+                                                    <xforms:item>
+                                                        <xforms:label></xforms:label>
+                                                        <xforms:value>Y</xforms:value>
+                                                    </xforms:item>
+                                                </xforms:select>
+                                            </td>
+                                        </tr>
+                                    </xforms:repeat>
+                                    <tr/><!-- This is to work around a bug in IE -->
+                                </table>
+
+                                <!-- TODO: Fix bug in xforms:repeat to enable this
+                                <xforms:repeat nodeset="instance('plate-instance')/plate[1]">
+                                    <table class="dmv-plate-table">
+                                        <tr>
+                                            <td>
+                                                <span style="position: relative; top: 15px">
+                                                    <xforms:repeat nodeset="character[. != '']">
+                                                        <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', ., '_small.gif')"/>
+                                                    </xforms:repeat>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </xforms:repeat>
+                                -->
                             </td>
                         </tr>
                     </xforms:group>

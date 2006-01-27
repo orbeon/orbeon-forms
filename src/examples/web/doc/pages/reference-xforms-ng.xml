@@ -2457,113 +2457,149 @@
             </section>
             -->
         </section>
-        <a name="xforms-extensions"/>
+        <a name="extensions"/>
         <section>
             <title>Extensions</title>
+            <a name="xforms11-extensions"/>
             <section>
-                <title>Media Type for <code>xforms:output</code></title>
-                <p>
-                    In XForms 1.0, <code>xforms:output</code> is used to display text. However,
-                    based on a proposal in a draft version of XForms 1.1, OPS supports a
-                    <code>mediatype</code> attribute on that element.
-                </p>
-                <a name="xforms-image-mediatype"/>
+                <title>XForms 1.1 Extensions</title>
                 <section>
-                    <title>Image Types</title>
+                    <title>Media Type for <code>xforms:output</code></title>
                     <p>
-                         For the <code>&lt;xforms:output></code> control to display an image, you
-                         need to:
+                        In XForms 1.0, <code>xforms:output</code> is used to display text. However,
+                        based on a proposal in a draft version of XForms 1.1, OPS supports a
+                        <code>mediatype</code> attribute on that element.
                     </p>
-                    <ul>
-                        <li>
-                            <p>
-                                Have a <code>mediatype</code> attribute on the
-                                <code>&lt;xforms:output></code>. That attribute must refer to an
-                                image, such as <code>image/*</code> or <code>image/jpeg</code>.
-                            </p>
-                        </li>
-                       <li>
-                            <p>
-                                Use the <code>value</code> attribute on
-                                <code>&lt;xforms:output></code> or bind to the control to a node
-                                without type or with an <code>xs:anyURI</code> type.
-                            </p>
-                        </li>
-                   </ul>
-                    <p>
-                        The resulting value is interpreted a URI pointing to an image. The image
-                        will display in place of the <code>xforms:output</code>. When a single-node
-                        binding is used, it is possible to dynamically change the image pointed to.
-                        For example:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
-                    </xml-source>
-                    <xml-source show-namespaces="false">
-                        <xforms:model>
-                            <xforms:instance>
-                                <image-uri/>
+                    <a name="xforms-image-mediatype"/>
+                    <section>
+                        <title>Image Types</title>
+                        <p>
+                             For the <code>&lt;xforms:output></code> control to display an image, you
+                             need to:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Have a <code>mediatype</code> attribute on the
+                                    <code>&lt;xforms:output></code>. That attribute must refer to an
+                                    image, such as <code>image/*</code> or <code>image/jpeg</code>.
+                                </p>
+                            </li>
+                           <li>
+                                <p>
+                                    Use the <code>value</code> attribute on
+                                    <code>&lt;xforms:output></code> or bind to the control to a node
+                                    without type or with an <code>xs:anyURI</code> type.
+                                </p>
+                            </li>
+                       </ul>
+                        <p>
+                            The resulting value is interpreted a URI pointing to an image. The image
+                            will display in place of the <code>xforms:output</code>. When a single-node
+                            binding is used, it is possible to dynamically change the image pointed to.
+                            For example:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:output mediatype="image/*" value="'/images/moon.jpg'"/>
+                        </xml-source>
+                        <xml-source show-namespaces="false">
+                            <xforms:model>
+                                <xforms:instance>
+                                    <image-uri/>
+                                </xforms:instance>
+                                <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
+                            </xforms:model>
+                            ...
+                            <xforms:output mediatype="image/*" ref="image-uri"/>
+                        </xml-source>
+                        <note>
+                            It is not yet possible to directly embed image data in an XForms instance
+                            using the <code>xs:base64Binary</code> type.
+                        </note>
+                    </section>
+                    <section>
+                        <title>HTML Type</title>
+                        <p>
+                            When an <code>xforms:output</code> control has a <code>mediatype</code>
+                            attribute with value <code>text/html</code>, the value of the node to which
+                            the control is bound is interpreted as HTML content. Consider the following
+                            XForms instance:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:instance id="my-instance">
+                                <form>
+                                    <html-content>
+                                        This is in &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt;!
+                                    </html-content>
+                                </form>
                             </xforms:instance>
-                            <xforms:bind nodeset="image-uri" type="xs:anyURI"/>
-                        </xforms:model>
-                        ...
-                        <xforms:output mediatype="image/*" ref="image-uri"/>
-                    </xml-source>
-                    <note>
-                        It is not yet possible to directly embed image data in an XForms instance
-                        using the <code>xs:base64Binary</code> type.
-                    </note>
+                        </xml-source>
+                        <p>
+                            You bind an <code>xforms:output</code> control to the
+                            <code>html-content</code> node as follows:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
+                        </xml-source>
+                        <p>
+                            This will display the result as HTML, as expected: "This is in in
+                            <b>bold</b>!". If the <code>mediatype</code> is not specified, the result
+                            would be instead: "This is in in &lt;b>bold&lt;/b>!". In the XForms
+                            instance, the HTML content must be escaped as text. On the other hand, the
+                            following content will not work as expected:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:instance>
+                                <form>
+                                    <html-content>
+                                        This is in in <b>bold</b>!
+                                    </html-content>
+                                </form>
+                            </xforms:instance>
+                        </xml-source>
+                        <note>
+                            When using a <code>mediatype="text/html"</code>, an HTML
+                            <code>&lt;div></code> element will be generated by the XForms engine to hold
+                            the HTML data. As in HTML a <code>&lt;div></code> cannot
+                            be embedded into a <code>&lt;p></code>, if you have a
+                            <code>&lt;xforms:output mediatype="text/html"></code> control, you should
+                            not put that control into a <code>&lt;xhtml:p></code>.
+                        </note>
+                    </section>
                 </section>
                 <section>
-                    <title>HTML Type</title>
+                    <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
-                        When an <code>xforms:output</code> control has a <code>mediatype</code>
-                        attribute with value <code>text/html</code>, the value of the node to which
-                        the control is bound is interpreted as HTML content. Consider the following
-                        XForms instance:
+                        Based on a proposal in a draft version of XForms 1.1, OPS supports an
+                        <code>origin</code> attribute on the <code>xforms:insert</code> action. This
+                        attribute allows specifying the source node to use as template. This allows
+                        storing templates separately from the node-set specified by the
+                        <code>nodeset</code> attribute. For example:
                     </p>
                     <xml-source show-namespaces="false">
-                        <xforms:instance id="my-instance">
-                            <form>
-                                <html-content>
-                                    This is in &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt;!
-                                </html-content>
-                            </form>
+                        <xforms:insert nodeset="address" at="last()" position="after" origin="instance('template-instance')"/>
+                    </xml-source>
+                    <p>
+                        The template copied in this case comes from an XForms instance:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="template-instance">
+                            <address>
+                                <street>
+                                    <number/>
+                                    <name-1/>
+                                    <name-2/>
+                                </street>
+                                <apt/>
+                                <city/>
+                                <state/>
+                                <zip/>
+                            </address>
                         </xforms:instance>
                     </xml-source>
-                    <p>
-                        You bind an <code>xforms:output</code> control to the
-                        <code>html-content</code> node as follows:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
-                    </xml-source>
-                    <p>
-                        This will display the result as HTML, as expected: "This is in in
-                        <b>bold</b>!". If the <code>mediatype</code> is not specified, the result
-                        would be instead: "This is in in &lt;b>bold&lt;/b>!". In the XForms
-                        instance, the HTML content must be escaped as text. On the other hand, the
-                        following content will not work as expected:
-                    </p>
-                    <xml-source show-namespaces="false">
-                        <xforms:instance>
-                            <form>
-                                <html-content>
-                                    This is in in <b>bold</b>!
-                                </html-content>
-                            </form>
-                        </xforms:instance>
-                    </xml-source>
-                    <note>
-                        When using a <code>mediatype="text/html"</code>, an HTML
-                        <code>&lt;div></code> element will be generated by the XForms engine to hold
-                        the HTML data. As in HTML a <code>&lt;div></code> cannot
-                        be embedded into a <code>&lt;p></code>, if you have a
-                        <code>&lt;xforms:output mediatype="text/html"></code> control, you should
-                        not put that control into a <code>&lt;xhtml:p></code>.
-                    </note>
                 </section>
             </section>
+            <a name="xpath-extensions"/>
             <section>
                 <title>XPath Extension Functions</title>
                 <p>
@@ -2571,7 +2607,7 @@
                     in XForms documents.
                 </p>
                 <section>
-                    <title>XSLT 2.0 Extensions</title>
+                    <title>XSLT 2.0 Functions</title>
                     <p>
                         When using XPath 2.0, the following functions from XSLT 2.0 are also available:
                     </p>
@@ -2584,7 +2620,7 @@
                 </section>
                 <a name="ops-extensions"/>
                 <section>
-                    <title>OPS Extensions</title>
+                    <title>OPS Functions</title>
                     <p>
                         The following functions are implemented:
                     </p>
@@ -2644,7 +2680,7 @@
                     </ul>
                 </section>
                 <section>
-                    <title>eXForms Extensions</title>
+                    <title>eXForms Functions</title>
                     <p>
                         <a href="http://www.exforms.org/">eXForms</a> is a suggested set of
                         extensions to XForms 1.0, grouped into different modules. OPS supports the

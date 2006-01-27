@@ -28,7 +28,7 @@
                         <b>Using XForms to capture and display form data.</b> XForms was designed
                         primarily to replace HTML forms, and of course it shines at capturing and
                         displaying form data. In this example, we illustrate how to use XForms
-                        control to capture simple text data, dates, and checkboxes.
+                        control to capture simple text data, dates, and flags.
                     </p>
                 </li>
                 <li>
@@ -53,34 +53,36 @@
                         <b>Repeating homogeneous data sections.</b> Repeated sections are common in
                         forms. In this example we show how you can easily insert new rows and delete
                         existing rows in a repeated section, using <code>xforms:repeat</code>,
-                        <code>xforms:insert</code> and <code>xforms:delete</code>.
+                        <code>xforms:insert</code> and <code>xforms:delete</code>, while controlling
+                        the minimal and maximal number of rows.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Producing forms in different formats such as HTML, XML or PDF.</b>
-                        Storing form data in XML format makes it easy to exchange between systems.
-                        This example allows you to easily look at the resulting XML document. It
-                        also features a full template-based PDF export, which allows you to print an
-                        official resulting form. The PDF faciliaties are available in Orbeon
+                        <b>Producing forms in formats such as HTML, XML or PDF.</b> Storing form
+                        data in XML format makes it easy to exchange between systems. This example
+                        allows you to easily look at the resulting XML document. It also features a
+                        full template-based PDF export, which allows you to print an official
+                        resulting form. The PDF facilities are available in Orbeon
                         PresentationServer.
                     </p>
                 </li>
                 <li>
                     <p>
                         <b>Implementing XML services.</b> Many technologies and platforms can be
-                        used to implement services, and Orbeon PresentationServer does not focus on
-                        services but on the presentation. However, we show how, with the Page Flow
-                        Controler, XPL and the eXist XML database, you can quickly implement XML
-                        services.
+                        used to implement services. Orbeon PresentationServer does not focus on
+                        services but on the presentation, however, we show how you can quickly
+                        implement XML services with OPS's Page Flow Controler, XPL and the eXist
+                        XML database,
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Navigating between pages with page flow and XForms.</b> XForms pages
-                        rarely exist in a vacuum, and are often part of a flow of pages. Here we
-                        show how you can easily go back and forth between a summary and detail page
-                        while passing information in the process.
+                        <b>Navigating between pages.</b> XForms pages rarely exist in a vacuum, and
+                        are often part of a flow of pages. Here we show how you can easily go back
+                        and forth between a summary and detail page while passing information in the
+                        process using the OPS Page Flow Controller and XForms facilities such as
+                        <code>xforms:load</code>.
                     </p>
                 </li>
                 <li>

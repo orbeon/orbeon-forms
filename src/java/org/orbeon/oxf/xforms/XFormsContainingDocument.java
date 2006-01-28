@@ -314,6 +314,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
+        // Don't allow for DOMActivate on non-relevant control
+        if (eventName.equals("DOMActivate") && eventTarget instanceof XFormsControls.ControlInfo) {
+            final XFormsControls.ControlInfo controlInfo = (XFormsControls.ControlInfo) eventTarget;
+            if (!controlInfo.isRelevant()) {
+                return;
+            }
+        }
+
         // Get other event target
         final XFormsEventTarget otherEventTarget;
         {
@@ -459,10 +467,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
-                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
+                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement(), initializeStateEvent.isInitializeControls()));
             }
 
-            dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
+            if (initializeStateEvent.isInitializeControls())
+                dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
 
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized

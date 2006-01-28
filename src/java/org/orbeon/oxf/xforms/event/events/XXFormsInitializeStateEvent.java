@@ -26,11 +26,13 @@ public class XXFormsInitializeStateEvent extends XFormsEvent {
 
     private Element divsElement;
     private Element repeatIndexesElement;
+    private boolean initializeControls;
 
-    public XXFormsInitializeStateEvent(XFormsEventTarget targetObject, Element divsElement, Element repeatIndexesElement) {
+    public XXFormsInitializeStateEvent(XFormsEventTarget targetObject, Element divsElement, Element repeatIndexesElement, boolean initializeControls) {
         super(XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
         this.divsElement = divsElement;
         this.repeatIndexesElement = repeatIndexesElement;
+        this.initializeControls = initializeControls;
     }
 
     public Element getDivsElement() {
@@ -39,5 +41,9 @@ public class XXFormsInitializeStateEvent extends XFormsEvent {
 
     public Element getRepeatIndexesElement() {
         return repeatIndexesElement;
+    }
+
+    public boolean isInitializeControls() {
+        return initializeControls;
     }
 }

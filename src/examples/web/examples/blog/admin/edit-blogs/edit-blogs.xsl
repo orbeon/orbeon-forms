@@ -158,6 +158,7 @@
                         </td>
                     </tr>
                 </xforms:repeat>
+                <tr/><!-- This is to work around a bug in IE -->
             </table>
             <xforms:trigger>
                 <xforms:label>Save Changes</xforms:label>
@@ -203,6 +204,7 @@
                                         </td>
                                     </tr>
                                 </xforms:repeat>
+                                <tr/><!-- This is to work around a bug in IE -->
                             </table>
                             <xforms:trigger>
                                 <xforms:label>Add Category</xforms:label>

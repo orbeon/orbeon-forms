@@ -46,8 +46,13 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
             else xformsRemoveClass(element, "xforms-readonly");
         } else {
             // Other controls
-            if (readonly) element.setAttribute("disabled", "disabled");
-            else element.removeAttribute("disabled");
+            if (readonly) {
+                element.setAttribute("disabled", "disabled");
+                xformsAddClass(element, "xforms-readonly");
+            } else {
+                element.removeAttribute("disabled");
+                xformsRemoveClass(element, "xforms-readonly");
+            }
         }
     }
     if (xformsIsDefined(required)) {

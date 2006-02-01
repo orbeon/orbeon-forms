@@ -22,6 +22,16 @@ function xformsUpdateStyleLabel(label, message) {
     }
 }
 
+function xformsUpdateReadonlyFormElement(element, readonly) {
+    if (readonly) {
+        element.setAttribute("disabled", "disabled");
+        xformsAddClass(element, "xforms-readonly");
+    } else {
+        element.removeAttribute("disabled");
+        xformsRemoveClass(element, "xforms-readonly");
+    }
+}
+
 function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required) {
     if (xformsIsDefined(relevant)) {
         if (relevant) xformsRemoveClass(element, "xforms-disabled")
@@ -44,15 +54,16 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
             // XForms output and group
             if (readonly) xformsAddClass(element, "xforms-readonly");
             else xformsRemoveClass(element, "xforms-readonly");
+        } else if (xformsArrayContains(classes, "xforms-select1-full") || xformsArrayContains(classes, "xforms-select-full")) {
+            // XForms radio buttons
+            for (var spanIndex = 0; spanIndex < element.childNodes.length; spanIndex++) {
+                var span = element.childNodes[spanIndex];
+                var input = span.firstChild;
+                xformsUpdateReadonlyFormElement(input, readonly);
+            }
         } else {
             // Other controls
-            if (readonly) {
-                element.setAttribute("disabled", "disabled");
-                xformsAddClass(element, "xforms-readonly");
-            } else {
-                element.removeAttribute("disabled");
-                xformsRemoveClass(element, "xforms-readonly");
-            }
+            xformsUpdateReadonlyFormElement(element, readonly);
         }
     }
     if (xformsIsDefined(required)) {

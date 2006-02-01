@@ -10,6 +10,17 @@
             .odd-line  { background: #ddf; }
             .label     { font-style: italic; }
         </xhtml:style>
+        <xforms:model>
+            <xforms:instance id="hprof">
+                <empty/>
+            </xforms:instance>
+            <xforms:instance id="ui">
+                <ui upload-section=""/>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('ui')">
+                <xforms:bind nodeset="@upload" relevant="instance('hprof')/empty"/>
+            </xforms:bind>
+        </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:h1>Java Profiling</xhtml:h1>

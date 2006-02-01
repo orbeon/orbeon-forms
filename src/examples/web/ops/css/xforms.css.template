@@ -228,6 +228,10 @@ span.xforms-type-string {
     display: none;
 }
 
+a.xforms-readonly {
+    color: grey; cursor: default;
+}
+
 #xforms-messages {
     display: none;
     background: #fcc;

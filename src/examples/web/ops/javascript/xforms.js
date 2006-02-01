@@ -392,7 +392,8 @@ function xformsHandleValueChange(event) {
 function xformsHandleClick(event) {
     var target = getEventTarget(event);
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-    if (xformsArrayContains(target.className.split(" "), "xforms-trigger"))
+    var targetClasses = target.className.split(" ")
+    if (xformsArrayContains(targetClasses, "xforms-trigger") && !xformsArrayContains(targetClasses, "xforms-readonly")) 
         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)));
     return false;
 }

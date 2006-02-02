@@ -1,14 +1,14 @@
 <!--
     Copyright (C) 2004 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
@@ -26,9 +26,6 @@
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>
     <files path-info="*.xq" mime-type="text/plain"/>
-
-    <page path-info="/teleflex/20060124" view="view.xsl"/>
-    <page path-info="/teleflex/20060124/service" view="getPEAs.xpl"/>
 
     <!-- Examples portal -->
     <page id="home" path-info="/" model="/examples-portal/page-flow.xpl"/>

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.SAXWriter;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -23,6 +24,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class LocationSAXWriter extends SAXWriter {
 
     protected Element curElement;
+    protected boolean locatorSet = false;
     protected Locator loc = new Locator() {
 
         public String getPublicId() {
@@ -57,13 +59,24 @@ public class LocationSAXWriter extends SAXWriter {
     };
 
     protected void documentLocator(Document document) throws SAXException {
-        getContentHandler().setDocumentLocator(loc);
+        if (!locatorSet) {
+            locatorSet = true;
+            getContentHandler().setDocumentLocator(loc);
+        }
+    }
+
+    public void write(Element element) throws SAXException {
+        documentLocator(null);
+        super.write(element);
+    }
+
+    public void write(Node node) throws SAXException {
+        documentLocator(null);
+        super.write(node);
     }
 
     protected void startElement(Element element, AttributesImpl namespaceAttributes) throws SAXException {
         curElement = element;
         super.startElement(element, namespaceAttributes);
     }
-
-
 }

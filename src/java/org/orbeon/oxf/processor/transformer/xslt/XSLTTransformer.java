@@ -551,7 +551,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 if ("include".equals(localname) || "import".equals(localname)) {
                     String href = attributes.getValue("href");
                     URIReference uriReference = new URIReference();
-                    uriReference.context = locator.getSystemId();
+                    uriReference.context = systemId;
                     uriReference.spec = href;
                     uriReferences.stylesheetReferences.add(uriReference);
                 }
@@ -609,7 +609,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // We don't need to worry here about reference to the processor inputs
                             if (!isProcessorInputScheme(uri)) {
                                 URIReference uriReference = new URIReference();
-                                uriReference.context = locator.getSystemId();
+                                uriReference.context = systemId;
                                 uriReference.spec = uri;
                                 uriReferences.documentReferences.add(uriReference);
                             }

@@ -314,10 +314,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
-        // Don't allow for DOMActivate on non-relevant control
+        // Don't allow for DOMActivate on non-relevant or readonly control
         if (eventName.equals("DOMActivate") && eventTarget instanceof XFormsControls.ControlInfo) {
             final XFormsControls.ControlInfo controlInfo = (XFormsControls.ControlInfo) eventTarget;
-            if (!controlInfo.isRelevant()) {
+            if (!controlInfo.isRelevant() || controlInfo.isReadonly()) {
                 return;
             }
         }

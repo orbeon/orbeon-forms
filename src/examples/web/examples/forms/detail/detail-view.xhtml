@@ -112,8 +112,8 @@
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="save-trigger" relevant="../data-status = 'dirty'"/>
                 <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
-                <xforms:bind nodeset="vehicle-insert-trigger" relevant="not(count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3)"/>
-                <xforms:bind nodeset="vehicle-delete-trigger" relevant="not(count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2)"/>
+                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
+                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
                 <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
                 <xforms:bind nodeset="remove-mailing-address" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
                 <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>

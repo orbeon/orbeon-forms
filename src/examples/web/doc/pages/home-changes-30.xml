@@ -86,6 +86,11 @@
                 </li>
                 <li>
                     <p>
+                        Fixed XPL performance regression introduced with OPS 3.0.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Minor documentation and CSS improvements.
                     </p>
                 </li>

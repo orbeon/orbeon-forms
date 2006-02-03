@@ -228,7 +228,7 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Last updated: January 2006
+Last updated: February 2006
 
 Copyright 1999-2006 (C) Orbeon, Inc. All rights reserved.
 

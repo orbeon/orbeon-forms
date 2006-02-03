@@ -20,34 +20,35 @@
     </header>
     <body>
         <section>
-            <title>Introduction</title>
+            <title>Orbeon PresentationServer (OPS)</title>
             <img src="/images/ops30.png" style="border: 0px; float: right" width="276" height="75"/>
             <p>
                 Welcome to the reference documentation for the Orbeon PresentationServer (OPS)
                 platform.
             </p>
             <p>
-                OPS is an open source Java-based server platform for XML-centric web applications. OPS is
-                built around XML technologies such as XHTML, XForms, XSLT, XML pipelines, and web
-                services, which makes it ideal for applications that capture, process and present
-                XML data.
+                <!--Form-based web applications done the right way-->
+
+                Orbeon PresentationServer is an <b>open source</b> platform that uses <b>standard
+                XForms</b> to make your form-based web applications more <b>user-friendly</b> and
+                <b>simpler to create</b>.
             </p>
             <p>
-                Unlike other popular web application frameworks like Struts or WebWork which are
-                based on Java objects and JSP, OPS is based on XML documents and XML technologies.
-                This leads to an architecture better suited for the tasks of capturing, processing,
-                and presenting information in XML format, and often does not require writing any
-                Java code at all to implement the presentation layer of your web application.
+                Unlike other web application frameworks based on Java objects or scripting
+                languages, OPS is based on XML documents and XForms. This leads to an architecture
+                perfectly suited for the tasks of capturing, processing, and presenting XML data,
+                and does not require writing any Java or scripting code at all to implement a
+                dynamic presentation layer for your web application.
             </p>
             <p>
-                OPS is built around Orbeon's <a href="reference-xpl-pipelines">XPL engine</a>, a
-                mature, high-performance XML pipeline engine for processing XML data.
+                OPS is built around a user-friendly Ajax-based XForms engine, which brings standard
+                W3C XForms to mainstream browsers, and the <a href="reference-xpl-pipelines">XPL
+                engine</a>, a mature, high-performance XML pipeline engine for processing XML data.
             </p>
         </section>
 
         <section>
             <title>Purpose of the User Guide</title>
-
             <p>
                 The purpose of this guide is to get you acquainted with the main components of OPS:
             </p>
@@ -95,7 +96,7 @@
             </note>
             -->
         </section>
-
+<!--
         <section>
             <title>Prerequisites</title>
             <p>
@@ -126,6 +127,6 @@
                 in printed form.
             </p>
         </section>
-
+-->
     </body>
 </document>

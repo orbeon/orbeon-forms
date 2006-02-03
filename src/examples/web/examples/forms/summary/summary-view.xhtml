@@ -50,6 +50,8 @@
                     <detail-uri/>
                     <xml-detail-uri/>
                     <pdf-detail-uri/>
+                    <non-empty-triggers/>
+                    <empty-triggers/>
                     <non-empty/>
                     <empty/>
                 </control>
@@ -70,6 +72,9 @@
 
                 <xforms:bind id="non-empty-bind" nodeset="non-empty" relevant="count(instance('main-instance')/document-info) > 0"/>
                 <xforms:bind id="empty-bind" nodeset="empty" relevant="count(instance('main-instance')/document-info) = 0"/>
+
+                <xforms:bind id="non-empty-bind" nodeset="non-empty-triggers" readonly="not(count(instance('main-instance')/document-info) > 0)"/>
+                <xforms:bind id="empty-bind" nodeset="empty-triggers" readonly="not(count(instance('main-instance')/document-info) = 0)"/>
             </xforms:bind>
 
             <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"
@@ -114,7 +119,7 @@
                                 </xforms:group>
                             </td>
                             <td>
-                                <xforms:group ref="instance('control-instance')/empty">
+                                <xforms:group ref="instance('control-instance')/empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:send submission="import-documents-submission"/>
                                         <xforms:send submission="list-documents-submission"/>
@@ -129,7 +134,7 @@
                                 </xforms:group>
                             </td>
                             <td>
-                                <xforms:group ref="instance('control-instance')/non-empty">
+                                <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
                                         <xforms:load ref="instance('control-instance')/detail-uri"/>
@@ -144,7 +149,7 @@
                                 </xforms:group>
                             </td>
                             <td>
-                                <xforms:group ref="instance('control-instance')/non-empty">
+                                <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('main-instance')/document-info[index('documents-repeat')]/document-id"/>
                                         <xforms:send submission="delete-document-submission"/>
@@ -160,7 +165,7 @@
                                 </xforms:group>
                             </td>
                             <td>
-                                <xforms:group ref="instance('control-instance')/non-empty">
+                                <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
                                         <xforms:load ref="instance('control-instance')/xml-detail-uri" f:url-type="resource"/>
@@ -175,7 +180,7 @@
                                 </xforms:group>
                             </td>
                             <td>
-                                <xforms:group ref="instance('control-instance')/non-empty">
+                                <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
                                         <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource"/>

@@ -22,6 +22,7 @@
     <files path-info="*.js"/>
     <files path-info="*.png"/>
     <files path-info="*.jpg"/>
+    <files path-info="*.xsd"/>
     <files path-info="*.html" mime-type="text/html"/>
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>

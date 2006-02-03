@@ -110,8 +110,8 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="save-trigger" relevant="../data-status = 'dirty'"/>
-                <xforms:bind nodeset="back-trigger" relevant="not(../data-status = 'dirty')"/>
+                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty')"/>
+                <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty'"/>
                 <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
                 <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
                 <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
@@ -182,6 +182,18 @@
                         <table class="dmv-actions-table">
                             <tr>
                                 <td>
+                                    <xforms:group ref="instance('control-instance')/back-trigger">
+                                        <xforms:load ev:event="DOMActivate" resource="/forms"/>
+                                        <xforms:trigger appearance="xxforms:image">
+                                            <xforms:label ref="instance('resources-instance')/labels/return"/>
+                                            <xxforms:img src="/images/back.gif"/>
+                                        </xforms:trigger>
+                                        <xforms:trigger appearance="xxforms:link">
+                                            <xforms:label ref="instance('resources-instance')/labels/return"/>
+                                        </xforms:trigger>
+                                    </xforms:group>
+                                </td>
+                                <td>
                                     <xforms:group ref="instance('control-instance')/save-trigger">
                                         <xforms:action ev:event="DOMActivate">
                                             <xforms:send submission="save-submission"/>
@@ -192,18 +204,6 @@
                                         </xforms:trigger>
                                         <xforms:trigger appearance="xxforms:link">
                                             <xforms:label ref="instance('resources-instance')/labels/save-document"/>
-                                        </xforms:trigger>
-                                    </xforms:group>
-                                </td>
-                                <td>
-                                    <xforms:group ref="instance('control-instance')/back-trigger">
-                                        <xforms:load ev:event="DOMActivate" resource="/forms"/>
-                                        <xforms:trigger appearance="xxforms:image">
-                                            <xforms:label ref="instance('resources-instance')/labels/return"/>
-                                            <xxforms:img src="/images/back.gif"/>
-                                        </xforms:trigger>
-                                        <xforms:trigger appearance="xxforms:link">
-                                            <xforms:label ref="instance('resources-instance')/labels/return"/>
                                         </xforms:trigger>
                                     </xforms:group>
                                 </td>

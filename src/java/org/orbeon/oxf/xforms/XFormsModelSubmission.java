@@ -204,6 +204,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
+//                            {
+//                                currentInstance.readOut();
+//                            }
                             if (XFormsServer.logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -476,6 +479,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
+                                                // TODO: should reverse way this is doing, and iterate through controls instead of iterating through instance nodes
                                                 XFormsUtils.markAllValuesChanged(replaceInstance.getDocument());
 
                                                 // Rebuild ControlsState

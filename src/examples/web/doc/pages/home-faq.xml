@@ -36,26 +36,36 @@
             <section added="2006-01-10">
                 <title>What is Orbeon PresentationServer?</title>
                 <p>
-                    Orbeon PresentationServer (OPS) is an open source Java-based server platform for
-                    XML-centric web applications. OPS is built around XHTML, XForms, XSLT, XML
-                    pipelines, and Web Services, which makes it ideal for applications that capture,
-                    process and present XML data.
+                    <!--Form-based web applications done the right way-->
+                    Orbeon PresentationServer is an <b>open source</b> platform that uses <b>standard
+                    XForms</b> to make your form-based web applications more <b>user-friendly</b> and
+                    <b>simpler to create</b>.
                 </p>
                 <p>
-                    Unlike other popular web application frameworks like Struts or WebWork that are
-                    based on Java objects and JSP, OPS is based on XML documents and XML
-                    technologies. This leads to an architecture better suited for the tasks of
-                    capturing, processing, and presenting information in XML format, and often does
-                    not require writing any Java code at all to implement your presentation layer.
+                    Unlike other web application frameworks based on Java objects or scripting
+                    languages, OPS is based on XML documents and XForms. This leads to an architecture
+                    perfectly suited for the tasks of capturing, processing, and presenting XML data,
+                    and does not require writing any Java or scripting code at all to implement a
+                    dynamic presentation layer for your web application.
                 </p>
                 <p>
-                    OPS is built around Orbeon's optimized <a href="#xml-pipeline">XPL engine</a>, a
-                    mature, high-performance XML pipeline engine for processing XML data.
+                    OPS is built around a user-friendly Ajax-based XForms engine, which brings standard
+                    W3C XForms to mainstream browsers, and the <a href="reference-xpl-pipelines">XPL
+                    engine</a>, a mature, high-performance XML pipeline engine for processing XML data.
+                </p>
+            </section>
+            <section added="2006-02-04">
+                <title>Is Orbeon PresentationServer an XForms Engine?</title>
+                <p>
+                    Orbeon PresentationServer does contain an XForms engine, which we refer to as
+                    the OPS XForms engine. It also contains an XML pipeline engine, an
+                    application controller (the Page Flow Controller or PFC), and built-in
+                    components to perform XSLT transformations, database access, and more. Needless
+                    to say, OPS ships with examples and documentation.
                 </p>
                 <p>
-                    OPS features standards-based forms processing using XForms, rich controller
-                    semantics, and full-featured XML pipelines described with XPL, the XML Pipeline
-                    Language.
+                    You are free to limit your use of OPS to its XForms functionality. But you can
+                    also leverage more of OPS to build your application's presentation layer.
                 </p>
             </section>
             <!--

@@ -774,8 +774,7 @@
                         <code>appearance</code> attribute on submit controls). As of version 2.0,
                         attributes are copied if they are in a namespace and this namespace is not
                         <code>http://orbeon.org/oxf/xml/xforms</code>. The namespace is left
-                        unchanged when the attribute is copied. Please refer to the <link
-                        href="processors-xforms#xforms-custom-attibute">XForms section</link> for
+                        unchanged when the attribute is copied. Please refer to the XForms section for
                         more information.
                     </p>
                 </section>

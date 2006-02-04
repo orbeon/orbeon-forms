@@ -58,6 +58,7 @@
                     Language.
                 </p>
             </section>
+            <!--
             <a name="compare-cocoon"/>
             <section>
                 <title>How does Orbeon PresentationServer compare with Apache Cocoon?</title>
@@ -68,6 +69,7 @@
                     matrix.
                 </p>
             </section>
+            -->
             <a name="compare-model2x"/>
             <section>
                 <title>How does OPS compare with Model 2X?</title>

@@ -421,7 +421,7 @@
     <target name='make-one-source-list' >
         <dirname file='${example-descriptor}' property='dir' />
 
-	<length property='files' mode='each' >
+	    <length property='files' mode='each' >
             <fileset dir='${dir}' >
                 <include name='**/*.x?l' />
                 <include name='**/*.xhtml' />

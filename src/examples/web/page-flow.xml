@@ -84,15 +84,9 @@
     <!-- Java profiler  -->
     <page path-info="/profiler/*" model="/examples/profiler/page-flow.xpl"/>
 
-    <!-- Struts and JSF -->
-    <page path-info="/faces/*" model="/jsf/config/model.xpl"/>
-    <page path-info="/examples/jsf*" model="/jsf/config/model.xpl"/>
-    <page path-info="/WEB-INF/*" view="/struts-view/model/struts.xpl"/>
-
     <!-- Documentation -->
     <!--<page path-info="/examples/doc" view="/doc/stub-view.xml"/>-->
     <!--<page path-info="/doc/book" model="/doc/book/model.xpl"/>-->
-
     <page path-info="/doc/" matcher="oxf:perl5-matcher"
         default-submission="/doc/default-submission.xml" model="/doc/doc-model.xpl" view="/doc/doc-view.xpl">
         <setvalue ref="/form/pdf" parameter="pdf"/>
@@ -103,15 +97,6 @@
         <setvalue ref="/form/pdf" parameter="pdf"/>
     </page>
 
-    <!-- XPL specification -->
-    <page path-info="/2005/SUBM-xpl-20050222/" model="/doc/xpl-spec/model.xpl"/>
-    <page path-info="/2005/xpl/" model="/doc/xpl-spec/model.xpl"/>
-
-    <!-- Source code -->
-    <page path-info="/examples/source"
-        xforms="/source/source-xforms.xml"
-        model="/source/source-model.xpl"/>
-
     <!-- Portal -->
     <page path-info="/examples/portal/*" model="/portal/config/model.xpl"/>
 
@@ -121,6 +106,10 @@
 
     <!-- XTech Article -->
     <page path-info="/xtech*" model="/doc/xtech-2005/model.xpl" view="/doc/xtech-2005/docbook/html/docbook.xsl"/>
+
+    <!-- XPL specification -->
+    <page path-info="/2005/SUBM-xpl-20050222/" model="/doc/xpl-spec/model.xpl"/>
+    <page path-info="/2005/xpl/" model="/doc/xpl-spec/model.xpl"/>
 
     <!-- "Not Found" page displayed when no page matches the request URL -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>

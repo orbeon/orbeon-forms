@@ -18,7 +18,6 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns="http://www.w3.org/1999/xhtml">
 

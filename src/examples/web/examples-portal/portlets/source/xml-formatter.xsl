@@ -78,7 +78,7 @@
                 </style>
             </head>
             <body onload="initialize()">
-                <div class="source">
+                <div class="ops-source">
                     <xsl:apply-templates mode="xml-formatting"/>
                 </div>
             </body>

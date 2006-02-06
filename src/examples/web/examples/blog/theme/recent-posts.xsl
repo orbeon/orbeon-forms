@@ -221,14 +221,14 @@
                             <!--<a name="{links/fragment-name}"/>-->
                             <a name="xxx"/>
                             <h3>
-                                <img src="/images/text.png" style="border: 0px" alt="Icon"/>
+                                <img src="/images/text.gif" style="border: 0px" alt="Icon"/>
                                 <xforms:output value="' '"/>
                                 <xforms:trigger appearance="xxforms:link">
                                     <xforms:label ref="title"/>
                                     <xforms:load ev:event="DOMActivate" ref="links/post"/>
                                 </xforms:trigger>
                                 <!--<a href="{links/post}">-->
-                                    <!--<img src="/images/text.png" style="border: 0px"/>-->
+                                    <!--<img src="/images/text.gif" style="border: 0px"/>-->
                                     <!--<xforms:output value="' '"/>-->
                                     <!--<xforms:output ref="title"/>-->
                                 <!--</a>-->

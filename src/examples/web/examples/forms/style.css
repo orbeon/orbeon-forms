@@ -13,11 +13,11 @@
 */
 th { padding: 1em; padding-top: 0px; text-align: left; vertical-align: top }
 td { vertical-align: top }
-.dmv-main-table { border: 2px solid #e9d3e6 }
+.dmv-main-table { border: solid 2px #ffcc66 }
 .dmv-main-table th p { text-align: center }
-.dmv-actions-table td { white-space: nowrap; vertical-align: middle }
-.dmv-actions-table input { vertical-align: middle;}
-.dmv-hr { height: 3px; border: 0px; background-color: #8e3694; color: #8e3694 }
+.dmv-action-table td { white-space: nowrap; vertical-align: middle; }
+.dmv-action-table input { vertical-align: middle;}
+.dmv-hr { height: 3px; border: 0px; background-color: #ffcc66; color: #ffcc66 }
 .dmv-last-name input { width: 20em }
 .dmv-driver-license-number input { width: 8em }
 .dmv-first-name input { width: 10em }
@@ -33,9 +33,9 @@ td { vertical-align: top }
 .dmv-company-name input { width: 22em }
 .dmv-street-number-name input { width: 22em }
 .dmv-apt-number input { width: 4em }
-.dmv-gridtable { border-collapse: collapse }
-.dmv-gridtable th { background-color: #e9d3e6; text-align: center; padding: .3em; border: 1px solid #8e3694 }
-.dmv-gridtable td { padding: .3em; border: 1px solid #8e3694; margin: 0px; cursor: pointer }
+.dmv-gridtable { border-collapse: collapse; width: 100%; margin-left: 1em; margin-right: 1em }
+.dmv-gridtable th { background-color: #ffcc66; text-align: center; padding: .3em; border: 1px solid #f93 }
+.dmv-gridtable td { padding: .3em; border: 1px solid #f93; margin: 0px; cursor: pointer }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; text-align: center }
 .dmv-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana }
 .dmv-message-positive { color: green }

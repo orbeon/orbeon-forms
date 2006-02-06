@@ -32,6 +32,8 @@
     <page id="home" path-info="/" model="/examples-portal/page-flow.xpl"/>
     <page path-info="/goto-example/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
     <page path-info="/goto-source/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
+    <page path-info="/source/download/.+" matcher="oxf:perl5-matcher" model="/examples-portal/portlets/source/page-flow.xpl"/>
+    <page path-info="/source/service/format" matcher="oxf:perl5-matcher" model="/examples-portal/portlets/source/page-flow.xpl"/>
 
     <!-- Dispatch resources for the examples. This is necessary, since portlets cannot serve resources directly by design. -->
     <page path-info="/direct/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
@@ -47,9 +49,6 @@
 
     <!-- Standalone Forms example -->
     <page path-info="/forms*" model="/examples/forms/page-flow.xpl"/>
-
-    <!-- Standalone BizDoc 2 example -->
-    <page path-info="/bizdoc2*" model="/examples/bizdoc2/page-flow.xpl"/>
 
     <!-- Standalone Address Book 2 example -->
     <page path-info="/address-book2*" model="/examples/address-book2/page-flow.xpl"/>

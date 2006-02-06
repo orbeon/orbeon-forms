@@ -70,8 +70,6 @@
     </section>
     <section label="Document-Centric Apps">
         <example id="forms" label="&quot;DMV Forms&quot;" xforms-ng="true"/>
-        <example id="bizdoc2" label="&quot;BizDoc&quot;" xforms-ng="true"/>
-        <!--<example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>-->
         <example id="blog" label="The OPS Blog" xforms-ng="true"/>
     </section>
     <section label="Cool Stuff">
@@ -81,7 +79,6 @@
         <example id="spellchecker" label="Google Spell Checker"/>
         <example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>
         <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
-        <!--<example id="yim" label="Instant Messaging"/>-->
     </section>
     <section label="Query &amp; Transformation">
         <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>

@@ -426,6 +426,8 @@
                 <include name='**/*.x?l' />
                 <include name='**/*.xsd' />
                 <include name='**/*.rng' />
+                <include name='**/*.css' />
+                <include name='**/*.js' />
                 <include name='**/*.xhtml' />
                 <include name='**/*.java' />
                 <include name='**/*.txt' />

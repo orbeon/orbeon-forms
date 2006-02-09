@@ -424,6 +424,8 @@
 	    <length property='files' mode='each' >
             <fileset dir='${dir}' >
                 <include name='**/*.x?l' />
+                <include name='**/*.xsd' />
+                <include name='**/*.rng' />
                 <include name='**/*.xhtml' />
                 <include name='**/*.java' />
                 <include name='**/*.txt' />

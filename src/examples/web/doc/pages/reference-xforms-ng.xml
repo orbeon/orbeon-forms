@@ -2598,6 +2598,15 @@
                         </xforms:instance>
                     </xml-source>
                 </section>
+                <section>
+                    <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
+                    <p>
+                        Based on a proposal in a draft version of XForms 1.1, OPS supports the
+                        <code>validate</code> and <code>relevant</code> attributes on
+                        <code>xforms:submission</code>. For more information, please visit the
+                        <a href="http://www.w3.org/TR/2004/WD-xforms11-20041115/#submit-attribs">XForms 1.1 draft</a>.
+                    </p>
+                </section>
             </section>
             <a name="xpath-extensions"/>
             <section>
@@ -2675,6 +2684,20 @@
                                 xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl',
                                 ('input', 'xpath'), (instance('instance')/input,
                                 instance('instance')/xpath), 'formatted-output')/*, 'html')
+                            </xml-source>
+                        </li>
+                        <li>
+                            <p>
+                                <code>xxforms:evaluate($xpath as xs:string)</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:evaluate()</code> function allows you to evaluate
+                                XPath expressions dynamically. For example:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:input ref="xxforms:evaluate(concat('instance(''my-instance'')/document', my-xpath))">
+                                    <xforms:label>...</xforms:label>
+                                </xforms:input>
                             </xml-source>
                         </li>
                     </ul>

@@ -64,6 +64,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String action; // required
     private String method; // required
 
+    private boolean validate = true; // required
+    private boolean relevant = true; // required
+
     private String version;
     private boolean indent;
     private String mediatype;
@@ -101,6 +104,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             action = submissionElement.attributeValue("action");
             method = submissionElement.attributeValue("method");
             method = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(submissionElement, "method"));
+
+            validate = !"false".equals(submissionElement.attributeValue("validate"));
+            relevant = !"false".equals(submissionElement.attributeValue("relevant"));
 
             version = submissionElement.attributeValue("version");
 
@@ -204,9 +210,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
-//                            {
-//                                currentInstance.readOut();
-//                            }
+                            {
+                                currentInstance.readOut();
+                            }
                             if (XFormsServer.logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -517,9 +523,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                             final Integer previouslIndex = (Integer) currentEntry.getValue();
 
 //                                                            final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
+                                                             // TODO FIXME: repeatId is a control id, but effectiveRepeatIdToIterations contains effective ids
+                                                            // -> this doesn't work and can throw exceptions!
                                                             final Integer newIterations = (Integer) effectiveRepeatIdToIterations.get(repeatId);
 
-                                                            if (previouslIndex.intValue() == 0 && newIterations.intValue() > 0) {
+                                                            if (previouslIndex.intValue() == 0 && newIterations != null && newIterations.intValue() > 0) {
                                                                 // Set index to defaul value
                                                                 final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
 //                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, initialRepeatIndex.toString());
@@ -634,39 +642,41 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit = currentInstance.getDocument();
         }
 
-        // "Any node which is considered not relevant as defined in 6.1.4 is removed."
-        final Node[] nodeToDetach = new Node[1];
-        do {
-            // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
-            // detaching elements within accept(). Should implement a more efficient algorithm to
-            // prune non-relevant nodes.
-            nodeToDetach[0] = null;
-            documentToSubmit.accept(new VisitorSupport() {
+        if (relevant) {
+            // "Any node which is considered not relevant as defined in 6.1.4 is removed."
+            final Node[] nodeToDetach = new Node[1];
+            do {
+                // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
+                // detaching elements within accept(). Should implement a more efficient algorithm to
+                // prune non-relevant nodes.
+                nodeToDetach[0] = null;
+                documentToSubmit.accept(new VisitorSupport() {
 
-                public final void visit(Element element) {
-                    checkInstanceData(element);
-                }
+                    public final void visit(Element element) {
+                        checkInstanceData(element);
+                    }
 
-                public final void visit(Attribute attribute) {
-                    checkInstanceData(attribute);
-                }
+                    public final void visit(Attribute attribute) {
+                        checkInstanceData(attribute);
+                    }
 
-                private final void checkInstanceData(Node node) {
-                    if (nodeToDetach[0] == null) {
-                        final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
-                        // Check "relevant" MIP and remove non-relevant nodes
-                        {
-                            final BooleanModelItemProperty relevantMIP = instanceData.getRelevant();
-                            if (relevantMIP != null && !relevantMIP.get())
-                                nodeToDetach[0] = node;
+                    private final void checkInstanceData(Node node) {
+                        if (nodeToDetach[0] == null) {
+                            final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
+                            // Check "relevant" MIP and remove non-relevant nodes
+                            {
+                                final BooleanModelItemProperty relevantMIP = instanceData.getRelevant();
+                                if (relevantMIP != null && !relevantMIP.get())
+                                    nodeToDetach[0] = node;
+                            }
                         }
                     }
-                }
-            });
-            if (nodeToDetach[0] != null)
-                nodeToDetach[0].detach();
+                });
+                if (nodeToDetach[0] != null)
+                    nodeToDetach[0].detach();
 
-        } while (nodeToDetach[0] != null);
+            } while (nodeToDetach[0] != null);
+        }
 
         // TODO: handle includenamespaceprefixes
         return documentToSubmit;
@@ -709,35 +719,37 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean isDocumentSatisfiesValidRequired(final Document documentToSubmit) {
         final boolean[] instanceSatisfiesValidRequired = new boolean[]{true};
-        documentToSubmit.accept(new VisitorSupport() {
+        if (validate) {
+            documentToSubmit.accept(new VisitorSupport() {
 
-            public final void visit(Element element) {
-                final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-                checkInstanceData(instanceData);
-            }
-
-            public final void visit(Attribute attribute) {
-                final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-                checkInstanceData(instanceData);
-            }
-
-            private final void checkInstanceData(InstanceData instanceData) {
-                // Check "valid" MIP
-                {
-                    final BooleanModelItemProperty validMIP = instanceData.getValid();
-                    if (validMIP != null && !validMIP.get())
-                        instanceSatisfiesValidRequired[0] = false;
+                public final void visit(Element element) {
+                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
+                    checkInstanceData(instanceData);
                 }
-                // Check "required" MIP
-                {
-                    final ValidModelItemProperty requiredMIP = instanceData.getRequired();
-                    if (requiredMIP != null && requiredMIP.get() && requiredMIP.getStringValue().length() == 0) {
-                        // Required and empty
-                        instanceSatisfiesValidRequired[0] = false;
+
+                public final void visit(Attribute attribute) {
+                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
+                    checkInstanceData(instanceData);
+                }
+
+                private final void checkInstanceData(InstanceData instanceData) {
+                    // Check "valid" MIP
+                    {
+                        final BooleanModelItemProperty validMIP = instanceData.getValid();
+                        if (validMIP != null && !validMIP.get())
+                            instanceSatisfiesValidRequired[0] = false;
+                    }
+                    // Check "required" MIP
+                    {
+                        final ValidModelItemProperty requiredMIP = instanceData.getRequired();
+                        if (requiredMIP != null && requiredMIP.get() && requiredMIP.getStringValue().length() == 0) {
+                            // Required and empty
+                            instanceSatisfiesValidRequired[0] = false;
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
         return instanceSatisfiesValidRequired[0];
     }
 

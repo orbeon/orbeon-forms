@@ -671,6 +671,7 @@ public class XFormsControls {
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
 
                 final String controlName = controlElement.getName();
+                final String controlId = controlElement.attributeValue("id");
 
                 // Handle xforms:switch
                 if (controlName.equals("switch")) {
@@ -693,7 +694,7 @@ public class XFormsControls {
                             // Current index is 0
                             result.setRepeatIterations(effectiveControlId, 0);
                             // Update repeat index to 0 if there was no iteration
-                            result.updateRepeatIndex(effectiveControlId, 0);
+                            result.updateRepeatIndex(controlId, 0);
                         } else {
                             // Number of iterations is number of children
                             result.setRepeatIterations(effectiveControlId, children.size());
@@ -1211,6 +1212,8 @@ public class XFormsControls {
         }
 
         public void updateRepeatIndex(String controlId, int index) {
+            if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+                throw new OXFException("Invalid repeat id provided: " + controlId);
             if (repeatIdToIndex == null)
                 repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
             repeatIdToIndex.put(controlId, new Integer(index));

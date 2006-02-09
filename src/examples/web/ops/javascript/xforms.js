@@ -64,7 +64,7 @@ function xformsRemoveEventListener(target, eventName, handler) {
 function xformsDispatchEvent(target, eventName) {
     if (target.dispatchEvent) {
         var event = document.createEvent("HTMLEvents");
-        event.initEvent(eventName, true, true);
+        event.initEvent(eventName.toLowerCase(), true, true);
         target.dispatchEvent(event);
     } else {
         target.fireEvent("on" + eventName);
@@ -474,6 +474,7 @@ function xformsHandleFirefoxValueChange(property, oldvalue, newvalue) {
         textField.value = newvalue;
         xformsDispatchEvent(textField, "change");
     }
+    span.valueSetByXForms = 0;
     return newvalue;
 }
 
@@ -487,6 +488,7 @@ function xformsHandleIEValueChange(event) {
             span.value = span.previousValue;
             xformsDispatchEvent(textField, "change");
         }
+        span.valueSetByXForms = 0;
     }
 }
 

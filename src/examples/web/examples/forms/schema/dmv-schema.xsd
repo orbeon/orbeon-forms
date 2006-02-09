@@ -139,11 +139,11 @@
     </xs:complexType>
 
     <xs:simpleType name="requiredNonEmptyString">
-		<xs:restriction base="xs:string">
-			<xs:minLength value="1" />
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1" />
             <xs:whiteSpace value="collapse"/>
-		</xs:restriction>
-	</xs:simpleType>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:simpleType name="first-name">
         <xs:restriction base="dmv:requiredNonEmptyString">

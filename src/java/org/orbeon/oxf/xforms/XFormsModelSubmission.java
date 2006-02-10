@@ -182,7 +182,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Select node based on ref or bind
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
-                xformsControls.setBinding(pipelineContext, submissionElement); // FIXME: the submission element is not a control...
+                xformsControls.setBinding(pipelineContext, submissionElement); // TODO FIXME: the submission element is not a control...
 
                 final Node currentNode = xformsControls.getCurrentSingleNode();
 

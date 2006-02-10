@@ -682,10 +682,14 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     ret = handleEltWithResource("img", SRC_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;
 
+                    ret = handleEltWithResource("frame", SRC_ATT, ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+                    
+                    ret = handleEltWithResource("iframe", SRC_ATT, ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+
                     ret = handleEltWithResource(SCRIPT_ELT, SRC_ATT, ns, lnam, qnam, atts);
-                    if (ret != null) {
-                        break done;
-                    }
+                    if (ret != null) break done;
 
                     ret = handleInput(ns, lnam, qnam, atts);
                     if (ret != null) break done;

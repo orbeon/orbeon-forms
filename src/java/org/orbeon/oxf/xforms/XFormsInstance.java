@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -291,6 +292,9 @@ public class XFormsInstance implements XFormsEventTarget {
         return externalContext.getRequest();
     }
 
+    /**
+     * Return the id of this instance.
+     */
     public String getId() {
         return id;
     }
@@ -305,5 +309,13 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         // NOP
+    }
+
+    /**
+     * Return a dom4j node wrapped into a NodeInfo. The node must belong to this particular
+     * instance.
+     */
+    public NodeInfo wrapNode(Node node) {
+        return documentXPathEvaluator.wrapNode(node);
     }
 }

@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
@@ -154,5 +155,13 @@ public class DocumentXPathEvaluator {
             result.add(documentWrapper.wrap(currentNode));
         }
         return result;
+    }
+
+    /**
+     * Return a dom4j node wrapped into a NodeInfo. The node must belong to this particular
+     * document.
+     */
+    public NodeInfo wrapNode(Node node) {
+        return documentWrapper.wrap(node);
     }
 }

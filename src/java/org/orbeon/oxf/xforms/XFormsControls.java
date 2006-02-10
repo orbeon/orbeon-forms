@@ -252,7 +252,7 @@ public class XFormsControls {
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
         final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument().getRootElement()});
-        contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, true, null));
+        contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, null, true, null));
     }
 
     public Document getControlsDocument() {
@@ -330,7 +330,7 @@ public class XFormsControls {
             // Push "artificial" binding with just current node in nodeset
             final XFormsModel newModel = getCurrentModel();
             final int position = ((RepeatIterationInfo) controlInfo).getIteration();
-            contextStack.push(new BindingContext(newModel, currentNodeset, position, true, null));
+            contextStack.push(new BindingContext(newModel, currentNodeset, position, controlInfo.getParent().getOriginalId(), true, null));
         }
     }
 
@@ -433,7 +433,7 @@ public class XFormsControls {
 
         // Push new context
         final boolean newBind = newNodeset != currentBindingContext.getNodeset();
-        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), newBind, bindingElement));
+        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), null, newBind, bindingElement));
     }
 
     protected BindingContext getCurrentContext() {
@@ -446,9 +446,9 @@ public class XFormsControls {
     public Node getCurrentSingleNode(String modelId) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
-            BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-            String currentModelId = currentBindingContext.getModel().getId();
+            final String currentModelId = currentBindingContext.getModel().getId();
             if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
                 return currentBindingContext.getSingleNode();
         }
@@ -484,6 +484,33 @@ public class XFormsControls {
      */
     public int getCurrentPosition() {
         return getCurrentContext().getPosition();
+    }
+
+    /**
+     * Return the single node associated with the iteration of the repeat specified. If a null
+     * repeat id is passed, return the single node associated with the closest enclosing repeat
+     * iteration.
+     *
+     * @param repeatId  enclosing repeat id, or null
+     * @return          the single node
+     */
+    public Node getRepeatCurrentSingleNode(String repeatId) {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+
+            final String repeatIdForIteration = currentBindingContext.getRepeatIdForIteration();
+            if (repeatIdForIteration != null) {
+                if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
+                    // Found binding context for relevant repeat iteration
+                    return currentBindingContext.getSingleNode();
+                }
+            }
+        }
+        // It is required that there is a relevant enclosing xforms:repeat
+        if (repeatId == null)
+            throw new OXFException("Enclosing xforms:repeat not found.");
+        else
+            throw new OXFException("Enclosing xforms:repeat not found for id: " + repeatId);
     }
 
     public void popBinding() {
@@ -865,7 +892,7 @@ public class XFormsControls {
                     if (currentNodeSet != null) {
                         for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
-                            contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeSet, currentPosition, true, null));
+                            contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeSet, currentPosition, controlId, true, null));
                             try {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
@@ -1085,13 +1112,15 @@ public class XFormsControls {
         private XFormsModel model;
         private List nodeset;
         private int position = 1;
+        private String repeatIdForIteration;
         private boolean newBind;
         private Element controlElement;
 
-        public BindingContext(XFormsModel model, List nodeSet, int position, boolean newBind, Element controlElement) {
+        public BindingContext(XFormsModel model, List nodeSet, int position, String repeatIdForIteration, boolean newBind, Element controlElement) {
             this.model = model;
             this.nodeset = nodeSet;
             this.position = position;
+            this.repeatIdForIteration = repeatIdForIteration;
             this.newBind = newBind;
             this.controlElement = controlElement;
 
@@ -1110,6 +1139,10 @@ public class XFormsControls {
 
         public int getPosition() {
             return position;
+        }
+
+        public String getRepeatIdForIteration() {
+            return repeatIdForIteration;
         }
 
         public boolean isNewBind() {
@@ -1893,7 +1926,7 @@ public class XFormsControls {
                     for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
 
                         // Push "artificial" binding with just current node in nodeset
-                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
+                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, null, true, null));
                         {
                             // Handle children of xforms:itemset
 

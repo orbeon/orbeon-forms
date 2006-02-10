@@ -17,7 +17,7 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:ui="http://www.example.com/ui">
+    xmlns:ui="http://orbeon.org/oxf/xml/examples/ui">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>

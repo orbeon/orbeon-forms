@@ -34,6 +34,7 @@
             <xforms:trigger>
                 <xforms:label>Button</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate">Button clicked</xforms:message>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
@@ -41,12 +42,14 @@
                 <xforms:label>Image</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate">Image clicked</xforms:message>
                 <xxforms:img src="/images/submit.gif"/>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
             <xforms:trigger appearance="xxforms:link">
                 <xforms:label>Link</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate">Link clicked</xforms:message>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:h3>Submit</xhtml:h3>
@@ -54,6 +57,7 @@
             <xforms:submit submission="submission">
                 <xforms:label>Button</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate" ev:defaultAction="cancel">Button clicked</xforms:message>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:submit>
         </xhtml:p>
         <xhtml:p>
@@ -61,12 +65,14 @@
                 <xforms:label>Image</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate" ev:defaultAction="cancel">Image clicked</xforms:message>
                 <xxforms:img src="/images/submit.gif"/>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:submit>
         </xhtml:p>
         <xhtml:p>
             <xforms:submit submission="submission" appearance="xxforms:link">
                 <xforms:label>Link</xforms:label>
                 <xforms:message level="modal" ev:event="DOMActivate" ev:defaultAction="cancel">Link clicked</xforms:message>
+                <xforms:help>Just click it!</xforms:help>
             </xforms:submit>
         </xhtml:p>
     </xhtml:body>

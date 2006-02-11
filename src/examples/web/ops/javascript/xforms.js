@@ -693,7 +693,7 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsRange = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
-            if (className == "xforms-select-compact" || className == "xforms-select1-minimal")
+            if (className == "xforms-select-compact" || className == "xforms-select1-minimal" || className == "xforms-select1-compact")
                 isXFormsComboboxList = true;
             if (className == "xforms-trigger")
                 isXFormsTrigger = true;
@@ -1291,7 +1291,7 @@ function xformsHandleResponse() {
                                             // and it is possible to receive a response from the server after the value is modified but
                                             // before the keyup event is dispatched.
                                             var foundControlModified = false;
-                                            if (xformsArrayContains(documentElement.className.split(" "), "xforms-input")) {
+                                            if (xformsArrayContains(documentElementClasses, "xforms-input")) {
                                                 if (documentElement.childNodes[1].value != documentElement.previousValue)
                                                     foundControlModified = true;
                                             } else if (xformsIsDefined(documentElement.previousValue)
@@ -1325,6 +1325,7 @@ function xformsHandleResponse() {
                                                     checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
                                                 }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-compact")
                                                     || xformsArrayContains(documentElementClasses, "xforms-select1-minimal")) {
                                                 // Handle lists and comboboxes
                                                 var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-compact")

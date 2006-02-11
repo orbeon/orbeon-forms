@@ -1221,7 +1221,7 @@ function xformsHandleResponse() {
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
 
-                                        // Get its child element and clone
+                                        // Get its child element (a span that contains an input)
                                         template = template.firstChild;
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
@@ -1243,10 +1243,10 @@ function xformsHandleResponse() {
                                                     itemElement.getAttribute("label"));
                                                 xformsStringReplace(templateClone, "$xforms-template-value$",
                                                     itemElement.getAttribute("value"));
+                                                documentElement.appendChild(templateClone);
                                                 // Restore checked state after copy
                                                 if (valueToChecked[itemElement.getAttribute("value")] == true)
                                                     xformsGetInputUnderNode(templateClone).checked = true;
-                                                documentElement.appendChild(templateClone);
                                             }
                                         }
 

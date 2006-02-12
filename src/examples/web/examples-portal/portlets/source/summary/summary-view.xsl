@@ -21,14 +21,39 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns="http://www.w3.org/1999/xhtml">
 
-    <xsl:variable name="example-descriptor" select="/*" as="element()"/>
-
     <head>
+        <xsl:variable name="example-descriptor" select="/*" as="element()"/>
         <title><xsl:value-of select="$example-descriptor/title"/> - Example Source Code</title>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background: white; }
             .xforms-repeat-selected-item-2 { background: white; }
         </style>
+        <script language="Javascript" type="text/javascript">
+            window.onload = sourceInit;
+            window.onresize = sourceResize;
+
+            function sourceInit() {
+                sourceResize();
+            }
+
+            function sourceResize() {
+                var divElement = document.getElementById('source-file-output');
+                divElement.style.height = (document.body.clientHeight - findTopPosition(divElement) - 18) + "px";
+            }
+
+            function findTopPosition(element) {
+                var curtop = 0;
+                if (element.offsetParent) {
+                    while (element.offsetParent) {
+                        curtop += element.offsetTop
+                        element = element.offsetParent;
+                    }
+                } else if (element.y) {
+                    curtop += element.y;
+                }
+                return curtop;
+            }
+        </script>
         <xforms:model id="main-model">
 
             <!-- This instance contains the entire example descriptor -->
@@ -67,7 +92,9 @@
             </xforms:instance>
 
             <!-- Make sure there are no backslashes in file names -->
-            <xforms:bind nodeset="instance('descriptor-instance')//file/@name" calculate="replace(., '\\', '/')"/>
+            <xforms:bind nodeset="instance('descriptor-instance')">
+                <xforms:bind nodeset="//file/@name" calculate="replace(., '\\', '/')"/>
+            </xforms:bind>
 
             <xforms:bind nodeset="instance('source-request-instance')">
                 <xforms:bind nodeset="example-id" calculate="instance('submission-instance')/example-id"/>
@@ -77,6 +104,11 @@
                 <xforms:bind nodeset="mediatype"
                              calculate="if (instance('control-instance')/show-xml = 'false' or ends-with(../source-url, '.txt') or ends-with(../source-url, '.java'))
                                         then 'text/plain' else 'application/xml'"/>
+            </xforms:bind>
+
+            <!-- Make current trigger read-only -->
+            <xforms:bind nodeset="instance('descriptor-instance')">
+                <xforms:bind nodeset="//file/@name" readonly=". = instance('source-request-instance')/source-url"/>
             </xforms:bind>
 
             <xforms:bind nodeset="instance('control-instance')">
@@ -154,7 +186,7 @@
         </table>
 
         <!-- List of files -->
-        <table style="border: solid 1px #f93">
+        <table style="border: solid 1px #f93" id="source-table">
             <tr>
                 <td style="vertical-align: top">
                     <table>
@@ -168,8 +200,8 @@
                                 <tr>
                                     <td style="white-space: nowrap">
                                         <!--<xforms:output ref="@name"/>-->
-                                        <xforms:trigger appearance="xxforms:link">
-                                            <xforms:label ref="@name"/>
+                                        <xforms:trigger ref="@name" appearance="xxforms:link">
+                                            <xforms:label ref="."/>
                                         </xforms:trigger>
                                     </td>
                                     <td style="text-align: right">
@@ -185,7 +217,7 @@
                     <table style="width: 100%">
                         <tr>
                             <td style="padding: 0px">
-                                <div class="ops-source">
+                                <div class="ops-source" id="source-file-output">
                                     <xforms:output ref="instance('source-response-instance')" mediatype="text/html"/>
                                 </div>
                             </td>

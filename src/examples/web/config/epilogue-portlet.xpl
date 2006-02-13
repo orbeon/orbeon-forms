@@ -92,9 +92,7 @@
                     </xsl:if>
                     <xhtml:div xmlns:f="http://orbeon.org/oxf/xml/formatting">
                         <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
-                        <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:style"/>
-                        <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:link"/>
-                        <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
+                        <xsl:apply-templates select="/xhtml:html/xhtml:head/(xhtml:style | xhtml:link | xhtml:script)"/>
                         <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                     </xhtml:div>
                 </xsl:template>

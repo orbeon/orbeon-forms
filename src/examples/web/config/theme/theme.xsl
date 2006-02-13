@@ -25,28 +25,16 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <xsl:include href="formatting.xsl"/>
-
-    <!-- This contains some useful request information -->
+<!-- This contains some useful request information -->
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
 
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head>
-                <!-- Calendar -->
-                <xhtml:link rel="stylesheet" href="/config/theme/jscalendar/calendar-blue.css" type="text/css"/>
-                <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/jscalendar/lang/calendar-en.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar-setup.js"/>
-                <!-- Other standard scripts/styles -->
-                <xhtml:link rel="stylesheet" href="/config/theme/xforms.css" type="text/css"/>
+                <!-- Standard scripts/styles -->
+                <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/xforms-style.js"/>
-                <xhtml:script type="text/javascript" src="/ops/javascript/wz_tooltip.js"/>
-                <xhtml:script type="text/javascript" src="/ops/javascript/overlib_mini.js"/>
-                <xhtml:script type="text/javascript" src="/ops/javascript/time-utils.js"/>
-                <xhtml:script type="text/javascript" src="/ops/javascript/sarissa.js"/>
-                <xhtml:script type="text/javascript" src="/ops/javascript/xforms.js"/>
                 <!-- Handle meta elements -->
                 <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <!-- Copy user-defined links -->
@@ -124,7 +112,7 @@
         <xhtml:fieldset>
             <xsl:apply-templates select="@*"/>
             <xhtml:legend>
-                <xsl:variable name="label" as="element()" select="xhtml:label[@class = 'xforms-label']"/>
+                <xsl:variable name="label" as="element()" select="xhtml:label[@class = 'xforms-label'][1]"/>
                 <xsl:apply-templates select="$label/@*"/>
                 <xsl:value-of select="$label"/>
             </xhtml:legend>

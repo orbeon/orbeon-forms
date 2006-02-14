@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.resources.OXFProperties;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -142,20 +143,8 @@ public class FileSerializer extends ProcessorImpl {
 
             final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
-            // Check that directory is ok
-            File file;
-            String directoryProperty = getPropertySet().getString(DIRECTORY_PROPERTY);
-            if (directoryProperty == null && config.getDirectory() == null) {
-                // No base directory specified
-                file = new File(config.getFile());
-            } else {
-                // Base directory specified
-                File baseDirectory = directoryProperty != null ? new File(directoryProperty) : new File(config.getDirectory());
-                if (!baseDirectory.isDirectory() || !baseDirectory.canWrite())
-                    throw new OXFException("Directory '" + baseDirectory + "' is not a directory or is not writeable.");
-
-                file = new File(baseDirectory, config.getFile());
-            }
+            // Get file object
+            final File file = getFile(config.getDirectory(), config.getFile(), getPropertySet());
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
@@ -246,5 +235,22 @@ public class FileSerializer extends ProcessorImpl {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    public static File getFile(String configDirectory, String configFile, OXFProperties.PropertySet propertySet) {
+        final File file;
+        final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
+        if (directoryProperty == null && configDirectory == null) {
+            // No base directory specified
+            file = new File(configFile);
+        } else {
+            // Base directory specified
+            final File baseDirectory = (configDirectory != null) ? new File(configDirectory) : new File(directoryProperty);
+            if (!baseDirectory.isDirectory() || !baseDirectory.canWrite())
+                throw new OXFException("Directory '" + baseDirectory + "' is not a directory or is not writeable.");
+
+            file = new File(baseDirectory, configFile);
+        }
+        return file;
     }
 }

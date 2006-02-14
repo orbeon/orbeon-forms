@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.file.FileProcessor;
 import org.orbeon.oxf.processor.converter.*;
 import org.orbeon.oxf.processor.generator.*;
 import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
@@ -134,6 +135,9 @@ public class SchemaRepository {
         // XSLT schemas
         schemas.put(XSLT1Transformer.XSLT_1_0_PSEUDO_URI, "schemas/xslt-1_0.rng");// Schema for 1.0 only
         schemas.put(XSLTTransformer.XSLT_URI, "schemas/xslt-2_0.xsd");// Schema for 1.0 and 2.0, should be less restrictive
+
+        // Other schemas
+        schemas.put(FileProcessor.FILE_PROCESSOR_CONFIG_NAMESPACE_URI, "schemas/file-processor-config.rng");
     }
 
     private SchemaRepository() {

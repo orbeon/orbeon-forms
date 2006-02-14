@@ -34,6 +34,13 @@
             <xforms:submission ref="instance('request-instance')" id="default-submission"
                 method="post" action="/direct/xforms-translate/post" replace="instance" instance="response-instance"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .ops-translate-wide-text {
+                display: block;
+                background: #FFFFCC;
+                height: 6em;
+            }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <p>
@@ -125,7 +132,7 @@
             </xforms:textarea>
         </xhtml:p>
         <xhtml:p>
-            <xforms:output ref="instance('response-instance')/target" class="wide-text">
+            <xforms:output ref="instance('response-instance')/target" class="ops-translate-wide-text">
                 <xforms:label class="bold">Translation:</xforms:label>
             </xforms:output>
         </xhtml:p>

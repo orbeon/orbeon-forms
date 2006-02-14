@@ -506,10 +506,10 @@ ul {
     padding: 10px
 }
 
-.rd {margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
-.cd {margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
-.id {margin-left: 2em; margin-top: 0px; margin-bottom: 0px; display: block; }
-.x {cursor: pointer; cursor: hand}
+.rd { margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
+.cd { margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
+.id { margin-left: 2em; margin-top: 0px; margin-bottom: 0px; display: block; }
+.x { cursor: pointer; }
 .c {}
 .t {}
 
@@ -539,12 +539,6 @@ ul {
 .wide-textarea {
     font-size: 11px;
     width: 100%;
-}
-
-.wide-text {
-    display: block;
-    background: #FFFFCC;
-    height: 6em;
 }
 
 @media print {
@@ -598,6 +592,6 @@ ul {
     .maincontent thead { display: table-header-group }
     .maincontent tfoot { display: table-footer-group }
 
-    a :link { text-color: black }
-    a :visited { text-color: black }
+    a :link { color: black }
+    a :visited { color: black }
 }

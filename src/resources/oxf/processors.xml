@@ -304,6 +304,11 @@
         <class name="org.orbeon.oxf.processor.generator.DirectoryScannerProcessor"/>
     </processor>
 
+    <!-- File processor -->
+    <processor name="oxf:file-processor">
+        <class name="org.orbeon.oxf.processor.file.FileProcessor"/>
+    </processor>
+
     <!-- Converters -->
     <processor name="oxf:xml-converter">
         <class name="org.orbeon.oxf.processor.converter.XMLConverter"/>

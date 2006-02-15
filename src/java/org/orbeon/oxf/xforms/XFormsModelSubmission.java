@@ -210,9 +210,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
-                            {
-                                currentInstance.readOut();
-                            }
+//                            {
+//                                currentInstance.readOut();
+//                            }
                             if (XFormsServer.logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -482,6 +482,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 }
 
                                                 // Set new instance
+//                                                replaceInstance.logMIPs();
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
@@ -501,6 +502,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 model.doRecalculate(pipelineContext);
                                                 model.doRevalidate(pipelineContext);
                                                 model.doRefresh(pipelineContext);
+
+//                                                replaceInstance.logMIPs();
 
                                                 // Update repeat indexes if necessary
 
@@ -639,7 +642,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
         } else {
             // Use entire instance document
-            documentToSubmit = currentInstance.getDocument();
+            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getDocument().getRootElement());
         }
 
         if (relevant) {

@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.xforms.input;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.input.action.*;
@@ -26,6 +25,7 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -68,8 +68,8 @@ public class RequestParameters {
                 for (Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();)
                     values.add(((Element) elementIterator.next()).getStringValue());
 
-                String type = parameterElement.element("value").attributeValue
-                        (new QName("type", Dom4jUtils.XSI_NAMESPACE));
+                final String type
+                    = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(parameterElement.element("value"), XMLConstants.XSI_TYPE_QNAME));
 
                 if ("$instance".equals(name)) {
                     // Un-base64 and uncompress to get XML

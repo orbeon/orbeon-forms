@@ -232,11 +232,15 @@ public class XFormsInstance implements XFormsEventTarget {
         attribute.setValue(value);
     }
 
+    /**
+     * @deprecated legacy XForms engine
+     */
     private void setElementValue(Element element, String value, String type) {
         // Don't do anything if value exists and dontSetIfexisting is true
         if (type != null) {
             // Handle value type
-            String currentType = element.attributeValue(XMLConstants.XSI_TYPE_QNAME);
+            final String currentType
+                    = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME));
             if (currentType != null && !currentType.equals(type)) { // FIXME: prefixes of type name could be different!
                 // There is a different type already, do a conversion
                 value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);

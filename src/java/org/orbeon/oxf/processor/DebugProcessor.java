@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
 
 public class DebugProcessor extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(DebugProcessor.class);
+    static public Logger logger = LoggerFactory.createLogger(DebugProcessor.class);
 
     public DebugProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));

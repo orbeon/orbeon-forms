@@ -40,13 +40,13 @@
                 an XHTML + XForms document below, press the "Upload" button, and check if it works
                 with OPS!
             </p>
-            <p style="color: red">
+            <p style="color: red; font-size: smaller">
                 Your document has to be in the XHTML namespace. Plain HTML won't work.
             </p>
             <table>
                 <tr>
                     <td>
-                        <xforms:upload ref="file">
+                        <xforms:upload ref="file" xhtml:size="50">
                             <xforms:filename ref="@filename"/>
                             <xforms:mediatype ref="@mediatype"/>
                             <xxforms:size ref="@size"/>
@@ -54,7 +54,7 @@
                     </td>
                     <td>
                         <xforms:trigger>
-                            <xforms:label>Upload</xforms:label>
+                            <xforms:label>Run XForms</xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="action">upload</xforms:setvalue>
                                 <xforms:send submission="main"/>

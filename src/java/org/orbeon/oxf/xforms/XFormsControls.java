@@ -611,6 +611,8 @@ public class XFormsControls {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("output")) {
                         controlInfo = new OutputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                    } else if (controlName.equals("range")) {
+                        controlInfo = new RangeControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("upload")) {
                         controlInfo = new UploadControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                         result.setHasUpload(true);
@@ -1740,6 +1742,14 @@ public class XFormsControls {
             // NOP for most controls
         }
 
+        public String convertFromExternalValue(String externalValue) {
+            return externalValue;
+        }
+
+        public String convertToExternalValue(String internalValue) {
+            return internalValue;
+        }
+
         protected void evaluateDisplayValue(PipelineContext pipelineContext, String format) {
             final String result;
             if (format == null) {
@@ -1895,6 +1905,65 @@ public class XFormsControls {
 
         public void evaluateDisplayValue(PipelineContext pipelineContext) {
             evaluateDisplayValue(pipelineContext, format);
+        }
+    }
+
+    /**
+     * Represents an xforms:range control.
+     */
+    public class RangeControlInfo extends ControlInfo {
+
+        private String start;
+        private String end;
+        private String step;
+
+        public RangeControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
+            this.start = element.attributeValue("start");
+            this.end = element.attributeValue("end");
+            this.step = element.attributeValue("step");
+        }
+
+        public String getStart() {
+            return start;
+        }
+
+        public String getEnd() {
+            return end;
+        }
+
+        public String getStep() {
+            return step;
+        }
+
+        public String convertFromExternalValue(String externalValue) {
+
+            if (getStart() != null && getEnd() != null
+                    && XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "integer").equals(getType())) {
+
+                final int start = Integer.parseInt(getStart());
+                final int end = Integer.parseInt(getEnd());
+
+                final int value = start + ((int) (Double.parseDouble(externalValue) * (double) (end - start)));
+                return Integer.toString(value);
+            } else {
+                return externalValue;
+            }
+        }
+
+        public String convertToExternalValue(String internalValue) {
+
+            if (getStart() != null && getEnd() != null
+                    && XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "integer").equals(getType())) {
+
+                final int start = Integer.parseInt(getStart());
+                final int end = Integer.parseInt(getEnd());
+
+                final double value = ((double) (Integer.parseInt(internalValue) - start)) / ((double) end - start);
+                return Double.toString(value);
+            } else {
+                return internalValue;
+            }
         }
     }
 

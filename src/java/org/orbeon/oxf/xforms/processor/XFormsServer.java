@@ -680,7 +680,7 @@ public class XFormsServer extends ProcessorImpl {
 
                             // Create element with text value
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                            ch.text(controlInfo2.getValue());
+                            ch.text(controlInfo2.convertToExternalValue(controlInfo2.getValue()));
                             ch.endElement();
                         } else {
                             // No value, just output element with no content

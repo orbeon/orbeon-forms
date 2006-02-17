@@ -43,34 +43,34 @@
     <section label="Welcome">
         <example id="welcome" path="welcome" label="Welcome"/>
     </section>
-    <section label="The Basics">
+    <section label="Must-See XForms">
+        <example id="xforms-controls" path="xforms/xforms-controls" label="Controls" xforms-ng="true"/>
+        <example id="xforms-todo" path="xforms/xforms-todo" label="To-Do Lists" xforms-ng="true"/>
+        <example id="xforms-translate" path="xforms/xforms-translate" label="Instant Translation" xforms-ng="true"/>
+        <example id="forms" label="&quot;DMV Forms&quot;" xforms-ng="true"/>
+        <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
+    </section>
+    <section label="More XForms">
+        <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
+        <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
+        <example id="xforms-i18n" path="xforms/xforms-i18n" label="Internationalization" xforms-ng="true"/>
+        <example id="xforms-registration" path="xforms/xforms-registration" label="Registration Form" xforms-ng="true"/>
+        <example id="xforms-dynamic-image" path="xforms/xforms-dynamic-image" label="Dynamic Image" xforms-ng="true"/>
+        <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>
+        <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control" xforms-ng="true"/>
+        <example id="xforms-wizard-pfc" path="xforms/xforms-wizard-pfc" label="Wizard with PFC" xforms-ng="true"/>
+        <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier" xforms-ng="true"/>
+        <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
+        <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
+        <example id="blog" label="The OPS Blog" xforms-ng="true"/>
+    </section>
+    <section label="OPS Basics">
     	<example id="tutorial-hello1" path="tutorial/hello1" label="Hello World Classic"/>
         <example id="tutorial-hello2" path="tutorial/hello2" label="Hello World MVC"/>
         <example id="tutorial-hello3" path="tutorial/hello3" label="Hello World XForms" xforms-ng="true"/>
         <example id="tutorial-hello4" path="tutorial/hello4" label="Hello World Page Flow" xforms-ng="true"/>
         <example id="atm" label="ATM Page Flow"/>
         <example id="counter" label="Counter Page Flow"/>
-    </section>
-    <section label="Form Handling w/XForms">
-        <example id="xforms-controls" path="xforms/xforms-controls" label="Controls" xforms-ng="true"/>
-        <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control" xforms-ng="true"/>
-        <example id="xforms-todo" path="xforms/xforms-todo" label="To-Do Lists" xforms-ng="true"/>
-        <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier" xforms-ng="true"/>
-        <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
-        <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>
-        <example id="xforms-wizard-pfc" path="xforms/xforms-wizard-pfc" label="Wizard with PFC" xforms-ng="true"/>
-        <example id="xforms-i18n" path="xforms/xforms-i18n" label="Internationalization" xforms-ng="true"/>
-        <example id="xforms-registration" path="xforms/xforms-registration" label="Registration Form" xforms-ng="true"/>
-        <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
-        <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
-        <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
-        <example id="xforms-translate" path="xforms/xforms-translate" label="Instant Translation" xforms-ng="true"/>
-        <example id="xforms-dynamic-image" path="xforms/xforms-dynamic-image" label="Dynamic Image" xforms-ng="true"/>
-        <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
-    </section>
-    <section label="Document-Centric Apps">
-        <example id="forms" label="&quot;DMV Forms&quot;" xforms-ng="true"/>
-        <example id="blog" label="The OPS Blog" xforms-ng="true"/>
     </section>
     <section label="Cool Stuff">
         <example id="xquery-the-web" label="XQuery The Web"/>

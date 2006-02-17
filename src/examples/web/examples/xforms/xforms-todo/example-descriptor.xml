@@ -12,18 +12,18 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XForms To Do Lists</title>
+    <title>XForms To-Do Lists</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p >
-                The <i>To Do Lists</i> example application illustrates many cool XForms features,
+                The <i>To-Do Lists</i> example application illustrates many cool XForms features,
                 such as:
             </p>
             <ul>
                 <li>
                     <p>
-                        Nested <code>xforms:repeat</code>: serveral to do lists can each contain
+                        Nested <code>xforms:repeat</code>: serveral to-do lists can each contain
                         several items.
                     </p>
                 </li>

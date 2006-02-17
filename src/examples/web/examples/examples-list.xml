@@ -54,7 +54,7 @@
     <section label="Form Handling w/XForms">
         <example id="xforms-controls" path="xforms/xforms-controls" label="Controls" xforms-ng="true"/>
         <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control" xforms-ng="true"/>
-        <example id="xforms-todo" path="xforms/xforms-todo" label="To Do Lists" xforms-ng="true"/>
+        <example id="xforms-todo" path="xforms/xforms-todo" label="To-Do Lists" xforms-ng="true"/>
         <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier" xforms-ng="true"/>
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
         <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>

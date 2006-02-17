@@ -21,7 +21,7 @@
             <image>
                 <path>ca-coast.jpg</path>
                 <quality>0.7</quality>
-                <use-cache>false</use-cache>
+                <use-cache>true</use-cache>
                 <scale>
                     <enable>false</enable>
                     <quality>high</quality>

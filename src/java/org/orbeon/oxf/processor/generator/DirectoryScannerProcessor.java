@@ -109,7 +109,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                                 if (realPath == null)
                                     throw new OXFException("Directory Scanner processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + baseDirectoryURLString);
                             } else if (fullURL.getProtocol().equals("file")) {
-                                realPath = fullURL.getFile();
+                                String host = fullURL.getHost();
+                                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
                             } else {
                                 throw new OXFException("Directory Scanner processor only supports the file: and oxf: protocols for the base-directory property: " + baseDirectoryURLString);
                             }

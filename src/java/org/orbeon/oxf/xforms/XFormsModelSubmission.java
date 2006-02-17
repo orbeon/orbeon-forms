@@ -774,6 +774,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
 class ResponseAdapter implements ExternalContext.Response {
 
+    private Object nativeResponse;
+
     private int status = 200;
     private String contentType;
 
@@ -782,6 +784,10 @@ class ResponseAdapter implements ExternalContext.Response {
     private LocalByteArrayOutputStream byteStream;
 
     private InputStream inputStream;
+
+    public ResponseAdapter(Object nativeResponse) {
+        this.nativeResponse = nativeResponse;
+    }
 
     public int getResponseCode() {
         return status;
@@ -889,6 +895,6 @@ class ResponseAdapter implements ExternalContext.Response {
     }
 
     public Object getNativeResponse() {
-        return null;
+        return nativeResponse;
     }
 }

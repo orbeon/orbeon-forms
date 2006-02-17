@@ -89,7 +89,7 @@ public class XFormsSubmissionUtils {
                     connectionResult.dontHandleResponse = true;
                 } else {
                     // We must intercept the reply
-                    final ResponseAdapter responseAdapter = new ResponseAdapter();
+                    final ResponseAdapter responseAdapter = new ResponseAdapter(externalContext.getNativeResponse());
                     requestDispatcher.include(requestAdapter, responseAdapter);
 
                     // Get response information that needs to be forwarded

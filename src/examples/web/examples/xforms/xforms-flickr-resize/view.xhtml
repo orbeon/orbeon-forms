@@ -1,0 +1,158 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xhtml:head>
+    <xhtml:title>Resizing Images With XForms and Flickr</xhtml:title>
+    <xforms:model>
+        <xforms:instance>
+            <instanceData xmlns="">
+                <method>flickr.photos.search</method>
+                <api_key>68149024a667e0be3c63708f002ffe1e</api_key>
+                <tags/>
+                <per_page>12</per_page>
+            </instanceData>
+        </xforms:instance>
+        <xforms:instance id="inst-rs">
+            <dummy xmlns=""/>
+        </xforms:instance>
+        <xforms:instance id="inst-control">
+            <instanceData xmlns="">
+                <size>75</size>
+            </instanceData>
+        </xforms:instance>
+        <xforms:submission id="sub-flickr"
+                           method="get" action="http://www.flickr.com/services/rest/" separator="&amp;"
+                           replace="instance" instance="inst-rs">
+            <xforms:toggle case="case-busy" ev:event="xforms-submit"/>
+            <xforms:toggle case="case-done" ev:event="xforms-submit-done"/>
+        </xforms:submission>
+        <xforms:bind nodeset="instance('inst-control')/size" type="xs:integer"/>
+    </xforms:model>
+    <xhtml:style type="text/css">
+
+        #flickr-main-body {
+            background-color : #eee;
+            border : 5px solid #333;
+            margin: 0px;
+            padding : 10px;
+            display : block;
+        }
+
+        .flickr-image img {
+            border : 1px solid black;
+            margin: 5px;
+        }
+
+        .xforms-label {
+            display: none;
+            margin-right: 1em;
+        }
+
+        .flicker-slider-table {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        .flicker-slider-table th {
+            text-align: right;
+            vertical-align: middle;
+            padding-right: 0.5em;
+        }
+
+        .flicker-slider-table td {
+            vertical-align: middle;
+        }
+
+        .xforms-repeat-selected-item-1 { background: none; }
+
+    </xhtml:style>
+</xhtml:head>
+<xhtml:body>
+    <xforms:group id="flickr-main-body">
+        <table class="flicker-slider-table">
+            <tr>
+                <th>
+                    Tags:
+                </th>
+                <td colspan="2">
+                    <xforms:input ref="tags">
+                        <xforms:label>Tags:</xforms:label>
+                        <xforms:send ev:event="DOMActivate" submission="sub-flickr"/>
+                    </xforms:input>
+                    <xforms:submit submission="sub-flickr">
+                        <xforms:label>Find</xforms:label>
+                    </xforms:submit>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Size:
+                </th>
+                <td>
+                    <xforms:range ref="instance('inst-control')/size" incremental="true" start="10" end="200">
+                        <xforms:label>Size:</xforms:label>
+                    </xforms:range>
+                </td>
+                <td>
+                    <xforms:output ref="instance('inst-control')/size"/>
+                </td>
+            </tr>
+        </table>
+        <xforms:switch>
+            <xforms:case id="case-start"></xforms:case>
+            <xforms:case id="case-busy">
+                <img src="/images/loading.gif" alt="Busy"/>
+            </xforms:case>
+            <xforms:case id="case-done">
+                <xforms:group ref="instance('inst-rs')">
+                    <xforms:output ref="err/@msg">
+                        <xforms:label>Error:</xforms:label>
+                    </xforms:output>
+                    <xforms:repeat nodeset="photos/photo">
+                        <xforms:output
+                            value="concat(
+                                    '&lt;img',
+                                      ' src=&#34;http://static.flickr.com/',
+                                        @server, '/',
+                                        @id, '_',
+                                        @secret,
+                                        '_',
+                                        if (instance('inst-control')/size &lt; 100)
+                                          then 's' else  'm',
+                                        '.jpg&#34;',
+                                      ' style=&#34;',
+                                        'width:', instance('inst-control')/size, ';',
+                                        ' height:', instance('inst-control')/size, ';&#34;',
+                                    '/&gt;'
+                                   )"
+                                mediatype="text/html"
+                                class="flickr-image"/>
+                        <span style="display: none">x</span><!-- This is a hack for IE so that images flow. Better solutions welcome. -->
+                    </xforms:repeat>
+                </xforms:group>
+            </xforms:case>
+        </xforms:switch>
+        <xforms:output ref="instance('inst-rs')/err/@msg">
+            <xforms:label>Error:</xforms:label>
+        </xforms:output>
+    </xforms:group>
+</xhtml:body>
+</xhtml:html>

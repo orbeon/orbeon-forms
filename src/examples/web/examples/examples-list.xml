@@ -51,6 +51,7 @@
         <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
     </section>
     <section label="More XForms">
+        <example id="xforms-flickr-resize" path="xforms/xforms-flickr-resize" label="Flickr Resize" xforms-ng="true"/>
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
         <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
         <example id="xforms-i18n" path="xforms/xforms-i18n" label="Internationalization" xforms-ng="true"/>

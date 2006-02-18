@@ -16,8 +16,10 @@
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
-            This example is based on a tutorial by Mark Birbek. It illustrates connecting to a
-            Flickr service to query images, and then displays them while resizing them.
+            This XForms example is based on a <a
+            href="http://skimstone.x-port.net/index.php?q=node/89">tutorial</a> by Mark Birbek. It
+            illustrates connecting to a Flickr service to query images, and then displays them while
+            resizing them.
         </p>
     </description>
 </example-descriptor>

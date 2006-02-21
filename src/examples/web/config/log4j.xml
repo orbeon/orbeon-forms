@@ -20,7 +20,7 @@
             <param name="ConversionPattern" value="%d{ISO8601} %-5p %c %x - %m%n"/>
         </layout>
         <filter class="org.apache.log4j.varia.LevelRangeFilter">
-            <param name="LevelMin" value="INFO" />
+            <param name="LevelMin" value="debug" />
         </filter>
     </appender>
 
@@ -33,8 +33,11 @@
     
     <!-- This is the OPS Studio monitor -->
     <appender name="OPSMonitor" class="org.apache.log4j.net.SocketHubAppender">
-      <param name="Port" value="4446"/>
-      <param name="LocationInfo" value="true"/>
+        <param name="Port" value="4446"/>
+        <param name="LocationInfo" value="true"/>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="debug" />
+        </filter>
     </appender>
 
     <!-- Logging to file, typically used in production -->
@@ -66,12 +69,20 @@
     <category name="org.orbeon.oxf.processor.generator.RequestGenerator">
         <priority value="debug"/>
     </category>
+
+    <category name="org.orbeon.oxf.webapp.OPSSessionListener">
+        <priority value="info"/>
+    </category>
+
+    <category name="org.orbeon.oxf.webapp.OPSServletContextListener">
+        <priority value="info"/>
+    </category>
     -->
 
     <!-- This is the root logger -->
     <root>
         <priority value="info"/>
-        <appender-ref ref="ConsoleAppender"/>
+        <!--<appender-ref ref="ConsoleAppender"/>-->
         <!--<appender-ref ref="ChainsawAppender"/>-->
         <appender-ref ref="OPSMonitor"/>
     </root>

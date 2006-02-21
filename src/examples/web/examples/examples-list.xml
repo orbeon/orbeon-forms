@@ -100,14 +100,10 @@
     </section>
     <section label="Database Access">
         <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
-        <example id="address-book" label="Address Book Classic"/>
         <example id="employees" label="The &quot;Employees&quot; Example"/>
         <example id="xmldb" label="XML:DB Databases"/>
         <!--<example id="petstore" label="The &quot;Pet Store&quot; Example"/>-->
     </section>
-    <!--<section label="Enterprise Service Bus">-->
-        <!--<example id="xmlserver" label="Simple Bus Service"/>-->
-    <!--</section>-->
     <section label="Calling Web Services">
         <example id="quotes" label="Famous Quotes"/>
         <example id="ca-traffic" label="California Traffic"/>

@@ -487,19 +487,19 @@ public class Dom4jUtils {
      * @return LocationData of caller.
      */
     public static LocationData getLocationData() {
-        return getLocationData(1);
+        return getLocationData(1, false);
     }
 
-    public static LocationData getLocationData(final int dpth) {
+    public static LocationData getLocationData(final int depth, boolean isDebug) {
         // Enable this with a property for debugging only, as it is time consuming
-        if (!OXFProperties.instance().getPropertySet().getBoolean
-                ("oxf.debug.enable-java-location-data", false).booleanValue())
+        if (!isDebug && !OXFProperties.instance().getPropertySet()
+                .getBoolean("oxf.debug.enable-java-location-data", false).booleanValue())
             return null;
 
         // Compute stack trace and extract useful information
         final Exception e = new Exception();
         final StackTraceElement[] stkTrc = e.getStackTrace();
-        final int dpthToUse = dpth + 1;
+        final int dpthToUse = depth + 1;
         final String sysID = stkTrc[dpthToUse].getFileName();
         final int line = stkTrc[dpthToUse].getLineNumber();
         return new LocationData(sysID, line, -1);

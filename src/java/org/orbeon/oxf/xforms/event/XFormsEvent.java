@@ -38,7 +38,7 @@ public abstract class XFormsEvent {
 
         // Get location information for debugging only (it's time consuming)
         if (XFormsServer.logger.isDebugEnabled())
-            this.locationData = Dom4jUtils.getLocationData(2);
+            this.locationData = Dom4jUtils.getLocationData(2, true);
     }
 
     public String getEventName() {

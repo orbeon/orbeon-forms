@@ -72,7 +72,7 @@ public class ExtendedLocationData extends LocationData {
      * @param defaultIfNecessary
      */
     public ExtendedLocationData(LocationData locationData, String description, String[] parameters, boolean defaultIfNecessary) {
-        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData( 1 ) : locationData,
+        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData(1, false) : locationData,
                 description, parameters);
 //        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
 //            System.out.println("xxx defaultIfNecessary = true xxx ");
@@ -91,7 +91,7 @@ public class ExtendedLocationData extends LocationData {
      * @param defaultIfNecessary
      */
     public ExtendedLocationData(LocationData locationData, String description, Element element, String[] parameters, boolean defaultIfNecessary) {
-        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData( 1 ) : locationData,
+        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData(1, false) : locationData,
                 description, parameters);
 //        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
 //            System.out.println("xxx defaultIfNecessary = true xxx ");

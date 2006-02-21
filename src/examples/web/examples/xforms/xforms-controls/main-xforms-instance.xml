@@ -24,8 +24,8 @@
         <value>lime</value>
     </new-item>
     <range>
-        <value>0</value>
-        <letter>a</letter>
+        <value>1</value>
+        <letter>A</letter>
     </range>
     <country/>
 </instance>

@@ -225,7 +225,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.setInstanceDocument(backupInstanceDocument);
+                        currentInstance.restoreInstanceDocument(backupInstanceDocument);
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -314,7 +314,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.setInstanceDocument(backupInstanceDocument);
+                        currentInstance.restoreInstanceDocument(backupInstanceDocument);
                     }
                 } else {
                     // Don't recreate document

@@ -75,6 +75,17 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
+     * Restore an instance document retrieved earlier with getDocument().
+     *
+     * This is the same as setInstanceDocument(), except MIP status is not reset on the document
+     * being passed.
+     */
+    public void restoreInstanceDocument(Document instanceDocument) {
+        this.instanceDocument = instanceDocument;
+        this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
+    }
+
+    /**
      * Set a value on the instance using an element or attribute id.
      *
      * If a type is specified, it means that the Request generator set it, which, for now, means

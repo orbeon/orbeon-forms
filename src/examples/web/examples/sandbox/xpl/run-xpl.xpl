@@ -55,8 +55,8 @@
 
     <!-- Format output -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="oxf:/config/theme/format.xpl"/>
-        <p:input name="data" href="#output"/>
+        <p:input name="config" href="oxf:/config/theme/format-multiple.xpl"/>
+        <p:input name="data" href="aggregate('root', #output)"/>
         <p:output name="data" ref="formatted-output"/>
     </p:processor>
 

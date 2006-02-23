@@ -33,24 +33,26 @@
         <p:output name="data" id="input-parsed"/>
     </p:processor>
     
-    <!-- Parse input document -->
+    <!-- Execute XPath expresssion-->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#input-parsed"/>
         <p:input name="xpath" href="#xpath"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
-                    <xsl:copy-of select="saxon:evaluate(string(doc('input:xpath')))"/>
+                    <root>
+                        <xsl:copy-of select="saxon:evaluate(string(doc('input:xpath')))"/>
+                    </root>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="output"/>
     </p:processor>
-    
+
     <!-- Format output -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="oxf:/config/theme/format.xpl"/>
         <p:input name="data" href="#output"/>
+        <p:input name="config" href="oxf:/config/theme/format-multiple.xpl"/>
         <p:output name="data" ref="formatted-output"/>
     </p:processor>
 

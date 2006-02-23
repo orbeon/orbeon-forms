@@ -39,8 +39,7 @@
             <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
             <xforms:bind nodeset="instance('buttons-state')/finish" readonly="@readonly = 'false'"/>
             <xforms:bind nodeset="instance('formatted')" 
-                calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/config/theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
+                calculate="saxon:serialize(xxforms:call-xpl('oxf:/config/theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

@@ -29,10 +29,10 @@
                 </sandbox-instance>
             </xforms:instance>
             <xforms:bind nodeset="formatted-output"
-                calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/examples/sandbox/xquery/run-xquery.xpl', ('input', 'xquery'), 
-                    (instance('instance')/input, instance('instance')/xquery), 
-                    'formatted-output')/*, 'html')"/>
+                calculate="xxforms:call-xpl
+                            ('oxf:/examples/sandbox/xquery/run-xquery.xpl', ('input', 'xquery'),
+                            (instance('instance')/input, instance('instance')/xquery),
+                            'formatted-output')"/>
         </xforms:model>
 
     </xhtml:head>

@@ -418,7 +418,7 @@ public class XFormsActionInterpreter {
 
             final List collectionToUpdate = xformsControls.getCurrentNodeset();
 
-            if (collectionToUpdate.size() > 0) {
+            if (collectionToUpdate != null && collectionToUpdate.size() > 0) {
                 // "If the collection is empty, the delete action has no effect."
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();

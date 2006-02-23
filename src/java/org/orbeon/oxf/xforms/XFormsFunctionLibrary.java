@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRequired;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsCallXPL;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsValid;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsContext;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsRepeatCurrent;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
@@ -125,6 +126,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         // xxforms:repeat-current
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}repeat-current", XXFormsRepeatCurrent.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:context
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}context", XXFormsContext.class, 0, 0, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // xxforms:valid

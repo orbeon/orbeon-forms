@@ -51,7 +51,10 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         final XFormsControls xformsControls = getXFormsControls();
 
+        // Get current single node
         final Node currentNode = xformsControls.getRepeatCurrentSingleNode(repeatId);
+
+        // Wrap and return result
         final Document currentDocument = currentNode.getDocument();
 
         for (Iterator i = xformsControls.getContainingDocument().getModels().iterator(); i.hasNext();) {

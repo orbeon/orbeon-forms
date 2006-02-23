@@ -433,7 +433,8 @@ public class XFormsControls {
 
         // Push new context
         final boolean newBind = newNodeset != currentBindingContext.getNodeset();
-        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), null, newBind, bindingElement));
+        final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
+        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), id, newBind, bindingElement));
     }
 
     protected BindingContext getCurrentContext() {
@@ -498,8 +499,9 @@ public class XFormsControls {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-            final String repeatIdForIteration = currentBindingContext.getRepeatIdForIteration();
-            if (repeatIdForIteration != null) {
+            final Element bindingElement = currentBindingContext.getControlElement();
+            final String repeatIdForIteration = currentBindingContext.getIdForContext();
+            if (bindingElement == null && repeatIdForIteration != null) {
                 if (repeatId == null || repeatId.equals(repeatIdForIteration)) {
                     // Found binding context for relevant repeat iteration
                     return currentBindingContext.getSingleNode();
@@ -511,6 +513,34 @@ public class XFormsControls {
             throw new OXFException("Enclosing xforms:repeat not found.");
         else
             throw new OXFException("Enclosing xforms:repeat not found for id: " + repeatId);
+    }
+
+    /**
+     * Return the context node-set based on the enclosing xforms:repeat, xforms:group or
+     * xforms:switch, either the closest one if no argument is passed, or context at the level of
+     * the element with the given id passed.
+     *
+     * @param contextId  enclosing context id, or null
+     * @return           the node-set
+     */
+    public List getCurrentContext(String contextId) {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+
+            final Element bindingElement = currentBindingContext.getControlElement();
+            final String idForContext = currentBindingContext.getIdForContext();
+            if (bindingElement != null && idForContext != null) {
+                if (contextId == null || contextId.equals(idForContext)) {
+                    // Found binding context for relevant repeat iteration
+                    return currentBindingContext.getNodeset();
+                }
+            }
+        }
+        // It is required that there is a relevant enclosing xforms:repeat
+        if (contextId == null)
+            throw new OXFException("Enclosing XForms element not found.");
+        else
+            throw new OXFException("Enclosing XForms element not found for id: " + contextId);
     }
 
     public void popBinding() {
@@ -1114,15 +1144,15 @@ public class XFormsControls {
         private XFormsModel model;
         private List nodeset;
         private int position = 1;
-        private String repeatIdForIteration;
+        private String idForContext;
         private boolean newBind;
         private Element controlElement;
 
-        public BindingContext(XFormsModel model, List nodeSet, int position, String repeatIdForIteration, boolean newBind, Element controlElement) {
+        public BindingContext(XFormsModel model, List nodeSet, int position, String idForContext, boolean newBind, Element controlElement) {
             this.model = model;
             this.nodeset = nodeSet;
             this.position = position;
-            this.repeatIdForIteration = repeatIdForIteration;
+            this.idForContext = idForContext;
             this.newBind = newBind;
             this.controlElement = controlElement;
 
@@ -1143,8 +1173,8 @@ public class XFormsControls {
             return position;
         }
 
-        public String getRepeatIdForIteration() {
-            return repeatIdForIteration;
+        public String getIdForContext() {
+            return idForContext;
         }
 
         public boolean isNewBind() {

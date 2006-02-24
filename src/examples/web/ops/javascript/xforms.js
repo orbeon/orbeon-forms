@@ -71,6 +71,16 @@ function xformsDispatchEvent(target, eventName) {
     }
 }
 
+function xformsPreventDefault(event) {
+    if (event.preventDefault) {
+        // Firefox version
+        event.preventDefault();
+    } else {
+        // IE version
+        return false;
+    }
+}
+
 function xformsArrayContains(array, element) {
     for (var i = 0; i < array.length; i++)
         if (array[i] == element)
@@ -366,6 +376,7 @@ function xformsStoreInClientState(key, value) {
 
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
+    xformsLog("Current: " + target.value + ", previous: " + target.previousValue);
     if (valueChanged) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
@@ -378,15 +389,21 @@ function xformsValueChanged(target, other) {
 // Function called by browser when value changes (either after changing focus or keyboard input)
 function xformsHandleValueChange(event) {
     var target = getEventTarget(event);
-    // If this is an input field, set value on parent and send event on parent element
-    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")
-            || xformsArrayContains(target.parentNode.className.split(" "), "xforms-select1-open")) {
-        target.parentNode.valueSetByXForms++;
-        target.parentNode.value = target.value;
-        target = target.parentNode;
+    if (event.keyCode == 27) {
+        // We don't want to propagate the event and maybe cancel a request
+        return xformsPreventDefault(event);
+    } else {
+        // If this is an input field, set value on parent and send event on parent element
+        if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")
+                || xformsArrayContains(target.parentNode.className.split(" "), "xforms-select1-open")) {
+            target.parentNode.valueSetByXForms++;
+            target.parentNode.value = target.value;
+            target = target.parentNode;
+            target.lastKeyCode = event.keyCode;
+        }
+        xformsValueChanged(target, null);
+        return true;
     }
-    xformsValueChanged(target, null);
-    return true;
 }
 
 // Handle click on trigger
@@ -499,13 +516,7 @@ function xformsHandleInputKeyPress(event) {
         xformsHandleValueChange(event);
         xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
         // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
-        if (event.preventDefault) {
-            // Firefox version
-            event.preventDefault();
-        } else {
-            // IE version
-            return false;
-        }
+        return xformsPreventDefault(event);
     }
 }
 
@@ -1213,7 +1224,7 @@ function xformsHandleResponse() {
                                         // Case of the auto-complete control
                                         var textfield = documentElement.childNodes[0];
                                         textfield.actb_keywords = newValues;
-                                        textfield.actb_tocomplete(65);
+                                        textfield.actb_tocomplete(documentElement.lastKeyCode);
                                     } else if (documentElement.tagName == "SELECT") {
 
                                         // Case of list / combobox
@@ -1334,6 +1345,9 @@ function xformsHandleResponse() {
                                             var foundControlModified = false;
                                             if (xformsArrayContains(documentElementClasses, "xforms-input")) {
                                                 if (documentElement.childNodes[1].value != documentElement.previousValue)
+                                                    foundControlModified = true;
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                                if (documentElement.childNodes[0].value != documentElement.previousValue)
                                                     foundControlModified = true;
                                             } else if (xformsIsDefined(documentElement.previousValue)
                                                     && documentElement.previousValue != documentElement.value) {

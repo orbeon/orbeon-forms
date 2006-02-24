@@ -158,6 +158,10 @@
     display: none;
 }
 
+.xforms-select1-open-select {
+    display: none;
+}
+
 .xforms-repeat-template {
     display: none;
 }

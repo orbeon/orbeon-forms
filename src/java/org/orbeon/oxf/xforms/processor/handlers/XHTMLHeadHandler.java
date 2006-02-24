@@ -43,7 +43,9 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/overlib_mini.js",
             "/ops/javascript/time-utils.js",
             "/ops/javascript/sarissa.js",
-            "/ops/javascript/xforms.js"
+            "/ops/javascript/xforms.js",
+            "/ops/javascript/suggest-common.js",
+            "/ops/javascript/suggest-actb.js"
     };
 
     public XHTMLHeadHandler() {

@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <countries>
     <country>
-        <name>World</name>
-        <us-code>xx</us-code>
-    </country>
-    <country>
         <name>Afghanistan</name>
 
         <us-code>af</us-code>

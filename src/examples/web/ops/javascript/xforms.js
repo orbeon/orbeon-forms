@@ -379,7 +379,8 @@ function xformsValueChanged(target, other) {
 function xformsHandleValueChange(event) {
     var target = getEventTarget(event);
     // If this is an input field, set value on parent and send event on parent element
-    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
+    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")
+            || xformsArrayContains(target.parentNode.className.split(" "), "xforms-select1-open")) {
         target.parentNode.valueSetByXForms++;
         target.parentNode.value = target.value;
         target = target.parentNode;
@@ -675,12 +676,14 @@ function xformsInitializeControlsUnder(root) {
         var isIncremental = false;
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
+        var isXFormsAutoComplete = false;
         var isXFormsTrigger = false;
         var isXFormsOutput = false;
         var isXFormsInput = false;
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
+        var isXFormsNoInitElement = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
@@ -701,6 +704,12 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsOutput = true;
             if (className == "xforms-input")
                 isXFormsInput = true;
+            if (className == "xforms-select1-open")
+                isXFormsAutoComplete = true;
+            if (className == "xforms-select1-open-input")
+                isXFormsNoInitElement = true;
+            if (className == "xforms-select1-open-select")
+                isXFormsNoInitElement = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -710,11 +719,29 @@ function xformsInitializeControlsUnder(root) {
             xformsUpdateStyle(control);
         }
 
-        if (isXFormsElement) {
+        if (isXFormsElement && !isXFormsNoInitElement) {
             xformsElementCount++;
             if (isXFormsTrigger) {
                 // Handle click on trigger
                 control.onclick = xformsHandleClick;
+            } else if (isXFormsAutoComplete) {
+                var textfield = control.childNodes[0];
+                var select = control.childNodes[1];
+                // Get list of possible values from the select
+                var values = new Array();
+                for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
+                    values.push(select.options[optionIndex].value);
+                // Initialize auto-complete input
+                actb(textfield, values);
+                // Initialize span
+                control.value = textfield.value;
+                control.previousValue = textfield.value;
+                control.valueSetByXForms = 0;
+                // Intercept end-user pressing enter in text field
+                xformsAddEventListener(textfield, "keypress", xformsHandleInputKeyPress);
+                // Intercept incremental modifications
+                if (isIncremental)
+                    xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
             } else if (isXFormsCheckboxRadio) {
                 xformsInitCheckesRadios(control);
             } else if (isXFormsComboboxList) {
@@ -1172,8 +1199,23 @@ function xformsHandleResponse() {
                                     var itemsetElement = itemsetsElement.childNodes[j];
                                     var controlId = itemsetElement.getAttribute("id");
                                     var documentElement = document.getElementById(controlId);
+                                    var documentElementClasses = documentElement.className.split(" ");
 
-                                    if (documentElement.tagName == "SELECT") {
+                                    if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                        // Build list with new values
+                                        var newValues = new Array();
+                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
+                                            var itemElement = itemsetElement.childNodes[k];
+                                            if (itemElement.nodeType == ELEMENT_TYPE)
+                                                newValues.push(itemElement.getAttribute("value"));
+                                        }
+
+                                        // Case of the auto-complete control
+                                        var list = document.getElementById('tat_table')
+                                        if (list) document.body.removeChild(list);
+                                        var textfield = documentElement.childNodes[0];
+                                        actb(textfield, newValues);
+                                    } else if (documentElement.tagName == "SELECT") {
 
                                         // Case of list / combobox
                                         var options = documentElement.options;
@@ -1314,6 +1356,14 @@ function xformsHandleResponse() {
                                                 // so don't try to update it
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
                                                 // Triggers don't have a value: don't update them
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                                // Auto-complete
+                                                var textfield = documentElement.childNodes[0];
+                                                var select = documentElement.childNodes[1];
+
+                                                // Populate values
+                                                if (textfield.value != newControlValue)
+                                                    textfield.value = newControlValue;
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
                                                     || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
                                                 // Handle checkboxes and radio buttons
@@ -1344,6 +1394,7 @@ function xformsHandleResponse() {
                                                     xformsReplaceNodeText(documentElement, newOutputControlValue);
                                                 }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-input")) {
+                                                // XForms input
                                                 var displayField = documentElement.childNodes[0];
                                                 var inputField = documentElement.childNodes[1];
                                                 var datePicker = documentElement.childNodes[2];

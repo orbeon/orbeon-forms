@@ -174,6 +174,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 classes.append(" xforms-select1-");
             }
             classes.append(appearanceLocalname);
+            if (isOpenSelection)
+                classes.append(" xforms-select1-open");
 
             if (!handlerContext.isGenerateTemplate()) {
                 handleMIPClasses(classes, controlInfo);

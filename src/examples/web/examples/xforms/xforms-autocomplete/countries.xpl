@@ -18,7 +18,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param name="instance" type="input" debug="instance"/>
+    <p:param name="instance" type="input"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="/init-database/countries.xml"/>
@@ -31,12 +31,12 @@
                         <xsl:copy-of select="/countries/country[10 >= position()]"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="/countries/country[starts-with(lower-case(name), doc('input:instance')/country/name)][10 >= position()]"/>
+                        <xsl:copy-of select="/countries/country[starts-with(lower-case(name), lower-case(doc('input:instance')/country/name))][10 >= position()]"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </countries>
         </p:input>
-        <p:output name="data" id="xml-response" debug="countries"/>
+        <p:output name="data" id="xml-response"/>
     </p:processor>
 
     <!-- Generate response -->

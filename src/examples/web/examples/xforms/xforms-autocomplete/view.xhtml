@@ -36,28 +36,43 @@
     <xhtml:body>
         <xforms:group>
             <xhtml:p>Select country, either by name or US country code:</xhtml:p>
-            <xhtml:div>
+            <xhtml:p>
                 <xforms:select1 ref="name" selection="open" id="country-name" incremental="true">
-                    <xforms:label>Name: </xforms:label>
+                    <xforms:label class="fixed-width">Name: </xforms:label>
                     <xforms:itemset nodeset="instance('countries')/country">
                         <xforms:label ref="name"/>
                         <xforms:value ref="name"/>
                     </xforms:itemset>
                     <xforms:action ev:event="xforms-value-changed">
-                        <xforms:setvalue ref="../us-code"/>
                         <xforms:send submission="country-updated"/>
+                        <xforms:setvalue ref="../us-code" value="instance('countries')/country[name = instance('main-instance')/name]/us-code"/>
                     </xforms:action>
                 </xforms:select1>
-            </xhtml:div>
-            <!--<xhtml:div>-->
-                <!--<xforms:select1 ref="name" selection="open" id="country-">-->
-                    <!--<xforms:label>Name: </xforms:label>-->
+            </xhtml:p>
+            <!--<xhtml:p>-->
+                <!--<xforms:select1 ref="us-code" selection="open" id="country-us-code" incremental="true">-->
+                    <!--<xforms:label class="fixed-width">US code: </xforms:label>-->
                     <!--<xforms:itemset nodeset="instance('countries')/country">-->
-                        <!--<xforms:label ref="name"/>-->
-                        <!--<xforms:value ref="name"/>-->
+                        <!--<xforms:label ref="us-code"/>-->
+                        <!--<xforms:value ref="us-code"/>-->
                     <!--</xforms:itemset>-->
                 <!--</xforms:select1>-->
-            <!--</xhtml:div>-->
+            <!--</xhtml:p>-->
+            <xhtml:p>
+                <xforms:output
+                    value="if (instance('countries')/country[us-code = instance('main-instance')/us-code]) then
+                               concat(
+                                '&lt;img',
+                                  ' src=&#34;../images/flags/',
+                                    instance('main-instance')/us-code,
+                                    '-flag.gif&#34;',
+                                '/&gt;'
+                               )
+                           else
+                               ''"
+                        mediatype="text/html"
+                        class="flickr-image"/>
+            </xhtml:p>
         </xforms:group>
     </xhtml:body>
 </xhtml:html>

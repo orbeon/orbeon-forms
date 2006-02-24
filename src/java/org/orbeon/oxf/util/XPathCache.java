@@ -267,13 +267,18 @@ public class XPathCache {
             XPathEvaluator evaluator = new XPathEvaluator(currentNode);
             StandaloneContext origContext = (StandaloneContext) evaluator.getStaticContext();
 
-            // HACK: Workaround Saxon bug: need to allocate enough Slots to accomodate all variables
-            int numberVariables = 2;  // at least 1 if LetExpression is used
-            int index = 0;
-            while (index != -1) {
-                index = xpathExpression.indexOf("$", index + 1);
-                numberVariables++;
+            // TODO FIXME HACK: Workaround Saxon bug: need to allocate enough Slots to accomodate all variables
+            int numberVariables = 10;  // at least 1 if LetExpression is used
+            {
+                {
+                    int index = 0;
+                    while (index != -1) {
+                        index = xpathExpression.indexOf("$", index + 1);
+                        numberVariables++;
+                    }
+                }
             }
+
             // Set the base URI if specified
             if (baseURI != null)
                 origContext.setBaseURI(baseURI);

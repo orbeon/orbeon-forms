@@ -376,7 +376,6 @@ function xformsStoreInClientState(key, value) {
 
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
-    xformsLog("Current: " + target.value + ", previous: " + target.previousValue);
     if (valueChanged) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);

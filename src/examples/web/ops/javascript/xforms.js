@@ -221,15 +221,13 @@ function xformsFindRepeatDelimiter(repeatId, index) {
 
     var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
     var beginElement = document.getElementById(beginElementId);
-    if (! beginElement) throw "Cannot find element with id '" + beginElementId + "'";
+    if (!beginElement) return null;
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
         while (cursor.nodeType != ELEMENT_TYPE || !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")) {
             cursor = cursor.nextSibling;
-            if (!cursor)
-                throw "Cannot find element #" + index + " with class 'xforms-repeat-delimiter' after element with id '"
-                        + beginElementId + "'";
+            if (!cursor) return null;
         }
         cursorPosition++;
         if (cursorPosition == index) break;
@@ -1577,24 +1575,18 @@ function xformsHandleResponse() {
                                 }
                                 // For each repeat id that changes, see if all the children are also included in
                                 // newRepeatIndexes. If they are not, add an entry with the index unchanged.
-                                var newRepeatIndexesIgnoreHack = new Array(); // HACK
                                 for (var repeatId in newRepeatIndexes) {
                                     var children = document.xformsRepeatTreeParentToAllChildren[repeatId];
-                                    var parentIndex = document.xformsRepeatIndexes[repeatId]; // HACK
                                     for (var childIndex in children) {
                                         var child = children[childIndex];
-                                        if (!newRepeatIndexes[child]) {
+                                        if (!newRepeatIndexes[child])
                                             newRepeatIndexes[child] = document.xformsRepeatIndexes[child];
-                                            if (parentIndex == 0) // HACK
-                                                newRepeatIndexesIgnoreHack[child] = true; // HACK
-                                        }
                                     }
                                 }
                                 // Unhighlight items at old indexes
                                 for (var repeatId in newRepeatIndexes) {
                                     var oldIndex = document.xformsRepeatIndexes[repeatId];
-                                    if (oldIndex != 0 
-                                            && !newRepeatIndexesIgnoreHack[repeatId]) {  // HACK
+                                    if (oldIndex != 0) {
                                         var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
                                         if (oldItemDelimiter != null) {
                                             cursor = oldItemDelimiter.nextSibling;

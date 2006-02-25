@@ -332,7 +332,7 @@ public class XFormsActionInterpreter {
 
                                         final int adjustedNewIndex;
                                         {
-                                            final int newIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
+                                            final int newIndex = ((Integer) currentControlsState.getRepeatIdToIndex().get(repeatId)).intValue();
 
                                             // Adjust bounds if necessary
                                             if (newIndex < 1)
@@ -344,7 +344,7 @@ public class XFormsActionInterpreter {
                                         }
 
                                         // Set index
-                                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, adjustedNewIndex);
+                                        currentControlsState.updateRepeatIndex(repeatId, adjustedNewIndex);
                                     }
 
                                 } else {

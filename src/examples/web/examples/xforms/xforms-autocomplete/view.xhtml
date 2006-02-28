@@ -21,57 +21,105 @@
 
     <xhtml:head>
         <xhtml:title>XForms Auto-Complete</xhtml:title>
+        <xhtml:style type="text/css">
+            .search-by               { text-align: center; font-weight: bold; color: #666; margin-top: .5em; margin-bottom: 1.5em; }
+            .label                   { padding-left: 1em; display: -moz-inline-box; display: inline-block; width: expression('5em'); min-width: 5em; }
+            .flag                    { text-align: center; padding-top: 2em; padding-bottom: 1.5em; }
+        </xhtml:style>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="main-instance">
-                <country>
+                <country last-set="">
                     <name/>
                     <us-code/>
                 </country>
             </xforms:instance>
-            <xforms:instance id="countries" src="xforms-autocomplete/countries"/>
-            <xforms:submission ref="instance('main-instance')" id="country-updated"
-                method="post" action="/direct/xforms-autocomplete/countries" replace="instance" instance="countries"/>
+            <!-- List of countries for name select1 -->
+            <xforms:instance id="countries-name" src="xforms-autocomplete/countries"/>
+            <!-- List of countries for US code select1 -->
+            <xforms:instance id="countries-us-code" src="xforms-autocomplete/countries"/>
+            <!-- Submission when name changed -->
+            <xforms:submission ref="instance('main-instance')" id="country-name-updated"
+                method="post" action="/direct/xforms-autocomplete/countries" replace="instance" instance="countries-name"/>
+            <!-- Submission when US code changed -->
+            <xforms:submission ref="instance('main-instance')" id="country-us-code-updated"
+                method="post" action="/direct/xforms-autocomplete/countries" replace="instance" instance="countries-us-code"/>
         </xforms:model>
+
     </xhtml:head>
     <xhtml:body>
         <xforms:group>
-            <xhtml:p>Select country, and press enter to see its flag:</xhtml:p>
+            <xhtml:p>Search country by name or US code:</xhtml:p>
+            <xhtml:table class="gridtable">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xhtml:div class="search-by">Search by name</xhtml:div>
+                        <xhtml:p>
+                            <!-- Auto-complete for country name -->
+                            <xforms:select1 ref="name" selection="open" id="country-name" incremental="true">
+                                <xforms:label class="label">Name: </xforms:label>
+                                <xforms:itemset nodeset="instance('countries-name')/country">
+                                    <xforms:label ref="name"/>
+                                    <xforms:value ref="name"/>
+                                </xforms:itemset>
+                                <xforms:action ev:event="xforms-value-changed">
+                                    <xforms:setvalue ref="../@last-set">name</xforms:setvalue>
+                                    <xforms:send submission="country-name-updated"/>
+                                </xforms:action>
+                            </xforms:select1>
+                        </xhtml:p>
+                        <!-- Display flag of selected country -->
+                        <xhtml:div class="flag">
+                            <xforms:output
+                                value="for $c in instance('countries-name')/country[name = instance('main-instance')/name] return
+                                       if ($c) then
+                                           concat(
+                                            '&lt;img',
+                                              ' src=&#34;../images/flags/',
+                                                $c/us-code,
+                                                '-flag.gif&#34;',
+                                            '/&gt;'
+                                           )
+                                       else
+                                           ''"
+                                    mediatype="text/html"/>
+                        </xhtml:div>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xhtml:div class="search-by">Search by US code</xhtml:div>
+                        <!-- Auto-complete for country US code -->
+                        <xforms:select1 ref="us-code" selection="open" id="country-us-code" incremental="true">
+                            <xforms:label class="label">US code: </xforms:label>
+                            <xforms:itemset nodeset="instance('countries-us-code')/country">
+                                <xforms:label ref="us-code"/>
+                                <xforms:value ref="us-code"/>
+                            </xforms:itemset>
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:setvalue ref="../@last-set">us-code</xforms:setvalue>
+                                <xforms:send submission="country-us-code-updated"/>
+                            </xforms:action>
+                        </xforms:select1>
+                        <!-- Display flag of selected country -->
+                        <xhtml:div class="flag">
+                            <xforms:output
+                                value="for $c in instance('countries-us-code')/country[us-code = instance('main-instance')/us-code] return
+                                       if ($c) then
+                                           concat(
+                                            '&lt;img',
+                                              ' src=&#34;../images/flags/',
+                                                $c/us-code,
+                                                '-flag.gif&#34;',
+                                            '/&gt;'
+                                           )
+                                       else
+                                           ''"
+                                    mediatype="text/html"/>
+                        </xhtml:div>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
             <xhtml:p>
-                <xforms:select1 ref="name" selection="open" id="country-name" incremental="true">
-                    <xforms:label class="fixed-width">Name: </xforms:label>
-                    <xforms:itemset nodeset="instance('countries')/country">
-                        <xforms:label ref="name"/>
-                        <xforms:value ref="name"/>
-                    </xforms:itemset>
-                    <xforms:action ev:event="xforms-value-changed">
-                        <xforms:send submission="country-updated"/>
-                        <xforms:setvalue ref="../us-code" value="instance('countries')/country[name = instance('main-instance')/name]/us-code"/>
-                    </xforms:action>
-                </xforms:select1>
-            </xhtml:p>
-            <!--<xhtml:p>-->
-                <!--<xforms:select1 ref="us-code" selection="open" id="country-us-code" incremental="true">-->
-                    <!--<xforms:label class="fixed-width">US code: </xforms:label>-->
-                    <!--<xforms:itemset nodeset="instance('countries')/country">-->
-                        <!--<xforms:label ref="us-code"/>-->
-                        <!--<xforms:value ref="us-code"/>-->
-                    <!--</xforms:itemset>-->
-                <!--</xforms:select1>-->
-            <!--</xhtml:p>-->
-            <xhtml:p>
-                <xforms:output
-                    value="if (instance('countries')/country[us-code = instance('main-instance')/us-code]) then
-                               concat(
-                                '&lt;img',
-                                  ' src=&#34;../images/flags/',
-                                    instance('main-instance')/us-code,
-                                    '-flag.gif&#34;',
-                                '/&gt;'
-                               )
-                           else
-                               ''"
-                        mediatype="text/html"
-                        class="flickr-image"/>
             </xhtml:p>
         </xforms:group>
     </xhtml:body>

@@ -1,4 +1,5 @@
 function actb(obj,ca) {
+
     var actb_self = obj;
     actb_self.actb_keywords = ca;
 	/* ---- Public Variables ---- */
@@ -21,7 +22,10 @@ function actb(obj,ca) {
 	/* --- Styles --- */
 
 	/* ---- Private Variables ---- */
-	var actb_delimwords = new Array();
+    var actb_table_id = obj.parentNode.id + "-tat_table";
+    var actb_tr_id = obj.parentNode.id + "-tat_tr";
+    var actb_td_id = obj.parentNode.id + "-tat_td";
+    var actb_delimwords = new Array();
 	var actb_cdelimword = 0;
 	var actb_delimchar = new Array();
 	var actb_display = false;
@@ -86,7 +90,7 @@ function actb(obj,ca) {
 		return tobuild;
 	}
 	function actb_generate(){
-        if (document.getElementById('tat_table')){ actb_display = false;document.body.removeChild(document.getElementById('tat_table')); }
+        if (document.getElementById(actb_table_id)){ actb_display = false;document.body.removeChild(document.getElementById(actb_table_id)); }
 		if (actb_kwcount == 0){
 			actb_display = false;
 			return;
@@ -101,7 +105,7 @@ function actb(obj,ca) {
 		a.style.backgroundColor=actb_self.actb_bgColor;
 		a.style.color = actb_self.actb_textColor;
         a.style.border = "1px solid black";
-        a.id = 'tat_table';
+        a.id = actb_table_id;
 		document.body.appendChild(a);
 		var i;
 		var first = true;
@@ -129,14 +133,14 @@ function actb(obj,ca) {
 					r.style.backgroundColor = actb_self.actb_bgColor;
 					r.style.color = actb_self.actb_textColor;
 				}
-				r.id = 'tat_tr'+(j);
+				r.id = actb_tr_id+(j);
                 // Generate cell
                 c = r.insertCell(-1);
 				c.style.fontFamily = actb_self.actb_fFamily;
 				c.style.fontSize = actb_self.actb_fSize;
                 c.style.padding = '2px 2px 2px 2px';
 				c.innerHTML = actb_parse(actb_self.actb_keywords[i]);
-				c.id = 'tat_td'+(j);
+				c.id = actb_td_id+(j);
 				c.setAttribute('pos',j);
 				if (actb_self.actb_mouse){
 					c.style.cursor = 'pointer';
@@ -167,7 +171,7 @@ function actb(obj,ca) {
 		if (actb_pos <= 0) actb_pos = 1;
 	}
 	function actb_remake(){
-		document.body.removeChild(document.getElementById('tat_table'));
+		document.body.removeChild(document.getElementById(actb_table_id));
 		a = document.createElement('table');
 		a.cellSpacing='1px';
 		a.cellPadding='2px';
@@ -176,7 +180,7 @@ function actb(obj,ca) {
 		a.style.left = curLeft(actb_curr) + "px";
 		a.style.backgroundColor=actb_self.actb_bgColor;
 		a.style.color = actb_self.actb_textColor;
-		a.id = 'tat_table';
+		a.id = actb_table_id;
 		if (actb_self.actb_mouse){
 			a.onmouseout= actb_table_unfocus;
 			a.onmouseover=actb_table_focus;
@@ -205,12 +209,12 @@ function actb(obj,ca) {
 					r = a.insertRow(-1);
 					r.style.backgroundColor = actb_self.actb_bgColor;
 					r.style.color = actb_self.actb_textColor;
-					r.id = 'tat_tr'+(j);
+					r.id = actb_tr_id+(j);
 					c = r.insertCell(-1);
 					c.style.fontFamily = actb_self.actb_fFamily;
 					c.style.fontSize = actb_self.actb_fSize;
 					c.innerHTML = actb_parse(actb_self.actb_keywords[i]);
-					c.id = 'tat_td'+(j);
+					c.id = actb_td_id+(j);
 					c.setAttribute('pos',j);
 					if (actb_self.actb_mouse){
 						c.style.cursor = 'pointer';
@@ -242,12 +246,12 @@ function actb(obj,ca) {
 	function actb_goup(){
 		if (!actb_display) return;
 		if (actb_pos == 1) return;
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_textColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos--;
 		if (actb_pos < actb_rangeu) actb_moveup();
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_hColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_hTextColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_hColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_hTextColor;
 		if (actb_toid) clearTimeout(actb_toid);
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list=0;actb_removedisp();},actb_self.actb_timeOut);
 	}
@@ -255,12 +259,12 @@ function actb(obj,ca) {
 		if (!actb_display)
             actb_tocomplete(40);
 		if (actb_pos == actb_total) return;
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_textColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos++;
 		if (actb_pos > actb_ranged) actb_movedown();
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_hColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_hTextColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_hColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_hTextColor;
 		if (actb_toid) clearTimeout(actb_toid);
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list=0;actb_removedisp();},actb_self.actb_timeOut);
 	}
@@ -277,12 +281,12 @@ function actb(obj,ca) {
 
 	/* Mouse */
 	function actb_mouse_down(){
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_textColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos++;
 		actb_movedown();
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_hColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_hTextColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_hColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_hTextColor;
 		actb_curr.focus();
 		actb_mouse_on_list = 0;
 		if (actb_toid) clearTimeout(actb_toid);
@@ -295,12 +299,12 @@ function actb(obj,ca) {
 		}else{
 			evt.cancelBubble = true;
 		}
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_textColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos--;
 		actb_moveup();
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_hColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_hTextColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_hColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_hTextColor;
 		actb_curr.focus();
 		actb_mouse_on_list = 0;
 		if (actb_toid) clearTimeout(actb_toid);
@@ -323,13 +327,13 @@ function actb(obj,ca) {
 	}
 	function actb_table_highlight(){
 		actb_mouse_on_list = 1;
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_textColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos = this.getAttribute('pos');
 		while (actb_pos < actb_rangeu) actb_moveup();
 		while (actb_pos > actb_ranged) actb_movedown();
-		document.getElementById('tat_tr'+actb_pos).style.backgroundColor = actb_self.actb_hColor;
-		document.getElementById('tat_tr'+actb_pos).style.color = actb_self.actb_hTextColor;
+		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_hColor;
+		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_hTextColor;
 		if (actb_toid) clearTimeout(actb_toid);
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list = 0;actb_removedisp();},actb_self.actb_timeOut);
 	}
@@ -391,7 +395,7 @@ function actb(obj,ca) {
 	function actb_removedisp(){
 		if (actb_mouse_on_list==0){
 			actb_display = 0;
-			if (document.getElementById('tat_table')){ document.body.removeChild(document.getElementById('tat_table')); }
+			if (document.getElementById(actb_table_id)){ document.body.removeChild(document.getElementById(actb_table_id)); }
 			if (actb_toid) clearTimeout(actb_toid);
 		}
 	}

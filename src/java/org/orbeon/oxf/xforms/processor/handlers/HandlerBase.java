@@ -77,6 +77,11 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     sb.append(' ');
                 sb.append("xforms-disabled");
             }
+            if (!controlInfo.isValid()) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-invalid");
+            }
             if (controlInfo != null && controlInfo.isReadonly()) {
                 if (sb.length() > 0)
                     sb.append(' ');

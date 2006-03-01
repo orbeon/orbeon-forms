@@ -840,11 +840,12 @@ function xformsInitializeControlsUnder(root) {
                 }
             }
 
-            // Set initial values for disabled, readonly, and required
+            // Set initial values for disabled, readonly, required, and valid
             if (xformsArrayContains(classes, "xforms-control")) {
                 control.isRelevant = !xformsArrayContains(classes, "xforms-disabled");
                 control.isReadonly = xformsArrayContains(classes, "xforms-readonly");
                 control.isRequired = xformsArrayContains(classes, "xforms-required");
+                control.isValid = !xformsArrayContains(classes, "xforms-invalid");
             }
 
             // Add style to element

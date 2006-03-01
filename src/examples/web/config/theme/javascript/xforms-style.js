@@ -32,7 +32,7 @@ function xformsUpdateReadonlyFormElement(element, readonly) {
     }
 }
 
-function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required) {
+function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required, valid) {
     if (xformsIsDefined(relevant)) {
         if (relevant) xformsRemoveClass(element, "xforms-disabled")
         else xformsAddClass(element, "xforms-disabled");
@@ -82,6 +82,10 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
             xformsRemoveClass(element, "xforms-required-filled");
             xformsRemoveClass(element, "xforms-required-empty");
         }
+    }
+    if (xformsIsDefined(valid)) {
+        if (valid) xformsRemoveClass(element, "xforms-invalid")
+        else xformsAddClass(element, "xforms-invalid");
     }
 }
 
@@ -186,7 +190,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable label depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
             }
 
             if (className == "xforms-hint") {
@@ -215,7 +219,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable hint depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
             }
             
             if (className == "xforms-help") {
@@ -261,7 +265,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable help depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
             }
 
             if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
@@ -285,7 +289,7 @@ function xformsUpdateStyle(element) {
                 element.title = xformsStringValue(element);
 
                 // Disable or enable help depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired);
+                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
             }
 
             if (className == "xforms-input") {
@@ -351,6 +355,6 @@ function xformsUpdateStyle(element) {
         }
 
         // Update class on element based on its attributes
-        xformsUpdateStyleRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired);
+        xformsUpdateStyleRelevantReadonly(element, element.isRelevant, element.isReadonly, element.isRequired, element.isValid);
     }
 }

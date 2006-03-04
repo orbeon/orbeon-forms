@@ -172,7 +172,7 @@ function actb(obj,ca) {
 	}
 	function actb_remake(){
 		document.body.removeChild(document.getElementById(actb_table_id));
-		a = document.createElement('table');
+        a = document.createElement('table');
 		a.cellSpacing='1px';
 		a.cellPadding='2px';
 		a.style.position='absolute';
@@ -393,14 +393,15 @@ function actb(obj,ca) {
 		l = getCaretStart(actb_curr);
 	}
 	function actb_removedisp(){
-		if (actb_mouse_on_list==0){
+        // Ignore the actb_mouse_on_list which does not seem to be accurate (avernet)
+        if (true || actb_mouse_on_list==0){
 			actb_display = 0;
-			if (document.getElementById(actb_table_id)){ document.body.removeChild(document.getElementById(actb_table_id)); }
+            if (document.getElementById(actb_table_id)){ document.body.removeChild(document.getElementById(actb_table_id)); }
 			if (actb_toid) clearTimeout(actb_toid);
 		}
 	}
     function actb_keypress(e){
-		if (actb_caretmove) stopEvent(e);
+        if (actb_caretmove) stopEvent(e);
 		return !actb_caretmove;
 	}
 	function actb_checkkey(evt){
@@ -435,7 +436,7 @@ function actb(obj,ca) {
 	}
 
 	function actb_tocomplete(kc){
-        if (kc == 38 || kc == 13 || kc == 18) return;
+        if (kc == 38 || kc == 13 || kc == 18 || kc == 27) return;
 		var i;
 		if (actb_display){ 
 			var word = 0;
@@ -522,5 +523,6 @@ function actb(obj,ca) {
 		actb_generate();
 	}
     actb_curr.actb_tocomplete = actb_tocomplete;
+    actb_curr.actb_removedisp = actb_removedisp;
 	return this;
 }

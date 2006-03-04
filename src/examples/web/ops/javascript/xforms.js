@@ -517,6 +517,14 @@ function xformsHandleInputKeyPress(event) {
     }
 }
 
+function xformsHandleAutoCompleteKeyPress(event) {
+    // When esc is pressed, remove the auto-complete list
+    var target = getEventTarget(event);
+    if (event.keyCode == 27) {
+        target.actb_removedisp();
+    }
+}
+
 // Focus out events are only handled when we have receive a focus in event.
 // Here we just save the event which will be handled when we receive a focus
 // in from the browser.
@@ -747,6 +755,8 @@ function xformsInitializeControlsUnder(root) {
                 control.valueSetByXForms = 0;
                 // Intercept end-user pressing enter in text field
                 xformsAddEventListener(textfield, "keypress", xformsHandleInputKeyPress);
+                // Intercept end-user pressing enter escape field
+                xformsAddEventListener(textfield, "keypress", xformsHandleAutoCompleteKeyPress);
                 // Intercept incremental modifications
                 if (isIncremental)
                     xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);

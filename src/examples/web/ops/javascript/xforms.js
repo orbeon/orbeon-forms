@@ -520,7 +520,7 @@ function xformsHandleInputKeyPress(event) {
 function xformsHandleAutoCompleteKeyPress(event) {
     // When esc is pressed, remove the auto-complete list
     var target = getEventTarget(event);
-    if (event.keyCode == 27) {
+    if (event.keyCode == 27 || event.keyCode == 37 || event.keyCode == 39) {
         target.actb_removedisp();
     }
 }

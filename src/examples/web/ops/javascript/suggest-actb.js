@@ -436,7 +436,7 @@ function actb(obj,ca) {
 	}
 
 	function actb_tocomplete(kc){
-        if (kc == 38 || kc == 13 || kc == 18 || kc == 27) return;
+        if (kc == 38 || kc == 13 || kc == 18 || kc == 27 || kc == 37 || kc == 39) return;
 		var i;
 		if (actb_display){ 
 			var word = 0;

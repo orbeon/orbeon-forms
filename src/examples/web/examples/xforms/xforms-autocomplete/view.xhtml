@@ -55,7 +55,7 @@
                         <xhtml:div class="search-by">Search by name</xhtml:div>
                         <xhtml:p>
                             <!-- Auto-complete for country name -->
-                            <xforms:select1 ref="name" selection="open" id="country-name" incremental="true">
+                            <xforms:select1 ref="name" selection="open" id="country-name" incremental="true" appearance="xxforms:autocompletex">
                                 <xforms:label class="label">Name: </xforms:label>
                                 <xforms:itemset nodeset="instance('countries-name')/country">
                                     <xforms:label ref="name"/>
@@ -89,7 +89,7 @@
                     <xhtml:td>
                         <xhtml:div class="search-by">Search by US code</xhtml:div>
                         <!-- Auto-complete for country US code -->
-                        <xforms:select1 ref="us-code" selection="open" id="country-us-code" incremental="true">
+                        <xforms:select1 ref="us-code" selection="open" id="country-us-code" incremental="true" appearance="xxforms:autocomplete">
                             <xforms:label class="label">US code: </xforms:label>
                             <xforms:itemset nodeset="instance('countries-us-code')/country">
                                 <xforms:label ref="us-code"/>

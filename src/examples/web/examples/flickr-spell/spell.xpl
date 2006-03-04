@@ -34,7 +34,7 @@
             <letters xsl:version="2.0">
                 <xsl:variable name="text" as="xs:string" select="upper-case(/input/text)"/>
                 <xsl:for-each select="1 to string-length($text)">
-                    <letter>
+                     <letter>
                         <xsl:variable name="letter" select="substring($text, current(), 1)"/>
                         <xsl:attribute name="tag" select="if ($letter = 'A') then 'AA' else if ($letter = 'I') then 'II' else $letter"/>
                     </letter>

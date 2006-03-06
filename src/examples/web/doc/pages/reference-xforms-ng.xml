@@ -834,6 +834,26 @@
                         </tr>
                         <tr>
                             <td>
+                                <b>Autocomplete box</b>
+                                <img src="pages/reference-xforms-autocomplete.png"/>
+                            </td>
+                            <td>
+                                <xml-source border="false" show-namespaces="false">
+                                    <xforms:select1 ref="name" selection="open" incremental="true" appearance="xxforms:autocomplete">
+                                        <xforms:label class="label">Name: </xforms:label>
+                                        <xforms:itemset nodeset="instance('countries-name')/country">
+                                            <xforms:label ref="name"/>
+                                            <xforms:value ref="name"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xml-source>
+                            </td>
+                            <td>
+                                <a href="../goto-example/xforms-autocomplete">Auto-Complete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <b>Checkboxes</b>
                                 <img src="pages/reference-xforms-checkbox.png"/>
                             </td>

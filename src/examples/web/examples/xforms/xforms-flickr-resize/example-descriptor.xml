@@ -18,7 +18,7 @@
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This XForms example is based on a <a
-                href="http://skimstone.x-port.net/index.php?q=node/89">tutorial</a> by Mark Birbek.
+                href="http://skimstone.x-port.net/index.php?q=node/89">tutorial</a> by Mark Birbeck.
                 It illustrates connecting to a Flickr service to query images matching certain tags,
                 and then displaying them while allowing for resizing them with a slider.
             </p>

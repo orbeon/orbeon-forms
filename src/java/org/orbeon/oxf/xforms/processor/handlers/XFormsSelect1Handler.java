@@ -364,17 +364,21 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         if (!handlerContext.isGenerateTemplate() && controlInfo != null) {
 
             boolean selected = false;
-            if (isMany) {
-                for (final StringTokenizer st = new StringTokenizer(controlInfo.getValue()); st.hasMoreTokens();) {
-                    final String token = st.nextToken();
-                    if (token.equals(value)) {
-                        selected = true;
-                        break;
+            {
+                final String controlValue = controlInfo.getValue();
+                if (controlValue != null) {
+                    if (isMany) {
+                        for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                            final String token = st.nextToken();
+                            if (token.equals(value)) {
+                                selected = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        selected = controlValue.equals(value);
                     }
                 }
-            } else {
-                final String controlValue = controlInfo.getValue();
-                selected = controlValue != null && controlValue.equals(value);
             }
             if (selected)
                 optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");

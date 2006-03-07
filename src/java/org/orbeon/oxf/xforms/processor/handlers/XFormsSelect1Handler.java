@@ -246,7 +246,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "xforms-select1-open-input-" + effectiveId);
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-input");
 
-                            final String value = controlInfo.getValue();
+
+
+                            final String value = (controlInfo == null) ? null : controlInfo.getValue();
                             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
 

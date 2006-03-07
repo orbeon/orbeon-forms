@@ -57,6 +57,8 @@
                     </carriers>
                 </items>
             </xforms:instance>
+            <!-- List of countries for name select1 -->
+            <xforms:instance id="countries-name" src="xforms-controls/countries"/>
             <xforms:instance id="formatted">
                 <formated-instance>
                     &lt;span>
@@ -102,12 +104,15 @@
                 method="post" action="/xforms-controls/update-countries" replace="instance"/>
             <xforms:submission ref="instance('country-details')" id="country-details-submission" 
                 method="post" action="/xforms-controls/update-country-details" replace="instance"/>
+            <!-- Submission when country name changed -->
+            <xforms:submission ref="instance('instance')" id="country-name-updated"
+                method="post" action="/direct/xforms-controls/countries" replace="instance" instance="countries-name"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('instance')">
             <widget:tabs>
-                <widget:tab id="text-controls" selected="true">
+                <widget:tab id="text-controls">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age" incremental="true">
@@ -141,7 +146,7 @@
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="selection-controls">
+                <widget:tab id="selection-controls" selected="true">
                     <widget:label>Selection controls</widget:label>
                     <xforms:group>
                         <xforms:label>Single Value Selection</xforms:label>
@@ -232,6 +237,37 @@
                             </xforms:trigger>
                         </xhtml:p>
                     </xforms:group>
+                    <xforms:group>
+                        <xforms:label>Auto-Complete</xforms:label>
+                        <xhtml:p>
+                            <!-- Auto-complete for country name -->
+                            <xforms:select1 ref="instance('instance')/country-name" selection="open" id="country-name" incremental="true" appearance="xxforms:autocomplete">
+                                <xforms:label class="label">Enter a country name: </xforms:label>
+                                <xforms:itemset nodeset="instance('countries-name')/country">
+                                    <xforms:label ref="name"/>
+                                    <xforms:value ref="name"/>
+                                </xforms:itemset>
+                                <xforms:send submission="country-name-updated" ev:event="xforms-value-changed"/>
+                            </xforms:select1>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <!-- Display flag of selected country -->
+                            <xforms:output
+                                value="for $c in instance('countries-name')/country[name = instance('instance')/country-name] return
+                                       if ($c) then
+                                           concat(
+                                            '&lt;img',
+                                              ' src=&#34;../images/flags/',
+                                                $c/us-code,
+                                                '-flag.gif&#34;',
+                                            '/&gt;'
+                                           )
+                                       else
+                                           ''"
+                                    mediatype="text/html"/>
+                        </xhtml:p>
+                    </xforms:group>
+
                 </widget:tab>
                 <widget:tab id="slider">
                     <widget:label>Range</widget:label>

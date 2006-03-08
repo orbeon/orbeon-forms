@@ -96,8 +96,6 @@ public abstract class TaminoProcessor extends ProcessorImpl {
                         newConnection.setLockMode(lockMode);
                 }
 
-                newConnection.setIsolationDegree(TIsolationDegree.SERIALIZABLE);
-                newConnection.setLockMode(TLockMode.PROTECTED);
                 final TLocalTransaction transaction = newConnection.useLocalTransactionMode();
 
                 context.setAttribute(attributeName, newConnection);

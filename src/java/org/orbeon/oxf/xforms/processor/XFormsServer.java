@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
@@ -560,11 +561,11 @@ public class XFormsServer extends ProcessorImpl {
         final AttributesImpl attributesImpl = new AttributesImpl();
         final Iterator j = (state1 == null) ? null : state1.iterator();
         for (Iterator i = state2.iterator(); i.hasNext();) {
-            final XFormsControls.ControlInfo controlInfo1 = (state1 == null) ? null : (XFormsControls.ControlInfo) j.next();
-            final XFormsControls.ControlInfo controlInfo2 = (XFormsControls.ControlInfo) i.next();
+            final ControlInfo controlInfo1 = (state1 == null) ? null : (ControlInfo) j.next();
+            final ControlInfo controlInfo2 = (ControlInfo) i.next();
 
             // 1: Check current control
-            if (!(controlInfo2 instanceof XFormsControls.RepeatControlInfo)) {
+            if (!(controlInfo2 instanceof RepeatControlInfo)) {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
                 // Output diffs between controlInfo1 and controlInfo2
@@ -577,7 +578,7 @@ public class XFormsServer extends ProcessorImpl {
                     attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlInfo2.getId());
 
                     // Control children values
-                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+                    if (!(controlInfo2 instanceof RepeatIterationInfo)) {
                         {
                             final String labelValue1 = (controlInfo1 == null) ? null : controlInfo1.getLabel();
                             final String labelValue2 = controlInfo2.getLabel();
@@ -615,9 +616,9 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Output xforms:output-specific information
-                        if (controlInfo2 instanceof XFormsControls.OutputControlInfo) {
-                            final XFormsControls.OutputControlInfo outputControlInfo1 = (XFormsControls.OutputControlInfo) controlInfo1;
-                            final XFormsControls.OutputControlInfo outputControlInfo2 = (XFormsControls.OutputControlInfo) controlInfo2;
+                        if (controlInfo2 instanceof OutputControlInfo) {
+                            final OutputControlInfo outputControlInfo1 = (OutputControlInfo) controlInfo1;
+                            final OutputControlInfo outputControlInfo2 = (OutputControlInfo) controlInfo2;
 
                             final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediaTypeAttribute();
                             final String mediaTypeValue2 = outputControlInfo2.getMediaTypeAttribute();
@@ -650,8 +651,8 @@ public class XFormsServer extends ProcessorImpl {
                                 ContentHandlerHelper.CDATA, Boolean.toString(controlInfo2.isValid()));
                     }
 
-                    final boolean isOutputControlWithValueAttribute = controlInfo2 instanceof XFormsControls.OutputControlInfo && ((XFormsControls.OutputControlInfo) controlInfo2).getValueAttribute() != null;
-                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo) && !isOutputControlWithValueAttribute) {
+                    final boolean isOutputControlWithValueAttribute = controlInfo2 instanceof OutputControlInfo && ((OutputControlInfo) controlInfo2).getValueAttribute() != null;
+                    if (!(controlInfo2 instanceof RepeatIterationInfo) && !isOutputControlWithValueAttribute) {
 
                         final String typeValue1 = (controlInfo1 == null) ? null : controlInfo1.getType();
                         final String typeValue2 = controlInfo2.getType();
@@ -662,7 +663,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     }
 
-                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+                    if (!(controlInfo2 instanceof RepeatIterationInfo)) {
                         // Regular control
 
                         // Get current value if possible for this control
@@ -688,7 +689,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     } else {
                         // Repeat iteration
-                        final XFormsControls.RepeatIterationInfo repeatIterationInfo = (XFormsControls.RepeatIterationInfo) controlInfo2;
+                        final RepeatIterationInfo repeatIterationInfo = (RepeatIterationInfo) controlInfo2;
                         attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
 
                         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
@@ -696,9 +697,9 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Handle itemsets
-                if (controlInfo2 instanceof XFormsControls.Select1ControlInfo || controlInfo2 instanceof XFormsControls.SelectControlInfo) {
-                    final XFormsControls.Select1ControlInfo selectControlInfo1 = (XFormsControls.Select1ControlInfo) controlInfo1;
-                    final XFormsControls.Select1ControlInfo selectControlInfo2 = (XFormsControls.Select1ControlInfo) controlInfo2;
+                if (controlInfo2 instanceof Select1ControlInfo || controlInfo2 instanceof SelectControlInfo) {
+                    final Select1ControlInfo selectControlInfo1 = (Select1ControlInfo) controlInfo1;
+                    final Select1ControlInfo selectControlInfo2 = (Select1ControlInfo) controlInfo2;
 
                     if (itemsetsFull1 != null && selectControlInfo1 != null) {
                         final Object items = selectControlInfo1.getItemset();
@@ -715,14 +716,14 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             // 2: Check children if any
-            if (XFormsControls.isGroupingControl(controlInfo2.getName()) || controlInfo2 instanceof XFormsControls.RepeatIterationInfo) {
+            if (XFormsControls.isGroupingControl(controlInfo2.getName()) || controlInfo2 instanceof RepeatIterationInfo) {
 
                 final List children1 = (controlInfo1 == null) ? null : controlInfo1.getChildren();
                 final List children2 = (controlInfo2.getChildren() == null) ? Collections.EMPTY_LIST : controlInfo2.getChildren();
 
-                if (controlInfo2 instanceof XFormsControls.RepeatControlInfo && children1 != null) {
+                if (controlInfo2 instanceof RepeatControlInfo && children1 != null) {
 
-                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
+                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo2;
 
                     // Special case of repeat update
 
@@ -760,9 +761,9 @@ public class XFormsServer extends ProcessorImpl {
                         // Diff the remaining subset
                         diffControlsState(ch, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
-                } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && controlInfo1 == null) {
+                } else if ((controlInfo2 instanceof RepeatControlInfo) && controlInfo1 == null) {
 
-                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
+                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo2;
 
                     // Handle new sub-xforms:repeat
 
@@ -775,9 +776,9 @@ public class XFormsServer extends ProcessorImpl {
                     // Issue new values for the children
                     diffControlsState(ch, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
-                } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && children1 == null) {
+                } else if ((controlInfo2 instanceof RepeatControlInfo) && children1 == null) {
 
-                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
+                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo2;
 
                     // Handle repeat growing from size 0 (case of instance replacement, for example)
 
@@ -798,7 +799,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsControls.RepeatControlInfo repeatControlInfo, int idSuffix) {
+    private static void outputCopyRepeatTemplate(ContentHandlerHelper ch, RepeatControlInfo repeatControlInfo, int idSuffix) {
 
         final String repeatControlId = repeatControlInfo.getId();
         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
@@ -881,11 +882,11 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
                 final List children = switchControlInfo.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
+                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
 
                         if (!caseControlInfo.getId().equals(selectedCaseId)) {
                             final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -914,11 +915,11 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
                 final List children = switchControlInfo.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
+                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
 
                         if (!caseControlInfo.getId().equals(selectedCaseId)) {
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseControlInfo.getId(), "visibility", "hidden"});

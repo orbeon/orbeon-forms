@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.controls.UploadControlInfo;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -173,6 +174,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 extractSubmissionElement();
 
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
+                final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
+
                 final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
 
                 //noinspection UnnecessaryLocalVariable
@@ -255,8 +258,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String mediatype = parameterElement.element("content-type").getTextTrim();
                             final String size = parameterElement.element("content-length").getTextTrim();
 
-                            final XFormsControls.UploadControlInfo uploadControl
-                                    = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
+                            final UploadControlInfo uploadControl
+                                    = (UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
 
                             if (uploadControl != null)
                             { // in case of xforms:repeat, the name of the template will not match an existing control
@@ -368,7 +371,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Result information
                 ConnectionResult connectionResult = null;
                 try {
-                    if (isHandlingOptimizedGet) {
+                    if (isReplaceInstance && action.startsWith("test:")) {
+                        // Test action
+
+                        if (serializedInstance == null)
+                            throw new OXFException("Action 'test:' can only be used with POST method.");
+
+                        connectionResult = new ConnectionResult(null);
+                        connectionResult.resultCode = 200;
+                        connectionResult.resultHeaders = new HashMap();
+                        connectionResult.resultMediaType = "application/xml";
+                        connectionResult.dontHandleResponse = false;
+                        connectionResult.resultInputStream = new ByteArrayInputStream(serializedInstance);
+
+                    } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
                         connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString);
                     } else if (!NetUtils.urlHasProtocol(action)
@@ -455,7 +471,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     // Forward content to response
                                     NetUtils.copyStream(connectionResult.resultInputStream, response.getOutputStream());
 
-                                } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE)) {
+                                } else if (isReplaceInstance) {
 
                                     final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
                                     NetUtils.copyStream(connectionResult.resultInputStream, resultByteArrayOutputStream);

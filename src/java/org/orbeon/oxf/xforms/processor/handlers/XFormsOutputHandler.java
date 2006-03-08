@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.OutputControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -43,8 +43,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControls.OutputControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (XFormsControls.OutputControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final OutputControlInfo controlInfo = handlerContext.isGenerateTemplate()
+                ? null : (OutputControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -70,7 +70,7 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
         level--;
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControls.ControlInfo controlInfo) throws SAXException {
+    protected void handleLabelHintHelpAlert(String parentId, String type, ControlInfo controlInfo) throws SAXException {
         final String value;
 
         if (controlInfo != null) {

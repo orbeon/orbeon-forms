@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -531,11 +532,11 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
                 final List children = switchControlInfo.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
+                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
 
                         if (!caseControlInfo.getId().equals(selectedCaseId)) {
                             final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -564,11 +565,11 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
                 final List children = switchControlInfo.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
+                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
 
                         if (!caseControlInfo.getId().equals(selectedCaseId)) {
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseControlInfo.getId(), "visibility", "hidden"});

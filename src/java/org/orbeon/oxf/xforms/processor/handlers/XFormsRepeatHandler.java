@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.RepeatIterationInfo;
+import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
 import org.orbeon.oxf.xml.DeferredContentHandler;
 import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -69,7 +71,7 @@ public class XFormsRepeatHandler extends HandlerBase {
         if (isTopLevelRepeat || !isGenerateTemplate) {
             // Unroll repeat
 
-            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+            final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
             for (int i = 1; i <= currentRepeatIterations; i++) {
                 if (i > 1) {
                     // Delimiter: between repeat entries
@@ -79,7 +81,7 @@ public class XFormsRepeatHandler extends HandlerBase {
 
                 // Is the current iteration selected?
                 final boolean isCurrentRepeatSelected = isRepeatSelected && i == currentRepeatIndex;
-                final boolean isCurrentRepeatRelevant = ((XFormsControls.RepeatIterationInfo) repeatControlInfo.getChildren().get(i - 1)).isRelevant();
+                final boolean isCurrentRepeatRelevant = ((RepeatIterationInfo) repeatControlInfo.getChildren().get(i - 1)).isRelevant();
                 final int numberParentRepeat = handlerContext.countParentRepeats();
 
                 // Determine classes to add on root elements and around root characters

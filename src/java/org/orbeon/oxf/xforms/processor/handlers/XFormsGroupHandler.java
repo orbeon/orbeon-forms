@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -27,7 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsGroupHandler extends HandlerBase {
 
     protected String effectiveGroupId;
-    private XFormsControls.ControlInfo groupControlInfo;
+    private ControlInfo groupControlInfo;
     private boolean inLabel;
 
     public XFormsGroupHandler() {
@@ -41,7 +41,7 @@ public class XFormsGroupHandler extends HandlerBase {
         // Find classes to add
         final StringBuffer classes = new StringBuffer("xforms-" + localname);
         if (!handlerContext.isGenerateTemplate()) {
-            groupControlInfo = ((XFormsControls.ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
+            groupControlInfo = ((ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
 
             HandlerBase.handleMIPClasses(classes, groupControlInfo);
         }

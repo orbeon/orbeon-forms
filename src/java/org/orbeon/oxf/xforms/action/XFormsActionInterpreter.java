@@ -17,6 +17,8 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -541,7 +543,7 @@ public class XFormsActionInterpreter {
 
             final Object controlObject = containingDocument.getObjectById(pipelineContext, effectiveControlId);
 
-            if (!(controlObject instanceof XFormsControls.ControlInfo))
+            if (!(controlObject instanceof ControlInfo))
                 throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
 
             containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
@@ -607,10 +609,10 @@ public class XFormsActionInterpreter {
         xformsControls.rebuildCurrentControlsState(pipelineContext);
         xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
-            public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
-                if (controlInfo instanceof XFormsControls.RepeatControlInfo) {
+            public void startVisitControl(ControlInfo controlInfo) {
+                if (controlInfo instanceof RepeatControlInfo) {
                     // Found an xforms:repeat
-                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo;
+                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo;
                     final String repeatId = repeatControlInfo.getOriginalId();
 
                     final List repeatNodeSet = xformsControls.getCurrentNodeset();
@@ -655,7 +657,7 @@ public class XFormsActionInterpreter {
                 }
             }
 
-            public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+            public void endVisitControl(ControlInfo controlInfo) {
             }
         });
     }
@@ -679,7 +681,7 @@ public class XFormsActionInterpreter {
             final int index = Integer.parseInt(indexString);
 
             final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
-            final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
+            final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
 
             if (repeatControlInfo == null)
                 throw new OXFException("Invalid repeat id: " + repeatId);
@@ -742,9 +744,9 @@ public class XFormsActionInterpreter {
         // Get "fresh" event handler containier
         final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
 
-        if (eventHandlerContainer instanceof XFormsControls.ControlInfo) {
+        if (eventHandlerContainer instanceof ControlInfo) {
             // The event handler is contained within a control. Bindings are relative to that control
-            xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) eventHandlerContainer);
+            xformsControls.setBinding(pipelineContext, (ControlInfo) eventHandlerContainer);
         } else {
             // The event handler is not contained within a control (e.g. model or submission)
             xformsControls.resetBindingContext();

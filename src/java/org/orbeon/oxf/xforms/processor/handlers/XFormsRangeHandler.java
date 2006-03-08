@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
@@ -40,8 +40,8 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
+                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);

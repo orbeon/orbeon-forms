@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -836,11 +837,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         public static final int ALL = VALUE | REQUIRED | RELEVANT | READONLY | VALID;
 
-        private XFormsControls.ControlInfo controlInfo;
+        private ControlInfo controlInfo;
         private Node node;
         private int type;
 
-        public EventSchedule(XFormsControls.ControlInfo controlInfo, Node node, int type) {
+        public EventSchedule(ControlInfo controlInfo, Node node, int type) {
             this.controlInfo = controlInfo;
             this.node = node;
             this.type = type;
@@ -854,7 +855,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             return type;
         }
 
-        public XFormsControls.ControlInfo getControlInfo() {
+        public ControlInfo getControlInfo() {
             return controlInfo;
         }
     }
@@ -953,7 +954,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Iterate through controls and check the nodes they are bound to
             xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
-                public void startVisitControl(XFormsControls.ControlInfo controlInfo) {
+                public void startVisitControl(ControlInfo controlInfo) {
                     xformsControls.setBinding(pipelineContext, controlInfo);
                     final Node currentNode = xformsControls.getCurrentSingleNode();
 
@@ -1012,7 +1013,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     }
                 }
 
-                public void endVisitControl(XFormsControls.ControlInfo controlInfo) {
+                public void endVisitControl(ControlInfo controlInfo) {
                 }
             });
 
@@ -1025,7 +1026,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator i = eventsToDispatch.iterator(); i.hasNext();) {
                 final EventSchedule eventSchedule = (XFormsModel.EventSchedule) i.next();
 
-                final XFormsControls.ControlInfo controlInfo = eventSchedule.getControlInfo();
+                final ControlInfo controlInfo = eventSchedule.getControlInfo();
 
                 // Re-obtain node to which control is bound, in case things have shifted
                 // TODO: probably that controls should simply keep a pointer to the nodes they are bound to

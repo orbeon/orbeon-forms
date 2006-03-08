@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -63,14 +63,14 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return forwarding;
     }
 
-    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControls.ControlInfo controlInfo) {
+    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, ControlInfo controlInfo) {
         if (controlInfo != null && controlInfo.isReadonly()) {
             // @disabled="disabled"
             newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
         }
     }
 
-    public static void handleMIPClasses(StringBuffer sb, XFormsControls.ControlInfo controlInfo) {
+    public static void handleMIPClasses(StringBuffer sb, ControlInfo controlInfo) {
         if (controlInfo != null) {// TEMP, controlInfo should not be null
             if (!controlInfo.isRelevant()) {
                 if (sb.length() > 0)

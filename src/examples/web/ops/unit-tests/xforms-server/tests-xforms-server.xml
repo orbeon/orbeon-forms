@@ -1570,4 +1570,232 @@
         </output>
     </test>
 
+    <test description="Index initialization" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="controls">
+                        <controls>
+                            <!-- Check startindex in bounds, out of bounds, and 0 -->
+                            <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
+                                <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
+                                </xforms:repeat>
+                            </xforms:repeat>
+                            <xforms:repeat nodeset="r3" id="repeat3">
+                            </xforms:repeat>
+                            <xforms:repeat nodeset="r4" id="repeat4">
+                                <xforms:repeat nodeset="r5" id="repeat5"/>
+                            </xforms:repeat>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model>
+                                <xforms:instance>
+                                   <instance>
+                                       <r1/>
+                                       <r1>
+                                           <r2/>
+                                           <r2/>
+                                       </r1>
+                                       <r1/>
+                                       <r3/>
+                                       <r4/>
+                                       <r4>
+                                           <r5/>
+                                           <r5/>
+                                       </r4>
+                                       <r4/>
+                                   </instance>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:output name="response" id="repeat-response"/>
+                </p:processor>
+
+                <!-- Just return repeat information -->
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="data" href="#repeat-response"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="//xxforms:repeats"/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:repeats xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:repeat-index id="repeat1" index="2"/>
+                <xxf:repeat-index id="repeat2" index="2"/>
+                <xxf:repeat-index id="repeat4" index="1"/>
+                <xxf:repeat-index id="repeat3" index="1"/>
+                <xxf:repeat-index id="repeat5" index="0"/>
+                <xxf:repeat-iteration id="repeat1" occurs="3"/>
+                <xxf:repeat-iteration id="repeat5·2" occurs="2"/>
+                <xxf:repeat-iteration id="repeat5·1" occurs="0"/>
+                <xxf:repeat-iteration id="repeat2·2" occurs="2"/>
+                <xxf:repeat-iteration id="repeat2·1" occurs="0"/>
+                <xxf:repeat-iteration id="repeat4" occurs="3"/>
+                <xxf:repeat-iteration id="repeat5·3" occurs="0"/>
+                <xxf:repeat-iteration id="repeat2·3" occurs="0"/>
+                <xxf:repeat-iteration id="repeat3" occurs="1"/>
+            </xxf:repeats>
+        </output>
+    </test>
+
+    <test description="Instance replacement with index updates" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="test-trigger"/>
+                        </xxforms:action>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls>
+                            <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
+                                <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
+                                </xforms:repeat>
+                            </xforms:repeat>
+                            <xforms:repeat nodeset="r3" id="repeat3">
+                            </xforms:repeat>
+                            <xforms:repeat nodeset="r4" id="repeat4">
+                                <xforms:repeat nodeset="r5" id="repeat5"/>
+                            </xforms:repeat>
+                            <xforms:trigger id="test-trigger">
+                                <xforms:label>Test</xforms:label>
+                                <xforms:send submission="test-submission" ev:event="DOMActivate"/>
+                            </xforms:trigger>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model>
+                                <xforms:instance id="main-instance">
+                                   <instance/>
+                                </xforms:instance>
+                                <xforms:instance id="new-instance">
+                                   <instance/>
+                                </xforms:instance>
+                                <xforms:submission id="test-submission" ref="instance('new-instance')" action="test:"
+                                                   replace="instance" instance="main-instance" method="post"/>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <instances>
+                            <instance>
+                               <r1/>
+                               <r1>
+                                   <r2/>
+                                   <r2/>
+                               </r1>
+                               <r1/>
+                               <r3/>
+                               <r4/>
+                               <r4>
+                                   <r5/>
+                                   <r5/>
+                               </r4>
+                               <r4/>
+                           </instance>
+                           <instance>
+                               <r1/>
+                               <r1>
+                                   <r2/><!-- Force repeat2 from 2 to 1 -->
+                               </r1>
+                               <r1/>
+                               <!-- Force repeat3 from 1 to 0 -->
+                               <r4>
+                                   <r5/><!-- Force repeat5 from 0 to 1 -->
+                               </r4>
+                               <r4>
+                                   <r5/>
+                                   <r5/>
+                               </r4>
+                               <r4/>
+                           </instance>
+                        </instances>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance>
+                                <r1/>
+                                <r1>
+                                    <r2/>
+                                </r1>
+                                <r1/>
+                                <r4>
+                                    <r5/>
+                                </r4>
+                                <r4>
+                                    <r5/>
+                                    <r5/>
+                                </r4>
+                                <r4/>
+                            </instance>
+                            <instance>
+                                <r1/>
+                                <r1>
+                                    <r2/>
+                                </r1>
+                                <r1/>
+                                <r4>
+                                    <r5/>
+                                </r4>
+                                <r4>
+                                    <r5/>
+                                    <r5/>
+                                </r4>
+                                <r4/>
+                            </instance>
+                        </instances>
+                        <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="repeat1" index="2"/>
+                            <repeat-index id="repeat2" index="1"/>
+                            <repeat-index id="repeat4" index="1"/>
+                            <repeat-index id="repeat3" index="0"/>
+                            <repeat-index id="repeat5" index="1"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:delete-repeat-elements id="repeat2" parent-indexes="2" count="1"/>
+                        <xxf:delete-repeat-elements id="repeat3" parent-indexes="" count="1"/>
+                        <xxf:copy-repeat-template id="repeat5" parent-indexes="1" id-suffix="1"/>
+                        <xxf:repeat-iteration id="repeat5·1" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="repeat2" old-index="2" new-index="1"/>
+                        <xxf:repeat-index id="repeat3" old-index="1" new-index="0"/>
+                        <xxf:repeat-index id="repeat5" old-index="0" new-index="1"/>
+                    </xxf:repeat-indexes>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

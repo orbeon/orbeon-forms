@@ -19,17 +19,12 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.controls.*;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -37,7 +32,6 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 
 /**
@@ -163,7 +157,7 @@ public class XFormsControls {
                 if (controlElement.getName().equals("repeat")) {
                     // Create control without parent, just to hold iterations
                     final RepeatControlInfo repeatControlInfo
-                            = new RepeatControlInfo(null, controlElement, controlElement.getName(), effectiveControlId);
+                            = new RepeatControlInfo(containingDocument, null, controlElement, controlElement.getName(), effectiveControlId);
 
                     // Set initial index
                     controlsState.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
@@ -181,7 +175,7 @@ public class XFormsControls {
             public void startRepeatIteration(int iteration) {
                 // One more iteration in current repeat
                 final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.peek();
-                repeatControlInfo.addChild(new RepeatIterationInfo(repeatControlInfo, iteration));
+                repeatControlInfo.addChild(new RepeatIterationInfo(containingDocument, repeatControlInfo, iteration));
             }
 
             public void endRepeatIteration(int iteration) {
@@ -437,7 +431,17 @@ public class XFormsControls {
         contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), id, newBind, bindingElement));
     }
 
-    protected BindingContext getCurrentContext() {
+    /**
+     * NOTE: Not sure this should be exposed.
+     */
+    public Stack getContextStack() {
+        return contextStack;
+    }
+
+    /**
+     * NOTE: Not sure this should be exposed.
+     */
+    public BindingContext getCurrentContext() {
         return (BindingContext) contextStack.peek();
     }
 
@@ -605,7 +609,7 @@ public class XFormsControls {
 
         final ControlsState result = new ControlsState();
 
-        final ControlInfo rootControlInfo = new ControlInfo(null, null, "root", null);// this is temporary and won't be stored
+        final ControlInfo rootControlInfo = new ControlInfo(containingDocument, null, null, "root", null);// this is temporary and won't be stored
         final Map idsToControlInfo = new HashMap();
 
         final Map switchIdToSelectedCaseIdMap = new HashMap();
@@ -627,25 +631,25 @@ public class XFormsControls {
                 {
                     // TODO: Create one ControlInfo per control, and use a factory to create those
                     if (controlName.equals("input")) {
-                        controlInfo = new InputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new InputControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("repeat")) {
-                        controlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                        controlInfo = new RepeatControlInfo(containingDocument, currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                         result.setHasRepeat(true);
                     } else if (controlName.equals("select")) {
-                        controlInfo = new SelectControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                        controlInfo = new SelectControlInfo(containingDocument, currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("select1")) {
-                        controlInfo = new Select1ControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                        controlInfo = new Select1ControlInfo(containingDocument, currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("submit")) {
-                        controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new SubmitControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("output")) {
-                        controlInfo = new OutputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new OutputControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("range")) {
-                        controlInfo = new RangeControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new RangeControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("upload")) {
-                        controlInfo = new UploadControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new UploadControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                         result.setHasUpload(true);
                     } else {
-                        controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                        controlInfo = new ControlInfo(containingDocument, currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
                 }
                 // Make sure there are no duplicate ids
@@ -728,7 +732,6 @@ public class XFormsControls {
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
 
                 final String controlName = controlElement.getName();
-                final String controlId = controlElement.attributeValue("id");
 
                 // Handle xforms:switch
                 if (controlName.equals("switch")) {
@@ -764,7 +767,7 @@ public class XFormsControls {
 
             public void startRepeatIteration(int iteration) {
 
-                final ControlInfo repeatIterationInfo = new RepeatIterationInfo(currentControlsContainer, iteration);
+                final ControlInfo repeatIterationInfo = new RepeatIterationInfo(containingDocument, currentControlsContainer, iteration);
                 currentControlsContainer.addChild(repeatIterationInfo);
                 currentControlsContainer = repeatIterationInfo;
 
@@ -1145,7 +1148,7 @@ public class XFormsControls {
         return result;
     }
 
-    protected static class BindingContext {
+    public static class BindingContext {
         private XFormsModel model;
         private List nodeset;
         private int position = 1;
@@ -1160,10 +1163,6 @@ public class XFormsControls {
             this.idForContext = idForContext;
             this.newBind = newBind;
             this.controlElement = controlElement;
-
-//            if (nodeSet == null) {
-//                System.out.println("abc");
-//            }
         }
 
         public XFormsModel getModel() {
@@ -1516,747 +1515,6 @@ public class XFormsControls {
             }
             // Not found
             return null;
-        }
-    }
-
-    /**
-     * Represents XForms control state information.
-     */
-    public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContainer {
-
-        private ControlInfo parent;
-        private String name;
-
-        private Element element;
-
-        private String originalId;
-
-        private String id;
-        private String label;
-        private String help;
-        private String hint;
-        private String alert;
-        private String value;
-        private String displayValue;
-
-        private String labelId;
-        private String helpId;
-        private String hintId;
-        private String alertId;
-
-        private boolean readonly;
-        private boolean required;
-        private boolean relevant;
-        private boolean valid;
-        private String type;
-
-        private List children;
-        private List eventHandlers;
-
-        protected BindingContext currentBindingContext;
-
-        public ControlInfo(ControlInfo parent, Element element, String name, String id) {
-            this.parent = parent;
-            this.element = element;
-            this.name = name;
-            this.id = id;
-
-            // Extract event handlers
-            if (element != null) {
-                originalId = element.attributeValue("id");
-                eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
-
-                labelId = getChildElementId(element, XFormsConstants.XFORMS_LABEL_QNAME);
-                helpId = getChildElementId(element, XFormsConstants.XFORMS_HELP_QNAME);
-                hintId = getChildElementId(element, XFormsConstants.XFORMS_HINT_QNAME);
-                alertId = getChildElementId(element, XFormsConstants.XFORMS_ALERT_QNAME);
-            }
-        }
-
-        private String getChildElementId(Element element, QName qName) {
-            // Check that there is a current child element
-            Element childElement = element.element(qName);
-            if (childElement == null)
-                return null;
-
-            return childElement.attributeValue("id");
-        }
-
-        public void addChild(ControlInfo controlInfo) {
-            if (children == null)
-                children = new ArrayList();
-            children.add(controlInfo);
-        }
-
-        public String getOriginalId() {
-            return originalId;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public LocationData getLocationData() {
-            return (LocationData) element.getData();
-        }
-
-        public List getChildren() {
-            return children;
-        }
-
-        public String getAlert() {
-            return alert;
-        }
-
-        public void setAlert(String alert) {
-            this.alert = alert;
-        }
-
-        public String getHelp() {
-            return help;
-        }
-
-        public void setHelp(String help) {
-            this.help = help;
-        }
-
-        public String getHint() {
-            return hint;
-        }
-
-        public void setHint(String hint) {
-            this.hint = hint;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public void setLabel(String label) {
-            this.label = label;
-        }
-
-        public String getLabelId() {
-            return labelId;
-        }
-
-        public String getHintId() {
-            return hintId;
-        }
-
-        public String getHelpId() {
-            return helpId;
-        }
-
-        public String getAlertId() {
-            return alertId;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public boolean isReadonly() {
-            return readonly;
-        }
-
-        public void setReadonly(boolean readonly) {
-            this.readonly = readonly;
-        }
-
-        public boolean isRelevant() {
-            return relevant;
-        }
-
-        public void setRelevant(boolean relevant) {
-            this.relevant = relevant;
-        }
-
-        public boolean isRequired() {
-            return required;
-        }
-
-        public void setRequired(boolean required) {
-            this.required = required;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public boolean isValid() {
-            return valid;
-        }
-
-        public void setValid(boolean valid) {
-            this.valid = valid;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        /**
-         * Return a formatted display value of the control value, null if there is no such value.
-         */
-        public String getDisplayValue() {
-            return displayValue;
-        }
-
-        protected void setValue(String value) {
-            this.value = value;
-        }
-
-        public void setDisplayValue(String displayValue) {
-            this.displayValue = displayValue;
-        }
-
-        public ControlInfo getParent() {
-            return parent;
-        }
-
-        public void detach() {
-            this.parent = null;
-        }
-
-        public Element getElement() {
-            return element;
-        }
-
-        public boolean equals(Object obj) {
-
-            if (obj == null || !(obj instanceof ControlInfo))
-                return false;
-
-            if (this == obj)
-                return true;
-
-            final ControlInfo other = (ControlInfo) obj;
-
-            if (!((name == null && other.name == null) || (name != null && other.name != null && name.equals(other.name))))
-                return false;
-            if (!((id == null && other.id == null) || (id != null && other.id != null && id.equals(other.id))))
-                return false;
-            if (!((label == null && other.label == null) || (label != null && other.label != null && label.equals(other.label))))
-                return false;
-            if (!((help == null && other.help == null) || (help != null && other.help != null && help.equals(other.help))))
-                return false;
-            if (!((hint == null && other.hint == null) || (hint != null && other.hint != null && hint.equals(other.hint))))
-                return false;
-            if (!((alert == null && other.alert == null) || (alert != null && other.alert != null && alert.equals(other.alert))))
-                return false;
-            if (!((value == null && other.value == null) || (value != null && other.value != null && value.equals(other.value))))
-                return false;
-
-            if (readonly != other.readonly)
-                return false;
-            if (required != other.required)
-                return false;
-            if (relevant != other.relevant)
-                return false;
-            if (valid != other.valid)
-                return false;
-
-            if (!((type == null && other.type == null) || (type != null && other.type != null && type.equals(other.type))))
-                return false;
-
-            return true;
-        }
-
-        public boolean isValueControl() {
-            return XFormsControls.isValueControl(getName());
-        }
-
-        public void prepareValue(PipelineContext pipelineContext, BindingContext currentBindingContext) {
-            this.currentBindingContext = currentBindingContext;
-        }
-
-        public void evaluateValue(PipelineContext pipelineContext) {
-            setValue(XFormsInstance.getValueForNode(currentBindingContext.getSingleNode()));
-        }
-
-        public void evaluateDisplayValue(PipelineContext pipelineContext) {
-            // NOP for most controls
-        }
-
-        public String convertFromExternalValue(String externalValue) {
-            return externalValue;
-        }
-
-        public String convertToExternalValue(String internalValue) {
-            return internalValue;
-        }
-
-        protected void evaluateDisplayValue(PipelineContext pipelineContext, String format) {
-            final String result;
-            if (format == null) {
-                // Try default format for known types
-
-                final Map prefixToURIMap = new HashMap();
-                prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-
-                final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-
-                if ("{http://www.w3.org/2001/XMLSchema}date".equals(type)) {
-                    // Format a date
-                    final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else .";
-                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATE_FORMAT_PROPERTY, DEFAULT_FORMAT);
-                } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)) {
-                    // Format a dateTime
-                    final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-                } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(type)) {
-                    // Format a time
-                    final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-                }
-
-                if (format != null) {
-                    result = getCurrentInstance()
-                        .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
-                                format, prefixToURIMap, null, functionLibrary, null);
-                } else {
-                    result = null;
-                }
-
-            } else {
-                // Format value according to format attribute
-                final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
-
-                result = getCurrentInstance()
-                    .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
-                            format, prefixToURIMap, null, functionLibrary, null);
-            }
-            setDisplayValue(result);
-        }
-
-        public XFormsEventHandlerContainer getParentContainer() {
-            return parent;
-        }
-
-        public List getEventHandlers() {
-            return eventHandlers;
-        }
-
-        public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
-
-                // Try to update xforms:repeat indices based on this
-                {
-                    RepeatControlInfo firstAncestorRepeatControlInfo = null;
-                    final List ancestorRepeatsIds = new ArrayList();
-                    final Map ancestorRepeatsIterationMap = new HashMap();
-
-                    // Find current path through ancestor xforms:repeat elements, if any
-                    {
-                        ControlInfo currentControlInfo = getParent();
-                        while (currentControlInfo != null) {
-
-                            if (currentControlInfo instanceof RepeatIterationInfo) {
-                                final RepeatIterationInfo repeatIterationInfo = (RepeatIterationInfo) currentControlInfo;
-                                final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIterationInfo.getParent();
-                                final int iteration = repeatIterationInfo.getIteration();
-                                final String repeatId = repeatControlInfo.getRepeatId();
-
-                                if (firstAncestorRepeatControlInfo == null)
-                                    firstAncestorRepeatControlInfo = repeatControlInfo;
-                                ancestorRepeatsIds.add(repeatId);
-                                ancestorRepeatsIterationMap.put(repeatId,  new Integer(iteration));
-                            }
-
-                            currentControlInfo = currentControlInfo.getParent();
-                        }
-                    }
-
-                    if (ancestorRepeatsIds.size() > 0) {
-
-                        // Update ControlsState if needed as we are going to make some changes
-                        if (initialControlsState == currentControlsState)
-                            rebuildCurrentControlsState(pipelineContext);
-
-                        // Iterate from root to leaf
-                        Collections.reverse(ancestorRepeatsIds);
-                        for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
-                            final String repeatId = (String) i.next();
-                            final Integer iteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
-
-//                            XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, iteration.toString());
-                            currentControlsState.updateRepeatIndex(repeatId, iteration.intValue());
-                        }
-
-                        // Update children xforms:repeat indexes if any
-                        visitAllControlInfo(new ControlInfoVisitorListener() {
-                            public void startVisitControl(ControlInfo controlInfo) {
-                                if (controlInfo instanceof RepeatControlInfo) {
-                                    // Found child repeat
-                                    currentControlsState.updateRepeatIndex(((RepeatControlInfo) controlInfo).getRepeatId(), 1);
-                                }
-                            }
-
-                            public void endVisitControl(ControlInfo controlInfo) {
-                            }
-                        }, firstAncestorRepeatControlInfo);
-
-                        // Adjust controls ids that could have gone out of bounds
-                        XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, XFormsControls.this);
-
-                        // After changing indexes, must recalculate
-                        // NOTE: The <setindex> action is supposed to "The implementation data
-                        // structures for tracking computational dependencies are rebuilt or
-                        // updated as a result of this action."
-                        // What should we do here? We run the computed expression binds so that
-                        // those are updated, but is that what we should do?
-                        for (Iterator i = getContainingDocument().getModels().iterator(); i.hasNext();) {
-                            XFormsModel currentModel = (XFormsModel) i.next();
-                            currentModel.applyComputedExpressionBinds(pipelineContext);
-                            //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
-                        }
-                        // TODO: Should try to use the code of the <setindex> action
-                    }
-
-                    // Store new focus information for client
-                    if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
-                        containingDocument.setClientFocusEffectiveControlId(getId());
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Represents an xforms:input control.
-     */
-    public class InputControlInfo extends ControlInfo {
-
-        // Optional display format
-        private String format;
-
-        public InputControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-            this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
-        }
-
-        public String getFormat() {
-            return format;
-        }
-
-        public void evaluateDisplayValue(PipelineContext pipelineContext) {
-            evaluateDisplayValue(pipelineContext, format);
-        }
-    }
-
-    /**
-     * Represents an xforms:range control.
-     */
-    public class RangeControlInfo extends ControlInfo {
-
-        private String start;
-        private String end;
-        private String step;
-
-        public RangeControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-            this.start = element.attributeValue("start");
-            this.end = element.attributeValue("end");
-            this.step = element.attributeValue("step");
-        }
-
-        public String getStart() {
-            return start;
-        }
-
-        public String getEnd() {
-            return end;
-        }
-
-        public String getStep() {
-            return step;
-        }
-
-        public String convertFromExternalValue(String externalValue) {
-
-            if (getStart() != null && getEnd() != null
-                    && XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "integer").equals(getType())) {
-
-                final int start = Integer.parseInt(getStart());
-                final int end = Integer.parseInt(getEnd());
-
-                final int value = start + ((int) (Double.parseDouble(externalValue) * (double) (end - start)));
-                return Integer.toString(value);
-            } else {
-                return externalValue;
-            }
-        }
-
-        public String convertToExternalValue(String internalValue) {
-
-            if (getStart() != null && getEnd() != null
-                    && XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "integer").equals(getType())) {
-
-                final int start = Integer.parseInt(getStart());
-                final int end = Integer.parseInt(getEnd());
-
-                final double value = ((double) (Integer.parseInt(internalValue) - start)) / ((double) end - start);
-                return Double.toString(value);
-            } else {
-                return internalValue;
-            }
-        }
-    }
-
-    /**
-     * Represents an xforms:select1 control.
-     */
-    public class Select1ControlInfo extends ControlInfo {
-
-        private List items;
-
-        public Select1ControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-        }
-
-        public void evaluateItemsets(PipelineContext pipelineContext) {
-
-            // Find itemset element if any
-            // TODO: Handle multiple itemsets, xforms:case, and mixed xforms:item / xforms:itemset
-            final Element itemsetElement = getElement().element(XFormsConstants.XFORMS_ITEMSET_QNAME);
-
-            if (itemsetElement != null) {
-                pushBinding(pipelineContext, itemsetElement); // when entering this method, binding must be on control
-                final BindingContext currentBindingContext = getCurrentContext();
-
-                //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                items = new ArrayList();
-                final List currentNodeSet = getCurrentNodeset();
-                if (currentNodeSet != null) {
-                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
-
-                        // Push "artificial" binding with just current node in nodeset
-                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, null, true, null));
-                        {
-                            // Handle children of xforms:itemset
-
-                            pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
-                            final String label = getCurrentSingleNodeValue();
-                            popBinding();
-                            final Element valueCopyElement;
-                            {
-                                final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                valueCopyElement = (valueElement != null)
-                                    ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
-                            }
-                            pushBinding(pipelineContext, valueCopyElement);
-                            final String value = getCurrentSingleNodeValue();;
-                            // TODO: handle xforms:copy
-                            items.add(new ItemsetInfo(getId(), label, value));
-
-                            popBinding();
-                        }
-                        contextStack.pop();
-                    }
-                }
-                popBinding();
-            }
-        }
-
-        public List getItemset() {
-            return items;
-        }
-    }
-
-    /**
-     * Represents an xforms:select control.
-     */
-    public class SelectControlInfo extends Select1ControlInfo {
-
-        public SelectControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-        }
-    }
-
-    /**
-     * Represents an xforms:output control.
-     */
-    public class OutputControlInfo extends ControlInfo {
-
-        // Optional display format
-        private String format;
-
-        // Value attribute
-        private String valueAttribute;
-
-        // XForms 1.1 draft mediatype attribute
-        private String mediaTypeAttribute;
-
-        public OutputControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-            this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
-            this.mediaTypeAttribute = element.attributeValue("mediatype");
-            this.valueAttribute = element.attributeValue("value");
-        }
-
-        public void evaluateValue(PipelineContext pipelineContext) {
-            final String rawValue;
-            if (valueAttribute == null) {
-                // Get value from single-node binding
-                rawValue = XFormsInstance.getValueForNode(currentBindingContext.getSingleNode());
-            } else {
-                // Value comes from the XPath expression within the value attribute
-                rawValue = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext,
-                        currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
-                        "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, functionLibrary, null);
-            }
-
-            // Handle mediatype if necessary
-            final String updatedValue;
-            if (mediaTypeAttribute != null && mediaTypeAttribute.startsWith("image/")) {
-                final String type = getType();
-                if (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
-                    // Rewrite URI
-
-                    final URI resolvedURI = XFormsUtils.resolveURI(getElement(), rawValue);
-                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                    updatedValue = externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), false);
-                } else {
-                    updatedValue = rawValue;
-                }
-            } else {
-                updatedValue = rawValue;
-            }
-
-            super.setValue(updatedValue);
-        }
-
-        public void evaluateDisplayValue(PipelineContext pipelineContext) {
-            evaluateDisplayValue(pipelineContext, format);
-        }
-
-        public String getMediaTypeAttribute() {
-            return mediaTypeAttribute;
-        }
-
-        public String getValueAttribute() {
-            return valueAttribute;
-        }
-    }
-
-    /**
-     * Represents an xforms:upload control.
-     */
-    public class UploadControlInfo extends ControlInfo {
-
-        private Element mediatypeElement;
-        private Element filenameElement;
-        private Element sizeElement;
-
-        public UploadControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-            mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
-            filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
-            sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
-        }
-
-        public Element getMediatypeElement() {
-            return mediatypeElement;
-        }
-
-        public Element getFilenameElement() {
-            return filenameElement;
-        }
-
-        public Element getSizeElement() {
-            return sizeElement;
-        }
-    }
-
-    /**
-     * Represents an xforms:submit control.
-     */
-    public class SubmitControlInfo extends ControlInfo {
-        public SubmitControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-        }
-
-        public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-            // Do the default stuff upon receiving a DOMActivate event
-            if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(event.getEventName())) {
-
-                // Find submission id
-                final String submissionId = getElement().attributeValue("submission");
-                if (submissionId == null)
-                    throw new OXFException("xforms:submit requires a submission attribute.");
-
-                // Find submission object and dispatch submit event to it
-                final Object object = containingDocument.getObjectById(pipelineContext, submissionId);
-                if (object instanceof XFormsModelSubmission) {
-                    final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
-                } else {
-                    throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element.");
-                }
-            }
-            super.performDefaultAction(pipelineContext, event);
-        }
-    }
-
-    /**
-     * Represents xforms:repeat iteration information.
-     *
-     * This is not really a control, but an abstraction for xforms:repeat branches.
-     */
-    public class RepeatIterationInfo extends ControlInfo {
-        private int iteration;
-        public RepeatIterationInfo(ControlInfo parent, int iteration) {
-            super(parent, null, "xxforms-repeat-iteration", parent.getId());
-            this.iteration = iteration;
-        }
-
-        public int getIteration() {
-            return iteration;
-        }
-
-        public boolean equals(Object obj) {
-            if (!super.equals(obj))
-                return false;
-            final RepeatIterationInfo other = (RepeatIterationInfo) obj;
-            return this.iteration == other.iteration;
-        }
-    }
-
-    /**
-     * Represents xforms:repeat information.
-     */
-    public class RepeatControlInfo extends ControlInfo {
-        private int startIndex;
-        public RepeatControlInfo(ControlInfo parent, Element element, String name, String id) {
-            super(parent, element, name, id);
-
-            // Store initial repeat index information
-            final String startIndexString = element.attributeValue("startindex");
-            this.startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
-        }
-
-        public int getStartIndex() {
-            return startIndex;
-        }
-
-        public String getRepeatId() {
-            return getOriginalId();
-        }
-
-        public boolean equals(Object obj) {
-            if (!super.equals(obj))
-                return false;
-            final RepeatControlInfo other = (RepeatControlInfo) obj;
-            return this.startIndex == other.startIndex;
         }
     }
 

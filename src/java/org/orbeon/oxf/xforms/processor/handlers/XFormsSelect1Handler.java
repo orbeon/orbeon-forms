@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.controls.Select1ControlInfo;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -86,8 +88,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                 if (!handlerContext.isGenerateTemplate()) {
 
-                    final XFormsControls.Select1ControlInfo controlInfo
-                            = (XFormsControls.Select1ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+                    final Select1ControlInfo controlInfo
+                            = (Select1ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
 
                     final List itemsetInfos = (List) controlInfo.getItemset();
                     if (itemsetInfos != null) { // may be null when there is no item in the itemset
@@ -143,8 +145,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final XFormsControls.ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (XFormsControls.ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
+                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         final boolean isMany = localname.equals("select");
         final String type = isMany ? "checkbox" : "radio";
@@ -316,7 +318,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                XFormsControls.ControlInfo controlInfo, String effectiveId, String type, Item item) throws SAXException {
+                                ControlInfo controlInfo, String effectiveId, String type, Item item) throws SAXException {
 
         // xhtml:span
 
@@ -353,7 +355,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
-    private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsControls.ControlInfo controlInfo,
+    private void handleItemCompact(ContentHandler contentHandler, String optionQName, ControlInfo controlInfo,
                                    boolean isMany, Item item) throws SAXException {
 
         final AttributesImpl optionAttributes = getAttributes(item.getAttributes(), null, null);

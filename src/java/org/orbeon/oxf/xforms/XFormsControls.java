@@ -611,9 +611,6 @@ public class XFormsControls {
         final Map switchIdToSelectedCaseIdMap = new HashMap();
         final List valueControls = new ArrayList();
 
-        // Get default xforms:repeat indexes beforehand
-        getDefaultRepeatIndexes(result);
-
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
 
             private ControlInfo currentControlsContainer = rootControlInfo;
@@ -633,6 +630,7 @@ public class XFormsControls {
                         controlInfo = new InputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("repeat")) {
                         controlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                        result.setHasRepeat(true);
                     } else if (controlName.equals("select")) {
                         controlInfo = new SelectControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("select1")) {
@@ -752,8 +750,6 @@ public class XFormsControls {
                         if (children == null || children.size() == 0) {
                             // Current index is 0
                             result.setRepeatIterations(effectiveControlId, 0);
-                            // Update repeat index to 0 if there was no iteration
-                            result.updateRepeatIndex(controlId, 0);
                         } else {
                             // Number of iterations is number of children
                             result.setRepeatIterations(effectiveControlId, children.size());
@@ -803,6 +799,15 @@ public class XFormsControls {
         result.setIdsToControlInfo(idsToControlInfo);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setValueControls(valueControls);
+
+        // Handle repeat indexes if needed
+        if (result.isHasRepeat()) {
+            // Get default xforms:repeat indexes beforehand
+            getDefaultRepeatIndexes(result);
+
+            // Adjust repeat indexes
+            XFormsIndexUtils.adjustIndexes(pipelineContext, this, result);
+        }
 
         return result;
     }
@@ -1253,6 +1258,8 @@ public class XFormsControls {
         private Map effectiveRepeatIdToIterations;
         private Map switchIdToSelectedCaseIdMap;
         private List valueControls;
+
+        private boolean hasRepeat;
         private boolean hasUpload;
 
         public ControlsState() {
@@ -1330,6 +1337,14 @@ public class XFormsControls {
 
         public Map getEffectiveRepeatIdToIterations() {
             return effectiveRepeatIdToIterations;
+        }
+
+        public boolean isHasRepeat() {
+            return hasRepeat;
+        }
+
+        public void setHasRepeat(boolean hasRepeat) {
+            this.hasRepeat = hasRepeat;
         }
 
         public boolean isHasUpload() {

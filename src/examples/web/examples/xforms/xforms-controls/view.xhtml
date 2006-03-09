@@ -21,6 +21,9 @@
     
     <xhtml:head>
         <xhtml:title>XForms Controls</xhtml:title>
+        <xhtml:style type="text/css">
+            .range    { margin-top: 1em; margin-bottom: 2em; }
+        </xhtml:style>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema" id="main-model">
             <xforms:action ev:event="xforms-ready">
@@ -138,9 +141,9 @@
                         <xforms:input ref="date">
                             <xforms:label class="fixed-width">Birth date:</xforms:label>
                             <xforms:help>
-                                This is supposed to be a help message explaining what a birth date is. 
-                                But since you already know, it mostly serves the purpose of showing how 
-                                help messages can be attached to controls, and that they can be pretty 
+                                This is supposed to be a help message explaining what a birth date is.
+                                But since you already know, it mostly serves the purpose of showing how
+                                help messages can be attached to controls, and that they can be pretty
                                 long as they can be displayed on multiple lines.
                             </xforms:help>
                         </xforms:input>
@@ -216,7 +219,7 @@
                             <xforms:trigger>
                                 <xforms:label>Add carrier</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
-                                    <xforms:insert nodeset="instance('items')/carriers/carrier" 
+                                    <xforms:insert nodeset="instance('items')/carriers/carrier"
                                         at="last()" position="after"/>
                                     <xforms:setvalue ref="instance('items')/carriers/carrier[last()]/@value"
                                         value="instance('instance')/new-item/value"/>
@@ -227,7 +230,7 @@
                             <xforms:trigger>
                                 <xforms:label>Add flavor</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
-                                    <xforms:insert nodeset="instance('items')/flavors/flavor" 
+                                    <xforms:insert nodeset="instance('items')/flavors/flavor"
                                         at="last()" position="after"/>
                                     <xforms:setvalue ref="instance('items')/flavors/flavor[last()]/@value"
                                         value="instance('instance')/new-item/value"/>
@@ -271,14 +274,16 @@
                 </widget:tab>
                 <widget:tab id="slider">
                     <widget:label>Range</widget:label>
-                    <xforms:range ref="range/value" start="1" end="26">
-                        <xforms:action ev:event="xforms-value-changed">
-                            <xforms:recalculate/>
-                            <xforms:send submission="countries-submission"/>
-                        </xforms:action>
-                    </xforms:range>
+                    <xhtml:div class="range">
+                        <xforms:range ref="range/value" start="1" end="26">
+                            <xforms:action ev:event="xforms-value-changed">
+                                <xforms:recalculate/>
+                                <xforms:send submission="countries-submission"/>
+                            </xforms:action>
+                        </xforms:range>
+                    </xhtml:div>
                     <xhtml:p>
-                        Countries starting with letter 
+                        Countries starting with letter
                         <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
                     </xhtml:p>
                     <xhtml:p>

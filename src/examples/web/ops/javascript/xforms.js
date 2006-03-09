@@ -25,8 +25,8 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS = 100;
-var REPEAT_HIERARCHY_SEPARATOR_1 = "\xB7";
-var REPEAT_HIERARCHY_SEPARATOR_2 = "-";
+var XFORMS_SEPARATOR_1 = "\xB7";
+var XFORMS_SEPARATOR_2 = "-";
 
 /* * * * * * Utility functions * * * * * */
 
@@ -192,12 +192,12 @@ function xformsNormalizeEndlines(text) {
 function xformsAppendRepeatSuffix(id, suffix) {
     if (suffix == "")
         return id;
-    if (suffix.charAt(0) == REPEAT_HIERARCHY_SEPARATOR_2)
+    if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
         suffix = suffix.substring(1);
-    if (id.indexOf(REPEAT_HIERARCHY_SEPARATOR_1) == -1)
-        return id + REPEAT_HIERARCHY_SEPARATOR_1 + suffix;
+    if (id.indexOf(XFORMS_SEPARATOR_1) == -1)
+        return id + XFORMS_SEPARATOR_1 + suffix;
     else
-        return id + REPEAT_HIERARCHY_SEPARATOR_2 + suffix;
+        return id + XFORMS_SEPARATOR_2 + suffix;
 }
 
 /**
@@ -213,7 +213,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
             var parent = document.xformsRepeatTreeChildToParent[currentId];
             if (parent == null) break;
             var grandParent = document.xformsRepeatTreeChildToParent[parent];
-            parentRepeatIndexes = (grandParent == null ? REPEAT_HIERARCHY_SEPARATOR_1 : REPEAT_HIERARCHY_SEPARATOR_2)
+            parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
                     + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
             currentId = parent;
         }
@@ -433,40 +433,11 @@ function xformsHandleSelectChanged(event) {
         select.selectValue)));
 }
 
-function xformsHandleRangeMouseDown(event) {
-    document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
-    return false;
-}
-
-function xformsHandleRangeMouseUp(event) {
-    document.xformsCurrentRangeControl = null;
-    return false;
-}
-
-function xformsHandleRangeMouseMove(event) {
-    var rangeControl = document.xformsCurrentRangeControl;
-    if (rangeControl) {
-        // Compute range boundaries
-        var rangeStart = xformsGetElementPosition(rangeControl.track).left;
-        var rangeLength = rangeControl.track.clientWidth - rangeControl.slider.clientWidth;
-
-        // Compute value
-        var value = (event.clientX - rangeStart) / rangeLength;
-        if (value < 0) value = 0;
-        if (value > 1) value = 1;
-
-        // Compute slider position
-        var sliderPosition = event.clientX - rangeStart;
-        if (sliderPosition < 0) sliderPosition = 0;
-        if (sliderPosition > rangeLength) sliderPosition = rangeLength;
-        rangeControl.slider.style.left = sliderPosition;
-
-        // Notify server that value changed
-        rangeControl.value = value;
-        xformsValueChanged(rangeControl, null);
-    }
-
-    return false;
+function xformsSliderValueChange(offset) {
+    // Notify server that value changed
+    var rangeControl = document.getElementById(this.id);
+    rangeControl.value = offset / 200;
+    xformsValueChanged(rangeControl, null);
 }
 
 function xformsHandleOutputClick(event) {
@@ -708,7 +679,7 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsAlert = true;
             if (className == "xforms-incremental")
                 isIncremental = true;
-            if (className == "xforms-range-casing")
+            if (className == "xforms-range-background")
                 isXFormsRange = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
@@ -768,27 +739,12 @@ function xformsInitializeControlsUnder(root) {
                 // Compute the checkes value for the first time
                 xformsComputeSelectValue(control);
             } else if (isXFormsRange) {
-            
-                if (!control.listenersRegistered) {
-                    control.listenersRegistered = true;
-                    control.mouseDown = false;
-                    for (var childIndex = 0; childIndex < control.childNodes.length; childIndex++) {
-                        var child = control.childNodes[childIndex];
-                        if (child.className 
-                                && xformsArrayContains(child.className.split(" "), "xforms-range-track"))
-                            control.track = child;
-                        if (child.className 
-                                && xformsArrayContains(child.className.split(" "), "xforms-range-slider"))
-                            control.slider = child;
-                    }
-                    xformsAddEventListener(control.slider, "mousedown", xformsHandleRangeMouseDown);
-                }
-                
-                if (!document.xformsRangeListenerRegistered) {
-                    document.xformsRangeListenerRegistered = true;
-                    xformsAddEventListener(document, "mousemove", xformsHandleRangeMouseMove);
-                    xformsAddEventListener(document, "mouseup", xformsHandleRangeMouseUp);
-                }
+                control.tabIndex = 0;
+                var thumbDiv = control.firstChild;
+                if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
+                thumbDiv.id = control.id + XFORMS_SEPARATOR_1 + "thumb";
+                var slider = YAHOO.widget.Slider.getHorizSlider(control.id, thumbDiv.id, 0, 200);
+                slider.onChange = xformsSliderValueChange;
             } else if (isXFormsOutput) {
                 xformsAddEventListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
@@ -1001,7 +957,7 @@ function xformsGetLocalName(element) {
 function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
     var idSuffixWithDepth = idSuffix;
     for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-         idSuffixWithDepth += REPEAT_HIERARCHY_SEPARATOR_2 + "1";
+         idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
     if (element.id)
         element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
     if (element.htmlFor)
@@ -1107,7 +1063,7 @@ function xformsHandleResponse() {
                                                                 templateNode.id.indexOf("repeat-begin-") == 0)
                                                             nestedRepeatLevel--;
                                                         // Add suffix to all the ids
-                                                        xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + REPEAT_HIERARCHY_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
+                                                        xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + XFORMS_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
                                                         // Increment nestedRepeatLevel when we enter a nested repeat
                                                         if (xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-begin-end") &&
                                                                 templateNode.id.indexOf("repeat-end-") == 0)

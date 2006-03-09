@@ -48,7 +48,7 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = new StringBuffer("xforms-control xforms-range xforms-range-casing");
+            final StringBuffer classes = new StringBuffer("xforms-control xforms-range xforms-range-background");
             if (!handlerContext.isGenerateTemplate()) {
 
                 handleMIPClasses(classes, controlInfo);
@@ -67,17 +67,11 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
             {
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-track");
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-thumb");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
             }
 
-            {
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-range-slider");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-            }
 
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         }

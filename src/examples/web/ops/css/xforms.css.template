@@ -124,34 +124,23 @@
     display: none;
 }
 
-.xforms-range-casing {
-    height: 30px;
-    overflow: hidden;
-    font-size: 1px;
+.xforms-range-background {
+    position: relative;
+    width: 218px;
+    background: url(/ops/config/theme/images/slider-horizontal-background.png) no-repeat;
+    height: 26px;
+    width: 218px;
+    zindex: 5;
 }
 
-.xforms-range-track {
-    position: relative;
-    top: 12px;
-    border:1px solid &dark-color;;
-    background-color: &xxlight-color;;
-    width: 300px;
-    height: 6px;
-    z-index: 5;
-    overflow: hidden;
-}
-
-.xforms-range-slider {
-    position: relative;
-    z-index:6;
-    border:1px solid &dark-color;;
-    background-color:&light-color;;
-    top: 0px;
-    padding:0px;
-    width: 10px;
-    height: 16px;
-    cursor: pointer;
-    overflow: hidden;
+.xforms-range-thumb {
+    position:absolute;
+    left: 0px;
+    top: 8px;
+    cursor: default;
+    width: 18px;
+    height: 20px;
+    background: url(/ops/config/theme/images/slider-horizontal-thumb.png) no-repeat;
 }
 
 .xforms-select-template {

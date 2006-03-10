@@ -59,7 +59,7 @@ public class XFormsIndexUtils {
                         final int newIndex = ((Integer) currentControlsState.getRepeatIdToIndex().get(repeatId)).intValue();
 
                         // Adjust bounds if necessary
-                        if (repeatNodeSet.size() == 0)
+                        if (repeatNodeSet == null || repeatNodeSet.size() == 0)
                             adjustedNewIndex = 0;
                         else if (newIndex < 1)
                             adjustedNewIndex = 1;

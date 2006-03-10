@@ -1412,19 +1412,19 @@ function xformsHandleResponse() {
 
                                             // Store new label message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
-                                            if (newLabel && newLabel != documentElement.labelMessage)
+                                            if (newLabel != null && newLabel != documentElement.labelMessage)
                                                 documentElement.labelMessage = newLabel;
                                             // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");
-                                            if (newHint && newHint != documentElement.hintMessage)
+                                            if (newHint != null && newHint != documentElement.hintMessage)
                                                 documentElement.hintMessage = newHint;
                                             // Store new help message in control attribute
                                             var newHelp = controlElement.getAttribute("help");
-                                            if (newHelp && newHelp != documentElement.helpMessage)
+                                            if (newHelp != null && newHelp != documentElement.helpMessage)
                                                 documentElement.helpMessage = newHelp;
                                             // Store new alert message in control attribute
                                             var newAlert = controlElement.getAttribute("alert");
-                                            if (newAlert && newAlert != documentElement.alertMessage)
+                                            if (newAlert != null && newAlert != documentElement.alertMessage)
                                                 documentElement.alertMessage = newAlert;
                                             // Store validity, label, hint, help in element
                                             var newValid = controlElement.getAttribute("valid");

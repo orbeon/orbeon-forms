@@ -1086,6 +1086,28 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     /**
+     * Handle events related to externally updating one or more instance documents.
+     */
+    public void handleNewInstanceDocuments(PipelineContext pipelineContext ) {
+
+        // "Once the XML instance data has been replaced, the rebuild, recalculate, revalidate and refresh operations
+        // are performed on the model, without dispatching events to invoke those four operations."
+
+        doRebuild(pipelineContext);
+        doRecalculate(pipelineContext);
+        doRevalidate(pipelineContext);
+
+        // Rebuild ControlsState
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+        doRefresh(pipelineContext);
+
+        // Update repeat indexes if necessary
+        XFormsIndexUtils.adjustIndexes(pipelineContext, xformsControls, xformsControls.getCurrentControlsState());
+    }
+
+    /**
      * This class is cloneable.
      */
     public Object clone() throws CloneNotSupportedException {

@@ -490,51 +490,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             if (replaceInstance == null) {
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
-                                                // Get repeat index information just before insertion
-                                                final Map previousRepeatIdToIndex;
-                                                {
-                                                    final Map map = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-                                                    previousRepeatIdToIndex = (map == null) ? null : new HashMap(map);
-                                                }
 
                                                 // Set new instance
-//                                                replaceInstance.logMIPs();
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
                                                 XFormsUtils.markAllValuesChanged(replaceInstance.getDocument());
 
-                                                // "Once the XML instance data has been replaced,
-                                                // the rebuild, recalculate, revalidate and refresh
-                                                // operations are performed on the model, without
-                                                // dispatching events to invoke those four
-                                                // operations."
-
-                                                model.doRebuild(pipelineContext);
-                                                model.doRecalculate(pipelineContext);
-                                                model.doRevalidate(pipelineContext);
-
-                                                // Rebuild ControlsState
-                                                xformsControls.rebuildCurrentControlsState(pipelineContext);
-
-                                                model.doRefresh(pipelineContext);
-
-                                                // NOTE: You can imagine really complicated stuff related to index
-                                                // updates. Here, we assume that repeat iterations do
-                                                // *not* depend on instance values that themselves depend on the index()
-                                                // function. This scenario is not impossible, but fairly far-fetched I
-                                                // think, and we haven't seen it yet. So once an instance structure and
-                                                // content is determined, we assume that it won't change in a
-                                                // significant way with index updates performed below.
-
-                                                // However, one scenario we want to allow is a repeat "detail" on the
-                                                // same level as a repeat "master", where the repeat detail iteration
-                                                // depends on index('master').
-
-//                                                replaceInstance.logMIPs();
-
-                                                // Update repeat indexes if necessary
-                                                XFormsIndexUtils.adjustIndexes(pipelineContext, xformsControls, xformsControls.getCurrentControlsState());
+                                                // Handle new instance and associated events
+                                                model.handleNewInstanceDocuments(pipelineContext);
 
                                                 // Notify that submission is done
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));

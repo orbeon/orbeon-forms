@@ -38,6 +38,16 @@ public class XFormsIndexUtils {
     public static void adjustIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls,
                                      final XFormsControls.ControlsState currentControlsState) {
 
+        // NOTE: You can imagine really complicated stuff related to index
+        // updates. Here, we assume that repeat iterations do
+        // *not* depend on instance values that themselves depend on the index()
+        // function. This scenario is not impossible, but fairly far-fetched I think, and we haven't seen it yet. So
+        // once an instance structure and content is determined, we assume that it won't change in a significant way
+        // with index updates performed below.
+
+        // However, one scenario we want to allow is a repeat "detail" on the same level as a repeat "master", where
+        // the repeat detail iteration depends on index('master').
+
         // TODO: detect use of index() function
         final Map updatedIndexesIds = new HashMap();
         currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
@@ -72,7 +82,6 @@ public class XFormsIndexUtils {
                     // Set index
                     currentControlsState.updateRepeatIndex(repeatId, adjustedNewIndex);
                     updatedIndexesIds.put(repeatId, "");
-//                                                            System.out.println("Updating index: " + repeatId + " to " + adjustedNewIndex);
 
                     level++;
                 }
@@ -90,57 +99,11 @@ public class XFormsIndexUtils {
             final Map.Entry currentEntry = (Map.Entry) i.next();
             final String repeatId = (String) currentEntry.getKey();
 
-//                                                    System.out.println("Existing index: " + repeatId);
-
             if (updatedIndexesIds.get(repeatId) == null) {
-//                                                        System.out.println("  setting to 0");
                 currentControlsState.updateRepeatIndex(repeatId, 0);
             }
         }
     }
-
-
-    // The idea is that if a repeat index was set to 0 (which can only
-    // happen when a repeat node-set is empty) and instance replacement
-    // causes the node-set to be non-empty, then the repeat index must be
-    // set to the initial repeat index for that repeat.
-//                                                if (previousRepeatIdToIndex != null) {
-//                                                    final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-//
-//                                                    final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-//                                                    final Map intialRepeatIdToIndex = currentControlsState.getDefaultRepeatIdToIndex();
-//                                                    final Map effectiveRepeatIdToIterations = currentControlsState.getEffectiveRepeatIdToIterations();
-//                                                    if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
-//                                                        for (Iterator i = previousRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-//                                                            final Map.Entry currentEntry = (Map.Entry) i.next();
-//                                                            final String repeatId = (String) currentEntry.getKey();
-//                                                            final Integer previouslIndex = (Integer) currentEntry.getValue();
-//
-////                                                            final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
-//                                                             // TODO FIXME: repeatId is a control id, but effectiveRepeatIdToIterations contains effective ids
-//                                                            // -> this doesn't work and can throw exceptions!
-//                                                            final Integer newIterations = (Integer) effectiveRepeatIdToIterations.get(repeatId);
-//
-//                                                            if (previouslIndex.intValue() == 0 && newIterations != null && newIterations.intValue() > 0) {
-//                                                                // Set index to defaul value
-//                                                                final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
-////                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, initialRepeatIndex.toString());
-//                                                                // TODO: Here we need to check that the index is within bounds and to send the appropriate events
-//                                                                currentControlsState.updateRepeatIndex(repeatId, initialRepeatIndex.intValue());
-//                                                            } else {
-//                                                                // Just reset index and make sure it is within bounds
-////                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, previousRepeatIndex.toString());
-//                                                                // TODO: Here we need to check that the index is within bounds and to send the appropriate events
-////                                                                final Integer previousRepeatIndex = (Integer) previousRepeatIdToIndex.get(repeatId);
-////                                                                currentControlsState.updateRepeatIndex(repeatId, previousRepeatIndex.intValue());
-//                                                                final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
-//                                                                currentControlsState.updateRepeatIndex(repeatId, initialRepeatIndex.intValue());
-//                                                            }
-//                                                            // TODO: Adjust controls ids that could have gone out of bounds?
-//                                                            // adjustRepeatIndexes(pipelineContext, xformsControls);
-//                                                        }
-//                                                    }
-//                                                }
 
     /**
      * Adjust repeat indexes after an insertion.

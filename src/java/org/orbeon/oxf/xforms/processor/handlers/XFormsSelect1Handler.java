@@ -170,6 +170,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
                 && "autocomplete".equals(appearanceLocalname);
 
+        final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
+
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
 
@@ -184,6 +186,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             classes.append(appearanceLocalname);
             if (isOpenSelection)
                 classes.append(" xforms-select1-open");
+            if (isAutocompleteNoFilter)
+                classes.append(" xforms-select1-open-autocomplete-nofilter");
 
             if (!handlerContext.isGenerateTemplate()) {
                 handleMIPClasses(classes, controlInfo);
@@ -233,8 +237,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (isOpenSelection) {
 
                 if (isAutocomplete) {
-                    // Create xhtml:span
 
+                    // Create xhtml:span
                     final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
@@ -247,8 +251,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "xforms-select1-open-input-" + effectiveId);
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-input");
-
-
 
                             final String value = (controlInfo == null) ? null : controlInfo.getValue();
                             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);

@@ -719,7 +719,8 @@ function xformsInitializeControlsUnder(root) {
                 for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
                     values.push(select.options[optionIndex].value);
                 // Initialize auto-complete input
-                actb(textfield, values);
+                var noFilter = xformsArrayContains(classes, "xforms-select1-open-autocomplete-nofilter");
+                actb(textfield, values, noFilter);
                 // Initialize span
                 control.value = textfield.value;
                 control.previousValue = textfield.value;

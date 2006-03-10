@@ -1,7 +1,8 @@
-function actb(obj,ca) {
+function actb(obj,ca,no_filter) {
 
     var actb_self = obj;
     actb_self.actb_keywords = ca;
+    actb_self.actb_no_filter = no_filter;
 	/* ---- Public Variables ---- */
 	actb_self.actb_timeOut = -1; // Autocomplete Timeout in ms (-1: autocomplete never time out)
 	actb_self.actb_lim = -1;    // Number of elements autocomplete can show (-1: no limit)
@@ -69,7 +70,9 @@ function actb(obj,ca) {
 		var tobuild = '';
 		var i;
 
-		if (actb_self.actb_firstText){
+        if (actb_self.actb_no_filter) {
+            var re = new RegExp("");
+        } else if (actb_self.actb_firstText) {
 			var re = new RegExp("^" + t, "i");
 		}else{
 			var re = new RegExp(t, "i");
@@ -499,7 +502,9 @@ function actb(obj,ca) {
 			actb_removedisp();
 		}
 		if (ot.length < actb_self.actb_startcheck) return this;
-		if (actb_self.actb_firstText){
+        if (actb_self.actb_no_filter) {
+            var re = new RegExp("");
+		} else if (actb_self.actb_firstText){
 			var re = new RegExp("^" + t, "i");
 		}else{
 			var re = new RegExp(t, "i");

@@ -448,7 +448,7 @@ function actb(obj,ca,no_filter) {
 	}
 
 	function actb_tocomplete(kc){
-        if (kc == 27 || kc == 37 || kc == 39 || kc == 8) {
+        if (kc == 27 || kc == 37 || kc == 39 || kc == 8 || kc == 9) {
             actb_removedisp();
             return;
         }

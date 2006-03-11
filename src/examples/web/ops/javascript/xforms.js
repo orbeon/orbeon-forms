@@ -497,6 +497,7 @@ function xformsHandleAutoCompleteKeyPress(event) {
 }
 
 function xformsHandleAutoCompleteMouseChange(input) {
+    input.parentNode.lastKeyCode = -1;
     input.parentNode.value = input.value;
     xformsValueChanged(input.parentNode, null);
 }
@@ -1194,7 +1195,8 @@ function xformsHandleResponse() {
                                         // Case of the auto-complete control
                                         var textfield = documentElement.childNodes[0];
                                         textfield.actb_keywords = newValues;
-                                        textfield.actb_tocomplete(documentElement.lastKeyCode);
+                                        if (documentElement.lastKeyCode != -1)
+                                            textfield.actb_tocomplete(documentElement.lastKeyCode);
                                     } else if (documentElement.tagName == "SELECT") {
 
                                         // Case of list / combobox

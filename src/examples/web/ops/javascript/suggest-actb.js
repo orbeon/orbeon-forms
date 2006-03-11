@@ -44,7 +44,7 @@ function actb(obj,ca,no_filter) {
 	var actb_kwcount = 0;
 	var actb_caretmove = false;
 	/* ---- Private Variables---- */
-	
+
 	addEvent(actb_curr,"focus",actb_setup);
 	function actb_setup(){
 		addEvent(document,"keydown",actb_checkkey);
@@ -79,7 +79,7 @@ function actb(obj,ca,no_filter) {
 			var re = new RegExp(t, "i");
 		}
 		var p = n.search(re);
-				
+
 		for (i=0;i<p;i++){
 			tobuild += n.substr(i,1);
 		}
@@ -104,12 +104,13 @@ function actb(obj,ca,no_filter) {
 		a.cellSpacing='0px';
 		a.cellPadding='0px';
 		a.style.position='absolute';
-        a.style.top = eval(curTop(actb_curr) + actb_curr.offsetHeight - 10) + "px";
-		a.style.left = curLeft(actb_curr) + "px";
 		a.style.backgroundColor=actb_self.actb_bgColor;
 		a.style.color = actb_self.actb_textColor;
         a.style.border = "1px solid black";
         a.id = actb_table_id;
+        var inputPosition = YAHOO.util.Dom.getXY(actb_curr);
+        a.style.left = (inputPosition[0] - 2) + "px";
+        a.style.top = (inputPosition[1] + actb_curr.offsetHeight - 12) + "px";
 		document.body.appendChild(a);
 		var i;
 		var first = true;
@@ -169,7 +170,10 @@ function actb(obj,ca,no_filter) {
 				break;
 			}
 		}
-		actb_rangeu = 1;
+        // avernet: Make it so the table is at least of the same width as the text field
+        if (a.offsetWidth < actb_self.offsetWidth)
+            a.width = actb_self.offsetWidth;
+        actb_rangeu = 1;
 		actb_ranged = j-1;
 		actb_display = true;
 		if (actb_pos <= 0) actb_pos = 1;
@@ -260,9 +264,11 @@ function actb(obj,ca,no_filter) {
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list=0;actb_removedisp();},actb_self.actb_timeOut);
 	}
 	function actb_godown(){
-		if (!actb_display)
+		if (!actb_display) {
             actb_tocomplete(40);
-		if (actb_pos == actb_total) return;
+            return;
+        }
+        if (actb_pos == actb_total) return;
 		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
 		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos++;
@@ -320,7 +326,7 @@ function actb(obj,ca,no_filter) {
 		actb_mouse_on_list = 0;
 		actb_pos = this.getAttribute('pos');
 		actb_penter();
-        // avernet: Notify the XForms code that the value has changed 
+        // avernet: Notify the XForms code that the value has changed
         xformsHandleAutoCompleteMouseChange(actb_self);
     }
 	function actb_table_focus(){
@@ -399,7 +405,7 @@ function actb(obj,ca,no_filter) {
 		l = getCaretStart(actb_curr);
 	}
 	function actb_removedisp(){
-        // Ignore the actb_mouse_on_list which does not seem to be accurate (avernet)
+        // avernet: Ignore the actb_mouse_on_list which does not seem to be accurate
         if (true || actb_mouse_on_list==0){
 			actb_display = 0;
             if (document.getElementById(actb_table_id)){ document.body.removeChild(document.getElementById(actb_table_id)); }
@@ -442,9 +448,13 @@ function actb(obj,ca,no_filter) {
 	}
 
 	function actb_tocomplete(kc){
-        if (kc == 38 || kc == 13 || kc == 18 || kc == 27 || kc == 37 || kc == 39) return;
-		var i;
-		if (actb_display){ 
+        if (kc == 27 || kc == 37 || kc == 39 || kc == 8) {
+            actb_removedisp();
+            return;
+        }
+        if (kc == 38 || kc == 13 || kc == 18 || kc == 16 || kc == 17 || kc == 20) return;
+        var i;
+		if (actb_display){
 			var word = 0;
 			var c = 0;
 			for (var i=0;i<=actb_self.actb_keywords.length;i++){

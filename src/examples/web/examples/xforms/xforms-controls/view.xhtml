@@ -39,13 +39,13 @@
                     <flavors>
                         <flavor value="v">
                             <label>Vanilla</label>
-                        </flavor> 
+                        </flavor>
                         <flavor value="s">
                             <label>Strawberry</label>
-                        </flavor> 
+                        </flavor>
                         <flavor value="c">
                             <label>Chocolate</label>
-                        </flavor> 
+                        </flavor>
                     </flavors>
                     <carriers>
                         <carrier value="ups">
@@ -67,7 +67,7 @@
                     &lt;span>
                     &lt;/span>
                 </formated-instance>
-            </xforms:instance>                
+            </xforms:instance>
             <xforms:instance id="countries">
                 <countries letter=""/>
             </xforms:instance>
@@ -80,8 +80,8 @@
                 <ui>
                     <show-instance>false</show-instance>
                 </ui>
-            </xforms:instance>                
-            
+            </xforms:instance>
+
             <xforms:bind nodeset="instance('instance')">
                 <xforms:bind nodeset="age" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
@@ -98,14 +98,14 @@
                 calculate="instance('instance')/range/letter"/>
             <xforms:bind nodeset="instance('country-details')/@us-code"
                 calculate="instance('instance')/country"/>
-            <xforms:bind nodeset="instance('formatted')" 
+            <xforms:bind nodeset="instance('formatted')"
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/config/theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
-            
-            <xforms:submission ref="instance('countries')" id="countries-submission" 
+
+            <xforms:submission ref="instance('countries')" id="countries-submission"
                 method="post" action="/xforms-controls/update-countries" replace="instance"/>
-            <xforms:submission ref="instance('country-details')" id="country-details-submission" 
+            <xforms:submission ref="instance('country-details')" id="country-details-submission"
                 method="post" action="/xforms-controls/update-country-details" replace="instance"/>
             <!-- Submission when country name changed -->
             <xforms:submission ref="instance('instance')" id="country-name-updated"
@@ -115,7 +115,7 @@
     <xhtml:body>
         <xforms:group ref="instance('instance')">
             <widget:tabs>
-                <widget:tab id="text-controls" selected="true">
+                <widget:tab id="text-controls">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age" incremental="true">
@@ -149,7 +149,7 @@
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="selection-controls">
+                <widget:tab id="selection-controls" selected="true">
                     <widget:label>Selection controls</widget:label>
                     <xforms:group>
                         <xforms:label>Single Value Selection</xforms:label>

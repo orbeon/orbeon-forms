@@ -8,7 +8,7 @@ function actb(obj,ca,no_filter) {
 	actb_self.actb_lim = -1;    // Number of elements autocomplete can show (-1: no limit)
 	actb_self.actb_firstText = true; // should the auto complete be limited to the beginning of keyword?
 	actb_self.actb_mouse = true; // Enable Mouse Support
-	actb_self.actb_delimiter = new Array(';',',');  // Delimiter for multiple autocomplete. Set it to empty array for single autocomplete
+	actb_self.actb_delimiter = new Array();  // Delimiter for multiple autocomplete. Set it to empty array for single autocomplete
 	actb_self.actb_startcheck = 0; // Show widget only after this number of characters is typed in.
 	/* ---- Public Variables ---- */
 
@@ -54,10 +54,11 @@ function actb(obj,ca,no_filter) {
 
 	function actb_clear(evt){
         if (!evt) evt = event;
-		removeEvent(document,"keydown",actb_checkkey);
+        removeEvent(document,"keydown",actb_checkkey);
 		removeEvent(actb_curr,"blur",actb_clear);
 		removeEvent(document,"keypress",actb_keypress);
-		actb_removedisp();
+        // avernet: Do not remove the table right away, otherwise we might miss a click event on the table
+        setTimeout(actb_removedisp, 100);
 	}
     function actb_parse(n){
 		if (actb_self.actb_delimiter.length > 0){
@@ -221,7 +222,7 @@ function actb(obj,ca,no_filter) {
 					c.setAttribute('pos',j);
 					if (actb_self.actb_mouse){
 						c.style.cursor = 'pointer';
-						c.onclick=actb_mouseclick;
+                        c.onclick=actb_mouseclick;
 						c.onmouseover = actb_table_highlight;
 					}
 					j++;
@@ -284,7 +285,7 @@ function actb(obj,ca,no_filter) {
 
 	/* Mouse */
 	function actb_mouse_down(){
-		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
+        document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
 		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos++;
 		actb_movedown();
@@ -296,7 +297,7 @@ function actb(obj,ca,no_filter) {
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list=0;actb_removedisp();},actb_self.actb_timeOut);
 	}
 	function actb_mouse_up(evt){
-		if (!evt) evt = event;
+        if (!evt) evt = event;
 		if (evt.stopPropagation){
 			evt.stopPropagation();
 		}else{
@@ -319,7 +320,9 @@ function actb(obj,ca,no_filter) {
 		actb_mouse_on_list = 0;
 		actb_pos = this.getAttribute('pos');
 		actb_penter();
-	}
+        // avernet: Notify the XForms code that the value has changed 
+        xformsHandleAutoCompleteMouseChange(actb_self);
+    }
 	function actb_table_focus(){
 		actb_mouse_on_list = 1;
 	}
@@ -329,7 +332,7 @@ function actb(obj,ca,no_filter) {
 		if (actb_self.actb_timeOut > 0) actb_toid = setTimeout(function(){actb_mouse_on_list = 0;actb_removedisp();},actb_self.actb_timeOut);
 	}
 	function actb_table_highlight(){
-		actb_mouse_on_list = 1;
+        actb_mouse_on_list = 1;
 		document.getElementById(actb_tr_id+actb_pos).style.backgroundColor = actb_self.actb_bgColor;
 		document.getElementById(actb_tr_id+actb_pos).style.color = actb_self.actb_textColor;
 		actb_pos = this.getAttribute('pos');
@@ -343,7 +346,7 @@ function actb(obj,ca,no_filter) {
 	/* ---- */
 
 	function actb_insertword(a){
-		if (actb_self.actb_delimiter.length > 0){
+        if (actb_self.actb_delimiter.length > 0){
 			str = '';
 			l=0;
 			for (i=0;i<actb_delimwords.length;i++){
@@ -381,7 +384,7 @@ function actb(obj,ca,no_filter) {
 		actb_removedisp();
 	}
 	function actb_penter(){
-		if (!actb_display) return;
+        if (!actb_display) return;
 		actb_display = false;
 		var word = '';
 		var c = 0;

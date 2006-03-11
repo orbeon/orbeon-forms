@@ -496,6 +496,11 @@ function xformsHandleAutoCompleteKeyPress(event) {
     }
 }
 
+function xformsHandleAutoCompleteMouseChange(input) {
+    input.parentNode.value = input.value;
+    xformsValueChanged(input.parentNode, null);
+}
+
 // Focus out events are only handled when we have receive a focus in event.
 // Here we just save the event which will be handled when we receive a focus
 // in from the browser.

@@ -323,7 +323,9 @@
         </copy>
         <copy file='${cli.jar.file}' todir='${war.inf}' />
         <copy todir="${war.dir}" >
-            <fileset dir="${examples-src.dir}/jsp"/>
+            <fileset dir="${examples-src.dir}">
+                <include name="xforms-jsp/**"/>
+            </fileset>
         </copy>
     </target>
 

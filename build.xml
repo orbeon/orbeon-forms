@@ -322,6 +322,9 @@
             </fileset>
         </copy>
         <copy file='${cli.jar.file}' todir='${war.inf}' />
+        <copy todir="${war.dir}" >
+            <fileset dir="${examples-src.dir}/jsp"/>
+        </copy>
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">

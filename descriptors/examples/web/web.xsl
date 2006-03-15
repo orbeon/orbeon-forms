@@ -167,6 +167,32 @@
             </xsl:call-template>
             -->
 
+            <xsl:comment> All JSP files under /xforms-jsp go through the OPS filter </xsl:comment>
+            <filter>
+                <filter-name>ops-main-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.OXFServletFilter</filter-class>
+                <init-param>
+                    <param-name>oxf.main-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.main-processor.input.config</param-name>
+                    <param-value>oxf:/config/filter.xpl</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.input.config</param-name>
+                    <param-value>oxf:/ops/xforms/xforms-server-error.xpl</param-value>
+                </init-param>
+            </filter>
+            <filter-mapping>
+                <filter-name>ops-main-filter</filter-name>
+                <url-pattern>/xforms-jsp/*</url-pattern>
+            </filter-mapping>
+
             <xsl:comment> Set PresentationServer listeners </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>

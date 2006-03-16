@@ -14,7 +14,7 @@
 <%@ page import="java.util.Random"%>
 <%
     // Set content type to XML. By default it will be HTML, and OPS will tidy it.
-    response.setContentType("text/xml");
+    response.setContentType("application/xhtml+xml");
 %>
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"

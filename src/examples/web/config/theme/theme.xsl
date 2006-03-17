@@ -36,13 +36,13 @@
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                 <!-- Handle meta elements -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:meta"/>
-                <!-- Copy user-defined links -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:link"/>
-                <!-- Copy user-defined stylesheets -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:style"/>
-                <!-- Copy user-defined scripts -->
-                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:script"/>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
+                <!-- Handle user-defined links -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:link"/>
+                <!-- Handle user-defined stylesheets -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:style"/>
+                <!-- Handle user-defined scripts -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>

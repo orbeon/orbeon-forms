@@ -87,6 +87,7 @@
         <example id="xpath" path="sandbox/xpath" label="XPath Sandbox" xforms-ng="true"/>
         <example id="xpl" path="sandbox/xpl" label="XPL Sandbox" xforms-ng="true"/>
         <example id="xslt" path="sandbox/xslt" label="XSLT Sandbox" xforms-ng="true"/>
+        <example id="schema" path="sandbox/schema" label="Schema Sandbox" xforms-ng="true"/>
         <example id="parsing" label="Parsing XML"/>
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>

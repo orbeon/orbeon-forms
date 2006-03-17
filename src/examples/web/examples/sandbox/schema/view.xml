@@ -40,7 +40,7 @@
             <xforms:group ref="/sandbox-instance">
                 <p>
                     <xforms:textarea ref="input" class="wide-textarea" incremental="true">
-                        <xforms:label>Input:</xforms:label>
+                        <xforms:label>Document to validate:</xforms:label>
                     </xforms:textarea>
                 </p>
                 <p>

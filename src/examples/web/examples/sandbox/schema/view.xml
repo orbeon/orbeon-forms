@@ -49,7 +49,7 @@
                     </xforms:textarea>
                 </p>
                 <xforms:group>
-                    <xforms:label>Output</xforms:label>
+                    <xforms:label>Validation Result</xforms:label>
                     <xforms:output ref="formatted-output" mediatype="text/html"/>
                 </xforms:group>
             </xforms:group>

@@ -94,7 +94,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument(pipelineContext, 0, requestParameters.getInstance());
+                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone());
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(XFormsInstance localInstance) {

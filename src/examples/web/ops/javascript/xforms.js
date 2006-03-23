@@ -1230,6 +1230,17 @@ function xformsHandleResponse() {
 
                                         // Case of checkboxes / radio bottons
 
+                                        // Actual values:
+                                        //     <span id="id" class="xforms-control xforms-select[1]-full">
+                                        //         <span><input type="checkbox" checked="..." value="v"/> Vanilla</span>
+                                        //         ... other checkboxes / radio buttons
+                                        //     </span>
+                                        //
+                                        // Template follows:
+                                        //     <span id="xforms-select-template-id" class="xforms-select-template">
+                                        //         <span><input type="checkbox" checked="..." value="$xforms-template-value$"/> $xforms-template-label$</span>
+                                        //     </span>
+
                                         // Get element following control
                                         var template = documentElement.nextSibling;
                                         while (template.nodeType != ELEMENT_TYPE)
@@ -1297,7 +1308,7 @@ function xformsHandleResponse() {
                                             var type = controlElement.getAttribute("type");
                                             var documentElement = document.getElementById(controlId);
                                             if (documentElement == null)
-                                                xformsLog(controlId);
+                                                throw "Can not find element with id '" + controlId + "' received in <control>";
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control was modified and we haven't even received the key event yet

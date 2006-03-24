@@ -98,7 +98,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     if (itemsetInfos != null) { // may be null when there is no item in the itemset
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
                             final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
-                            items.add(new Item(true, itemsetAttributes, itemsetInfo.getLabel(), itemsetInfo.getValue()));
+                            final String value = itemsetInfo.getValue();
+                            items.add(new Item(true, itemsetAttributes, itemsetInfo.getLabel(), value));
                         }
                     }
                 }
@@ -328,13 +329,23 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
 
-            final String value = item.getValue();
-            if (!handlerContext.isGenerateTemplate() && controlInfo != null && controlInfo.getValue() != null) {
-                for (final StringTokenizer st = new StringTokenizer(controlInfo.getValue()); st.hasMoreTokens();) {
-                    final String token = st.nextToken();
-                    if (token.equals(value)) {
+            if (!handlerContext.isGenerateTemplate() && controlInfo != null) {
+                final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
+                final String controlValue = ((controlInfo.getValue() == null) ? "" : controlInfo.getValue()).trim();
+
+                if ("".equals(controlValue)) {
+                    // Special case of empty string: check the item that has empty string if any
+                    if ("".equals(itemValue)) {
                         reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
-                        break;
+                    }
+                } else {
+                    // Case of multiple tokens
+                    for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                        final String token = st.nextToken();
+                        if (token.equals(itemValue)) {
+                            reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
+                            break;
+                        }
                     }
                 }
             }

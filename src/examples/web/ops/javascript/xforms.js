@@ -1385,17 +1385,6 @@ function xformsHandleResponse() {
                                                 var inputField = documentElement.childNodes[1];
                                                 var datePicker = documentElement.childNodes[2];
 
-                                                // Populate values
-                                                if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")) 
-                                                    xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
-                                                if (documentElement.value != newControlValue) {
-                                                    documentElement.previousValue = newControlValue;
-                                                    documentElement.valueSetByXForms++;
-                                                    documentElement.value = newControlValue;
-                                                }
-                                                if (inputField.value != newControlValue)
-                                                    inputField.value = newControlValue;
-
                                                 // Change classes on control and date pick based on type
                                                 if (type == "{http://www.w3.org/2001/XMLSchema}date") {
                                                     for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
@@ -1410,6 +1399,17 @@ function xformsHandleResponse() {
                                                         xformsRemoveClass(child, "xforms-type-date");
                                                     }
                                                 }
+
+                                                // Populate values
+                                                if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date"))
+                                                    xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
+                                                if (documentElement.value != newControlValue) {
+                                                    documentElement.previousValue = newControlValue;
+                                                    documentElement.valueSetByXForms++;
+                                                    documentElement.value = newControlValue;
+                                                }
+                                                if (inputField.value != newControlValue)
+                                                    inputField.value = newControlValue;
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Textarea, password

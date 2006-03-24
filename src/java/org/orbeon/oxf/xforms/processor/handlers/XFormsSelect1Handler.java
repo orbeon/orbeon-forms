@@ -41,6 +41,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private StringBuffer labelStringBuffer;
     private StringBuffer valueStringBuffer;
     private boolean hasItemset;
+    private Attributes itemsetAttributes;
 
     private boolean isInItem;
     private boolean isInLabel;
@@ -85,6 +86,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
             } else if ("itemset".equals(localname)) {
                 // xforms:itemset
+                itemsetAttributes = new AttributesImpl(attributes);
+                hasItemset = true; // TODO: in the future we should be able to handle multiple itemsets
 
                 if (!handlerContext.isGenerateTemplate()) {
 
@@ -93,15 +96,12 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                     final List itemsetInfos = (List) controlInfo.getItemset();
                     if (itemsetInfos != null) { // may be null when there is no item in the itemset
-                        final Attributes itemsetAttributes = new AttributesImpl(attributes);
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
                             final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
                             items.add(new Item(true, itemsetAttributes, itemsetInfo.getLabel(), itemsetInfo.getValue()));
                         }
                     }
                 }
-
-                hasItemset = true;
 
             } else if (isInItem) {
                 if ("label".equals(localname)) {
@@ -213,24 +213,16 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             }
 
             if (hasItemset) {
-                // Produce template(s)
+                // Produce template
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
-                for (Iterator i = items.iterator(); i.hasNext();) {
-                    final Item item = (Item) i.next();
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, type, new Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$"));
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
-                    if (item.isItemSet()) {
-                        // xhtml:span
-                        reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
-
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                        handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, type, new Item(true, item.getAttributes(), "$xforms-template-label$", "$xforms-template-value$"));
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-                        break; // TODO: in the future we should be able to handle multiple itemsets
-                    }
-                }
+                // TODO: in the future we should be able to handle multiple itemsets
             }
         } else {
 

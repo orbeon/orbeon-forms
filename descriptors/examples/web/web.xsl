@@ -185,7 +185,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/ops/xforms/xforms-server-error.xpl</param-value>
+                    <param-value>oxf:/config/error.xpl</param-value>
                 </init-param>
             </filter>
             <filter-mapping>

@@ -47,7 +47,7 @@
         <p:output name="data" id="schema-parsed"/>
     </p:processor>
 
-    <!-- Parse input document -->
+    <!-- Validate input document with schema -->
     <p:processor name="oxf:validation">
         <p:input name="data" href="#input-parsed"/>
         <p:input name="schema" href="#schema-parsed"/>

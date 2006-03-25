@@ -713,10 +713,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
+                            // NOTE: Optimizing with include() for servlets doesn't allow detecting
+                            // errors caused by the included resource, so we don't allow this for now.
+
+//                            final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
+//                               && (externalContext.getRequest().getContainerType().equals("portlet")
+//                                    || (externalContext.getRequest().getContainerType().equals("servlet")
+//                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
+
                             final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
-                               && (externalContext.getRequest().getContainerType().equals("portlet")
-                                    || (externalContext.getRequest().getContainerType().equals("servlet")
-                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
+                                                        && externalContext.getRequest().getContainerType().equals("portlet");
 
                             final XFormsModelSubmission.ConnectionResult connectionResult;
                             if (optimize) {

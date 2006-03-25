@@ -753,7 +753,7 @@ class ResponseAdapter implements ExternalContext.Response {
     public InputStream getInputStream() {
         if (inputStream == null) {
             if (stringWriter != null) {
-
+                throw new OXFException("ResponseAdapter.getInputStream() does not yet support content written with getWriter().");
             } else if (byteStream != null) {
                 inputStream = new ByteArrayInputStream(byteStream.getByteArray(), 0, byteStream.size());
             }

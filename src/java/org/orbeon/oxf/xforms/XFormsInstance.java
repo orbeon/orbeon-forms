@@ -55,32 +55,25 @@ public class XFormsInstance implements XFormsEventTarget {
         this.pipelineContext = pipelineContext;
         this.id = id;
         this.model = model;
-        setInstanceDocument(instanceDocument);
+        setInstanceDocument(instanceDocument, true);
     }
 
     /**
      * Return the instance document.
      */
-    public Document getDocument() {
+    public Document getInstanceDocument() {
         return instanceDocument;
     }
 
     /**
      * Set the instance document.
-     */
-    public void setInstanceDocument(Document instanceDocument) {
-        XFormsUtils.setInitialDecoration(instanceDocument);
-        this.instanceDocument = instanceDocument;
-        this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
-    }
-
-    /**
-     * Restore an instance document retrieved earlier with getDocument().
      *
-     * This is the same as setInstanceDocument(), except MIP status is not reset on the document
-     * being passed.
+     * @param instanceDocument  the Document to use
+     * @param initialize        true if initial decoration (MIPs) has to be reset
      */
-    public void restoreInstanceDocument(Document instanceDocument) {
+    public void setInstanceDocument(Document instanceDocument, boolean initialize) {
+        if(initialize)
+            XFormsUtils.setInitialDecoration(instanceDocument);
         this.instanceDocument = instanceDocument;
         this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
     }
@@ -271,11 +264,11 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public void read(ContentHandler contentHandler) {
         try {
-            XFormsUtils.addInstanceAttributes(getDocument());
+            XFormsUtils.addInstanceAttributes(getInstanceDocument());
             LocationSAXWriter saxw = new LocationSAXWriter();
             saxw.setContentHandler(contentHandler);
             saxw.write(instanceDocument);
-            XFormsUtils.removeInstanceAttributes(getDocument());
+            XFormsUtils.removeInstanceAttributes(getInstanceDocument());
 
         } catch (SAXException e) {
             throw new OXFException(e);
@@ -298,7 +291,7 @@ public class XFormsInstance implements XFormsEventTarget {
 
         final Document result = Dom4jUtils.createDocument();
 
-        getDocument().accept(new VisitorSupport() {
+        getInstanceDocument().accept(new VisitorSupport() {
 
             private Element rootElement = result.addElement("mips");
             private Element currentElement;

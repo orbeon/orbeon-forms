@@ -82,7 +82,7 @@ public class XFormsInput extends ProcessorImpl {
                 XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
-                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getDocument());
+                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument());
                 } else {
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
@@ -127,7 +127,7 @@ public class XFormsInput extends ProcessorImpl {
 
                             if (logger.isDebugEnabled())
                                 logger.debug("1) Instance recontructed from request:\n"
-                                        + Dom4jUtils.domToString(localInstance.getDocument()));
+                                        + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
 
                             // Run actions
                             // TODO: this has to be done in Model
@@ -135,11 +135,11 @@ public class XFormsInput extends ProcessorImpl {
                             for (int i = 0; i < actions.length; i++) {
                                 Action action = actions[i];
                                 action.run(pipelineContext, new ActionFunctionContext(),
-                                        requestParameters.getEncryptionKey(), localInstance.getDocument());
+                                        requestParameters.getEncryptionKey(), localInstance.getInstanceDocument());
                             }
                             if (logger.isDebugEnabled())
                                 logger.debug("2) Instance with actions applied:\n"
-                                        + Dom4jUtils.domToString(localInstance.getDocument()));
+                                        + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
                         }
                     });
                 }
@@ -151,7 +151,7 @@ public class XFormsInput extends ProcessorImpl {
 
                 if (logger.isDebugEnabled())
                     logger.debug("3) Instance with model item properties applied:\n"
-                            + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));
+                            + Dom4jUtils.domToString(model.getDefaultInstance().getInstanceDocument()));
 
                 // Get instance from XForms model
                 XFormsInstance instance = model.getDefaultInstance();

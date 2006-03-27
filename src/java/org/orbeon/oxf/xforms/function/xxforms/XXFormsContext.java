@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.xpath.XPathException;
@@ -69,7 +68,7 @@ public class XXFormsContext extends XFormsFunction {
                 final XFormsModel currentModel = (XFormsModel) i.next();
                 for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                    if (currentInstance.getDocument() == currentDocument) {
+                    if (currentInstance.getInstanceDocument() == currentDocument) {
                         results.set(nodeIndex, currentInstance.wrapNode(currentNode));
                     }
                 }

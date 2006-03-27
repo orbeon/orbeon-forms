@@ -245,7 +245,7 @@ public class XFormsControls {
 
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument().getRootElement()});
+        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getInstanceDocument().getRootElement()});
         contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, null, true, null));
     }
 
@@ -459,7 +459,7 @@ public class XFormsControls {
         }
 
         // If not found, return the document element of the model's default instance
-        return containingDocument.getModel(modelId).getDefaultInstance().getDocument();
+        return containingDocument.getModel(modelId).getDefaultInstance().getInstanceDocument();
     }
 
     /**

@@ -198,10 +198,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final Document initialDocumentToSubmit;
                 if (!isDeferredSubmissionSecondPass) {
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getDocument();
+                    final Document backupInstanceDocument = currentInstance.getInstanceDocument();
                     try {
                         initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
-                        currentInstance.setInstanceDocument(initialDocumentToSubmit);
+                        currentInstance.setInstanceDocument(initialDocumentToSubmit, false);
 
                         // Revalidate instance
                         containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
@@ -228,7 +228,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.restoreInstanceDocument(backupInstanceDocument);
+                        currentInstance.setInstanceDocument(backupInstanceDocument, false);
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -298,10 +298,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getDocument();
+                    final Document backupInstanceDocument = currentInstance.getInstanceDocument();
                     try {
                         documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
-                        currentInstance.setInstanceDocument(documentToSubmit);
+                        currentInstance.setInstanceDocument(documentToSubmit, false);
 
                         // Revalidate instance
                         containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
@@ -317,7 +317,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.restoreInstanceDocument(backupInstanceDocument);
+                        currentInstance.setInstanceDocument(backupInstanceDocument, false);
                     }
                 } else {
                     // Don't recreate document
@@ -492,10 +492,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             } else {
 
                                                 // Set new instance
-                                                replaceInstance.setInstanceDocument(resultingInstanceDocument);
+                                                replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
-                                                XFormsUtils.markAllValuesChanged(replaceInstance.getDocument());
+                                                XFormsUtils.markAllValuesChanged(replaceInstance.getInstanceDocument());
 
                                                 // Handle new instance and associated events
                                                 model.handleNewInstanceDocuments(pipelineContext);
@@ -591,7 +591,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
         } else {
             // Use entire instance document
-            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getDocument().getRootElement());
+            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getInstanceDocument().getRootElement());
         }
 
         if (relevant) {

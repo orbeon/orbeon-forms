@@ -20,8 +20,6 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.xpath.XPathException;
-import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.dom4j.Node;
 import org.dom4j.Document;
 
@@ -61,7 +59,7 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
             final XFormsModel currentModel = (XFormsModel) i.next();
             for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                if (currentInstance.getDocument() == currentDocument) {
+                if (currentInstance.getInstanceDocument() == currentDocument) {
                     return currentInstance.wrapNode(currentNode);
                 }
             }

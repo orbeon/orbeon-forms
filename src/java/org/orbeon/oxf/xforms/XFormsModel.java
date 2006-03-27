@@ -226,7 +226,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                if (currentInstance.getDocument() == document)
+                if (currentInstance.getInstanceDocument() == document)
                     return currentInstance;
             }
         }
@@ -295,7 +295,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (modelBind.getParent() == null) {
                 try {
                     // Create XPath evaluator for this bind
-                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getDocument(), null);
+                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getInstanceDocument(), null);
                     bindRunner.applyBind(modelBind, documentWrapper);
                 } catch (final Exception e) {
                     throw new ValidationException(e, modelBind.getLocationData());
@@ -590,7 +590,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Find the final node
         final List nodeset = new ArrayList();
         final XFormsInstance defaultInstance = getDefaultInstance();
-        nodeset.add(defaultInstance.getDocument());
+        nodeset.add(defaultInstance.getInstanceDocument());
         for (Iterator i = parents.iterator(); i.hasNext();) {
             ModelBind current = (ModelBind) i.next();
             List currentModelBindResults = new ArrayList();
@@ -869,7 +869,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void clearInstanceDataEventState() {
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
                     public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
                         if (localInstanceData != null) {
                             localInstanceData.clearInstanceDataEventState();
@@ -891,7 +891,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Clear state
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
                     public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
                         if (localInstanceData != null) {
                             localInstanceData.clearOtherState();
@@ -913,7 +913,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Clear validation state
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
                     public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
                         if (localInstanceData != null) {
                             localInstanceData.clearValidationState();

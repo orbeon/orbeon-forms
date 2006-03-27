@@ -35,7 +35,7 @@ public class Group extends XFormsElement {
         if (isFirstGroup) {
 
             // Go through the instance and wipe out the nodes bound to a control (generated is true)
-            Document instance = context.getCurrentInstance().getDocument();
+            Document instance = context.getCurrentInstance().getInstanceDocument();
             instance.accept(new VisitorSupport() {
                 public void visit(Attribute node) {
                     wipeValue(node);

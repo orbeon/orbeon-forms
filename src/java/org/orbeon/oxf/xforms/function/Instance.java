@@ -52,7 +52,7 @@ public class Instance extends XFormsFunction {
 
         // Return instance document
         if (instance != null) {
-            final Document instanceDocument = instance.getDocument();
+            final Document instanceDocument = instance.getInstanceDocument();
             // "this function returns a node-set containing just the root element node"
             return new ListIterator(Collections.singletonList(new DocumentWrapper(instanceDocument, null).wrap(instanceDocument.getRootElement())));
         } else {

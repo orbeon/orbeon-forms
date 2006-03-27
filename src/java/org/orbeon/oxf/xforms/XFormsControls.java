@@ -1329,8 +1329,12 @@ public class XFormsControls {
         }
 
         public Map getRepeatIdToIndex() {
-            if (repeatIdToIndex == null && defaultRepeatIdToIndex != null)
-                repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
+            if (repeatIdToIndex == null){
+                if (defaultRepeatIdToIndex != null)
+                    repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
+                else // In this case there is no repeat
+                    return Collections.EMPTY_MAP;
+            }
             return repeatIdToIndex;
         }
 

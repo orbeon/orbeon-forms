@@ -638,7 +638,7 @@ function xformsInitCheckesRadios(control) {
 function xformsInitializeControlsUnder(root) {
 
     // Gather all potential form controls
-    var interestingTagNames = new Array("span", "button", "textarea", "input", "a", "label", "select", "td", "table", "div");
+    var interestingTagNames = new Array("span", "button", "textarea", "input", "a", "select", "label", "td", "table", "div");
     var formsControls = new Array();
     for (var tagIndex = 0; tagIndex < interestingTagNames.length; tagIndex++) {
         var elements = root.getElementsByTagName(interestingTagNames[tagIndex]);

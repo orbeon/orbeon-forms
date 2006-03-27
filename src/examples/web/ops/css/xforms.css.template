@@ -203,7 +203,7 @@
     padding-right: 1px;
 }
 
-.xforms-required-empty input {
+.xforms-required-empty input, textarea.xforms-required-empty {
     border: 1px solid #f99;
     background: #fcc;
     padding-bottom: 3px;

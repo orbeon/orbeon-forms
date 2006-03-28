@@ -86,11 +86,13 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             
             public void readImpl(final PipelineContext context, final ContentHandler contentHandler) {
+                start(context);
                 final ProcessorInput bottomInput = getInput(context);
                 if (bottomInput.getOutput() == null)
                     throw new ValidationException("Pipeline output '" + name +
                             "' is not connected to a processor output in pipeline",
                             PipelineProcessor.this.getLocationData());
+
                 executeChildren(context, new Runnable() {
                     public void run() {
                         readInputAsSAX(context, bottomInput, contentHandler);
@@ -106,6 +108,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             public OutputCacheKey getKeyImpl(final PipelineContext context) {
                 if (configFromAST == null && !isInputInCache(context, INPUT_CONFIG))
                     return null;
+                init(context);
                 final ProcessorInput bottomInput = getInput(context);
                 final OutputCacheKey[] bottomInputKey = new OutputCacheKey[1];
                 executeChildren(context, new Runnable() {
@@ -123,6 +126,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             public Object getValidityImpl(final PipelineContext context) {
                 if (configFromAST == null && !isInputInCache(context, INPUT_CONFIG))
                     return null;
+                init(context);
                 final ProcessorInput bottomInput = getInput(context);
                 final Object[] bottomInputValidity = new Object[1];
                 executeChildren(context, new Runnable() {
@@ -136,9 +140,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
             private ProcessorInput getInput(PipelineContext context) {
                 State state = (State) getState(context);
-                if (!state.started)
-                    start(context);
-                final ProcessorInput bottomInput = (ProcessorInput) state.nameToBottomInputMap.get( name );
+                final ProcessorInput bottomInput = (ProcessorInput) state.nameToBottomInputMap.get(name);
                 if (bottomInput == null) {
                     throw new ValidationException("There is no <param type=\"output\" name=\""
                             + name + "\"/>", getLocationData());
@@ -384,9 +386,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 ASTForEach forEach = (ASTForEach) statement;
                 LocationData forEachLocationData = forEach.getLocationData();
                 AbstractProcessor forEachAbstractProcessor = new ForEachProcessor(forEach, astPipeline.getValidity());
-                ForEachProcessor.ConcreteForEachProcessor forEachProcessor =
-                        (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance(context);
-                processor = forEachProcessor;
+                processor = (ForEachProcessor.ConcreteForEachProcessor) forEachAbstractProcessor.createInstance(context);
 
                 // Connect special $data input (document on which the decision is made, or iterated on)
                 ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
@@ -610,51 +610,64 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         }
     }
 
-    public void start(final PipelineContext context) {
-        // Check that we are not already started
-        State state = (State) getState(context);
-        if (state.started)
-            throw new IllegalStateException("ASTPipeline Processor already started");
+    /**
+     * 1) Read the configuration
+     * 2) Reset the processors
+     * 3) DO NOT run the processors that not connected to an output
+     */
+    private void init(final PipelineContext context) {
+        // Check that we are not already initialized
+        final State state = (State) getState(context);
+        if (!state.initialized) {
 
-        // Create config. We have 2 cases:
-        // 1) The config is provided to us as an AST
-        // 2) We need to read the config input
-        final PipelineConfig config = configFromAST != null ? configFromAST :
-                (PipelineConfig) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                        new CacheableInputReader() {
-                            public Object read(final PipelineContext context, final ProcessorInput input) {
-                                return readPipelineConfig(context, input);
-                            }
-                        });
+            // Create config. We have 2 cases:
+            // 1) The config is provided to us as an AST
+            // 2) We need to read the config input
+            state.config = configFromAST != null ? configFromAST :
+                    (PipelineConfig) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+                            new CacheableInputReader() {
+                                public Object read(final PipelineContext context, final ProcessorInput input) {
+                                    return readPipelineConfig(context, input);
+                                }
+                            });
 
-        // Reset processors
-        executeChildren(context, new Runnable() {
-            public void run() {
-                for (Iterator i = config.getProcessors().iterator(); i.hasNext();) {
-                    ((Processor) i.next()).reset(context);
-                }
-            }
-        });
-
-        // Save inputs in state for InternalTopOutput
-        state.pipelineInputs = getConnectedInputs();
-
-        // Bottom inputs: copy in state
-        state.nameToBottomInputMap = config.getNameToInputMap();
-        state.started = true;
-
-        // Run the processors that are not connected to any pipeline output
-        for (Iterator i = config.getProcessorsToStart().iterator(); i.hasNext();) {
-            final Processor processor = (Processor) i.next();
+            // Reset processors
             executeChildren(context, new Runnable() {
                 public void run() {
-                    try {
-                        processor.start(context);
-                    } catch (Exception e) {
-                        throw ValidationException.wrapException(e, processor.getLocationData());
+                    for (Iterator i = state.config.getProcessors().iterator(); i.hasNext();) {
+                        ((Processor) i.next()).reset(context);
                     }
                 }
             });
+
+            // Save inputs in state for InternalTopOutput
+            state.pipelineInputs = getConnectedInputs();
+
+            // Bottom inputs: copy in state
+            state.nameToBottomInputMap = state.config.getNameToInputMap();
+            state.initialized = true;
+        }
+    }
+
+    public void start(final PipelineContext context) {
+        init(context);
+        final State state = (State) getState(context);
+        if (!state.started) {
+
+            // Run the processors that are not connected to any pipeline output
+            for (Iterator i = state.config.getProcessorsToStart().iterator(); i.hasNext();) {
+                final Processor processor = (Processor) i.next();
+                executeChildren(context, new Runnable() {
+                    public void run() {
+                        try {
+                            processor.start(context);
+                        } catch (Exception e) {
+                            throw ValidationException.wrapException(e, processor.getLocationData());
+                        }
+                    }
+                });
+            }
+            state.started = true;
         }
     }
 
@@ -672,8 +685,10 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
     private static class State {
         public Map nameToBottomInputMap = new HashMap();
+        public boolean initialized = false;
         public boolean started = false;
         public Map pipelineInputs = new HashMap();
+        public PipelineConfig config;
     }
 
     private List breakpoints;

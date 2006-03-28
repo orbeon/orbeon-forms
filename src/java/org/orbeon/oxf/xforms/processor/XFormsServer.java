@@ -359,7 +359,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Output index updates
                     final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
                     final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-                    if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
+                    if (currentRepeatIdToIndex.size() != 0) {
                         boolean found = false;
                         for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                             final Map.Entry currentEntry = (Map.Entry) i.next();
@@ -497,7 +497,7 @@ public class XFormsServer extends ProcessorImpl {
         // Output repeat index information
         {
             final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-            if (repeatIdToIndex != null && repeatIdToIndex.size() != 0) {
+            if (repeatIdToIndex.size() != 0) {
                 final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
                 for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();

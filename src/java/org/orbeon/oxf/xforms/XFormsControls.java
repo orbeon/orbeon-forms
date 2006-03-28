@@ -839,7 +839,7 @@ public class XFormsControls {
         // Transfer some of the previous information
         // Keep repeat index information
         final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-        if (currentRepeatIdToIndex != null) {
+        if (currentRepeatIdToIndex.size() != 0) {
             result.setRepeatIdToIndex(currentRepeatIdToIndex);
         }
         // Keep switch index information

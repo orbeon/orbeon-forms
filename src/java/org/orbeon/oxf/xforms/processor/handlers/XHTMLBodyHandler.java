@@ -177,7 +177,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         {
             final StringBuffer repeatIndexesStringBuffer = new StringBuffer();
             final Map repeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-            if (repeatIdToIndex != null && repeatIdToIndex.size() != 0) {
+            if (repeatIdToIndex.size() != 0) {
                 for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry = (Map.Entry) i.next();
                     final String repeatId = (String) currentEntry.getKey();

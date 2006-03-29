@@ -314,15 +314,13 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             protected OutputCacheKey getKeyImpl(PipelineContext context) {
                 State state = (State) getState(context);
                 DOMGenerator domGenerator = (DOMGenerator) state.domGenerators.get(state.currentDOMGenerator);
-                OutputCacheKey result = ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
-                return result;
+                return ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getKey(context);
             }
 
             protected Object getValidityImpl(PipelineContext context) {
                 State state = (State) getState(context);
                 DOMGenerator domGenerator = (DOMGenerator) state.domGenerators.get(state.currentDOMGenerator);
-                Object result = ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
-                return result;
+                return ((Cacheable) domGenerator.getOutputByName(OUTPUT_DATA)).getValidity(context);
             }
         }
 

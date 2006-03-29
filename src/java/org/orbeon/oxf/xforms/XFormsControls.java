@@ -412,10 +412,6 @@ public class XFormsControls {
                 if (currentSingleNodeForModel != null) {
                     newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
                             ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
-
-//                    if (ref != null && newNodeset.isEmpty())
-//                        throw new ValidationException("Single-node binding expression '"
-//                                + ref + "' returned an empty nodeset", new LocationData(locator));
                 } else {
                     newNodeset = null;
                 }
@@ -545,6 +541,29 @@ public class XFormsControls {
             throw new OXFException("Enclosing XForms element not found.");
         else
             throw new OXFException("Enclosing XForms element not found for id: " + contextId);
+    }
+
+    /**
+     * Return the currrent model for the current nodeset binding.
+     */
+    public XFormsModel getCurrentModel() {
+        return getCurrentContext().getModel();
+    }
+
+    /**
+     * Return the current instance for the current nodeset binding.
+     *
+     * This method goes up the context stack until it finds a node, and returns the instance associated with that node.
+     */
+    public XFormsInstance getCurrentInstance() {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+            final Node currentSingleNode = currentBindingContext.getSingleNode();
+
+            if (currentSingleNode != null)
+                return currentBindingContext.getModel().getInstanceForNode(currentSingleNode);
+        }
+        return null;
     }
 
     public void popBinding() {
@@ -877,18 +896,6 @@ public class XFormsControls {
 
     public void setLocator(Locator locator) {
         this.locator = locator;
-    }
-
-    public XFormsModel getCurrentModel() {
-        return getCurrentContext().getModel();
-    }
-
-    public XFormsInstance getCurrentInstance() {
-        final Node currentSingleNode = getCurrentSingleNode();
-        if (currentSingleNode != null)
-            return getCurrentContext().getModel().getInstanceForNode(currentSingleNode);
-        else
-            return null;
     }
 
     /**

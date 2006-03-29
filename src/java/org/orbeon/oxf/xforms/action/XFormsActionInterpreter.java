@@ -28,10 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of all the XForms actions.
@@ -84,9 +81,22 @@ public class XFormsActionInterpreter {
             final String valueToSet;
             if (value != null) {
                 // Value to set is computed with an XPath expression
-                Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
+                final Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
+
+                final List currentNodeset = (xformsControls.getCurrentNodeset()!= null) ?
+                        xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocument());
+                // NOTE: The above is actually not correct: the context should not become null. This is therefore just
+                // a workaround for a bug we hit:
+
+                // o Do 2 setvalue in sequence
+                // o The first one changes the context around the control containing the actions
+                // o When the second one runs, context is empty, and setvalue either crashes or does nothing
+                //
+                // The correct solution is probably to NOT reevaluate the context of actions unless a rebuild is done.
+                // This would require an update to the way we impelement the processing model.
+
                 valueToSet = currentInstance.evaluateXPathAsString(pipelineContext,
-                        xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
+                        currentNodeset, xformsControls.getCurrentPosition(),
                         value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
             } else {
                 // Value to set is static content

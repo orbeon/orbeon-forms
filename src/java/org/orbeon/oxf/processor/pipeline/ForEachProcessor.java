@@ -154,43 +154,24 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 }
 
                 /**
-                 * Combine keys from all iterations
+                 * For each is not cachable. We used to have code here that combines the keys for
+                 * the outputs of the different executions of the for-each. The problem is when we
+                 * have a block in the for-each that has an output and a serializer. In that case,
+                 * getting the output key runs the serializer.
+                 *
+                 * So if we get the key here, we'll run the serializer n times, which is
+                 * unexpected. Maybe an an API that combines reading the output and reading the
+                 * key/validity would solve this problem.
                  */
                 protected OutputCacheKey getKeyImpl(PipelineContext context) {
-                    State state = (State) getState(context);
-                    updateStateWithDOMGeneratorsFromCache
-                            (context, state, createInternalKey(context), createInternalValidity(context));
-                    if (state.domGenerators == null)  return null;
-                    List keys = new ArrayList();
-                    for (int i = 0; i < state.domGenerators.size(); i++) {
-                        state.currentDOMGenerator = i;
-                        iterationProcessor.reset(context);
-                        OutputCacheKey key = ((Cacheable) iterationOutput).getKey(context);
-                        if (key == null) return null;
-                        keys.add(key);
-                    }
-                    final CacheKey[] outKys = new CacheKey[ keys.size() ];
-                    keys.toArray( outKys );
-                    return new CompoundOutputCacheKey( ForEachProcessor.class, name, outKys );
+                    return null;
                 }
 
                 /**
-                 * Combine validities from all iterations
+                 * For each is not cachable. See comment in getKeyImpl().
                  */
                 protected Object getValidityImpl(PipelineContext context) {
-                    State state = (State) getState(context);
-                    updateStateWithDOMGeneratorsFromCache
-                            (context, state, createInternalKey(context), createInternalValidity(context));
-                    if (state.domGenerators == null)  return null;
-                    List validities = new ArrayList();
-                    for (int i = 0; i < state.domGenerators.size(); i++) {
-                        state.currentDOMGenerator = i;
-                        iterationProcessor.reset(context);
-                        Object valdity = ((Cacheable) iterationOutput).getValidity(context);
-                        if (valdity == null) return null;
-                        validities.add(valdity);
-                    }
-                    return validities;
+                    return null;
                 }
 
             };

@@ -55,6 +55,7 @@
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
         <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
         <example id="xforms-i18n" path="xforms/xforms-i18n" label="Internationalization" xforms-ng="true"/>
+        <example id="xforms-google-suggests" path="xforms/xforms-google-suggests" label="Google Suggests" xforms-ng="true"/>
         <example id="xforms-registration" path="xforms/xforms-registration" label="Registration Form" xforms-ng="true"/>
         <example id="xforms-dynamic-image" path="xforms/xforms-dynamic-image" label="Dynamic Image" xforms-ng="true"/>
         <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>
@@ -75,6 +76,7 @@
     </section>
     <section label="Cool Stuff">
         <example id="xquery-the-web" label="XQuery The Web"/>
+        <!--<example id="flickr-viewr" path="flickr-viewr" label="Flickr Viewr" xforms-ng="true"/>-->
         <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>
@@ -88,6 +90,7 @@
         <example id="xpl" path="sandbox/xpl" label="XPL Sandbox" xforms-ng="true"/>
         <example id="xslt" path="sandbox/xslt" label="XSLT Sandbox" xforms-ng="true"/>
         <example id="schema" path="sandbox/schema" label="Schema Sandbox" xforms-ng="true"/>
+        <example id="exist" path="sandbox/exist" label="eXist Sandbox" xforms-ng="true"/>
         <example id="parsing" label="Parsing XML"/>
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
@@ -102,7 +105,6 @@
     <section label="Database Access">
         <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
         <example id="employees" label="The &quot;Employees&quot; Example"/>
-        <example id="xmldb" label="XML:DB Databases"/>
         <!--<example id="petstore" label="The &quot;Pet Store&quot; Example"/>-->
     </section>
     <section label="Calling Web Services">

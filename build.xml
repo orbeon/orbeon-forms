@@ -345,13 +345,6 @@
             <param name="build-root" expression="${build.root}"/>
             <param name="version-number" expression="${version.number}"/>
         </xslt>
-        <!-- Override web.xml with local-web.xml when present -->
-        <copy file="${descriptors.dir}/devel/local-web.xml" tofile="${war.inf}/web.xml"
-            filtering="true" overwrite="true" failonerror="false">
-            <filterset>
-                <filter token="BUILD_ROOT" value="${build.root}"/>
-            </filterset>
-        </copy>
     </target>
 
     <!-- WAR file -->

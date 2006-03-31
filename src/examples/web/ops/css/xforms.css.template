@@ -85,7 +85,11 @@
 
 .xforms-loading-loading {
     display: none;
-    height: 18px;
+    background: #c44;
+    color: #fff;
+    padding: 2px;
+    position: absolute;
+    right: 2em;
 }
 
 .xforms-loading-error {

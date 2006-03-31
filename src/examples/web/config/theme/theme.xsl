@@ -124,7 +124,6 @@
     <xsl:template match="xhtml:span[@class = 'xforms-loading-loading']">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xhtml:img src="/images/loading.gif" style="float: left"/>
             Loading...
         </xsl:copy>
     </xsl:template>

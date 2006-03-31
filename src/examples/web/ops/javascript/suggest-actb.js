@@ -103,15 +103,14 @@ function actb(obj,ca,no_filter) {
         a = document.createElement('table');
 		a.cellSpacing='0px';
 		a.cellPadding='0px';
-		a.style.position='absolute';
+		a.style.position= 'absolute';
 		a.style.backgroundColor=actb_self.actb_bgColor;
 		a.style.color = actb_self.actb_textColor;
         a.style.border = "1px solid black";
         a.id = actb_table_id;
-        var inputPosition = YAHOO.util.Dom.getXY(actb_curr);
-        a.style.left = (inputPosition[0] - 2) + "px";
-        a.style.top = (inputPosition[1] + actb_curr.offsetHeight - 12) + "px";
-		document.body.appendChild(a);
+        document.body.appendChild(a);
+//        a.style.left = (inputPosition[0] - 2) + "px";
+//        a.style.top = (inputPosition[1] + actb_curr.offsetHeight - 12) + "px";
 		var i;
 		var first = true;
 		var j = 1;
@@ -170,9 +169,21 @@ function actb(obj,ca,no_filter) {
 				break;
 			}
 		}
+
         // avernet: Make it so the table is at least of the same width as the text field
         if (a.offsetWidth < actb_self.offsetWidth)
             a.width = actb_self.offsetWidth;
+
+        // avernet: Perform position relative to input field
+        var listPosition = YAHOO.util.Dom.getXY(actb_curr);
+        if (YAHOO.util.Event.isIE) {
+            listPosition[1] += actb_curr.offsetHeight;
+        } else {
+            listPosition[0] -= 1;
+            listPosition[1] += actb_curr.offsetHeight - 12;
+        }
+        YAHOO.util.Dom.setXY(a, listPosition);
+
         actb_rangeu = 1;
 		actb_ranged = j-1;
 		actb_display = true;

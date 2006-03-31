@@ -25,6 +25,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS = 100;
+var XFORMS_DELAY_BEFORE_DISPLAY_LOADING = 100;
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
 
@@ -314,7 +315,7 @@ function xformsLogProperties(object) {
     xformsLog(message);
 }
 
-function xformsDisplayLoading(state) {
+function xformsDisplayIndicator(state) {
     switch (state) {
         case "loading" :
             if (document.xformsLoadingLoading != null)
@@ -322,7 +323,7 @@ function xformsDisplayLoading(state) {
             if (document.xformsLoadingError != null)
                 document.xformsLoadingError.style.display = "none";
             if (document.xformsLoadingNone != null)
-                document.xformsLoadingNone.style.display = "none";
+                document.xformsLoadingNone.style.display = "block";
             break;
         case "error":
             if (document.xformsLoadingLoading != null)
@@ -1657,7 +1658,7 @@ function xformsHandleResponse() {
                 xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
             }
 
-            xformsDisplayLoading("none");
+            xformsDisplayIndicator("none");
 
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
@@ -1675,11 +1676,11 @@ function xformsHandleResponse() {
             // Display error
             var errorContainer = document.xformsLoadingError;
             xformsReplaceNodeText(errorContainer, errorMessage);
-            xformsDisplayLoading("error");
+            xformsDisplayIndicator("error");
         } else {
             // The server didn't send valid XML
             document.xformsLoadingError.innerHTML = "Unexpected response received from server";
-            xformsDisplayLoading("error");
+            xformsDisplayIndicator("error");
             
         }
 
@@ -1689,12 +1690,17 @@ function xformsHandleResponse() {
     }
 }
 
+function xformsDisplayLoading() {
+    if (document.xformsRequestInProgress == true)
+        xformsDisplayIndicator("loading");
+}
+
 function xformsExecuteNextRequest() {
     if (! document.xformsRequestInProgress && document.xformsEvents.length > 0) {
 
         // Mark this as loading
         document.xformsRequestInProgress = true;
-        xformsDisplayLoading("loading");
+        window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING);
 
         // Build request
         var requestDocument;

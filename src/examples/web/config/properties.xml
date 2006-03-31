@@ -46,7 +46,7 @@
     <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-local-instance-loads"        value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
 
     <!-- XPL profiling support -->

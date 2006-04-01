@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+    Copyright (C) 2006 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -19,34 +19,17 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <!--<p:processor name="oxf:identity">-->
-        <!--<p:input name="data">-->
-            <!--<query>orb</query>-->
-        <!--</p:input>-->
-        <!--<p:output name="data" id="instance"/>-->
-    <!--</p:processor>-->
-
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
-            <config xsl:version="2.0">
-                <url>http://www.google.com/complete/search?qu=<xsl:value-of select="/query"/>&amp;hl=en&amp;js=false</url>
-            </config>
-        </p:input>
-        <p:output name="data" id="url-config" debug="config"/>
-    </p:processor>
-
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#url-config"/>
-        <p:output name="data" id="google-response"/>
-    </p:processor>
-
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#google-response"/>
-        <p:input name="config">
             <suggestions xsl:version="2.0">
+                <!-- Get back Google response -->
+                <xsl:variable name="google-response" as="element(html)" select="
+                        doc(concat('http://www.google.com/complete/search?qu=', string(/query), '&amp;js=false'))/html"/>
+                <!-- Extract the interesting part of the JavaScript -->
                 <xsl:variable name="suggestions-list" as="xs:string" select="
-                        substring-before(substring-after(/html/head/script, 'new Array(&quot;'), '&quot;), new Array(')"/>
+                        substring-before(substring-after($google-response/head/script, 'new Array(&quot;'), '&quot;), new Array(')"/>
+                <!-- Generate on <suggestion> element for each suggestion we get from Google -->
                 <xsl:for-each select="tokenize($suggestions-list, '&quot;, &quot;')">
                     <suggestion>
                         <xsl:value-of select="."/>

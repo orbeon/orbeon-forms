@@ -43,11 +43,17 @@ public class ProcessorUtils {
     public static final String DEFAULT_CONTENT_TYPE = XML_CONTENT_TYPE2;
     public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
-    public static final Map supportedBinaryTypes = new HashMap();
+    public static final Map SUPPORTED_BINARY_TYPES = new HashMap();
+
+    public static final String XS_BASE64BINARY_EXPLODED_QNAME =
+            XMLUtils.buildExplodedQName(XMLConstants.XS_BASE64BINARY_QNAME.getNamespaceURI(), XMLConstants.XS_BASE64BINARY_QNAME.getName());
+
+    public static final String XS_ANYURI_EXPLODED_QNAME =
+            XMLUtils.buildExplodedQName(XMLConstants.XS_ANYURI_QNAME.getNamespaceURI(), XMLConstants.XS_ANYURI_QNAME.getName());
 
     static {
-        supportedBinaryTypes.put(XMLUtils.buildExplodedQName(XMLConstants.XS_BASE64BINARY_QNAME.getNamespaceURI(), XMLConstants.XS_BASE64BINARY_QNAME.getName()), "");
-        supportedBinaryTypes.put(XMLUtils.buildExplodedQName(XMLConstants.XS_ANYURI_QNAME.getNamespaceURI(), XMLConstants.XS_ANYURI_QNAME.getName()), "");
+        SUPPORTED_BINARY_TYPES.put(XS_BASE64BINARY_EXPLODED_QNAME, "");
+        SUPPORTED_BINARY_TYPES.put(XS_ANYURI_EXPLODED_QNAME, "");
     }
 
     public static LocationData getElementLocationData(Element element) {

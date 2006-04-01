@@ -112,13 +112,13 @@ public class XFormsInstance implements XFormsEventTarget {
         if (type != null) {
             final String nodeType = instanceData.getType().getAsString();
 
-            if (nodeType != null && !nodeType.equals(type)) { // FIXME: prefixes of type name could be different!
+            if (nodeType != null && !nodeType.equals(type)) {
                 // There is a different type already, do a conversion
                 newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, nodeType);
             } else if (nodeType == null) {
                 // There is no type, convert to default type
-                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
-                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsUtils.DEFAULT_UPLOAD_TYPE);
+                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
+                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
             }
         }
 
@@ -242,15 +242,15 @@ public class XFormsInstance implements XFormsEventTarget {
             // Handle value type
             final String currentType
                     = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME));
-            if (currentType != null && !currentType.equals(type)) { // FIXME: prefixes of type name could be different!
+            if (currentType != null && !currentType.equals(type)) {
                 // There is a different type already, do a conversion
                 value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);
                 Dom4jUtils.clearElementContent(element);
             } else if (currentType == null) {
                 // There is no type, convert to default type
-                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
-                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsUtils.DEFAULT_UPLOAD_TYPE);
-                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsUtils.DEFAULT_UPLOAD_TYPE));
+                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
+                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsUtils.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
             }
             element.setText(value);
         } else {

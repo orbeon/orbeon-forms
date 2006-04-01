@@ -14,13 +14,19 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Node;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represent an xforms:bind element.
+ */
 public class ModelBind {
 
     private String id;
@@ -31,14 +37,25 @@ public class ModelBind {
     private String constraint;
     private String required;
     private String readonly;
+    private String xxformsExternalize;
+
     private Map namespaceMap;
     private LocationData locationData;
     private ModelBind parent;
     private List children = new ArrayList();
     private Node currentNode;
 
-    public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
-                     String required, String readonly,
+    public ModelBind(Element bindElement, ModelBind parent) {
+        this(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
+                    bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
+                    bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
+                    bindElement.attributeValue(XFormsConstants.XXFORMS_EXTERNALIZE_QNAME),
+                    Dom4jUtils.getNamespaceContextNoDefault(bindElement),
+                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement), parent);
+    }
+
+    private ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
+                     String required, String readonly, String xxformsExternalize,
                      Map namespaceMap, LocationData locationData, ModelBind parent) {
 
         if (nodeset == null)
@@ -52,6 +69,8 @@ public class ModelBind {
         this.constraint = constraint;
         this.required = required;
         this.readonly = readonly;
+
+        this.xxformsExternalize = xxformsExternalize;
 
         this.namespaceMap = namespaceMap;
         this.locationData = locationData;
@@ -89,6 +108,10 @@ public class ModelBind {
 
     public String getReadonly() {
         return readonly;
+    }
+
+    public String getXXFormsExternalize() {
+        return xxformsExternalize;
     }
 
     public Map getNamespaceMap() {

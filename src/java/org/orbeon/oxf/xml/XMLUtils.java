@@ -49,8 +49,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
-
 public class XMLUtils {
 
     private static Logger logger = Logger.getLogger(XMLUtils.class);

@@ -49,6 +49,9 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
 
+    <!-- Rarely used global properties -->
+    <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>
+
     <!-- XPL profiling support -->
     <!-- Currently one of org.orbeon.oxf.processor.NetworkTrace or
                           org.orbeon.oxf.processor.StdOutTrace -->

@@ -18,6 +18,7 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
@@ -28,8 +29,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -128,8 +130,43 @@ public class XFormsElement {
                             String id = Integer.toString(currentNodeLocalInstanceData.getId());
                             if (XFormsUtils.isNameEncryptionEnabled())
                                 id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
-                            addExtensionAttribute(newAttributes, "name", "$node^" + id);
-                            addExtensionAttribute(newAttributes, "value", context.getRefValue());
+
+                            // Check if node value must be externalized
+                            final boolean externalize = currentNodeInheritedInstanceData.getXXFormsExternalize().get();
+                            final String namePrefix = externalize ? "$extnode^" : "$node^";
+                            addExtensionAttribute(newAttributes, "name", namePrefix + id);
+
+                            final String valueToSet;
+                            if (externalize) {
+                                // In this case, the value is empty or an URL that we must dereference
+                                final String url = context.getRefValue();
+
+                                if (!url.trim().equals("")){
+
+                                    // There is non-blank content, decode
+                                    try {
+                                        final String fileName = new URL(url).getPath();
+                                        final Reader reader = new InputStreamReader(new FileInputStream(new File(fileName)), "utf-8");
+                                        final StringWriter writer = new StringWriter();
+                                        try {
+                                            NetUtils.copyStream(reader, writer);
+                                        } finally {
+                                            reader.close();
+                                        }
+                                        valueToSet = writer.toString();
+                                    } catch (Exception e) {
+                                        throw new OXFException(e);
+                                    }
+                                } else {
+                                    // No non-blank content, keep value as is
+                                    valueToSet = context.getRefValue();
+                                }
+                            } else {
+                                // Use value as is
+                                valueToSet = context.getRefValue();
+                            }
+
+                            addExtensionAttribute(newAttributes, "value", valueToSet);
                         } else if (ACTION_CONTROLS.containsKey(localname)) {
                             addExtensionAttribute(newAttributes, "value", context.getRefValue());
                         }

@@ -26,6 +26,9 @@ import org.xml.sax.ContentHandler;
 
 import java.util.Collections;
 
+/**
+ *  Handle XForms output (XForms Classic engine).
+ */
 public class XFormsOutput extends ProcessorImpl {
 
     private static final String INPUT_MODEL = "model";
@@ -57,7 +60,7 @@ public class XFormsOutput extends ProcessorImpl {
                 }
 
                 // Set annotated instance on model
-                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();// TODO: Check this: why do we cache?
                 model.setInstanceDocument(pipelineContext, 0, instanceDocument);
 
                 // Create and initialize XForms Engine

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Collections;
 
 /**
- * Handle XForms decoding.
+ * Handle XForms decoding (XForms Classic engine).
  *
  * A filter can be provided. It contains XPath references to nodes that have been filled-out by the
  * PFC based on URL filtering. The format of the filter comes directly from the native document
@@ -116,9 +116,9 @@ public class XFormsInput extends ProcessorImpl {
                                     throw new OXFException("Number of parameters does not match number of groups in path expression");
                                 for (Iterator paramIterator = paramElements.iterator(),
                                         groupIterator = groupElements.iterator(); paramIterator.hasNext();) {
-                                    Element paramElement = (Element) paramIterator.next();
-                                    Element groupElement = (Element) groupIterator.next();
-                                    String value = groupElement.getStringValue();
+                                    final Element paramElement = (Element) paramIterator.next();
+                                    final Element groupElement = (Element) groupIterator.next();
+                                    final String value = groupElement.getStringValue();
                                     if (!"".equals(value))
                                         localInstance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
                                                 Dom4jUtils.getNamespaceContext(paramElement), value);

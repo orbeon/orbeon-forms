@@ -21,7 +21,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import java.util.*;
 
 /**
- * Instance of this class are used to decorate the XForms instance.
+ * Instances of this class are used to annotate XForms instance nodes with MIPs and other information.
  */
 public class InstanceData implements Cloneable {
 
@@ -36,6 +36,8 @@ public class InstanceData implements Cloneable {
 
     private ValidModelItemProperty valueValid = new ValidModelItemProperty();
     private ValidModelItemProperty constraint = new ValidModelItemProperty();
+
+    private XXFormsExternalizeModelItemProperty xxformsExternalize;
 
     private boolean valueChanged;
     private boolean previousRequiredState;
@@ -84,27 +86,10 @@ public class InstanceData implements Cloneable {
                 public boolean get() {
                     // "An instance node is valid if and only if the following conditions hold:"
 
-
                     // "* the constraint model item property is true"
                     if (!constraint.get())
                         return false;
 
-                    // NOTE: The commented-out code below assumed that the valid MIP was depending
-                    // on the required MIP. The latest errata clarifies that this is not the case.
-                    // In OPS, the UI will specially mark fields that are required but empty. Also,
-                    // upon submission, an empty but required node will prevent submission from
-                    // happening.
-
-                    // Handle type and required constraints
-//                    if (valueValid.get() && getRequired().get()) {
-//                        // Valid and required, check that the value is actually non-empty
-//                        return !(getRequired().getStringValue().length() == 0);
-//                    } else if (!valueValid.get() && !getRequired().get()) {
-//                        // Not valid and not required, checked that the value is actually empty
-//                        return valueValid.getStringValue().length() == 0;
-//                    } else {
-//                        return valueValid.get();
-//                    }
                     // "* the node satisfies any applicable XML schema definitions (including those
                     // associated by the type model item property) NOTE: A node that satifies the
                     // above conditions is valid even if it is required but empty."
@@ -126,6 +111,14 @@ public class InstanceData implements Cloneable {
 
     public TypeModelItemProperty getType() {
         return type;
+    }
+
+    public BooleanModelItemProperty getXXFormsExternalize() {
+        // This extension MIP may not be used, so create lazily
+        if (xxformsExternalize == null)
+            xxformsExternalize = new XXFormsExternalizeModelItemProperty();
+
+        return xxformsExternalize;
     }
 
     public String getInvalidBindIds() {
@@ -251,6 +244,8 @@ public class InstanceData implements Cloneable {
             result.valueValid = (ValidModelItemProperty) this.valueValid.clone();
             result.constraint = (ValidModelItemProperty) this.constraint.clone();
             result.type = (TypeModelItemProperty) this.type.clone();
+
+            result.xxformsExternalize = (this.xxformsExternalize != null) ? (XXFormsExternalizeModelItemProperty) this.xxformsExternalize.clone() : null;
         } catch (CloneNotSupportedException e) {
             // This should not happen because the classes cloned are Cloneable
             throw new OXFException(e);
@@ -262,11 +257,4 @@ public class InstanceData implements Cloneable {
 
         return result;
     }
-
-//    public String toString() {
-//        return "[valueChanged=" + valueChanged
-//                + ", previousValidState=" + previousValidState
-//                + ", validState=" + getValid().get()
-//                +"]";
-//    }
 }

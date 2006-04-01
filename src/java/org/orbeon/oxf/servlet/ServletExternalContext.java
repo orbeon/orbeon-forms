@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.*;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardHttpServletRequestWrapper;
@@ -53,6 +50,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     public static final String DEFAULT_FORM_CHARSET = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
+    public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
 
     private class Request implements ExternalContext.Request {
 
@@ -318,7 +316,24 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         final Map uploadParameterMap = new HashMap();
         try {
             // Setup commons upload
-            DiskFileUpload upload = new DiskFileUpload();
+            final DiskFileUpload upload = new DiskFileUpload() {
+                protected FileItem createItem(Map headers, boolean isFormField) throws FileUploadException {
+                    if (isFormField) {
+                        final String externalizeFormValuesPrefix = OXFProperties.instance().getPropertySet().getString(EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY);
+                        final String fieldName = getFieldName(headers);
+                        if (externalizeFormValuesPrefix != null && fieldName.startsWith(externalizeFormValuesPrefix)) {
+                            // In this case, we do as if the value content is an uploaded file so that it can be externalized
+                            return super.createItem(headers, false);
+                        } else {
+                            // Just create the FileItem using the default way
+                            return super.createItem(headers, isFormField);
+                        }
+                    } else {
+                        // Just create the FileItem using the default way
+                        return super.createItem(headers, isFormField);
+                    }
+                }
+            };
             upload.setHeaderEncoding(encoding);
 
             // Read properties

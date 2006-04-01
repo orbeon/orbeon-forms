@@ -51,7 +51,8 @@ import java.util.zip.GZIPOutputStream;
 public class XFormsUtils {
 
     private static final int BUFFER_SIZE = 1024;
-    public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
+    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
+    public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
     private static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
 
     /**
@@ -447,12 +448,12 @@ public class XFormsUtils {
     public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
         if (currentType.equals(newType))
             return value;
-        if (ProcessorUtils.supportedBinaryTypes.get(currentType) == null)
+        if (ProcessorUtils.SUPPORTED_BINARY_TYPES.get(currentType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        if (ProcessorUtils.supportedBinaryTypes.get(newType) == null)
+        if (ProcessorUtils.SUPPORTED_BINARY_TYPES.get(newType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
-        if (currentType.equals(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName())) {
+        if (currentType.equals(ProcessorUtils.XS_BASE64BINARY_EXPLODED_QNAME)) {
             // Convert from xs:base64Binary to xs:anyURI
             return XMLUtils.base64BinaryToAnyURI(pipelineContext, value);
         } else {

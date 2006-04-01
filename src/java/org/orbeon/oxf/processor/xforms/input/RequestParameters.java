@@ -24,13 +24,16 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.*;
 
+/**
+ * Extract XForms values from request (XForms Classic engine).
+ */
 public class RequestParameters {
 
     private static final Map actionClasses = new HashMap();
@@ -49,9 +52,9 @@ public class RequestParameters {
     private Document instance;
     private String encryptionKey;
 
-    public RequestParameters(PipelineContext pipelineContext, Document requestDocument) {
+    public RequestParameters(final PipelineContext pipelineContext, Document requestDocument) {
         try {
-            List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
+            final List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
             if (XFormsUtils.isHiddenEncryptionEnabled()) {
                 encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
@@ -59,12 +62,14 @@ public class RequestParameters {
 
             // Go through parameters
             for (Iterator i = parameters.iterator(); i.hasNext();) {
-                Element parameterElement = (Element) i.next();
+                final Element parameterElement = (Element) i.next();
                 String name = parameterElement.element("name").getStringValue();
 
-                List values = new ArrayList();
-                for (Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();)
-                    values.add(((Element) elementIterator.next()).getStringValue());
+                final List values = new ArrayList();
+                for (Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();) {
+                    final String currentValue = ((Element) elementIterator.next()).getStringValue();
+                    values.add(currentValue);
+                }
 
                 final String type
                     = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(parameterElement.element("value"), XMLConstants.XSI_TYPE_QNAME));
@@ -152,7 +157,7 @@ public class RequestParameters {
                         action.setParameters(actionParameters);
                         actions.add(action);
                     }
-                } else if (name.startsWith("$node^")) {
+                } else if (name.startsWith("$node^") || name.startsWith("$extnode^")) {
                     addValue(pipelineContext, name, values, type);
                 }
             }
@@ -168,14 +173,20 @@ public class RequestParameters {
     /**
      * Adds (id -> value) in idToValue. If there is already a value for this id,
      * concatenates the two values by adding a space.
-     * <p/>
+     *
      * Also store the value type in idToType if present.
      */
     private void addValue(PipelineContext pipelineContext, String name, List values, String type) {
-        String idString = name.substring("$node^".length());
-        if (XFormsUtils.isNameEncryptionEnabled())
-            idString = SecureUtils.decrypt(pipelineContext, encryptionKey, idString);
-        Integer idObject = new Integer(idString);
+        // Extract the decrypted node id after the "^" character
+        final String idString;
+        {
+            final String encryptedIdString = name.substring(name.indexOf('^') + 1);
+            idString = (XFormsUtils.isNameEncryptionEnabled())
+                    ? SecureUtils.decrypt(pipelineContext, encryptionKey, encryptedIdString) :encryptedIdString;
+        }
+
+        // Save value
+        final Integer idObject = new Integer(idString);
         String currentValue = (String) idToValue.get(idObject);
         for (Iterator i = values.iterator(); i.hasNext();) {
             String value = (String) i.next();
@@ -183,6 +194,8 @@ public class RequestParameters {
                     "".equals(value) ? currentValue : currentValue + ' ' + value;
             idToValue.put(idObject, currentValue);
         }
+
+        // Save type
         if (type != null)
             idToType.put(idObject, type);
     }

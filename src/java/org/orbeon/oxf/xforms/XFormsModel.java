@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
@@ -174,11 +173,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void handleBindContainer(Element container, ModelBind parent) {
         for (Iterator i = container.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
             final Element bindElement = (Element) i.next();
-            final ModelBind modelBind = new ModelBind(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
-                    bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
-                    bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
-                    Dom4jUtils.getNamespaceContextNoDefault(bindElement),
-                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement), parent);
+            final ModelBind modelBind = new ModelBind(bindElement, parent);
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);
@@ -414,6 +409,33 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Mark node
                     InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
                     instanceData.getReadonly().set(true);
+                }
+            });
+        }
+
+        // Handle xxforms:externalize bind
+        if (modelBind.getXXFormsExternalize() != null) {
+            // The bind has an xxforms:externalize attribute
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Evaluate "externalize" XPath expression on this node
+                    final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
+                    final PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+
+                    try {
+                        boolean xxformsExternalize = ((Boolean) expr.evaluateSingle()).booleanValue();
+
+                        // Mark node
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        instanceData.getXXFormsExternalize().set(xxformsExternalize);
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
+                    }
                 }
             });
         }

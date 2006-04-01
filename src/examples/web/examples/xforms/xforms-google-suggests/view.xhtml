@@ -54,14 +54,20 @@
         </xforms:model>
         <xhtml:style type="text/css">
             .search              { text-align: center; }
-            .search-field input  { width: 16em; margin-top: .5em; }
+            .search-logo         { margin-bottom: 1em; }
+            .search-field input  { width: 16em; margin-top: 1em; }
             .search-button       { margin-top: 1em; }
             .xforms-alert        { display: none; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xhtml:div class="search">
-            <xhtml:div><xhtml:img src="/images/search-logo.png" alt="Search logo"/></xhtml:div>
+            <xhtml:div class="search-logo"><xhtml:img src="/images/search-logo.png" alt="Search logo"/></xhtml:div>
+            <xhtml:div>
+                Type your search string, and see how the<br/>
+                XForms auto-complete field give you suggestion<br/>
+                of what might want to search
+            </xhtml:div>
             <xhtml:div>
 
                 <!-- Auto-complete text field -->

@@ -1186,7 +1186,7 @@ function xformsHandleResponse() {
                                         // Case of the auto-complete control
                                         var textfield = documentElement.childNodes[0];
                                         textfield.actb_keywords = newValues;
-                                        if (documentElement.lastKeyCode != -1)
+                                        if (xformsIsDefined(documentElement.lastKeyCode) && documentElement.lastKeyCode != -1)
                                             textfield.actb_tocomplete(documentElement.lastKeyCode);
                                     } else if (documentElement.tagName == "SELECT") {
 

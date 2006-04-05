@@ -8,10 +8,21 @@
 -->
 <exist>
 
+
+    <!-- Configures the cluster configuration
+        - protocol:
+        defines a protocol stack. Refers the jgroups protocol stack.
+        - dbaUser:
+        defines the user used by the cluster for the replica.
+        - dbaPassword:
+        defines the user password used by the cluster for the replica.
+   -->
+    <cluster protocol="UDP:PING" dbaUser="admin" dbaPassword=""/>
+
     <!-- Configures the database backend:
         - database:
-            selects a database backend. Currently, "native" is the
-            only valid setting.
+            selects a database backend. Currently, "native" and "native_cluster"
+            are the only valid setting.
         - files:
             path to the directory where database files are
             stored.
@@ -35,8 +46,8 @@
     exceptions on machines with limited memory (256MB). Increase the
     buffer settings for elements_buffers and words_buffers if you have
     some more memory to waste. -->
-    <db-connection database="native" files="exist-data"
-        pageSize="4096" cacheSize="48M" free_mem_min="10">
+	<db-connection database="native" files="exist-data"
+		pageSize="4096" cacheSize="64M" free_mem_min="5">
 
         <!-- Settings for the database connection pool:
             - sync-period
@@ -46,8 +57,18 @@
                 milliseconds and write all dirty pages to disk.
             - min: minimum number of connections to keep alive.
             - max: maximum number of connections allowed.
+			- wait-before-shutdown:
+			    defines how long the database instance will wait for running
+			    operations to complete before it forces a shutdown.
         -->
-        <pool min="1" max="20" sync-period="300000"/>
+		<pool min="1" max="20" sync-period="120000" wait-before-shutdown="120000"/>
+
+		<recovery enabled="yes" sync-on-commit="no"
+            size="10M" journal-dir="exist-data"/>
+
+		<!--system-task class="org.exist.storage.DataBackup" period="120000">
+			<parameter name="output-dir" value="backup"/>
+		</system-task-->
     </db-connection>
 
     <!-- Default settings for the serializer. Most of these can be changed
@@ -71,14 +92,60 @@
         of the returned XML fragments.
     -->
     <serializer enable-xinclude="yes" enable-xsl="no"
-        indent="yes" add-exist-id="none" match-tagging-elements="yes"
+		indent="yes" add-exist-id="none" match-tagging-elements="yes"
         match-tagging-attributes="no"/>
+
+	<!-- During XUpdates, the database needs to do a partial reindex of the
+	document whenever the internal node-id structure has changed. Reindex
+	runs can occur quite frequently and slow down the XUpdate process.
+
+	Frequent reindex runs can be avoided by leaving some space between the
+	numeric identifiers assigned to every node. Future insertions will first
+	fill up these spare identifiers, so no reindex is required.
+
+	The "growth-factor" attribute determines the number of spare ids to be
+	inserted whenever the node id scheme is recomputed after an XUpdate.
+	Increase the setting to have less reindex runs. However, you have to
+	be aware that leaving spare ids also limits the maximum size of a
+	document that can be indexed.
+
+	"enable-consistency-checks" is for debugging only. If the parameter
+	is set to "yes", a consistency check will be run on every modified
+	document after every XUpdate request. It checks if the
+	persistent DOM is complete and all pointers in the structural
+	index point to valid storage addresses containing valid nodes.
+
+    "allowed-fragmentation" defines the maximum number of page splits allowed within a
+    document before a defragmentation run will be triggered.
+	-->
+
+	<xupdate growth-factor="20" allowed-fragmentation="20"
+		enable-consistency-checks="no"/>
+
+    <xquery>
+        <builtin-modules>
+            <module uri="http://exist-db.org/xquery/util"
+                class="org.exist.xquery.functions.util.UtilModule"/>
+            <module uri="http://exist-db.org/xquery/transform"
+                class="org.exist.xquery.functions.transform.TransformModule"/>
+            <module uri="http://exist-db.org/xquery/xmldb"
+                class="org.exist.xquery.functions.xmldb.XMLDBModule"/>
+            <module uri="http://exist-db.org/xquery/request"
+                class="org.exist.xquery.functions.request.RequestModule"/>
+            <module uri="http://exist-db.org/xquery/text"
+                class="org.exist.xquery.functions.text.TextModule"/>
+            <module uri="http://exist-db.org/xquery/examples"
+                class="org.exist.xquery.modules.example.ExampleModule"/>
+        </builtin-modules>
+    </xquery>
 
     <!--
         Settings for the indexer:
         - suppress-whitespace
             should leading or trailing whitespace be removed from a text
-            node? Set to "leading", "trailing", "both" or "none".
+            node? Set to "leading", "trailing", "both" or "none". Changing
+            the parameter will only have an effect on newly loaded files, not
+            old ones.
         - caseSensitive
             should equality comparisons between strings be case-sensitive or
             insensitive: "yes" or "no".
@@ -98,59 +165,31 @@
             not be indexed in the DOM file. This has only an effect when
             retrieving query results or for some types of XPath subexpressions, like
             equality comparisons.
+        - suppress-whitespace-mixed-content
+            preserve the white space inside a mixed content node
     -->
-    <indexer stemming="no" caseSensitive="no" suppress-whitespace="both"
-        index-depth="1" tokenizer="org.exist.storage.analysis.SimpleTokenizer"
-		validation="no">
+    <indexer stemming="no" caseSensitive="yes" suppress-whitespace="both"
+	index-depth="1" tokenizer="org.exist.storage.analysis.SimpleTokenizer"
+	track-term-freq="yes" validation="no" preserve-whitespace-mixed-content="no">
 
 		<!-- where's the file containing a list of stopwords to be ignored
          by the parser. -->
 		<stopwords file="stopword"/>
 
-		<!-- index tells the parser which element-content should be
-	     fulltext-indexed. By default everything is indexed. To
-	     change this, set default="none". Additionally you may
-	     specify which elements to include, by defining one or
-	     more include statements below.
-
-	     The include statement expects to find a simple path-
-	     expression in it's attribute-tag. Only element or attribute names
-		 and the / and // operators are allowed here. Attributes start
-		 with a @.
-
-	     Every element matching the path expression will have it's
-	     textual content indexed. This is also valid for all of
-	     it's descendants.
-
-		 Attributes:
-		 	- doctype  the doctype for which this definition should be used.
-		 	- default  index everything by default? Set to "none" to switch
-		 			   of default indexing.
-		 	- attributes  index attribute values?
-		 	- index-depth
-	    		defines the maximum nesting depth of nodes which will be indexed
-	    		in the DOM index. Nodes below the specified nesting depth will
-	    		not be indexed in the DOM file. This has only an effect when
-	    		retrieving queryb results or for some types of XPath subexpressions, like
-	    		equality comparisons.
+		<!-- default index settings. Default settings apply if there's no collection-specific
+		configuration for a collection.
         -->
-        <index doctype="users" default="none" attributes="false">
-		</index>
-		<index doctype="PLAY" default="all">
-		</index>
-		<index doctype="dblp" attributes="true" alphanum="true" default="all">
-			<exclude path="//@mdate"/>
-			<exclude path="//ee"/>
-			<exclude path="//volume"/>
-			<exclude path="//cdrom"/>
-			<exclude path="//url"/>
+        <index>
+			<fulltext default="all" attributes="false">
+				<exclude path="/auth"/>
+			</fulltext>
 		</index>
 
         <!-- Specify the location of one or more catalog files.
         Catalogs are used to resolve external entities in XML documents.
         -->
 		<entity-resolver>
-			<catalog file="webapp/WEB-INF/catalog"/>
+			<catalog file="exist-catalog.xml"/>
 		</entity-resolver>
     </indexer>
 

@@ -68,6 +68,7 @@
         <include name="junit.jar"/>
         <include name="saxon-6_5_2.jar"/>
         <include name="saxon-8_1_1_orbeon.jar"/>
+        <!--<include name="saxon-8_7_orbeon.jar"/>-->
         <include name="joost-20030623_orbeon.jar"/>
         <include name="batik-all-1_5.jar"/>
         <include name="avalon*"/>
@@ -84,10 +85,11 @@
         <include name="commons-httpclient-slide_2_0rc1.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
         <include name="portlet-api_1.0.jar"/>
-        <include name="exist-1_0b2_build_1107.jar"/>
-        <include name="exist-optional-1_0b2_build_1107.jar"/>
-        <include name="xmldb-exist_1_0b2_build_1107.jar"/>
-        <include name="xmlrpc-1_2_patched_exist_1_0b2_build_1107.jar"/>
+        <include name="exist-20060316.jar"/>
+        <include name="exist-optional-20060316.jar"/>
+        <include name="xmldb-exist_20060316.jar"/>
+        <include name="xmlrpc-1_2_patched_exist_20060316.jar"/>
+        <include name="jgroups-all-exist_20060316.jar"/>
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>
         <include name="itext-1_02b.jar"/>

@@ -109,6 +109,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                 DatabaseManager.registerDatabase(database);
                 {
                     // This is specific for eXist
+                    // TODO: move this to properties?
                     ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                     String configurationFile = externalContext.getRealPath("WEB-INF/exist-conf.xml");
                     database.setProperty("create-database", "true");

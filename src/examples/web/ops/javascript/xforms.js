@@ -831,11 +831,14 @@ function xformsPageLoaded() {
         var scripts = document.getElementsByTagName("script");
         for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
             var script = scripts[scriptIndex];
-            var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
-            if (startPathToJavaScript != -1) {
-                BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
-                XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-                break;
+            var scriptSrc = script.getAttribute("src");
+            if (scriptSrc != null) {
+                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT);
+                if (startPathToJavaScript != -1) {
+                    BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
+                    XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+                    break;
+                }
             }
         }
 
@@ -1658,7 +1661,9 @@ function xformsHandleResponse() {
                 xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
             }
 
-            xformsDisplayIndicator("none");
+            // Hide loading if there are no other request in the queue
+            if (document.xformsEvents.length == 0)
+                xformsDisplayIndicator("none");
 
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {

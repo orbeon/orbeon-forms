@@ -25,6 +25,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
+var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
@@ -569,13 +570,20 @@ function xformsRegisterForFocusBlurEvents(control) {
  */
 function xformsFireEvents(events, incremental) {
 
+    // Store the time of the first event to be sent in the queue
+    var currentTime = new Date().getTime();
+    if (document.xformsEvents.length == 0)
+        document.xformsEventsFirstEventTime = currentTime;
+
     // Store events to fire
     for (var eventIndex = 0; eventIndex < events.length; eventIndex++)
         document.xformsEvents.push(events[eventIndex]);
 
     // Fire them with a delay to give us a change to aggregate events together
     document.xformsExecuteNextRequestInQueue++;
-    if (incremental) window.setTimeout(xformsExecuteNextRequest,
+    if (incremental && !(currentTime - document.xformsEventsFirstEventTime >
+            XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS))
+        window.setTimeout(xformsExecuteNextRequest,
             XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
     else xformsExecuteNextRequest(true);
     return false;

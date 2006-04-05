@@ -24,8 +24,8 @@ var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
-var XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS = 100;
-var XFORMS_DELAY_BEFORE_DISPLAY_LOADING = 500;
+var XFORMS_DELAY_BEFORE_AJAX_REQUEST_IN_MS = 200;
+var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
 
@@ -557,9 +557,12 @@ function xformsRegisterForFocusBlurEvents(control) {
     }
 }
 
-
-// Parameter is an array of arrays with each array containing:
-// new Array(target, eventName, value, incremental, other)
+/**
+ * Root function called by any widget that wants an event to be sent to the server.
+ *
+ * @param events  Array of arrays with each array containing:
+ *                new Array(target, eventName, value, incremental, other)
+ */
 function xformsFireEvents(events) {
 
     // Store events to fire
@@ -567,7 +570,8 @@ function xformsFireEvents(events) {
         document.xformsEvents.push(events[eventIndex]);
 
     // Fire them with a delay to give us a change to aggregate events together
-    window.setTimeout(xformsExecuteNextRequest, XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS);
+    document.xformsExecuteNextRequestInQueue++;
+    window.setTimeout(xformsExecuteNextRequest, XFORMS_DELAY_BEFORE_AJAX_REQUEST_IN_MS);
     
     return false;
 }
@@ -845,6 +849,7 @@ function xformsPageLoaded() {
         // Initialize attributes on document
         document.xformsRequestInProgress = false;
         document.xformsEvents = new Array();
+        document.xformsExecuteNextRequestInQueue = 0;
         document.xformsChangedIdsRequest = new Array();
 
         // Initialize summary section that displays alert messages
@@ -1691,6 +1696,7 @@ function xformsHandleResponse() {
 
         // Go ahead with next request, if any
         document.xformsRequestInProgress = false;
+        document.xformsExecuteNextRequestInQueue++;
         xformsExecuteNextRequest();
     }
 }
@@ -1701,11 +1707,14 @@ function xformsDisplayLoading() {
 }
 
 function xformsExecuteNextRequest() {
-    if (! document.xformsRequestInProgress && document.xformsEvents.length > 0) {
+    document.xformsExecuteNextRequestInQueue--;
+    if (!document.xformsRequestInProgress
+            && document.xformsEvents.length > 0
+            && document.xformsExecuteNextRequestInQueue == 0) {
 
         // Mark this as loading
         document.xformsRequestInProgress = true;
-        window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING);
+        window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
 
         // Build request
         var requestDocument;

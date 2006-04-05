@@ -24,7 +24,7 @@ var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
-var XFORMS_DELAY_BEFORE_AJAX_REQUEST_IN_MS = 200;
+var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
@@ -378,8 +378,11 @@ function xformsValueChanged(target, other) {
     if (valueChanged) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
-        xformsFireEvents(new Array(xformsCreateEventArray
-                (target, "xxforms-value-change-with-focus-change", target.value, other)));
+        var events = new Array(xformsCreateEventArray
+                (target, "xxforms-value-change-with-focus-change", target.value, other));
+        var incremental = other == null
+                && xformsArrayContains(target.className.split(" "), "xforms-incremental");
+        xformsFireEvents(events, incremental);
     }
     return valueChanged;
 }
@@ -410,7 +413,7 @@ function xformsHandleClick(event) {
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
     var targetClasses = target.className.split(" ")
     if (xformsArrayContains(targetClasses, "xforms-trigger") && !xformsArrayContains(targetClasses, "xforms-readonly"))
-        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)));
+        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)), false);
     return false;
 }
 
@@ -431,7 +434,7 @@ function xformsHandleSelectChanged(event) {
     var select = getEventTarget(event);
     xformsComputeSelectValue(select);
     xformsFireEvents(new Array(xformsCreateEventArray(select, "xxforms-value-change-with-focus-change",
-        select.selectValue)));
+        select.selectValue)), false);
 }
 
 function xformsSliderValueChange(offset) {
@@ -450,7 +453,7 @@ function xformsHandleOutputClick(event) {
     while (!xformsArrayContains(target.className.split(" "), "xforms-output"))
         target = target.parentNode;
     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-    xformsFireEvents(events);
+    xformsFireEvents(events, false);
 }
 
 function xformsHandleFirefoxValueChange(property, oldvalue, newvalue) {
@@ -483,7 +486,7 @@ function xformsHandleInputKeyPress(event) {
     if (event.keyCode == 10 || event.keyCode == 13) {
         var span = getEventTarget(event).parentNode;
         xformsHandleValueChange(event);
-        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)));
+        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)), false);
         // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
         return xformsPreventDefault(event);
     }
@@ -533,12 +536,12 @@ function xformsHandleFocus(event) {
                     events.push(xformsCreateEventArray
                         (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
                     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                    xformsFireEvents(events);
+                    xformsFireEvents(events, false);
                 }
                 document.xformsPreviousDOMFocusOut = null;
             } else {
                 if (document.xformsPreviousDOMFocusIn != target) {
-                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)));
+                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), false);
                 }
             }
         }
@@ -560,10 +563,11 @@ function xformsRegisterForFocusBlurEvents(control) {
 /**
  * Root function called by any widget that wants an event to be sent to the server.
  *
- * @param events  Array of arrays with each array containing:
- *                new Array(target, eventName, value, incremental, other)
+ * @param events       Array of arrays with each array containing:
+ *                     new Array(target, eventName, value, other)
+ * @param incremental  Are these incremental events
  */
-function xformsFireEvents(events) {
+function xformsFireEvents(events, incremental) {
 
     // Store events to fire
     for (var eventIndex = 0; eventIndex < events.length; eventIndex++)
@@ -571,8 +575,9 @@ function xformsFireEvents(events) {
 
     // Fire them with a delay to give us a change to aggregate events together
     document.xformsExecuteNextRequestInQueue++;
-    window.setTimeout(xformsExecuteNextRequest, XFORMS_DELAY_BEFORE_AJAX_REQUEST_IN_MS);
-    
+    if (incremental) window.setTimeout(xformsExecuteNextRequest,
+            XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
+    else xformsExecuteNextRequest(true);
     return false;
 }
 
@@ -611,7 +616,7 @@ function xformsInitCheckesRadios(control) {
         }
         xformsInitCheckesRadiosComputeSpanValue(span);
         xformsFireEvents(new Array(xformsCreateEventArray
-                (span, "xxforms-value-change-with-focus-change", span.value, null)));
+                (span, "xxforms-value-change-with-focus-change", span.value, null)), false);
     }
 
     // Register event listener on every checkbox
@@ -943,7 +948,7 @@ function xformsPageLoaded() {
         if (xformsGetFromClientState("load-did-run") == null) {
             xformsStoreInClientState("load-did-run", "true");
         } else {
-            xformsFireEvents(new Array(xformsCreateEventArray(null, "xxforms-all-events-required", null, null)));
+            xformsFireEvents(new Array(xformsCreateEventArray(null, "xxforms-all-events-required", null, null)), false);
         }
     }
 
@@ -1697,7 +1702,7 @@ function xformsHandleResponse() {
         // Go ahead with next request, if any
         document.xformsRequestInProgress = false;
         document.xformsExecuteNextRequestInQueue++;
-        xformsExecuteNextRequest();
+        xformsExecuteNextRequest(false);
     }
 }
 
@@ -1706,15 +1711,17 @@ function xformsDisplayLoading() {
         xformsDisplayIndicator("loading");
 }
 
-function xformsExecuteNextRequest() {
+function xformsExecuteNextRequest(bypassRequestQueue) {
+    bypassRequestQueue = typeof(bypassRequestQueue) == "boolean"  && bypassRequestQueue == true;
     document.xformsExecuteNextRequestInQueue--;
     if (!document.xformsRequestInProgress
             && document.xformsEvents.length > 0
-            && document.xformsExecuteNextRequestInQueue == 0) {
+            && (bypassRequestQueue || document.xformsExecuteNextRequestInQueue == 0)) {
 
         // Mark this as loading
         document.xformsRequestInProgress = true;
-        window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
+        if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
+        else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
 
         // Build request
         var requestDocument;

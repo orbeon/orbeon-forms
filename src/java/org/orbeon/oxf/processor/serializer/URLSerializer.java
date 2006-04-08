@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.oxf.Handler;
+import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
@@ -58,7 +58,7 @@ public class URLSerializer extends ProcessorImpl {
                 }
             });
 
-            if (Handler.PROTOCOL.equals(url.getProtocol())) {
+            if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                 // NOTE: This is probably done as an optimization. Is this really necessary?
                 final ContentHandler contentHandler = ResourceManagerWrapper.instance().getWriteContentHandler(url.getFile());
                 readInputAsSAX(pipelineContext, INPUT_DATA, contentHandler);

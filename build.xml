@@ -48,6 +48,8 @@
         <include name="commons-beanutils-1_5.jar"/>
         <include name="commons-pool-1.2.jar"/>
         <include name="commons-discovery-0_2.jar"/>
+        <include name="commons-httpclient-3_0.jar"/>
+        <include name="commons-codec-1_3.jar"/>
         <include name="axis_1_2_1-axis.jar"/>
         <include name="axis_1_2_1-jaxrpc.jar"/>
         <include name="axis_1_2_1-saaj.jar"/>
@@ -82,7 +84,6 @@
         <include name="castor-0_9_4_3-xml.jar"/>
         <include name="antlr-2_7_4.jar"/>
         <include name="antlr-2_7_4_orbeon.jar"/>
-        <include name="commons-httpclient-slide_2_0rc1.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
         <include name="portlet-api_1.0.jar"/>
         <include name="exist-20060316.jar"/>

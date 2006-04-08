@@ -31,7 +31,7 @@ import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.resources.oxf.Handler;
+import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.NetUtils;
@@ -1552,7 +1552,7 @@ public abstract class ProcessorImpl implements Processor {
                     return getInputValidity(pipelineContext, getInputByName(inputName));
                 } else {
                     final URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
-                    if (Handler.PROTOCOL.equals(url.getProtocol())) {
+                    if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                         // oxf: URLs
                         final String key = url.getFile();
                         long result = ResourceManagerWrapper.instance().lastModified(key);

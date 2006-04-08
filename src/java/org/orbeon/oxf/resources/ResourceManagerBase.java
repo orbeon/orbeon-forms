@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.resources.oxf.Handler;
+import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -131,7 +131,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
         final Locator[] locator = new Locator[1];
         try {
             inputStream = getContentAsStream(key);
-            XMLUtils.inputStreamToSAX(inputStream, Handler.PROTOCOL + ":" + key, new ForwardingContentHandler(handler) {
+            XMLUtils.inputStreamToSAX(inputStream, OXFHandler.PROTOCOL + ":" + key, new ForwardingContentHandler(handler) {
                 public void setDocumentLocator(Locator loc) {
                     locator[0] = loc;
                     super.setDocumentLocator(loc);

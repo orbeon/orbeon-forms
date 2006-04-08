@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.oxf.Handler;
+import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -366,7 +366,7 @@ public class URLGenerator extends ProcessorImpl {
                             } else {
                                 // We need to read the resource
 
-                                handler = Handler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
+                                handler = OXFHandler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
                                         ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
                                         : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
 
@@ -502,7 +502,7 @@ public class URLGenerator extends ProcessorImpl {
 
             private Object getHandlerValidity(URL url) {
                 try {
-                    ResourceHandler handler = Handler.PROTOCOL.equals(url.getProtocol())
+                    ResourceHandler handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
                             ? (ResourceHandler) new OXFResourceHandler(new Config(url))
                             : (ResourceHandler) new URLResourceHandler(new Config(url));
                     try {

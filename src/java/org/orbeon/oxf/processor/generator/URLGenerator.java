@@ -702,7 +702,7 @@ public class URLGenerator extends ProcessorImpl {
             // getting the last modified date, the stream is
             // actually opened. When using the file: protocol, the
             // file can be locked on disk.
-            if (urlConn != null) {
+            if (urlConn != null && urlConn.getInputStream() != null) {
                 urlConn.getInputStream().close();
             }
         }

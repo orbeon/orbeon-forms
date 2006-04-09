@@ -101,7 +101,7 @@ public class TomcatClasspathFix {
                     // there is a jar ( e.g. ops.jar ) that will have a manifest we
                     // care about.  ( So yes in this case we process many more manifests
                     // than in the above case.
-                    final String sPth = url.getPath();
+                    final String sPth = url.getPath().replaceAll("%20", " ");
                     final String sPthLC = sPth.toLowerCase();
                     final String webInf = "/web-inf/";
                     final int webInfIdx = sPthLC.lastIndexOf( webInf );

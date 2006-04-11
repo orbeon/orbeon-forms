@@ -376,7 +376,9 @@ function xformsStoreInClientState(key, value) {
 
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
-    if (valueChanged) {
+    // We don't send value change events for the XForms upload control
+    var isUploadControl = xformsArrayContains(target.className.split(" "), "xforms-upload");
+    if (valueChanged && !isUploadControl) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
         var events = new Array(xformsCreateEventArray

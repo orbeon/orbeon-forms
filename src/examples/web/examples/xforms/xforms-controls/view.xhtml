@@ -111,6 +111,9 @@
             <xforms:submission ref="instance('instance')" id="country-name-updated"
                 method="post" action="/direct/xforms-controls/countries" replace="instance" instance="countries-name"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .textarea { height: 6em; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('instance')">
@@ -131,7 +134,7 @@
                         </xforms:secret>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:textarea ref="textarea">
+                        <xforms:textarea ref="textarea" class="textarea">
                             <xforms:label class="fixed-width">Text area:</xforms:label>
                             <xforms:hint>Enter at least 11 characters</xforms:hint>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>

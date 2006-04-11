@@ -13,20 +13,34 @@
  */
 package org.orbeon.oxf.resources.handler;
 
+import org.apache.commons.httpclient.methods.RequestEntity;
+
+import java.io.OutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
 
-/**
- * Implements a URLStreamHandler for HTTP to be passed to the URL constructor.
- * The Apache HTTP Client library will be used to handle the URL.
- */
-public class HTTPHandler extends URLStreamHandler  {
+public class HandlerRequestEntity implements RequestEntity {
 
-    public static final String PROTOCOL = "http";
+    private byte[] requestBody;
+    private  String contentType;
 
-    protected URLConnection openConnection(URL url) throws IOException {
-        return new HTTPURLConnection(url);
+    public HandlerRequestEntity(byte[] requestBody, String contentType) {
+        this.requestBody = requestBody;
+        this.contentType = contentType;
+    }
+
+    public boolean isRepeatable() {
+        return false;
+    }
+
+    public void writeRequest(OutputStream out) throws IOException {
+        out.write(requestBody);
+    }
+
+    public long getContentLength() {
+        return requestBody.length;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 }

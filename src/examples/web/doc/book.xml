@@ -121,6 +121,7 @@
         <menu-item label="XForms with JSP" href="integration-xforms-jsp"/>
 <!--        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>-->
         <menu-item label="EJB Support" href="integration-ejb"/>
+        <menu-item label="Development" href="integration-development"/>
 <!--        <menu-item label="Struts Support" href="model2x-struts"/>-->
     </menu>
     <!--

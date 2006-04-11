@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -139,7 +140,7 @@ public class XFormsSubmissionUtils {
             // file SHOULD be supported
             try {
                 final URLConnection urlConnection = submissionURL.openConnection();
-                final HttpURLConnection httpURLConnection = (urlConnection instanceof HttpURLConnection) ? (HttpURLConnection) urlConnection : null;
+                final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
                 if (isPost(method) || isPut(method) || isGet(method)) {
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(!isGet(method)); // Only if POST / PUT
@@ -166,23 +167,11 @@ public class XFormsSubmissionUtils {
                     if (authorizationHeader != null)
                         httpURLConnection.setRequestProperty("authorization", authorizationHeader);
 
-                    urlConnection.connect();
-
                     // Write request body if needed
-                    if (!isGet(method)) {
-                        final OutputStream os = urlConnection.getOutputStream();
-                        try {
-                            os.write(serializedInstance);
-                        } finally {
-                            if (os != null) {
-                                try {
-                                    os.close();
-                                } catch (IOException e) {
-                                    throw new OXFException("Exception while closing output stream for action: " + action);
-                                }
-                            }
-                        }
-                    }
+                    if (!isGet(method))
+                        httpURLConnection.setRequestBody(serializedInstance);
+
+                    urlConnection.connect();
 
                     // Create result
                     final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(submissionURL.toExternalForm()) {

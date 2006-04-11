@@ -203,7 +203,8 @@ YAHOO.util.Dom = new function() {
       if ( isNaN(delta[1]) ) { delta[1] = 0; }
 
       if (pos[0] !== null) { el.style.left = pos[0] - pageXY[0] + delta[0] + 'px'; }
-      if (pos[1] !== null) { el.style.top = pos[1] - pageXY[1] + delta[1] + 'px'; }
+      // avernet: Added && !isNaN(pos[1]) to condition
+      if (pos[1] !== null && !isNaN(pos[1])) { el.style.top = pos[1] - pageXY[1] + delta[1] + 'px'; }
 
       var newXY = this.getXY(el);
 

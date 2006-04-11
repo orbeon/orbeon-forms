@@ -507,7 +507,6 @@ YAHOO.widget.Slider.prototype.onMouseDown = function(e) {
  * @private
  */
 YAHOO.widget.Slider.prototype.onDrag = function(e) {
-    xformsLog("drag");
     if (! this.isLocked()) {
 		var x = YAHOO.util.Event.getPageX(e);
 		var y = YAHOO.util.Event.getPageY(e);

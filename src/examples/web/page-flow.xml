@@ -62,7 +62,7 @@
     <!-- Standalone XForms Controls example -->
     <page path-info="/xforms-controls*" model="/examples/xforms/xforms-controls/page-flow.xpl"/>
 
-    <!-- Standalone XForms To Do Lists example -->
+    <!-- Standalone XForms To-Do Lists example -->
     <page path-info="/xforms-todo*" model="/examples/xforms/xforms-todo/page-flow.xpl"/>
 
     <!-- Standalone XForms Upload example -->

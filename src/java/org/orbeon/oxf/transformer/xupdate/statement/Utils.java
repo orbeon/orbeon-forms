@@ -60,11 +60,18 @@ public class Utils {
                 Attribute attribute = (Attribute) parent;
                 attribute.setValue(attribute.getValue() + node.getText());
             } else if (parent instanceof Document) {
-                if (! (node instanceof Element))
-                    throw new ValidationException("Only an element can be at the root of a document", locationData);
-                if (((Document) parent).getRootElement() != null)
-                    throw new ValidationException("Document already has a root element", locationData);
-                ((Document) parent).setRootElement((Element) node);
+                // Update a document element
+                final Document document = (Document) parent;
+                if (node instanceof Element) {
+                    if (document.getRootElement() != null)
+                        throw new ValidationException("Document already has a root element", locationData);
+                    document.setRootElement((Element) node);
+                } else if (node instanceof ProcessingInstruction) {
+                    document.add(node);
+                } else {
+                    throw new ValidationException("Only an element or processing instruction can be at the root of a document", locationData);
+                }
+
             } else {
                 throw new ValidationException("Cannot insert into a node of type '" + parent.getClass() + "'", locationData);
             }

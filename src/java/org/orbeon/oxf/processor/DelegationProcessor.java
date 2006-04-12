@@ -39,6 +39,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.Configuration;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -289,7 +290,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
                                             PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                                                    new DocumentWrapper(resultEnvelopeDOM4j, null),
+                                                    new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration()),
                                                     xpath,
                                                     operation != null && operation.select != null
                                                             ? operation.selectNamespaceContext : selectNamespaceContext);

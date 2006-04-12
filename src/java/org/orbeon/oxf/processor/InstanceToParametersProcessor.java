@@ -26,6 +26,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -78,7 +79,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
                     Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
                     DocumentWrapper instanceWrapper = new DocumentWrapper(instance,
-                            ((LocationData) instance.getRootElement().getData()).getSystemID());
+                            ((LocationData) instance.getRootElement().getData()).getSystemID(), new Configuration());
 
                     // Mark all nodes referenced by XPath expressions
                     final Set markedNodes = new HashSet();

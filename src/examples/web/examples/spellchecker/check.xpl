@@ -87,7 +87,7 @@
                             <xsl:variable name="sentence" select="string-join(/group/word, ' ')" as="xs:string"/>
                             <url>
                                 <xsl:text>http://www.google.com/search?q=</xsl:text>
-                                <xsl:value-of select="escape-uri(substring($sentence, 1, string-length($sentence) - 1), true())"/>
+                                <xsl:value-of select="encode-for-uri(substring($sentence, 1, string-length($sentence) - 1))"/>
                             </url>
                             <content-type>text/xml</content-type>
                             <header>

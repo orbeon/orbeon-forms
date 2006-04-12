@@ -15,38 +15,49 @@ package org.orbeon.oxf.util;
 
 import org.apache.commons.pool.ObjectPool;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.xpath.*;
-import org.orbeon.saxon.xpath.Variable;
-import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.instruct.SlotManager;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.sxpath.XPathExpression;
+import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.Variable;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.Value;
-import org.orbeon.saxon.instruct.SlotManager;
+import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.Configuration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 public class PooledXPathExpression {
-    private StandaloneContext context;
+
     private XPathExpression expression;
+    private Configuration configuration;
+    private SlotManager stackFrameMap;
     private ObjectPool pool;
 
     // Dynamic context
     private Map variables;
+    private Map variableToValueMap;
     private List contextNodeSet;
     private int contextPosition;
 
-    public PooledXPathExpression(XPathExpression exp, ObjectPool pool, StandaloneContext context, final java.util.Map vars) {
-        this.expression = exp;
+    public PooledXPathExpression(XPathExpression expression, ObjectPool pool, IndependentContext context, Map variables) {
+        this.expression = expression;
         this.pool = pool;
-        this.context = context;
-        variables = vars;
+        this.configuration = context.getConfiguration();
+        this.stackFrameMap = context.getStackFrameMap();
+        this.variables = variables;
     }
 
+    /**
+     * This *must* be called in a finally block to return the expression to the pool.
+     */
     public void returnToPool() {
         try {
             pool.returnObject(this);
@@ -55,82 +66,53 @@ public class PooledXPathExpression {
         }
     }
 
-//    public List evaluate() throws XPathException {
-//        return expression.evaluate();
-//    }
-
-    /**
-     * Evaluate the XPath expression by providing a context node-set and initial position.
-     *
-     * @return result of the evaluation
-     * @throws XPathException
-     */
     public List evaluate() throws XPathException {
 
-//        if (!(expression instanceof org.orbeon.saxon.xpath.XPathExpressionImpl))
-//            throw new OXFException("XPath expression object not an instance of XPathExpressionImpl");
-
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
-        if (false) {// TODO
-//            // Use low-level Expression object and implement context node-set and context position
-//            final Expression expression;
-//            {
-//                final XPathExpressionImpl xPathExpressionImpl = (XPathExpressionImpl) this.expression;
-//                expression = xPathExpressionImpl.getInternalExpression();
-//            }
-//
-//            final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.context.getConfiguration());
-//            final SlotManager map = this.context.getConfiguration().makeSlotManager(); // this is already set on XPathExpressionImpl but we can't get to it
-//            xpathContext.setCurrentIterator(new ListSequenceIterator(contextNodeSet, contextPosition));
-//            xpathContext.openStackFrame(map);
-//
-//            final SequenceIterator iter = expression.iterate(xpathContext);
-//
-//            // Format
-//            final SequenceExtent extent = new SequenceExtent(iter);
-//            return (List) extent.convertToJava(Object.class, xpathContext);
-            return null;
-        } else {
-            // Use high-level API
-            expression.setContextNode(contextNode);
-            return expression.evaluate();
-        }
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext);
+
+        final SequenceExtent extent = new SequenceExtent(iter);
+        return (List) extent.convertToJava(Object.class, xpathContext);
     }
 
     public Object evaluateSingle() throws XPathException {
-//        if (!(expression instanceof org.orbeon.saxon.xpath.XPathExpressionImpl))
-//            throw new OXFException("XPath expression object not an instance of XPathExpressionImpl");
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
-        if (false) {// TODO
-//            // Use low-level Expression object and implement context node-set and context position
-//            final Expression expression;
-//            {
-//                final XPathExpressionImpl xPathExpressionImpl = (XPathExpressionImpl) this.expression;
-//                expression = xPathExpressionImpl.getInternalExpression();
-//            }
-//
-//            final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.context.getConfiguration());
-//            final SlotManager map = this.context.getConfiguration().makeSlotManager(); // this is already set on XPathExpressionImpl but we can't get to it
-//            xpathContext.setCurrentIterator(new ListSequenceIterator(contextNodeSet, contextPosition));
-//            xpathContext.openStackFrame(map);
-//
-//            final SequenceIterator iter = expression.iterate(xpathContext);
-//
-//            Item item = iter.next();
-//            if (item == null) {
-//                return null;
-//            } else {
-//                return Value.convert(item);
-//            }
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext);
+
+        Item item = iter.next();
+        if (item == null) {
             return null;
         } else {
-            // Use high-level API
-            return expression.evaluateSingle();
+            return Value.convert(item);
         }
     }
 
-    // TODO: This will be used when we upgrade to Saxon >= 8.5.
+    private SequenceIterator evaluate(XPathContextMajor xpathContext) throws XPathException {
+
+        // Use low-level Expression object and implement context node-set and context position
+        final Expression expression = this.expression.getInternalExpression();
+
+        final SlotManager slotManager = this.stackFrameMap; // this is already set on XPathExpressionImpl but we can't get to it
+        xpathContext.setCurrentIterator(new ListSequenceIterator(contextNodeSet, contextPosition));
+        xpathContext.openStackFrame(slotManager);
+
+        // Set variable values if any
+        if (variableToValueMap != null) {
+            for (Iterator i = variables.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final String name = (String) entry.getKey();
+                final Variable variable = (Variable) entry.getValue();
+                final String value = (String) variableToValueMap.get(name);// for now we require String values
+                xpathContext.setLocalVariable(variable.getLocalSlotNumber(), new StringValue(value));
+            }
+        }
+
+        return expression.iterate(xpathContext);
+    }
+
     private static class ListSequenceIterator implements SequenceIterator, Cloneable {
 
         private List contextNodeset;
@@ -149,11 +131,7 @@ public class PooledXPathExpression {
         }
 
         public SequenceIterator getAnother() {
-            try {
-                return (SequenceIterator) super.clone();
-            } catch (CloneNotSupportedException e) {
-                throw new OXFException(e);
-            }
+            return new ListSequenceIterator(contextNodeset, 0);
         }
 
         public Item next() {
@@ -168,6 +146,10 @@ public class PooledXPathExpression {
         public int position() {
             return currentPosition;
         }
+
+        public int getProperties() {
+            return 0; // "It is always acceptable to return the value zero, indicating that there are no known special properties."
+        }
     }
 
     /**
@@ -181,29 +163,18 @@ public class PooledXPathExpression {
         this.contextPosition = contextPosition;
     }
 
-    // TODO
-    public void setContextNode(NodeInfo contextNode) {
-        expression.setContextNode(contextNode);
-    }
+    public void setVariables(Map variableToValueMap) {
+        this.variableToValueMap = variableToValueMap;
 
-    /**
-     * Set context variable.
-     *
-     * @param name   variable name
-     * @param value  variable value
-     */
-    public void setVariable(String name, Object value) {
-        try {
-            Variable v = (Variable) variables.get(name);
-            if (v != null)
-                v.setValue(value);
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        }
+        if ((variables != null && variables.size() > 0) && (variableToValueMap == null || variableToValueMap.size() == 0))
+            throw new OXFException("Expression requires variables.");
+
+        if ((variables == null || variables.size() ==0) && (variableToValueMap != null && variableToValueMap.size() > 0))
+            throw new OXFException("Expression does not require variables.");
     }
 
     public void destroy() {
-        context = null;
+        configuration = null;
         expression = null;
         pool = null;
         variables = null;

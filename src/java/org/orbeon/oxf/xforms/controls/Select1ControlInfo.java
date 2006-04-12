@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.common.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,10 @@ public class Select1ControlInfo extends ControlInfo {
                     xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null));
                     {
                         // Handle children of xforms:itemset
-                        xformsControls.pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                        final Element labelElement = itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                        if (labelElement == null)
+                            throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
+                        xformsControls.pushBinding(pipelineContext, labelElement);
                         final String label = xformsControls.getCurrentSingleNodeValue();
                         xformsControls.popBinding();
                         final Element valueCopyElement;
@@ -63,6 +67,8 @@ public class Select1ControlInfo extends ControlInfo {
                             valueCopyElement = (valueElement != null)
                                 ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
                         }
+                        if (valueCopyElement == null)
+                            throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", getLocationData());
                         xformsControls.pushBinding(pipelineContext, valueCopyElement);
                         final String value = xformsControls.getCurrentSingleNodeValue();;
                         // TODO: handle xforms:copy

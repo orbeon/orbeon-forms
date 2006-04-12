@@ -33,12 +33,16 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.sxpath.XPathEvaluator;
+import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.type.BuiltInSchemaFactory;
+import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.xpath.StandaloneContext;
-import org.orbeon.saxon.xpath.XPathEvaluator;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.ValidationErrorValue;
+import org.orbeon.saxon.style.StandardNames;
+import org.orbeon.saxon.Configuration;
 
 import java.util.*;
 import java.net.URI;
@@ -290,7 +294,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (modelBind.getParent() == null) {
                 try {
                     // Create XPath evaluator for this bind
-                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getInstanceDocument(), null);
+                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getInstanceDocument(), null, new Configuration());
                     bindRunner.applyBind(modelBind, documentWrapper);
                 } catch (final Exception e) {
                     throw new ValidationException(e, modelBind.getLocationData());
@@ -475,8 +479,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Need an evaluator to check and convert type below
             final XPathEvaluator xpathEvaluator;
             try {
-                xpathEvaluator= new XPathEvaluator(documentWrapper);
-                StandaloneContext context = (StandaloneContext) xpathEvaluator.getStaticContext();
+                xpathEvaluator= new XPathEvaluator();
+                // NOTE: Not sure declaring namespaces here is necessary just to perform the cast
+                IndependentContext context = xpathEvaluator.getStaticContext();
                 for (Iterator j = modelBind.getNamespaceMap().keySet().iterator(); j.hasNext();) {
                     String prefix = (String) j.next();
                     context.declareNamespace(prefix, (String) modelBind.getNamespaceMap().get(prefix));
@@ -489,8 +494,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 public void handleNode(Node node) {
 
                     // Get type information
-                    int requiredType = -1;
-                    boolean foundType = false;
+                    int requiredTypeFingerprint = -1;
                     {
                         String type = modelBind.getType();
                         int prefixPosition = type.indexOf(':');
@@ -500,34 +504,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (namespace == null)
                                 throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
                                         modelBind.getLocationData());
-                            ItemType itemType = Type.getBuiltInItemType((String) modelBind.getNamespaceMap().get(prefix),
-                                    type.substring(prefixPosition + 1));
-                            if (itemType != null) {
-                                requiredType = itemType.getPrimitiveType();
-                                foundType = true;
-                            }
+
+                            requiredTypeFingerprint = StandardNames.getFingerprint(namespace, type.substring(prefixPosition + 1));
                         }
                     }
-                    if (!foundType)
+                    if (requiredTypeFingerprint == -1)
                         throw new ValidationException("Invalid type '" + modelBind.getType() + "'",
                                 modelBind.getLocationData());
 
                     // Pass-through the type value
                     InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                    instanceData.getType().set(requiredType);
+                    instanceData.getType().set(requiredTypeFingerprint);
 
                     // Try to perform casting
                     final String nodeStringValue = node.getStringValue().trim();
                     if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
-                        try {
-                            StringValue stringValue = new StringValue(nodeStringValue);
-                            XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
-                            // TODO: we don't do anything with the result value here?
-                            stringValue.convert(requiredType, xpContext);
-                            instanceData.updateValueValid(true, node, modelBind.getId());
-                        } catch (XPathException e) {
-                            instanceData.updateValueValid(false, node, modelBind.getId());
-                        }
+                        StringValue stringValue = new StringValue(nodeStringValue);
+                        XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
+                        AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
+
+                        instanceData.updateValueValid(!(result instanceof ValidationErrorValue), node, modelBind.getId());
                     }
                 }
             });

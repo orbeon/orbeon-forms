@@ -22,7 +22,8 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 
 import java.util.Collections;
 
@@ -54,7 +55,7 @@ public class Instance extends XFormsFunction {
         if (instance != null) {
             final Document instanceDocument = instance.getInstanceDocument();
             // "this function returns a node-set containing just the root element node"
-            return new ListIterator(Collections.singletonList(new DocumentWrapper(instanceDocument, null).wrap(instanceDocument.getRootElement())));
+            return new ListIterator(Collections.singletonList(new DocumentWrapper(instanceDocument, null, new Configuration()).wrap(instanceDocument.getRootElement())));
         } else {
             // "an empty node-set is returned"
             return new ListIterator(Collections.EMPTY_LIST);

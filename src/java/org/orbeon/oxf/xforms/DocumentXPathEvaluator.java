@@ -21,8 +21,9 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.Configuration;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public class DocumentXPathEvaluator {
 
     public DocumentXPathEvaluator(Document document) {
         this.document = document;
-        this.documentWrapper = new DocumentWrapper(document, null);
+        this.documentWrapper = new DocumentWrapper(document, null, new Configuration());
     }
 
     /**

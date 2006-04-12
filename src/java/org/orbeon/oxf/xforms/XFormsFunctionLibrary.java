@@ -30,7 +30,7 @@ import org.orbeon.saxon.om.NamespaceConstant;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.SequenceType;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -239,5 +239,15 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         f.setFunctionNameCode(nameCode);
         f.setArguments(staticArgs);
         return f;
+    }
+
+    public FunctionLibrary copy() {
+        return this;
+    }
+
+    public int hashCode() {
+        // NOTE: maybe this could be optimized to depend on the actual function names, etc. This is used to cache XPath
+        // expressions.
+        return super.hashCode();
     }
 }

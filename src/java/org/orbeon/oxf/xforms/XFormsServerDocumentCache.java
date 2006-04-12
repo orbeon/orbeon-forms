@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
@@ -155,9 +156,15 @@ public class XFormsServerDocumentCache {
         }
 
         public Object makeObject() throws Exception {
-            // We create a new PipelineContext, because we have trouble passing it from
-            // borrowObject() up to here; it is only used for statistics so that's ok
-            final XFormsContainingDocument result = XFormsServer.createXFormsContainingDocument(new PipelineContext(), xformsState, null);
+            // NOTE: We have trouble passing the PipelineContext from borrowObject() up to here, so we try to get it
+            // from the StaticExternalContext. We need an ExternalContext in it in case the XForms initialization
+            // requires things like resolving URLs to load schemas, etc.
+
+            final PipelineContext pipelineContext = StaticExternalContext.getStaticContext().getPipelineContext();
+//            if (pipelineContext == null)
+//                pipelineContext = new PipelineContext();
+
+            final XFormsContainingDocument result = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null);
             result.setSourceObjectPool(pool);
             return result;
         }

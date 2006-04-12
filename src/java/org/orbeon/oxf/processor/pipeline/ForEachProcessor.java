@@ -30,7 +30,8 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -221,7 +222,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     Document dataInput = readInputAsDOM4J(context, getInputByName(FOR_EACH_DATA_INPUT));
                     state.domGenerators = new ArrayList();
                     PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                            new DocumentWrapper(dataInput, null),
+                            new DocumentWrapper(dataInput, null, new Configuration()),
                             select, namespaceContext);
                     try {
                         for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {

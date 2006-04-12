@@ -25,7 +25,8 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
@@ -183,7 +184,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             // Lazily read input in case there is only a p:otherwise
             if (refNode == null)
                 refNode = readCacheInputAsDOM4J(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
-            DocumentWrapper wrapper = new DocumentWrapper(refNode.getDocument(), null);
+            DocumentWrapper wrapper = new DocumentWrapper(refNode.getDocument(), null, new Configuration());
             PooledXPathExpression expr = null;
             Map namespaces = (Map)branchNamespaces.get(branchIndex);
             try {

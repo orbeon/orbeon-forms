@@ -52,7 +52,7 @@ public class XPathUtils {
         try {
             XPath path = new DOMXPath(expr);
             path.setNamespaceContext(new SimpleNamespaceContext(prefixes));
-            return path.selectNodes(node).iterator();
+            return new IteratorFilter(path.selectNodes(node).iterator(), org.jaxen.dom.NamespaceNode.class);
         } catch (JaxenException e) {
             throw new OXFException(e);
         }
@@ -69,7 +69,7 @@ public class XPathUtils {
             org.dom4j.XPath path = node.createXPath(expr);
             path.setNamespaceContext(new SimpleNamespaceContext(prefixes));
 
-            return path.selectNodes(node).iterator();
+            return new IteratorFilter(path.selectNodes(node).iterator(), org.dom4j.Namespace.class);
         } catch (InvalidXPathException e) {
             throw new OXFException(e);
         }
@@ -79,7 +79,7 @@ public class XPathUtils {
         try {
             org.dom4j.XPath path = node.createXPath(expr);
             hookupPath(path, prefixes, variableContext, functionContext);
-            return path.selectNodes(node).iterator();
+            return new IteratorFilter(path.selectNodes(node).iterator(), org.dom4j.Namespace.class);
         } catch (InvalidXPathException e) {
             throw new OXFException(e);
         }
@@ -499,4 +499,72 @@ public class XPathUtils {
         return resultDocument;
     }
 
+    /**
+     * Wraps an Iterator and filters out objects of a particular class. Because the Iterator interface
+     * is particularly minimal, this means reading the next object from the iterator in advance.
+     */
+    private static class IteratorFilter implements Iterator {
+    	/** The class of objects to filter out. */
+    	private final Class filterClass;
+
+    	/** The underlying iterator. */
+    	private final Iterator iterator;
+
+    	/** The next filtered object which has been read ahead, or null if there are no
+    	 * remaining objects in the iterator which meet the filter criteria.*/
+    	private Object nextFiltered;
+
+    	/**
+    	 * @param iterator the iterator to filter
+    	 * @param filterClass the type of object to filter out, including sub classes & implementations
+    	 */
+    	public IteratorFilter(final Iterator iterator, final Class filterClass) {
+    		this.filterClass = filterClass;
+    		this.iterator = iterator;
+
+    		// Pre-load the first object
+    		nextFiltered = readNext();
+    	}
+
+		/** @see java.util.Iterator#remove() */
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		/** @see java.util.Iterator#hasNext() */
+		public boolean hasNext() {
+			return nextFiltered != null;
+		}
+
+		/** @see java.util.Iterator#next() */
+		public Object next() {
+			if(nextFiltered == null) {
+				throw new NoSuchElementException();
+			}
+
+			// Return the previously read object, but not before
+			// pre-loading the next one.
+
+			final Object toReturn = nextFiltered;
+			nextFiltered = readNext();
+			return toReturn;
+		}
+
+		/**
+		 * @return the next object in the iterator which meets the filter criteria, or null if
+		 * 	there are none remaining after the filter is applied.
+		 */
+		private Object readNext() {
+
+			// Loop until we find a matching object, or
+			// until we run out of objects.
+			while(iterator.hasNext()) {
+				final Object next = iterator.next();
+				if(!filterClass.isAssignableFrom(next.getClass())) {
+					return next;
+				}
+			}
+			return null;
+		}
+    }
 }

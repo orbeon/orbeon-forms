@@ -17,7 +17,7 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.Component;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.*;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 public class Seconds extends XFormsFunction {
 

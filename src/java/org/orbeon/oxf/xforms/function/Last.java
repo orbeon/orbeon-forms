@@ -20,7 +20,7 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.IntegerValue;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 public class Last extends XFormsFunction {
 

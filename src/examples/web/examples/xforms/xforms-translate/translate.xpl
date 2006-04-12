@@ -27,9 +27,9 @@
             <config xsl:version="2.0">
                 <url>
                     <xsl:text>http://translate.google.com/translate_t?text=</xsl:text>
-                    <xsl:value-of select="escape-uri(doc('input:source'), true())"/>
+                    <xsl:value-of select="encode-for-uri(doc('input:source'))"/>
                     <xsl:text>&amp;langpair=</xsl:text>
-                    <xsl:value-of select="escape-uri(doc('input:language-pair'), true())"/>
+                    <xsl:value-of select="encode-for-uri(doc('input:language-pair'))"/>
                 </url>
                 <content-type>text/html</content-type>
                 <header>

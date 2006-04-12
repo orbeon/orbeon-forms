@@ -23,7 +23,7 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.IntegerValue;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 /**
  * XForms index() function.

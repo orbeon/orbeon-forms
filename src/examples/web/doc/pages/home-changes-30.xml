@@ -47,6 +47,29 @@
             </p>
         </section>
         <section>
+            <title>Changes in Verion 3.0.2</title>
+            <p>
+                OPS 3.0.2 is an update containing the following changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        The embedded eXist database has been upgraded to the 20060316 snapshot.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Bug-fixes, including:
+                    </p>
+                    <ul>
+                        <li>
+                            <a href="">TODO</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section>
             <title>Changes in Verion 3.0.1</title>
             <p>
                 OPS 3.0.1 is a minor update containing the following changes:
@@ -64,7 +87,7 @@
                 </li>
                 <li>
                     <p>
-                        Bug-fixes in the XForms engine, including :
+                        Bug-fixes in the XForms engine, including:
                     </p>
                     <ul>
                         <li>

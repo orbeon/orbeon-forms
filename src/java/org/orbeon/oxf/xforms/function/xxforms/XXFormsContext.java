@@ -20,7 +20,7 @@ import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 import org.dom4j.Node;
 import org.dom4j.Document;
 

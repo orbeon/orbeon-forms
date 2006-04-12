@@ -34,7 +34,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
@@ -65,11 +66,19 @@ public class XLSGenerator extends ProcessorImpl {
                     final byte[] fileContent;
                     {
                         final String NO_FILE = "No file was uploaded";
-                        Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
-                        PooledXPathExpression expr = XPathCache.getXPathExpression(context,
-                                new DocumentWrapper(requestDocument, null),
+                        final Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
+                        final PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                                new DocumentWrapper(requestDocument, null, new Configuration()),
                                 "/request/parameters/parameter[1]/value");
-                        Element valueElement = (Element) expr.evaluateSingle();
+
+                        final Element valueElement;
+                        try {
+                             valueElement = (Element) expr.evaluateSingle();
+                        } finally{
+                            if (expr != null)
+                                expr.returnToPool();
+                        }
+                        
                         if (valueElement == null) throw new OXFException(NO_FILE);
                         String type = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);
                         if (type == null) throw new OXFException(NO_FILE);

@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.BooleanValue;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 public class BooleanFromString extends XFormsFunction {
 

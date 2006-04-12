@@ -66,7 +66,7 @@
                                 if ($request/server-port = '80') then '' else concat(':', $request/server-port),
                                 $request/context-path,
                                 '/direct/xml-to-url/doc?xml=',
-                                escape-uri($base64-string, true()))"/>
+                                encode-for-uri($base64-string))"/>
                         </xsl:if>
                     </xsl:copy>
                 </xsl:template>

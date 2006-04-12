@@ -19,7 +19,7 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 import org.dom4j.Node;
 import org.dom4j.Document;
 

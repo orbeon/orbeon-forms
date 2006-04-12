@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.w3c.dom.Node;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -277,10 +278,11 @@ public class TransformerUtils {
      * @throws TransformerException
      */
     public static org.w3c.dom.Document dom4jToDomDocument(Document document) throws TransformerException {
-        Transformer identity = getIdentityTransformer();
-        DOMResult domResult = new DOMResult();
+        final Transformer identity = getIdentityTransformer();
+        final DOMResult domResult = new DOMResult();
         identity.transform(new DocumentSource(document), domResult);
-        return domResult.getNode().getOwnerDocument();
+        final Node resultNode = domResult.getNode();
+        return (resultNode instanceof org.w3c.dom.Document) ? ((org.w3c.dom.Document) resultNode) : resultNode.getOwnerDocument();
     }
 
     public static Transformer testCreateTransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {

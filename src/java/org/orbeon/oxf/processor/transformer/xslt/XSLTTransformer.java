@@ -38,10 +38,11 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.type.TypeHierarchy;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.xpath.StandaloneContext;
-import org.orbeon.saxon.xpath.StaticError;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.StaticError;
+import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
@@ -443,14 +444,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
          * This is context that will resolve any prefix, function, and variable.
          * It is just used to parse XPath expression and get an AST.
          */
-        private StandaloneContext dummySaxonXPathContext;
+        private IndependentContext dummySaxonXPathContext;
         private final NamePool namePool = new NamePool();
 
         private void initDummySaxonXPathContext() {
             Configuration config = new Configuration();
             config.setHostLanguage(Configuration.XSLT);
             config.setNamePool(namePool);
-            dummySaxonXPathContext = new StandaloneContext(config) {
+            dummySaxonXPathContext = new IndependentContext(config) {
                 {
                     // Dummy Function lib that accepts any name
                     setFunctionLibrary(new FunctionLibrary() {
@@ -466,16 +467,18 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                     return this.argument.length;
                                 }
 
-                                public ItemType getItemType() {
+                                public ItemType getItemType(TypeHierarchy typeHierarchy) {
                                     return Type.BOOLEAN_TYPE;
                                 }
-
-
                             };
                         }
 
                         public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
                             return true;
+                        }
+
+                        public FunctionLibrary copy() {
+                            return this;
                         }
                     });
 
@@ -486,7 +489,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     return true;
                 }
 
-
                 public String getURIForPrefix(String prefix) {
                     return namespaces.getURI(prefix);
                 }
@@ -494,12 +496,19 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 public boolean isImportedSchema(String namespace) { return true; }
 
                 // Dummy var decl to allow any name
-                public VariableDeclaration bindVariable(int fingerprint) throws StaticError {
-                    try {
-                        return declareVariable("dummy", "dummy");
-                    }catch(XPathException e) {
-                        throw new StaticError(e);
-                    }
+                public VariableReference bindVariable(final int fingerprint) {
+                        return new VariableReference(new VariableDeclaration() {
+                            public void registerReference(BindingReference bindingReference) {
+                            }
+
+                            public int getNameCode() {
+                                return fingerprint;
+                            }
+
+                            public String getVariableName() {
+                                return "dummy";
+                            }
+                        });
                 }
             };
         }

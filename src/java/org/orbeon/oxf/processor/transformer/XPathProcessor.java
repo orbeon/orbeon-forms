@@ -26,7 +26,8 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -76,7 +77,7 @@ public class XPathProcessor extends ProcessorImpl {
                 });
 
 //                List results = xpath.selectNodes(readCacheInputAsDOM4J(context, INPUT_DATA));
-                DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null);
+                DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null, new Configuration());
                 PooledXPathExpression xpath = null;
                 try {
                     xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces());
@@ -90,8 +91,8 @@ public class XPathProcessor extends ProcessorImpl {
                         if ( result == null ) continue;
                         final String strVal;
                         if ( result instanceof org.dom4j.Element || result instanceof org.dom4j.Document ) {
-                            final org.dom4j.Element elt = result instanceof org.dom4j.Element 
-                                              ? ( org.dom4j.Element )result 
+                            final org.dom4j.Element elt = result instanceof org.dom4j.Element
+                                              ? ( org.dom4j.Element )result
                                               : ( ( org.dom4j.Document )result ).getRootElement();
                             final String sid = Dom4jUtils.makeSystemId( elt  );
                             final DOMGenerator domGenerator = new DOMGenerator
@@ -112,6 +113,8 @@ public class XPathProcessor extends ProcessorImpl {
                             strVal = XMLUtils.removeScientificNotation( d );
                         } else if ( result instanceof Boolean ) {
                             strVal = ((Boolean) result).toString();
+                        } else if (result instanceof org.orbeon.saxon.om.FastStringBuffer) {
+                            strVal = result.toString();
                         } else {
                             String message = "Unsupported type returned by XPath expression: "
                                     + (result == null ? "null" : result.getClass().getName());

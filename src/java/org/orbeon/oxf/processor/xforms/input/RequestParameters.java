@@ -136,8 +136,7 @@ public class RequestParameters {
                             for (int j = 0; j < 2; j++) {
                                 int firstDelimiter = actionString.indexOf('&');
                                 keyValue[j] = firstDelimiter == -1 ? actionString
-                                        : actionString.substring(0, firstDelimiter);
-//                                        : URLDecoder.decode(actionString.substring(0, firstDelimiter), NetUtils.DEFAULT_URL_ENCODING);
+                                        : URLDecoder.decode(actionString.substring(0, firstDelimiter), NetUtils.DEFAULT_URL_ENCODING);
                                 actionString = firstDelimiter == -1 ? ""
                                         : actionString.substring(firstDelimiter + 1);
                                 if (actionName == null) break;

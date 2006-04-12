@@ -657,18 +657,19 @@
             <xsl:for-each select="$submit-control/(xforms:setvalue | xforms:insert | xforms:delete)">
                 <!-- Optional parameters -->
                 <xsl:variable name="node-ids-param"
-                    select="if (@ref or @bind or @nodeset) then ('node-ids', escape-uri(@xxforms:node-ids, true())) else ()"/>
+                    select="if (@ref or @bind or @nodeset) then ('node-ids', encode-for-uri(@xxforms:node-ids)) else ()"/>
                 <xsl:variable name="at-param"
-                    select="if (@at) then ('at', escape-uri(@xxforms:at-value, true())) else ()"/>
+                    select="if (@at) then ('at', encode-for-uri(@xxforms:at-value)) else ()"/>
                 <xsl:variable name="value-param"
-                    select="if (@value) then ('value', escape-uri(@xxforms:value-value, true())) else ()"/>
+                    select="if (@value) then ('value', encode-for-uri(@xxforms:value-value)) else ()"/>
                 <xsl:variable name="position-param"
                     select="if (@position) then ('position', @position) else ()"/>
-                <xsl:variable name="content-param" select="('content', escape-uri(string(.), true()))"/>
+                <xsl:variable name="content-param" select="('content', encode-for-uri(string(.)))"/>
                 <!-- Join parameters -->
                 <xsl:sequence
-                    select="escape-uri(string-join((local-name(), $value-param, $node-ids-param,
-                        $at-param, $position-param, $content-param), '&amp;'), true())"/>
+                    select="encode-for-uri(string-join((local-name(), $value-param, $node-ids-param,
+                        $at-param, $position-param, $content-param), '&amp;'))"/>
+
             </xsl:for-each>
         </xsl:variable>
 

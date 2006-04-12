@@ -29,7 +29,7 @@
                 processing XML using a pipeline metaphor. XML documents enter a pipeline, are
                 efficiently processed by one or more processors as specified by XPL instructions,
                 and are then output for further processing, display, or storage. XPL features
-                advanced capabilities such as document aggregation, conditionals (“if” conditions),
+                advanced capabilities such as document aggregation, conditionals ("if" conditions),
                 loops, schema validation, and sub-pipelines.
             </p>
             <p>
@@ -38,7 +38,7 @@
                 XML documents. New XML processors are most often written in Java. But most often
                 developers do not need to write their own processors because OPS
                 comes standard with a comprehensive library. XPL orchestrates these to create
-                business logic, similar to the way Java code “orchestrates” method calls within a
+                business logic, similar to the way Java code "orchestrates" method calls within a
                 Java object.
             </p>
             <p>

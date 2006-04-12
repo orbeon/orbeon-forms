@@ -16,37 +16,38 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.*;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
 
 public class DaysFromDate extends XFormsFunction {
 
-    private static final StringValue NAN = new StringValue("NaN");
-    private static final int coefficient = (1000 * 60 * 60 * 24);
-
+    private static final int SECONDS_PER_DAY = (60 * 60 * 24);
 
     public Item evaluateItem(XPathContext context) throws XPathException {
-        String arg = argument[0].evaluateAsString(context);
+
+        // "If the string parameter represents a legal lexical xsd:date or xsd:dateTime"...
+        final String arg = argument[0].evaluateAsString(context);
         CalendarValue value = null;
         try {
             value = new DateTimeValue(arg);
-        } catch (XPathException e) {
+        } catch (XPathException e1) {// FIXME: handling this with exceptions may be slow
             try {
                 value = new DateValue(arg);
-            } catch (XPathException ee) {
+            } catch (XPathException e2) {// FIXME: handling this with exceptions may be slow
             }
         }
+
+        // "Any other input parameter causes a return value of NaN."
         if(value == null)
-            return NAN;
+            return SecondsFromDateTime.NAN;
+
         else {
-            long l = 0;
-            if(value instanceof DateTimeValue)
-                l = ((DateTimeValue)value).getUTCDate().getTime();
-            else
-                l = ((DateValue)value).getUTCDate().getTime();
-            return new IntegerValue(l/coefficient);
+
+            // "the return value is equal to the number of days difference between the specified date or dateTime
+            // (normalized to UTC) and 1970-01-01. Hour, minute, and second components are ignored after
+            // normalization."
+
+            final DateTimeValue dateTimeValue = (value instanceof DateTimeValue) ? (DateTimeValue) value : ((DateValue) value).toDateTime();
+            return new IntegerValue(dateTimeValue.normalize(context).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY / 1000);
         }
-
-
     }
-
 }

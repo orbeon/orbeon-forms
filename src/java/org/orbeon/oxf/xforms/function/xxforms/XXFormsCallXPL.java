@@ -39,7 +39,8 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.Configuration;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -184,7 +185,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                         DOMSerializer domSerializer = (DOMSerializer) i.next();
 
                         domSerializer.start(pipelineContext);
-                        results.add(new DocumentWrapper(domSerializer.getDocument(pipelineContext), null));
+                        results.add(new DocumentWrapper(domSerializer.getDocument(pipelineContext), null, new Configuration()));
                     }
                     if (newPipelineContext && !pipelineContext.isDestroyed())
                         pipelineContext.destroy(true);

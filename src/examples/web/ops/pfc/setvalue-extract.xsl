@@ -67,9 +67,7 @@
                 </xsl:attribute>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:copy>
-                    <xsl:apply-templates/>
-                </xsl:copy>
+                <xsl:copy/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

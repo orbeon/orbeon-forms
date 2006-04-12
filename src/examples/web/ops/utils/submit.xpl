@@ -1,3 +1,35 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+
+<!--
+    This pipleine performs a submission using the XForms server. You can call it with:
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="oxf:/ops/utils/submit.xpl"/>
+        <p:input name="submission">
+            <xforms:submission method="post"
+                action="http://localhost:8080/ops/direct/xforms-translate/post"/>
+        </p:input>
+        <p:input name="request">
+            <translation>
+                <source>This is a table.</source>
+                <language-pair>en|fr</language-pair>
+            </translation>
+        </p:input>
+        <p:output name="response" ref="data"/>
+    </p:processor>
+-->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:ev="http://www.w3.org/2001/xml-events"

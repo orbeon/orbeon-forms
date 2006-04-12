@@ -26,7 +26,7 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events" only="true">
 
     <!--
         TODO:
@@ -309,44 +309,44 @@
                 <xxf:static-state>
                     <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
                         <controls>
-                            <xforms:group ref="/" id="group111">
-                                <xforms:group ref="nested111" id="group112">
-                                    <xforms:group ref="nested112" id="group113">
-                                        <xforms:output ref="first" id="id111"/>
-                                        <xforms:output ref="second" id="id112"/>
-                                        <xforms:output ref="third" id="id113"/>
-                                        <xforms:output ref="fourth" id="id114"/>
+                            <xforms:group id="group111" ref="/">
+                                <xforms:group id="group112" ref="nested111">
+                                    <xforms:group id="group113" ref="nested112">
+                                        <xforms:output id="id111" ref="first"/>
+                                        <xforms:output id="id112" ref="second"/>
+                                        <xforms:output id="id113" ref="third"/>
+                                        <xforms:output id="id114" ref="fourth"/>
                                     </xforms:group>
                                 </xforms:group>
                             </xforms:group>
-                            <xforms:group ref="instance(&apos;instance12&apos;)" id="group121">
-                                <xforms:group ref="nested122" id="group122">
-                                    <xforms:output ref="first" id="id121"/>
-                                    <xforms:output ref="second" id="id122"/>
-                                    <xforms:output ref="third" id="id123"/>
-                                    <xforms:output ref="fourth" id="id124"/>
+                            <xforms:group id="group121" ref="instance(&apos;instance12&apos;)">
+                                <xforms:group id="group122" ref="nested122">
+                                    <xforms:output id="id121" ref="first"/>
+                                    <xforms:output id="id122" ref="second"/>
+                                    <xforms:output id="id123" ref="third"/>
+                                    <xforms:output id="id124" ref="fourth"/>
                                 </xforms:group>
                             </xforms:group>
-                            <xforms:group ref="/" id="group211">
-                                <xforms:group ref="nested211" model="model2" id="group212">
-                                    <xforms:group ref="nested212" id="group213">
-                                        <xforms:output ref="first" id="id211"/>
-                                        <xforms:output ref="second" id="id212"/>
-                                        <xforms:output ref="third" id="id213"/>
-                                        <xforms:output ref="fourth" id="id214"/>
+                            <xforms:group id="group211" ref="/">
+                                <xforms:group id="group212" model="model2" ref="nested211">
+                                    <xforms:group id="group213" ref="nested212">
+                                        <xforms:output id="id211" ref="first"/>
+                                        <xforms:output id="id212" ref="second"/>
+                                        <xforms:output id="id213" ref="third"/>
+                                        <xforms:output id="id214" ref="fourth"/>
                                     </xforms:group>
-                                    <xforms:group ref="instance(&apos;instance22&apos;)" id="group214">
-                                        <xforms:group ref="nested222" id="group8">
-                                            <xforms:output ref="first" id="id221"/>
-                                            <xforms:output ref="second" id="id222"/>
-                                            <xforms:output ref="third" id="id223"/>
-                                            <xforms:output ref="fourth" id="id224"/>
-                                            <xforms:group ref="instance(&apos;instance21&apos;)" id="group215">
-                                                <xforms:group ref="nested212" id="group10">
-                                                    <xforms:output ref="first" id="id211b"/>
-                                                    <xforms:output ref="second" id="id212b"/>
-                                                    <xforms:output ref="third" id="id213b"/>
-                                                    <xforms:output ref="fourth" id="id214b"/>
+                                    <xforms:group id="group214" ref="instance(&apos;instance22&apos;)">
+                                        <xforms:group id="group8" ref="nested222">
+                                            <xforms:output id="id221" ref="first"/>
+                                            <xforms:output id="id222" ref="second"/>
+                                            <xforms:output id="id223" ref="third"/>
+                                            <xforms:output id="id224" ref="fourth"/>
+                                            <xforms:group id="group215" ref="instance(&apos;instance21&apos;)">
+                                                <xforms:group id="group10" ref="nested212">
+                                                    <xforms:output id="id211b" ref="first"/>
+                                                    <xforms:output id="id212b" ref="second"/>
+                                                    <xforms:output id="id213b" ref="third"/>
+                                                    <xforms:output id="id214b" ref="fourth"/>
                                                 </xforms:group>
                                             </xforms:group>
                                         </xforms:group>
@@ -721,16 +721,16 @@
                 <xxf:static-state xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <static-state>
                         <controls xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:repeat nodeset="/form/departments/department" id="id123">
+                            <xforms:repeat id="id123" nodeset="/form/departments/department">
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert nodeset="../department" at="2" position="after"/>
+                                    <xforms:insert at="2" nodeset="../department" position="after"/>
                                 </xforms:action>
-                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                                <xforms:repeat id="id124" nodeset="employee" startindex="2">
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert nodeset="../../department[index(&apos;id123&apos;)]/employee" at="2" position="after"/>
+                                        <xforms:insert at="2" nodeset="../../department[index(&apos;id123&apos;)]/employee" position="after"/>
                                     </xforms:action>
-                                    <xforms:output ref="@first" id="id125"/>
-                                    <xforms:output ref="@last" id="id126"/>
+                                    <xforms:output id="id125" ref="@first"/>
+                                    <xforms:output id="id126" ref="@last"/>
                                 </xforms:repeat>
                             </xforms:repeat>
                         </controls>
@@ -1315,11 +1315,11 @@
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                 <xxf:static-state>
+                <xxf:static-state>
                     <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
                         <controls>
-                            <xforms:group ref="instance(&apos;tests&apos;)" id="id1">
-                                <xforms:input ref="noFoundData" id="id2">
+                            <xforms:group id="id1" ref="instance(&apos;tests&apos;)">
+                                <xforms:input id="id2" ref="noFoundData">
                                     <xforms:label class="fixed-width" id="id3">test noFoundData:</xforms:label>
                                 </xforms:input>
                             </xforms:group>
@@ -1331,8 +1331,8 @@
                                         <noFoundData>0</noFoundData>
                                     </instance>
                                 </xforms:instance>
-                                <xforms:bind nodeset="instance(&apos;tests&apos;)" id="id4">
-                                    <xforms:bind nodeset="noFoundData" calculate=". + 1" id="id5"/>
+                                <xforms:bind id="id4" nodeset="instance(&apos;tests&apos;)">
+                                    <xforms:bind calculate=". + 1" id="id5" nodeset="noFoundData"/>
                                 </xforms:bind>
                             </xforms:model>
                         </models>
@@ -1342,7 +1342,7 @@
                     <dynamic-state>
                         <instances>
                             <instance>
-                                <noFoundData>1</noFoundData><!-- This is the value we are interested in -->
+                                <noFoundData>1</noFoundData>
                             </instance>
                         </instances>
                         <divs/>
@@ -1395,9 +1395,9 @@
                 <xxf:static-state>
                     <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
                         <controls>
-                            <xforms:group ref="instance(&apos;main-instance&apos;)" id="id1">
-                                <xforms:input ref="this-is-an-existing-node" id="id2"/>
-                                <xforms:input ref="this-is-a-non-existing-node" id="id3"/>
+                            <xforms:group id="id1" ref="instance(&apos;main-instance&apos;)">
+                                <xforms:input id="id2" ref="this-is-an-existing-node"/>
+                                <xforms:input id="id3" ref="this-is-a-non-existing-node"/>
                             </xforms:group>
                         </controls>
                         <models>

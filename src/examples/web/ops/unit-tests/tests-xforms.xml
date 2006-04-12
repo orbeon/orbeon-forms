@@ -682,171 +682,171 @@
     </test>
 
 
-    <test description="Core Function Library" name="oxf:pipeline">
-        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
-        <input name="model">
-            <xforms:model id="form">
-                <xforms:instance>
-                    <instance>
-                        <boolean>
-                            <from-string-1>1</from-string-1>
-                            <from-string-2>true</from-string-2>
-                            <from-string-3>0</from-string-3>
-                            <from-string-4>false</from-string-4>
-                            <if-1/>
-                            <if-2/>
-                        </boolean>
-                        <number>
-                            <avg>
-                                <arg>2</arg>
-                                <arg>4</arg>
-                                <arg>6</arg>
-                                <result/>
-                            </avg>
-                            <min>
-                                <arg>2</arg>
-                                <arg>4</arg>
-                                <arg>6</arg>
-                                <result/>
-                            </min>
-                            <max>
-                                <arg>2</arg>
-                                <arg>4</arg>
-                                <arg>6</arg>
-                                <result/>
-                            </max>
-                            <count-non-empty>
-                                <arg>2</arg>
-                                <arg/>
-                                <arg>4</arg>
-                                <arg>6</arg>
-                                <arg/>
-                                <result/>
-                            </count-non-empty>
-                        </number>
-                        <string>
-                            <property-version/>
-                            <property-conformance/>
-                        </string>
-                        <date>
-                            <now/>
-                            <days-from-date-1/>
-                            <days-from-date-2/>
-                            <days-from-date-3/>
-                            <days-from-date-4/>
-                            <seconds-from-date-1/>
-                            <seconds-from-date-2/>
-                            <seconds-from-date-3/>
-                            <seconds-1/>
-                            <seconds-2/>
-                            <seconds-3/>
-                            <seconds-4/>
-                            <months-1/>
-                            <months-2/>
-                            <months-3/>
-                        </date>
-                    </instance>
-                </xforms:instance>
-
-                <xforms:bind nodeset="/instance/boolean/from-string-1" calculate="boolean-from-string(.)"/>
-                <xforms:bind nodeset="/instance/boolean/from-string-2" calculate="boolean-from-string(.)"/>
-                <xforms:bind nodeset="/instance/boolean/from-string-3" calculate="boolean-from-string(.)"/>
-                <xforms:bind nodeset="/instance/boolean/from-string-4" calculate="boolean-from-string(.)"/>
-
-                <xforms:bind nodeset="/instance/boolean/if-1" calculate="xfif(../from-string-1 = 'true', '1', '2')"/>
-                <xforms:bind nodeset="/instance/boolean/if-2" calculate="xfif(../from-string-1 != 'true', '1', '2')"/>
-
-                <xforms:bind nodeset="/instance/number/avg/result" calculate="avg(../arg)"/>
-                <xforms:bind nodeset="/instance/number/min/result" calculate="min(../arg)"/>
-                <xforms:bind nodeset="/instance/number/max/result" calculate="max(../arg)"/>
-                <xforms:bind nodeset="/instance/number/count-non-empty/result" calculate="count-non-empty(../arg)"/>
-
-                <xforms:bind nodeset="/instance/string/property-version" calculate="property('version')"/>
-                <xforms:bind nodeset="/instance/string/property-conformance" calculate="property('conformance-level')"/>
-
-                <xforms:bind nodeset="/instance/date/now" calculate="now('test')"/>
-                <xforms:bind nodeset="/instance/date/days-from-date-1" calculate="days-from-date('2002-01-01')"/>
-                <xforms:bind nodeset="/instance/date/days-from-date-2" calculate="days-from-date('1969-12-31')"/>
-                <xforms:bind nodeset="/instance/date/days-from-date-3" calculate="days-from-date('2001-12-31T14:40:30.000Z')"/>
-                <xforms:bind nodeset="/instance/date/days-from-date-4" calculate="days-from-date('invalid')"/>
-                <xforms:bind nodeset="/instance/date/seconds-from-date-1" calculate="seconds-from-dateTime('2001-12-31T14:40:30.000Z')"/>
-                <xforms:bind nodeset="/instance/date/seconds-from-date-2" calculate="seconds-from-dateTime('invalid')"/>
-                <xforms:bind nodeset="/instance/date/seconds-from-date-3" calculate="seconds-from-dateTime('1969-12-31T23:00:00.000Z')"/>
-                <xforms:bind nodeset="/instance/date/seconds-1" calculate="seconds('P1Y2M')"/>
-                <xforms:bind nodeset="/instance/date/seconds-2" calculate="seconds('P3DT10H30M1.5S')"/>
-                <xforms:bind nodeset="/instance/date/seconds-3" calculate="seconds('3')"/>
-                <xforms:bind nodeset="/instance/date/seconds-4" calculate="seconds('-P1S')"/>
-                <xforms:bind nodeset="/instance/date/months-1" calculate="months('P1Y2M')"/>
-                <xforms:bind nodeset="/instance/date/months-2" calculate="months('-P19M')"/>
-                <xforms:bind nodeset="/instance/date/months-3" calculate="months('3')"/>
-            </xforms:model>
-        </input>
-        <input name="view">
-            <xforms:group ref="/instance">
-            </xforms:group>
-        </input>
-        <output name="instance">
-            <instance>
-                <boolean>
-                    <from-string-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-1>
-                    <from-string-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-2>
-                    <from-string-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-3>
-                    <from-string-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-4>
-                    <if-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</if-1>
-                    <if-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</if-2>
-                </boolean>
-                <number>
-                    <avg>
-                        <arg>2</arg>
-                        <arg>4</arg>
-                        <arg>6</arg>
-                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">4</result>
-                    </avg>
-                    <min>
-                        <arg>2</arg>
-                        <arg>4</arg>
-                        <arg>6</arg>
-                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</result>
-                    </min>
-                    <max>
-                        <arg>2</arg>
-                        <arg>4</arg>
-                        <arg>6</arg>
-                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">6</result>
-                    </max>
-                    <count-non-empty>
-                        <arg>2</arg>
-                        <arg/>
-                        <arg>4</arg>
-                        <arg>6</arg>
-                        <arg/>
-                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</result>
-                    </count-non-empty>
-                </number>
-                <string>
-                    <property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.0</property-version>
-                    <property-conformance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">full</property-conformance>
-                </string>
-                <date>
-                    <now xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2004-12-31T12:00:00Z</now>
-                    <days-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11688</days-from-date-1>
-                    <days-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</days-from-date-2>
-                    <days-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11687</days-from-date-3>
-                    <days-from-date-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</days-from-date-4>
-                    <seconds-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1009809630</seconds-from-date-1>
-                    <seconds-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-from-date-2>
-                    <seconds-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-3600</seconds-from-date-3>
-                    <seconds-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">0</seconds-1>
-                    <seconds-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">297001.5</seconds-2>
-                    <seconds-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-3>
-                    <seconds-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</seconds-4>
-                    <months-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">14</months-1>
-                    <months-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-19</months-2>
-                    <months-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</months-3>
-                </date>
-            </instance>
-        </output>
-    </test>
+    <!--<test description="Core Function Library" name="oxf:pipeline">-->
+        <!--<input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>-->
+        <!--<input name="model">-->
+            <!--<xforms:model id="form">-->
+                <!--<xforms:instance>-->
+                    <!--<instance>-->
+                        <!--<boolean>-->
+                            <!--<from-string-1>1</from-string-1>-->
+                            <!--<from-string-2>true</from-string-2>-->
+                            <!--<from-string-3>0</from-string-3>-->
+                            <!--<from-string-4>false</from-string-4>-->
+                            <!--<if-1/>-->
+                            <!--<if-2/>-->
+                        <!--</boolean>-->
+                        <!--<number>-->
+                            <!--<avg>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</avg>-->
+                            <!--<min>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</min>-->
+                            <!--<max>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</max>-->
+                            <!--<count-non-empty>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg/>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<arg/>-->
+                                <!--<result/>-->
+                            <!--</count-non-empty>-->
+                        <!--</number>-->
+                        <!--<string>-->
+                            <!--<property-version/>-->
+                            <!--<property-conformance/>-->
+                        <!--</string>-->
+                        <!--<date>-->
+                            <!--<now/>-->
+                            <!--<days-from-date-1/>-->
+                            <!--<days-from-date-2/>-->
+                            <!--<days-from-date-3/>-->
+                            <!--<days-from-date-4/>-->
+                            <!--<seconds-from-date-1/>-->
+                            <!--<seconds-from-date-2/>-->
+                            <!--<seconds-from-date-3/>-->
+                            <!--<seconds-1/>-->
+                            <!--<seconds-2/>-->
+                            <!--<seconds-3/>-->
+                            <!--<seconds-4/>-->
+                            <!--<months-1/>-->
+                            <!--<months-2/>-->
+                            <!--<months-3/>-->
+                        <!--</date>-->
+                    <!--</instance>-->
+                <!--</xforms:instance>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-1" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-2" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-3" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-4" calculate="boolean-from-string(.)"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/boolean/if-1" calculate="xfif(../from-string-1 = 'true', '1', '2')"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/if-2" calculate="xfif(../from-string-1 != 'true', '1', '2')"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/number/avg/result" calculate="avg(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/min/result" calculate="min(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/max/result" calculate="max(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/count-non-empty/result" calculate="count-non-empty(../arg)"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/string/property-version" calculate="property('version')"/>-->
+                <!--<xforms:bind nodeset="/instance/string/property-conformance" calculate="property('conformance-level')"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/date/now" calculate="now('test')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-1" calculate="days-from-date('2002-01-01')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-2" calculate="days-from-date('1969-12-31')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-3" calculate="days-from-date('2001-12-31T14:40:30.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-4" calculate="days-from-date('invalid')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-1" calculate="seconds-from-dateTime('2001-12-31T14:40:30.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-2" calculate="seconds-from-dateTime('invalid')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-3" calculate="seconds-from-dateTime('1969-12-31T23:00:00.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-1" calculate="seconds('P1Y2M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-2" calculate="seconds('P3DT10H30M1.5S')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-3" calculate="seconds('3')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-4" calculate="seconds('-P1S')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-1" calculate="months('P1Y2M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-2" calculate="months('-P19M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-3" calculate="months('3')"/>-->
+            <!--</xforms:model>-->
+        <!--</input>-->
+        <!--<input name="view">-->
+            <!--<xforms:group ref="/instance">-->
+            <!--</xforms:group>-->
+        <!--</input>-->
+        <!--<output name="instance">-->
+            <!--<instance>-->
+                <!--<boolean>-->
+                    <!--<from-string-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-1>-->
+                    <!--<from-string-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-2>-->
+                    <!--<from-string-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-3>-->
+                    <!--<from-string-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-4>-->
+                    <!--<if-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</if-1>-->
+                    <!--<if-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</if-2>-->
+                <!--</boolean>-->
+                <!--<number>-->
+                    <!--<avg>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">4</result>-->
+                    <!--</avg>-->
+                    <!--<min>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</result>-->
+                    <!--</min>-->
+                    <!--<max>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">6</result>-->
+                    <!--</max>-->
+                    <!--<count-non-empty>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg/>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<arg/>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</result>-->
+                    <!--</count-non-empty>-->
+                <!--</number>-->
+                <!--<string>-->
+                    <!--<property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.0</property-version>-->
+                    <!--<property-conformance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">full</property-conformance>-->
+                <!--</string>-->
+                <!--<date>-->
+                    <!--<now xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2004-12-31T12:00:00Z</now>-->
+                    <!--<days-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11688</days-from-date-1>-->
+                    <!--<days-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</days-from-date-2>-->
+                    <!--<days-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11687</days-from-date-3>-->
+                    <!--<days-from-date-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</days-from-date-4>-->
+                    <!--<seconds-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1009809630</seconds-from-date-1>-->
+                    <!--<seconds-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-from-date-2>-->
+                    <!--<seconds-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-3600</seconds-from-date-3>-->
+                    <!--<seconds-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">0</seconds-1>-->
+                    <!--<seconds-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">297001.5</seconds-2>-->
+                    <!--<seconds-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-3>-->
+                    <!--<seconds-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</seconds-4>-->
+                    <!--<months-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">14</months-1>-->
+                    <!--<months-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-19</months-2>-->
+                    <!--<months-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</months-3>-->
+                <!--</date>-->
+            <!--</instance>-->
+        <!--</output>-->
+    <!--</test>-->
 
     <test description="Nested binds" name="oxf:pipeline">
         <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>

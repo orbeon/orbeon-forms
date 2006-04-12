@@ -75,8 +75,8 @@
                 </to>
                 <subject>Hello</subject>
                 <body content-type="multipart/alternative">This is simple body content
-                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="41"/>
-                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="41"/>
+                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="-1"/>
+                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="-1"/>
                 </body>
             </message>
         </output>
@@ -119,8 +119,8 @@
                 <subject>Hello</subject>
                 <body content-type="multipart/alternative">
                     <part name="text" content-type="multipart/related">This is simple body content
-                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="41"/>
-                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="41"/>
+                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="-1"/>
+                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:/ops/unit-tests/tests.xml" line="41" column="-1"/>
                     </part>
                 </body>
             </message>

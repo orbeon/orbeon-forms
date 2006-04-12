@@ -151,7 +151,7 @@
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="is-html"
-                      select="local-name-from-QName(xs:QName(@appearance)) = 'html'
+                      select="local-name-from-QName(resolve-QName(@appearance, .)) = 'html'
                               and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
         <xsl:variable name="is-image"
                       select="starts-with(@mediatype, 'image/')" as="xs:boolean"/>
@@ -202,7 +202,7 @@
             <!-- Link appearance -->
             <xsl:when test="@appearance
                             and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
-                            and local-name-from-QName(xs:QName(@appearance)) = 'link'">
+                            and local-name-from-QName(resolve-QName(@appearance, .)) = 'link'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
@@ -212,7 +212,7 @@
             <!-- Image appearance -->
             <xsl:when test="@appearance
                             and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
-                            and local-name-from-QName(xs:QName(@appearance)) = 'image'">
+                            and local-name-from-QName(resolve-QName(@appearance, .)) = 'image'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:input type="image" src="{xxforms:img/@src}" alt="{$label-value}" >
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>

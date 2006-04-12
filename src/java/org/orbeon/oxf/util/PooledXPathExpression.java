@@ -105,7 +105,18 @@ public class PooledXPathExpression {
                 final Map.Entry entry = (Map.Entry) i.next();
                 final String name = (String) entry.getKey();
                 final Variable variable = (Variable) entry.getValue();
-                final String value = (String) variableToValueMap.get(name);// for now we require String values
+
+                final Object object = variableToValueMap.get(name);
+                final String value;
+                if (object instanceof String) {
+                    value = (String) object;
+                } else if (object instanceof Integer) {
+                    value = ((Integer) object).toString();
+                } else {
+                    throw new OXFException("Invalid variable type: " + object.getClass());
+                }
+
+
                 xpathContext.setLocalVariable(variable.getLocalSlotNumber(), new StringValue(value));
             }
         }

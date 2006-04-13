@@ -260,13 +260,13 @@ function tt_ReleasMov()
 function tt_HideInput()
 {
 	if (!(tt_ie || tt_op6) || !tt_inputs) return;
-	var t_o;
+    var t_o;
 	var t_i = tt_inputs.length; while(t_i--)
 	{
 		t_o = tt_inputs[t_i];
 		if (tt_act && !t_o.vis && tt_objX+tt_objW > t_o.x && tt_objX < t_o.x+t_o.offsetWidth && tt_objY+tt_objH > t_o.y && tt_objY < t_o.y+t_o.offsetHeight)
 		{
-			t_o.vis = t_o.currentStyle? t_o.currentStyle.visibility : t_o.style.visibility;
+            t_o.vis = t_o.currentStyle? t_o.currentStyle.visibility : t_o.style.visibility;
 			t_o.style.visibility = 'hidden';
 		}
 		else if (t_o.vis)
@@ -314,9 +314,9 @@ function tt_SetDivPos(t_x, t_y)
 {
 	var t_i = tt_obj.style || tt_obj;
 	var t_px = (tt_op6 || tt_n4)? '' : 'px';
-	t_i.left = (tt_objX = t_x) + t_px;
-	t_i.top = (tt_objY = t_y) + t_px;
-	tt_HideInput();
+    t_i.left =(tt_objX = t_x) + t_px;
+    t_i.top = (tt_objY = t_y) + t_px;
+    //tt_HideInput(); // avernet: Removed this as it creates flickering on IE
 }
 
 function tt_ShowDiv(t_x)
@@ -433,7 +433,7 @@ function tt_Move(t_ev)
 		setTimeout('tt_wait = false;', 5);
 	}
 	var t_e = t_ev || window.event;
-	tt_SetDivPos(tt_EvX(t_e), tt_EvY(t_e));
+    tt_SetDivPos(tt_EvX(t_e), tt_EvY(t_e));
 	if (tt_op6)
 	{
 		if (tt_area && t_e.target.tagName != 'AREA') tt_Hide();

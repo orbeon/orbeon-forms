@@ -121,6 +121,22 @@
                     value is <code>true</code>).
                 </p>
             </section>
+            <a name="gzip"/>
+            <section>
+                <title>Enable gzip compression for generated text content</title>
+                <p>
+                    HTML and XML content usually compresses extremely well using gzip. You can obtain sizes for the
+                    content sent by the server to the web browser that are up to 10 times smaller. A very complex XForms
+                    page taking 100 KB, for example, may end up taking only about 10 KB. This means that the data will
+                    reach the web browser up to 10 times faster than without gzip compression.
+                </p>
+                <p>
+                    Most web and application servers support gzip compression. For example, Tomcat 5 supports the
+                    attribute <code>gzip</code> on the <code>&lt;Connector></code> element. For more information,
+                    please visit the <a href="http://tomcat.apache.org/tomcat-5.5-doc/config/http.html">Tomcat HTTP
+                    connector documentation</a>.
+                </p>
+            </section>
         </section>
         <section>
             <title>Tunning OPS</title>

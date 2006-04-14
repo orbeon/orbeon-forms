@@ -13,22 +13,26 @@
  */
 
 /**
+ * Parameters
+ */
+var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
+var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
+var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
+var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
+var XFORMS_DEBUG_WINDOW_WIDTH = 300;
+/**
  * Constants
  */
+var XFORMS_SEPARATOR_1 = "\xB7";
+var XFORMS_SEPARATOR_2 = "-";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var BASE_URL = null;
 var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT = "/ops/javascript/xforms.js";
+var XFORMS_IS_GECKO = navigator.userAgent.toLowerCase().indexOf("gecko") != -1;
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
-var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
-var XFORMS_DEBUG_WINDOW_WIDTH = 300;
-var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
-var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
-var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
-var XFORMS_SEPARATOR_1 = "\xB7";
-var XFORMS_SEPARATOR_2 = "-";
 
 /* * * * * * Utility functions * * * * * */
 
@@ -716,6 +720,7 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsNoInitElement = true;
             if (className == "xforms-select1-open-select")
                 isXFormsNoInitElement = true;
+//            if (className == "xforms-mediatype-text-html")
             if (className == "xforms-textarea-html")
                 isXFormsHTMLArea = true;
             if (className.indexOf("widget-") != -1)
@@ -836,6 +841,7 @@ function xformsInitializeControlsUnder(root) {
 
             // Initialize HTML area
             if (isXFormsHTMLArea) {
+                document.xformsHTMLAreaNames = new Array();
                 var fckEditor = new FCKeditor(control.name);
                 if (!xformsArrayContains(document.xformsHTMLAreaNames, control.name))
                     document.xformsHTMLAreaNames.push(control.name);
@@ -1586,15 +1592,20 @@ function xformsHandleResponse() {
                                     }
                                 }
 
-                                // After we display add divs, we must reenable the HTML editors
+                                // After we display divs, we must reenable the HTML editors.
+                                // This is a workaround for a Gecko bug documented at:
                                 // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                                /*
-                                for (var htmlAreaIndex = 0; htmlAreaIndex < document.xformsHTMLAreaNames.length; htmlAreaIndex++) {
-                                    var name = document.xformsHTMLAreaNames[htmlAreaIndex];
-                                    var editor = FCKeditorAPI.GetInstance(name);
-                                    editor.EditorDocument.designMode = "on";
+                                if (XFORMS_IS_GECKO && document.xformsHTMLAreaNames.length > 0) {
+                                    for (var htmlAreaIndex = 0; htmlAreaIndex < document.xformsHTMLAreaNames.length; htmlAreaIndex++) {
+                                        var name = document.xformsHTMLAreaNames[htmlAreaIndex];
+                                        var editor = FCKeditorAPI.GetInstance(name);
+                                        try {
+                                            editor.EditorDocument.designMode = "on";
+                                        } catch (e) {
+                                            // Nop
+                                        }
+                                    }
                                 }
-                                */
 
                                 break;
                             }

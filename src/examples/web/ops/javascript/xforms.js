@@ -688,6 +688,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
+        var isXFormsHTMLArea = false;
         var isXFormsNoInitElement = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
@@ -715,6 +716,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsNoInitElement = true;
             if (className == "xforms-select1-open-select")
                 isXFormsNoInitElement = true;
+            if (className == "xforms-textarea-html")
+                isXFormsHTMLArea = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -831,6 +834,16 @@ function xformsInitializeControlsUnder(root) {
                 control.isValid = !xformsArrayContains(classes, "xforms-invalid");
             }
 
+            // Initialize HTML area
+            if (isXFormsHTMLArea) {
+                var fckEditor = new FCKeditor(control.name);
+                if (!xformsArrayContains(document.xformsHTMLAreaNames, control.name))
+                    document.xformsHTMLAreaNames.push(control.name);
+                fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
+                fckEditor.ToolbarSet = "OPS";
+                fckEditor.ReplaceTextarea() ;
+            }
+
             // Add style to element
             xformsUpdateStyle(control);
         }
@@ -866,6 +879,7 @@ function xformsPageLoaded() {
         document.xformsEvents = new Array();
         document.xformsExecuteNextRequestInQueue = 0;
         document.xformsChangedIdsRequest = new Array();
+        document.xformsHTMLAreaNames = new Array();
 
         // Initialize summary section that displays alert messages
         var xformsMessages = document.getElementById("xforms-messages");
@@ -1216,6 +1230,16 @@ function xformsHandleResponse() {
                                         // Case of list / combobox
                                         var options = documentElement.options;
 
+                                        // Remember selected values
+                                        var selectedValueCount = 0;
+                                        var selectedValues = new Array();
+                                        for (var k = 0; k < options.length; k++) {
+                                            if (options[k].selected) {
+                                                selectedValues[selectedValueCount] = options[k].value;
+                                                selectedValueCount++;
+                                            }
+                                        }
+
                                         // Update select per content of itemset
                                         var itemCount = 0;
                                         for (var k = 0; k < itemsetElement.childNodes.length; k++) {
@@ -1227,13 +1251,17 @@ function xformsHandleResponse() {
                                                     documentElement.options.add(newOption);
                                                     newOption.text = itemElement.getAttribute("label");
                                                     newOption.value = itemElement.getAttribute("value");
+                                                    newOption.selected = xformsArrayContains(selectedValues, newOption.value);
                                                 } else {
                                                     // Replace current label/value if necessary
                                                     var option = options[itemCount];
-                                                    if (option.text != itemElement.getAttribute("label"))
+                                                    if (option.text != itemElement.getAttribute("label")) {
                                                         option.text = itemElement.getAttribute("label");
-                                                    if (option.value != itemElement.getAttribute("value"))
+                                                    }
+                                                    if (option.value != itemElement.getAttribute("value")) {
                                                         option.value = itemElement.getAttribute("value");
+                                                    }
+                                                    option.selected = xformsArrayContains(selectedValues, option.value);
                                                 }
                                                 itemCount++;
                                             }
@@ -1557,6 +1585,17 @@ function xformsHandleResponse() {
                                         }
                                     }
                                 }
+
+                                // After we display add divs, we must reenable the HTML editors
+                                // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
+                                /*
+                                for (var htmlAreaIndex = 0; htmlAreaIndex < document.xformsHTMLAreaNames.length; htmlAreaIndex++) {
+                                    var name = document.xformsHTMLAreaNames[htmlAreaIndex];
+                                    var editor = FCKeditorAPI.GetInstance(name);
+                                    editor.EditorDocument.designMode = "on";
+                                }
+                                */
+
                                 break;
                             }
 

@@ -59,6 +59,12 @@
                 </li>
                 <li>
                     <p>
+                        The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.7. [TODO:
+                        details]
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Bug-fixes, including:
                     </p>
                     <ul>

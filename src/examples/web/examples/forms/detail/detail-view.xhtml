@@ -487,19 +487,19 @@
                                         <tr>
                                             <td>
                                                 <xforms:group ref="instance('control-instance')/vehicle-insert-trigger">
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
-                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
-                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
-                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
-                                                    </xforms:action>
-                                                    <xforms:trigger appearance="xxforms:image">
-                                                        <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
-                                                        <xxforms:img src="/images/add.gif"/>
-                                                    </xforms:trigger>
-                                                    <xforms:trigger appearance="xxforms:link">
-                                                        <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
-                                                    </xforms:trigger>
+<xforms:action ev:event="DOMActivate">
+    <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
+    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
+    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
+</xforms:action>
+<xforms:trigger appearance="xxforms:image">
+    <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
+    <xxforms:img src="/images/add.gif"/>
+</xforms:trigger>
+<xforms:trigger appearance="xxforms:link">
+    <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
+</xforms:trigger>
                                                 </xforms:group>
                                             </td>
                                             <td>

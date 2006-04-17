@@ -63,10 +63,10 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 || (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "html".equals(appearanceLocalname));
 
         if (isHTML) {
-            classes.append(" xforms-output-html");
             classes.append(" xforms-output-html-initial");
+            classes.append(" xforms-mediatype-text-html");
         } else if (isImage) {
-            classes.append(" xforms-output-image");
+            classes.append(" xforms-mediatype-image");
         }
 
         if (!handlerContext.isGenerateTemplate()) {

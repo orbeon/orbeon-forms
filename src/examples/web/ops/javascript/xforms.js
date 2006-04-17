@@ -1432,7 +1432,7 @@ function xformsHandleResponse() {
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
                                                 // XForms output
                                                 var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
-                                                if (xformsArrayContains(documentElementClasses, "xforms-output-image")) {
+                                                if (xformsArrayContains(documentElementClasses, "xforms-mediatype-image")) {
                                                     documentElement.firstChild.src = newOutputControlValue;
                                                 } else {
                                                     xformsReplaceNodeText(documentElement, newOutputControlValue);

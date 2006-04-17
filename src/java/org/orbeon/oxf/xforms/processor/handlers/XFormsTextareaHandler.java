@@ -46,9 +46,15 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
 
+        final String mediatypeValue = elementAttributes.getValue("mediatype");
+        final boolean isHTMLMediaType = mediatypeValue != null && mediatypeValue.equals("text/html");
+
         final AttributesImpl newAttributes;
         {
             final StringBuffer classes = new StringBuffer("xforms-control xforms-textarea");
+            if (isHTMLMediaType)
+                classes.append(" xforms-mediatype-text-html");
+
             if (!handlerContext.isGenerateTemplate()) {
 
                 handleMIPClasses(classes, controlInfo);

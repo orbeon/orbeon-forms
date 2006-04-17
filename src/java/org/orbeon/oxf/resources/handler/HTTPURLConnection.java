@@ -28,7 +28,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class HTTPURLConnection extends URLConnection {
@@ -68,10 +67,10 @@ public class HTTPURLConnection extends URLConnection {
             if (userinfo != null) {
                 // Set username and password
                 int separatorPosition = userinfo.indexOf(":");
-                String username = userinfo.substring(0, separatorPosition);
-                String password = userinfo.substring(separatorPosition + 1);
+                String username = separatorPosition == -1 ? userinfo : userinfo.substring(0, separatorPosition);
+                String password = separatorPosition == -1 ? "" : userinfo.substring(separatorPosition + 1);
                 client.getState().setCredentials(
-                    new AuthScope(url.getHost(), 80),
+                    new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password)
                 );
             }

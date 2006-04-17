@@ -66,6 +66,8 @@
 		<recovery enabled="yes" sync-on-commit="no"
             size="10M" journal-dir="exist-data"/>
 
+		<watchdog query-timeout="-1" output-size-limit="10000"/>
+
 		<!--system-task class="org.exist.storage.DataBackup" period="120000">
 			<parameter name="output-dir" value="backup"/>
 		</system-task-->
@@ -136,6 +138,8 @@
                 class="org.exist.xquery.functions.text.TextModule"/>
             <module uri="http://exist-db.org/xquery/examples"
                 class="org.exist.xquery.modules.example.ExampleModule"/>
+            <module uri="http://exist-db.org/xquery/validation"
+                class="org.exist.xquery.functions.validation.ValidationModule"/>
         </builtin-modules>
     </xquery>
 
@@ -180,7 +184,7 @@
 		configuration for a collection.
         -->
         <index>
-			<fulltext default="all" attributes="false">
+			<fulltext default="all" attributes="true">
 				<exclude path="/auth"/>
 			</fulltext>
 		</index>
@@ -188,9 +192,11 @@
         <!-- Specify the location of one or more catalog files.
         Catalogs are used to resolve external entities in XML documents.
         -->
+        <!--
 		<entity-resolver>
 			<catalog file="exist-catalog.xml"/>
 		</entity-resolver>
+        -->
     </indexer>
 
 </exist>

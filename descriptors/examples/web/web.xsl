@@ -290,6 +290,33 @@
             </servlet>
 
             <servlet>
+                <servlet-name>exist-rest-servlet</servlet-name>
+                <servlet-class>org.exist.http.servlets.EXistServlet</servlet-class>
+                <init-param>
+                    <param-name>basedir</param-name>
+                    <param-value>WEB-INF/</param-value>
+                </init-param>
+v                <init-param>
+                    <param-name>configuration</param-name>
+                    <param-value>exist-conf.xml</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>start</param-name>
+                    <param-value>true</param-value>
+                </init-param>
+                <load-on-startup>2</load-on-startup>
+            </servlet>
+
+            <servlet>
+                <servlet-name>exist-webdav-servlet</servlet-name>
+                <servlet-class>org.exist.http.servlets.WebDAVServlet</servlet-class>
+                <init-param>
+                    <param-name>authentication</param-name>
+                    <param-value>basic</param-value>
+                </init-param>
+            </servlet>
+
+            <servlet>
                 <servlet-name>struts-servlet</servlet-name>
                 <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
                 <init-param>
@@ -342,6 +369,16 @@
             <servlet-mapping>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
                 <url-pattern>/xforms-server</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+                <servlet-name>exist-rest-servlet</servlet-name>
+                <url-pattern>/exist/rest/*</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+                <servlet-name>exist-webdav-servlet</servlet-name>
+                <url-pattern>/exist/webdav/*</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>

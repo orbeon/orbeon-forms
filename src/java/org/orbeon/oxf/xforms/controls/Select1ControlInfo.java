@@ -72,7 +72,8 @@ public class Select1ControlInfo extends ControlInfo {
                         xformsControls.pushBinding(pipelineContext, valueCopyElement);
                         final String value = xformsControls.getCurrentSingleNodeValue();;
                         // TODO: handle xforms:copy
-                        items.add(new XFormsControls.ItemsetInfo(getId(), label, value));
+                        if (value != null)
+                            items.add(new XFormsControls.ItemsetInfo(getId(), label != null ? label : "", value)); // don't allow for null label
 
                         xformsControls.popBinding();
                     }

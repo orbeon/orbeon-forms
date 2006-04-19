@@ -62,7 +62,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     // Event handlers
     private List eventHandlers;
 
-    private String action; // required
+    private String avtAction; // required
+    private String resolvedAction;
     private String method; // required
 
     private boolean validate = true; // required
@@ -105,7 +106,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private void extractSubmissionElement() {
         if (!submissionElementExtracted) {
 
-            action = submissionElement.attributeValue("action");
+            avtAction = submissionElement.attributeValue("action");
             method = submissionElement.attributeValue("method");
             method = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(submissionElement, "method"));
 
@@ -196,6 +197,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 xformsControls.setBinding(pipelineContext, submissionElement); // TODO FIXME: the submission element is not a control...
 
                 final Node currentNode = xformsControls.getCurrentSingleNode();
+
+                // Evaluate action AVT
+                resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
 
                 if (!(currentNode instanceof Document || currentNode instanceof Element)) {
                     throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
@@ -379,7 +383,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Result information
                 ConnectionResult connectionResult = null;
                 try {
-                    if (isReplaceInstance && action.startsWith("test:")) {
+                    if (isReplaceInstance && resolvedAction.startsWith("test:")) {
                         // Test action
 
                         if (serializedInstance == null)
@@ -395,7 +399,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
                         connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString);
-                    } else if (!NetUtils.urlHasProtocol(action)
+                    } else if (!NetUtils.urlHasProtocol(resolvedAction)
                                && (externalContext.getRequest().getContainerType().equals("portlet")
                                     || (externalContext.getRequest().getContainerType().equals("servlet")
                                         && (XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
@@ -415,7 +419,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // o Servlets cannot access resources on the same serer but not in the current application
                         //   except by using absolute URLs
 
-                        final URI resolvedURI = XFormsUtils.resolveURI(submissionElement, action);
+                        final URI resolvedURI = XFormsUtils.resolveURI(submissionElement, resolvedAction);
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
                                 this, method, resolvedURI.toString(), mediatype, isReplaceAll,
                                 serializedInstance, serializedInstanceString);
@@ -424,7 +428,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // This is a regular remote submission going through a protocol handler
 
                         // Absolute URLs or absolute paths are allowed to a local servlet
-                        final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, action);
+                        final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
                         connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
                                 method, resolvedURL, xxformsUsername, xxformsPassword, mediatype, isReplaceAll,
                                 serializedInstance, serializedInstanceString);
@@ -570,7 +574,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     throw new OXFException(e);
                 } else {
                     // Any exception will cause an error event to be dispatched
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction, e));
                 }
             }
 
@@ -581,7 +585,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {
-        final String actionString = action + ((action.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
+        final String actionString = resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
         final String resultURL = XFormsActionInterpreter.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;

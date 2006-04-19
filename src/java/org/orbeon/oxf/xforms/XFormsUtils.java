@@ -552,6 +552,36 @@ public class XFormsUtils {
         return externalURL;
     }
 
+    /**
+     * Resolve attribute value templates (AVTs).
+     *
+     * @param pipelineContext   current pipeline context
+     * @param xformsControls    XFormsControls object (to obtain context information)
+     * @param element           element on which the AVT attribute is present
+     * @param attributeValue    attribute value
+     * @return                  resolved attribute value
+     */
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, XFormsControls xformsControls, Element element, String attributeValue) {
+        int startIndex = 0;
+        int openingIndex;
+        final StringBuffer sb = new StringBuffer();
+        while ((openingIndex = attributeValue.indexOf('{', startIndex)) != -1) {
+            sb.append(attributeValue.substring(startIndex, openingIndex));
+            final int closingIndex = attributeValue.indexOf('}', openingIndex + 1);
+            if (closingIndex == -1)
+                throw new OXFException("Missing closing '}' in attribute value: " + attributeValue);
+            final String xpathExpression = attributeValue.substring(openingIndex + 1, closingIndex);
+
+            final String result = xformsControls.getCurrentInstance().evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
+                    xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), null, xformsControls.getFunctionLibrary(), null);
+
+            sb.append(result);
+            startIndex = closingIndex + 1;
+        }
+        sb.append(attributeValue.substring(startIndex));
+        return sb.toString();
+    }
+
     public static interface InstanceWalker {
         public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData);
     }

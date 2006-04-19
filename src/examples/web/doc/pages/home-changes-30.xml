@@ -65,6 +65,36 @@
                 </li>
                 <li>
                     <p>
+                        XForms improvements, including [TODO: link, elaborate]:
+                    </p>
+                    <ul>
+                        <li>
+                            Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
+                            <code>xforms:submission</code>.
+                        </li>
+                        <li>
+                            Support for attribute value templates (AVT) on <code>xforms:submission</code>
+                            <code>action</code> attribute.
+                        </li>
+                        <li>
+                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
+                        </li>
+                        <li>
+                            Autocomplete control.
+                        </li>
+                        <li>
+                            HTML editor control.
+                        </li>
+                        <li>
+                            Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>.
+                        </li>
+                        <li>
+                            [TODO]
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
                         Bug-fixes, including:
                     </p>
                     <ul>

@@ -125,7 +125,7 @@ public class XFormsSubmissionUtils {
      * @param action absolute URL or absolute path (which must include the context path)
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(PipelineContext pipelineContext, ExternalContext externalContext,
-                                                                   String method, final String action, String mediatype, boolean doReplace,
+                                                                   String method, final String action, String username, String password, String mediatype, boolean doReplace,
                                                                    byte[] serializedInstance, String serializedInstanceString) {
 
         // Compute submission URL
@@ -147,6 +147,11 @@ public class XFormsSubmissionUtils {
 
                     if (httpURLConnection != null) {
                         httpURLConnection.setRequestMethod(method.toUpperCase());
+                        if (username != null) {
+                            httpURLConnection.setUsername(username);
+                            if (password != null)
+                               httpURLConnection.setPassword(password);
+                        }
                     }
                     if (!isGet(method))
                         urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");

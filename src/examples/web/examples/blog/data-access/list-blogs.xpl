@@ -23,7 +23,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
-            <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true" xsl:version="2.0">
+            <xdb:query collection="/db/ops/blog-example/blogs" create-collection="true" xsl:version="2.0">
                 xquery version "1.0";
                 <blogs>
                     {

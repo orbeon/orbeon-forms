@@ -117,6 +117,9 @@ public class XFormsConstants {
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     

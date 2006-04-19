@@ -97,7 +97,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#post"/>
         <p:input name="config">
-            <xdb:update collection="/db/orbeon/blog-example/posts" xsl:version="2.0">
+            <xdb:update collection="/db/ops/blog-example/posts" xsl:version="2.0">
                 <xu:modifications version="1.0">
                     <xu:remove select="/post[username = '{/post/username}' and post-id = '{/post/post-id}']/*[name() != 'username' and name() != 'blog-id' and name() != 'post-id']"/>
                     <xu:append select="/post[username = '{/post/username}' and post-id = '{/post/post-id}']">

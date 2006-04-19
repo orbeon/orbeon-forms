@@ -26,7 +26,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#post"/>
         <p:input name="config">
-            <xdb:update collection="/db/orbeon/blog-example/posts" xsl:version="2.0">
+            <xdb:update collection="/db/ops/blog-example/posts" xsl:version="2.0">
                 <xu:modifications version="1.0">
                     <xu:update select="/post[username = '{/post/username}' and blog-id = '{/post/blog-id}' and post-id = '{/post/post-id}']">
                         <xsl:copy-of select="/post/*"/>

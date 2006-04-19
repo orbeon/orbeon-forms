@@ -25,7 +25,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#query"/>
         <p:input name="config">
-            <xdb:delete xsl:version="2.0" collection="/db/orbeon/blog-example/blogs">
+            <xdb:delete xsl:version="2.0" collection="/db/ops/blog-example/blogs">
                 <xsl:text>/blog[blog-id = '</xsl:text>
                 <xsl:value-of select="/query/blog-id"/>
                 <xsl:text>']</xsl:text>

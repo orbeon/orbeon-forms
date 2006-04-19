@@ -216,11 +216,11 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
 
-            // TODO: Handle repeat controls, AKA "switch within repeat"
             final String caseId = actionElement.attributeValue("case");
+            final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
 
             // Update xforms:switch info and dispatch events
-            xformsControls.updateSwitchInfo(pipelineContext, caseId);
+            xformsControls.updateSwitchInfo(pipelineContext, effectiveCaseId);
 
         } else if (XFormsActions.XFORMS_INSERT_ACTION.equals(actionEventName)) {
             // 9.3.5 The insert Element
@@ -247,7 +247,7 @@ public class XFormsActionInterpreter {
                         XFormsUtils.setInitialDecoration(clonedElement);
                     } else {
                         xformsControls.pushBinding(pipelineContext, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
-                        final Element templateElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Elemewnt
+                        final Element templateElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Element
                         clonedElement = templateElement.createCopy();
                         XFormsUtils.setInitialDecoration(clonedElement);
                         xformsControls.popBinding();

@@ -388,49 +388,69 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
 
                 if (ancestorRepeatsIds.size() > 0) {
 
-                    // Update ControlsState if needed as we are going to make some changes
                     final XFormsControls xformsControls = containingDocument.getXFormsControls();
-                    if (xformsControls.getInitialControlsState() == xformsControls.getCurrentControlsState())
-                        xformsControls.rebuildCurrentControlsState(pipelineContext);
 
-                    // Iterate from root to leaf
-                    Collections.reverse(ancestorRepeatsIds);
-                    for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
-                        final String repeatId = (String) i.next();
-                        final Integer iteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
-
-//                            XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, iteration.toString());
-                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, iteration.intValue());
-                    }
-
-                    // Update children xforms:repeat indexes if any
-                    xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
-                        public void startVisitControl(ControlInfo controlInfo) {
-                            if (controlInfo instanceof RepeatControlInfo) {
-                                // Found child repeat
-                                xformsControls.getCurrentControlsState().updateRepeatIndex(((RepeatControlInfo) controlInfo).getRepeatId(), 1);
+                    // Check whether this changes the index selection
+                    boolean doUpdate = false;
+                    {
+                        final Map currentRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
+                        for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
+                            final String repeatId = (String) i.next();
+                            final Integer newIteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
+                            final Integer currentIteration = (Integer) currentRepeatIdToIndex.get(repeatId);
+                            if (!newIteration.equals(currentIteration)) {
+                                doUpdate = true;
+                                break;
                             }
                         }
-
-                        public void endVisitControl(ControlInfo controlInfo) {
-                        }
-                    }, firstAncestorRepeatControlInfo);
-
-                    // Adjust controls ids that could have gone out of bounds
-                    XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, xformsControls);
-
-                    // After changing indexes, must recalculate
-                    // NOTE: The <setindex> action is supposed to "The implementation data
-                    // structures for tracking computational dependencies are rebuilt or
-                    // updated as a result of this action."
-                    // What should we do here? We run the computed expression binds so that
-                    // those are updated, but is that what we should do?
-                    for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                        XFormsModel currentModel = (XFormsModel) i.next();
-                        currentModel.applyComputedExpressionBinds(pipelineContext);
-                        //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                     }
-                    // TODO: Should try to use the code of the <setindex> action
+
+                    // Only update if the index selection has changed
+                    if (doUpdate) {
+
+                        // Update ControlsState if needed as we are going to make some changes
+                        if (xformsControls.getInitialControlsState() == xformsControls.getCurrentControlsState())
+                            xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+                        // Iterate from root to leaf
+                        Collections.reverse(ancestorRepeatsIds);
+                        for (Iterator i = ancestorRepeatsIds.iterator(); i.hasNext();) {
+                            final String repeatId = (String) i.next();
+                            final Integer iteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
+
+    //                            XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, iteration.toString());
+                            xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, iteration.intValue());
+                        }
+
+                        // Update children xforms:repeat indexes if any
+                        xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
+                            public void startVisitControl(ControlInfo controlInfo) {
+                                if (controlInfo instanceof RepeatControlInfo) {
+                                    // Found child repeat
+                                    xformsControls.getCurrentControlsState().updateRepeatIndex(((RepeatControlInfo) controlInfo).getRepeatId(), 1);
+                                }
+                            }
+
+                            public void endVisitControl(ControlInfo controlInfo) {
+                            }
+                        }, firstAncestorRepeatControlInfo);
+
+                        // Adjust controls ids that could have gone out of bounds
+                        XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, xformsControls);
+
+                        // After changing indexes, must recalculate
+                        // NOTE: The <setindex> action is supposed to "The implementation data
+                        // structures for tracking computational dependencies are rebuilt or
+                        // updated as a result of this action."
+                        // What should we do here? We run the computed expression binds so that
+                        // those are updated, but is that what we should do?
+                        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+                            XFormsModel currentModel = (XFormsModel) i.next();
+                            currentModel.applyComputedExpressionBinds(pipelineContext);
+                            //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
+                        }
+                        // TODO: Should try to use the code of the <setindex> action
+                    }
                 }
 
                 // Store new focus information for client

@@ -2779,6 +2779,18 @@
                     </p>
                 </section>
             </section>
+            <a name="other-extensions"/>
+            <section>
+                <title>XForms Submission</title>
+                <p>
+                    The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
+                    <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submission id="save-submission" ref="instance('my-instance')"
+                               method="put" action="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
+                </xml-source>
+            </section>
         </section>
         <a name="xforms-state-handling"/>
         <section>

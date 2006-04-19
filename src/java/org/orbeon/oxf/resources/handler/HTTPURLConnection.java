@@ -40,6 +40,9 @@ public class HTTPURLConnection extends URLConnection {
     private HashMap requestProperties = new HashMap();
     private HashMap responseHeaders;
 
+    private String username;
+    private String password;
+
     public HTTPURLConnection(URL url) {
         super(url);
         this.url = url;
@@ -65,13 +68,19 @@ public class HTTPURLConnection extends URLConnection {
             HttpClient client = new HttpClient();
 
             if (userinfo != null) {
-                // Set username and password
+                // Set username and optional password specified on URL
                 int separatorPosition = userinfo.indexOf(":");
                 String username = separatorPosition == -1 ? userinfo : userinfo.substring(0, separatorPosition);
                 String password = separatorPosition == -1 ? "" : userinfo.substring(separatorPosition + 1);
                 client.getState().setCredentials(
                     new AuthScope(url.getHost(), url.getPort()),
                     new UsernamePasswordCredentials(username, password)
+                );
+            } else if (username != null) {
+                // Set username and password specified externally
+                client.getState().setCredentials(
+                    new AuthScope(url.getHost(), url.getPort()),
+                    new UsernamePasswordCredentials(username, password == null ? "" : password)
                 );
             }
 
@@ -150,5 +159,13 @@ public class HTTPURLConnection extends URLConnection {
 
     public void disconnect() {
         method.releaseConnection();
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

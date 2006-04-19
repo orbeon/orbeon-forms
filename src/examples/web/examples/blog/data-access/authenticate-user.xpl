@@ -28,7 +28,7 @@
             <xdb:query collection="/db/" xsl:version="2.0" xmlns:xmldb="http://exist-db.org/xquery/xmldb">
                 xquery version "1.0";
                 <authenticated>
-                    {xmldb:authenticate(concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', '/db/orbeon/blog-example/'),
+                    {xmldb:authenticate(concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', '/db/ops/blog-example/'),
                                         '<xsl:value-of select="/query/username"/>',
                                         '<xsl:value-of select="/query/password"/>')}
                 </authenticated>

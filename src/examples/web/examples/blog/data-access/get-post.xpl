@@ -24,7 +24,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#query"/>
         <p:input name="config">
-            <xdb:query collection="/db/orbeon/blog-example/posts" create-collection="true" xsl:version="2.0">
+            <xdb:query collection="/db/ops/blog-example/posts" create-collection="true" xsl:version="2.0">
                 xquery version "1.0";
                 <post>
                     {

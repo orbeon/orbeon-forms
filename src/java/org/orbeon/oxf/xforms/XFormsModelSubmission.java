@@ -81,6 +81,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String separator = ";";
     private String includenamespaceprefixes;
 
+    private String xxformsUsername;
+    private String xxformsPassword;
+
     public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
         this.containingDocument = containingDocument;
         this.id = id;
@@ -136,6 +139,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
             includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
 
+            // Extension: username and password
+            xxformsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+            xxformsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+
+            // Remember that we did this
             submissionElementExtracted = true;
         }
     }
@@ -418,7 +426,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Absolute URLs or absolute paths are allowed to a local servlet
                         final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, action);
                         connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
-                                method, resolvedURL, mediatype, isReplaceAll,
+                                method, resolvedURL, xxformsUsername, xxformsPassword, mediatype, isReplaceAll,
                                 serializedInstance, serializedInstanceString);
                     }
 

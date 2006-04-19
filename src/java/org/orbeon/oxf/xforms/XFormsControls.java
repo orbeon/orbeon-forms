@@ -516,6 +516,19 @@ public class XFormsControls {
     }
 
     /**
+     * For the given case id and the current binding, try to find an effective case id.
+     *
+     * The effective case id is for now the effective case id following repeat branches. This can be improved in the
+     * future.
+     *
+     * @param caseId    a case id
+     * @return          an effective case id if possible
+     */
+    public String findEffectiveCaseId(String caseId) {
+        return getCurrentControlsState().findEffectiveControlId(caseId);
+    }
+
+    /**
      * Return the context node-set based on the enclosing xforms:repeat, xforms:group or
      * xforms:switch, either the closest one if no argument is passed, or context at the level of
      * the element with the given id passed.

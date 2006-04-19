@@ -749,8 +749,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
                             } else {
                                 // Connect using actual external protocol
+
+                                // Extension: username and password
+                                final String xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+                                final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
-                                connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext, "get", resolvedURL, null, false, null, null);
+                                connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
+                                        "get", resolvedURL, xxformsUsername, xxformsPassword, null, false, null, null);
                             }
 
                             try {

@@ -23,7 +23,7 @@
     <p:processor name="oxf:xmldb-delete">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query">
-            <xdb:delete collection="/db/orbeon/blog-example/posts">
+            <xdb:delete collection="/db/ops/blog-example/posts">
                 /post[username = 'ebruchez']
             </xdb:delete>
         </p:input>

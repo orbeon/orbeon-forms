@@ -27,7 +27,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
-            <xdb:delete xsl:version="2.0" collection="/db/orbeon/blog-example/posts">
+            <xdb:delete xsl:version="2.0" collection="/db/ops/blog-example/posts">
                 /post[username = '<xsl:value-of select="/params/param[3]/value/string"/>' and post-id = '<xsl:value-of select="/params/param[2]/value/string"/>']
             </xdb:delete>
         </p:input>

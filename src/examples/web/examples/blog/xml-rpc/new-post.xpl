@@ -80,7 +80,7 @@
     <p:processor name="oxf:xmldb-insert">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query">
-            <xdb:insert collection="/db/orbeon/blog-example/posts" create-collection="true"/>
+            <xdb:insert collection="/db/ops/blog-example/posts" create-collection="true"/>
         </p:input>
         <p:input name="data" href="#post"/>
     </p:processor>

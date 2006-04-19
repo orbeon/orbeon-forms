@@ -354,7 +354,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
                         serializedInstanceString = null;
 
-                    } else if (XFormsSubmissionUtils.isGet(method)) {
+                    } else if (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isDelete(method)) {
 
                         // Perform "application/x-www-form-urlencoded" serialization
                         serializedInstanceString = createWwwFormUrlEncoded(documentToSubmit);

@@ -25,10 +25,8 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.MalformedURLException;
-import java.net.HttpURLConnection;
 import java.net.URLConnection;
 
 /**
@@ -141,19 +139,20 @@ public class XFormsSubmissionUtils {
             try {
                 final URLConnection urlConnection = submissionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
-                if (isPost(method) || isPut(method) || isGet(method)) {
+                if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
+                    final boolean hasRequestBody = isPost(method) || isPut(method);
                     urlConnection.setDoInput(true);
-                    urlConnection.setDoOutput(!isGet(method)); // Only if POST / PUT
+                    urlConnection.setDoOutput(hasRequestBody);
 
                     if (httpURLConnection != null) {
-                        httpURLConnection.setRequestMethod(method.toUpperCase());
+                        httpURLConnection.setRequestMethod(getHttpMethod(method));
                         if (username != null) {
                             httpURLConnection.setUsername(username);
                             if (password != null)
                                httpURLConnection.setPassword(password);
                         }
                     }
-                    if (!isGet(method))
+                    if (hasRequestBody)
                         urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
 
                     // Forward cookies for session handling
@@ -173,7 +172,7 @@ public class XFormsSubmissionUtils {
                         httpURLConnection.setRequestProperty("authorization", authorizationHeader);
 
                     // Write request body if needed
-                    if (!isGet(method))
+                    if (hasRequestBody)
                         httpURLConnection.setRequestBody(serializedInstance);
 
                     urlConnection.connect();
@@ -272,5 +271,13 @@ public class XFormsSubmissionUtils {
 
     public static boolean isPut(String method) {
         return method.equals("put") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "put"));
+    }
+
+    public static boolean isDelete(String method) {
+        return method.equals("delete") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "delete"));
+    }
+
+    public static String getHttpMethod(String method) {
+        return isGet(method) ? "GET" : isPost(method) ? "POST" : isPut(method) ? "PUT" : isDelete(method) ? "DELETE" : null;
     }
 }

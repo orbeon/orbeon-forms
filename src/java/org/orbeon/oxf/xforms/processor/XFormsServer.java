@@ -667,10 +667,9 @@ public class XFormsServer extends ProcessorImpl {
                         // Regular control
 
                         // Get current value if possible for this control
-                        // NOTE: We issue the new value anyway because we don't have yet a mechanism
-                        // to tell the client not to update the value, unlike with attributes which can
-                        // be missing
-                        if (XFormsControls.isValueControl(controlInfo2.getName())) {
+                        // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
+                        // client not to update the value, unlike with attributes which can be missing
+                        if (XFormsControls.isValueControl(controlInfo2.getName()) && !(controlInfo2 instanceof UploadControlInfo)) {
 
                             // Check if a "display-value" attribute must be added
                             if (!isOutputControlWithValueAttribute) {

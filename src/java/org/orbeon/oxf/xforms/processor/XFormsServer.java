@@ -683,7 +683,7 @@ public class XFormsServer extends ProcessorImpl {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                             ch.text(controlInfo2.convertToExternalValue(controlInfo2.getValue()));
                             ch.endElement();
-                        } else {
+                        } else if (!"case".equals(controlInfo2.getName())) {
                             // No value, just output element with no content
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                         }

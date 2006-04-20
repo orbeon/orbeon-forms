@@ -77,7 +77,8 @@
                             <code>action</code> attribute.
                         </li>
                         <li>
-                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
+                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>. [TODO:
+                            Elaborate on using REST APIs for eXist]
                         </li>
                         <li>
                             Autocomplete control.

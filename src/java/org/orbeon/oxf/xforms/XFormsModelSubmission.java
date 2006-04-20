@@ -264,6 +264,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             final Element valueElement = parameterElement.element("value");
                             final String value = valueElement.getTextTrim();
+
+                            // An empty value likely means that the user did not select a file. In this case, we don't
+                            // want to override an existing value in the instance. Clearing the value in the instance
+                            // will have to be done by other means, like a "clear file" button.
+                            if (value.length() == 0)
+                                continue;
+
                             final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
 
                             final String filename = parameterElement.element("filename").getTextTrim();

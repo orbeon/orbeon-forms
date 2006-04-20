@@ -874,10 +874,22 @@ public class XFormsControls {
         if (currentRepeatIdToIndex.size() != 0) {
             result.setRepeatIdToIndex(currentRepeatIdToIndex);
         }
-        // Keep switch index information
-        final Map switchIdToSelectedCaseIdMap = currentControlsState.getSwitchIdToSelectedCaseIdMap();
-        if (switchIdToSelectedCaseIdMap != null) {
-            result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
+        // Update switch index information
+        final Map oldSwitchIdToSelectedCaseIdMap = currentControlsState.getSwitchIdToSelectedCaseIdMap();
+        final Map newSwitchIdToSelectedCaseIdMap = result.getSwitchIdToSelectedCaseIdMap();
+        {
+            for (Iterator i = newSwitchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry entry = (Map.Entry) i.next();
+                final String switchId =  (String) entry.getKey();
+
+                // Keep old switch state
+                final String oldSelectedCaseId = (String) oldSwitchIdToSelectedCaseIdMap.get(switchId);
+                if (oldSelectedCaseId != null) {
+                    entry.setValue(oldSelectedCaseId);
+                }
+            }
+
+            result.setSwitchIdToSelectedCaseIdMap(newSwitchIdToSelectedCaseIdMap);
         }
 
         // Remember new state

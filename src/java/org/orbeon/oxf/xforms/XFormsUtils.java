@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
-import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -25,21 +24,16 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.xml.sax.SAXException;
 
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.sax.TransformerHandler;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -312,7 +306,10 @@ public class XFormsUtils {
         try {
             final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-            gzipOutputStream.write(Dom4jUtils.domToString(instance, false, false).getBytes("utf-8"));
+
+            final String xmlString = Dom4jUtils.domToString(instance, false, false);
+
+            gzipOutputStream.write(xmlString.getBytes("utf-8"));
             gzipOutputStream.close();
             String result = Base64.encode(gzipByteArray.toByteArray());
             if (encryptionPassword != null)
@@ -323,35 +320,35 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {
-        return encodeXML2(pipelineContext, instance, getEncryptionKey());
-    }
-
-    public static String encodeXML2(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
-        // NOTE: This is an attempt to implement an alternative way of encoding. It appears to be
-        // slower. Possibly manually serializing the SAXStore could yield better performance.
-        try {
-            final SAXStore saxStore = new SAXStore();
-            final SAXResult saxResult = new SAXResult(saxStore);
-            final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(new DocumentSource(instance), saxResult);
-
-            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
-            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream);
-            objectOutputStream.writeObject(saxStore);
-            objectOutputStream.close();
-
-            String result = Base64.encode(byteArrayOutputStream.toByteArray());
-            if (encryptionPassword != null)
-                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
-            return result;
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-    }
+//    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {
+//        return encodeXML2(pipelineContext, instance, getEncryptionKey());
+//    }
+//
+//    public static String encodeXML2(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
+//        // NOTE: This is an attempt to implement an alternative way of encoding. It appears to be
+//        // slower. Possibly manually serializing the SAXStore could yield better performance.
+//        try {
+//            final SAXStore saxStore = new SAXStore();
+//            final SAXResult saxResult = new SAXResult(saxStore);
+//            final Transformer identity = TransformerUtils.getIdentityTransformer();
+//            identity.transform(new DocumentSource(instance), saxResult);
+//
+//            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+//            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(gzipOutputStream);
+//            objectOutputStream.writeObject(saxStore);
+//            objectOutputStream.close();
+//
+//            String result = Base64.encode(byteArrayOutputStream.toByteArray());
+//            if (encryptionPassword != null)
+//                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
+//            return result;
+//        } catch (IOException e) {
+//            throw new OXFException(e);
+//        } catch (TransformerException e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     public static org.w3c.dom.Document decodeXMLAsDOM(PipelineContext pipelineContext, String encodedXML) {
         try {
@@ -368,58 +365,56 @@ public class XFormsUtils {
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
         try {
             // Get raw text
-            String xmlText;
+            String xmlString;
             {
                 if (encryptionPassword != null)
                     encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
                 ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
-                StringBuffer xml = new StringBuffer();
-                byte[] buffer = new byte[1024];
                 GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-                int size;
-                while ((size = gzipInputStream.read(buffer)) != -1) xml.append(new String(buffer, 0, size, "utf-8"));
-                xmlText = xml.toString();
+                ByteArrayOutputStream binaryData = new ByteArrayOutputStream(1024);
+                NetUtils.copyStream(gzipInputStream, binaryData);
+                xmlString = new String(binaryData.toByteArray(), "utf-8");
             }
             // Parse XML and return documents
             LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-            XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false, false);
+            XMLUtils.stringToSAX(xmlString, null, saxContentHandler, false, false);
             return saxContentHandler.getDocument();
         } catch (IOException e) {
             throw new OXFException(e);
         }
     }
 
-    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML) {
-        return decodeXML2(pipelineContext, encodedXML, getEncryptionKey());
-    }
-
-    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
-        // NOTE: This is an attempt to implement an alternative way of decoding. It appears to be
-        // slower. Possibly manually serializing the SAXStore could yield better performance.
-        try {
-            if (encryptionPassword != null)
-                encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
-            final ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
-            final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-
-            final ObjectInputStream objectInputStream = new ObjectInputStream(gzipInputStream);
-            final SAXStore saxStore = (SAXStore) objectInputStream.readObject();
-
-            final LocationDocumentResult documentResult = new LocationDocumentResult();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(documentResult);
-            saxStore.replay(identity);
-
-            return documentResult.getDocument();
-
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } catch (ClassNotFoundException e) {
-            throw new OXFException(e);
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
-    }
+//    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML) {
+//        return decodeXML2(pipelineContext, encodedXML, getEncryptionKey());
+//    }
+//
+//    public static Document decodeXML2(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+//        // NOTE: This is an attempt to implement an alternative way of decoding. It appears to be
+//        // slower. Possibly manually serializing the SAXStore could yield better performance.
+//        try {
+//            if (encryptionPassword != null)
+//                encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
+//            final ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
+//            final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
+//
+//            final ObjectInputStream objectInputStream = new ObjectInputStream(gzipInputStream);
+//            final SAXStore saxStore = (SAXStore) objectInputStream.readObject();
+//
+//            final LocationDocumentResult documentResult = new LocationDocumentResult();
+//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+//            identity.setResult(documentResult);
+//            saxStore.replay(identity);
+//
+//            return documentResult.getDocument();
+//
+//        } catch (IOException e) {
+//            throw new OXFException(e);
+//        } catch (ClassNotFoundException e) {
+//            throw new OXFException(e);
+//        } catch (SAXException e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     public static String getEncryptionKey() {
         if (XFormsUtils.isHiddenEncryptionEnabled())

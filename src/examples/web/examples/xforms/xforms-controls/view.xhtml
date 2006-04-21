@@ -112,7 +112,10 @@
                 method="post" action="/direct/xforms-controls/countries" replace="instance" instance="countries-name"/>
         </xforms:model>
         <xhtml:style type="text/css">
-            .textarea { height: 6em; }
+            .input input { width: 20em; }
+            .password { width: 20em; }
+            .textarea { height: 6em; width: 20em; }
+            .widget-tab-panel { padding-top: 1em; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -121,13 +124,13 @@
                 <widget:tab id="text-controls" selected="true">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
-                        <xforms:input ref="age" incremental="true">
+                        <xforms:input ref="age" incremental="true" class="input">
                             <xforms:label class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:secret ref="secret" incremental="true">
+                        <xforms:secret ref="secret" incremental="true" class="password">
                             <xforms:label class="fixed-width">Password:</xforms:label>
                             <xforms:hint>The password is 42 ;)</xforms:hint>
                             <xforms:alert>Invalid password</xforms:alert>
@@ -274,6 +277,12 @@
                         </xhtml:p>
                     </xforms:group>
 
+                </widget:tab>
+                <widget:tab id="html-area">
+                    <widget:label>HTML Area</widget:label>
+                    <xhtml:p>
+                        <xforms:textarea mediatype="text/html" ref="html"/>
+                    </xhtml:p>
                 </widget:tab>
                 <widget:tab id="slider">
                     <widget:label>Range</widget:label>

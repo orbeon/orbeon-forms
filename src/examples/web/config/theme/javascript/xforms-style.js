@@ -161,198 +161,195 @@ function xformsChangeHeightHandler(variant) {
 function xformsUpdateStyle(element) {
     if (element.className) {
         var classes = element.className.split(" ");
-        for (var classIndex = 0; classIndex < classes.length; classIndex++) {
-            var className = classes[classIndex];
-            
-            if (className == "xforms-mediatype-text-html") {
-                if (element.firstChild != null)
-                    element.innerHTML = xformsStringValue(element);
+
+        if (xformsArrayContains(classes, "xforms-mediatype-text-html") && xformsArrayContains(classes, "xforms-output")) {
+            if (element.firstChild != null)
+                element.innerHTML = xformsStringValue(element);
+        }
+
+        if (xformsArrayContains(classes, "xforms-output-html-initial")) {
+            // Make the content of the element visible
+            xformsRemoveClass(element, "xforms-output-html-initial");
+        }
+
+        if (xformsArrayContains(classes, "xforms-label")) {
+
+            // Initialize hint message on control if not set already
+            var control = document.getElementById(element.htmlFor);
+            if (!control.labelElement) {
+                control.labelMessage = xformsStringValue(element);
+                control.labelElement = element;
             }
 
-            if (className == "xforms-output-html-initial") {
-                // Make the content of the element visible
-                xformsRemoveClass(element, "xforms-output-html-initial");
+            // Update label if it changed
+            if (control.labelMessage != xformsStringValue(element)) {
+                while (element.firstChild) element.removeChild(element.firstChild);
+                element.appendChild(document.createTextNode(control.labelMessage));
             }
 
-            if (className == "xforms-label") {
+            // Disable or enable label depending if control is relevant
+            xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+        }
 
-                // Initialize hint message on control if not set already
-                var control = document.getElementById(element.htmlFor);
-                if (!control.labelElement) {
-                    control.labelMessage = xformsStringValue(element);
-                    control.labelElement = element;
-                }
+        if (xformsArrayContains(classes, "xforms-hint")) {
 
-                // Update label if it changed
-                if (control.labelMessage != xformsStringValue(element)) {
-                    while (element.firstChild) element.removeChild(element.firstChild);
-                    element.appendChild(document.createTextNode(control.labelMessage));
-                }
-
-                // Disable or enable label depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+            // Initialize hint message on control if not set already
+            var control = document.getElementById(element.htmlFor);
+            if (control.hintElement != element) {
+                control.hintElement = element;
+                control.hintMessage = xformsStringValue(element);
             }
 
-            if (className == "xforms-hint") {
-
-                // Initialize hint message on control if not set already
-                var control = document.getElementById(element.htmlFor);
-                if (control.hintElement != element) {
-                    control.hintElement = element;
-                    control.hintMessage = xformsStringValue(element);
-                }
-
-                // Update hint if it changed
-                if (control.hintMessage != xformsStringValue(element)) {
-                    while (element.firstChild) element.removeChild(element.firstChild);
-                    element.appendChild(document.createTextNode(control.hintMessage));
-                }
-
-                // Only add listener once
-                if (!element.styleListenerRegistered) {
-                    element.styleListenerRegistered = true;
-                    // Add listeners on control
-                    var controlGeneratingEvent = xformsArrayContains(control.className.split(" "), "xforms-input")
-                        ? control.childNodes[1] : control;
-                    xformsAddEventListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
-                    xformsAddEventListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
-                }
-
-                // Disable or enable hint depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+            // Update hint if it changed
+            if (control.hintMessage != xformsStringValue(element)) {
+                while (element.firstChild) element.removeChild(element.firstChild);
+                element.appendChild(document.createTextNode(control.hintMessage));
             }
-            
-            if (className == "xforms-help") {
 
-                // Initialize help message on control if not set already
-                var control = document.getElementById(element.htmlFor);
-                if (control.helpElement != element) {
-                    control.helpMessage = xformsStringValue(element);
-                    control.helpElement = element;
-                }
+            // Only add listener once
+            if (!element.styleListenerRegistered) {
+                element.styleListenerRegistered = true;
+                // Add listeners on control
+                var controlGeneratingEvent = xformsArrayContains(control.className.split(" "), "xforms-input")
+                    ? control.childNodes[1] : control;
+                xformsAddEventListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
+                xformsAddEventListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
+            }
 
-                // Figure out if we need to create a div
-                // When there is an existing div, check if it has the same message
-                var needToCreateDiv;
-                if (element.divId) {
-                    var existingDiv = document.getElementById(element.divId);
-                    if (existingDiv.helpMessage == control.helpMessage) {
-                        needToCreateDiv = false;
-                    } else {
-                        needToCreateDiv = true;
-                        existingDiv.parentNode.removeChild(existingDiv);
-                    }
+            // Disable or enable hint depending if control is relevant
+            xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+        }
+
+        if (xformsArrayContains(classes, "xforms-help")) {
+
+            // Initialize help message on control if not set already
+            var control = document.getElementById(element.htmlFor);
+            if (control.helpElement != element) {
+                control.helpMessage = xformsStringValue(element);
+                control.helpElement = element;
+            }
+
+            // Figure out if we need to create a div
+            // When there is an existing div, check if it has the same message
+            var needToCreateDiv;
+            if (element.divId) {
+                var existingDiv = document.getElementById(element.divId);
+                if (existingDiv.helpMessage == control.helpMessage) {
+                    needToCreateDiv = false;
                 } else {
                     needToCreateDiv = true;
+                    existingDiv.parentNode.removeChild(existingDiv);
                 }
-
-                // Create new div when necessary
-                if (needToCreateDiv) {
-                    element.divId = control.id + "-div";
-                    var divHTML = tt_Htm(this, element.divId, control.helpMessage);
-                    var container = document.createElement("DIV");
-                    container.innerHTML = divHTML;
-                    var newDiv = container.firstChild;
-                    newDiv.helpMessage = control.helpMessage;
-                    document.body.appendChild(newDiv);
-                }
-
-                // Only add listener once
-                if (!element.styleListenerRegistered) {
-                    element.styleListenerRegistered = true;
-                    xformsAddEventListener(element, "mouseover", xformsHelpMouseOver);
-                    xformsAddEventListener(element, "mouseout", tt_Hide);
-                }
-
-                // Disable or enable help depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+            } else {
+                needToCreateDiv = true;
             }
 
-            if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
-
-                // Initialize alert control when necessary
-                var control = document.getElementById(element.htmlFor);
-                if (control.alertElement != element)
-                    control.alertElement = element;
-
-                // Change alert status when necessary
-                if (xformsIsDefined(control.isValid)) {
-                    xformsAddClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
-                    xformsRemoveClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
-                }
-
-                // Change message if necessary
-                if (control.alertMessage && control.xformsMessageLabel)
-                    xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
-
-                // Set title of label with content of label
-                element.title = xformsStringValue(element);
-
-                // Disable or enable help depending if control is relevant
-                xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+            // Create new div when necessary
+            if (needToCreateDiv) {
+                element.divId = control.id + "-div";
+                var divHTML = tt_Htm(this, element.divId, control.helpMessage);
+                var container = document.createElement("DIV");
+                container.innerHTML = divHTML;
+                var newDiv = container.firstChild;
+                newDiv.helpMessage = control.helpMessage;
+                document.body.appendChild(newDiv);
             }
 
-            if (className == "xforms-input") {
-
-                var inputField = element.childNodes[1];
-                var showCalendar = element.childNodes[2];
-
-                if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date") 
-                        && !element.styleListenerRegistered) {
-                    element.styleListenerRegistered = true;
-
-                    // Assign ids to input field and icon for date picker
-                    inputField.id = "input-" + element.id;
-                    showCalendar.id = "showcalendar-" + element.id;
-
-                    // Setup calendar library
-                    Calendar.setup({
-                        inputField     :    inputField.id,
-                        ifFormat       :    "%Y-%m-%d",
-                        showsTime      :    false,
-                        button         :    element.id,
-                        singleClick    :    true,
-                        step           :    1,
-                        onUpdate       :    xformsCalendarUpdate,
-                        electric       :    true
-                    });
-
-                    element.xformsJscalendarOnClick = element.onclick;
-                    element.onclick = xformsCalendarClick;
-                }
-            }
-            
-            if (className == "xforms-select1-compact") {
-                // Prevent end-user from selecting multiple values
-                xformsAddEventListener(element, "change", xformsSelect1CompactChanged);
+            // Only add listener once
+            if (!element.styleListenerRegistered) {
+                element.styleListenerRegistered = true;
+                xformsAddEventListener(element, "mouseover", xformsHelpMouseOver);
+                xformsAddEventListener(element, "mouseout", tt_Hide);
             }
 
-            if (className == "xforms-trigger") {
-                // Update label on trigger
-                if (typeof element.labelMessage != "undefined" && element.labelMessage != xformsStringValue(element)) {
-                    if (element.tagName.toLowerCase() == "input")
-                        element.alt = element.labelMessage;
-                    else
-                        xformsReplaceNodeText(element, element.labelMessage);
-                }
-            }
-            
-            if (className == "wide-textarea") {
-                if (!element.changeHeightHandlerRegistered) {
-                    element.changeHeightHandlerRegistered = true;
-                    xformsChangeHeightHandler(element);
-                    xformsAddEventListener(element, "keyup", xformsChangeHeightHandler);
-                }
+            // Disable or enable help depending if control is relevant
+            xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+        }
+
+        if (xformsArrayContains(classes, "xforms-alert-inactive") || xformsArrayContains(classes, "xforms-alert-active")) {
+
+            // Initialize alert control when necessary
+            var control = document.getElementById(element.htmlFor);
+            if (control.alertElement != element)
+                control.alertElement = element;
+
+            // Change alert status when necessary
+            if (xformsIsDefined(control.isValid)) {
+                xformsAddClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
+                xformsRemoveClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
             }
 
-            // This is for widgets. Code for widgets should be modularized and moved out of this file
-            if (className == "widget-tabs" || className == "widget-tab-inactive"
-                    || className == "widget-tab-active" || className == "widget-tab-spacer-side"
-                    || className == "widget-tab-spacer-between") {
-                // Once the size of the table is set, do not change it
-                if (!element.width)
-                    element.width = element.clientWidth;
+            // Change message if necessary
+            if (control.alertMessage && control.xformsMessageLabel)
+                xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
+
+            // Set title of label with content of label
+            element.title = xformsStringValue(element);
+
+            // Disable or enable help depending if control is relevant
+            xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+        }
+
+        if (xformsArrayContains(classes, "xforms-input")) {
+
+            var inputField = element.childNodes[1];
+            var showCalendar = element.childNodes[2];
+
+            if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
+                    && !element.styleListenerRegistered) {
+                element.styleListenerRegistered = true;
+
+                // Assign ids to input field and icon for date picker
+                inputField.id = "input-" + element.id;
+                showCalendar.id = "showcalendar-" + element.id;
+
+                // Setup calendar library
+                Calendar.setup({
+                    inputField     :    inputField.id,
+                    ifFormat       :    "%Y-%m-%d",
+                    showsTime      :    false,
+                    button         :    element.id,
+                    singleClick    :    true,
+                    step           :    1,
+                    onUpdate       :    xformsCalendarUpdate,
+                    electric       :    true
+                });
+
+                element.xformsJscalendarOnClick = element.onclick;
+                element.onclick = xformsCalendarClick;
             }
+        }
+
+        if (xformsArrayContains(classes, "xforms-select1-compact")) {
+            // Prevent end-user from selecting multiple values
+            xformsAddEventListener(element, "change", xformsSelect1CompactChanged);
+        }
+
+        if (xformsArrayContains(classes, "xforms-trigger")) {
+            // Update label on trigger
+            if (typeof element.labelMessage != "undefined" && element.labelMessage != xformsStringValue(element)) {
+                if (element.tagName.toLowerCase() == "input")
+                    element.alt = element.labelMessage;
+                else
+                    xformsReplaceNodeText(element, element.labelMessage);
+            }
+        }
+
+        if (xformsArrayContains(classes, "wide-textarea")) {
+            if (!element.changeHeightHandlerRegistered) {
+                element.changeHeightHandlerRegistered = true;
+                xformsChangeHeightHandler(element);
+                xformsAddEventListener(element, "keyup", xformsChangeHeightHandler);
+            }
+        }
+
+        // This is for widgets. Code for widgets should be modularized and moved out of this file
+        if (xformsArrayContains(classes, "widget-tabs") || xformsArrayContains(classes, "widget-tab-inactive")
+                || xformsArrayContains(classes, "widget-tab-active") || xformsArrayContains(classes, "widget-tab-spacer-side")
+                || xformsArrayContains(classes, "widget-tab-spacer-between")) {
+            // Once the size of the table is set, do not change it
+            if (!element.width)
+                element.width = element.clientWidth;
         }
 
         // Update class on element based on its attributes

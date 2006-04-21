@@ -44,6 +44,8 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/event.js",
             "/ops/javascript/animation.js",
             "/ops/javascript/slider.js",
+            // HTML area
+            "/ops/fckeditor/fckeditor.js",
             // Other standard scripts
             "/config/theme/javascript/xforms-style.js",
             "/ops/javascript/wz_tooltip.js",

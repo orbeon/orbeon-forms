@@ -378,6 +378,14 @@ function xformsStoreInClientState(key, value) {
     document.xformsClientState.value = keyValues.join("&");
 }
 
+/**
+ * Value change handling for all the controls. It is assumed that the "value" property of "target"
+ * contain the current value for the control. We create a value change event and fire it by calling
+ * xformsFireEvents().
+ *
+ * This function is in general called by xformsHandleValueChange(), and will be called directly by
+ * other event handler for less usual events (e.g. slider, HTML area).
+ */
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
     // We don't send value change events for the XForms upload control
@@ -394,7 +402,14 @@ function xformsValueChanged(target, other) {
     return valueChanged;
 }
 
-// Function called by browser when value changes (either after changing focus or keyboard input)
+/**
+ * Function called by browser when value changes (either after changing focus or keyboard input).
+ * This is an event handler we register with the browser on "change" and "keyup" (for incremental)
+ * events.
+ *
+ * Here we intercept the user pressing cancel, we handle the case of the input which is in a span
+ * and call xformsValueChanged().
+ */
 function xformsHandleValueChange(event) {
     var target = getEventTarget(event);
     if (event.keyCode == 27) {
@@ -505,16 +520,38 @@ function xformsHandleAutoCompleteMouseChange(input) {
     xformsValueChanged(input.parentNode, null);
 }
 
-// Focus out events are only handled when we have receive a focus in event.
-// Here we just save the event which will be handled when we receive a focus
-// in from the browser.
+/**
+ * Focus out events are only handled when we have receive a focus in event.
+ * Here we just save the event which will be handled when we receive a focus
+ * in from the browser.
+ */
 function xformsHandleBlur(event) {
     if (!document.xformsMaskFocusEvents) {
         var target = getEventTarget(event);
-        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+
+        // Look for first parent-or-self that is an XForms control
+        var targetClasses;
+        while (true) {
+            if (!target) break; // No more parent, stop search
+            if (target.className != null) {
+                targetClasses = target.className.split(" ");
+                if (xformsArrayContains(targetClasses, "xforms-control")) {
+                    // We found our XForms element target
+                    break;
+                }
+            }
+            // Go to parent and continue search
             target = target.parentNode;
-        if (target != null)
+        }
+
+        if (target != null) {
+            // This is an event for an XForms control
             document.xformsPreviousDOMFocusOut = target;
+            // HTML area does not throw value change event, so we throw it on blur
+            if (xformsArrayContains(targetClasses, "xforms-textarea")
+                    && xformsArrayContains(targetClasses, "xforms-mediatype-text-html"))
+                xformsValueChanged(target, null);
+        }
     }
 }
 
@@ -523,20 +560,9 @@ function xformsHandleFocus(event) {
         var target = getEventTarget(event);
         while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
             target = target.parentNode;
-        var sendFocusEvents = target != null;
-
-        // We have just received a change event: try to combine both
-        if (sendFocusEvents && document.xformsPreviousValueChanged) {
-            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
-            document.xformsPreviousValueChanged = null;
-            if (eventSent)
-                document.xformsPreviousDOMFocusOut = null;
-            // If value changed didn't send anything, we still want to send the focus events
-            sendFocusEvents = !eventSent;
-        }
 
         // Send focus events
-        if (sendFocusEvents) {
+        if (target != null) {
             if (document.xformsPreviousDOMFocusOut) {
                 if (document.xformsPreviousDOMFocusOut != target) {
                     var events = new Array();
@@ -558,7 +584,9 @@ function xformsHandleFocus(event) {
     }
 }
 
-// Register listener on focus in and out events
+/**
+ * Register listener on focus in and out events
+ */
 function xformsRegisterForFocusBlurEvents(control) {
     if (!control.focusBlurEventListenerRegistered) {
         control.focusBlurEventListenerRegistered = true;
@@ -600,8 +628,23 @@ function xformsCreateEventArray(target, eventName, value, other) {
 }
 
 function getEventTarget(event) {
-    event = event ? event : window.event;
-    return event.srcElement ? event.srcElement : event.target;
+    if (event && event.LinkedField) {
+        // Case of events coming from HTML area thrown by the HTML area library
+        return event.LinkedField;
+    } else {
+        // Case of normal HTML DOM events
+        event = event ? event : window.event;
+        var target = event.srcElement ? event.srcElement : event.target;
+        if (target.xformsElement) {
+            // HTML area on Gecko: event target is the document, return the textarea
+            return target.xformsElement;
+        } else if (target.ownerDocument.xformsElement) {
+            // HTML area on IS: event target is the body of the document, return the textarea
+            return target.ownerDocument.xformsElement;
+        } else {
+            return target;
+        }
+    }
 }
 
 function xformsInitCheckesRadiosComputeSpanValue(span) {
@@ -642,6 +685,30 @@ function xformsInitCheckesRadios(control) {
     xformsInitCheckesRadiosComputeSpanValue(control);
 }
 
+function xformsHtmlEditorChange(editorInstance) {
+    editorInstance.LinkedField.value = editorInstance.GetXHTML();
+    // Throw value change event if the field is in incremental mode
+    if (xformsArrayContains(editorInstance.LinkedField.className.split(" "), "xforms-incremental"))
+        xformsValueChanged(editorInstance.LinkedField, null);
+}
+
+/**
+ * Called by FCKeditor when an editor is fully loaded. This is our opportunity
+ * to listen for events on this editor.
+ */
+function FCKeditor_OnComplete(editorInstance) {
+    // Save reference to XForms element (textarea) in document for event handlers that receive the document
+    editorInstance.EditorDocument.xformsElement = editorInstance.LinkedField;
+    // Register value change handler
+    editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
+    // Register focus/blur events for Gecko
+    xformsAddEventListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
+    xformsAddEventListener(editorInstance.EditorDocument, "blur", xformsHandleBlur);
+    // Register focus/blur events for IE
+    xformsAddEventListener(editorInstance.EditorDocument, "focusin", xformsHandleFocus);
+    xformsAddEventListener(editorInstance.EditorDocument, "focusout", xformsHandleBlur);
+}
+
 /**
  * Initializes attributes on the document object:
  *
@@ -654,7 +721,6 @@ function xformsInitCheckesRadios(control) {
  *     Input           xformsDynamicState
  *     boolean         xformsRequestInProgress
  *     XMLHttpRequest  xformsXMLHttpRequest
- *     Element         xformsPreviousValueChanged
  *     Array           xformsChangedIdsRequest        Ids of controls changed while request is processed by server
  *     Array[id]->id   xformsRepeatTreeChildToParent  Returns the direct parent for each repeat id (or null if no parent)
  *     Array[id]->#    xformsRepeatIndexes            Current index for each repeat id
@@ -692,7 +758,8 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
-        var isXFormsHTMLArea = false;
+        var isXFormsMediatypeTextHTML = false;
+        var isXFormsTextarea = false;
         var isXFormsNoInitElement = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
@@ -720,9 +787,10 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsNoInitElement = true;
             if (className == "xforms-select1-open-select")
                 isXFormsNoInitElement = true;
-//            if (className == "xforms-mediatype-text-html")
-            if (className == "xforms-textarea-html")
-                isXFormsHTMLArea = true;
+            if (className == "xforms-mediatype-text-html")
+                isXFormsMediatypeTextHTML = true;
+            if (className == "xforms-textarea")
+                isXFormsTextarea = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -840,7 +908,7 @@ function xformsInitializeControlsUnder(root) {
             }
 
             // Initialize HTML area
-            if (isXFormsHTMLArea) {
+            if (isXFormsMediatypeTextHTML && isXFormsTextarea) {
                 document.xformsHTMLAreaNames = new Array();
                 var fckEditor = new FCKeditor(control.name);
                 if (!xformsArrayContains(document.xformsHTMLAreaNames, control.name))

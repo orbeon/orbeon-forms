@@ -15,6 +15,7 @@
     <age>35</age>
     <secret>42</secret>
     <textarea>The world is but a canvas for the imagination.</textarea>
+    <html>This is some &lt;strong>sample text&lt;/strong>. You are using &lt;a href="http://www.fckeditor.net/">FCKeditor&lt;/a>.</html>
     <label>Hello, World!</label>
     <date>2004-01-07</date>
     <flavor>v c</flavor>

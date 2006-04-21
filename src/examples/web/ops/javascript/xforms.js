@@ -1448,6 +1448,12 @@ function xformsHandleResponse() {
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
                                                 if (documentElement.childNodes[0].value != documentElement.previousValue)
                                                     foundControlModified = true;
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-textarea")
+                                                    && xformsArrayContains(documentElementClasses, "xforms-mediatype-text-html")) {
+                                                // For HTML area, compare previous value to value of the HTML area widget
+                                                var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
+                                                if (documentElement.previousValue != htmlEditor.GetXHTML())
+                                                    foundControlModified = true;
                                             } else if (xformsIsDefined(documentElement.previousValue)
                                                     && documentElement.previousValue != documentElement.value) {
                                                 foundControlModified = true;
@@ -1536,6 +1542,15 @@ function xformsHandleResponse() {
                                                 }
                                                 if (inputField.value != newControlValue)
                                                     inputField.value = newControlValue;
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-textarea")
+                                                    && xformsArrayContains(documentElementClasses, "xforms-mediatype-text-html")) {
+                                                // HTML area
+                                                var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
+                                                if (xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)) {
+                                                    htmlEditor.SetHTML(newControlValue);
+                                                    documentElement.value = newControlValue;
+                                                    documentElement.previousValue = newControlValue;
+                                                }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Textarea, password

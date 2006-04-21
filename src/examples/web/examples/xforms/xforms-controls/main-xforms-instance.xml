@@ -15,7 +15,7 @@
     <age>35</age>
     <secret>42</secret>
     <textarea>The world is but a canvas for the imagination.</textarea>
-    <html>This is some &lt;strong>sample text&lt;/strong>. You are using &lt;a href="http://www.fckeditor.net/">FCKeditor&lt;/a>.</html>
+    <html>In the PresentationServer HTML area, you can use different:&lt;br />&lt;ul>&lt;li>fonts like times or courrier&lt;/li>&lt;li>&lt;font size="3">sizes&lt;/font>&lt;/li>&lt;li>&lt;span style="background-color: rgb(255, 153, 0);">background colors&lt;/span> or &lt;span style="color: rgb(255, 102, 0);">text colors&lt;/span>&lt;span style="background-color: rgb(255, 153, 0);">&lt;br />&lt;/span>&lt;/li>&lt;li>font styles like &lt;span style="font-weight: bold;">bold &lt;/span>or &lt;span style="font-style: italic;">italic&lt;/span>&lt;/li>&lt;/ul></html>
     <label>Hello, World!</label>
     <date>2004-01-07</date>
     <flavor>v c</flavor>

@@ -420,6 +420,7 @@
             <xsd:attribute name="inputmode" type="xsd:string" use="optional"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
 
+            <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="false"/>
         </xsd:complexType>
     </xsd:element>
@@ -485,6 +486,9 @@
                 </xsd:simpleType>
             </xsd:attribute>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="true"/>
+            <!-- Should not be needed here as we already have this in xforms:Common.Attributes,
+                 but without this, IntelliJ complains about the xxforms:filter on select1. -->
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="select">
@@ -548,7 +552,7 @@
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
             <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
-
+            <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="submit">
@@ -642,7 +646,7 @@
         <xsd:complexType>
 
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>

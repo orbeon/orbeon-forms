@@ -135,6 +135,7 @@
                                 <xsd:enumeration value="get"/>
                                 <xsd:enumeration value="form-data-post"/>
                                 <xsd:enumeration value="urlencoded-post"/>
+                                <xsd:enumeration value="delete"/>
                             </xsd:restriction>
 
                         </xsd:simpleType>

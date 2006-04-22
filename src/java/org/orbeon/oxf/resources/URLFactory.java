@@ -38,7 +38,7 @@ public class URLFactory {
     }
 
     public static URL createURL(String context, String spec) throws MalformedURLException {
-        return createURL(context == null ? null : createURL(context), spec);
+        return createURL(context == null || "".equals(context) ? null : createURL(context), spec);
     }
 
     public static URL createURL(URL context, String spec) throws MalformedURLException {

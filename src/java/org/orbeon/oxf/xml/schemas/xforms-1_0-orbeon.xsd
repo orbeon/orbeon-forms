@@ -796,6 +796,7 @@
                     <xsd:choice>
                         <xsd:group ref="xforms:Form.Controls"/>
                         <xsd:element ref="xforms:group"/>
+                        <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
                         <xsd:any namespace="##other" processContents="lax"/>
                         <!-- containing document language to add additional allowed content here -->

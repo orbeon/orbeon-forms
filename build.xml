@@ -181,16 +181,6 @@
             <exclude name="org/orbeon/faces/**/*.java"/>
             <exclude name="org/orbeon/faces11/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>
-            <!--      <exclude name="org/orbeon/oxf/resources/Tamino*"/>-->
-            <!--      <exclude name="org/orbeon/oxf/processor/tamino/**/*.java"/>-->
-            <!--            <exclude name="org/orbeon/oxf/processor/xmldb/**"/>-->
-            <!--            <exclude name="org/orbeon/oxf/portlet/**/*.java"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/FOP*"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/JFreeChart*"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/STXTransformer*"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/XLS*"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/Email*"/>-->
-            <!--            <exclude name="org/orbeon/oxf/pipeline/processors/Batik*"/>-->
         </javac>
     </target>
 
@@ -654,7 +644,7 @@ ${files}
         </java>
     </target>
 
-    <target name="orbeon-dist-war" >
+    <target name="orbeon-dist-war" depends="init">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">

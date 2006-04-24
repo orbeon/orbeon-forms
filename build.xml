@@ -164,7 +164,7 @@
     </target>
 
     <!-- Compile source -->
-    <target name="classes" depends="classpath">
+    <target name="classes" depends="classpath" unless="skip.compilation">
         <mkdir dir="${build.dir}/src"/>
         <copy todir="${build.dir}/src" file="${java-src.dir}/org/orbeon/oxf/common/Version.java" overwrite="true">
             <filterset>

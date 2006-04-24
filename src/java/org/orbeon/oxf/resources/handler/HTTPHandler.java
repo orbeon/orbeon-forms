@@ -24,8 +24,6 @@ import java.net.URLStreamHandler;
  */
 public class HTTPHandler extends URLStreamHandler  {
 
-    public static final String PROTOCOL = "http";
-
     protected URLConnection openConnection(URL url) throws IOException {
         return new HTTPURLConnection(url);
     }

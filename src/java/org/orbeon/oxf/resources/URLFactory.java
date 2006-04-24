@@ -43,7 +43,7 @@ public class URLFactory {
 
     public static URL createURL(URL context, String spec) throws MalformedURLException {
         return spec.startsWith(OXFHandler.PROTOCOL + ":") ? new URL(context, spec, oxfHandler)
-             : spec.startsWith(HTTPHandler.PROTOCOL + ":") ? new URL(context, spec, httpHandler)
+             : spec.startsWith("http:") || spec.startsWith("https:") ? new URL(context, spec, httpHandler)
              : new URL(context, spec);
     }
 }

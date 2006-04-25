@@ -557,6 +557,10 @@ public class XFormsUtils {
      * @return                  resolved attribute value
      */
     public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, XFormsControls xformsControls, Element element, String attributeValue) {
+
+        if (attributeValue == null)
+            return null;
+
         int startIndex = 0;
         int openingIndex;
         final StringBuffer sb = new StringBuffer();

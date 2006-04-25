@@ -74,20 +74,21 @@
                         </li>
                         <li>
                             Support for attribute value templates (AVT) on <code>xforms:submission</code>
-                            <code>action</code> attribute.
+                            <code>action</code>, <code>xxforms:username</code> and <code>xxforms:password</code>
+                            attributes.
                         </li>
                         <li>
                             Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>. [TODO:
                             Elaborate on using REST APIs for eXist]
                         </li>
                         <li>
-                            Autocomplete control.
+                            Autocomplete control. [TODO]
                         </li>
                         <li>
-                            HTML editor control.
+                            HTML editor control. [TODO]
                         </li>
                         <li>
-                            Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>.
+                            Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
                         </li>
                         <li>
                             [TODO]

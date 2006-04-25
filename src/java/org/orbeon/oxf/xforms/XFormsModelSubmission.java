@@ -21,12 +21,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.controls.UploadControlInfo;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.controls.UploadControlInfo;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -39,8 +39,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.net.URLEncoder;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -66,8 +66,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String resolvedAction;
     private String method; // required
 
-    private boolean validate = true; // required
-    private boolean relevant = true; // required
+    private boolean validate = true;
+    private boolean relevant = true;
 
     private String version;
     private boolean indent;
@@ -82,8 +82,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String separator = ";";
     private String includenamespaceprefixes;
 
-    private String xxformsUsername;
-    private String xxformsPassword;
+    private String avtXXFormsUsername;
+    private String resolvedXXFormsUsername;
+    private String avtXXFormsPassword;
+    private String resolvedXXFormsPassword;
 
     public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
         this.containingDocument = containingDocument;
@@ -141,8 +143,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             includenamespaceprefixes = submissionElement.attributeValue("includenamespaceprefixes");
 
             // Extension: username and password
-            xxformsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
-            xxformsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+            avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+            avtXXFormsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
 
             // Remember that we did this
             submissionElementExtracted = true;
@@ -198,8 +200,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final Node currentNode = xformsControls.getCurrentSingleNode();
 
-                // Evaluate action AVT
+                // Evaluate AVTs
                 resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
+                resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsUsername);
+                resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsPassword);
 
                 if (!(currentNode instanceof Document || currentNode instanceof Element)) {
                     throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
@@ -437,13 +441,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Absolute URLs or absolute paths are allowed to a local servlet
                         final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
                         connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
-                                method, resolvedURL, xxformsUsername, xxformsPassword, mediatype, isReplaceAll,
+                                method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, mediatype, isReplaceAll,
                                 serializedInstance, serializedInstanceString);
                     }
 
                     if (!connectionResult.dontHandleResponse) {
                         // Handle response
-                        if (connectionResult.resultCode == 200) {
+                        if (connectionResult.resultCode >= 200 && connectionResult.resultCode < 300) {// accept any success code (in particular "201 Resource Created")
                             // Sucessful response
 
                             final boolean hasContent;

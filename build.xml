@@ -181,6 +181,7 @@
             <exclude name="org/orbeon/faces/**/*.java"/>
             <exclude name="org/orbeon/faces11/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>
+            <!--<exclude name="org/orbeon/saxon/dom4j/*"/>-->
         </javac>
     </target>
 

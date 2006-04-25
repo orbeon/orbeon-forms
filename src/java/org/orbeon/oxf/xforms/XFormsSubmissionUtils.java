@@ -161,7 +161,7 @@ public class XFormsSubmissionUtils {
                     if (cookies != null) {
                         for (int i = 0; i < cookies.length; i++) {
                             final String cookie = cookies[i];
-                            urlConnection.setRequestProperty("cookie", cookie);
+                            urlConnection.setRequestProperty("Cookie", cookie);
                         }
                     }
 

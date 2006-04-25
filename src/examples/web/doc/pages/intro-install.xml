@@ -814,7 +814,7 @@
                 </li>
                 <li>
                     <p>
-                        Run an modify the examples.
+                        Run and modify the examples.
                         <ul>
                             <li>Go to <code>http://localhost:8080/ops/</code></li>
                             <li>

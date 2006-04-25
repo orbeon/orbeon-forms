@@ -121,6 +121,9 @@
     <xs:complexType name="value-of-type" mixed="true">
         <xs:attribute name="select" type="xs:string" use="required"/>
     </xs:complexType>
+    <xs:complexType name="node-set-type" mixed="true">
+        <xs:attribute name="select" type="xs:string" use="required"/>
+    </xs:complexType>
     <xs:complexType name="variable-type" mixed="true">
         <xs:complexContent mixed="true">
             <xs:extension base="xupdate:EverythingContainer">
@@ -172,6 +175,7 @@
             <xs:element name="remove" type="xupdate:remove-type"/>
             <xs:element name="update" type="xupdate:update-type"/>
             <xs:element name="value-of" type="xupdate:value-of-type"/>
+            <xs:element name="node-set" type="xupdate:node-set-type"/>
             <xs:element name="variable" type="xupdate:variable-type"/>
             <xs:element name="while" type="xupdate:while-type"/>
             <xs:element name="element" type="xupdate:element-type"/>
@@ -203,6 +207,7 @@
                     <xs:element name="remove" type="xupdate:remove-type"/>
                     <xs:element name="update" type="xupdate:update-type"/>
                     <xs:element name="value-of" type="xupdate:value-of-type"/>
+                    <xs:element name="node-set" type="xupdate:node-set-type"/>
                     <xs:element name="variable" type="xupdate:variable-type"/>
                     <xs:element name="while" type="xupdate:while-type"/>
                 </xs:choice>

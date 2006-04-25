@@ -16,9 +16,8 @@
         <web-app>
             <display-name>Orbeon PresentationServer <xsl:value-of select="$version-number"/></display-name>
             <description>
-                Orbeon PresentationServer is an open-source J2EE-based platform used to build
-                XML-centric web applications with standard technologies like XForms, XSLT, and XML
-                pipelines.
+                Orbeon PresentationServer is an open source platform that uses standard XForms to make your form-based
+                web applications more user-friendly and simpler to create.
             </description>
             <xsl:comment> Initialize resource manager </xsl:comment>
             <context-param>

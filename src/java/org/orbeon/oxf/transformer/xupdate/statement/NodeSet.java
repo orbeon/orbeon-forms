@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2006 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,50 +15,43 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 
 import org.dom4j.Node;
 import org.jaxen.NamespaceContext;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.transformer.xupdate.Closure;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
-import org.orbeon.oxf.transformer.xupdate.DocumentContext;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.common.ValidationException;
 
 import javax.xml.transform.URIResolver;
 import java.util.*;
 
-public class CopyOf extends Statement {
+public class NodeSet extends Statement {
     private String select;
     private NamespaceContext namespaceContext;
 
-    public CopyOf(LocationData locationData, String select, NamespaceContext namespaceContext) {
+    public NodeSet(LocationData locationData, String select, NamespaceContext namespaceContext) {
         super(locationData);
         this.select = select;
         this.namespaceContext = namespaceContext;
     }
 
     public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
-        Object selected = Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), select, namespaceContext);
+        final Object selected = Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), select, namespaceContext);
+
         if (selected == null) {
             return Collections.EMPTY_LIST;
-        } else if (selected instanceof String || selected instanceof Number) {
-            org.dom4j.Text textNode = Dom4jUtils.createText(selected.toString());
-            return Arrays.asList(new org.dom4j.Text[]{textNode});
         } else if (selected instanceof Node) {
-            return Arrays.asList(new Node[]{(Node) ((Node) selected).clone()});
+            return Arrays.asList(new Node[]{ (Node) selected });
         } else if (selected instanceof List) {
-            List result = new ArrayList(((List) selected).size());
+//            List result = new ArrayList(((List) selected).size());
             for (Iterator i = ((List) selected).iterator(); i.hasNext();) {
                 final Object o = i.next();
-                if (o instanceof Node)
-                    result.add(((Node) o).clone());
-                else if (o instanceof String || o instanceof Number)
-                    result.add(o);
-                else
+                if (!(o instanceof Node || o instanceof List))
                     throw new ValidationException("Unsupported type: " + o.getClass().getName(), getLocationData());
+
+//                result.add(o);
             }
-            return result;
-        } else if (selected instanceof Closure) {
-            return Arrays.asList(new Closure[]{(Closure) selected});
+            return selected;
+//            return result;
         } else {
             throw new ValidationException("Unsupported type: " + selected.getClass().getName(), getLocationData());
         }

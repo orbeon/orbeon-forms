@@ -83,6 +83,8 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
                         statements.add(new ValueOf((LocationData) element.getData(), element.attributeValue("select"), namespaceContext));
                     } else if (element.getName().equals("copy-of")) {
                         statements.add(new CopyOf((LocationData) element.getData(), element.attributeValue("select"), namespaceContext));
+                    } else if (element.getName().equals("node-set")) {
+                        statements.add(new NodeSet((LocationData) element.getData(), element.attributeValue("select"), namespaceContext));
                     } else if (element.getName().equals("attribute")) {
                         statements.add(new Attribute((LocationData) element.getData(), parseQName(element),
                                 parseStatements(element.content())));

@@ -183,6 +183,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_RECALCULATE_ACTION.equals(actionEventName)) {
             // 10.1.4 The recalculate Element
 
+            // TODO: handle optional "model" attribute
             final XFormsModel model = xformsControls.getCurrentModel();
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
 

@@ -104,6 +104,12 @@
                         </li>
                     </ul>
                 </li>
+                <li>
+                    <p>
+                        The XUpdate processor now supports an extension element, <code>xu:node-set</code>, which allows
+                        functions to return node-sets. [TODO: show example, add this to XUpdate doc]
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

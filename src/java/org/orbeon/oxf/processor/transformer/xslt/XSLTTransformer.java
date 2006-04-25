@@ -576,8 +576,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 // Analyze XPath expression to find dependencies on URIs
                 if (xpathString != null) {
                     try {
-                        Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
-                        visitExpression(expression);
+                        // First, test that one of the strings is present so we don't have to parse unnecessarily
+
+                        // NOTE: We assume that function calls don't allow spaces between the function name and the
+                        // opening bracket. This seems to be what XPath 2.0 specifies, but it looke like XPath engines
+                        // seem to allow spaces.
+                        final boolean containsDocString = xpathString.indexOf("doc(") != -1 || xpathString.indexOf("document(") != -1;
+                        if (containsDocString) {
+                            final Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
+                            visitExpression(expression);
+                        }
                     } catch (XPathException e) {
                         logger.error("Original exception", e);
                         throw new ValidationException("XPath syntax exception (" + e.getMessage() + ") for expression: "

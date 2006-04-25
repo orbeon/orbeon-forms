@@ -193,6 +193,7 @@
                 </xsd:simpleType>
             </xsd:attribute>
             <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:attributeGroup name="Linking.Attributes">

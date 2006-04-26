@@ -17,6 +17,9 @@
             <config>
                 <image-directory>oxf:/examples/imageserver/</image-directory>
                 <default-quality>0.7</default-quality>
+                <cache>
+                    <directory>c:/temp/photostore2</directory>
+                </cache>
             </config>
             <image>
                 <path>ca-coast.jpg</path>

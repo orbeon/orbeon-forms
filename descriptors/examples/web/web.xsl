@@ -80,11 +80,16 @@
                 <param-value>oxf:/config/properties.xml</param-value>
             </context-param>
 
-            <xsl:comment> Set XML Server configuration file </xsl:comment>
-            <context-param>
-                <param-name>oxf.xml-server.config</param-name>
-                <param-value>oxf:/ops/xml-server/xml-server.xml</param-value>
-            </context-param>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Set XML Server configuration file'"/>
+                <xsl:with-param name="commented" select="true()"/>
+                <xsl:with-param name="content">
+                    <context-param>
+                        <param-name>oxf.xml-server.config</param-name>
+                        <param-value>oxf:/ops/xml-server/xml-server.xml</param-value>
+                    </context-param>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:comment> Set context listener processors </xsl:comment>
             <xsl:call-template name="comment">

@@ -33,7 +33,7 @@
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="1.0">
+            <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
                     <new-root>
                         <xsl:value-of select="/root/a"/>
@@ -85,7 +85,7 @@
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="1.0">
+            <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
                     <new-root>
                         <xsl:for-each select="root/y">
@@ -180,7 +180,7 @@
                 <p:processor name="oxf:xslt">
                     <p:input name="data" href="#request"/>
                     <p:input name="config">
-                        <xsl:transform version="1.0">
+                        <xsl:transform version="2.0">
                             <xsl:template match="/">
                                 <d:document>
                                     <d:body>
@@ -204,7 +204,7 @@
             <a/>
         </input>
         <input name="config">
-            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:import href="oxf:/ops/unit-tests/docbase/style.xsl"/>
             </xsl:stylesheet>
         </input>

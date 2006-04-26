@@ -113,7 +113,7 @@ public class XFormsIndexUtils {
      * @param currentControlsState
      * @param clonedElement
      */
-    public static void ajustIndexesAfterRepeat(PipelineContext pipelineContext, final XFormsControls xformsControls,
+    public static void ajustIndexesAfterInsert(PipelineContext pipelineContext, final XFormsControls xformsControls,
                                                final XFormsControls.ControlsState currentControlsState, final Element clonedElement) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
@@ -233,9 +233,9 @@ public class XFormsIndexUtils {
      * @param nestedRepeatIndexUpdates
      * @param elementToRemove
      */
-    public static void adjustIndexesAfterDelete(PipelineContext pipelineContext, final XFormsControls xformsControls,
-                                                final Map previousRepeatIdToIndex, final Map repeatIndexUpdates,
-                                                final Map nestedRepeatIndexUpdates, final Element elementToRemove) {
+    public static void adjustIndexesForDelete(PipelineContext pipelineContext, final XFormsControls xformsControls,
+                                              final Map previousRepeatIdToIndex, final Map repeatIndexUpdates,
+                                              final Map nestedRepeatIndexUpdates, final Element elementToRemove) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
         xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {

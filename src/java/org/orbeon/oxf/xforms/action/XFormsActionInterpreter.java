@@ -240,16 +240,17 @@ public class XFormsActionInterpreter {
                 // "2. The node-set binding identifies a homogeneous collection in the instance
                 // data. The final member of this collection is cloned to produce the node that will
                 // be inserted."
+                final Element sourceElement;
                 final Element clonedElement;
                 {
                     if (originAttribute == null) {
-                        final Element lastElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
-                        clonedElement = (Element) lastElement.createCopy();
+                        sourceElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
+                        clonedElement = (Element) sourceElement.createCopy();
                         XFormsUtils.setInitialDecoration(clonedElement);
                     } else {
                         xformsControls.pushBinding(pipelineContext, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
-                        final Element templateElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Element
-                        clonedElement = templateElement.createCopy();
+                        sourceElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Element
+                        clonedElement = sourceElement.createCopy();
                         XFormsUtils.setInitialDecoration(clonedElement);
                         xformsControls.popBinding();
                     }
@@ -290,6 +291,9 @@ public class XFormsActionInterpreter {
                     throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
                 }
 
+                // Prepare switches
+                XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls, sourceElement, clonedElement);
+
                 // "3. The index for any repeating sequence that is bound to the homogeneous
                 // collection where the node was added is updated to point to the newly added node.
                 // The indexes for inner nested repeat collections are re-initialized to
@@ -303,7 +307,10 @@ public class XFormsActionInterpreter {
                 final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
                 // Update repeat indexes
-                XFormsIndexUtils.ajustIndexesAfterRepeat(pipelineContext, xformsControls, currentControlsState, clonedElement);
+                XFormsIndexUtils.ajustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedElement);
+
+                // Update switches
+                XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
 
                 // "4. If the insert is successful, the event xforms-insert is dispatched."
                 containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
@@ -365,17 +372,23 @@ public class XFormsActionInterpreter {
                 // Get current repeat indexes
                 final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
 
-                // Rebuild ControlsState
-                xformsControls.rebuildCurrentControlsState(pipelineContext);
-
                 // Find updates to repeat indexes
                 final Map repeatIndexUpdates = new HashMap();
                 final Map nestedRepeatIndexUpdates = new HashMap();
-                XFormsIndexUtils.adjustIndexesAfterDelete(pipelineContext, xformsControls, previousRepeatIdToIndex,
+                XFormsIndexUtils.adjustIndexesForDelete(pipelineContext, xformsControls, previousRepeatIdToIndex,
                         repeatIndexUpdates, nestedRepeatIndexUpdates, elementToRemove);
+
+                // Prepare switches
+                XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls);
 
                 // Then only perform the deletion
                 siblingElements.remove(actualIndexInCollection);
+
+                // Rebuild ControlsState
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+                // Update switches
+                XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
 
                 // Update affected repeat index information
                 if (repeatIndexUpdates.size() > 0) {
@@ -385,7 +398,7 @@ public class XFormsActionInterpreter {
                     }
                 }
 
-                // Adjust controls ids that could have gone out of bounds
+                // Adjust indexes that could have gone out of bounds
                 adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIndexUpdates);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."

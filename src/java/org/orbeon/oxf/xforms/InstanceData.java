@@ -45,6 +45,8 @@ public class InstanceData implements Cloneable {
     private boolean previousRelevantState;
     private boolean previousReadonlyState;
 
+    private Map switchIdsToCaseIds;
+
     private int id = -1;
     private String invalidBindIds = null;
     private Map idToNodeMap;
@@ -183,6 +185,8 @@ public class InstanceData implements Cloneable {
         relevant.set(relevant.getDefaultValue());
         readonly.set(readonly.getDefaultValue());
         required.set(required.getDefaultValue(), null);
+
+        switchIdsToCaseIds = null;
     }
 
     public void clearInstanceDataEventState() {
@@ -234,6 +238,28 @@ public class InstanceData implements Cloneable {
         this.valueChanged = true;
     }
 
+    public void addSwitchIdToCaseId(String switchId, String caseId) {
+        if (switchIdsToCaseIds == null)
+            switchIdsToCaseIds = new HashMap();
+
+        switchIdsToCaseIds.put(switchId,  caseId);
+    }
+
+    public void setSwitchIdsToCaseIds(Map switchIdsToCaseIds) {
+        this.switchIdsToCaseIds = switchIdsToCaseIds;
+    }
+
+    public Map getSwitchIdsToCaseIds() {
+        return switchIdsToCaseIds;
+    }
+
+    public String getCasedIdForSwitchId(String switchId) {
+        if (switchIdsToCaseIds == null)
+            return null;
+        else
+            return (String) switchIdsToCaseIds.get(switchId);
+    }
+
     public Object clone() throws CloneNotSupportedException {
         final InstanceData result = (InstanceData) super.clone();
 
@@ -246,6 +272,10 @@ public class InstanceData implements Cloneable {
             result.type = (TypeModelItemProperty) this.type.clone();
 
             result.xxformsExternalize = (this.xxformsExternalize != null) ? (XXFormsExternalizeModelItemProperty) this.xxformsExternalize.clone() : null;
+            
+            if (this.switchIdsToCaseIds != null)
+                result.switchIdsToCaseIds = new HashMap(this.switchIdsToCaseIds);
+
         } catch (CloneNotSupportedException e) {
             // This should not happen because the classes cloned are Cloneable
             throw new OXFException(e);

@@ -197,7 +197,7 @@ public class XFormsControls {
                 initialControlsState = buildControlsState(pipelineContext);
                 currentControlsState = initialControlsState;
 
-                // Set switch state if any
+                // Set switch state if necessary
                 if (divsElement != null) {
                     for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
                         final Element divElement = (Element) i.next();
@@ -209,8 +209,17 @@ public class XFormsControls {
                     }
                 }
 
-                // Set repeat index state if any
-                setRepeatIndexState(repeatIndexesElement);
+                // Handle repeat indexes if needed
+                if (initialControlsState.isHasRepeat()) {
+                    // Get default xforms:repeat indexes beforehand
+                    getDefaultRepeatIndexes(initialControlsState);
+                    
+                    // Set external updates
+                    setRepeatIndexState(repeatIndexesElement);
+
+                    // Adjust repeat indexes
+                    XFormsIndexUtils.adjustIndexes(pipelineContext, XFormsControls.this, initialControlsState);
+                }
 
                 // Evaluate values after index state has been computed
                 initialControlsState.evaluateValueControls(pipelineContext);
@@ -835,15 +844,6 @@ public class XFormsControls {
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setValueControls(valueControls);
 
-        // Handle repeat indexes if needed
-        if (result.isHasRepeat()) {
-            // Get default xforms:repeat indexes beforehand
-            getDefaultRepeatIndexes(result);
-
-            // Adjust repeat indexes
-            XFormsIndexUtils.adjustIndexes(pipelineContext, this, result);
-        }
-
         return result;
     }
 
@@ -869,12 +869,15 @@ public class XFormsControls {
         final ControlsState result = buildControlsState(pipelineContext);
 
         // Transfer some of the previous information
-        // Keep repeat index information
         final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
         if (currentRepeatIdToIndex.size() != 0) {
+            // Keep repeat index information
             result.setRepeatIdToIndex(currentRepeatIdToIndex);
+            // Adjust repeat indexes if necessary
+            XFormsIndexUtils.adjustIndexes(pipelineContext, XFormsControls.this, result);
         }
-        // Update switch index information
+
+        // Update switch information
         final Map oldSwitchIdToSelectedCaseIdMap = currentControlsState.getSwitchIdToSelectedCaseIdMap();
         final Map newSwitchIdToSelectedCaseIdMap = result.getSwitchIdToSelectedCaseIdMap();
         {

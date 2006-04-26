@@ -1132,9 +1132,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         xformsControls.rebuildCurrentControlsState(pipelineContext);
 
         doRefresh(pipelineContext);
-
-        // Update repeat indexes if necessary
-        XFormsIndexUtils.adjustIndexes(pipelineContext, xformsControls, xformsControls.getCurrentControlsState());
     }
 
     /**

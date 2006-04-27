@@ -200,6 +200,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final Node currentNode = xformsControls.getCurrentSingleNode();
 
+                if (currentNode == null)
+                    throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
+
                 // Evaluate AVTs
                 resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
                 resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsUsername);

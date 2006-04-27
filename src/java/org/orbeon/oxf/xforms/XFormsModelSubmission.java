@@ -702,29 +702,42 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 public final void visit(Element element) {
                     final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-                    checkInstanceData(instanceData);
+                    final boolean valid = checkInstanceData(instanceData);
+
+                    instanceSatisfiesValidRequired[0] &= valid;
+
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("Found invalid element: " + element.getQName() + ", value:" + element.getText());
+                    }
                 }
 
                 public final void visit(Attribute attribute) {
                     final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-                    checkInstanceData(instanceData);
+                    final boolean valid = checkInstanceData(instanceData);
+
+                    instanceSatisfiesValidRequired[0] &= valid;
+
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("Found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
+                    }
                 }
 
-                private final void checkInstanceData(InstanceData instanceData) {
+                private final boolean checkInstanceData(InstanceData instanceData) {
                     // Check "valid" MIP
                     {
                         final BooleanModelItemProperty validMIP = instanceData.getValid();
                         if (validMIP != null && !validMIP.get())
-                            instanceSatisfiesValidRequired[0] = false;
+                            return false;
                     }
                     // Check "required" MIP
                     {
                         final ValidModelItemProperty requiredMIP = instanceData.getRequired();
                         if (requiredMIP != null && requiredMIP.get() && requiredMIP.getStringValue().length() == 0) {
                             // Required and empty
-                            instanceSatisfiesValidRequired[0] = false;
+                            return false;
                         }
                     }
+                    return true;
                 }
             });
         }

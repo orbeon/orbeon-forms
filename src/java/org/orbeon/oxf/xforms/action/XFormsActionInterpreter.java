@@ -83,10 +83,10 @@ public class XFormsActionInterpreter {
                 // Value to set is computed with an XPath expression
                 final Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
 
-                final List currentNodeset = (xformsControls.getCurrentNodeset()!= null) ?
+                final List currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0) ?
                         xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocument());
-                // NOTE: The above is actually not correct: the context should not become null. This is therefore just
-                // a workaround for a bug we hit:
+                // NOTE: The above is actually not correct: the context should not become null or empty. This is
+                // therefore just a workaround for a bug we hit:
 
                 // o Do 2 setvalue in sequence
                 // o The first one changes the context around the control containing the actions

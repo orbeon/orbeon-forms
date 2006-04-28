@@ -32,8 +32,10 @@ public abstract class TaminoProcessor extends ProcessorImpl {
     private static final Logger logger = LoggerFactory.createLogger(TaminoProcessor.class);
     private static final Map ISOLATION_DEGREE_VALUES = new HashMap();
     private static final Map LOCK_MODE_VALUES = new HashMap();
+	private static final Map LOCK_WAIT_VALUES = new HashMap();
     private static final String ISOLATION_DEGREE_PROPERTY = "oxf.tamino.isolation-degree";
     private static final String LOCK_MODE_PROPERTY = "oxf.tamino.lock-mode";
+	private static final String LOCK_WAIT_PROPERTY = "oxf.tamino.lock-wait";
 
     public static final String TAMINO_CONFIG_URI = "http://www.orbeon.org/oxf/tamino-config";
     public static final String TAMINO_QUERY_URI = "http://www.orbeon.org/oxf/tamino-query";
@@ -53,6 +55,8 @@ public abstract class TaminoProcessor extends ProcessorImpl {
         LOCK_MODE_VALUES.put("protected", TLockMode.PROTECTED);
         LOCK_MODE_VALUES.put("shared", TLockMode.SHARED);
         LOCK_MODE_VALUES.put("unprotected", TLockMode.UNPROTECTED);
+		LOCK_WAIT_VALUES.put("yes", TLockwaitMode.YES);
+		LOCK_WAIT_VALUES.put("no", TLockwaitMode.NO);
     }
 
     protected Config readConfig(Document doc) {
@@ -62,11 +66,19 @@ public abstract class TaminoProcessor extends ProcessorImpl {
         String url = XPathUtils.selectStringValueNormalize(doc, "/config/url");
         String username = XPathUtils.selectStringValueNormalize(doc, "/config/username");
         String password = XPathUtils.selectStringValueNormalize(doc, "/config/password");
+		String isolationDegree = XPathUtils.selectStringValueNormalize(doc, "/config/isolation-degree");
+		String lockMode = XPathUtils.selectStringValueNormalize(doc, "/config/lock-mode");
+		String lockWait = XPathUtils.selectStringValueNormalize(doc, "/config/lock-wait");
 
         // Override with properties if needed
         config.setUrl(url != null ? url : getPropertySet().getString(URL_PROPERTY));
         config.setUsername(username != null ? username : getPropertySet().getString(USERNAME_PROPERTY));
         config.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
+		// Set isolation and locking properties, override from global if set
+		OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+		config.setIsolationDegree(isolationDegree != null ? isolationDegree : propertySet.getString(ISOLATION_DEGREE_PROPERTY));
+		config.setLockMode(lockMode != null ? lockMode : propertySet.getString(LOCK_MODE_PROPERTY));
+		config.setLockWait(lockWait != null ? lockWait : propertySet.getString(LOCK_WAIT_PROPERTY));
 
         config.setCollection(TAccessLocation.newInstance(XPathUtils.selectStringValueNormalize(doc, "/config/collection")));
 
@@ -85,15 +97,24 @@ public abstract class TaminoProcessor extends ProcessorImpl {
 
                 // Initialize isolation degree and lock mode as set in properties
                 {
-                    OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-                    TIsolationDegree isolationDegree = (TIsolationDegree)
-                            ISOLATION_DEGREE_VALUES.get(propertySet.getString(ISOLATION_DEGREE_PROPERTY));
-                    TLockMode lockMode = (TLockMode)
-                            LOCK_MODE_VALUES.get(propertySet.getString(LOCK_MODE_PROPERTY));
+                    //OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+                    TIsolationDegree isolationDegree = (TIsolationDegree) ISOLATION_DEGREE_VALUES.get(config.getIsolationDegree());
+                            //ISOLATION_DEGREE_VALUES.get(propertySet.getString(ISOLATION_DEGREE_PROPERTY));
+					TLockMode lockMode = (TLockMode) LOCK_MODE_VALUES.get(config.getLockMode());
+                            //LOCK_MODE_VALUES.get(propertySet.getString(LOCK_MODE_PROPERTY));
+					TLockwaitMode lockWait = (TLockwaitMode)LOCK_WAIT_VALUES.get(config.getLockWait());
+					if (logger.isDebugEnabled()) {
+						logger.debug("Isolation Degree: " + config.getIsolationDegree() +
+									" Locking Mode: " + config.getLockMode() +
+									" Lock Wait Mode: " + config.getLockWait());
+					}
+					/* TEST LOGGING VALUES */
                     if (isolationDegree != null)
                         newConnection.setIsolationDegree(isolationDegree);
                     if (lockMode != null)
                         newConnection.setLockMode(lockMode);
+					if (lockWait != null)
+						newConnection.setLockwaitMode(lockWait);
                 }
 
                 final TLocalTransaction transaction = newConnection.useLocalTransactionMode();
@@ -136,6 +157,9 @@ public abstract class TaminoProcessor extends ProcessorImpl {
         private String url;
         private String username;
         private String password;
+		private String isolationDegree;
+		private String lockMode;
+		private String lockWait;
 
         public TAccessLocation getCollection() {
             return collection;
@@ -172,5 +196,38 @@ public abstract class TaminoProcessor extends ProcessorImpl {
         public String toString() {
             return url + collection.getCollection() + username;
         }
+
+		// New configuration controls for isolation and locking
+
+		public String getIsolationDegree()
+		{
+			return isolationDegree;
+		}
+
+		public void setIsolationDegree(String isolationDegree)
+		{
+			this.isolationDegree = isolationDegree;
+		}
+
+		public String getLockMode()
+		{
+			return lockMode;
+		}
+
+		public void setLockMode(String lockMode)
+		{
+			this.lockMode = lockMode;
+		}
+
+		public String getLockWait()
+		{
+			return lockWait;
+		}
+
+		public void setLockWait(String lockWait)
+		{
+			this.lockWait = lockWait;
+		}
     }
 }
+

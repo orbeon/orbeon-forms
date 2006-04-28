@@ -45,7 +45,7 @@
                 <title>Configuration</title>
                 <p>
                     All Tamino processors have a common <code>config</code> input, describing the
-                    database connection and collection.
+                    database connection, collection and how it is handled.
                 </p>
                 <p>
                     The configuration of the Tamino processors can be done in two ways: either
@@ -66,9 +66,9 @@
                     </title>
                     <p>
                         The <code>config</code> input document specifies the URL of the Tamino
-                        server, the credentials to use when connecting and the collection to
-                        access. The following table describes the configuration elements.
-                    </p>
+                        server, the credentials to use when connecting, the collection to
+                           access, isolation degree and locking modes. The following table describes the configuration elements.
+                 </p>
                     <p>
                         <table ca="|l|p{0.6\textwidth}|">
                             <tr>
@@ -99,6 +99,34 @@
                                 </td>
                                 <td>XML Collection to use</td>
                             </tr>
+                            <tr>
+                                <td>
+                                    <code>isolation-degree</code>
+                                </td>
+                                <td>Type of isolation degree used (optional). One of<br/><code>
+                                    uncommittedDocument<br/>
+                                    committedCommand<br/>
+                                    serializable<br/>
+                                    stableDocument<br/>
+                                    stableCursor</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>lock-mode</code>
+                                </td>
+                                <td>Type of locking mode used (optional). One of<br/><code>
+                                    protected<br/>
+                                    shared<br/>
+                                    unprotected</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>lock-wait</code>
+                                </td>
+                                <td>'yes' if the query should wait for locked records to become free. (optional)</td>
+                            </tr>
                         </table>
                     </p>
                     <p>
@@ -127,6 +155,34 @@
                                 <element name="collection">
                                     <data type="string"/>
                                 </element>
+                                <optional>
+                                    <element name="isolation-degree">
+                                        <choice>
+                                            <value>uncommittedDocument</value>
+                                            <value>committedCommand</value>
+                                            <value>stableCursor</value>
+                                            <value>stableDocument</value>
+                                            <value>serializable</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="lock-mode">
+                                        <choice>
+                                            <value>unprotected</value>
+                                            <value>shared</value>
+                                            <value>protected</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="lock-wait">
+                                        <choice>
+                                            <value>yes</value>
+                                            <value>no</value>
+                                        </choice>
+                                    </element>
+                                </optional>
                             </interleave>
                         </element>
                     </xml-source>
@@ -211,6 +267,14 @@
                                 documentation for more details on the lock mode.
                             </td>
                         </tr>
+                        <tr>
+                            <td><code>oxf.tamino.lock-wait</code></td>
+                            <td><code>string</code></td>
+                            <td>
+                                Lock Wait Mode. If 'yes' then the query will wait for locked
+                                records to become free before returning the results.
+                            </td>
+                        </tr>
                     </table>
                     <p>
                         These properties as set as follows:
@@ -218,6 +282,7 @@
                     <xml-source>
                         <property as="xs:string" name="oxf.tamino.isolation-degree" value="..."/>
                         <property as="xs:string" name="oxf.tamino.lock-mode" value="..."/>
+                        <property as="xs:string" name="oxf.tamino.lock-wait" value="..."/>
                     </xml-source>
                 </section>
             </section>

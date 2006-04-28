@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
@@ -66,6 +67,9 @@ public class XFormsSubmissionUtils {
                                 effectiveResourceURI, method.toUpperCase());
                     }
                 }
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - dispatching to effective resource URI: " + effectiveResourceURI);
 
                 final ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                 final XFormsModelSubmission.ConnectionResult connectionResult = new XFormsModelSubmission.ConnectionResult(effectiveResourceURI) {
@@ -137,6 +141,9 @@ public class XFormsSubmissionUtils {
             // https SHOULD be supported
             // file SHOULD be supported
             try {
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - opening URL connection for: " + submissionURL.toExternalForm());
+
                 final URLConnection urlConnection = submissionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
                 if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
@@ -235,7 +242,7 @@ public class XFormsSubmissionUtils {
             final String actionString;
             {
                 final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                if (searchString != null) {
+                if (searchString != null && searchString.length() > 0) {
                     if (action.indexOf('?') == -1)
                         updatedActionStringBuffer.append('?');
                     else

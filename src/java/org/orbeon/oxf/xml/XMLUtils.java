@@ -321,13 +321,12 @@ public class XMLUtils {
     }
 
     public static Attributes stripNamespaceAttributes(Attributes attributes) {
-        final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
         for (int i = 0; i < attributes.getLength(); i++) {
-            if (XMLNS_URI.equals(attributes.getURI(i)) || "xmlns".equals(attributes.getLocalName(i))) {
+            if (XMLConstants.XMLNS_URI.equals(attributes.getURI(i)) || "xmlns".equals(attributes.getLocalName(i))) {
                 // Found at least one, strip
                 AttributesImpl newAttributes = new AttributesImpl();
                 for (int j = 0; j < attributes.getLength(); j++) {
-                    if (!XMLNS_URI.equals(attributes.getURI(j)) && !"xmlns".equals(attributes.getLocalName(j)))
+                    if (!XMLConstants.XMLNS_URI.equals(attributes.getURI(j)) && !"xmlns".equals(attributes.getLocalName(j)))
                         newAttributes.addAttribute(attributes.getURI(j), attributes.getLocalName(j),
                                 attributes.getQName(j), attributes.getType(j), attributes.getValue(j));
                 }

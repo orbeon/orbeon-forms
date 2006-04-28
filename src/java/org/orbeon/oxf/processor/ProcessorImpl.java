@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import orbeon.apache.xerces.xni.NamespaceContext;
 import orbeon.apache.xml.utils.DOMBuilder;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
@@ -38,6 +37,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -383,9 +383,9 @@ public abstract class ProcessorImpl implements Processor {
                 for (Iterator i = prefixes.iterator(), j = uris.iterator(); i.hasNext();) {
                     String prefix = (String) i.next();
                     String uri = (String) j.next();
-                    String currentURI = currentElement.getAttributeNS(NamespaceContext.XMLNS_URI, prefix);
+                    String currentURI = currentElement.getAttributeNS(XMLConstants.XMLNS_URI, prefix);
                     if (currentURI == null || "".equals(currentURI)) {
-                        currentElement.setAttributeNS(NamespaceContext.XMLNS_URI, "xmlns:" + prefix, uri);
+                        currentElement.setAttributeNS(XMLConstants.XMLNS_URI, "xmlns:" + prefix, uri);
                     } else if (!currentURI.equals(uri)) {
                         throw new OXFException("Different URI for same prefix '" + prefix + "'");
                     }

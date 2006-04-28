@@ -570,7 +570,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             // Forward redirect
                             response.setStatus(connectionResult.resultCode);
-
+                            
                         } else {
                             // Error code received
                             throw new OXFException("Error code received when submitting instance: " + connectionResult.resultCode);

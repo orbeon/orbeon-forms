@@ -541,6 +541,8 @@ ul {
     width: 100%;
 }
 
+.ops-portlet-div { text-align: left; margin: 1em }
+
 @media print {
     #orbeon-logo { display: none }
     #main { border: none; }

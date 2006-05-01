@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -24,6 +25,8 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -78,9 +81,14 @@ public class XHTMLBodyHandler extends HandlerBase {
         final boolean hasUpload = xformsControls.getCurrentControlsState().isHasUpload();
 
         // Create xhtml:form
+        final String xformsSubmissionPath = OXFProperties.instance().getPropertySet(
+                new QName("page-flow", XMLConstants.OXF_PROCESSORS_NAMESPACE)).getString(
+                PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
+                PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
+
         helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[]{
                 "id", "xforms-form", "class", "xforms-form",
-                "action", "/xforms-server-submit", "method", "POST", "onsubmit", "return false",
+                "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
         // Store private information used by the client-side JavaScript

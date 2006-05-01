@@ -63,8 +63,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
     private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
     private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
-    private static final String XFORMS_SUBMISSION_PATH_PROPERTY_NAME = "xforms-submission-path";
     private static final String XFORMS_SUBMISSION_MODEL_PROPERTY_NAME = "xforms-submission-model";
+
+    public static final String XFORMS_SUBMISSION_PATH_PROPERTY_NAME = "xforms-submission-path";
+    public static final String XFORMS_SUBMISSION_PATH_DEFAULT_VALUE = "/xforms-server-submit";
 
     static {
         Element trueConfigElement = new NonLazyUserDataElement( "config");
@@ -120,7 +122,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                 // XForms Submission page
                 {
-                    final String xformsSubmissionPath = getPropertySet().getString(XFORMS_SUBMISSION_PATH_PROPERTY_NAME);
+                    final String xformsSubmissionPath = getPropertySet().getString(XFORMS_SUBMISSION_PATH_PROPERTY_NAME, XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
                     final String xformsSubmissionModel = getPropertySet().getStringOrURIAsString(XFORMS_SUBMISSION_MODEL_PROPERTY_NAME);
                     if ((xformsSubmissionPath == null && xformsSubmissionModel != null) || (xformsSubmissionPath != null && xformsSubmissionModel == null)) {
                         throw new OXFException("Only one of properties " + XFORMS_SUBMISSION_PATH_PROPERTY_NAME + " and " + XFORMS_SUBMISSION_MODEL_PROPERTY_NAME + " is set.");

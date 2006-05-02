@@ -140,7 +140,8 @@ public class JavaProcessor extends ProcessorImpl {
                 state.bottomInputs.put(outputName, bottomInput);
             }
 
-            // Start processor if required
+            // Reset and start processor if required
+            processor.reset(context);
             if (!hasOutputs) {
                 processor.start(context);
             }

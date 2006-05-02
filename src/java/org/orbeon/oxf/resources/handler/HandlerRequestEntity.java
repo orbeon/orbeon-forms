@@ -29,7 +29,7 @@ public class HandlerRequestEntity implements RequestEntity {
     }
 
     public boolean isRepeatable() {
-        return false;
+        return true;
     }
 
     public void writeRequest(OutputStream out) throws IOException {

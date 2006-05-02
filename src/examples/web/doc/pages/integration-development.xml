@@ -1,0 +1,76 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+	<header>
+		<title>Development</title>
+	</header>
+	<body>
+		<section>
+			<title>Scope</title>
+			<p>
+                This section
+            </p>
+		</section>
+        <section>
+            <title>Getting The Source</title>
+            <p>
+                The source code of PresentationServer is available on the CVS repository hosted by
+                ObjectWeb. To checkout the source code on your local machine, follow the
+                instructions provided on <a href="http://forge.objectweb.org/scm/?group_id=168">the
+                project CVS page</a> under the <i>Anonymous CVS Access</i>.
+            </p>
+        </section>
+        <section>
+            <title>Building With Ant</title>
+            <p>
+                We build PresentationServer with Ant. The Ant configuration file (build.xml) is
+                located at the root of the source directory. You can start Ant from the command line
+                or if you are using an IDE like Eclipse or IntelliJ, use the builtin Ant support
+                provided by your IDE. The PresentationServer build.xml defines a number of targets,
+                but only a few are used frequently:
+            </p>
+            <ul>
+                <li>
+                    <p><b>orbeon-war</b>: Build PresentationServer and creates an exploded war file in the
+                    directory <tt>build/ops-war</tt>. To test your modifications to the
+                    PresentationServer code, you will typically run a Tomcat with a context pointing
+                    to that directory. That context, defined in Tomcat's server.xml will typically
+                    look like:</p>
+
+                    <p><tt>&lt;Context crossContext="true" debug="0" docBase="path to your
+                    source/build/ops-war" path="/ops" reloadable="false"/></tt></p>
+                </li>
+                <li>
+                    <p><b>orbeon-dist-war</b>: This will build a "distribution" war file, which is
+                    equivalent to the war file created by our automated build system and uploaded to
+                    the "unstable builds" <a
+                    href="http://forge.objectweb.org/nightlybuilds/ops/ops/">directory</a>. The
+                    produced file will be located in <tt>build/distrib/ops.war</tt></p>
+                </li>
+                <li>
+                    
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Compiling Java Files From Your IDE</title>
+            <p>
+                You can build PresentationServer
+            </p>
+        </section>
+    </body>
+</document>

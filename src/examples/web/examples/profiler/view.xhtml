@@ -1,35 +1,83 @@
 <xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <xhtml:head>
         <xhtml:style type="text/css">
-            .info      { font-size: 10px; color: #aaa; }
-            .even-line { background: #ffb ; }
-            .odd-line  { background: #ddf; }
-            .label     { font-style: italic; }
+            .url             { padding-left: 2em; padding-top: 1em; }
+            .change          { padding-left: 2em; }
+            .reports         { padding-top: 1em; }
+            .report-list     { padding-left: 1em; padding-top: 1em; }
+            .url-input input { width: 20em; }
         </xhtml:style>
         <xforms:model>
             <xforms:instance id="hprof">
-                <empty/>
+                <config>
+                    <url>http://...</url>
+                    <content-type>text/plain</content-type>
+                </config>
             </xforms:instance>
             <xforms:instance id="ui">
-                <ui upload-section=""/>
+                <ui>
+                    <url-set>false</url-set>
+                </ui>
             </xforms:instance>
-            <xforms:bind nodeset="instance('ui')">
-                <xforms:bind nodeset="@upload" relevant="instance('hprof')/empty"/>
-            </xforms:bind>
+            <xforms:submission method="post" action="hotspots" ref="instance('hprof')" id="hotspots"/>
+            <xforms:submission method="post" action="functionality" ref="instance('hprof')" id="functionality"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:h1>Java Profiling</xhtml:h1>
-        <xhtml:ul>
-            <xhtml:li><xhtml:a href="hotspots">Hotspots</xhtml:a></xhtml:li>
-            <xhtml:li><xhtml:a href="functionality">Split by functionality</xhtml:a></xhtml:li>
-        </xhtml:ul>
-        <xhtml:table class="gridtable">
-            <xsl:copy-of select="f:display-methods(/analysis/method, 1)"/>
-        </xhtml:table>
+        <xhtml:ol>
+            <xhtml:li>
+                Specify URL that point to your hprof.txt
+                <xhtml:div class="url">
+                    <xforms:group ref=".[instance('ui')/url-set = 'false']">
+                        <xforms:input ref="instance('hprof')/url" class="url-input"/>
+                        <xforms:trigger>
+                            <xforms:label>Set</xforms:label>
+                            <xforms:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">true</xforms:setvalue>
+                        </xforms:trigger>
+                    </xforms:group>
+                    <xforms:group ref=".[instance('ui')/url-set = 'true']">
+                        <xforms:output ref="instance('hprof')/url"/>
+                        <xhtml:span class="change">
+                            [
+                            <xforms:trigger appearance="xxforms:link">
+                                <xforms:label>Change</xforms:label>
+                                <xforms:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">false</xforms:setvalue>
+                            </xforms:trigger>
+                            ]
+                        </xhtml:span>
+                    </xforms:group>
+                </xhtml:div>
+            </xhtml:li>
+            <xhtml:li class="reports">
+                See report based on specified data:
+                <xhtml:div  class="report-list">
+                    <xforms:group ref=".[instance('ui')/url-set = 'false']">
+                        Specify URL first.
+                    </xforms:group>
+                    <xforms:group ref=".[instance('ui')/url-set = 'true']">
+                        <xhtml:ul>
+                            <xhtml:li>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label>Hotspots</xforms:label>
+                                    <xforms:send submission="hotspots" ev:event="DOMActivate"/>
+                                </xforms:trigger>
+                            </xhtml:li>
+                            <xhtml:li>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label>Split by functionality</xforms:label>
+                                    <xforms:send submission="functionality" ev:event="DOMActivate"/>
+                                </xforms:trigger>
+                            </xhtml:li>
+                        </xhtml:ul>
+                    </xforms:group>
+                </xhtml:div>
+            </xhtml:li>
+        </xhtml:ol>
     </xhtml:body>
 </xhtml:html>

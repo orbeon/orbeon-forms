@@ -1,0 +1,93 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+        xmlns:orbeon="http://www.orbeon.com/"
+        xmlns:flickr="urn:flickr">
+
+    <xhtml:head>
+        <xhtml:title>Flickr Spell</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="input">
+                <input>
+                    <text/>
+                    <seed>1</seed>
+                </input>
+            </xforms:instance>
+            <xforms:instance id="images">
+                <images/>
+            </xforms:instance>
+            <xforms:submission ref="instance('input')" id="spell"
+                method="post" action="/direct/flickr-spell/spell"
+                replace="instance" instance="images"/>
+            <xforms:bind nodeset="instance('images')" relevant="instance('input')/text != ''"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:ul>
+            <xhtml:li>
+                <xhtml:p>
+                    <xhtml:b>Usage.</xhtml:b> Enter some text and we'll pull for each letter a random
+                    image from <xhtml:a href="http://flickr.com/">Flickr</xhtml:a>.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    <xhtml:b>Implementation.</xhtml:b> The UI an interaction with the server is
+                    implemented 100% in XForms. The <xhtml:a href="/goto-source/flickr-spell/view.xhtml"
+                    f:url-type="resource">XForms UI</xhtml:a> sends the text you type in an XML
+                    document to the server which responds with an XML document that contains link to the
+                    images. The <xhtml:a href="/goto-source/flickr-spell/spell.xpl"
+                    f:url-type="resource">server-side code</xhtml:a> is implemented in an <xhtml:a
+                    href="http://www.w3.org/Submission/xpl/">XPL pipeline</xhtml:a>, calls a web service
+                    provided to Flickr and caches the response to avoid sending the same query over and
+                    over to the Flickr.
+                </xhtml:p>
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:p>
+                    <xhtml:b>Credits.</xhtml:b> All the credits go to <xhtml:a
+                    href="http://metaatem.net/">kastner</xhtml:a>, who was the first to <xhtml:a
+                    href="http://metaatem.net/words/">implement</xhtml:a> this cool idea ;). And thanks
+                    to Flickr for being so open with their web services.
+                </xhtml:p>
+            </xhtml:li>
+        </xhtml:ul>
+        <xforms:group>
+            <xhtml:p>
+                <xforms:input ref="instance('input')/text" incremental="true">
+                    <xforms:label>Type here: </xforms:label>
+                    <xforms:send submission="spell" ev:event="xforms-value-changed"/>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="instance('images')" mediatype="text/html"/>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:trigger ref="instance('images')">
+                    <xforms:label>Change letters!</xforms:label>
+                    <xforms:action  ev:event="DOMActivate">
+                        <xforms:setvalue ref="instance('input')/seed" value="instance('input')/seed + 1"/>
+                        <xforms:send submission="spell"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:p>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

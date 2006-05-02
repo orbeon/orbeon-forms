@@ -47,10 +47,10 @@ import java.util.*;
 
 /**
  * Generates SAX events from a document fetched from an URL.
- * <p/>
+ * 
  * NOTE: For XML content-type and encoding related questions, check out the following draft
  * document:
- * <p/>
+ *
  * http://www.faqs.org/rfcs/rfc3023.html
  * http://www.ietf.org/internet-drafts/draft-murata-kohn-lilley-xml-00.txt
  */

@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * NOTE: This generator depends on the Servlet API.
+ * NOTE: This processor depends on the Servlet API.
  */
 public class ServletFilterGenerator extends ProcessorImpl {
 

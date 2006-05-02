@@ -101,7 +101,8 @@ public class XFormsTriggerHandler extends HandlerBase {
                 // Add @src attribute
                 newAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, xxformsImgAttributes.getValue("src"));
 
-                // Copy everything else except @src and @alt
+                // Copy everything else except @src, @alt, and @id
+                // NOTE: It is not 100% clear what attributes make sense for propagation.
                 for (int i = 0; i < xxformsImgAttributes.getLength(); i++) {
                     final String attributeURI = xxformsImgAttributes.getURI(i);
                     final String attributeValue = xxformsImgAttributes.getValue(i);
@@ -109,7 +110,7 @@ public class XFormsTriggerHandler extends HandlerBase {
                     final String attributeQName = xxformsImgAttributes.getQName(i);
                     final String attributeLocalname = xxformsImgAttributes.getLocalName(i);
 
-                    if (!(uri.equals("") && (localname.equals("src") || localname.equals("alt"))))
+                    if (!(attributeURI.equals("") && (attributeLocalname.equals("src") || attributeLocalname.equals("alt")) || attributeLocalname.equals("id")))
                         newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
                 }
 

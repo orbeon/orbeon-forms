@@ -220,8 +220,8 @@
                             <!-- Remove due date -->
                             <xforms:group ref="@ui:remove-due-trigger" class="actions-action" id="todo-action-remove-group">
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"/>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xxforms:img src="/images/date-remove.gif" id="todo-action-remove-image"/>
+                                <xforms:trigger appearance="xxforms:image" id="todo-action-remove-image">
+                                    <xxforms:img src="/images/date-remove.gif"/>
                                     <xforms:label>Remove due date</xforms:label>
                                 </xforms:trigger>
                                 <xforms:trigger appearance="xxforms:link" id="todo-action-remove-label">

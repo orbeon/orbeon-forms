@@ -26,6 +26,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -46,6 +47,7 @@ public class JavaProcessor extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(JavaProcessor.class);
     private final static String PATH_SEPARATOR = System.getProperty("path.separator");
+    private final static ExpirationMap lastModifiedMap = new ExpirationMap(1000);
 
     public static final String JARPATH_PROPERTY = "jarpath";
     public static final String CLASSPATH_PROPERTY = "classpath";
@@ -182,7 +184,24 @@ public class JavaProcessor extends ProcessorImpl {
             String sourceFile = config.sourcepath + "/" + config.clazz.replace('.', '/') + ".java";
             String destinationDirectory = SystemUtils.getTemporaryDirectory().getAbsolutePath();
             String destinationFile = destinationDirectory + "/" + config.clazz.replace('.', '/') + ".class";
-            boolean fileUpToDate = new File(sourceFile).lastModified() < new File(destinationFile).lastModified();
+
+            // Check if file is up-to-date
+            long currentTimeMillis = System.currentTimeMillis();
+            Long sourceLastModified;
+            Long destinationLastModified;
+            synchronized (lastModifiedMap) {
+                sourceLastModified = (Long) lastModifiedMap.get(currentTimeMillis, sourceFile);
+                if (sourceLastModified == null) {
+                    sourceLastModified = new Long(new File(sourceFile).lastModified());
+                    lastModifiedMap.put(currentTimeMillis, sourceFile, sourceLastModified);
+                }
+                destinationLastModified = (Long) lastModifiedMap.get(currentTimeMillis, destinationFile);
+                if (destinationLastModified == null) {
+                    destinationLastModified = new Long(new File(destinationFile).lastModified());
+                    lastModifiedMap.put(currentTimeMillis, destinationFile, destinationLastModified);
+                }
+            }
+            boolean fileUpToDate = sourceLastModified.longValue() < destinationLastModified.longValue();
 
             // Compile
             if (!fileUpToDate) {

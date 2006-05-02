@@ -1439,11 +1439,13 @@ public abstract class ProcessorImpl implements Processor {
     /**
      * Implementation of a caching transformer output that assumes that an output depends on a set
      * of URIs associated with an input document.
+     *
+     * Usage: an URIReferences object must be cached as an object associated with the config input.
      */
     public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         private String configInputName;
-        private URIReferences localConfigURIReferences;
+        private URIReferences localConfigURIReferences; // TODO: NIY
 
         public URIProcessorOutputImpl(Class clazz, String name, String configInputName) {
             super(clazz, name);
@@ -1472,6 +1474,8 @@ public abstract class ProcessorImpl implements Processor {
             if (uriReferences.getReferences() != null) {
                 for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
                     final URIReference uriReference = (URIReference) i.next();
+                    if (uriReference == null)
+                        return null;
                     keys.add(getURIKey(pipelineContext, uriReference));
                 }
             }
@@ -1502,6 +1506,8 @@ public abstract class ProcessorImpl implements Processor {
             if (uriReferences.getReferences() != null) {
                 for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
                     final URIReference uriReference = (URIReference) i.next();
+                    if (uriReference == null)
+                        return null;
                     validities.add(getURIValidity(pipelineContext, uriReference));
                 }
             }
@@ -1622,7 +1628,19 @@ public abstract class ProcessorImpl implements Processor {
         public void addReference(String context, String spec) {
             if (references == null)
                 references = new ArrayList();
+            
             references.add(new URIReference(context, spec));
+        }
+
+        public void setNoCache() {
+            // Make sure we have an empty list of references
+            if (references == null)
+                references = new ArrayList();
+            else
+                references.clear();
+
+            // Store a null reference to prevent caching
+            references.add(null);
         }
 
         public List getReferences() {

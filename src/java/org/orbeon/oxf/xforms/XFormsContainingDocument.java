@@ -56,9 +56,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsControls xformsControls;
     private String containerType;
     private String stateHandling;
+    private String baseURI;
 
     // Client state
     private XFormsModelSubmission activeSubmission;
+    private boolean gotSubmission;
     private List messages;
     private List loads;
     private String focusEffectiveControlId;
@@ -66,15 +68,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(models, controlsDocument, null, null, null);
+        this(models, controlsDocument, null, null, null, null);
     }
 
-    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement, String containerType, String stateHandling) {
+    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement,
+                                    String containerType, String stateHandling, String baseURI) {
 
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
         this.containerType = containerType;
         this.stateHandling = stateHandling;
+        this.baseURI = baseURI;
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
@@ -98,6 +102,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsModel getModel(String modelId) {
         return (XFormsModel) ("".equals(modelId) ? models.get(0) : modelsMap.get(modelId));
+    }
+
+    /**
+     * Return the document base URI.
+     */
+    public String getBaseURI() {
+        return baseURI;
     }
 
     /**
@@ -174,6 +185,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public void clearClientState() {
         this.activeSubmission = null;
+        this.gotSubmission = false;
         this.messages = null;
         this.loads = null;
         this.focusEffectiveControlId = null;
@@ -188,6 +200,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (this.activeSubmission != null)
             throw new OXFException("There is already an active submission.");
         this.activeSubmission = activeSubmission;
+    }
+
+    public boolean isGotSubmission() {
+        return gotSubmission;
+    }
+
+    public void setGotSubmission(boolean gotSubmission) {
+        this.gotSubmission = gotSubmission;
     }
 
     /**

@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -232,7 +233,8 @@ public class XFormsServer extends ProcessorImpl {
 
             // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
-                outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler, requestPageGenerationId, externalContext, xformsState);
+                outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
+                        requestPageGenerationId, externalContext, xformsState);
             }
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
@@ -262,8 +264,11 @@ public class XFormsServer extends ProcessorImpl {
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         sentEventCount[0]++;
     }
+ 
+    private void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
+                                PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
+                                ExternalContext externalContext, XFormsState xformsState) {
 
-    private void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds, PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId, ExternalContext externalContext, XFormsState xformsState) {
         final XFormsControls xFormsControls = containingDocument.getXFormsControls();
         xFormsControls.rebuildCurrentControlsState(pipelineContext);
         final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
@@ -993,8 +998,10 @@ public class XFormsServer extends ProcessorImpl {
                     : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
         }
 
+        final String baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
+
         final XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement,
-                staticStateDocument.getRootElement().attributeValue("container-type"), stateHandling);
+                staticStateDocument.getRootElement().attributeValue("container-type"), stateHandling, baseURI);
 
         // Get instances
         boolean isInitializeEvent;
@@ -1027,7 +1034,7 @@ public class XFormsServer extends ProcessorImpl {
 //                    final Document instanceDocument = Dom4jUtils.createDocument();
 //                    instanceDocument.add(instanceElement.detach());
                     Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
-                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument);
+                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
 
                     currentCount++;
                     foundInstancesCount++;

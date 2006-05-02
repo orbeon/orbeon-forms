@@ -258,10 +258,6 @@ public class XFormsControls {
         contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, null, true, null));
     }
 
-    public Document getControlsDocument() {
-        return controlsDocument;
-    }
-
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
     }

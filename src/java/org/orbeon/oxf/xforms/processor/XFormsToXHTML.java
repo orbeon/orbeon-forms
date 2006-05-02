@@ -19,20 +19,15 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.*;
-import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.util.Iterator;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -43,12 +38,12 @@ public class XFormsToXHTML extends ProcessorImpl {
     static public Logger logger = XFormsServer.logger;
 
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
-    private static final String INPUT_STATIC_STATE = "static-state";
+//    private static final String INPUT_STATIC_STATE = "static-state";
     private static final String OUTPUT_DOCUMENT = "document";
 
     public XFormsToXHTML() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_ANNOTATED_DOCUMENT));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_STATIC_STATE));
+//        addInputInfo(new ProcessorInputOutputInfo(INPUT_STATIC_STATE));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DOCUMENT));
     }
 
@@ -56,7 +51,7 @@ public class XFormsToXHTML extends ProcessorImpl {
      * Case where an XML response must be generated.
      */
     public ProcessorOutput createOutput(final String outputName) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), outputName) {
+        ProcessorOutput output = new ProcessorImpl.URIProcessorOutputImpl(getClass(), outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler);
             }
@@ -69,30 +64,97 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        // XForms containing document
-        final XFormsContainingDocument containingDocument;
-        // This is the state after XForms initialization
-        final XFormsServer.XFormsState xformsState;
-        {
-            final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
-            final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
-            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, staticStateDocument);
+        // What can be cached: URI dependencies + the annotated XForms document
+        class Result extends URIReferences {
+            private SAXStore annotatedSAXStore;
 
-            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument, new boolean[1]);
-            xformsState = new XFormsServer.XFormsState(initialXFormsState.getStaticState(), XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument));
+            public Result(SAXStore annotatedSAXStore) {
+                this.annotatedSAXStore = annotatedSAXStore;
+            }
+
+            public SAXStore getAnnotatedSAXStore() {
+                return annotatedSAXStore;
+            }
         }
 
+        // ContainingDocument and XFormsState created below
+        final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
+        final XFormsServer.XFormsState[] xformsState = new XFormsServer.XFormsState[1];
+
+        // Read and try to cache the complete XForms+XHTML document with annotations
+        final Result result = (Result) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
+            public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+
+                // Compute two SAXStores in one pass: annotated XForms document + static state document
+                final SAXStore staticStateSAXStore = new SAXStore();
+                final SAXStore annotatedSAXStore = new SAXStore(new XFormsExtractor.XFormsExtractorContentHandler(pipelineContext, staticStateSAXStore));
+                readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
+
+                final Result result = new Result(annotatedSAXStore);
+
+                // Create document here so we can do appropriate analysis of caching dependencies
+                createCacheContainingDocument(pipelineContext, staticStateSAXStore, containingDocument, xformsState);
+
+                // If a submission took place during XForms initialization, we currently don't cache
+                // TODO: Some cases could be easily handled, like GET
+                if (containingDocument[0].isGotSubmission()) {
+                    result.setNoCache();
+                    return result;
+                }
+
+                // Set caching dependencies if the input was actually read
+                for (Iterator i = containingDocument[0].getModels().iterator(); i.hasNext();) {
+                    final XFormsModel currentModel = (XFormsModel) i.next();
+
+                    // Add schema dependencies
+                    final String schemaURI = currentModel.getSchemaURI();
+                    if (schemaURI != null) {
+                        if (logger.isDebugEnabled())
+                            logger.debug("XForms - adding document cache dependency for schema: " + schemaURI);
+                        result.addReference(containingDocument[0].getBaseURI(), schemaURI);
+                    }
+
+                    // Add instance source dependencies
+                    for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                        final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                        final String instanceSourceURI = currentInstance.getInstanceSourceURI();
+                        if (instanceSourceURI != null) {
+                            if (logger.isDebugEnabled())
+                                logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
+                            result.addReference(containingDocument[0].getBaseURI(), instanceSourceURI);
+                        }
+                    }
+
+                    // TODO: Add @src attributes from controls
+                }
+
+                return result;
+            }
+        });
+
         try {
+            // Create containing document if not done yet
+            if (containingDocument[0] == null) {
+                logger.debug("XForms - annotated document not cached, creating.");
+
+                final SAXStore staticStateSAXStore = new SAXStore();
+                result.getAnnotatedSAXStore().replay(new XFormsExtractor.XFormsExtractorContentHandler(pipelineContext, staticStateSAXStore));
+
+                createCacheContainingDocument(pipelineContext, staticStateSAXStore, containingDocument, xformsState);
+            } else {
+                logger.debug("XForms - using cached annotated document.");
+            }
+
             // Output resulting document
-            outputResponse(pipelineContext, externalContext, containingDocument, contentHandler, xformsState);
+            outputResponse(pipelineContext, externalContext, result.annotatedSAXStore, containingDocument[0], contentHandler, xformsState[0]);
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
-            final ObjectPool sourceObjectPool = containingDocument.getSourceObjectPool();
+            final ObjectPool sourceObjectPool = containingDocument[0].getSourceObjectPool();
             if (sourceObjectPool != null) {
                 logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
                 try {
                     sourceObjectPool.invalidateObject(containingDocument);
-                    containingDocument.setSourceObjectPool(null);
+                    containingDocument[0].setSourceObjectPool(null);
                 } catch (Exception e1) {
                     throw new OXFException(e1);
                 }
@@ -101,7 +163,51 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext, final XFormsContainingDocument containingDocument, final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState) {
+    private void createCacheContainingDocument(PipelineContext pipelineContext, SAXStore staticStateSAXStore,
+                                               XFormsContainingDocument[] containingDocument, XFormsServer.XFormsState[] xformsState) {
+
+        // This is the state after XForms initialization
+        boolean[] requireClientSubmission = new boolean[1];
+        {
+            final XFormsServer.XFormsState initialXFormsState
+                    = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateSAXStore, XFormsUtils.getEncryptionKey()), "");
+
+            // TODO FIXME TEMP XXX
+            final Document staticStateDocument = TransformerUtils.saxStoreToDom4jDocument(staticStateSAXStore);
+            containingDocument[0] = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, staticStateDocument);
+
+            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0], requireClientSubmission);
+            xformsState[0] = new XFormsServer.XFormsState(initialXFormsState.getStaticState(), XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument));
+        }
+
+        // Cache document if requested and possible
+        {
+            if (XFormsUtils.isCacheDocument()) {
+                if (!requireClientSubmission[0]) {
+                    // NOTE: We check on requireClientSubmission because the event is encoded
+                    // in the dynamic state. But if we stored the event separately, then we
+                    // could still cache the containing document.
+                    XFormsServerDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
+                } else {
+                    // Since we cannot cache the result, we have to get the object out of its current pool
+                    final ObjectPool objectPool = containingDocument[0].getSourceObjectPool();
+                    if (objectPool != null) {
+                        logger.debug("XForms - containing document cache: discarding non-cacheable document from pool.");
+                        try {
+                            objectPool.invalidateObject(containingDocument);
+                            containingDocument[0].setSourceObjectPool(null);
+                        } catch (Exception e1) {
+                            throw new OXFException(e1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext,
+                                final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
+                                final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState) throws SAXException {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
@@ -173,6 +279,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, externalContext));
 
         // Process everything
-        readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT, controller);
+        annotatedDocument.replay(controller);
     }
 }

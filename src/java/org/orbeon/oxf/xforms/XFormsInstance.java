@@ -46,14 +46,16 @@ public class XFormsInstance implements XFormsEventTarget {
 
     private PipelineContext pipelineContext;
     private String id;
+    private String instanceSourceURI;
     private XFormsModel model;
     private Document instanceDocument;
 
     private DocumentXPathEvaluator documentXPathEvaluator;
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.id = id;
+        this.instanceSourceURI = instanceSourceURI;
         this.model = model;
         setInstanceDocument(instanceDocument, true);
     }
@@ -63,6 +65,10 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public Document getInstanceDocument() {
         return instanceDocument;
+    }
+
+    public String getInstanceSourceURI() {
+        return instanceSourceURI;
     }
 
     /**
@@ -333,7 +339,7 @@ public class XFormsInstance implements XFormsEventTarget {
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null);
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, null);
     }
 
     private static ExternalContext.Request getRequest(PipelineContext context) {

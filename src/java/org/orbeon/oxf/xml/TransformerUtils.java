@@ -19,9 +19,9 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.w3c.dom.Node;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
@@ -267,6 +267,25 @@ public class TransformerUtils {
         Transformer identity = getIdentityTransformer();
         LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.transform(new DOMSource(node), documentResult);
+        return documentResult.getDocument();
+    }
+
+    /**
+     * Transform a SAXStore into a dom4j document
+     *
+     * @param   SAXStore input SAXStore
+     * @return  dom4j document
+     * @throws TransformerException
+     */
+    public static Document saxStoreToDom4jDocument(SAXStore saxStore) {
+        final TransformerHandler identity = getIdentityTransformerHandler();
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
+        identity.setResult(documentResult);
+        try {
+            saxStore.replay(identity);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
         return documentResult.getDocument();
     }
 

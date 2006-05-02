@@ -179,6 +179,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            containingDocument.setGotSubmission(true);
+
             boolean isDeferredSubmissionSecondPass = false;
             try {
                 // Make sure submission element info is extracted

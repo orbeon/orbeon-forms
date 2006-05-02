@@ -18,14 +18,15 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.DebugProcessor;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
+import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -34,7 +35,12 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import javax.xml.transform.TransformerException;
-import java.io.*;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -298,16 +304,35 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document instance) {
-        return encodeXML(pipelineContext, instance, getEncryptionKey());
+    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode) {
+        return encodeXML(pipelineContext, documentToEncode, getEncryptionKey());
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
+    public static String encodeXML(PipelineContext pipelineContext, SAXStore saxStore, String encryptionPassword) {
         try {
             final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
 
-            final String xmlString = Dom4jUtils.domToString(instance, false, false);
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(new StreamResult(gzipOutputStream));
+            saxStore.replay(identity);
+
+            gzipOutputStream.close();
+            String result = Base64.encode(gzipByteArray.toByteArray());
+            if (encryptionPassword != null)
+                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
+            return result;
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
+        try {
+            final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
+            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+
+            final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
 
             gzipOutputStream.write(xmlString.getBytes("utf-8"));
             gzipOutputStream.close();

@@ -53,7 +53,6 @@ public class XIncludeProcessor extends ProcessorImpl {
         final ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
-                final ContentHandler debugContentHandler = contentHandler;
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
 
                 // Try to cache URI references
@@ -61,7 +60,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         final URIReferences uriReferences = new URIReferences();
-                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, debugContentHandler, uriReferences, uriResolver));
+                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
                         wasRead[0] = true;
                         return uriReferences;
                     }
@@ -69,7 +68,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                 // Read if not already read
                 if (!wasRead[0]) {
-                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, debugContentHandler, null, uriResolver));
+                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));
                 }
             }
         };

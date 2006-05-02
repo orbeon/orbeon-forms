@@ -31,8 +31,8 @@ import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -60,7 +60,14 @@ public class XFormsModelSchemaValidator {
 
     private static final ValidationContext validationContext = new ValidationContext();
 
+    private Element modelElement;
+    private String schemaURIs;
     private Grammar schemaGrammar;
+
+    public XFormsModelSchemaValidator(Element modelElement) {
+        this.modelElement = modelElement;
+        this.schemaURIs = modelElement.attributeValue("schema");
+    }
 
     private static class MSVGrammarReaderController implements GrammarReaderController {
 
@@ -354,24 +361,20 @@ public class XFormsModelSchemaValidator {
     /**
      * Load XForms model schemas.
      */
-    public void loadSchemas(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, Element modelElement) {
+    public void loadSchemas(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument) {
         if (!isSkipInstanceSchemaValidation()) {
-            final String schemaURIs = modelElement.attributeValue("schema");
-            if (schemaURIs != null) {
+            final String schemaURI = schemaURIs;// TODO: check for multiple schemas
 
-                final String schemaURI = schemaURIs;// TODO: check for multiple schemas
+            // External instance
+            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                // External instance
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            // Resolve URL
+            // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
+            final String resolvedURLString = XFormsUtils.resolveURL(containingDocument, pipelineContext, modelElement, false, schemaURI);
+            final URL resolvedURL = XFormsSubmissionUtils.createURL(resolvedURLString, null, externalContext);
 
-                // Resolve URL
-                // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
-                final String resolvedURLString = XFormsUtils.resolveURL(containingDocument, pipelineContext, modelElement, false, schemaURI);
-                final URL resolvedURL = XFormsSubmissionUtils.createURL(resolvedURLString, null, externalContext);
-
-                // Load associated grammar
-                schemaGrammar = loadGrammar(pipelineContext, resolvedURL.toExternalForm());
-            }
+            // Load associated grammar
+            schemaGrammar = loadGrammar(pipelineContext, resolvedURL.toExternalForm());
         }
     }
 
@@ -438,5 +441,12 @@ public class XFormsModelSchemaValidator {
         OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
         Boolean schmVldatdObj =  propertySet.getBoolean(XFormsConstants.XFORMS_VALIDATION_PROPERTY, true);
         return !schmVldatdObj.booleanValue();
+    }
+
+    /**
+     * Return the value of the @schema attribute on the model.
+     */
+    public String getSchemaURIs() {
+        return schemaURIs;
     }
 }

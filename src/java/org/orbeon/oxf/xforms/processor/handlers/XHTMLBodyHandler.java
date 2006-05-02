@@ -111,8 +111,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         {
             final String dynamicStateString;
             {
-                if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE))
-                {
+                if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
                     // Produce dynamic state key
                     final String newRequestId = UUIDUtils.createPseudoUUID();
                     final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);

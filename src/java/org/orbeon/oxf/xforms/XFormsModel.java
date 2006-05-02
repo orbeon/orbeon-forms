@@ -142,6 +142,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return containingDocument;
     }
 
+    public Document getModelDocument() {
+        return modelDocument;
+    }
+
     /**
      * Get object with the id specified.
      */
@@ -237,7 +241,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each
      * instance document may have an associated id that identifies it.
      */
-    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument) {
+    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument, String instanceSourceURI) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -245,7 +249,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
         // Prepare and set instance
         final String instanceId = (String) instanceIds.get(instancePosition);
-        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, this);
+        final XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, instanceSourceURI, this);
         instances.set(instancePosition, newInstance);
 
         // Create mapping instance id -> instance
@@ -657,8 +661,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final Element modelElement = modelDocument.getRootElement();
         // Create Schema validator only if we have schemas specified
         if (modelElement.attributeValue("schema") != null && schemaValidator == null) {
-            schemaValidator = new XFormsModelSchemaValidator();
-            schemaValidator.loadSchemas(pipelineContext, containingDocument, modelElement);
+            schemaValidator = new XFormsModelSchemaValidator(modelElement);
+            schemaValidator.loadSchemas(pipelineContext, containingDocument);
         }
     }
 
@@ -670,6 +674,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
                 schemaValidator.applySchema(currentInstance);
             }
+        }
+    }
+
+    public String getSchemaURI() {
+        if (schemaValidator != null) {
+            return schemaValidator.getSchemaURIs();
+        } else {
+            return null;
         }
     }
 
@@ -721,12 +733,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
                         final Document instanceDocument;
                         //= ProcessorUtils.createDocumentFromEmbeddedOrHref(Element element, String urlString) {
+                        final String instanceSourceURI;
                         if (srcAttribute == null) {
                             // Inline instance
                             final List children = instanceContainerElement.elements();
                             if (children == null || children.size() == 0)
                                 throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+                            instanceSourceURI = null;
                         } else {
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -747,6 +761,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 // Use optimized local mode
                                 final URI resolvedURI = XFormsUtils.resolveURI(instanceContainerElement, srcAttribute);
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
+
+                                instanceSourceURI = resolvedURI.toString();
                             } else {
                                 // Connect using actual external protocol
 
@@ -757,6 +773,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
                                 connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
                                         "get", resolvedURL, xxformsUsername, xxformsPassword, null, false, null, null);
+
+                                instanceSourceURI = resolvedURL;
                             }
 
                             try {
@@ -774,7 +792,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     connectionResult.close();
                             }
                         }
-                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument);
+                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI);
                     }
                 }
             }

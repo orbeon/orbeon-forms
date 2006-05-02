@@ -36,7 +36,8 @@ public class HandlerContext {
     private XFormsServer.XFormsState xformsState;
     private ExternalContext externalContext;
 
-    public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext, XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, ExternalContext externalContext) {
+    public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
+                          XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, ExternalContext externalContext) {
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;

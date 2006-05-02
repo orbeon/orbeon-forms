@@ -14,7 +14,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <p:param type="input" name="data"/>
     <p:param type="input" name="instance"/>
@@ -35,7 +36,7 @@
 
     <!-- Annotate XForms elements and generate XHTML if necessary -->
     <p:choose href="#xforms-model">
-        <!-- Test for legacy XForms engine -->
+        <!-- ========== Test for Classic XForms engine ========== -->
         <p:when test="/xforms:model">
             <p:processor name="oxf:xforms-output">
                 <p:input name="model" href="#xforms-model"/>
@@ -72,8 +73,8 @@
         <p:otherwise>
             <!-- TODO: put here processor detecting XForms model -->
             <p:choose href="#data">
-                <!-- Test for NG XForms engine -->
-                <p:when test="//xforms:model"><!-- TODO: test on result of processor above -->
+                <!-- ========== Test for NG XForms engine ========== -->
+                <p:when test="/xhtml:html/xhtml:head/xforms:model"><!-- TODO: test on result of processor above -->
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#data"/>
@@ -83,21 +84,12 @@
                     <!-- Annotate elements in view with ids and alerts -->
                     <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
-                        <!--<p:input name="data" href="#data"/>-->
                         <p:output name="data" id="annotated-view"/>
-                    </p:processor>
-                    <!-- Extract models and controls for XForms server -->
-                    <p:processor name="oxf:xforms-extractor">
-                        <!--<p:input name="data" href="#annotated-view" debug="xxxannotated-view"/>-->
-                        <!--<p:output name="data" id="static-state" debug="xxxcontrols"/>-->
-                        <p:input name="data" href="#annotated-view"/>
-                        <p:output name="data" id="static-state"/>
                     </p:processor>
 
                     <!-- Native XForms Initialization -->
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
-                        <p:input name="static-state" href="#static-state"/>
                         <p:output name="document" ref="xformed-data"/>
                     </p:processor>
                     <!--<p:processor name="oxf:sax-debugger">-->
@@ -106,6 +98,7 @@
                     <!--</p:processor>-->
                 </p:when>
                 <p:otherwise>
+                    <!-- ========== No XForms ========== -->
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="#data"/>
                         <p:output name="data" ref="xformed-data"/>

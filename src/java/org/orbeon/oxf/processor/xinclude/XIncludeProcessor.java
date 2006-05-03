@@ -50,7 +50,7 @@ public class XIncludeProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(final String name) {
-        final ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
+        final ProcessorOutput output = new URIProcessorOutputImpl(XIncludeProcessor.this, name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
@@ -79,7 +79,7 @@ public class XIncludeProcessor extends ProcessorImpl {
     private class XIncludeContentHandler extends ForwardingContentHandler {
 
         private PipelineContext pipelineContext;
-        private URIReferences uriReferences;
+        private URIProcessorOutputImpl.URIReferences uriReferences;
         private boolean topLevelContentHandler;
         private String xmlBase;
         private NamespaceSupport3 paremtNamespaceSupport;
@@ -92,15 +92,15 @@ public class XIncludeProcessor extends ProcessorImpl {
         private boolean inInclude;
         private int includeLevel = -1;
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver) {
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
             this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null);
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
             this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;

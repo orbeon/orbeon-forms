@@ -22,14 +22,15 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * Handle XForms decoding (XForms Classic engine).
@@ -82,7 +83,7 @@ public class XFormsInput extends ProcessorImpl {
                 XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
-                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null);
+                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null, false);
                 } else {
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
@@ -94,7 +95,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null);
+                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null, false);
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(XFormsInstance localInstance) {
@@ -146,7 +147,6 @@ public class XFormsInput extends ProcessorImpl {
 
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
-                containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 if (logger.isDebugEnabled())

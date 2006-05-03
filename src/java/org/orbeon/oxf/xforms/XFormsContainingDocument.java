@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.NetUtils;
 import org.apache.commons.pool.ObjectPool;
 
+import javax.xml.transform.URIResolver;
 import java.util.*;
 import java.io.IOException;
 
@@ -49,6 +50,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     // Object pool this object must be returned to, if any
     private ObjectPool sourceObjectPool;
+
+    // URI resolver
+    private URIResolver uriResolver;
 
     // A document contains models and controls
     private XFormsEngineStaticState xformsEngineStaticState;
@@ -72,9 +76,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * @param xformsEngineStaticState
      * @param repeatIndexesElement
      */
-    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, Element repeatIndexesElement) {
+    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, URIResolver uriResolver, Element repeatIndexesElement) {
         // Remember static state
         this.xformsEngineStaticState = xformsEngineStaticState;
+
+        // URI resolver
+        this.uriResolver = uriResolver;
 
         // Create XForms controls
         this.xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
@@ -109,6 +116,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public ObjectPool getSourceObjectPool() {
         return sourceObjectPool;
+    }
+
+    public URIResolver getURIResolver() {
+        return uriResolver;
+    }
+
+    public void setURIResolver(URIResolver uriResolver) {
+        this.uriResolver = uriResolver;
     }
 
     /**
@@ -152,13 +167,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String getStateHandling() {
         return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getStateHandling();
-    }
-
-    /**
-     * Initialize the XForms engine.
-     */
-    public void initialize(PipelineContext pipelineContext) {
-        // NOP for now
     }
 
     /**

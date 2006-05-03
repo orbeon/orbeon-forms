@@ -22,8 +22,6 @@ import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
-import java.util.Collections;
-
 public class XFormsAnnotate extends ProcessorImpl {
 
     private static final String INPUT_MODEL = "model";
@@ -55,11 +53,10 @@ public class XFormsAnnotate extends ProcessorImpl {
 
                 // Set annotated instance on model
                 Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null);
+                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, false);
 
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
-                containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 // Output the instance to the specified content handler

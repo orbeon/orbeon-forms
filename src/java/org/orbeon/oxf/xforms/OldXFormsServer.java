@@ -169,7 +169,7 @@ public class OldXFormsServer extends ProcessorImpl {
             xformsState = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
             final XFormsEngineStaticState xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
 
-            containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, xformsEngineStaticState);
+            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, xformsEngineStaticState, null);
 
             filesElement = null;
             actionElement = null;

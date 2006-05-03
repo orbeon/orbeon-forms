@@ -38,6 +38,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import javax.xml.transform.URIResolver;
 import java.util.*;
 
 /**
@@ -934,12 +935,25 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement) {
-        return createXFormsContainingDocument(pipelineContext, xformsState, filesElement, null);
+        return createXFormsContainingDocument(pipelineContext, xformsState, filesElement, null, null);
     }
 
-    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement, XFormsEngineStaticState xformsEngineStaticState) {
+    /**
+     * Create a ContainingDocument.
+     *
+     * @param pipelineContext           current pipeline context
+     * @param xformsState               XForms state containing static and dynamic state. Static state is ignored if xformsEngineStaticState is provided.
+     * @param filesElement              file information used in case of submission
+     * @param xformsEngineStaticState   XForms static state information
+     * @param initializationURIResolver URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
+     * @return                          created XFormsContainingDocument
+     */
+    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState,
+                                                                          Element filesElement, XFormsEngineStaticState xformsEngineStaticState,
+                                                                          URIResolver initializationURIResolver) {
 
         if (xformsEngineStaticState == null) {
+            // TODO: Handle caching of this.
             xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
             logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
         } else {
@@ -965,7 +979,7 @@ public class XFormsServer extends ProcessorImpl {
         final Element eventElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("event");
 
         // Create XForms Engine ContainingDocument
-        final XFormsContainingDocument containingDocument = new XFormsContainingDocument(xformsEngineStaticState, repeatIndexesElement);
+        final XFormsContainingDocument containingDocument = new XFormsContainingDocument(xformsEngineStaticState, initializationURIResolver, repeatIndexesElement);
 
         // Get instances
         boolean isInitializeEvent;
@@ -995,7 +1009,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Create and set instance document on current model
                     Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
-                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
+                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, false);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
 
                     currentCount++;
                     foundInstancesCount++;
@@ -1009,7 +1023,6 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         // Initialize XForms Engine
-        containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
             containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else

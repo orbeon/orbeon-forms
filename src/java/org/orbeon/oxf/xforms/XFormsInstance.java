@@ -47,15 +47,17 @@ public class XFormsInstance implements XFormsEventTarget {
     private PipelineContext pipelineContext;
     private String id;
     private String instanceSourceURI;
+    private boolean hasUsername;
     private XFormsModel model;
     private Document instanceDocument;
 
     private DocumentXPathEvaluator documentXPathEvaluator;
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, boolean hasUsername, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.id = id;
         this.instanceSourceURI = instanceSourceURI;
+        this.hasUsername = hasUsername;
         this.model = model;
         setInstanceDocument(instanceDocument, true);
     }
@@ -69,6 +71,10 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public String getInstanceSourceURI() {
         return instanceSourceURI;
+    }
+
+    public boolean isHasUsername() {
+        return hasUsername;
     }
 
     /**
@@ -339,7 +345,7 @@ public class XFormsInstance implements XFormsEventTarget {
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, null);
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
     }
 
     private static ExternalContext.Request getRequest(PipelineContext context) {

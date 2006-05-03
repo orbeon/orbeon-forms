@@ -24,8 +24,6 @@ import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
-import java.util.Collections;
-
 /**
  *  Handle XForms output (XForms Classic engine).
  */
@@ -61,11 +59,10 @@ public class XFormsOutput extends ProcessorImpl {
 
                 // Set annotated instance on model
                 Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();// TODO: Check this: why do we cache?
-                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null);
+                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, false);
 
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
-                containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 // Create evaluation context

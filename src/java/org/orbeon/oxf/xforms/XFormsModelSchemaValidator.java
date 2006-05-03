@@ -374,14 +374,14 @@ public class XFormsModelSchemaValidator {
             final URL resolvedURL = XFormsSubmissionUtils.createURL(resolvedURLString, null, externalContext);
 
             // Load associated grammar
-            schemaGrammar = loadGrammar(pipelineContext, resolvedURL.toExternalForm());
+            schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());
         }
     }
 
     /**
      * Load and cache a Grammar for a given schema URI.
      */
-    private Grammar loadGrammar(final PipelineContext pipelineContext, final String schemaURI) {
+    private Grammar loadCacheGrammar(final PipelineContext pipelineContext, final String schemaURI) {
         try {
             final URL url = URLFactory.createURL(schemaURI);
             final Long modTim = NetUtils.getLastModified(url, (Long) null);

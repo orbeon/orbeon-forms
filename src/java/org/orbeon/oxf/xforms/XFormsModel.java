@@ -241,7 +241,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each
      * instance document may have an associated id that identifies it.
      */
-    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument, String instanceSourceURI) {
+    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument, String instanceSourceURI, boolean hasUsername) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -249,7 +249,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
         // Prepare and set instance
         final String instanceId = (String) instanceIds.get(instancePosition);
-        final XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, instanceSourceURI, this);
+        final XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, instanceSourceURI, hasUsername, this);
         instances.set(instancePosition, newInstance);
 
         // Create mapping instance id -> instance
@@ -731,9 +731,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
                         final Element instanceContainerElement = (Element) i.next();
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
+
                         final Document instanceDocument;
-                        //= ProcessorUtils.createDocumentFromEmbeddedOrHref(Element element, String urlString) {
                         final String instanceSourceURI;
+                        final boolean hasUsername;
                         if (srcAttribute == null) {
                             // Inline instance
                             final List children = instanceContainerElement.elements();
@@ -741,58 +742,95 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                             instanceSourceURI = null;
+                            hasUsername = false;
                         } else {
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                            // NOTE: Optimizing with include() for servlets doesn't allow detecting
-                            // errors caused by the included resource, so we don't allow this for now.
+                            // NOTE: Optimizing with include() for servlets doesn't allow detecting errors caused by
+                            // the included resource, so we don't allow this for now. Furthermore, we are forced to
+                            // "optimize" for portlet access.
 
 //                            final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
 //                               && (externalContext.getRequest().getContainerType().equals("portlet")
 //                                    || (externalContext.getRequest().getContainerType().equals("servlet")
 //                                        && XFormsUtils.isOptimizeLocalInstanceLoads()));
 
-                            final boolean optimize = !NetUtils.urlHasProtocol(srcAttribute)
+                            final boolean optimizeForPortlets = !NetUtils.urlHasProtocol(srcAttribute)
                                                         && externalContext.getRequest().getContainerType().equals("portlet");
 
                             final XFormsModelSubmission.ConnectionResult connectionResult;
-                            if (optimize) {
+                            if (optimizeForPortlets) {
                                 // Use optimized local mode
                                 final URI resolvedURI = XFormsUtils.resolveURI(instanceContainerElement, srcAttribute);
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
 
                                 instanceSourceURI = resolvedURI.toString();
+                                hasUsername = false;
+
+                                try {
+                                    // Handle connection errors
+                                    if (connectionResult.resultCode != 200)
+                                        throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+
+                                    // Read result as XML
+                                    instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                } catch (Exception e) {
+                                    throw new OXFException(e);
+                                } finally {
+                                    // Clean-up
+                                    if (connectionResult != null)
+                                        connectionResult.close();
+                                }
+
                             } else {
-                                // Connect using actual external protocol
+                                // Connect using external protocol
 
                                 // Extension: username and password
+                                // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
+                                // instances that haven't been loaded yet.
                                 final String xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
                                 final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
 
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
-                                connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
-                                        "get", resolvedURL, xxformsUsername, xxformsPassword, null, false, null, null);
-
                                 instanceSourceURI = resolvedURL;
-                            }
 
-                            try {
-                                // Handle connection errors
-                                if (connectionResult.resultCode != 200)
-                                    throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+                                if (containingDocument.getURIResolver() == null || xxformsUsername != null) {
+                                    // We connect directly
 
-                                // Read result as XML
-                                instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
-                            } catch (Exception e) {
-                                throw new OXFException(e);
-                            } finally {
-                                // Clean-up
-                                if (connectionResult != null)
-                                    connectionResult.close();
+                                    // TODO: We should be able to use the username/password as part of the cache key,
+                                    // and therefore to use the resolver (or an extension of it supporting
+                                    // username/password) when provided.
+
+                                    connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
+                                            "get", resolvedURL, xxformsUsername, xxformsPassword, null, false, null, null);
+
+                                    try {
+                                        // Handle connection errors
+                                        if (connectionResult.resultCode != 200)
+                                            throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+
+                                        // Read result as XML
+                                        instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                    } catch (Exception e) {
+                                        throw new OXFException(e);
+                                    } finally {
+                                        // Clean-up
+                                        if (connectionResult != null)
+                                            connectionResult.close();
+                                    }
+
+                                    hasUsername = true;
+                                } else {
+                                    // Optimized case that uses the provided resolver
+                                    instanceDocument = XFormsSubmissionUtils.readURLAsDocument(containingDocument.getURIResolver(), resolvedURL);
+
+                                    hasUsername = false;
+                                }
                             }
                         }
-                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI);
+                        // Set instance and associated information
+                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI, hasUsername);
                     }
                 }
             }

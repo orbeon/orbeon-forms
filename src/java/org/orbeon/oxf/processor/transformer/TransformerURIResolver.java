@@ -67,10 +67,9 @@ public class TransformerURIResolver implements URIResolver {
                 if (prohibitedInput != null && prohibitedInput.equals(inputName)) {
                     // Don't allow a prohibited input (usually INPUT_DATA) to be read this way. We do this to prevent that input to read twice from XSLT.
                     throw new OXFException("Can't read '" + prohibitedInput + "' input. If you are calling this from XSLT, use a '/' expression in XPath instead.");
-                } else  if (inputName != null) {
+                } else if (inputName != null) {
                     // Resolve to input of current processor
-                    xmlReader = new ProcessorOutputXMLReader
-                            (pipelineContext, processor.getInputByName(inputName).getOutput());
+                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput());
                     systemId = href;
                 } else {
                     // Resolve to regular URI

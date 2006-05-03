@@ -20,15 +20,23 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.processor.handlers.*;
+import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
+import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
+import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
+import org.xml.sax.helpers.XMLFilterImpl;
 
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 
 /**
@@ -40,7 +48,6 @@ public class XFormsToXHTML extends ProcessorImpl {
     static public Logger logger = XFormsServer.logger;
 
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
-//    private static final String INPUT_STATIC_STATE = "static-state";
     private static final String OUTPUT_DOCUMENT = "document";
 
     public XFormsToXHTML() {
@@ -52,7 +59,7 @@ public class XFormsToXHTML extends ProcessorImpl {
      * Case where an XML response must be generated.
      */
     public ProcessorOutput createOutput(final String outputName) {
-        ProcessorOutput output = new ProcessorImpl.URIProcessorOutputImpl(getClass(), outputName, INPUT_ANNOTATED_DOCUMENT) {
+        ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler);
             }
@@ -61,12 +68,16 @@ public class XFormsToXHTML extends ProcessorImpl {
         return output;
     }
 
+    public void reset(PipelineContext context) {
+        setState(context, new URIProcessorOutputImpl.URIReferencesState());
+    }
+
     private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         // What can be cached: URI dependencies + the annotated XForms document
-        class Result extends URIReferences {
+        class Result extends URIProcessorOutputImpl.URIReferences {
             private SAXStore annotatedSAXStore;
             private XFormsEngineStaticState xformsEngineStaticState;
 
@@ -145,7 +156,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void setCachingDependencies(XFormsContainingDocument containingDocument, URIReferences uriReferences) {
+    private void setCachingDependencies(XFormsContainingDocument containingDocument, URIProcessorOutputImpl.URIReferences uriReferences) {
 
         // If a submission took place during XForms initialization, we currently don't cache
         // TODO: Some cases could be easily handled, like GET
@@ -172,6 +183,16 @@ public class XFormsToXHTML extends ProcessorImpl {
             for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) j.next();
                 final String instanceSourceURI = currentInstance.getInstanceSourceURI();
+
+                // For now we are not able to cache when an instance load uses a username and password
+                if (currentInstance.isHasUsername()) {
+                    if (logger.isDebugEnabled())
+                        logger.debug("XForms - found instance load using username and password, disabling caching of output.");
+                    uriReferences.setNoCache();
+                    return;
+                }
+
+                // Add dependency
                 if (instanceSourceURI != null) {
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
@@ -183,7 +204,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void createCacheContainingDocument(PipelineContext pipelineContext, XFormsEngineStaticState xformsEngineStaticState,
+    private void createCacheContainingDocument(final PipelineContext pipelineContext, XFormsEngineStaticState xformsEngineStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsServer.XFormsState[] xformsState) {
 
         boolean[] requireClientSubmission = new boolean[1];
@@ -191,8 +212,54 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create initial state, before XForms initialization
             final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
 
+            // Create URIResolver
+            final TransformerURIResolver uriResolver = new TransformerURIResolver(XFormsToXHTML.this, pipelineContext, INPUT_ANNOTATED_DOCUMENT, false) {
+                public Source resolve(String href, String base) throws TransformerException {
+
+                    final URL url;
+                    try {
+                        url = URLFactory.createURL(base, href);
+                    } catch (MalformedURLException e) {
+                        throw new OXFException(e);
+                    }
+                    final String urlString = url.toExternalForm();
+                    final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) XFormsToXHTML.this.getState(pipelineContext);
+                    if (state.isDocumentSet(urlString)) {
+                        // This means the document requested is already available. We use the cached document.
+                        final XMLReader xmlReader = new XMLFilterImpl() {
+                            public void parse(String systemId) throws SAXException {
+                                state.getDocument(urlString).replay(getContentHandler());
+                            }
+
+                            // FIXME: Is this necessary?
+                            public void setFeature(String name, boolean state) throws SAXNotRecognizedException {
+                                // We allow these two features
+                                if (name.equals("http://xml.org/sax/features/namespaces") && state)
+                                    return;
+                                if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
+                                    return;
+
+                                // Otherwise we throw
+                                throw new SAXNotRecognizedException("Feature: " + name);
+                            }
+                        };
+
+                        if (logger.isDebugEnabled())
+                            logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
+
+                        return new SAXSource(xmlReader, new InputSource(urlString));
+                    } else {
+                        // Use parent resolver
+                        return super.resolve(href, base);
+                    }
+                }
+            };
+
             // Create containing document and initialize XForms engine
-            containingDocument[0] = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, xformsEngineStaticState);
+            containingDocument[0] = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, xformsEngineStaticState, uriResolver);
+
+            // The URIResolver above doesn't make any sense anymore past initialization
+            containingDocument[0].setURIResolver(null);
 
             // This is the state after XForms initialization
             final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0], requireClientSubmission);

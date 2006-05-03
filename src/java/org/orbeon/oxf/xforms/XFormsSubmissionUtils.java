@@ -13,21 +13,28 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.xml.sax.XMLReader;
 
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 
 /**
@@ -35,6 +42,9 @@ import java.net.URLConnection;
  */
 public class XFormsSubmissionUtils {
 
+    /**
+     * Perform an optimized local connection using the Servlet API instead of using a URLConnection.
+     */
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
                                                                      byte[] serializedInstance, String serializedInstanceString) {
@@ -124,6 +134,8 @@ public class XFormsSubmissionUtils {
     }
 
     /**
+     * Perform a connection using an URLConnection.
+     *
      * @param action absolute URL or absolute path (which must include the context path)
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(PipelineContext pipelineContext, ExternalContext externalContext,
@@ -131,8 +143,7 @@ public class XFormsSubmissionUtils {
                                                                    byte[] serializedInstance, String serializedInstanceString) {
 
         // Compute submission URL
-        final URL submissionURL;
-        submissionURL = createURL(action, serializedInstanceString, externalContext);
+        final URL submissionURL = createURL(action, serializedInstanceString, externalContext);
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -176,7 +187,7 @@ public class XFormsSubmissionUtils {
                     // TODO: This should probably not be done automatically
                     final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
                     if (authorizationHeader != null)
-                        httpURLConnection.setRequestProperty("authorization", authorizationHeader);
+                        urlConnection.setRequestProperty("authorization", authorizationHeader);
 
                     // Write request body if needed
                     if (hasRequestBody)
@@ -224,15 +235,39 @@ public class XFormsSubmissionUtils {
                 throw new OXFException(e);
             }
         } else if (!isGet(method) && (scheme.equals("file") || scheme.equals("oxf"))) {
-            // TODO
+            // TODO: implement writing to file: and oxf:
             // SHOULD be supported (should probably support oxf: as well)
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
         } else if (scheme.equals("mailto")) {
-            // TODO
+            // TODO: implement sending mail
             // MAY be supported
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
         } else {
             throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
+        }
+    }
+
+    public static Document readURLAsDocument(URIResolver uriResolver, String urlString) {
+
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
+
+        try {
+            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
+            // TODO: forward session and authorization?
+
+            final LocationDocumentResult documentResult = new LocationDocumentResult();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(documentResult);
+
+            final XMLReader xmlReader = source.getXMLReader();
+            xmlReader.setContentHandler(identity);
+            xmlReader.parse(urlString);
+
+            return documentResult.getDocument();
+
+        } catch (Exception e) {
+            throw new OXFException(e);
         }
     }
 

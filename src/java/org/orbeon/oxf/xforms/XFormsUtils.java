@@ -502,10 +502,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY, true).booleanValue();
     }
 
-    public static boolean isOptimizeLocalInstanceLoads() {
-        return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
-    }
+    // This is not used currently
+//    public static boolean isOptimizeLocalInstanceLoads() {
+//        return OXFProperties.instance().getPropertySet().getBoolean
+//                (XFormsConstants.XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY, true).booleanValue();
+//    }
 
     public static boolean isCacheSession() {
         final String propertyValue = OXFProperties.instance().getPropertySet().getString

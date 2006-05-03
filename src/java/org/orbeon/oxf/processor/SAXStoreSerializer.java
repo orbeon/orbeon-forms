@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 public class SAXStoreSerializer extends ProcessorImpl {
 
@@ -27,11 +28,11 @@ public class SAXStoreSerializer extends ProcessorImpl {
         return saxStore;
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void start(PipelineContext context) {
         readInputAsSAX(context, INPUT_DATA, saxStore);
     }
 
-    public void reset(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void reset(PipelineContext context) {
         saxStore = new SAXStore();
     }
 }

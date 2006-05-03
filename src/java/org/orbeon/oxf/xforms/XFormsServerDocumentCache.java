@@ -161,9 +161,6 @@ public class XFormsServerDocumentCache {
             // requires things like resolving URLs to load schemas, etc.
 
             final PipelineContext pipelineContext = StaticExternalContext.getStaticContext().getPipelineContext();
-//            if (pipelineContext == null)
-//                pipelineContext = new PipelineContext();
-
             final XFormsContainingDocument result = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null);
             result.setSourceObjectPool(pool);
             return result;

@@ -58,7 +58,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                 model.setInstanceDocument(pipelineContext, 0, instanceDocument, null);
 
                 // Create and initialize XForms Engine
-                XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
+                XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
                 containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 

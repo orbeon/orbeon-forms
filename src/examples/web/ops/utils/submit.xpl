@@ -91,13 +91,13 @@
                 </xxforms:action>
             </xxforms:event-request>
         </p:input>
-        <p:output name="data" id="encoded-request" debug="request"/>
+        <p:output name="data" id="encoded-request"/>
     </p:processor>
 
     <!-- Run XForms Server -->
     <p:processor name="oxf:xforms-server">
         <p:input name="request" href="#encoded-request" schema-href="/ops/xforms/xforms-server-request.rng"/>
-        <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng" debug="response"/>
+        <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
     </p:processor>
 
     <!-- Decode -->

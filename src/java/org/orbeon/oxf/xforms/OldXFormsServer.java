@@ -166,8 +166,10 @@ public class OldXFormsServer extends ProcessorImpl {
             // Use static-state input provided during initialization run
 
             final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
-            xformsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
-            containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, staticStateDocument);
+            xformsState = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
+            final XFormsEngineStaticState xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
+
+            containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, null, xformsEngineStaticState);
 
             filesElement = null;
             actionElement = null;

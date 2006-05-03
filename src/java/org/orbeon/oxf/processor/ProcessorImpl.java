@@ -1452,8 +1452,13 @@ public abstract class ProcessorImpl implements Processor {
             this.configInputName = configInputName;
         }
 
+//        private void log(String message) {
+//            logger.info("URIProcessorOutputImpl (" + getClass().getName() + ") " + message);
+//        }
+
         protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
             final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
+//            log("uriReferences: " + uriReferences);
             if (uriReferences == null)
                 return null;
 
@@ -1462,6 +1467,7 @@ public abstract class ProcessorImpl implements Processor {
             // Handle config if read as input
             if (localConfigURIReferences == null) {
                 final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, configInputName);
+//                log("configKeyValidity: " + configKeyValidity);
                 if (configKeyValidity == null)
                     return null;
                 keys.add(configKeyValidity.key);
@@ -1471,12 +1477,15 @@ public abstract class ProcessorImpl implements Processor {
             if (localKey != null)
                 keys.add(localKey);
             // Handle dependencies if any
+//            log("uriReferences.getReferences(): " + uriReferences.getReferences());
             if (uriReferences.getReferences() != null) {
                 for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
                     final URIReference uriReference = (URIReference) i.next();
                     if (uriReference == null)
                         return null;
-                    keys.add(getURIKey(pipelineContext, uriReference));
+                    final CacheKey uriKey = getURIKey(pipelineContext, uriReference);
+//                    log("key: " + uriKey);
+                    keys.add(uriKey);
                 }
             }
             final CacheKey[] outKys = new CacheKey[keys.size()];
@@ -1486,6 +1495,7 @@ public abstract class ProcessorImpl implements Processor {
 
         protected Object getValidityImpl(PipelineContext pipelineContext) {
             final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
+//            log("uriReferences: " + uriReferences);
             if (uriReferences == null)
                 return null;
 
@@ -1494,6 +1504,7 @@ public abstract class ProcessorImpl implements Processor {
             // Handle config if read as input
             if (localConfigURIReferences == null) {
                 final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, configInputName);
+//                log("configKeyValidity: " + configKeyValidity);
                 if (configKeyValidity == null)
                     return null;
                 validities.add(configKeyValidity.validity);
@@ -1503,12 +1514,16 @@ public abstract class ProcessorImpl implements Processor {
             if (localValidity != null)
                 validities.add(localValidity);
             // Handle dependencies if any
+//            log("uriReferences.getReferences(): " + uriReferences.getReferences());
             if (uriReferences.getReferences() != null) {
                 for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
                     final URIReference uriReference = (URIReference) i.next();
                     if (uriReference == null)
                         return null;
-                    validities.add(getURIValidity(pipelineContext, uriReference));
+
+                    final Object uriValidity = getURIValidity(pipelineContext, uriReference);
+//                    log("validity: " + uriValidity);
+                    validities.add(uriValidity);
                 }
             }
             return validities;
@@ -1537,6 +1552,7 @@ public abstract class ProcessorImpl implements Processor {
             } catch (Exception e) {
                 // If the file no longer exists, for example, we don't want to throw, just to invalidate
                 // An exception will be thrown if necessary when the document is actually read
+//                log("exception: " + e.getMessage());
                 return null;
             }
         }
@@ -1581,6 +1597,7 @@ public abstract class ProcessorImpl implements Processor {
             } catch (Exception e) {
                 // If the file no longer exists, for example, we don't want to throw, just to invalidate
                 // An exception will be thrown if necessary when the document is actually read
+//                log("exception: " + e.getMessage());
                 return null;
             }
         }
@@ -1615,6 +1632,10 @@ public abstract class ProcessorImpl implements Processor {
 
         public String context;
         public String spec;
+
+        public String toString() {
+            return "[" + context + ", " + spec + "]";
+        }
     }
 
     /**
@@ -1625,13 +1646,24 @@ public abstract class ProcessorImpl implements Processor {
 
         private List references;
 
+        /**
+         * Add a URL reference.
+         *
+         * @param context   optional context (can be null)
+         * @param spec      URL spec
+         */
         public void addReference(String context, String spec) {
             if (references == null)
                 references = new ArrayList();
-            
+
+//            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
+
             references.add(new URIReference(context, spec));
         }
 
+        /**
+         * Calling this makes sure the associated output cannot be cached.
+         */
         public void setNoCache() {
             // Make sure we have an empty list of references
             if (references == null)
@@ -1643,6 +1675,11 @@ public abstract class ProcessorImpl implements Processor {
             references.add(null);
         }
 
+        /**
+         * Get URI references.
+         *
+         * @return  references or null if none
+         */
         public List getReferences() {
             return references;
         }

@@ -33,7 +33,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -264,7 +263,7 @@ public class XFormsServer extends ProcessorImpl {
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         sentEventCount[0]++;
     }
- 
+
     private void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
                                 ExternalContext externalContext, XFormsState xformsState) {
@@ -344,7 +343,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else {
                         // Reload / back case
                         final XFormsContainingDocument initialContainingDocument
-                                    = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null, null);
+                                    = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);
 
                         diffControlsState(ch, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
@@ -938,13 +937,13 @@ public class XFormsServer extends ProcessorImpl {
         return createXFormsContainingDocument(pipelineContext, xformsState, filesElement, null);
     }
 
-    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement, Document staticStateDocument) {
+    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement, XFormsEngineStaticState xformsEngineStaticState) {
 
-        if (staticStateDocument == null) {
-            staticStateDocument = XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState());
-            logger.debug("XForms - creating new document.");
+        if (xformsEngineStaticState == null) {
+            xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
+            logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
         } else {
-            logger.debug("XForms - creating new document (static state Document provided).");
+            logger.debug("XForms - creating new ContainingDocument (static state object provided).");
         }
 
         final Document dynamicStateDocument;
@@ -952,14 +951,6 @@ public class XFormsServer extends ProcessorImpl {
             final String dynamicStateString = xformsState.getDynamicState();
             dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
         }
-
-        // Get controls from static state
-//        final Document controlsDocument = Dom4jUtils.createDocument();
-//        controlsDocument.add(staticStateDocument.getRootElement().element("controls").detach());
-        final Document controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(staticStateDocument.getRootElement().element("controls"));
-
-        // Get models from static state
-        final Element modelsElement = staticStateDocument.getRootElement().element("models");
 
         // Get instances from dynamic state
         final Element instancesElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("instances");
@@ -973,35 +964,8 @@ public class XFormsServer extends ProcessorImpl {
         // Get automatic event from dynamic state
         final Element eventElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("event");
 
-        // Get all models
-        final List models = new ArrayList();
-        {
-            // FIXME: we don't get a System ID here. Is there a simple solution?
-            for (Iterator i = modelsElement.elements().iterator(); i.hasNext();) {
-                Element modelElement = (Element) i.next();
-
-//                final Document modelDocument = Dom4jUtils.createDocument();
-//                modelDocument.add(modelElement.detach());
-                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
-
-                XFormsModel model = new XFormsModel(modelDocument);
-                models.add(model);
-            }
-        }
-
-        // Create XForms Engine
-        final String stateHandling;
-        {
-            final String stateHandlingAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
-            stateHandling = (stateHandlingAttribute != null)
-                    ? stateHandlingAttribute
-                    : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
-        }
-
-        final String baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
-
-        final XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument, repeatIndexesElement,
-                staticStateDocument.getRootElement().attributeValue("container-type"), stateHandling, baseURI);
+        // Create XForms Engine ContainingDocument
+        final XFormsContainingDocument containingDocument = new XFormsContainingDocument(xformsEngineStaticState, repeatIndexesElement);
 
         // Get instances
         boolean isInitializeEvent;
@@ -1030,9 +994,6 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Create and set instance document on current model
-
-//                    final Document instanceDocument = Dom4jUtils.createDocument();
-//                    instanceDocument.add(instanceElement.detach());
                     Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
                     currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
 

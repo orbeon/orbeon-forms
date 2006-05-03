@@ -51,12 +51,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private ObjectPool sourceObjectPool;
 
     // A document contains models and controls
-    private List models;
+    private XFormsEngineStaticState xformsEngineStaticState;
+    private List models = new ArrayList();
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
-    private String containerType;
-    private String stateHandling;
-    private String baseURI;
+
 
     // Client state
     private XFormsModelSubmission activeSubmission;
@@ -67,25 +66,41 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private XFormsActionInterpreter actionInterpreter;
 
-    public XFormsContainingDocument(List models, Document controlsDocument) {
-        this(models, controlsDocument, null, null, null, null);
+    /**
+     * Construct a ContainingDocument from a static state and repeat indexes elements.
+     *
+     * @param xformsEngineStaticState
+     * @param repeatIndexesElement
+     */
+    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, Element repeatIndexesElement) {
+        // Remember static state
+        this.xformsEngineStaticState = xformsEngineStaticState;
+
+        // Create XForms controls
+        this.xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
+
+        // Create and index models
+        for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
+            final Document modelDocument = (Document) i.next();
+            final XFormsModel model = new XFormsModel(modelDocument);
+            model.setContainingDocument(this);
+
+            this.models.add(model);
+            if (model.getId() != null)
+                this.modelsMap.put(model.getId(), model);
+        }
     }
 
-    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement,
-                                    String containerType, String stateHandling, String baseURI) {
+    /**
+     * Legacy constructor for XForms Classic.
+     */
+    public XFormsContainingDocument(XFormsModel xformsModel) {
+        this.models = Collections.singletonList(xformsModel);
+        this.xformsControls = new XFormsControls(this, null, null);
 
-        this.models = models;
-        this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
-        this.containerType = containerType;
-        this.stateHandling = stateHandling;
-        this.baseURI = baseURI;
-
-        for (Iterator i = models.iterator(); i.hasNext();) {
-            XFormsModel model = (XFormsModel) i.next();
-            if (model.getId() != null)
-                modelsMap.put(model.getId(), model);
-            model.setContainingDocument(this);
-        }
+        if (xformsModel.getId() != null)
+            modelsMap.put(xformsModel.getId(), xformsModel);
+        xformsModel.setContainingDocument(this);
     }
 
     public void setSourceObjectPool(ObjectPool sourceObjectPool) {
@@ -105,13 +120,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Return the document base URI.
-     */
-    public String getBaseURI() {
-        return baseURI;
-    }
-
-    /**
      * Get a list of all the models in this document.
      */
     public List getModels() {
@@ -126,17 +134,24 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Return the document base URI.
+     */
+    public String getBaseURI() {
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getBaseURI();
+    }
+
+    /**
      * Return the container type that generate the XForms page, either "servlet" or "portlet".
      */
     public String getContainerType() {
-        return containerType;
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getContainerType();
     }
 
     /**
      * Return the state handling strategy for this document, either "client" or "session".
      */
     public String getStateHandling() {
-        return stateHandling;
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getStateHandling();
     }
 
     /**

@@ -1,4 +1,4 @@
-/**
+    /**
  *  Copyright (C) 2004 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 
 /**
  * Constants useful for the XForms engine. 
@@ -102,6 +104,7 @@ public class XFormsConstants {
     public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
     public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
     public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";
+    public static final String XFORMS_CACHE_APPLICATION_SIZE_PROPERTY = "oxf.xforms.cache.application.size";
     public static final String XFORMS_OPTIMIZE_POST_ALL_PROPERTY = "oxf.xforms.optimize-post-all";
     public static final String XFORMS_OPTIMIZE_GET_ALL_PROPERTY = "oxf.xforms.optimize-get-all";
     public static final String XFORMS_OPTIMIZE_LOCAL_SUBMISSION_PROPERTY = "oxf.xforms.optimize-local-submission";
@@ -122,7 +125,11 @@ public class XFormsConstants {
 
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
-    
+    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
+    public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
+    public static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
+    public static final int DEFAULT_APPLICATION_STATE_CACHE_SIZE = 1024 * 1024;
+
     private XFormsConstants() {
         // Disallow contruction
     }

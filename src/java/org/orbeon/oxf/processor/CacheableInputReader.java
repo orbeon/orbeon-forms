@@ -16,6 +16,8 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 
-public interface CacheableInputReader {
-    public Object read(PipelineContext pipelineContext, ProcessorInput processorInput);
+public abstract class CacheableInputReader {
+    public abstract Object read(PipelineContext pipelineContext, ProcessorInput processorInput);
+    public void foundInCache() {}
+    public void storedInCache() {}
 }

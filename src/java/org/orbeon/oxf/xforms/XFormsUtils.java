@@ -51,9 +51,6 @@ import java.util.zip.GZIPOutputStream;
 public class XFormsUtils {
 
     private static final int BUFFER_SIZE = 1024;
-    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;
-    public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
-    private static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
 
     /**
      * Return the local XForms instance data for the given node, null if not available.
@@ -532,7 +529,12 @@ public class XFormsUtils {
 
     public static int getSessionCacheSize() {
         return OXFProperties.instance().getPropertySet().getInteger
-                (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
+                (XFormsConstants.XFORMS_CACHE_SESSION_SIZE_PROPERTY, XFormsConstants.DEFAULT_SESSION_STATE_CACHE_SIZE).intValue();
+    }
+
+    public static int getApplicationCacheSize() {
+        return OXFProperties.instance().getPropertySet().getInteger
+                (XFormsConstants.XFORMS_CACHE_APPLICATION_SIZE_PROPERTY, XFormsConstants.DEFAULT_APPLICATION_STATE_CACHE_SIZE).intValue();
     }
 
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {

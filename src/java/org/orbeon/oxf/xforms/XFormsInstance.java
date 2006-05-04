@@ -129,8 +129,8 @@ public class XFormsInstance implements XFormsEventTarget {
                 newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, nodeType);
             } else if (nodeType == null) {
                 // There is no type, convert to default type
-                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
+                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
             }
         }
 
@@ -260,9 +260,9 @@ public class XFormsInstance implements XFormsEventTarget {
                 Dom4jUtils.clearElementContent(element);
             } else if (currentType == null) {
                 // There is no type, convert to default type
-                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsUtils.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
-                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsUtils.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
+                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
+                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsConstants.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
             }
             element.setText(value);
         } else {

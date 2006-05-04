@@ -34,14 +34,18 @@ public class HandlerContext {
     private PipelineContext pipelineContext;
     private XFormsContainingDocument containingDocument;
     private XFormsServer.XFormsState xformsState;
+    private String staticStateUUID;
+    private String dynamicStateUUID;
     private ExternalContext externalContext;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
-                          XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, ExternalContext externalContext) {
+                          XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
         this.xformsState = xformsState;
+        this.staticStateUUID = staticStateUUID;
+        this.dynamicStateUUID = dynamicStateUUID;
         this.externalContext = externalContext;
     }
 
@@ -59,6 +63,14 @@ public class HandlerContext {
 
     public XFormsServer.XFormsState getXFormsState() {
         return xformsState;
+    }
+
+    public String getStaticStateUUID() {
+        return staticStateUUID;
+    }
+
+    public String getDynamicStateUUID() {
+        return dynamicStateUUID;
     }
 
     public ExternalContext getExternalContext() {

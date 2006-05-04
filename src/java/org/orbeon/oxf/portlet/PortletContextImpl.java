@@ -30,8 +30,6 @@ public class PortletContextImpl implements PortletContext {
     private static final int SERVER_MAJOR_VERSION = 1;
     private static final int SERVER_MINOR_VERSION = 0;
 
-    private Map attributes = new HashMap();
-
     private ExternalContext externalContext;
     private PortletConfigImpl portletConfig;
 
@@ -41,13 +39,11 @@ public class PortletContextImpl implements PortletContext {
     }
 
     public Object getAttribute(String name) {
-        // FIXME: Should come from servletRequest
-        return attributes.get(name);
+        return externalContext.getAttributesMap().get(name);
     }
 
     public Enumeration getAttributeNames() {
-        // FIXME: Should come from servletRequest
-        return Collections.enumeration(attributes.keySet());
+        return Collections.enumeration(externalContext.getAttributesMap().keySet());
     }
 
     public String getInitParameter(String name) {
@@ -126,12 +122,10 @@ public class PortletContextImpl implements PortletContext {
     }
 
     public void removeAttribute(String name) {
-        // FIXME: Should come from servletRequest
-        attributes.remove(name);
+        externalContext.getAttributesMap().remove(name);
     }
 
     public void setAttribute(String name, Object object) {
-        // FIXME: Should come from servletRequest
-        attributes.put(name, object);
+        externalContext.getAttributesMap().put(name, object);
     }
 }

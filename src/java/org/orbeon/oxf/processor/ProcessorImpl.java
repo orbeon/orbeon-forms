@@ -28,16 +28,12 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -47,8 +43,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.*;
-import java.net.URL;
-import java.net.URLConnection;
 
 /**
  * Helper class that implements default method of the Processor interface.
@@ -456,6 +450,7 @@ public abstract class ProcessorImpl implements Processor {
                     // Return cached object
                     if (logger.isDebugEnabled())
                         logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + configObject);
+                    reader.foundInCache();
                     return configObject;
                 }
             }
@@ -463,7 +458,7 @@ public abstract class ProcessorImpl implements Processor {
             // Result was not found in cache, read result
             if (logger.isDebugEnabled())
                 logger.debug("Cache " + debugInfo + ": READING.");
-            Object result = reader.read(context, input);
+            final Object result = reader.read(context, input);
 
             // Cache new result if possible, asking again for KeyValidity if needed
             if (keyValidity == null)
@@ -473,6 +468,7 @@ public abstract class ProcessorImpl implements Processor {
                 if (logger.isDebugEnabled())
                     logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
                 cache.add(context, keyValidity.key, keyValidity.validity, result);
+                reader.storedInCache();
             }
 
             return result;
@@ -1206,6 +1202,10 @@ public abstract class ProcessorImpl implements Processor {
 
     protected boolean isInputInCache(PipelineContext context, String inputName) {
         return isInputInCache(context, getInputByName(inputName));
+    }
+
+    protected boolean isInputInCache(PipelineContext context, KeyValidity keyValidity) {
+        return ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
     }
 
     /**

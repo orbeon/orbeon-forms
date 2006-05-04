@@ -132,8 +132,8 @@ public class OldXFormsServer extends ProcessorImpl {
                     requestPageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
 
                     // We don't create the cache at this point as it may not be necessary
-                    final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
-                    final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
+                    final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(false), false);
+                    final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(requestPageGenerationId, requestId);
 
                     // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                     if (sessionFormsState == null)
@@ -315,8 +315,8 @@ public class OldXFormsServer extends ProcessorImpl {
                         if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
                             // Produce dynamic state key
                             final String newRequestId = UUIDUtils.createPseudoUUID();
-                            final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);
-                            sessionCache.add(currentPageGenerationId, newRequestId, newXFormsState);
+                            final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
+                            sessionStateCache.add(currentPageGenerationId, newRequestId, newXFormsState);
                             ch.text(SESSION_STATE_PREFIX + newRequestId);
                         } else {
                             // Send state to the client

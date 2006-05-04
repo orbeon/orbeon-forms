@@ -52,8 +52,8 @@ public class XFormsServer extends ProcessorImpl {
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
 
-
-    private static final String SESSION_STATE_PREFIX = "session:";
+    public static final String APPLICATION_STATE_PREFIX = "application:";
+    public static final String SESSION_STATE_PREFIX = "session:";
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
 
@@ -123,20 +123,40 @@ public class XFormsServer extends ProcessorImpl {
                 dynamicStateString = dynamicStateElement.getTextTrim();
             }
 
-            if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
+            
+            if (dynamicStateString.startsWith(APPLICATION_STATE_PREFIX)) {
+                //  State is currently stored in the application scope
+                final String requestId = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
+
+                // Extract page generation id
+                requestPageGenerationId = staticStateString.substring(APPLICATION_STATE_PREFIX.length());
+
+                // We don't create the session cache at this point as it may not be necessary
+                final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, false);
+                final XFormsState applicationFormsState = applicationStateCache.find(requestPageGenerationId, requestId);
+
+                // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
+                if (applicationFormsState == null)
+                    throw new OXFException("Unable to retrieve XForms engine state from application cache.");
+
+                xformsState = applicationFormsState;
+
+            } else if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
                 // State doesn't come with the request, we should look it up in the repository
                 final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
 
                 // Extract page generation id
-                requestPageGenerationId = staticStateString.substring(SESSION_STATE_PREFIX.length());
+                requestPageGenerationId = staticStateString.startsWith(SESSION_STATE_PREFIX)
+                        ? staticStateString.substring(SESSION_STATE_PREFIX.length())
+                        : staticStateString.substring(APPLICATION_STATE_PREFIX.length());
 
-                // We don't create the cache at this point as it may not be necessary
-                final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(false), false);
-                final XFormsState sessionFormsState = (sessionCache == null) ? null : sessionCache.find(requestPageGenerationId, requestId);
+                // We don't create the session cache at this point as it may not be necessary
+                final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(false), false);
+                final XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(requestPageGenerationId, requestId);
 
                 // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                 if (sessionFormsState == null)
-                    throw new OXFException("Unable to retrieve XForms engine state.");
+                    throw new OXFException("Unable to retrieve XForms engine state from session cache.");
 
                 xformsState = sessionFormsState;
             } else {
@@ -296,8 +316,8 @@ public class XFormsServer extends ProcessorImpl {
                 if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
                     // Produce dynamic state key
                     final String newRequestId = UUIDUtils.createPseudoUUID();
-                    final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);
-                    sessionCache.add(currentPageGenerationId, newRequestId, newXFormsState);
+                    final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
+                    sessionStateCache.add(currentPageGenerationId, newRequestId, newXFormsState);
                     ch.text(SESSION_STATE_PREFIX + newRequestId);
                 } else {
                     // Send state to the client

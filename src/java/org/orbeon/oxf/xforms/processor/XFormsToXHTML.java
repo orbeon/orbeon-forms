@@ -28,7 +28,8 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.*;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLFilterImpl;
 
@@ -39,6 +40,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -65,27 +68,31 @@ public class XFormsToXHTML extends ProcessorImpl {
     public ProcessorOutput createOutput(final String outputName) {
         ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
-                doIt(pipelineContext, contentHandler);
+                doIt(pipelineContext, contentHandler, this);
             }
 
             protected boolean supportsLocalKeyValidity() {
-                return true;
+                return false;
             }
 
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
                 final InputDependencies inputDependencies = (XFormsToXHTML.InputDependencies) uriReferences;
 
                 if (inputDependencies.isDependsOnSession()) {
-                    // Make sure the session is created. It will be used anyway.
-                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                    final ExternalContext.Session session = externalContext.getSession(true);
-                    final String sessionId = session.getId();
 
-                    if (logger.isDebugEnabled())
-                        logger.debug("XForms - checking dependency on session id: " + sessionId);
+                    // For now, cannot cache output when we depend on the session.
+                    return null;
 
-                    // Add dependency on session id
-                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0));
+//                    // Make sure the session is created. It will be used anyway.
+//                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+//                    final ExternalContext.Session session = externalContext.getSession(true);
+//                    final String sessionId = session.getId();
+//
+//                    if (logger.isDebugEnabled())
+//                        logger.debug("XForms - checking dependency on session id: " + sessionId);
+//
+//                    // Add dependency on session id
+//                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0));
                 } else {
                     return CONSTANT_KEY_VALIDITY;
                 }
@@ -99,13 +106,14 @@ public class XFormsToXHTML extends ProcessorImpl {
         setState(context, new URIProcessorOutputImpl.URIReferencesState());
     }
 
-    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler) {
+    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, ProcessorOutputImpl xhtmlOutput) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
         final XFormsServer.XFormsState[] xformsState = new XFormsServer.XFormsState[1];
+        final boolean[] cachedInput = new boolean[1];
 
         // Read and try to cache the complete XForms+XHTML document with annotations
         final InputDependencies inputDependencies = (InputDependencies) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
@@ -135,10 +143,19 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 return inputDependencies;
             }
+
+            public void foundInCache() {
+                cachedInput[0] = true;
+            }
+
+            public void storedInCache() {
+                cachedInput[0] = true;
+            }
         });
 
         try {
             // Create containing document if not done yet
+            final String staticStateUUID;
             if (containingDocument[0] == null) {
                 logger.debug("XForms - annotated document and static state obtained from cache; creating containing document.");
                 createCacheContainingDocument(pipelineContext, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
@@ -146,8 +163,55 @@ public class XFormsToXHTML extends ProcessorImpl {
                 logger.debug("XForms - annotated document and static state not obtained from cache.");
             }
 
+            if (cachedInput[0]) {
+                staticStateUUID = inputDependencies.getUUID();
+            } else {
+                staticStateUUID = null;
+            }
+
+            // Try to cache dynamic state UUID associated with the output
+            final String dynamicStateUUID;
+            final OutputCacheKey outputCacheKey = xhtmlOutput.getKey(pipelineContext);
+            if (outputCacheKey != null) {
+                final Object outputValidity = xhtmlOutput.getValidity(pipelineContext);
+                if (outputValidity != null) {
+                    // Output is cacheable
+
+                    // Get cache instance
+                    final Cache cache = ObjectCache.instance();
+
+                    // Check in cache first
+//                    final KeyValidity = new KeyValidity();
+
+                    final CacheKey internalCacheKey = new InternalCacheKey(XFormsToXHTML.this, "dynamicState", "DYNAMIC_STATE");
+                    final CacheKey compoundCacheKey = new CompoundOutputCacheKey(XFormsToXHTML.this.getClass(), xhtmlOutput.getName(), new CacheKey[] { outputCacheKey, internalCacheKey } );
+
+                    final List compoundValidities = new ArrayList();
+                    compoundValidities.add(outputValidity);
+                    compoundValidities.add(new Long(0));
+
+                    final Object cachedDynamicStateUUID = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+                    if (cachedDynamicStateUUID != null) {
+                        // Found it
+                        dynamicStateUUID = (String) cachedDynamicStateUUID;
+                        logger.debug("XForms - found cached UUID for resulting document .");
+                    } else {
+                        // Create new UUID and cache it
+                        dynamicStateUUID = UUIDUtils.createPseudoUUID();
+                        cache.add(pipelineContext, compoundCacheKey, compoundValidities, dynamicStateUUID);
+                        logger.debug("XForms - caching UUID for resulting document .");
+                    }
+                } else {
+                    dynamicStateUUID = null;
+                    logger.debug("XForms - cannot cache UUID for resulting document.");
+                }
+            } else {
+                dynamicStateUUID = null;
+                logger.debug("XForms - cannot cache UUID for resulting document.");
+            }
+
             // Output resulting document
-            outputResponse(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0]);
+            outputResponse(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
             final ObjectPool sourceObjectPool = containingDocument[0].getSourceObjectPool();
@@ -171,6 +235,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         private XFormsEngineStaticState xformsEngineStaticState;
         private boolean dependsOnSession;
 
+        private String uuid = UUIDUtils.createPseudoUUID();
+
         public InputDependencies(SAXStore annotatedSAXStore, XFormsEngineStaticState xformsEngineStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
             this.xformsEngineStaticState = xformsEngineStaticState;
@@ -190,6 +256,10 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         public void setDependsOnSession(boolean dependsOnSession) {
             this.dependsOnSession = dependsOnSession;
+        }
+
+        public String getUUID() {
+            return uuid;
         }
     }
 
@@ -335,7 +405,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState) throws SAXException {
+                                final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState,
+                                final String staticStateUUID, String dynamicStateUUID) throws SAXException {
 
         final ElementHandlerController controller = new ElementHandlerController();
 
@@ -404,7 +475,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         }));
 
-        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, externalContext));
+        controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, staticStateUUID, dynamicStateUUID, externalContext));
 
         // Process everything
         annotatedDocument.replay(controller);

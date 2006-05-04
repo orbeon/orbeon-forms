@@ -15,18 +15,15 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.XFormsServerSessionCache;
-import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -39,8 +36,6 @@ import java.util.Stack;
  * Handle xhtml:body.
  */
 public class XHTMLBodyHandler extends HandlerBase {
-
-    private static final String SESSION_STATE_PREFIX = "session:";
 
     private ContentHandlerHelper helper;
 
@@ -92,18 +87,27 @@ public class XHTMLBodyHandler extends HandlerBase {
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
         // Store private information used by the client-side JavaScript
-        final String currentPageGenerationId = UUIDUtils.createPseudoUUID();
+        final String currentPageGenerationId;
         {
             final String staticStateString;
             if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
-                // Produce static state key, in fact a page generation id
-                staticStateString = SESSION_STATE_PREFIX + currentPageGenerationId;
+                // Produce UUID
+                if (handlerContext.getStaticStateUUID() == null) {
+                    currentPageGenerationId = UUIDUtils.createPseudoUUID();
+                    staticStateString = XFormsServer.SESSION_STATE_PREFIX + currentPageGenerationId;
+                } else {
+                    // In this case, we first store in the application scope, so that multiple requests can use the
+                    // same cached state.
+                    currentPageGenerationId = handlerContext.getStaticStateUUID();
+                    staticStateString = XFormsServer.APPLICATION_STATE_PREFIX + currentPageGenerationId;
+                }
             } else {
                 // Produce encoded static state
                 staticStateString = xformsState.getStaticState();
+                currentPageGenerationId = null;
             }
 
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$static-state", "value", staticStateString
             });
         }
@@ -112,11 +116,22 @@ public class XHTMLBodyHandler extends HandlerBase {
             final String dynamicStateString;
             {
                 if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
-                    // Produce dynamic state key
-                    final String newRequestId = UUIDUtils.createPseudoUUID();
-                    final XFormsServerSessionCache sessionCache = XFormsServerSessionCache.instance(externalContext.getSession(true), true);
-                    sessionCache.add(currentPageGenerationId, newRequestId, xformsState);
-                    dynamicStateString = SESSION_STATE_PREFIX + newRequestId;
+
+                    if (handlerContext.getDynamicStateUUID() == null) {
+                        // In this case, we use session scope since not much sharing will occur, if at all.
+
+                        // Produce dynamic state key
+                        final String newRequestId = UUIDUtils.createPseudoUUID();
+                        final XFormsServerSessionStateCache sessionCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);
+                        sessionCache.add(currentPageGenerationId, newRequestId, xformsState);
+                        dynamicStateString = XFormsServer.SESSION_STATE_PREFIX + newRequestId;
+                    } else {
+                        // In this case, we first store in the application scope, so that multiple requests can use the
+                        // same cached state.
+                        dynamicStateString = XFormsServer.APPLICATION_STATE_PREFIX + handlerContext.getDynamicStateUUID();
+                        final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, true);
+                        applicationStateCache.add(currentPageGenerationId, handlerContext.getDynamicStateUUID(), xformsState);
+                    }
                 } else {
                     // Send state to the client
                     dynamicStateString = xformsState.getDynamicState();

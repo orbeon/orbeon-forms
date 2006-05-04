@@ -208,13 +208,15 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Handle dependency on session id
         if (!containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)) {
 
-            if (logger.isDebugEnabled())
-                logger.debug("XForms - adding dependency on session id.");
-
             // Make sure the session is created. It will be used anyway.
-            externalContext.getSession(true);
+            final ExternalContext.Session session = externalContext.getSession(true);
+            final String sessionId = session.getId();
+
+            if (logger.isDebugEnabled())
+                logger.debug("XForms - adding dependency on session id: " + sessionId);
+
             // Add dependency on session id
-            uriReferences.setLocalKeyValidity(new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", externalContext.getRequest().getRequestedSessionId()), new Long(0)));
+            uriReferences.setLocalKeyValidity(new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0)));
         }
     }
 

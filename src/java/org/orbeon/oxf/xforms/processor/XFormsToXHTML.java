@@ -16,20 +16,20 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
+import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.cache.*;
-import org.orbeon.oxf.util.UUIDUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLFilterImpl;
 
@@ -40,8 +40,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -170,58 +168,35 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // Try to cache dynamic state UUID associated with the output
-            final String dynamicStateUUID;
-            final OutputCacheKey outputCacheKey = xhtmlOutput.getKey(pipelineContext);
-            if (outputCacheKey != null) {
-                final Object outputValidity = xhtmlOutput.getValidity(pipelineContext);
-                if (outputValidity != null) {
-                    // Output is cacheable
+            final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, xhtmlOutput, "dynamicState", new OutputObjectCreator() {
+                public Object create(PipelineContext pipelineContext, ProcessorOutput processorOutput) {
+                    logger.debug("XForms - caching UUID for resulting document.");
+                    return UUIDUtils.createPseudoUUID();
+                }
 
-                    // Get cache instance
-                    final Cache cache = ObjectCache.instance();
+                public void foundInCache() {
+                    logger.debug("XForms - found cached UUID for resulting document.");
+                }
 
-                    // Check in cache first
-//                    final KeyValidity = new KeyValidity();
-
-                    final CacheKey internalCacheKey = new InternalCacheKey(XFormsToXHTML.this, "dynamicState", "DYNAMIC_STATE");
-                    final CacheKey compoundCacheKey = new CompoundOutputCacheKey(XFormsToXHTML.this.getClass(), xhtmlOutput.getName(), new CacheKey[] { outputCacheKey, internalCacheKey } );
-
-                    final List compoundValidities = new ArrayList();
-                    compoundValidities.add(outputValidity);
-                    compoundValidities.add(new Long(0));
-
-                    final Object cachedDynamicStateUUID = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
-                    if (cachedDynamicStateUUID != null) {
-                        // Found it
-                        dynamicStateUUID = (String) cachedDynamicStateUUID;
-                        logger.debug("XForms - found cached UUID for resulting document .");
-                    } else {
-                        // Create new UUID and cache it
-                        dynamicStateUUID = UUIDUtils.createPseudoUUID();
-                        cache.add(pipelineContext, compoundCacheKey, compoundValidities, dynamicStateUUID);
-                        logger.debug("XForms - caching UUID for resulting document .");
-                    }
-                } else {
-                    dynamicStateUUID = null;
+                public void unableToCache() {
                     logger.debug("XForms - cannot cache UUID for resulting document.");
                 }
-            } else {
-                dynamicStateUUID = null;
-                logger.debug("XForms - cannot cache UUID for resulting document.");
-            }
+            });
 
             // Output resulting document
             outputResponse(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
         } catch (Throwable e) {
-            // If an exception is caught, we need to discard the object as its state may be inconsistent
-            final ObjectPool sourceObjectPool = containingDocument[0].getSourceObjectPool();
-            if (sourceObjectPool != null) {
-                logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
-                try {
-                    sourceObjectPool.invalidateObject(containingDocument);
-                    containingDocument[0].setSourceObjectPool(null);
-                } catch (Exception e1) {
-                    throw new OXFException(e1);
+            if (containingDocument[0] != null) {
+                // If an exception is caught, we need to discard the object as its state may be inconsistent
+                final ObjectPool sourceObjectPool = containingDocument[0].getSourceObjectPool();
+                if (sourceObjectPool != null) {
+                    logger.debug("XForms - containing document cache: throwable caught, discarding document from pool.");
+                    try {
+                        sourceObjectPool.invalidateObject(containingDocument);
+                        containingDocument[0].setSourceObjectPool(null);
+                    } catch (Exception e1) {
+                        throw new OXFException(e1);
+                    }
                 }
             }
             throw new OXFException(e);

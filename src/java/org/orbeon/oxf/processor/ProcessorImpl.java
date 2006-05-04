@@ -1407,6 +1407,55 @@ public abstract class ProcessorImpl implements Processor {
         }
     }
 
+    /**
+     * Cache an object associated with a given processor output.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param processorOutput   output to associate with
+     * @param keyName           key for the object to cache
+     * @param creator           creator for the object
+     * @return                  created object if caching was possible, null otherwise
+     */
+    public Object getCacheOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, OutputObjectCreator creator) {
+        final OutputCacheKey outputCacheKey = processorOutput.getKey(pipelineContext);
+        if (outputCacheKey != null) {
+            final Object outputValidity = processorOutput.getValidity(pipelineContext);
+            if (outputValidity != null) {
+                // Output is cacheable
+
+                // Get cache instance
+                final Cache cache = ObjectCache.instance();
+
+                // Check in cache first
+                final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+                final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+                        new CacheKey[] { outputCacheKey, internalCacheKey } );
+
+                final List compoundValidities = new ArrayList();
+                compoundValidities.add(outputValidity);
+                compoundValidities.add(new Long(0));
+
+                final Object cachedObject = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+                if (cachedObject != null) {
+                    // Found it
+                    creator.foundInCache();
+                    return cachedObject;
+                } else {
+                    // Not found, call method to create object
+                    final Object readObject = creator.create(pipelineContext, processorOutput);
+                    cache.add(pipelineContext, compoundCacheKey, compoundValidities, readObject);
+                    return readObject;
+                }
+            } else {
+                creator.unableToCache();
+                return null;
+            }
+        } else {
+            creator.unableToCache();
+            return null;
+        }
+    }
+
     private static class DigestValidity {
         public DigestValidity(byte[] digest, Long lastModified) {
             this.digest = digest;

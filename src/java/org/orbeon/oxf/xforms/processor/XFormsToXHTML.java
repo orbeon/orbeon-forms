@@ -51,6 +51,9 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
     private static final String OUTPUT_DOCUMENT = "document";
 
+    private static final KeyValidity CONSTANT_KEY_VALIDITY
+            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
+
     public XFormsToXHTML() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_ANNOTATED_DOCUMENT));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DOCUMENT));
@@ -63,6 +66,29 @@ public class XFormsToXHTML extends ProcessorImpl {
         ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler);
+            }
+
+            protected boolean supportsLocalKeyValidity() {
+                return true;
+            }
+
+            public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
+                final InputDependencies inputDependencies = (XFormsToXHTML.InputDependencies) uriReferences;
+
+                if (inputDependencies.isDependsOnSession()) {
+                    // Make sure the session is created. It will be used anyway.
+                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    final ExternalContext.Session session = externalContext.getSession(true);
+                    final String sessionId = session.getId();
+
+                    if (logger.isDebugEnabled())
+                        logger.debug("XForms - checking dependency on session id: " + sessionId);
+
+                    // Add dependency on session id
+                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0));
+                } else {
+                    return CONSTANT_KEY_VALIDITY;
+                }
             }
         };
         addOutput(outputName, output);
@@ -77,31 +103,12 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        // What can be cached: URI dependencies + the annotated XForms document
-        class Result extends URIProcessorOutputImpl.URIReferences {
-            private SAXStore annotatedSAXStore;
-            private XFormsEngineStaticState xformsEngineStaticState;
-
-            public Result(SAXStore annotatedSAXStore, XFormsEngineStaticState xformsEngineStaticState) {
-                this.annotatedSAXStore = annotatedSAXStore;
-                this.xformsEngineStaticState = xformsEngineStaticState;
-            }
-
-            public SAXStore getAnnotatedSAXStore() {
-                return annotatedSAXStore;
-            }
-
-            public XFormsEngineStaticState getXFormsEngineStaticState() {
-                return xformsEngineStaticState;
-            }
-        }
-
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
         final XFormsServer.XFormsState[] xformsState = new XFormsServer.XFormsState[1];
 
         // Read and try to cache the complete XForms+XHTML document with annotations
-        final Result result = (Result) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
+        final InputDependencies inputDependencies = (InputDependencies) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT), new CacheableInputReader() {
             public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
                 // Compute annotated XForms document + static state document
@@ -123,10 +130,10 @@ public class XFormsToXHTML extends ProcessorImpl {
                 createCacheContainingDocument(pipelineContext, xformsEngineStaticState, containingDocument, xformsState);
 
                 // Set caching dependencies
-                final Result result = new Result(annotatedSAXStore, xformsEngineStaticState);
-                setCachingDependencies(containingDocument[0], result, externalContext);
+                final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsEngineStaticState);
+                setCachingDependencies(containingDocument[0], inputDependencies);
 
-                return result;
+                return inputDependencies;
             }
         });
 
@@ -134,13 +141,13 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create containing document if not done yet
             if (containingDocument[0] == null) {
                 logger.debug("XForms - annotated document and static state obtained from cache; creating containing document.");
-                createCacheContainingDocument(pipelineContext, result.getXFormsEngineStaticState(), containingDocument, xformsState);
+                createCacheContainingDocument(pipelineContext, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
             } else {
                 logger.debug("XForms - annotated document and static state not obtained from cache.");
             }
 
             // Output resulting document
-            outputResponse(pipelineContext, externalContext, result.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0]);
+            outputResponse(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0]);
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
             final ObjectPool sourceObjectPool = containingDocument[0].getSourceObjectPool();
@@ -157,15 +164,43 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void setCachingDependencies(XFormsContainingDocument containingDocument, URIProcessorOutputImpl.URIReferences uriReferences,
-                                        ExternalContext externalContext) {
+    // What can be cached: URI dependencies + the annotated XForms document
+    private static class InputDependencies extends URIProcessorOutputImpl.URIReferences {
+
+        private SAXStore annotatedSAXStore;
+        private XFormsEngineStaticState xformsEngineStaticState;
+        private boolean dependsOnSession;
+
+        public InputDependencies(SAXStore annotatedSAXStore, XFormsEngineStaticState xformsEngineStaticState) {
+            this.annotatedSAXStore = annotatedSAXStore;
+            this.xformsEngineStaticState = xformsEngineStaticState;
+        }
+
+        public SAXStore getAnnotatedSAXStore() {
+            return annotatedSAXStore;
+        }
+
+        public XFormsEngineStaticState getXFormsEngineStaticState() {
+            return xformsEngineStaticState;
+        }
+
+        public boolean isDependsOnSession() {
+            return dependsOnSession;
+        }
+
+        public void setDependsOnSession(boolean dependsOnSession) {
+            this.dependsOnSession = dependsOnSession;
+        }
+    }
+
+    private void setCachingDependencies(XFormsContainingDocument containingDocument, InputDependencies inputDependencies) {
 
         // If a submission took place during XForms initialization, we currently don't cache
         // TODO: Some cases could be easily handled, like GET
         if (containingDocument.isGotSubmission()) {
             if (logger.isDebugEnabled())
                 logger.debug("XForms - submission occurred during XForms initialization, disabling caching of output.");
-            uriReferences.setNoCache();
+            inputDependencies.setNoCache();
             return;
         }
 
@@ -178,7 +213,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (schemaURI != null) {
                 if (logger.isDebugEnabled())
                     logger.debug("XForms - adding document cache dependency for schema: " + schemaURI);
-                uriReferences.addReference(null, schemaURI);
+                inputDependencies.addReference(null, schemaURI);
             }
 
             // Add instance source dependencies
@@ -190,7 +225,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 if (currentInstance.isHasUsername()) {
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - found instance load using username and password, disabling caching of output.");
-                    uriReferences.setNoCache();
+                    inputDependencies.setNoCache();
                     return;
                 }
 
@@ -198,7 +233,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 if (instanceSourceURI != null) {
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
-                    uriReferences.addReference(null, instanceSourceURI);
+                    inputDependencies.addReference(null, instanceSourceURI);
                 }
             }
 
@@ -207,16 +242,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // Handle dependency on session id
         if (!containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)) {
-
-            // Make sure the session is created. It will be used anyway.
-            final ExternalContext.Session session = externalContext.getSession(true);
-            final String sessionId = session.getId();
-
-            if (logger.isDebugEnabled())
-                logger.debug("XForms - adding dependency on session id: " + sessionId);
-
-            // Add dependency on session id
-            uriReferences.setLocalKeyValidity(new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0)));
+            inputDependencies.setDependsOnSession(true);
         }
     }
 

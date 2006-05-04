@@ -65,10 +65,20 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 return null;
             keys.add(configKeyValidity.key);
         }
+
+        // Add local key if needed
+        if (supportsLocalKeyValidity()) {
+            final ProcessorImpl.KeyValidity keyValidity = getLocalKeyValidity(pipelineContext, uriReferences);
+            if (keyValidity == null)
+                return null;
+            keys.add(keyValidity.key);
+        }
+
         // Handle local key
-        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
-        if (localKeyValidity != null)
-            keys.add(localKeyValidity.key);
+//        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
+//        if (localKeyValidity != null)
+//            keys.add(localKeyValidity.key);
+
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
@@ -81,9 +91,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 keys.add(uriKey);
             }
         }
-        final CacheKey[] outKys = new CacheKey[keys.size()];
-        keys.toArray(outKys);
-        return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKys);
+        final CacheKey[] outKeys = new CacheKey[keys.size()];
+        keys.toArray(outKeys);
+        return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKeys);
     }
 
     protected Object getValidityImpl(PipelineContext pipelineContext) {
@@ -103,9 +113,18 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
             validities.add(configKeyValidity.validity);
         }
         // Handle local validity
-        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
-        if (localKeyValidity != null)
-            validities.add(localKeyValidity.validity);
+//        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
+//        if (localKeyValidity != null)
+//            validities.add(localKeyValidity.validity);
+
+        // Add local validity if needed
+        if (supportsLocalKeyValidity()) {
+            final ProcessorImpl.KeyValidity keyValidity = getLocalKeyValidity(pipelineContext, uriReferences);
+            if (keyValidity == null)
+                return null;
+            validities.add(keyValidity.validity);
+        }
+
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
@@ -364,13 +383,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         public List getReferences() {
             return references;
         }
+    }
 
-        public void setLocalKeyValidity(ProcessorImpl.KeyValidity localKeyValidity) {
-            this.localKeyValidity = localKeyValidity;
-        }
+    protected boolean supportsLocalKeyValidity() {
+        return false;
+    }
 
-        public ProcessorImpl.KeyValidity getLocalKeyValidity() {
-            return localKeyValidity;
-        }
+    public ProcessorImpl.KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
+        throw new UnsupportedOperationException();
     }
 }

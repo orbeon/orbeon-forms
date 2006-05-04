@@ -89,7 +89,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // Get last modification date and compute last modified if possible
                 Object validity = getInputValidity(pipelineContext, dataInput);
-                long lastModified = (validity != null) ? findLastModified(validity) : 0;
+                long lastModified = (validity != null && isInputInCache(pipelineContext, dataInput)) ? findLastModified(validity) : 0;
 
                 if (logger.isDebugEnabled())
                     logger.debug("Last modified: " + lastModified);

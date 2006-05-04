@@ -15,9 +15,27 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
-
+/**
+ * This class is called back from ProcessorImpl.readCacheInputAsObject().
+ */
 public abstract class CacheableInputReader {
+    /**
+     * Method called back when it is necessary to read the input. It may not be called when the input data is already
+     * in cache.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param processorInput    input being read
+     * @return                  object created from the input
+     */
     public abstract Object read(PipelineContext pipelineContext, ProcessorInput processorInput);
+
+    /**
+     * Method called back when the input data is already in cache. If this is called, read() won't be called.
+     */
     public void foundInCache() {}
+
+    /**
+     * Method called back when the input data has been cached after a call to read().
+     */
     public void storedInCache() {}
 }

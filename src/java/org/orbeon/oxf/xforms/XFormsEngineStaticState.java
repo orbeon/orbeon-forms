@@ -18,6 +18,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.UUIDUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
  */
 public class XFormsEngineStaticState {
 
+    private String uuid;
     private String encodedStaticState;
 
     private Document controlsDocument;
@@ -42,6 +44,7 @@ public class XFormsEngineStaticState {
 
     public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument) {
 
+        uuid = UUIDUtils.createPseudoUUID();
         encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey());
 
         // Get controls document
@@ -67,6 +70,10 @@ public class XFormsEngineStaticState {
 
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
+    }
+
+    public String getUUID() {
+        return uuid;
     }
 
     public String getEncodedStaticState() {

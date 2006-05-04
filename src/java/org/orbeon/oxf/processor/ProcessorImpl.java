@@ -445,13 +445,13 @@ public abstract class ProcessorImpl implements Processor {
             // Check in cache first
             KeyValidity keyValidity = getInputKeyValidity(context, input);
             if (keyValidity != null) {
-                Object configObject = cache.findValid(context, keyValidity.key, keyValidity.validity);
-                if (configObject != null) {
+                final Object inputObject = cache.findValid(context, keyValidity.key, keyValidity.validity);
+                if (inputObject != null) {
                     // Return cached object
                     if (logger.isDebugEnabled())
-                        logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + configObject);
+                        logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + inputObject);
                     reader.foundInCache();
-                    return configObject;
+                    return inputObject;
                 }
             }
 
@@ -477,6 +477,26 @@ public abstract class ProcessorImpl implements Processor {
                 logger.debug("Cache " + debugInfo + ": source never cacheable. READING.");
             // Never read from cache
             return reader.read(context, input);
+        }
+    }
+
+    protected Object getCachedInputAsObject(PipelineContext pipelineContext, ProcessorInput processorInput) {
+        // Get associated output
+        final ProcessorOutput output = processorInput.getOutput();
+
+        if (output instanceof Cacheable) {
+            // Get cache instance
+            final Cache cache = ObjectCache.instance();
+
+            // Check cache
+            final KeyValidity keyValidity = getInputKeyValidity(pipelineContext, processorInput);
+            if (keyValidity != null) {
+                return cache.findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
         }
     }
 
@@ -1176,6 +1196,14 @@ public abstract class ProcessorImpl implements Processor {
         public final Object getValidity(PipelineContext context) {
             return getFilter(context).getValidity(context);
         }
+
+        public final KeyValidity getKeyValidityImpl(PipelineContext context) {
+            final OutputCacheKey outputCacheKey = getKeyImpl(context);
+            if (outputCacheKey == null) return null;
+            final Object outputCacheValidity = getValidityImpl(context);
+            if (outputCacheValidity == null) return null;
+            return new KeyValidity(outputCacheKey, outputCacheValidity);
+        }
     }
 
     protected static OutputCacheKey getInputKey(PipelineContext context, ProcessorInput input) {
@@ -1194,7 +1222,7 @@ public abstract class ProcessorImpl implements Processor {
      * config (if we don't already have it) just to return a key/validity.
      */
     protected boolean isInputInCache(PipelineContext context, ProcessorInput input) {
-        KeyValidity keyValidity = getInputKeyValidity(context, input);
+        final KeyValidity keyValidity = getInputKeyValidity(context, input);
         if (keyValidity == null)
             return false;
         return ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
@@ -1416,43 +1444,107 @@ public abstract class ProcessorImpl implements Processor {
      * @param creator           creator for the object
      * @return                  created object if caching was possible, null otherwise
      */
-    public Object getCacheOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, OutputObjectCreator creator) {
-        final OutputCacheKey outputCacheKey = processorOutput.getKey(pipelineContext);
-        if (outputCacheKey != null) {
-            final Object outputValidity = processorOutput.getValidity(pipelineContext);
-            if (outputValidity != null) {
-                // Output is cacheable
+    protected Object getCacheOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, OutputObjectCreator creator) {
 
-                // Get cache instance
-                final Cache cache = ObjectCache.instance();
+        final KeyValidity outputKeyValidity = processorOutput.getKeyValidityImpl(pipelineContext);
+        if (outputKeyValidity != null) {
+            // Output is cacheable
 
-                // Check in cache first
-                final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
-                final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
-                        new CacheKey[] { outputCacheKey, internalCacheKey } );
+            // Get cache instance
+            final Cache cache = ObjectCache.instance();
 
-                final List compoundValidities = new ArrayList();
-                compoundValidities.add(outputValidity);
-                compoundValidities.add(new Long(0));
+            // Check in cache first
+            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+                    new CacheKey[] { outputKeyValidity.key, internalCacheKey } );
 
-                final Object cachedObject = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
-                if (cachedObject != null) {
-                    // Found it
-                    creator.foundInCache();
-                    return cachedObject;
-                } else {
-                    // Not found, call method to create object
-                    final Object readObject = creator.create(pipelineContext, processorOutput);
-                    cache.add(pipelineContext, compoundCacheKey, compoundValidities, readObject);
-                    return readObject;
-                }
+            final List compoundValidities = new ArrayList();
+            compoundValidities.add(outputKeyValidity.validity);
+            compoundValidities.add(new Long(0));
+
+            final Object cachedObject = cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+            if (cachedObject != null) {
+                // Found it
+                creator.foundInCache();
+                return cachedObject;
             } else {
-                creator.unableToCache();
-                return null;
+                // Not found, call method to create object
+                final Object readObject = creator.create(pipelineContext, processorOutput);
+                cache.add(pipelineContext, compoundCacheKey, compoundValidities, readObject);
+                return readObject;
             }
         } else {
             creator.unableToCache();
             return null;
+        }
+    }
+
+    /**
+     * Get a cached object associated with a given processor output.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param processorOutput   output to associate with
+     * @param keyName           key for the object to cache
+     * @return                  cached object if object found, null otherwise
+     */
+    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName) {
+        final KeyValidity outputKeyValidityImpl = processorOutput.getKeyValidityImpl(pipelineContext);
+        if (outputKeyValidityImpl != null) {
+            // Output is cacheable
+
+            // Get cache instance
+            final Cache cache = ObjectCache.instance();
+
+            // Check in cache first
+            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
+
+            final List compoundValidities = new ArrayList();
+            compoundValidities.add(outputKeyValidityImpl.validity);
+            compoundValidities.add(new Long(0));
+
+            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+        } else {
+            return null;
+        }
+    }
+
+    protected Object getOutputObject(PipelineContext pipelineContext, ProcessorOutputImpl processorOutput, String keyName, KeyValidity outputKeyValidityImpl) {
+        if (outputKeyValidityImpl != null) {
+            // Output is cacheable
+
+            // Get cache instance
+            final Cache cache = ObjectCache.instance();
+
+            // Check in cache first
+            final CacheKey internalCacheKey = new InternalCacheKey(this, "outputKey", keyName);
+            final CacheKey compoundCacheKey = new CompoundOutputCacheKey(this.getClass(), processorOutput.getName(),
+                    new CacheKey[] { outputKeyValidityImpl.key, internalCacheKey } );
+
+            final List compoundValidities = new ArrayList();
+            compoundValidities.add(outputKeyValidityImpl.validity);
+            compoundValidities.add(new Long(0));
+
+            return cache.findValid(pipelineContext, compoundCacheKey, compoundValidities);
+        } else {
+            return null;
+        }
+    }
+
+    public static long findLastModified(Object validity) {
+        if (validity instanceof Long) {
+            return ((Long) validity).longValue();
+        } else if (validity instanceof List) {
+            List list = (List) validity;
+            long latest = 0;
+            for (Iterator i = list.iterator(); i.hasNext();) {
+                Object o = i.next();
+                latest = Math.max(latest, findLastModified(o));
+            }
+            return latest;
+        } else {
+            return 0;
         }
     }
 

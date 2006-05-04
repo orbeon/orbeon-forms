@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -47,13 +47,17 @@ import java.util.Iterator;
  */
 public class XFormsToXHTML extends ProcessorImpl {
 
+    private static final boolean IS_MIGRATE_TO_SESSION = false;// TODO: for tests
+
     static public Logger logger = XFormsServer.logger;
 
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
     private static final String OUTPUT_DOCUMENT = "document";
 
-    private static final KeyValidity CONSTANT_KEY_VALIDITY
-            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
+    private static final String OUTPUT_CACHE_KEY = "dynamicState";
+
+//    private static final KeyValidity CONSTANT_KEY_VALIDITY
+//            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
 
     public XFormsToXHTML() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_ANNOTATED_DOCUMENT));
@@ -64,36 +68,33 @@ public class XFormsToXHTML extends ProcessorImpl {
      * Case where an XML response must be generated.
      */
     public ProcessorOutput createOutput(final String outputName) {
-        ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
+        final ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 doIt(pipelineContext, contentHandler, this);
             }
 
-            protected boolean supportsLocalKeyValidity() {
-                return false;
-            }
+            protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                final OutputCacheKey outputCacheKey = super.getKeyImpl(pipelineContext);
 
-            public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
-                final InputDependencies inputDependencies = (XFormsToXHTML.InputDependencies) uriReferences;
+                if (IS_MIGRATE_TO_SESSION && outputCacheKey != null) {
+                    final InputDependencies inputDependencies = (InputDependencies) getCachedInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT));
+                    if (inputDependencies != null && inputDependencies.isDependsOnSession()) {
+                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                        final ExternalContext.Session session = externalContext.getSession(true);
 
-                if (inputDependencies.isDependsOnSession()) {
+                        // Find cached info
+                        final XFormsEngineStaticState staticState = inputDependencies.getXFormsEngineStaticState();
+                        final String staticStateUUID = staticState.getUUID();
+                        final String encodedStaticState = staticState.getEncodedStaticState();
 
-                    // For now, cannot cache output when we depend on the session.
-                    return null;
+                        final String dynamicStateUUID = (String) getOutputObject(pipelineContext, this, OUTPUT_CACHE_KEY,
+                                new KeyValidity(outputCacheKey, getValidityImpl(pipelineContext)));
 
-//                    // Make sure the session is created. It will be used anyway.
-//                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-//                    final ExternalContext.Session session = externalContext.getSession(true);
-//                    final String sessionId = session.getId();
-//
-//                    if (logger.isDebugEnabled())
-//                        logger.debug("XForms - checking dependency on session id: " + sessionId);
-//
-//                    // Add dependency on session id
-//                    return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", sessionId), new Long(0));
-                } else {
-                    return CONSTANT_KEY_VALIDITY;
+                        // Migrate data to current session
+                    }
                 }
+
+                return outputCacheKey;
             }
         };
         addOutput(outputName, output);
@@ -162,13 +163,13 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             if (cachedInput[0]) {
-                staticStateUUID = inputDependencies.getUUID();
+                staticStateUUID = inputDependencies.getXFormsEngineStaticState().getUUID();
             } else {
                 staticStateUUID = null;
             }
 
             // Try to cache dynamic state UUID associated with the output
-            final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, xhtmlOutput, "dynamicState", new OutputObjectCreator() {
+            final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, xhtmlOutput, OUTPUT_CACHE_KEY, new OutputObjectCreator() {
                 public Object create(PipelineContext pipelineContext, ProcessorOutput processorOutput) {
                     logger.debug("XForms - caching UUID for resulting document.");
                     return UUIDUtils.createPseudoUUID();
@@ -210,8 +211,6 @@ public class XFormsToXHTML extends ProcessorImpl {
         private XFormsEngineStaticState xformsEngineStaticState;
         private boolean dependsOnSession;
 
-        private String uuid = UUIDUtils.createPseudoUUID();
-
         public InputDependencies(SAXStore annotatedSAXStore, XFormsEngineStaticState xformsEngineStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
             this.xformsEngineStaticState = xformsEngineStaticState;
@@ -231,10 +230,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         public void setDependsOnSession(boolean dependsOnSession) {
             this.dependsOnSession = dependsOnSession;
-        }
-
-        public String getUUID() {
-            return uuid;
         }
     }
 
@@ -303,41 +298,47 @@ public class XFormsToXHTML extends ProcessorImpl {
             final TransformerURIResolver uriResolver = new TransformerURIResolver(XFormsToXHTML.this, pipelineContext, INPUT_ANNOTATED_DOCUMENT, false) {
                 public Source resolve(String href, String base) throws TransformerException {
 
-                    final URL url;
-                    try {
-                        url = URLFactory.createURL(base, href);
-                    } catch (MalformedURLException e) {
-                        throw new OXFException(e);
-                    }
-                    final String urlString = url.toExternalForm();
-                    final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) XFormsToXHTML.this.getState(pipelineContext);
-                    if (state.isDocumentSet(urlString)) {
-                        // This means the document requested is already available. We use the cached document.
-                        final XMLReader xmlReader = new XMLFilterImpl() {
-                            public void parse(String systemId) throws SAXException {
-                                state.getDocument(urlString).replay(getContentHandler());
-                            }
-
-                            // FIXME: Is this necessary?
-                            public void setFeature(String name, boolean state) throws SAXNotRecognizedException {
-                                // We allow these two features
-                                if (name.equals("http://xml.org/sax/features/namespaces") && state)
-                                    return;
-                                if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
-                                    return;
-
-                                // Otherwise we throw
-                                throw new SAXNotRecognizedException("Feature: " + name);
-                            }
-                        };
-
-                        if (logger.isDebugEnabled())
-                            logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
-
-                        return new SAXSource(xmlReader, new InputSource(urlString));
-                    } else {
+                    final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
+                    if (inputName != null) {
                         // Use parent resolver
                         return super.resolve(href, base);
+                    } else {
+                        final URL url;
+                        try {
+                            url = URLFactory.createURL(base, href);
+                        } catch (MalformedURLException e) {
+                            throw new OXFException(e);
+                        }
+                        final String urlString = url.toExternalForm();
+                        final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) XFormsToXHTML.this.getState(pipelineContext);
+                        if (state.isDocumentSet(urlString)) {
+                            // This means the document requested is already available. We use the cached document.
+                            final XMLReader xmlReader = new XMLFilterImpl() {
+                                public void parse(String systemId) throws SAXException {
+                                    state.getDocument(urlString).replay(getContentHandler());
+                                }
+
+                                // FIXME: Is this necessary?
+                                public void setFeature(String name, boolean state) throws SAXNotRecognizedException {
+                                    // We allow these two features
+                                    if (name.equals("http://xml.org/sax/features/namespaces") && state)
+                                        return;
+                                    if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
+                                        return;
+
+                                    // Otherwise we throw
+                                    throw new SAXNotRecognizedException("Feature: " + name);
+                                }
+                            };
+
+                            if (logger.isDebugEnabled())
+                                logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
+
+                            return new SAXSource(xmlReader, new InputSource(urlString));
+                        } else {
+                            // Use parent resolver
+                            return super.resolve(href, base);
+                        }
                     }
                 }
             };

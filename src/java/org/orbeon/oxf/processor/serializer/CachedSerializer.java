@@ -50,20 +50,4 @@ public abstract class CachedSerializer extends ProcessorImpl {
      * @param outputStream  OutputStream to write to; do not use the response parameter
      */
     protected abstract void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config, OutputStream outputStream);
-
-    protected long findLastModified(Object validity) {
-        if (validity instanceof Long) {
-            return ((Long) validity).longValue();
-        } else if (validity instanceof List) {
-            List list = (List) validity;
-            long latest = 0;
-            for (Iterator i = list.iterator(); i.hasNext();) {
-                Object o = i.next();
-                latest = Math.max(latest, findLastModified(o));
-            }
-            return latest;
-        } else {
-            return 0;
-        }
-    }
 }

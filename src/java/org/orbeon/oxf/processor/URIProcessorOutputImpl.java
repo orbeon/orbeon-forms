@@ -15,17 +15,17 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.xml.SAXStore;
 
-import java.util.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.*;
 
 /**
  * Implementation of a caching transformer output that assumes that an output depends on a set
@@ -207,18 +207,22 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                     if (state.isDocumentSet(urlString))
                         return state.getLastModified(urlString);
 
-                    final URLConnection urlConnection = url.openConnection();
-                    try {
-                        final long lastModified = urlConnection.getLastModified();
+                    {
                         // We read the document and store it temporarily, since it will likely be read just after this anyway
                         final SAXStore documentSAXStore;
+                        final long lastModified;
                         {
+                            // Connect processors and read document
                             final URLGenerator urlGenerator = new URLGenerator(urlString);
                             final SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
                             PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, saxStoreSerializer, ProcessorImpl.INPUT_DATA);
                             final PipelineContext tempPipelineContext = new PipelineContext();
                             saxStoreSerializer.start(tempPipelineContext);
                             documentSAXStore = saxStoreSerializer.getSAXStore();
+
+                            // Obtain last modified
+                            final ProcessorImpl.ProcessorOutputImpl urlGeneratorOutputImpl = (ProcessorImpl.ProcessorOutputImpl) urlGenerator.getOutputByName(ProcessorImpl.OUTPUT_DATA);
+                            lastModified = ProcessorImpl.findLastModified(urlGeneratorOutputImpl.getValidityImpl(pipelineContext));
                         }
                         // Zero and negative values often have a special meaning, make sure to normalize here
                         final Long lastModifiedLong = lastModified <= 0 ? null : new Long(lastModified);
@@ -227,10 +231,6 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                         state.setDocument(urlString, documentSAXStore, lastModifiedLong);
 
                         return lastModifiedLong;
-                    } finally {
-                        if (urlConnection != null) {
-                            urlConnection.getInputStream().close();
-                        }
                     }
 
                 } else  {
@@ -344,7 +344,6 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     public static class URIReferences {
 
         private List references;
-        private ProcessorImpl.KeyValidity localKeyValidity;
 
         /**
          * Add a URL reference.

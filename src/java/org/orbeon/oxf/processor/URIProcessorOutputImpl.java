@@ -66,9 +66,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
             keys.add(configKeyValidity.key);
         }
         // Handle local key
-        final CacheKey localKey = uriReferences.getLocalKey();
-        if (localKey != null)
-            keys.add(localKey);
+        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
+        if (localKeyValidity != null)
+            keys.add(localKeyValidity.key);
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
@@ -103,9 +103,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
             validities.add(configKeyValidity.validity);
         }
         // Handle local validity
-        final Object localValidity = uriReferences.getLocalValidity();
-        if (localValidity != null)
-            validities.add(localValidity);
+        final ProcessorImpl.KeyValidity localKeyValidity = uriReferences.getLocalKeyValidity();
+        if (localKeyValidity != null)
+            validities.add(localKeyValidity.validity);
         // Handle dependencies if any
 //            log("uriReferences.getReferences(): " + uriReferences.getReferences());
         if (uriReferences.getReferences() != null) {
@@ -325,6 +325,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     public static class URIReferences {
 
         private List references;
+        private ProcessorImpl.KeyValidity localKeyValidity;
 
         /**
          * Add a URL reference.
@@ -364,14 +365,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
             return references;
         }
 
-        public CacheKey getLocalKey() {
-            // We don't have a config really, just another URL
-            return null;
+        public void setLocalKeyValidity(ProcessorImpl.KeyValidity localKeyValidity) {
+            this.localKeyValidity = localKeyValidity;
         }
 
-        public Object getLocalValidity() {
-            // We don't have a config really, just another URL
-            return null;
+        public ProcessorImpl.KeyValidity getLocalKeyValidity() {
+            return localKeyValidity;
         }
     }
 }

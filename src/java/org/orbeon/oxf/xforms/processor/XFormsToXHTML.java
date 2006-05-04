@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.cache.InternalCacheKey;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLFilterImpl;
 
@@ -123,7 +124,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 // Set caching dependencies
                 final Result result = new Result(annotatedSAXStore, xformsEngineStaticState);
-                setCachingDependencies(containingDocument[0], result);
+                setCachingDependencies(containingDocument[0], result, externalContext);
 
                 return result;
             }
@@ -156,7 +157,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void setCachingDependencies(XFormsContainingDocument containingDocument, URIProcessorOutputImpl.URIReferences uriReferences) {
+    private void setCachingDependencies(XFormsContainingDocument containingDocument, URIProcessorOutputImpl.URIReferences uriReferences,
+                                        ExternalContext externalContext) {
 
         // If a submission took place during XForms initialization, we currently don't cache
         // TODO: Some cases could be easily handled, like GET
@@ -201,6 +203,18 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // TODO: Add @src attributes from controls
+        }
+
+        // Handle dependency on session id
+        if (!containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)) {
+
+            if (logger.isDebugEnabled())
+                logger.debug("XForms - adding dependency on session id.");
+
+            // Make sure the session is created. It will be used anyway.
+            externalContext.getSession(true);
+            // Add dependency on session id
+            uriReferences.setLocalKeyValidity(new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, "sessionId", externalContext.getRequest().getRequestedSessionId()), new Long(0)));
         }
     }
 

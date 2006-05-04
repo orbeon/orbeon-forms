@@ -1627,15 +1627,17 @@ function xformsHandleResponse() {
                                             var repeatIterationElement = controlValuesElement.childNodes[j];
                                             var repeatId = repeatIterationElement.getAttribute("id");
                                             var iteration = repeatIterationElement.getAttribute("iteration");
-                                            var relevant = repeatIterationElement.getAttribute("relevant") == "true";
+                                            var relevant = repeatIterationElement.getAttribute("relevant");
                                             // Remove or add xforms-disabled on elements after this delimiter
                                             var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
                                             while (!(cursor.nodeType == ELEMENT_TYPE &&
                                                      (xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
                                                         || xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end")))) {
                                                 if (cursor.nodeType == ELEMENT_TYPE) {
-                                                    if (relevant) xformsRemoveClass(cursor, "xforms-disabled");
-                                                    else xformsAddClass(cursor, "xforms-disabled");
+                                                    if (relevant) {
+                                                        if (relevant == "true") xformsRemoveClass(cursor, "xforms-disabled");
+                                                        else xformsAddClass(cursor, "xforms-disabled");
+                                                    }
                                                 }
                                                 cursor = cursor.nextSibling;
                                             }

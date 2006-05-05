@@ -83,14 +83,17 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    protected long lastModifiedImpl(String key) {
+    protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         File file = getFile(key);
         if (file.canRead())
             return file.lastModified();
-        else
-            throw new ResourceNotFoundException("Cannot read from file " + key);
+        else {
+            if (doNotThrowResourceNotFound) return -1;
+            else throw new ResourceNotFoundException("Cannot read from file " + key);
+        }
     }
 
     /**

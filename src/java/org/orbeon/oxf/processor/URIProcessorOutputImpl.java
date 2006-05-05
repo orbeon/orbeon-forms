@@ -190,7 +190,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                     // oxf: URLs
                     final String key = url.getFile();
-                    final long result = ResourceManagerWrapper.instance().lastModified(key);
+                    final long result = ResourceManagerWrapper.instance().lastModified(key, false);
                     // Zero and negative values often have a special meaning, make sure to normalize here
                     return (result <= 0) ? null : new Long(result);
                 } else if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {

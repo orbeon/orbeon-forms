@@ -78,9 +78,10 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    protected long lastModifiedImpl(String key) {
+    protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         try {
             long lm;
             String realPath = servletContext.getRealPath(rootDirectory + key);
@@ -89,13 +90,17 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
                 // not uncompress the WAR file. This is in particular the case
                 // when deploying compressed WAR files on Tomcat.
                 URL url = servletContext.getResource(rootDirectory + key);
-                if (url == null)
-                    throw new ResourceNotFoundException("Cannot read from file " + key);
+                if (url == null) {
+                    if (doNotThrowResourceNotFound) return -1;
+                    else throw new ResourceNotFoundException("Cannot read from file " + key);
+                }
                 lm = url.openConnection().getLastModified();
             } else {
                 File file = new File(realPath);
-                if (!file.canRead())
-                    throw new ResourceNotFoundException("Cannot read from file " + key);
+                if (!file.canRead()) {
+                    if (doNotThrowResourceNotFound) return -1;
+                    else throw new ResourceNotFoundException("Cannot read from file " + key);
+                }
                 lm = file.lastModified();
             }
             if (lm == 0) lm = 1;

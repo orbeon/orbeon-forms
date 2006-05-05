@@ -62,16 +62,18 @@ public class WebDAVResourceManagerImpl extends ResourceManagerBase {
         }
     }
 
-    protected long lastModifiedImpl(String key) {
+    protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         HttpURL httpURL = getURL(key);
         try {
             WebdavResource webdavResource = new WebdavResource(httpURL);
             return webdavResource.getGetLastModified();
         } catch (HttpException e) {
-            if (e.getReasonCode() == HttpStatus.SC_NOT_FOUND)
-                throw new ResourceNotFoundException("Cannot connect to URL: " + httpURL);
-            else
+            if (e.getReasonCode() == HttpStatus.SC_NOT_FOUND) {
+                if (doNotThrowResourceNotFound) return -1;
+                else throw new ResourceNotFoundException("Cannot connect to URL: " + httpURL);
+            } else {
                 throw new OXFException(e);
+            }
         } catch (Exception e) {
             throw new OXFException(e);
         }

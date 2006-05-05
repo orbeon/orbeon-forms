@@ -615,7 +615,7 @@ public class URLGenerator extends ProcessorImpl {
             if (logger.isDebugEnabled())
                 logger.debug("OXF Protocol: Using ResourceManager for key " + getKey());
 
-            long result = ResourceManagerWrapper.instance().lastModified(getKey());
+            long result = ResourceManagerWrapper.instance().lastModified(getKey(), false);
             // Zero and negative values often have a special meaning, make sure to normalize here
             return (result <= 0) ? null : new Long(result);
         }

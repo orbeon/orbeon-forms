@@ -306,14 +306,14 @@ public abstract class ResourceManagerBase implements ResourceManager {
         };
     }
 
-    final synchronized public long lastModified(String key) {
+    final synchronized public long lastModified(String key, boolean doNotThrowResourceNotFound) {
         // Do only 1 call to currentTimeMillis()
         long currentTimeMillis = System.currentTimeMillis();
         Object value = lastModifiedMap.get(currentTimeMillis, key);
         if (value == null) {
             // We don't have the information or or it has expired
             try {
-                long lastModified = lastModifiedImpl(key);
+                long lastModified = lastModifiedImpl(key, doNotThrowResourceNotFound);
                 lastModifiedMap.put(currentTimeMillis, key, new Long(lastModified));
                 return lastModified;
             } catch (ResourceNotFoundException e) {
@@ -329,7 +329,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
         }
     }
 
-    abstract protected long lastModifiedImpl(String key);
+    abstract protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound);
 
     protected void invalidateLastModifiedCache(String key) {
         lastCalltoLastModified.remove(key);

@@ -191,9 +191,10 @@ public class CacheResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModifiedImpl(String key) {
+    public long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         try {
             eXtc.Document doc = eXtc.DOMAPI.getDocumentNode(db, key);
             if (doc == null)

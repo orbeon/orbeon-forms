@@ -32,22 +32,15 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
     private final Class clazz;
     private final boolean prependSlash;
     
-    private java.net.URL getResource( final String key ) {
-        final String adjustedKey = prependSlash && !key.startsWith( "/" ) ? "/" + key : key;
-        final java.net.URL ret = clazz.getResource( adjustedKey ); 
-        if ( ret == null ) {
-            throw new ResourceNotFoundException( "Cannot read from file " + key );
-        }
-        return ret;
-    }
 
-    private java.net.URLConnection getConnection( final String key ) throws java.io.IOException { 
-        final java.net.URL u = getResource( key );
-        final java.net.URLConnection ret = u.openConnection();
-        // 5/24/2005 d : Put this in on off chance it would fix file locking pbm reported by 
-        //               Damon Rand on the mailing list.  It didn't so have removed it.
-        //ret.setUseCaches( false );
-        return ret;
+    private java.net.URLConnection getConnection(final String key, boolean doNotThrowResourceNotFound) throws java.io.IOException {
+        final String adjustedKey = prependSlash && !key.startsWith( "/" ) ? "/" + key : key;
+        final java.net.URL u = clazz.getResource( adjustedKey );
+        if (u == null) {
+            if (doNotThrowResourceNotFound) return null;
+            else throw new ResourceNotFoundException( "Cannot read from file " + key );
+        }
+        return u.openConnection();
     }
 
     /**
@@ -59,7 +52,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
     /**
      * Initialize this resource manager with rooted in the specified class
-     * @param clazz a root class
+     * @param c a root class
      */
     public ClassLoaderResourceManagerImpl( final java.util.Map props, final Class c ) {
         super( props );
@@ -89,7 +82,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
         final java.io.InputStream ret;
         try {
-            final java.net.URLConnection uc = getConnection( key );
+            final java.net.URLConnection uc = getConnection( key, false);
             uc.setUseCaches( false );
             ret = uc.getInputStream();
         } catch ( final java.io.IOException e ) {
@@ -101,9 +94,10 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specified resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    protected long lastModifiedImpl( final String key ) {
+    protected long lastModifiedImpl(final String key, boolean doNotThrowResourceNotFound) {
         /*
          * Slower implentations are commented out below.  Left them in place so we don't
          * re-implentment them...
@@ -113,12 +107,11 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
          */
         final long ret;
         done : try {
-//            java.net.URL url = getResource( key );
-//            if ( url == null ) {
-//                throw new ResourceNotFoundException( "Cannot read from file " + key );
-//            }
-//            final java.net.URLConnection uc = url.openConnection();
-            final java.net.URLConnection uc = getConnection( key );
+            final java.net.URLConnection uc = getConnection( key, doNotThrowResourceNotFound);
+            if (uc == null) {
+                ret = -1;
+                break done;
+            }
             if ( uc instanceof java.net.JarURLConnection ) {
                 final JarEntry je 
                     = ( ( java.net.JarURLConnection )uc ).getJarEntry();
@@ -147,137 +140,13 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
         return ret;
     }
 
-//    /**
-//     * Gets the last modified timestamp for the specified resource
-//     * @param key A Resource Manager key
-//     * @return a timestamp
-//     */
-//    protected long lastModifiedImplOld(String key) {
-//        try {
-//            java.net.URL resource = (clazz == null ? getClass() : clazz).getResource(((clazz == null && !key.startsWith("/")) ? "/" : "") + key);
-//            if (resource == null)
-//                throw new ResourceNotFoundException("Cannot read from file " + key);
-//            long lm = NetUtils.getLastModified(resource.openConnection());
-//            // If the class loader cannot determine this, we assume that the
-//            // file will not change.
-//            if (lm == 0) lm = 1;
-//            return lm;
-//        } catch (java.io.IOException e) {
-//            throw new OXFException(e);
-//        }
-//    }
-//
-//    protected long lastModifiedImpl2( final String key ) {
-//        try {
-//            final long ret;
-//            java.net.URL url = getResource( key );
-//            if ( url == null ) {
-//                throw new ResourceNotFoundException( "Cannot read from file " + key );
-//            }
-//            final String prot = url.getProtocol();
-//            if ( "jar".equalsIgnoreCase( prot ) ) {
-//                final java.net.JarURLConnection jc 
-//                    = ( java.net.JarURLConnection )url.openConnection();
-////                System.out.println( "dan jar: " + jc.getUseCaches() + " " + url );
-//                final JarEntry je = jc.getJarEntry();
-//                ret = je.getTime();
-//            } else if ( "file".equalsIgnoreCase( prot ) ) {
-////                System.out.println( "dan file: " + url );
-//                final String fnam = url.getPath();
-//                final java.io.File f = new java.io.File( fnam );
-//                if ( f.exists() ) {
-//                    ret = f.lastModified();
-//                } else {
-//                    final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
-//                    final java.io.File fdec = new java.io.File( fnamDec );
-//                    ret = f.lastModified();
-//                }
-//            } else {
-////                System.out.println( "dan other: " + url );
-//                final java.net.URLConnection uc = url.openConnection();
-//                final long l = NetUtils.getLastModified( uc );
-//                ret = l == 0 ? 1 : l;
-//            }
-//            return ret;
-//        } catch ( final java.io.IOException e ) {
-//            throw new OXFException( e );
-//        }
-//    }
-//
-//    protected long lastModifiedImpl1(String key) {
-//        /*
-//         * Opening JarURLConnections is expensive.  When possible just use the time stamp of the jar 
-//         * file.
-//         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
-//         * handling of a single request to '/' in the examples app. i.e. The trace below was 
-//         * responsible for creating 300k of garbage during the handing of a single request to '/'.
-//         * 
-//         * delta: 303696 live: 1017792 alloc: 1264032 trace: 381205 class: byte[]
-//         * 
-//         * TRACE 381205:
-//         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:178)
-//         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:158)
-//         * sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:70)
-//         * sun.net.www.protocol.file.FileURLConnection.initializeHeaders(FileURLConnection.java:90)
-//         * sun.net.www.protocol.file.FileURLConnection.getHeaderField(FileURLConnection.java:126)
-//         * sun.net.www.protocol.jar.JarURLConnection.getHeaderField(JarURLConnection.java:178)
-//         * java.net.URLConnection.getHeaderFieldDate(URLConnection.java:597)
-//         * java.net.URLConnection.getLastModified(URLConnection.java:526)
-//         * org.orbeon.oxf.util.NetUtils.getLastModified(NetUtils.java:119)
-//         * org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl.lastModifiedImpl(ClassLoaderResourceManagerImpl.java:89)
-//         * org.orbeon.oxf.resources.ResourceManagerBase.lastModified(ResourceManagerBase.java:299)
-//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl$5.run(PriorityResourceManagerImpl.java:125)
-//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.delegate(PriorityResourceManagerImpl.java:232)
-//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.lastModified(PriorityResourceManagerImpl.java:123)
-//         * org.orbeon.oxf.processor.generator.URLGenerator$OXFResourceHandler.getValidity(URLGenerator.java:553)
-//         * org.orbeon.oxf.processor.generator.URLGenerator$1.getHandlerValidity(URLGenerator.java:470)
-//         * 
-//         * This mod brings gc time/app time ratio down from 1.778586943371413 to 1.5751878434169833.
-//         * ( 1500 samples, 50 threads, 512M, jdk 1.4.2.06, TC 4.1.30, ops 2.7.2 )
-//         */
-//        try {
-//            java.net.URL resource = getResource( key );
-//            if (resource == null)
-//                throw new ResourceNotFoundException("Cannot read from file " + key);
-//
-//            final java.io.File fil;
-//            final java.io.File jrFil = SystemUtils.getJarFilePath( resource );
-//            if ( jrFil == null ) {
-//                final String prot = resource.getProtocol();
-//                if ( "file".equalsIgnoreCase( prot ) ) {
-//                	final String pth = resource.getPath();
-//                	final java.io.File f = new java.io.File( pth );
-//                	fil  = f.exists() ? f : null;
-//                } else {
-//                    fil = null;
-//                }
-//            } else {
-//                fil = jrFil;
-//            }
-//
-//            long lm;
-//            if ( fil == null ) {
-//                lm = NetUtils.getLastModified(resource.openConnection());
-//            } else {
-//                lm = fil.lastModified();
-//            }
-//
-//            // If the class loader cannot determine this, we assume that the
-//            // file will not change.
-//            if (lm == 0) lm = 1;
-//            return lm;
-//        } catch (java.io.IOException e) {
-//            throw new OXFException(e);
-//        }
-//    }
-
     /**
      * Returns the length of the file denoted by this abstract pathname.
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
     public int length(String key) {
         try {
-            return getConnection( key ).getContentLength();
+            return getConnection( key, false).getContentLength();
         } catch (java.io.IOException e) {
             throw new OXFException(e);
         }

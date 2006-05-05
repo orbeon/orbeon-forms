@@ -54,7 +54,7 @@ public class OXFHandler extends URLStreamHandler {
             }
 
             public long getLastModified() {
-                return ResourceManagerWrapper.instance().lastModified(getKey());
+                return ResourceManagerWrapper.instance().lastModified(getKey(), false);
             }
 
             public int getContentLength() {

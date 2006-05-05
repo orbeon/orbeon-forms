@@ -101,9 +101,10 @@ public interface ResourceManager {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModified(String key);
+    public long lastModified(String key, boolean doNotThrowResourceNotFound);
 
     /**
      * Returns the length of the file denoted by this abstract pathname.

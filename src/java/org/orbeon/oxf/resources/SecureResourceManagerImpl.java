@@ -111,13 +111,16 @@ public class SecureResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModifiedImpl(String key) {
+    public long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         if (resources.get(key) != null)
             return 0;
-        else
-            throw new ResourceNotFoundException("Cannot read from file " + key);
+        else {
+            if (doNotThrowResourceNotFound) return -1;
+            else throw new ResourceNotFoundException("Cannot read from file " + key);
+        }
     }
 
     /**

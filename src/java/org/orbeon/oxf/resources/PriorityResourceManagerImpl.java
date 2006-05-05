@@ -43,7 +43,6 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     public PriorityResourceManagerImpl(Map props) {
 
         // Populate resource manager factories list with nulls
-        int resourceCount = 0;
         for (Iterator i = props.keySet().iterator(); i.hasNext();) {
             String priorityKey = (String) i.next();
             if (priorityKey.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY))
@@ -126,14 +125,17 @@ public class PriorityResourceManagerImpl implements ResourceManager {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModified(final String key) {
-        return ((Long) delegate(new Operation() {
-            public Object run(ResourceManager resourceManager) {
-                return new Long(resourceManager.lastModified(key));
-            }
-        })).longValue();
+    public long lastModified(final String key, boolean doNotThrowResourceNotFound) {
+        for (Iterator i = resourceManagers.iterator(); i.hasNext();) {
+            ResourceManager resourceManager = (ResourceManager) i.next();
+            long lastModified = resourceManager.lastModified(key, true);
+            if (lastModified != -1) 
+                return lastModified;
+        }
+        throw new ResourceNotFoundException("Cannot find resource " + key);
     }
 
     /**

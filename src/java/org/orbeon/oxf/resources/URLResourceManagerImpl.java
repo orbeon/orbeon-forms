@@ -82,9 +82,10 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
     /**
      * Gets the last modified timestamp for the specofoed resource
      * @param key A Resource Manager key
+     * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
-    public long lastModifiedImpl(String key) {
+    public long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         URL url = getURL(key);
         try {
             URLConnection conn = url.openConnection();
@@ -96,7 +97,8 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
                 conn.getInputStream().close();
             }
         } catch (IOException e) {
-            throw new ResourceNotFoundException("Cannot connect to URL " + url);
+            if (doNotThrowResourceNotFound) return -1;
+            else throw new ResourceNotFoundException("Cannot connect to URL " + url);
         }
     }
 

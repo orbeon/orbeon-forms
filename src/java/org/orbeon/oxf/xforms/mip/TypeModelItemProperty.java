@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.mip;
 
 import org.orbeon.saxon.style.StandardNames;
 
-public class TypeModelItemProperty implements Cloneable {
+public class TypeModelItemProperty {
 
     private boolean isSet = false;
     private int value;
@@ -42,9 +42,5 @@ public class TypeModelItemProperty implements Cloneable {
     public String getAsString() {
         final int typeCode = get();
         return (typeCode != 0) ? StandardNames.getClarkName(typeCode) : null;
-    }
-
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 }

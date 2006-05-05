@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
+import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -827,8 +828,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 } else {
                                     // Optimized case that uses the provided resolver
-                                    final URL finalURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, null, externalContext);
-                                    final String urlString = finalURL.toExternalForm();
+                                    final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(resolvedURL);
+                                    final String urlString;
+                                    if (inputName != null) {
+                                        // URL is input:*, keep it as is
+                                        urlString = resolvedURL;
+                                    } else {
+                                        // URL is regular URL, make sure it is absolute
+                                        final URL finalURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, null, externalContext);
+                                        urlString = finalURL.toExternalForm();
+                                    }
+
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
 

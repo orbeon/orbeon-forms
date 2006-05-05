@@ -167,7 +167,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                             uriReferences.addReference(base, href);
 
                         // Read document
-                        xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense
+                        xmlReader.parse(new InputSource(source.getSystemId())); // Yeah, the SAX API doesn't make much sense
 
                     } catch (Exception e) {
                         // Resource error, must go to fallback if possible

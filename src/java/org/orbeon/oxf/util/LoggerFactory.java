@@ -67,6 +67,7 @@ public class LoggerFactory {
                 DOMSerializer dom = new DOMSerializer();
                 PipelineUtils.connect(url, ProcessorImpl.OUTPUT_DATA, dom, ProcessorImpl.INPUT_DATA);
                 PipelineContext ctx = new PipelineContext();
+                url.reset(ctx);
                 dom.reset(ctx);
                 dom.start(ctx);
                 Object o = dom.getW3CDocument(ctx).getDocumentElement();

@@ -590,6 +590,10 @@ public abstract class ProcessorImpl implements Processor {
         context.setAttribute(getProcessorKey(context), state);
     }
 
+    protected boolean hasState(PipelineContext context) {
+        return context.getAttribute(getProcessorKey(context)) != null;
+    }
+
     /**
      * <p>Returns a key that should be used to store the state of the
      * processor in the context.

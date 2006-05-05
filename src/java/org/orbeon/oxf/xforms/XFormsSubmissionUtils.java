@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -24,14 +23,7 @@ import org.orbeon.oxf.resources.handler.HTTPURLConnection;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.xml.sax.XMLReader;
-
-import javax.xml.transform.URIResolver;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -244,30 +236,6 @@ public class XFormsSubmissionUtils {
             throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
         } else {
             throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
-        }
-    }
-
-    public static Document readURLAsDocument(URIResolver uriResolver, String urlString) {
-
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
-
-        try {
-            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
-            // TODO: forward session and authorization?
-
-            final LocationDocumentResult documentResult = new LocationDocumentResult();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(documentResult);
-
-            final XMLReader xmlReader = source.getXMLReader();
-            xmlReader.setContentHandler(identity);
-            xmlReader.parse(urlString);
-
-            return documentResult.getDocument();
-
-        } catch (Exception e) {
-            throw new OXFException(e);
         }
     }
 

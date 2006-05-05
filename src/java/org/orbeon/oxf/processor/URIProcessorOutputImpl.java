@@ -196,42 +196,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 } else if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
                     // HTTP and HTTPS protocols: read and keep document
 
-                    // Other URLs
-                    final String urlString = url.toExternalForm();
-
                     // NOTE: We cache for this execution of this processor, so we don't make multiple accesses. The
                     // cache is discarded once the processor gets out of scope.
 
-                    // Use cached state if possible
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
-                    if (state.isDocumentSet(urlString))
-                        return state.getLastModified(urlString);
-
-                    {
-                        // We read the document and store it temporarily, since it will likely be read just after this anyway
-                        final SAXStore documentSAXStore;
-                        final long lastModified;
-                        {
-                            // Connect processors and read document
-                            final URLGenerator urlGenerator = new URLGenerator(urlString);
-                            final SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
-                            PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, saxStoreSerializer, ProcessorImpl.INPUT_DATA);
-                            final PipelineContext tempPipelineContext = new PipelineContext();
-                            saxStoreSerializer.start(tempPipelineContext);
-                            documentSAXStore = saxStoreSerializer.getSAXStore();
-
-                            // Obtain last modified
-                            final ProcessorImpl.ProcessorOutputImpl urlGeneratorOutputImpl = (ProcessorImpl.ProcessorOutputImpl) urlGenerator.getOutputByName(ProcessorImpl.OUTPUT_DATA);
-                            lastModified = ProcessorImpl.findLastModified(urlGeneratorOutputImpl.getValidityImpl(pipelineContext));
-                        }
-                        // Zero and negative values often have a special meaning, make sure to normalize here
-                        final Long lastModifiedLong = lastModified <= 0 ? null : new Long(lastModified);
-
-                        // Cache document and last modified
-                        state.setDocument(urlString, documentSAXStore, lastModifiedLong);
-
-                        return lastModifiedLong;
-                    }
+                    final String urlString = url.toExternalForm();
+                    readURLToStateIfNeeded(url, state);
+                    return state.getLastModified(urlString);
 
                 } else  {
                     // Other URLs
@@ -390,5 +361,37 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
     public ProcessorImpl.KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
         throw new UnsupportedOperationException();
+    }
+
+    public static void readURLToStateIfNeeded(URL url, URIReferencesState state) {
+
+        final String urlString = url.toExternalForm();
+
+        // Use cached state if possible
+        if (!state.isDocumentSet(urlString)) {
+            // We read the document and store it temporarily, since it will likely be read just after this anyway
+            final SAXStore documentSAXStore;
+            final long lastModified;
+            {
+                // Connect processors and read document
+                // NOTE: below, we disable use of the URLGenerator's local cache, so that we don't check validity
+                // with HTTP and HTTPS. When would it make sense to use local caching?
+                final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, false, null, false);
+                final SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
+                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, saxStoreSerializer, ProcessorImpl.INPUT_DATA);
+                final PipelineContext tempPipelineContext = new PipelineContext();
+                saxStoreSerializer.start(tempPipelineContext);
+                documentSAXStore = saxStoreSerializer.getSAXStore();
+
+                // Obtain last modified
+                final ProcessorImpl.ProcessorOutputImpl urlGeneratorOutputImpl = (ProcessorImpl.ProcessorOutputImpl) urlGenerator.getOutputByName(ProcessorImpl.OUTPUT_DATA);
+                lastModified = ProcessorImpl.findLastModified(urlGeneratorOutputImpl.getValidityImpl(tempPipelineContext));
+            }
+            // Zero and negative values often have a special meaning, make sure to normalize here
+            final Long lastModifiedLong = lastModified <= 0 ? null : new Long(lastModified);
+
+            // Cache document and last modified
+            state.setDocument(urlString, documentSAXStore, lastModifiedLong);
+        }
     }
 }

@@ -364,7 +364,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else {
                         // Reload / back case
                         final XFormsContainingDocument initialContainingDocument
-                                    = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);
+                                    = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
 
                         diffControlsState(ch, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }

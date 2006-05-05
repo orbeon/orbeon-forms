@@ -27,8 +27,10 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -823,8 +825,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     hasUsername = true;
                                 } else {
                                     // Optimized case that uses the provided resolver
-                                    instanceDocument = XFormsSubmissionUtils.readURLAsDocument(containingDocument.getURIResolver(), resolvedURL);
+                                    if (XFormsServer.logger.isDebugEnabled())
+                                        XFormsServer.logger.debug("XForms - getting document from resolver for: " + resolvedURL);
 
+                                    instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), resolvedURL);
                                     hasUsername = false;
                                 }
                             }

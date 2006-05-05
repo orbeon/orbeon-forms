@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.Processor;
@@ -22,6 +23,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.ForwardingXMLReader;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TeeContentHandler;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -30,10 +33,11 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.net.URL;
 
 public class TransformerURIResolver implements URIResolver {
 
@@ -74,7 +78,11 @@ public class TransformerURIResolver implements URIResolver {
                 } else {
                     // Resolve to regular URI
                     final URL url = URLFactory.createURL(base, href);
-                    Processor urlGenerator = new URLGenerator(url, handleXInclude);
+                    // NOTE: below, we disable use of the URLGenerator's local cache, so that we don't check validity
+                    // with HTTP and HTTPS. When would it make sense to use local caching?
+                    final String protocol = url.getProtocol();
+                    final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
+                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, handleXInclude, null, cacheUseLocalCache);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }
@@ -107,4 +115,42 @@ public class TransformerURIResolver implements URIResolver {
             throw new OXFException(e);
         }
     }
+
+    public static Document readURLAsDocument(URIResolver uriResolver, String urlString) {
+        try {
+            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
+            // TODO: forward session and authorization?
+
+            final LocationDocumentResult documentResult = new LocationDocumentResult();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(documentResult);
+
+            final XMLReader xmlReader = source.getXMLReader();
+            xmlReader.setContentHandler(identity);
+            xmlReader.parse(urlString);
+
+            return documentResult.getDocument();
+
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+//    public static void readURLAsSAX(URIResolver uriResolver, String urlString, ContentHandler contentHandler) {
+//        try {
+//            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
+//            // TODO: forward session and authorization?
+//
+//            final SAXResult saxResult = new SAXResult(contentHandler);
+//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+//            identity.setResult(saxResult);
+//
+//            final XMLReader xmlReader = source.getXMLReader();
+//            xmlReader.setContentHandler(identity);
+//            xmlReader.parse(urlString);
+//
+//        } catch (Exception e) {
+//            throw new OXFException(e);
+//        }
+//    }
 }

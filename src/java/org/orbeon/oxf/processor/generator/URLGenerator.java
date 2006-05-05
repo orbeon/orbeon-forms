@@ -123,6 +123,15 @@ public class URLGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    public URLGenerator(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, Map headers,
+                      boolean cacheUseLocalCache) {
+        this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
+                forceEncoding, ignoreConnectionEncoding, validating, handleXInclude, headers, cacheUseLocalCache,
+                DEFAULT_CACHE_ALWAYS_REVALIDATE, DEFAULT_CACHE_EXPIRATION, new TidyConfig(null)));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+    }
+
     private static class Config {
         private URL url;
         private String contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
@@ -156,6 +165,7 @@ public class URLGenerator extends ProcessorImpl {
             this.forceContentType = true;
             this.contentType = contentType;
             this.forceContentType = forceContentType;
+            this.tidyConfig = new TidyConfig(null);
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
@@ -249,6 +259,8 @@ public class URLGenerator extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
+                makeSureStateIsSet(pipelineContext);
+
                 // Read config input into a URL, cache if possible
                 final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
                         (ConfigURIReferences) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
@@ -326,8 +338,6 @@ public class URLGenerator extends ProcessorImpl {
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
                                 } catch (MalformedURLException e) {
-//                                    final LocationData ld = URLGenerator.this.getLocationData();
-//                                    System.out.println(((ld == null) ? "" : ld.toString()) + " - " + url);
                                     throw new OXFException(e);
                                 }
                             }
@@ -337,91 +347,89 @@ public class URLGenerator extends ProcessorImpl {
                     if (configURIReferences.config.getURL() == null)
                         throw new OXFException("Missing configuration.");
                     // Create unique key and validity for the document
-                    CacheKey key = new InternalCacheKey(URLGenerator.this, "urlDocument", configURIReferences.config.toString());
+                    final boolean isUseLocalCache = configURIReferences.config.isCacheUseLocalCache();
+                    final CacheKey localCacheKey;
+                    final Object localCacheValidity;
+                    if (isUseLocalCache) {
+                        localCacheKey = new InternalCacheKey(URLGenerator.this, "urlDocument", configURIReferences.config.toString());
+                        localCacheValidity = getValidityImpl(pipelineContext);
+                    } else {
+                        localCacheKey = null;
+                        localCacheValidity = null;
+                    }
 
-                    // Resource from cache
-                    Object cachedResource = null;
-                    // Check if we can directly serve the resource from cache
-//                    if (configURIReferences.config.cacheExpiration != CACHE_EXPIRATION_LAST_MODIFIED) {
-//                        // We don't use the last-modified header, but instead we use an expiration value set by the user
-//                        long cacheExpiration = (configURIReferences.config.cacheExpiration < 0) ? configURIReferences.config.cacheExpiration : configURIReferences.config.cacheExpiration * 1000; // time is in msb
-//                        cachedResource = ObjectCache.instance().findValidWithExpiration(context, key, cacheExpiration);
-//                        if (cachedResource != null)
-//                            ((SAXStore) cachedResource).replay(contentHandler);
-//                    }
+                    // Decide whether to use read from the special oxf: handler or the generic URL handler
+                    ResourceHandler handler = null;
+                    try {
+                        // We use the same validity as for the output
+                        final Object cachedResource = (localCacheKey == null) ? null : ObjectCache.instance().findValid(pipelineContext, localCacheKey, localCacheValidity);
+                        if (cachedResource != null) {
+                            // Just replay the cached resource
+                            ((SAXStore) cachedResource).replay(contentHandler);
+                        } else {
+                            // We need to read the resource
 
-                    if (cachedResource == null) {
-                        // We are unable to just replay from cache without accessing the resource
+                            handler = OXFHandler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
+                                    ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
+                                    : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
 
-                        // Decide whether to use read from the special oxf: handler or the generic URL handler
-                        ResourceHandler handler = null;
-                        try {
-                            // We use the same validity as for the output
-                            Object validity = getValidityImpl(pipelineContext);
-                            cachedResource = ObjectCache.instance().findValid(pipelineContext, key, validity);
-                            if (cachedResource != null) {
-                                // Just replay the cached resource
-                                // NOTE: should we do this only with config.isCacheUseLocalCache() = true?
-                                ((SAXStore) cachedResource).replay(contentHandler);
+                            // Find content-type to use. If the config says to force the
+                            // content-type, we use the content-type provided by the user.
+                            // Otherwise, we give the priority to the content-type provided by
+                            // the connection, then the content-type provided by the user, then
+                            // we use the default content-type (XML). The user will have to
+                            // provide a content-type for example to read HTML documents with
+                            // the file: protocol.
+                            String contentType;
+                            if (configURIReferences.config.isForceContentType()) {
+                                contentType = configURIReferences.config.getContentType();
                             } else {
-                                // We need to read the resource
-
-                                handler = OXFHandler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
-                                        ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
-                                        : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
-
-                                // Find content-type to use. If the config says to force the
-                                // content-type, we use the content-type provided by the user.
-                                // Otherwise, we give the priority to the content-type provided by
-                                // the connection, then the content-type provided by the user, then
-                                // we use the default content-type (XML). The user will have to
-                                // provide a content-type for example to read HTML documents with
-                                // the file: protocol.
-                                String contentType;
-                                if (configURIReferences.config.isForceContentType()) {
+                                contentType = handler.getResourceContentType();
+                                if (contentType == null)
                                     contentType = configURIReferences.config.getContentType();
-                                } else {
-                                    contentType = handler.getResourceContentType();
-                                    if (contentType == null)
-                                        contentType = configURIReferences.config.getContentType();
-                                    if (contentType == null)
-                                        contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
-                                }
-
-                                // Create store for caching if necessary
-                                ContentHandler output = configURIReferences.config.isCacheUseLocalCache() ? new SAXStore(contentHandler) : contentHandler;
-
-                                //System.out.println("XXX " + configURIReferences.config.toString() + " XXX " + handler.getResourceContentType());
-
-                                // Read resource
-                                if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
-                                    handler.readHTML(output);
-                                    configURIReferences.uriReferences = null;
-                                } else if (ProcessorUtils.isXMLContentType(contentType)) {
-                                    LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
-                                    XIncludeHandler.setXIncludeListener(localXIncludeListener);
-                                    try {
-                                        handler.readXML(pipelineContext, output);
-                                    } finally {
-                                        XIncludeHandler.setXIncludeListener(null);
-                                    }
-                                    localXIncludeListener.updateCache(pipelineContext, configURIReferences);
-                                } else if (ProcessorUtils.isTextContentType(contentType)) {
-                                    handler.readText(output, contentType);
-                                    configURIReferences.uriReferences = null;
-                                } else {
-                                    handler.readBinary(output, contentType);
-                                    configURIReferences.uriReferences = null;
-                                }
-
-                                // Cache the resource
-                                if (configURIReferences.config.isCacheUseLocalCache())
-                                    ObjectCache.instance().add(pipelineContext, key, validity, output);
+                                if (contentType == null)
+                                    contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
                             }
-                        } finally {
-                            if (handler != null)
-                                handler.destroy();
+
+                            // Get and cache validity as the handler is open, as validity is likely to be used later
+                            // again for caching reasons
+                            getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), handler);
+
+                            // Create store for caching if necessary
+                            final ContentHandler output = isUseLocalCache ? new SAXStore(contentHandler) : contentHandler;
+
+                            // Read resource
+                            if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
+                                handler.readHTML(output);
+                                configURIReferences.uriReferences = null;
+                            } else if (ProcessorUtils.isXMLContentType(contentType)) {
+                                LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
+                                XIncludeHandler.setXIncludeListener(localXIncludeListener);
+                                try {
+                                    handler.readXML(pipelineContext, output);
+                                } finally {
+                                    XIncludeHandler.setXIncludeListener(null);
+                                }
+                                localXIncludeListener.updateCache(pipelineContext, configURIReferences);
+                            } else if (ProcessorUtils.isTextContentType(contentType)) {
+                                handler.readText(output, contentType);
+                                configURIReferences.uriReferences = null;
+                            } else {
+                                handler.readBinary(output, contentType);
+                                configURIReferences.uriReferences = null;
+                            }
+
+                            // Cache the resource if requested
+                            if (isUseLocalCache) {
+                                // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
+                                ((SAXStore) output).setContentHandler(null);
+                                // Add to cache
+                                ObjectCache.instance().add(pipelineContext, localCacheKey, localCacheValidity, output);
+                            }
                         }
+                    } finally {
+                        if (handler != null)
+                            handler.destroy();
                     }
                 } catch (SAXParseException spe) {
                     throw new ValidationException(spe.getMessage(), new LocationData(spe));
@@ -439,9 +447,10 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+                makeSureStateIsSet(pipelineContext);
                 try {
-                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
+                    ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
                     if (configURIReferences == null)
                         return null;
 
@@ -449,7 +458,7 @@ public class URLGenerator extends ProcessorImpl {
 
                     // Handle config if read as input
                     if (localConfigURIReferences == null) {
-                        KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                        KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
                         if (configKeyValidity == null) return null;
                         keys.add(configKeyValidity.key);
                     }
@@ -470,9 +479,10 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
-            public Object getValidityImpl(PipelineContext context) {
+            public Object getValidityImpl(PipelineContext pipelineContext) {
+                makeSureStateIsSet(pipelineContext);
                 try {
-                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
+                    ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
                     if (configURIReferences == null)
                         return null;
 
@@ -480,18 +490,18 @@ public class URLGenerator extends ProcessorImpl {
 
                     // Handle config if read as input
                     if (localConfigURIReferences == null) {
-                        KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                        KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
                         if (configKeyValidity == null)
                             return null;
                         validities.add(configKeyValidity.validity);
                     }
                     // Handle main document and config
-                    validities.add(getHandlerValidity(configURIReferences.config.getURL()));
+                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config.getURL(), null));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
                             URIReference uriReference = (URIReference) i.next();
-                            validities.add(getHandlerValidity(URLFactory.createURL(uriReference.context, uriReference.spec)));
+                            validities.add(getHandlerValidity(pipelineContext, URLFactory.createURL(uriReference.context, uriReference.spec), null));
                         }
                     }
                     return validities;
@@ -500,25 +510,40 @@ public class URLGenerator extends ProcessorImpl {
                 }
             }
 
-            private Object getHandlerValidity(URL url) {
-                try {
-                    ResourceHandler handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
-                            ? (ResourceHandler) new OXFResourceHandler(new Config(url))
-                            : (ResourceHandler) new URLResourceHandler(new Config(url));
+            private Object getHandlerValidity(PipelineContext pipelineContext, URL url, ResourceHandler handler) {
+                final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
+                final String urlString = url.toExternalForm();
+                if (state.isLastModifiedSet(urlString)) {
+                    // Found value in state cache
+                    return state.getLastModified(urlString);
+                } else {
+                    // Get value and cache it in state
                     try {
-                        // FIXME: this can potentially be very slow with some URLs
-                        return handler.getValidity();
-                    } finally {
-                        if (handler != null)
-                            handler.destroy();
+                        final boolean mustDestroyHandler;
+                        if (handler == null) {
+                            handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
+                                ? (ResourceHandler) new OXFResourceHandler(new Config(url))
+                                : (ResourceHandler) new URLResourceHandler(new Config(url));
+                            mustDestroyHandler = true;
+                        } else {
+                            mustDestroyHandler = false;
+                        }
+                        try {
+                            // FIXME: this can potentially be very slow with some URLs
+                            final Object validity = handler.getValidity();
+                            state.setLastModified(urlString, (Long) validity);
+                            return validity;
+                        } finally {
+                            if (mustDestroyHandler)
+                                handler.destroy();
+                        }
+                    } catch (Exception e) {
+                        // If the file no longer exists, for example, we don't want to throw, just to invalidate
+                        // An exception will be thrown if necessary when the document is actually read
+                        return null;
                     }
-                } catch (Exception e) {
-                    // If the file no longer exists, for example, we don't want to throw, just to invalidate
-                    // An exception will be thrown if necessary when the document is actually read
-                    return null;
                 }
             }
-
 
             private ConfigURIReferences getConfigURIReferences(PipelineContext context) {
                 // Check if config is external
@@ -872,5 +897,36 @@ public class URLGenerator extends ProcessorImpl {
 
     private static class URIReferences {
         public List references = new ArrayList();
+    }
+
+    private class URLGeneratorState {
+
+        private Map map;
+
+        public void setLastModified(String urlString, Long lastModified) {
+            if (map == null)
+                map = new HashMap();
+            map.put(urlString, lastModified == null ? (Object) "" : lastModified);
+        }
+
+        public boolean isLastModifiedSet(String urlString) {
+            if (map == null)
+                return false;
+            return map.get(urlString) != null;
+        }
+
+        public Long getLastModified(String urlString) {
+            final Object result = map.get(urlString);
+            return (result instanceof String) ? null : (Long) result;
+        }
+    }
+
+    private void makeSureStateIsSet(PipelineContext pipelineContext) {
+        if (!hasState(pipelineContext))
+            setState(pipelineContext, new URLGeneratorState());
+    }
+
+    public void reset(PipelineContext pipelineContext) {
+        makeSureStateIsSet(pipelineContext);
     }
 }

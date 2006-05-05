@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.UUIDUtils;
@@ -295,7 +296,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
 
             // Create URIResolver
-            final TransformerURIResolver uriResolver = new TransformerURIResolver(XFormsToXHTML.this, pipelineContext, INPUT_ANNOTATED_DOCUMENT, false) {
+            final TransformerURIResolver uriResolver = new TransformerURIResolver(XFormsToXHTML.this, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE) {
                 public Source resolve(String href, String base) throws TransformerException {
 
                     final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
@@ -309,8 +310,14 @@ public class XFormsToXHTML extends ProcessorImpl {
                         } catch (MalformedURLException e) {
                             throw new OXFException(e);
                         }
+
                         final String urlString = url.toExternalForm();
                         final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) XFormsToXHTML.this.getState(pipelineContext);
+
+                        // First, put in state if necessary
+                        URIProcessorOutputImpl.readURLToStateIfNeeded(url, state);
+
+                        // Then try to read from state
                         if (state.isDocumentSet(urlString)) {
                             // This means the document requested is already available. We use the cached document.
                             final XMLReader xmlReader = new XMLFilterImpl() {

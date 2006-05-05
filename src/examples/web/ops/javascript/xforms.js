@@ -1127,6 +1127,10 @@ function xformsHandleResponse() {
             var responseRoot = responseXML.documentElement;
             var newDynamicState = null;
             var newDynamicStateTriggersPost = false;
+
+			// Whether this response has triggered a load which will replace the current page.
+			var newDynamicStateTriggersReplace = false;
+
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
                 // Update instances
@@ -1787,8 +1791,12 @@ function xformsHandleResponse() {
                                 var show = loadElement.getAttribute("show");
                                 var target = loadElement.getAttribute("target");
                                 if (show == "replace") {
-                                    if (target == null)  window.location.href = resource;
-                                    else window.open(resource, target);
+                                    if (target == null) {
+										newDynamicStateTriggersReplace = true;
+										window.location.href = resource;
+                                    } else {
+                                        window.open(resource, target);
+									}
                                 } else {
                                     window.open(resource, "_blank");
                                 }
@@ -1812,13 +1820,18 @@ function xformsHandleResponse() {
             }
 
             // Store new dynamic state if that state did not trigger a post
-            if (!newDynamicStateTriggersPost) {
+            if (newDynamicStateTriggersPost) {
                 xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
             }
 
-            // Hide loading if there are no other request in the queue
-            if (document.xformsEvents.length == 0)
+            if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
+                // Display loading indicator when we go to another page.
+                // Display it even if it was not displayed before as loading the page could take time.
+                xformsDisplayIndicator("loading");
+            } else if (document.xformsEvents.length == 0) {
+                // Hide loading indicator if there are no other request in the queue
                 xformsDisplayIndicator("none");
+			}
 
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {

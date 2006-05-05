@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -22,13 +21,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xhtml:group.
+ * Handle xforms:group.
  */
 public class XFormsGroupHandler extends HandlerBase {
 
     protected String effectiveGroupId;
     private ControlInfo groupControlInfo;
-    private boolean inLabel;
 
     public XFormsGroupHandler() {
         super(false, true);
@@ -50,37 +48,12 @@ public class XFormsGroupHandler extends HandlerBase {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
-    }
 
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("label")) {
-            // xforms:label
-            final String labelValue = handlerContext.isGenerateTemplate() ? null : groupControlInfo.getLabel();
-
+        final String labelValue = handlerContext.isGenerateTemplate() ? null : groupControlInfo.getLabel();
+        if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
             XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
-
-            inLabel = true;
-
-        } else {
-            super.startElement(uri, localname, qName, attributes);
         }
-    }
-
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("label")) {
-            // xforms:label
-            inLabel = false;
-        } else {
-            super.endElement(uri, localname, qName);
-        }
-    }
-
-    public void characters(char[] chars, int start, int length) throws SAXException {
-        if (!inLabel)
-            super.characters(chars, start, length);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

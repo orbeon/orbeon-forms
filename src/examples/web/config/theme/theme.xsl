@@ -116,7 +116,7 @@
                 <xsl:apply-templates select="$label/@*"/>
                 <xsl:value-of select="$label"/>
             </xhtml:legend>
-            <xsl:apply-templates select="node() except xhtml:label"/>
+            <xsl:apply-templates select="node() except xhtml:label[@class = 'xforms-label' and @for = ../@id]"/>
         </xhtml:fieldset>
     </xsl:template>
     

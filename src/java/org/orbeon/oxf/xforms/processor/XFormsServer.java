@@ -1078,7 +1078,7 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         public String toString() {
-            return StringUtils.deleteWhitespace(staticState + "|" + dynamicState);
+            return staticState + "|" + dynamicState;
         }
     }
 }

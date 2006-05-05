@@ -36,16 +36,12 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import javax.xml.transform.TransformerException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.*;
 
 public class XFormsUtils {
 
@@ -341,10 +337,15 @@ public class XFormsUtils {
 //        }
 //    }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
+    // TODO: Don't use a global Deflater. Maybe use a pool?
+    public static Deflater deflater;
+
+    public static synchronized String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
         try {
             final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+            if (deflater == null)
+                deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+            final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, gzipByteArray, 1024);
 
             final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
 
@@ -354,9 +355,91 @@ public class XFormsUtils {
             if (encryptionPassword != null)
                 result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
             return result;
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            deflater = null;
             throw new OXFException(e);
+        } finally {
+            if (deflater != null)
+                deflater.reset();
         }
+    }
+
+    private static class DeflaterGZIPOutputStream extends DeflaterOutputStream {
+        public DeflaterGZIPOutputStream(Deflater deflater, OutputStream out, int size) throws IOException {
+            super(out, deflater, size);
+            writeHeader();
+            crc.reset();
+        }
+
+        private boolean closed = false;
+        protected CRC32 crc = new CRC32();
+        private final static int GZIP_MAGIC = 0x8b1f;
+        private final static int TRAILER_SIZE = 8;
+
+        public synchronized void write(byte[] buf, int off, int len) throws IOException {
+            super.write(buf, off, len);
+            crc.update(buf, off, len);
+        }
+
+        public void finish() throws IOException {
+            if (!def.finished()) {
+                def.finish();
+                while (!def.finished()) {
+                    int len = def.deflate(buf, 0, buf.length);
+                    if (def.finished() && len <= buf.length - TRAILER_SIZE) {
+                        writeTrailer(buf, len);
+                        len = len + TRAILER_SIZE;
+                        out.write(buf, 0, len);
+                        return;
+                    }
+                    if (len > 0)
+                        out.write(buf, 0, len);
+                }
+                byte[] trailer = new byte[TRAILER_SIZE];
+                writeTrailer(trailer, 0);
+                out.write(trailer);
+            }
+        }
+
+        public void close() throws IOException {
+            if (!closed) {
+                finish();
+                out.close();
+                closed = true;
+            }
+        }
+
+        private final static byte[] header = {
+                (byte) GZIP_MAGIC,
+                (byte) (GZIP_MAGIC >> 8),
+                Deflater.DEFLATED,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+        };
+
+        private void writeHeader() throws IOException {
+            out.write(header);
+        }
+
+        private void writeTrailer(byte[] buf, int offset) {
+            writeInt((int) crc.getValue(), buf, offset);
+            writeInt(def.getTotalIn(), buf, offset + 4);
+        }
+
+        private void writeInt(int i, byte[] buf, int offset) {
+            writeShort(i & 0xffff, buf, offset);
+            writeShort((i >> 16) & 0xffff, buf, offset + 2);
+        }
+
+        private void writeShort(int s, byte[] buf, int offset) {
+            buf[offset] = (byte) (s & 0xff);
+            buf[offset + 1] = (byte) ((s >> 8) & 0xff);
+    }
     }
 
 //    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {

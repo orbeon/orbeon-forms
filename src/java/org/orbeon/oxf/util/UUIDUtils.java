@@ -15,13 +15,23 @@ package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.OXFException;
 
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.server.UID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class UUIDUtils {
+
+    // Compute host name bytes once and for all
+    private static byte[] hostNameBytes;
+    static {
+        try {
+            hostNameBytes = InetAddress.getLocalHost().toString().getBytes("utf-8");
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
 
     /**
      * Return a String that looks like a 128-bit UUID. It really does not follow the spec as to the
@@ -37,12 +47,7 @@ public class UUIDUtils {
             messageDigest.update(new UID().toString().getBytes());
 
             // Add local host to make the ID more globally unique
-            try {
-                String localHost = InetAddress.getLocalHost().toString();
-                messageDigest.update(localHost.getBytes());
-            } catch (UnknownHostException e) {
-                throw new OXFException(e);
-            }
+            messageDigest.update(hostNameBytes);
 
             // Digest and create a String that looks nice
             byte[] digestBytes = messageDigest.digest();

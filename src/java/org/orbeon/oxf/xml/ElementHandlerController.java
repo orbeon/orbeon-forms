@@ -225,15 +225,23 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         this.locator = locator;
     }
 
+    // Class.forName is expensive, so we cache mappings
+    private static Map classNameToHandlerClass = new HashMap();
+
     private ElementHandlerNew getHandlerByClassName(String handlerClassName) {
+
+        Class handlerClass = (Class) classNameToHandlerClass.get(handlerClassName);
+        if (handlerClass == null) {
+            try {
+                handlerClass = Class.forName(handlerClassName);
+                classNameToHandlerClass.put(handlerClassName, handlerClass);
+            } catch (ClassNotFoundException e) {
+                throw new ValidationException(e, new LocationData(locator));
+            }
+        }
         try {
-            final Class handlerClass = Class.forName(handlerClassName);
             return (ElementHandlerNew) handlerClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new ValidationException(e, new LocationData(locator));
-        } catch (IllegalAccessException e) {
-            throw new ValidationException(e, new LocationData(locator));
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             throw new ValidationException(e, new LocationData(locator));
         }
     }

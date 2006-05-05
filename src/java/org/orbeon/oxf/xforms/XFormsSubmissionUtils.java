@@ -135,7 +135,7 @@ public class XFormsSubmissionUtils {
                                                                    byte[] serializedInstance, String serializedInstanceString) {
 
         // Compute submission URL
-        final URL submissionURL = createURL(action, serializedInstanceString, externalContext);
+        final URL submissionURL = createAbsoluteURL(action, serializedInstanceString, externalContext);
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -239,7 +239,15 @@ public class XFormsSubmissionUtils {
         }
     }
 
-    public static URL createURL(String action, String searchString, ExternalContext externalContext) {
+    /**
+     * Create an absolute URL from an action string and a search string.
+     *
+     * @param action            absolute URL or absolute path
+     * @param searchString      optional search string to append to the action URL
+     * @param externalContext   current ExternalContext
+     * @return                  an absolute URL
+     */
+    public static URL createAbsoluteURL(String action, String searchString, ExternalContext externalContext) {
         URL resultURL;
         try {
             final String actionString;

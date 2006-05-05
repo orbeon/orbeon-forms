@@ -371,7 +371,7 @@ public class XFormsModelSchemaValidator {
             // Resolve URL
             // TODO: We do not support "optimized" access here, we always use an URL, because loadGrammar() wants a URL
             final String resolvedURLString = XFormsUtils.resolveURL(containingDocument, pipelineContext, modelElement, false, schemaURI);
-            final URL resolvedURL = XFormsSubmissionUtils.createURL(resolvedURLString, null, externalContext);
+            final URL resolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURLString, null, externalContext);
 
             // Load associated grammar
             schemaGrammar = loadCacheGrammar(pipelineContext, resolvedURL.toExternalForm());

@@ -48,6 +48,7 @@ import org.orbeon.saxon.Configuration;
 
 import java.util.*;
 import java.net.URI;
+import java.net.URL;
 
 /**
  * Represents an XForms model.
@@ -795,7 +796,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
 
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
-                                instanceSourceURI = resolvedURL;
 
                                 if (containingDocument.getURIResolver() == null || xxformsUsername != null) {
                                     // We connect directly
@@ -823,13 +823,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     }
 
                                     hasUsername = true;
+                                    instanceSourceURI = connectionResult.resourceURI;
+
                                 } else {
                                     // Optimized case that uses the provided resolver
+                                    final URL finalURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, null, externalContext);
+                                    final String urlString = finalURL.toExternalForm();
                                     if (XFormsServer.logger.isDebugEnabled())
-                                        XFormsServer.logger.debug("XForms - getting document from resolver for: " + resolvedURL);
+                                        XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
 
-                                    instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), resolvedURL);
+                                    instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
                                     hasUsername = false;
+                                    instanceSourceURI = urlString;
                                 }
                             }
                         }

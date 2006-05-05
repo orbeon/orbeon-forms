@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * Instances of this class are used to annotate XForms instance nodes with MIPs and other information.
  */
-public class InstanceData implements Cloneable {
+public class InstanceData {
 
     private LocationData locationData;
     private boolean generated = false;
@@ -37,13 +37,17 @@ public class InstanceData implements Cloneable {
     private ValidModelItemProperty valueValid = new ValidModelItemProperty();
     private ValidModelItemProperty constraint = new ValidModelItemProperty();
 
+    private RelevantModelItemProperty inheritedRelevant;
+    private ReadonlyModelItemProperty inheritedReadonly;
+
+    // This is an extension property used only by XForms Classic for now
     private XXFormsExternalizeModelItemProperty xxformsExternalize;
 
     private boolean valueChanged;
     private boolean previousRequiredState;
     private boolean previousValidState;
-    private boolean previousRelevantState;
-    private boolean previousReadonlyState;
+    private boolean previousInheritedRelevantState;
+    private boolean previousInheritedReadonlyState;
 
     private Map switchIdsToCaseIds;
 
@@ -69,7 +73,7 @@ public class InstanceData implements Cloneable {
         this.generated = generated;
     }
 
-    public BooleanModelItemProperty getRelevant() {
+    public RelevantModelItemProperty getRelevant() {
         return relevant;
     }
 
@@ -77,8 +81,24 @@ public class InstanceData implements Cloneable {
         return required;
     }
 
-    public BooleanModelItemProperty getReadonly() {
+    public ReadonlyModelItemProperty getReadonly() {
         return readonly;
+    }
+
+    public RelevantModelItemProperty getInheritedRelevant() {
+        return inheritedRelevant;
+    }
+
+    public void setInheritedRelevant(RelevantModelItemProperty inheritedRelevant) {
+        this.inheritedRelevant = inheritedRelevant;
+    }
+
+    public ReadonlyModelItemProperty getInheritedReadonly() {
+        return inheritedReadonly;
+    }
+
+    public void setInheritedReadonly(ReadonlyModelItemProperty inheritedReadonly) {
+        this.inheritedReadonly = inheritedReadonly;
     }
 
     public BooleanModelItemProperty getValid() {
@@ -191,8 +211,8 @@ public class InstanceData implements Cloneable {
 
     public void clearInstanceDataEventState() {
         previousRequiredState = getRequired().get();
-        previousRelevantState = getRelevant().get();
-        previousReadonlyState = getReadonly().get();
+        previousInheritedRelevantState = getInheritedRelevant().get();
+        previousInheritedReadonlyState = getInheritedReadonly().get();
         previousValidState = getValid().get();
         valueChanged = false;
     }
@@ -205,12 +225,12 @@ public class InstanceData implements Cloneable {
         return previousValidState;
     }
 
-    public boolean getPreviousRelevantState() {
-        return previousRelevantState;
+    public boolean getPreviousInheritedRelevantState() {
+        return previousInheritedRelevantState;
     }
 
-    public boolean getPreviousReadonlyState() {
-        return previousReadonlyState;
+    public boolean getPreviousInheritedReadonlyState() {
+        return previousInheritedReadonlyState;
     }
 
     public void updateRequired(boolean value, Node node, String modelBindId) {
@@ -258,33 +278,5 @@ public class InstanceData implements Cloneable {
             return null;
         else
             return (String) switchIdsToCaseIds.get(switchId);
-    }
-
-    public Object clone() throws CloneNotSupportedException {
-        final InstanceData result = (InstanceData) super.clone();
-
-        try {
-            result.relevant = (RelevantModelItemProperty) this.relevant.clone();
-            result.required = (RequiredModelItemProperty) this.required.clone();
-            result.readonly = (ReadonlyModelItemProperty) this.readonly.clone();
-            result.valueValid = (ValidModelItemProperty) this.valueValid.clone();
-            result.constraint = (ValidModelItemProperty) this.constraint.clone();
-            result.type = (TypeModelItemProperty) this.type.clone();
-
-            result.xxformsExternalize = (this.xxformsExternalize != null) ? (XXFormsExternalizeModelItemProperty) this.xxformsExternalize.clone() : null;
-            
-            if (this.switchIdsToCaseIds != null)
-                result.switchIdsToCaseIds = new HashMap(this.switchIdsToCaseIds);
-
-        } catch (CloneNotSupportedException e) {
-            // This should not happen because the classes cloned are Cloneable
-            throw new OXFException(e);
-        }
-
-        result.valueChanged = this.valueChanged;
-        result.idToNodeMap = (this.idToNodeMap == null) ? null : new HashMap(this.idToNodeMap);
-        result.schemaErrors = (this.schemaErrors == null) ? null : new ArrayList(this.schemaErrors);
-
-        return result;
     }
 }

@@ -26,7 +26,8 @@ import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
+import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -35,8 +36,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -63,33 +62,52 @@ public class XFormsUtils {
     }
 
     /**
-     * Return the inherited XForms instance data for the given node, null if not available.
+     * Return the XForms instance data for the given node with updated inherited MIPs, null if not available.
      */
-    public static InstanceData getInheritedInstanceData(Node node) {
+    public static InstanceData getInstanceDataUpdateInherited(Node node) {
         final InstanceData localInstanceData = getLocalInstanceData(node);
         if (localInstanceData == null)
             return null;
 
-        final InstanceData resultInstanceData;
-        try {
-            resultInstanceData = (InstanceData) localInstanceData.clone();
-        } catch (CloneNotSupportedException e) {
-            // This should not happen because the classes cloned are Cloneable
-            throw new OXFException(e);
+        // Clear current inherited state
+        localInstanceData.setInheritedReadonly(null);
+        localInstanceData.setInheritedRelevant(null);
+
+        boolean handleReadonly = !localInstanceData.getReadonly().get();
+        boolean handleRelevant = localInstanceData.getRelevant().get();
+
+        if (handleReadonly || handleRelevant) {
+            // There may be something to do
+
+            for (Element currentElement = node.getParent(); currentElement != null && (handleReadonly || handleRelevant);
+                 currentElement = currentElement.getParent()) {
+
+                final InstanceData currentInstanceData = getLocalInstanceData(currentElement);
+
+                // Handle readonly inheritance
+                if (handleReadonly && currentInstanceData.getReadonly().get()) {
+                    if (currentInstanceData.getInheritedReadonly() == null)
+                        localInstanceData.setInheritedReadonly(new ReadonlyModelItemProperty());
+                    currentInstanceData.getInheritedReadonly().set(true);
+                    handleReadonly = false;
+                }
+                // Handle relevant inheritance
+                if (handleRelevant && !currentInstanceData.getRelevant().get()) {
+                    if (currentInstanceData.getInheritedRelevant() == null)
+                        localInstanceData.setInheritedRelevant(new RelevantModelItemProperty());
+                    currentInstanceData.getInheritedRelevant().set(false);
+                    handleRelevant = false;
+                }
+            }
         }
 
-        for (Element currentElement = node.getParent(); currentElement != null; currentElement = currentElement.getParent()) {
-            final InstanceData currentInstanceData = getLocalInstanceData(currentElement);
+        // Make sure there is a reference to a MIP
+        if (localInstanceData.getInheritedReadonly() == null)
+            localInstanceData.setInheritedReadonly(localInstanceData.getReadonly());
+        if (localInstanceData.getInheritedRelevant() == null)
+            localInstanceData.setInheritedRelevant(localInstanceData.getRelevant());
 
-            // Handle readonly inheritance
-            if (currentInstanceData.getReadonly().get())
-                resultInstanceData.getReadonly().set(true);
-            // Handle relevant inheritance
-            if (!currentInstanceData.getRelevant().get())
-                resultInstanceData.getRelevant().set(false);
-        }
-
-        return resultInstanceData;
+        return localInstanceData;
     }
 
     /**
@@ -150,9 +168,9 @@ public class XFormsUtils {
      */
     public static void markAllValuesChanged(Document document) {
         XFormsUtils.iterateInstanceData(document, new XFormsUtils.InstanceWalker() {
-            public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData) {
-                if (localInstanceData != null) {
-                    localInstanceData.markValueChanged();
+            public void walk(Node node, InstanceData updatedInstanceData) {
+                if (updatedInstanceData != null) {
+                    updatedInstanceData.markValueChanged();
                 }
             }
         }, false);
@@ -182,18 +200,17 @@ public class XFormsUtils {
     }
 
     private static void addInstanceAttributes(final Element element) {
-        final Object instanceDataObject = element.getData();
-        if (instanceDataObject instanceof InstanceData) {
-            final InstanceData instanceData = (InstanceData) element.getData();
-            final String invldBnds = instanceData.getInvalidBindIds();
-            updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds, null);
 
-            // Reconcile boolean model item properties
-            reconcileBoolean(instanceData.getReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
-            reconcileBoolean(instanceData.getRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
-            reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
-            reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
-        }
+        final InstanceData instanceData = getInstanceDataUpdateInherited(element);
+
+        final String invldBnds = instanceData.getInvalidBindIds();
+        updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds, null);
+
+        // Reconcile boolean model item properties
+        reconcileBoolean(instanceData.getInheritedReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
+        reconcileBoolean(instanceData.getInheritedRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
+        reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
+        reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
 
         for (final Iterator i = element.elements().iterator(); i.hasNext();) {
             final Object o = i.next();
@@ -276,12 +293,12 @@ public class XFormsUtils {
 
         // We "walk" an element which contains elements only if allNodes == true
         if (allNodes || childrenElements.size() == 0)
-            instanceWalker.walk(element, getLocalInstanceData(element), getInheritedInstanceData(element));
+            instanceWalker.walk(element, getInstanceDataUpdateInherited(element));
 
         // "walk" current element's attributes
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             final Attribute attribute = (Attribute) i.next();
-            instanceWalker.walk(attribute, getLocalInstanceData(attribute), getInheritedInstanceData(attribute));
+            instanceWalker.walk(attribute, getInstanceDataUpdateInherited(attribute));
         }
         // "walk" current element's children elements
         if (childrenElements.size() != 0) {
@@ -305,24 +322,24 @@ public class XFormsUtils {
         return encodeXML(pipelineContext, documentToEncode, getEncryptionKey());
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, SAXStore saxStore, String encryptionPassword) {
-        try {
-            final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(new StreamResult(gzipOutputStream));
-            saxStore.replay(identity);
-
-            gzipOutputStream.close();
-            String result = Base64.encode(gzipByteArray.toByteArray());
-            if (encryptionPassword != null)
-                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
-            return result;
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
+//    public static String encodeXML(PipelineContext pipelineContext, SAXStore saxStore, String encryptionPassword) {
+//        try {
+//            final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
+//            final GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+//
+//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+//            identity.setResult(new StreamResult(gzipOutputStream));
+//            saxStore.replay(identity);
+//
+//            gzipOutputStream.close();
+//            String result = Base64.encode(gzipByteArray.toByteArray());
+//            if (encryptionPassword != null)
+//                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
+//            return result;
+//        } catch (Exception e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
         try {
@@ -610,7 +627,7 @@ public class XFormsUtils {
     }
 
     public static interface InstanceWalker {
-        public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData);
+        public void walk(Node node, InstanceData updatedInstanceData);
     }
 
     /**

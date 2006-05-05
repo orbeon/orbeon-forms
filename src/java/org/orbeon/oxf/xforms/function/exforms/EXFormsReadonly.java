@@ -17,6 +17,6 @@ import org.orbeon.oxf.xforms.InstanceData;
 
 public class EXFormsReadonly  extends EXFormsMIP {
     protected boolean getResult(InstanceData instanceData) {
-        return instanceData.getReadonly().get();
+        return instanceData.getInheritedReadonly().get();
     }
 }

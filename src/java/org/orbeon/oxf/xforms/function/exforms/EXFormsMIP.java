@@ -54,7 +54,7 @@ public abstract class EXFormsMIP extends XFormsFunction {
             return BooleanValue.get(false);
 
         final Node node = (Node) ((NodeWrapper) item).getUnderlyingNode();
-        final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
+        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
         return BooleanValue.get(getResult(instanceData));
     }
 

@@ -729,11 +729,11 @@ public class XFormsControls {
                     final Node currentNode = currentBindingContext.getSingleNode();
                     if (currentNode != null) {
                         // Control is bound to a node - get model item properties
-                        final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
+                        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
                         if (instanceData != null) {
-                            controlInfo.setReadonly(instanceData.getReadonly().get());
+                            controlInfo.setReadonly(instanceData.getInheritedReadonly().get());
                             controlInfo.setRequired(instanceData.getRequired().get());
-                            controlInfo.setRelevant(instanceData.getRelevant().get());
+                            controlInfo.setRelevant(instanceData.getInheritedRelevant().get());
                             controlInfo.setValid(instanceData.getValid().get());
                             final String typeAsString = instanceData.getType().getAsString();
                             if (typeAsString != null) {
@@ -812,11 +812,11 @@ public class XFormsControls {
                 final Node currentNode = getCurrentSingleNode();
 
                 // Get model item properties
-                final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
+                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
                 if (instanceData != null) {
-                    repeatIterationInfo.setReadonly(instanceData.getReadonly().get());
+                    repeatIterationInfo.setReadonly(instanceData.getInheritedReadonly().get());
                     repeatIterationInfo.setRequired(instanceData.getRequired().get());
-                    repeatIterationInfo.setRelevant(instanceData.getRelevant().get());
+                    repeatIterationInfo.setRelevant(instanceData.getInheritedRelevant().get());
                     repeatIterationInfo.setValid(instanceData.getValid().get());
                 }
             }

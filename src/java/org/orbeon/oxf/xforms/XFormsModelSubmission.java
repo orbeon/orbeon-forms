@@ -642,10 +642,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     private final void checkInstanceData(Node node) {
                         if (nodeToDetach[0] == null) {
-                            final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
+                            final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
                             // Check "relevant" MIP and remove non-relevant nodes
                             {
-                                final BooleanModelItemProperty relevantMIP = instanceData.getRelevant();
+                                final BooleanModelItemProperty relevantMIP = instanceData.getInheritedRelevant();
                                 if (relevantMIP != null && !relevantMIP.get())
                                     nodeToDetach[0] = node;
                             }

@@ -324,9 +324,9 @@ public class XFormsInstance implements XFormsEventTarget {
             }
 
             private final void addMIPInfo(Element parentInfoElement, Node node) {
-                final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
-                parentInfoElement.addAttribute("readonly", Boolean.toString(instanceData.getReadonly().get()));
-                parentInfoElement.addAttribute("relevant", Boolean.toString(instanceData.getRelevant().get()));
+                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
+                parentInfoElement.addAttribute("readonly", Boolean.toString(instanceData.getInheritedReadonly().get()));
+                parentInfoElement.addAttribute("relevant", Boolean.toString(instanceData.getInheritedRelevant().get()));
                 parentInfoElement.addAttribute("required", Boolean.toString(instanceData.getRequired().get()));
                 parentInfoElement.addAttribute("valid", Boolean.toString(instanceData.getValid().get()));
                 final String typeAsString = instanceData.getType().getAsString();

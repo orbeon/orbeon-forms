@@ -67,18 +67,28 @@ public class TransformerUtils {
 //        properties.put("org.xml.sax.driver", "orbeon.apache.xerces.parsers.SAXParser");
 //    }
 
+    // Class.forName is expensive, so we cache mappings
+    private static Map classNameToHandlerClass = new HashMap();
+
+    private static Class getTransformerClass(String clazz) throws ClassNotFoundException {
+        Class transformerClass = (Class) classNameToHandlerClass.get(clazz);
+        if (transformerClass == null) {
+            transformerClass = Class.forName(clazz);
+            classNameToHandlerClass.put(clazz, transformerClass);
+        }
+        return transformerClass;
+    }
+
     /*
      * NOTE: Factories are not thread-safe. So we should not store them into transformerFactories
      * for now, or we should make sure there is one factory per thread, or that we synchronize.
      */
     public static SAXTransformerFactory getFactory(String clazz, Map attributes) {
-
-        //Object key = new Object[] { clazz, attributes };
         try {
-            SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(clazz).newInstance();
+            final SAXTransformerFactory factory = (SAXTransformerFactory) getTransformerClass(clazz).newInstance();
 
             for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
-                String key = (String) i.next();
+                final String key = (String) i.next();
                 factory.setAttribute(key, attributes.get(key));
             }
 
@@ -113,7 +123,7 @@ public class TransformerUtils {
                     //
                     // We prevent this to overriding the StylesheetHandler.setSystemId below.
 
-                    SAXTransformerFactory factory = new orbeon.apache.xalan.processor.TransformerFactoryImpl() {
+                    return new orbeon.apache.xalan.processor.TransformerFactoryImpl() {
                         public TemplatesHandler newTemplatesHandler()
                                 throws TransformerConfigurationException {
                             return new StylesheetHandler(this) {
@@ -123,17 +133,9 @@ public class TransformerUtils {
                             };
                         }
                     };
-                    return factory;
-//                    transformerFactories.put(XALAN_BUILTIN_TRANSFORMER_TYPE, factory);
-//                }
-//                return (SAXTransformerFactory) transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE);
             } else {
                 // Any other factory
-//                if (transformerFactories.get(clazz) == null) {
-                    SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(clazz).newInstance();
-                    return factory;
-//                }
-//                return (SAXTransformerFactory) transformerFactories.get(clazz);
+                return (SAXTransformerFactory) getTransformerClass(clazz).newInstance();
             }
         } catch (Exception e) {
             throw new OXFException(e);
@@ -273,9 +275,8 @@ public class TransformerUtils {
     /**
      * Transform a SAXStore into a dom4j document
      *
-     * @param   SAXStore input SAXStore
+     * @param   saxStore input SAXStore
      * @return  dom4j document
-     * @throws TransformerException
      */
     public static Document saxStoreToDom4jDocument(SAXStore saxStore) {
         final TransformerHandler identity = getIdentityTransformerHandler();

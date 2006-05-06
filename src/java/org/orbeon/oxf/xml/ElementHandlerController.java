@@ -45,6 +45,9 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     private int level;
 
+    // Class.forName is expensive, so we cache mappings
+    private static Map classNameToHandlerClass = new HashMap();
+
     /**
      * Register a handler. The handler can match on a URI + localname, or on URI only. URI
      * matching has lower priority than URI + localname matching.
@@ -224,9 +227,6 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
     }
-
-    // Class.forName is expensive, so we cache mappings
-    private static Map classNameToHandlerClass = new HashMap();
 
     private ElementHandlerNew getHandlerByClassName(String handlerClassName) {
 

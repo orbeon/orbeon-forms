@@ -223,9 +223,16 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public void addOutput(String name, ProcessorOutput output) {
-        ProcessorOutput po = (ProcessorOutput) outputMap.get(name);
-        if ( po != null ) new ValidationException("Exactly one output " + name + " is required", getLocationData());
-        outputMap.put( name, output );
+//        ProcessorOutput po = (ProcessorOutput) outputMap.get(name);
+//        if (po != null) {
+//            try {
+//                throw new ValidationException("Exactly one output " + name + " is required", getLocationData());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+        // NOTE: One exception to the rule that we only have one output with a name is the TeeProcessor, which adds multiple data outputs.
+        outputMap.put(name, output);
     }
 
     public void deleteOutput(ProcessorOutput output) {

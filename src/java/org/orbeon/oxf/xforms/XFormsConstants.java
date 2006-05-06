@@ -112,6 +112,7 @@ public class XFormsConstants {
     public static final String XFORMS_AJAX_SHOW_LOADING_ICON_PROPERTY = "oxf.xforms.ajax.show-loading-icon";
     public static final String XFORMS_AJAX_SHOW_ERRORS_PROPERTY = "oxf.xforms.ajax.show-errors";
     public static final String XFORMS_EXCEPTION_INVALID_CLIENT_CONTROL_PROPERTY = "oxf.xforms.exception-invalid-client-control";
+    public static final String XFORMS_GZIP_STATE_PROPERTY = "oxf.xforms.gzip-state";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
     public static final String XXFORMS_STATE_HANDLING_CLIENT_VALUE = "client";
@@ -129,6 +130,7 @@ public class XFormsConstants {
     public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
     public static final int DEFAULT_SESSION_STATE_CACHE_SIZE = 1024 * 1024;
     public static final int DEFAULT_APPLICATION_STATE_CACHE_SIZE = 1024 * 1024;
+    public static final boolean DEFAULT_GZIP_STATE = true;
 
     private XFormsConstants() {
         // Disallow contruction

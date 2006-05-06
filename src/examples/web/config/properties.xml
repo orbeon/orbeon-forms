@@ -43,6 +43,7 @@
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>
     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
+    <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
 
     <!-- Other XForms options -->
     <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
@@ -50,6 +51,7 @@
     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
 
     <!-- Rarely used global properties -->
     <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>

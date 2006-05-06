@@ -28,12 +28,15 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
 import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -337,14 +340,16 @@ public class XFormsUtils {
 //        }
 //    }
 
-    // TODO: Don't use a global Deflater. Maybe use a pool?
-    public static Deflater deflater;
+    // Use a Deflater pool as creating Deflaters is expensive
+    final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new CachedPoolableObjetFactory());
 
-    public static synchronized String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
+    public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
+//        XFormsServer.logger.debug("XForms - encoding XML.");
+        Deflater deflater = null;
         try {
+            deflater = (Deflater) deflaterPool.borrowObject();
+
             final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-            if (deflater == null)
-                deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
             final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, gzipByteArray, 1024);
 
             final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
@@ -356,11 +361,42 @@ public class XFormsUtils {
                 result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
             return result;
         } catch (Throwable e) {
-            deflater = null;
+            try {
+                if (deflater != null)
+                    deflaterPool.invalidateObject(deflater);
+            } catch (Exception e1) {
+                throw new OXFException(e1);
+            }
             throw new OXFException(e);
         } finally {
-            if (deflater != null)
-                deflater.reset();
+            try {
+                if (deflater != null) {
+                    deflater.reset();
+                    deflaterPool.returnObject(deflater);
+                }
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        }
+    }
+
+    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
+        public Object makeObject() throws Exception {
+            XFormsServer.logger.debug("XForms - creating new Deflater.");
+            return new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+        }
+
+        public void destroyObject(Object object) throws Exception {
+        }
+
+        public boolean validateObject(Object object) {
+            return true;
+        }
+
+        public void activateObject(Object object) throws Exception {
+        }
+
+        public void passivateObject(Object object) throws Exception {
         }
     }
 

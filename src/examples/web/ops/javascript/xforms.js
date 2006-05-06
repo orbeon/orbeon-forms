@@ -1820,7 +1820,7 @@ function xformsHandleResponse() {
             }
 
             // Store new dynamic state if that state did not trigger a post
-            if (newDynamicStateTriggersPost) {
+            if (!newDynamicStateTriggersPost) {
                 xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
             }
 

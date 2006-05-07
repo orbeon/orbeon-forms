@@ -24,10 +24,16 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.CacheKey;
+import org.orbeon.oxf.cache.CompoundOutputCacheKey;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class AggregatorProcessor extends ProcessorImpl {
 
@@ -87,6 +93,35 @@ public class AggregatorProcessor extends ProcessorImpl {
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
+            }
+
+            public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+
+                // Create input information
+                final List keys = new ArrayList();
+                final Map inputsMap = getConnectedInputs();
+                for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
+                    final List currentInputs = (List) inputsMap.get(i.next());
+                    for (Iterator j = currentInputs.iterator(); j.hasNext();) {
+                        final OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
+                        if (outputKey == null) return null;
+                        keys.add(outputKey);
+                    }
+                }
+
+                // Add local key if needed
+                if (supportsLocalKeyValidity()) {
+                    final CacheKey localKey = getLocalKey(pipelineContext);
+                    if (localKey == null) return null;
+                    keys.add(localKey);
+                }
+
+                // Concatenate current processor info and input info
+                final CacheKey[] outputKeys = new CacheKey[ keys.size() ];
+                keys.toArray(outputKeys);
+                final Class processorClass = getProcessorClass();
+                final String outputName = getName();
+                return new CompoundOutputCacheKey(processorClass, outputName, outputKeys);
             }
         };
         addOutput(name, output);

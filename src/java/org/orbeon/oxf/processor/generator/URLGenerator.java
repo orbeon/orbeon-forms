@@ -456,25 +456,25 @@ public class URLGenerator extends ProcessorImpl {
 
                     final int keyCount = 1 + ((localConfigURIReferences == null) ? 1 : 0)
                             + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.references.size() : 0);
-                    final CacheKey[] outKys = new CacheKey[keyCount];
+                    final CacheKey[] outputKeys = new CacheKey[keyCount];
 
                     // Handle config if read as input
                     int keyIndex = 0;
                     if (localConfigURIReferences == null) {
                         KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
                         if (configKeyValidity == null) return null;
-                        outKys[keyIndex++] = configKeyValidity.key;
+                        outputKeys[keyIndex++] = configKeyValidity.key;
                     }
                     // Handle main document and config
-                    outKys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
+                    outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
                             URIReference uriReference = (URIReference) i.next();
-                            outKys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
+                            outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
                         }
                     }
-                    return new CompoundOutputCacheKey(getProcessorClass(), name, outKys);
+                    return new CompoundOutputCacheKey(getProcessorClass(), name, outputKeys);
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }

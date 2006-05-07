@@ -204,6 +204,8 @@ public abstract class ProcessorImpl implements Processor {
             inputs = new ArrayList();
             inputMap.put(name, inputs);
         }
+//        if (inputs.size() > 0)
+//            logger.info("Processor " + getClass().getName() + " has more than 1 input called " + name);
         inputs.add(input);
     }
 
@@ -1299,15 +1301,25 @@ public abstract class ProcessorImpl implements Processor {
 
         public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
 
+            // NOTE: This implementation assumes that there is only one input with a given name
+
             // Create input information
-            List keys = new ArrayList();
-            Map inputsMap = getConnectedInputs();
-            for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
-                List currentInputs = (List) inputsMap.get(i.next());
+            final Set entrySet = getConnectedInputs().entrySet();
+            final int keyCount = entrySet.size() + (supportsLocalKeyValidity() ? 1 : 0);
+            final CacheKey[] outputKeys = new CacheKey[keyCount];
+
+            int keyIndex = 0;
+            for (Iterator i = entrySet.iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final List currentInputs = (List) currentEntry.getValue();
+//                int inputIndex = 0;
+//                for (Iterator j = currentInputs.iterator(); j.hasNext(); inputIndex++) {
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                    OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
+//                    if (inputIndex > 0)
+//                        logger.info("CacheableTransformerOutputImpl: processor " + getProcessorClass().getName() + " has more than 1 input called " + getName());
+                    final OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
                     if (outputKey == null) return null;
-                    keys.add(outputKey);
+                    outputKeys[keyIndex++] = outputKey;
                 }
             }
 
@@ -1315,15 +1327,13 @@ public abstract class ProcessorImpl implements Processor {
             if (supportsLocalKeyValidity()) {
                 CacheKey localKey = getLocalKey(pipelineContext);
                 if (localKey == null) return null;
-                keys.add(localKey);
+                outputKeys[keyIndex++] = localKey;
             }
 
             // Concatenate current processor info and input info
-            final CacheKey[] outKys = new CacheKey[ keys.size() ];
-            keys.toArray( outKys );
-            final Class c = getProcessorClass();
-            final String nm = getName();
-            return new CompoundOutputCacheKey( c, nm, outKys );
+            final Class processorClass = getProcessorClass();
+            final String outputName = getName();
+            return new CompoundOutputCacheKey(processorClass, outputName, outputKeys);
         }
 
         public Object getValidityImpl(PipelineContext pipelineContext) {

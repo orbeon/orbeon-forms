@@ -35,10 +35,10 @@ public class Delete implements Action {
     public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
         String[] ids = nodeset.split(" ");
         if (XFormsUtils.isNameEncryptionEnabled())
-            at = SecureUtils.decrypt(context, encryptionPassword, at);
+            at = SecureUtils.decryptAsString(context, encryptionPassword, at);
         String id = ids[Integer.parseInt(at) - 1];
         if (XFormsUtils.isNameEncryptionEnabled())
-            id = SecureUtils.decrypt(context, encryptionPassword, id);
+            id = SecureUtils.decryptAsString(context, encryptionPassword, id);
         Node nodeToRemove = (Node) ((org.orbeon.oxf.xforms.InstanceData) instance.getRootElement().getData())
                 .getIdToNodeMap().get(new Integer(id));
         nodeToRemove.getParent().remove(nodeToRemove);

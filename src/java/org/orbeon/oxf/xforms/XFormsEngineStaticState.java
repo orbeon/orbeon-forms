@@ -45,7 +45,6 @@ public class XFormsEngineStaticState {
     public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument) {
 
         uuid = UUIDUtils.createPseudoUUID();
-        encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey());
 
         // Get controls document
         controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(staticStateDocument.getRootElement().element("controls"));
@@ -70,6 +69,9 @@ public class XFormsEngineStaticState {
 
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
+
+        final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+        encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());
     }
 
     public String getUUID() {

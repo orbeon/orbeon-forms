@@ -433,7 +433,7 @@ public class EmailProcessor extends ProcessorImpl {
         }
 
         public InputStream getInputStream() throws IOException {
-            return new ByteArrayInputStream(text.getBytes());
+            return new ByteArrayInputStream(text.getBytes("utf-8"));
         }
 
         public String getName() {

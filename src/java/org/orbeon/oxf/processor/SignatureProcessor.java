@@ -63,7 +63,7 @@ public class SignatureProcessor extends ProcessorImpl {
 
                     Document data = readCacheInputAsDOM4J(context, INPUT_DATA);
                     String dataStr = Dom4jUtils.domToString(data);
-                    dsa.update(dataStr.getBytes());
+                    dsa.update(dataStr.getBytes("utf-8"));
                     String sig = new sun.misc.BASE64Encoder().encode(dsa.sign());
 
                     LocationSAXWriter saxw = new LocationSAXWriter();

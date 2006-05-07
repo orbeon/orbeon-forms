@@ -297,7 +297,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         final String currentPageGenerationId = (requestPageGenerationId != null) ? requestPageGenerationId : UUIDUtils.createPseudoUUID();
                         if (isInitializationRun) {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
-                            if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
+                            if (containingDocument.isSessionStateHandling()) {
                                 // Produce static state key, in fact a page generation id
                                 ch.text(SESSION_STATE_PREFIX + currentPageGenerationId);
                             } else {
@@ -312,7 +312,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState newXFormsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                        if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
+                        if (containingDocument.isSessionStateHandling()) {
                             // Produce dynamic state key
                             final String newRequestId = UUIDUtils.createPseudoUUID();
                             final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);

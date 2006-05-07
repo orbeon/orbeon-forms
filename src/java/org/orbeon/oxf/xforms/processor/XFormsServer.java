@@ -308,12 +308,13 @@ public class XFormsServer extends ProcessorImpl {
                 final String newEncodedDynamicState;
                 {
                     final Document dynamicStateDocument = createDynamicStateDocument(containingDocument, requireClientSubmission);
-                    newEncodedDynamicState = XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument);
+                    newEncodedDynamicState = XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument,
+                            containingDocument.isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey());
                 }
                 final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
-                if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
+                if (containingDocument.isSessionStateHandling()) {
                     // Produce dynamic state key
                     final String newRequestId = UUIDUtils.createPseudoUUID();
                     final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(true), true);

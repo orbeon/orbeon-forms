@@ -64,7 +64,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     Document sigData = new NonLazyUserDataDocument();
                     sigData.add(sigDataNode);
 
-                    dsa.update(Dom4jUtils.domToString(sigData).getBytes());
+                    dsa.update(Dom4jUtils.domToString(sigData).getBytes("utf-8"));
 
 
                     if (!dsa.verify(Base64.decode(sig)))

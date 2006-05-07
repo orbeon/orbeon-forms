@@ -53,7 +53,7 @@ public class Insert implements Action {
             String lastIndex = ids[ids.length - 1];
             Integer lastIndexInt;
             if(XFormsUtils.isNameEncryptionEnabled())
-                lastIndexInt = new Integer(SecureUtils.decrypt(context, encryptionPassword, lastIndex));
+                lastIndexInt = new Integer(SecureUtils.decryptAsString(context, encryptionPassword, lastIndex));
             else
                 lastIndexInt = new Integer(lastIndex);
 
@@ -65,7 +65,7 @@ public class Insert implements Action {
 
         // Determine where to insert the duplicated element
         if (XFormsUtils.isNameEncryptionEnabled())
-            at = SecureUtils.decrypt(context, encryptionPassword, at);
+            at = SecureUtils.decryptAsString(context, encryptionPassword, at);
         int atValue = Integer.parseInt(at) - 1;
         if (atValue < 0) atValue = 0;
         if (atValue >= ids.length) atValue = ids.length - 1;
@@ -75,7 +75,7 @@ public class Insert implements Action {
         {
             String id = ids[atValue];
             if (XFormsUtils.isNameEncryptionEnabled())
-                id = SecureUtils.decrypt(context, encryptionPassword, id);
+                id = SecureUtils.decryptAsString(context, encryptionPassword, id);
             Object atNode = idToNodeMap.get(new Integer(id));
             if (!(atNode instanceof Element))
                 throw new OXFException("node pointed by 'at' position in nodeset attribute from"

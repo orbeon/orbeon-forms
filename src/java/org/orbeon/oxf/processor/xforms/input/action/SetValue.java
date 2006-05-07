@@ -44,7 +44,7 @@ public class SetValue implements Action {
         try {
             String id = ids[0];
             if (XFormsUtils.isNameEncryptionEnabled())
-                id = SecureUtils.decrypt(pipelineContext, encryptionPassword, id);
+                id = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, id);
             Integer idInteger = new Integer(Integer.parseInt(id));
             Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
             String newValue = value != null ? value : content == null ? "" : content;

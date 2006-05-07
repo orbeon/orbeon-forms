@@ -13,22 +13,18 @@
  */
 package org.orbeon.oxf.util;
 
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.BadPaddingException;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
@@ -70,13 +66,7 @@ public class SecureUtils {
                 cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
             }
             return cipher;
-        } catch (NoSuchAlgorithmException e) {
-            throw new OXFException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new OXFException(e);
-        } catch (InvalidKeyException e) {
-            throw new OXFException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }
@@ -98,13 +88,7 @@ public class SecureUtils {
                 cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
             }
             return cipher;
-        } catch (NoSuchAlgorithmException e) {
-            throw new OXFException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new OXFException(e);
-        } catch (InvalidKeyException e) {
-            throw new OXFException(e);
-        } catch (InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }
@@ -114,36 +98,77 @@ public class SecureUtils {
         return Long.toString(random.nextLong());
     }
 
+    /**
+     * Encrypt a string of text using the given password. The result is converted to Base64 encoding.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param password          encryption password
+     * @param text              string to encrypt
+     * @return                  string containing the encoding data as Base64
+     */
     public static String encrypt(PipelineContext pipelineContext, String password, String text) {
         try {
-            Cache cache = ObjectCache.instance();
-            Long validity = new Long(0);
-            InternalCacheKey key = new InternalCacheKey("Encryption cipher", password);
+            return encrypt(pipelineContext, password, text.getBytes("utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Encrypt a byte array using the given password. The result is converted to Base64 encoding.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param password          encryption password
+     * @param bytes             byte array to encrypt
+     * @return                  string containing the encoding data as Base64
+     */
+    public static String encrypt(PipelineContext pipelineContext, String password, byte[] bytes) {
+        try {
+            // Find cipher in cache
+            final Cache cache = ObjectCache.instance();
+            final Long validity = new Long(0);
+            final InternalCacheKey key = new InternalCacheKey("Encryption cipher", password);
             Cipher cipher = (Cipher) cache.findValid(pipelineContext, key, validity);
             if (cipher == null) {
                 cipher = Cipher.getInstance(CIPHER_TYPE);
                 cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
                 cache.add(pipelineContext, key, validity, cipher);
             }
+            // Encode with cipher
+            // TODO: should probably use pool of cyphers instead of synchronization, which can cause contention here.
             synchronized(cipher) {
-                return Base64.encode(cipher.doFinal(text.toString().getBytes()));
+                return Base64.encode(cipher.doFinal(bytes));
             }
-        } catch (IllegalBlockSizeException e) {
-            throw new OXFException(e);
-        } catch (BadPaddingException e) {
-            throw new OXFException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new OXFException(e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new OXFException(e);
-        } catch (InvalidKeyException e) {
-            throw new OXFException(e);
-        } catch (NoSuchPaddingException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
-    public static String decrypt(PipelineContext pipelineContext, String password, String text) {
+    /**
+     * Decrypt a Base64-encoded string using the given password.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param password          encryption password
+     * @param text              string to decrypt
+     * @return                  string containing the decoded data
+     */
+    public static String decryptAsString(PipelineContext pipelineContext, String password, String text) {
+        try {
+            return new String(decrypt(pipelineContext, password, text), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Decrypt a Base64-encoded string into a byte array using the given password.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param password          encryption password
+     * @param text              string to decrypt
+     * @return                  byte array containing the decoded data
+     */
+    public static byte[] decrypt(PipelineContext pipelineContext, String password, String text) {
         try {
             Cache cache = ObjectCache.instance();
             Long validity = new Long(0);
@@ -155,19 +180,9 @@ public class SecureUtils {
                 cache.add(pipelineContext, key, validity, cipher);
             }
             synchronized(cipher) {
-                return new String(cipher.doFinal(Base64.decode(text)));
+                return cipher.doFinal(Base64.decode(text));
             }
-        } catch (IllegalBlockSizeException e) {
-            throw new OXFException(e);
-        } catch (BadPaddingException e) {
-            throw new OXFException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new OXFException(e);
-        } catch (InvalidAlgorithmParameterException e) {
-            throw new OXFException(e);
-        } catch (InvalidKeyException e) {
-            throw new OXFException(e);
-        } catch (NoSuchPaddingException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }

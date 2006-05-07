@@ -347,29 +347,46 @@ public class XFormsUtils {
 //        XFormsServer.logger.debug("XForms - encoding XML.");
         Deflater deflater = null;
         try {
+            // The XML document as a string
             final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
 
             // Compress if needed
-            final String gzippedString;
+            final byte[] gzipByteArray;
             if (isGZIPState()) {
                 deflater = (Deflater) deflaterPool.borrowObject();
-                final ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-                final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, gzipByteArray, 1024);
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
                 gzipOutputStream.write(xmlString.getBytes("utf-8"));
                 gzipOutputStream.close();
-                gzippedString = Base64.encode(gzipByteArray.toByteArray());
+                gzipByteArray = byteArrayOutputStream.toByteArray();
             } else {
-                gzippedString = Base64.encode(xmlString.getBytes("utf-8"));
+                gzipByteArray = null;
             }
 
             // Encrypt if needed
-            final String encryptedString;
-            if (encryptionPassword != null)
-                encryptedString = SecureUtils.encrypt(pipelineContext, encryptionPassword, gzippedString);
-            else
-                encryptedString = gzippedString;
-
-            return encryptedString;
+            if (encryptionPassword != null) {
+                // Perform encryption
+                final String encryptedString;
+                if (gzipByteArray == null) {
+                    // The data was not compressed
+                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, xmlString);
+                } else {
+                    // The data was compressed
+                    encryptedString = "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
+                }
+                return encryptedString;
+            } else {
+                // No encryption
+                if (gzipByteArray == null) {
+                    // The data was not compressed
+                    // NOTE: In this scenario, we take a shortcut and assume we don't even need to base64 the string
+                    // as it is going to stay in memory
+                    return "X3" + xmlString;
+                } else {
+                    // The data was compressed
+                    return "X4" + Base64.encode(gzipByteArray);
+                }
+            }
         } catch (Throwable e) {
             try {
                 if (deflater != null)
@@ -485,7 +502,7 @@ public class XFormsUtils {
         private void writeShort(int s, byte[] buf, int offset) {
             buf[offset] = (byte) (s & 0xff);
             buf[offset + 1] = (byte) ((s >> 8) & 0xff);
-    }
+        }
     }
 
 //    public static String encodeXML2(PipelineContext pipelineContext, Document instance) {
@@ -535,22 +552,43 @@ public class XFormsUtils {
             // Get raw text
             String xmlString;
             {
-                // Decrypte if needed
-                if (encryptionPassword != null)
-                    encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
+                final String prefix = encodedXML.substring(0, 2);
+                final String encodedString = encodedXML.substring(2);
+
+                final String xmlString1;
+                final byte[] gzipByteArray;
+                if (prefix.equals("X1")) {
+                    // Encryption + uncompressed
+                    xmlString1 = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, encodedString);
+                    gzipByteArray = null;
+                } else if (prefix.equals("X2")) {
+                    // Encryption + compressed
+                    xmlString1 = null;
+                    gzipByteArray = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
+                } else if (prefix.equals("X3")) {
+                    // No encryption + uncompressed
+                    xmlString1 = encodedString;
+                    gzipByteArray = null;
+                } else if (prefix.equals("X4")) {
+                    // No encryption + compressed
+                    xmlString1 = null;
+                    gzipByteArray = Base64.decode(encodedString);
+                } else {
+                    throw new OXFException("Invalid prefix for encoded XML string: " + prefix);
+                }
 
                 // Decompress if needed
-                if (isGZIPState()) {
-                    final ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
+                if (gzipByteArray != null) {
+                    final ByteArrayInputStream compressedData = new ByteArrayInputStream(gzipByteArray);
                     final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
                     final ByteArrayOutputStream binaryData = new ByteArrayOutputStream(1024);
                     NetUtils.copyStream(gzipInputStream, binaryData);
                     xmlString = new String(binaryData.toByteArray(), "utf-8");
                 } else {
-                    xmlString = new String(Base64.decode(encodedXML), "utf-8");
+                    xmlString = xmlString1;
                 }
             }
-            // Parse XML and return documents
+            // Parse XML and return document
             final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
             XMLUtils.stringToSAX(xmlString, null, saxContentHandler, false, false);
             return saxContentHandler.getDocument();

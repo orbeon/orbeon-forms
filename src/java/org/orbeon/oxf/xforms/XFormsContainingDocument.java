@@ -169,6 +169,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getStateHandling();
     }
 
+    public boolean isSessionStateHandling() {
+        return (xformsEngineStaticState == null) ? false : xformsEngineStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+    }
+
     /**
      * Get object with the id specified.
      */

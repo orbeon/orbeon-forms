@@ -282,7 +282,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Handle dependency on session id
-        if (!containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE)) {
+        if (containingDocument.isSessionStateHandling()) {
             inputDependencies.setDependsOnSession(true);
         }
     }

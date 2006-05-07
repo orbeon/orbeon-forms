@@ -16,6 +16,7 @@ package org.orbeon.oxf.util;
 import org.orbeon.oxf.common.OXFException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.rmi.server.UID;
 import java.security.MessageDigest;
@@ -44,7 +45,7 @@ public class UUIDUtils {
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
 
             // Create a locally unique ID
-            messageDigest.update(new UID().toString().getBytes());
+            messageDigest.update(new UID().toString().getBytes("utf-8"));
 
             // Add local host to make the ID more globally unique
             messageDigest.update(hostNameBytes);
@@ -67,6 +68,8 @@ public class UUIDUtils {
             return sb.toString();
 
         } catch (NoSuchAlgorithmException e) {
+            throw new OXFException(e);
+        } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }
     }

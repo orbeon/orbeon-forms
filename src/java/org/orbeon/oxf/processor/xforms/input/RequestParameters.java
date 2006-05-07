@@ -182,7 +182,7 @@ public class RequestParameters {
         {
             final String encryptedIdString = name.substring(name.indexOf('^') + 1);
             idString = (XFormsUtils.isNameEncryptionEnabled())
-                    ? SecureUtils.decrypt(pipelineContext, encryptionKey, encryptedIdString) :encryptedIdString;
+                    ? SecureUtils.decryptAsString(pipelineContext, encryptionKey, encryptedIdString) :encryptedIdString;
         }
 
         // Save value

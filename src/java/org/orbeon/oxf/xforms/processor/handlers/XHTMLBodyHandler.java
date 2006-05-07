@@ -90,7 +90,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         final String currentPageGenerationId;
         {
             final String staticStateString;
-            if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
+            if (containingDocument.isSessionStateHandling()) {
                 // Produce UUID
                 if (handlerContext.getStaticStateUUID() == null) {
                     currentPageGenerationId = UUIDUtils.createPseudoUUID();
@@ -115,7 +115,7 @@ public class XHTMLBodyHandler extends HandlerBase {
         {
             final String dynamicStateString;
             {
-                if (containingDocument.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)) {
+                if (containingDocument.isSessionStateHandling()) {
 
                     if (handlerContext.getDynamicStateUUID() == null) {
                         // In this case, we use session scope since not much sharing will occur, if at all.

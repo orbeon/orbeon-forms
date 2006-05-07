@@ -29,6 +29,7 @@
     <xsl:template match="widget:tabs">
         <xsl:variable name="tabs" select="widget:tab"/><!-- as="element()*"  -->
         <xhtml:table class="widget-tabs" cellpadding="0" cellspacing="0" border="0">
+            <xsl:copy-of select="@*"/>
             <xhtml:tr>
                 <xhtml:td class="widget-tab-spacer-side"/>
                 <!-- Tabs at the top -->

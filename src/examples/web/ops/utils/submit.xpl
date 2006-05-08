@@ -66,6 +66,7 @@
                                         </xforms:instance>
                                         <xforms:submission id="post" replace="instance">
                                             <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id' and local-name() != 'id']"/>
+                                            <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
                                         </xforms:submission>
                                     </xforms:model>
                                 </xxforms:models>

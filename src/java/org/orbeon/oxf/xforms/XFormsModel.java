@@ -942,12 +942,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         public static final int ALL = VALUE | REQUIRED | RELEVANT | READONLY | VALID;
 
-        private ControlInfo controlInfo;
+        private String controlInfoId;
         private Node node;
         private int type;
 
-        public EventSchedule(ControlInfo controlInfo, Node node, int type) {
-            this.controlInfo = controlInfo;
+        public EventSchedule(String controlInfoId, Node node, int type) {
+            this.controlInfoId = controlInfoId;
             this.node = node;
             this.type = type;
         }
@@ -960,8 +960,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             return type;
         }
 
-        public ControlInfo getControlInfo() {
-            return controlInfo;
+        public String getControlInfoId() {
+            return controlInfoId;
         }
     }
 
@@ -1054,6 +1054,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         if (xformsControls != null) {
 
+            // Rebuild controls
+//            xformsControls.rebuildCurrentControlsState(pipelineContext);
+
             // Build list of events to send
             final List eventsToDispatch = new ArrayList();
 
@@ -1076,7 +1079,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                     if (valueChanged) {
                         // Value change takes care of everything
-                        eventsToDispatch.add(new EventSchedule(controlInfo, currentNode, EventSchedule.ALL));
+                        eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.ALL));
                     } else {
                         // Dispatch xforms-optional/xforms-required if needed
                         {
@@ -1084,7 +1087,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final boolean newRequiredState = updatedInstanceData.getRequired().get();
 
                             if ((previousRequiredState && !newRequiredState) || (!previousRequiredState && newRequiredState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo, currentNode, EventSchedule.REQUIRED));
+                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.REQUIRED));
                         }
                         // Dispatch xforms-enabled/xforms-disabled if needed
                         {
@@ -1092,7 +1095,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final boolean newRelevantState = updatedInstanceData.getInheritedRelevant().get();
 
                             if ((previousRelevantState && !newRelevantState) || (!previousRelevantState && newRelevantState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo, currentNode, EventSchedule.RELEVANT));
+                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.RELEVANT));
                         }
                         // Dispatch xforms-readonly/xforms-readwrite if needed
                         {
@@ -1100,7 +1103,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final boolean newReadonlyState = updatedInstanceData.getInheritedReadonly().get();
 
                             if ((previousReadonlyState && !newReadonlyState) || (!previousReadonlyState && newReadonlyState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo, currentNode, EventSchedule.READONLY));
+                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.READONLY));
                         }
 
                         // Dispatch xforms-valid/xforms-invalid if needed
@@ -1113,7 +1116,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final boolean newValidState = updatedInstanceData.getValid().get();
 
                             if ((previousValidState && !newValidState) || (!previousValidState && newValidState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo, currentNode, EventSchedule.VALID));
+                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.VALID));
                         }
                     }
                 }
@@ -1131,10 +1134,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             for (Iterator i = eventsToDispatch.iterator(); i.hasNext();) {
                 final EventSchedule eventSchedule = (XFormsModel.EventSchedule) i.next();
 
-                final ControlInfo controlInfo = eventSchedule.getControlInfo();
+                final String controlInfoId = eventSchedule.getControlInfoId();
+                final ControlInfo controlInfo = (ControlInfo) xformsControls.getObjectById(controlInfoId);
+
+                if (controlInfo == null) {
+                    // In this case, the algorithm in the spec is not clear. Many thing can have happened between the
+                    // initial determination of a control bound to a changing node, and now, including many events and
+                    // actions.
+                    continue;
+                }
 
                 // Re-obtain node to which control is bound, in case things have shifted
-                // TODO: probably that controls should simply keep a pointer to the nodes they are bound to
                 xformsControls.setBinding(pipelineContext, controlInfo);
                 final Node currentNode = xformsControls.getCurrentSingleNode();
 

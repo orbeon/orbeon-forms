@@ -582,7 +582,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - dispatching event: " + event.getEventName() + " - " + event.getTargetObject().getId() + " - at " + event.getLocationData());
+            XFormsServer.logger.debug("XForms - dispatching event: " + getEventLogSpaces() + event.getEventName() + " - " + event.getTargetObject().getId() + " - at " + event.getLocationData());
         }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
@@ -618,7 +618,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                             if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
                                 // Capture phase match
-                                eventHandlerImpl.handleEvent(pipelineContext, event);
+                                startHandleEvent();
+                                try {
+                                    eventHandlerImpl.handleEvent(pipelineContext, event);
+                                } finally {
+                                    endHandleEvent();
+                                }
                                 propagate &= eventHandlerImpl.isPropagate();
                                 performDefaultAction &= eventHandlerImpl.isDefaultAction();
                             }
@@ -645,7 +650,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                             if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
                                 // Bubbling phase match
-                                eventHandlerImpl.handleEvent(pipelineContext, event);
+                                startHandleEvent();
+                                try {
+                                    eventHandlerImpl.handleEvent(pipelineContext, event);
+                                } finally {
+                                    endHandleEvent();
+                                }
                                 propagate &= eventHandlerImpl.isPropagate();
                                 performDefaultAction &= eventHandlerImpl.isDefaultAction();
                             }
@@ -659,7 +669,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
             // Perform default action is allowed to
             if (performDefaultAction || !event.isCancelable()) {
-                targetObject.performDefaultAction(pipelineContext, event);
+                startHandleEvent();
+                try {
+                    targetObject.performDefaultAction(pipelineContext, event);
+                } finally {
+                    endHandleEvent();
+                }
             }
         } catch (Exception e) {
             // Add OPS trace information if possible
@@ -671,6 +686,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             else
                 throw new OXFException(e);
         }
+    }
+
+    private int eventLevel = 0;
+
+    private void startHandleEvent() {
+        eventLevel++;
+    }
+
+    private void endHandleEvent() {
+        eventLevel--;
+    }
+
+    private String getEventLogSpaces() {
+        final StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < eventLevel; i++)
+            sb.append("  ");
+        return sb.toString();
     }
 
     /**

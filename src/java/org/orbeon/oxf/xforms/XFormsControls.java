@@ -923,7 +923,7 @@ public class XFormsControls {
     }
 
     /**
-     * Get the object with the id specified.
+     * Get the object with the id specified, null if not found.
      */
     public Object getObjectById(String controlId) {
         return currentControlsState.getIdsToControlInfo().get(controlId);

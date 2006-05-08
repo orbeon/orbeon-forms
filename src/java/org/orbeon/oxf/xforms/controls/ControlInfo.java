@@ -460,4 +460,8 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             }
         }
     }
+
+//    public String toString() {
+//        return "[" + id + ", " + Dom4jUtils.domToString(element) + "]";
+//    }
 }

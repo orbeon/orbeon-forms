@@ -48,7 +48,7 @@
         <include name="commons-beanutils-1_5.jar"/>
         <include name="commons-pool-1.2.jar"/>
         <include name="commons-discovery-0_2.jar"/>
-        <include name="commons-httpclient-3_0.jar"/>
+        <include name="commons-httpclient-3_0_1.jar"/>
         <include name="commons-codec-1_3.jar"/>
         <include name="axis_1_2_1-axis.jar"/>
         <include name="axis_1_2_1-jaxrpc.jar"/>

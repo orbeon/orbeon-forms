@@ -2483,6 +2483,7 @@
             <a name="xforms11-extensions"/>
             <section>
                 <title>XForms 1.1 Extensions</title>
+                <a name="output-mediatype"/>
                 <section>
                     <title>Media Type for <code>xforms:output</code></title>
                     <p>
@@ -2587,6 +2588,7 @@
                         </note>
                     </section>
                 </section>
+                <a name="origin-attribute"/>
                 <section>
                     <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
@@ -2618,6 +2620,7 @@
                         </xforms:instance>
                     </xml-source>
                 </section>
+                <a name="validate-relevant-attributes"/>
                 <section>
                     <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
                     <p>

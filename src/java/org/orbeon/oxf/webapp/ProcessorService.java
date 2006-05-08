@@ -80,7 +80,7 @@ public class ProcessorService {
                 errorProcessor = InitUtils.createProcessor(errorProcessorDefinition);
 
             initialized = true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new OXFException(e);
         }
     }
@@ -93,7 +93,7 @@ public class ProcessorService {
         try {
             // Run the processor
             InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, logger);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // Something bad happened
             // Store the exception; needed if we are in a portlet
             ExternalContext.Request request = externalContext.getRequest();
@@ -128,7 +128,7 @@ public class ProcessorService {
 
                 // Run the processor
                 InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext, logger);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // Something bad happened
                 logger.error(e);
                 serviceStaticError(externalContext, throwable);
@@ -169,7 +169,7 @@ public class ProcessorService {
                 if (length == -1) break;
                 sb.append(buffer, 0, length);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.error("Unable to load stylesheet error.css while serving static error page. Resuming.", e);
         } finally {
             if (styleReader != null) styleReader.close();

@@ -86,11 +86,11 @@ public class InitUtils {
             processor.start(pipelineContext);
             if (!pipelineContext.isDestroyed())
                 pipelineContext.destroy(true);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             try {
                 if (!pipelineContext.isDestroyed())
                     pipelineContext.destroy(false);
-            } catch (Exception f) {
+            } catch (Throwable f) {
                 logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
             }
             LocationData locationData = ValidationException.getRootLocationData(e);
@@ -100,7 +100,7 @@ public class InitUtils {
                     : "Exception at " + locationData.toString();
             logger.error(message, throwable);
             // Make sure the caller can do something about it, like trying to run an error page
-            throw e;
+            throw new OXFException(e);
         } finally {
             // Free context
             StaticExternalContext.removeStaticContext();
@@ -178,7 +178,7 @@ public class InitUtils {
         // Make sure the Web app context is initialized
         try {
             WebAppContext.instance(servletContext);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             final Throwable rootThrowable = OXFException.getRootThrowable(e);
             logger.error(logMessagePrefix + " - Error initializing the WebAppContext", rootThrowable);
             throw new OXFException(rootThrowable);
@@ -226,6 +226,7 @@ public class InitUtils {
                     PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 
                     PipelineContext pipelineContext = new PipelineContext();
+                    processorDefinitions.reset(pipelineContext);
                     registry.reset(pipelineContext);
                     registry.start(pipelineContext);
 
@@ -237,6 +238,7 @@ public class InitUtils {
                         PipelineUtils.connect(processorDefinitions, "data", registry, "config");
 
                         pipelineContext = new PipelineContext();
+                        processorDefinitions.reset(pipelineContext);
                         registry.reset(pipelineContext);
                         registry.start(pipelineContext);
                     }

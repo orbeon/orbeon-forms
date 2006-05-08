@@ -358,7 +358,8 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // This is the state after XForms initialization
             final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0], requireClientSubmission);
-            xformsState[0] = new XFormsServer.XFormsState(initialXFormsState.getStaticState(), XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument));
+            xformsState[0] = new XFormsServer.XFormsState(initialXFormsState.getStaticState(),
+                    XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument, containingDocument[0].isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey()));
         }
 
         // Cache ContainingDocument if requested and possible

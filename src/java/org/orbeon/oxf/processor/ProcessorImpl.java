@@ -686,7 +686,7 @@ public abstract class ProcessorImpl implements Processor {
                 + getClass().getName() + "'", locationData);
     }
 
-    public void reset(PipelineContext context) {
+    public void reset(PipelineContext pipelineContext) {
         // nop
     }
 

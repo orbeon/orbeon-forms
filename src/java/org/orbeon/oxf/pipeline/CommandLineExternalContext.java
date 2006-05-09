@@ -17,10 +17,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.common.OXFException;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 
 /**
@@ -50,13 +47,20 @@ public class CommandLineExternalContext extends SimpleExternalContext {
 
     private class CommandLineResponse extends Response {
 
-        private PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(System.out));
+        private PrintWriter printWriter;
         public PrintWriter getWriter() throws IOException {
+            if (printWriter == null)
+                printWriter = new PrintWriter(new OutputStreamWriter(getOutputStream()));
             return printWriter;
         }
 
         public OutputStream getOutputStream() throws IOException {
-            return System.out;
+            return new FilterOutputStream(System.out) {
+                public void close() {
+                    // Don't close System.out
+                    System.out.flush();
+                }
+            };
         }
 
         public String rewriteActionURL(String urlString) {

@@ -27,10 +27,16 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedInputStream;
 
 public class ProcessorUtils {
     public static final String XML_CONTENT_TYPE1 = "text/xml";
@@ -50,6 +56,10 @@ public class ProcessorUtils {
 
     public static final String XS_ANYURI_EXPLODED_QNAME =
             XMLUtils.buildExplodedQName(XMLConstants.XS_ANYURI_QNAME.getNamespaceURI(), XMLConstants.XS_ANYURI_QNAME.getName());
+
+    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
+    public static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
+    public static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
     static {
         SUPPORTED_BINARY_TYPES.put(XS_BASE64BINARY_EXPLODED_QNAME, "");
@@ -104,7 +114,7 @@ public class ProcessorUtils {
                     throw new OXFException("Input content is mandatory");
                 Element copiedElement = originalElement.createCopy();
                 addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-                final String sid = Dom4jUtils.makeSystemId( originalElement ); 
+                final String sid = Dom4jUtils.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
                     ( copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid );
                 PipelineUtils.connect( domGenerator, "data", processor, name );
@@ -189,6 +199,69 @@ public class ProcessorUtils {
         for (Iterator i = copyElement.elements().iterator(); i.hasNext();) {
             Element child = (Element) i.next();
             addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
+        }
+    }
+
+    /**
+     * Generate a "standard" OPS text document.
+     *
+     * @param is                    InputStream to read from
+     * @param encoding              character encoding to use, or null for default
+     * @param output                output ContentHandler to write text document to
+     * @param contentType           optional content type to set as attribute on the root element
+     */
+    public static void readText(InputStream is, String encoding, ContentHandler output, String contentType) {
+
+        if (encoding == null)
+            encoding = DEFAULT_TEXT_READING_ENCODING;
+
+        try {
+            // Create attributes for root element: xsi:type, and optional content-type
+            final AttributesImpl attributes = new AttributesImpl();
+            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
+            if (contentType != null)
+                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+
+            // Write document
+            output.startDocument();
+            output.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
+            XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
+            output.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+            output.endDocument();
+
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Generate a "standard" OPS binary document.
+     *
+     * @param is            InputStream to read from
+     * @param output        output ContentHandler to write binary document to
+     * @param contentType   optional content type to set as attribute on the root element
+     */
+    public static void readBinary(InputStream is, ContentHandler output, String contentType) {
+        try {
+            // Create attributes for root element: xsi:type, and optional content-type
+            AttributesImpl attributes = new AttributesImpl();
+            output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+            output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+            attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+            if (contentType != null)
+                attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+
+            // Write document
+            output.startDocument();
+            output.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+            XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
+            output.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+            output.endDocument();
+
+        } catch (SAXException e) {
+            throw new OXFException(e);
         }
     }
 }

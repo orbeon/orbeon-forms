@@ -309,6 +309,11 @@
         <class name="org.orbeon.oxf.processor.file.FileProcessor"/>
     </processor>
 
+    <!-- Excecute processor -->
+    <processor name="oxf:execute-processor">
+        <class name="org.orbeon.oxf.processor.execute.ExecuteProcessor"/>
+    </processor>
+
     <!-- Converters -->
     <processor name="oxf:xml-converter">
         <class name="org.orbeon.oxf.processor.converter.XMLConverter"/>

@@ -63,7 +63,6 @@
         <include name="jfreechart*"/>
         <include name="jcommon*"/>
         <include name="activation-1_0_2.jar"/>
-        <include name="ymsg9-v0_51.jar"/>
         <include name="jtidy-04aug2000r7.jar"/>
         <include name="kawa-1_7.jar"/>
         <include name="mondrian-0_5_orbeon.jar"/>
@@ -95,12 +94,14 @@
         <include name="itext-1_02b.jar"/>
         <include name="itext-xml-1_02.jar"/>
         <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
+        <!--<include name="xml-apis-xerces_2_7_1_orbeon.jar"/>-->
         <include name="pdfbox-0_7_1.jar"/>
-        <include name="ant-1_5_4.jar"/>
+        <include name="ant-1_6_5.jar"/>
     </fileset>
     <fileset id='war.libs.private' dir="${lib.dir}">
-      <include name='xercesImpl_2_6_2_orbeon.jar' />
-      <include name='commons-logging-1_0_4.jar' />
+        <include name="xercesImpl_2_6_2_orbeon.jar"/>
+        <!--<include name="xercesImpl_2_7_1_orbeon.jar"/>-->
+        <include name='commons-logging-1_0_4.jar' />
     </fileset>
 
     <target name="init">
@@ -290,6 +291,7 @@
     <!-- WAR -->
 	
     <target name="war" depends="jars,orbeon-source-files-lists,orbeon-css-templates">
+    <!--<target name="war" depends="jars,orbeon-css-templates">-->
         <echo message="war.dir: ${war.dir}"/>
         <mkdir dir="${war.classes}"/>
         <!--<javac destdir="${war.dir}/WEB-INF/classes"-->

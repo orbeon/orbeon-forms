@@ -1,0 +1,66 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="exec" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+    <attribute name="executable"/>
+    <optional>
+        <attribute name="dir"/>
+    </optional>
+    <optional>
+        <attribute name="spawn">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="output"/>
+    </optional>
+    <optional>
+        <attribute name="error"/>
+    </optional>
+    <optional>
+        <attribute name="append">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="timeout">
+            <data type="nonNegativeInteger"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="newenvironment">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="vmlauncher">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="resolveexecutable">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <attribute name="searchpath">
+            <data type="boolean"/>
+        </attribute>
+    </optional>
+    <optional>
+        <element name="arg">
+            <attribute name="line"/>
+        </element>
+    </optional>
+</element>

@@ -29,14 +29,12 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
-import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -58,8 +56,6 @@ public class URLGenerator extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(URLGenerator.class);
 
-    private static final String DEFAULT_TEXT_ENCODING = "iso-8859-1";
-
     private static final boolean DEFAULT_VALIDATING = false;
     public static final boolean DEFAULT_HANDLE_XINCLUDE = false;
 
@@ -74,9 +70,6 @@ public class URLGenerator extends ProcessorImpl {
     private static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
     private static final boolean DEFAULT_CACHE_ALWAYS_REVALIDATE = true;
     private static final int DEFAULT_CACHE_EXPIRATION = CACHE_EXPIRATION_LAST_MODIFIED;
-
-    private static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
-    private static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
@@ -649,7 +642,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readText(inputStream, getExternalEncoding(), output, contentType);
+            ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType);
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -665,7 +658,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readBinary(ContentHandler output, String contentType) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readBinary(inputStream, output, contentType);
+            ProcessorUtils.readBinary(inputStream, output, contentType);
         }
 
         private String getKey() {
@@ -769,12 +762,12 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType) throws IOException {
             openConnection();
-            readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType);
+            ProcessorUtils.readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType);
         }
 
         public void readBinary(ContentHandler output, String contentType) throws IOException {
             openConnection();
-            readBinary(urlConn.getInputStream(), output, contentType);
+            ProcessorUtils.readBinary(urlConn.getInputStream(), output, contentType);
         }
 
         public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
@@ -821,69 +814,6 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        /**
-         * Generate a "standard" OXF text document.
-         *
-         * @param is
-         * @param encoding
-         * @param output
-         * @param contentType
-         * @throws IOException
-         */
-        public static void readText(InputStream is, String encoding, ContentHandler output, String contentType) throws IOException {
-
-            if (encoding == null)
-                encoding = DEFAULT_TEXT_ENCODING;
-
-            try {
-                // Create attributes for root element: xsi:type, and optional content-type
-                AttributesImpl attributes = new AttributesImpl();
-                output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
-                if (contentType != null)
-                    attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
-
-                // Write document
-                output.startDocument();
-                output.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
-                XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
-                output.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
-                output.endDocument();
-
-            } catch (SAXException e) {
-                throw new OXFException(e);
-            }
-        }
-
-        /**
-         * Generate a "standard" OXF binary document.
-         *
-         * @param is
-         * @param output
-         * @param contentType
-         */
-        public static void readBinary(InputStream is, ContentHandler output, String contentType) {
-            try {
-                // Create attributes for root element: xsi:type, and optional content-type
-                AttributesImpl attributes = new AttributesImpl();
-                output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
-                if (contentType != null)
-                    attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
-
-                // Write document
-                output.startDocument();
-                output.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
-                XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
-                output.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-                output.endDocument();
-
-            } catch (SAXException e) {
-                throw new OXFException(e);
-            }
-        }
     }
 
     private static class URIReference {

@@ -155,21 +155,21 @@ Le bruit persistait toujours.
         </output>
     </test>
 
-    <test description="http: protocol: XML document" name="oxf:url-generator">
-        <input name="config">
-            <config>
-                <url>http://www.scdi.org/~avernet/try/orbeon.xml</url>
-            </config>
-        </input>
-        <output name="data">
-            <orbeon>
-                <test1/>
-                <test2>
-                    <test3/>
-                </test2>
-            </orbeon>
-        </output>
-    </test>
+    <!--<test description="http: protocol: XML document" name="oxf:url-generator">-->
+        <!--<input name="config">-->
+            <!--<config>-->
+                <!--<url>http://www.scdi.org/~avernet/try/orbeon.xml</url>-->
+            <!--</config>-->
+        <!--</input>-->
+        <!--<output name="data">-->
+            <!--<orbeon>-->
+                <!--<test1/>-->
+                <!--<test2>-->
+                    <!--<test3/>-->
+                <!--</test2>-->
+            <!--</orbeon>-->
+        <!--</output>-->
+    <!--</test>-->
 
     <test description="Test content-type with dots" name="oxf:url-generator">
         <input name="config">

@@ -111,6 +111,12 @@
                         functions to return node-sets. [TODO: show example, add this to XUpdate doc]
                     </p>
                 </li>
+                <li>
+                    <p>
+                        A new Execute processor has been added. It allows executing external commands and retrieving
+                        the command's standard output and standard error. [TODO: doc]
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

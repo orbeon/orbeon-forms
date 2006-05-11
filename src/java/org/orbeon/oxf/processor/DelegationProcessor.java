@@ -58,8 +58,8 @@ public class DelegationProcessor extends ProcessorImpl {
 
     private static final org.dom4j.QName xsiType = new org.dom4j.QName
             ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
-    private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
-    private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/SOAP-ENV:Envelope/SOAP-ENV:Body/node()";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/text() | /SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/*";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/SOAP-ENV:Envelope/SOAP-ENV:Body/text() | /SOAP-ENV:Envelope/SOAP-ENV:Body/*";
     private static final String DEFAULT_SELECT_BUS = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*";
 
     public final String INPUT_INTERFACE = "interface";

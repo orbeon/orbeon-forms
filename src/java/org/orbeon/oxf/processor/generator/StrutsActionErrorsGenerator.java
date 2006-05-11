@@ -29,6 +29,7 @@ import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.util.Base64;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -184,7 +185,7 @@ public class StrutsActionErrorsGenerator extends org.orbeon.oxf.processor.Proces
                 TeeContentHandler tee = new TeeContentHandler(Arrays.asList(new Object[]{state.store, dch}));
 
                 readOutput(context, tee);
-                String digest = new String(dch.getResult());
+                String digest = Base64.encode(dch.getResult());
 
                 // Make sure that validity extraction is thread-safe
                 synchronized (StrutsActionErrorsGenerator.class) {

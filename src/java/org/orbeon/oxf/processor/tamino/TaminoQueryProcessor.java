@@ -58,7 +58,7 @@ public class TaminoQueryProcessor extends TaminoProcessor {
                     // Read data
                     Document queryDocument = readCacheInputAsDOM4J(context, INPUT_DATA);
                     String query = XPathUtils.selectStringValueNormalize(queryDocument, "/query");
-                    String xquery = Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()"));
+                    String xquery = Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*"));
                     TConnection connection = getConnection(context, config);
 
                     TaminoElementHandler handler = new TaminoElementHandler(contentHandler);

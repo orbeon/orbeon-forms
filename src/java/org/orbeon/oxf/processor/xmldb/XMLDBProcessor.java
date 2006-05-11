@@ -77,7 +77,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         config.setCreateCollection(rootElement.attributeValue("create-collection"));
         config.setResourceId(rootElement.attributeValue("resource-id"));
 
-        config.setQuery(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(configDocument, "/*/node()")));
+        config.setQuery(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(configDocument, "/*/text() | /*/*")));
         config.setNamespaceContext(Dom4jUtils.getNamespaceContext(configDocument.getRootElement()));
 
         return config;

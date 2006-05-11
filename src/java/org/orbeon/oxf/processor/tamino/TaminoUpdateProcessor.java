@@ -54,7 +54,7 @@ public class TaminoUpdateProcessor extends TaminoProcessor {
             TConnection connection = getConnection(context, config);
             TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), TDOM4JObjectModel.getInstance());
 
-            TXQuery xquery = TXQuery.newInstance(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()")));
+            TXQuery xquery = TXQuery.newInstance(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/text() | /xquery/*")));
             System.out.println(xquery.getExpression());
             TResponse response = accessor.xquery(xquery);
             System.out.println("result: "+response.getQueryContentAsString());

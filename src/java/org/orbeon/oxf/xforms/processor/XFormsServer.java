@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -96,7 +95,7 @@ public class XFormsServer extends ProcessorImpl {
         final Element actionElement;
         final XFormsContainingDocument containingDocument;
         final XFormsState xformsState;
-        final String requestPageGenerationId;
+        final String staticStateUUID;
 
         // Use request input provided by client
         final Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
@@ -122,18 +121,17 @@ public class XFormsServer extends ProcessorImpl {
                 final Element dynamicStateElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_DYNAMIC_STATE_QNAME);
                 dynamicStateString = dynamicStateElement.getTextTrim();
             }
-
             
             if (dynamicStateString.startsWith(APPLICATION_STATE_PREFIX)) {
                 //  State is currently stored in the application scope
-                final String requestId = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
+                final String dynamicStateUUID = dynamicStateString.substring(APPLICATION_STATE_PREFIX.length());
 
                 // Extract page generation id
-                requestPageGenerationId = staticStateString.substring(APPLICATION_STATE_PREFIX.length());
+                staticStateUUID = staticStateString.substring(APPLICATION_STATE_PREFIX.length());
 
                 // We don't create the session cache at this point as it may not be necessary
                 final XFormsServerApplicationStateCache applicationStateCache = XFormsServerApplicationStateCache.instance(externalContext, false);
-                final XFormsState applicationFormsState = applicationStateCache.find(requestPageGenerationId, requestId);
+                final XFormsState applicationFormsState = applicationStateCache.find(staticStateUUID, dynamicStateUUID);
 
                 // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                 if (applicationFormsState == null)
@@ -143,16 +141,16 @@ public class XFormsServer extends ProcessorImpl {
 
             } else if (dynamicStateString.startsWith(SESSION_STATE_PREFIX)) {
                 // State doesn't come with the request, we should look it up in the repository
-                final String requestId = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
+                final String dynamicStateUUID = dynamicStateString.substring(SESSION_STATE_PREFIX.length());
 
                 // Extract page generation id
-                requestPageGenerationId = staticStateString.startsWith(SESSION_STATE_PREFIX)
+                staticStateUUID = staticStateString.startsWith(SESSION_STATE_PREFIX)
                         ? staticStateString.substring(SESSION_STATE_PREFIX.length())
                         : staticStateString.substring(APPLICATION_STATE_PREFIX.length());
 
                 // We don't create the session cache at this point as it may not be necessary
                 final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(false), false);
-                final XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(requestPageGenerationId, requestId);
+                final XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(staticStateUUID, dynamicStateUUID);
 
                 // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                 if (sessionFormsState == null)
@@ -161,7 +159,7 @@ public class XFormsServer extends ProcessorImpl {
                 xformsState = sessionFormsState;
             } else {
                 // State comes with request
-                requestPageGenerationId = null;
+                staticStateUUID = null;
                 xformsState = new XFormsState(staticStateString, dynamicStateString);
             }
         }
@@ -254,7 +252,7 @@ public class XFormsServer extends ProcessorImpl {
             // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
                 outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
-                        requestPageGenerationId, externalContext, xformsState);
+                        staticStateUUID, externalContext, xformsState);
             }
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent

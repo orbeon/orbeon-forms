@@ -15,14 +15,14 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.UUIDUtils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * This class encapsulates containing document static state information.
@@ -42,9 +42,12 @@ public class XFormsEngineStaticState {
     private String stateHandling;
     private String containerType;
 
+//    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
     public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument) {
 
-        uuid = UUIDUtils.createPseudoUUID();
+        // Remember UUID
+//        this.uuid = uuid;
+        this.uuid = UUIDUtils.createPseudoUUID();
 
         // Get controls document
         controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(staticStateDocument.getRootElement().element("controls"));

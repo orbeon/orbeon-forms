@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
@@ -127,10 +128,22 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final LocationDocumentResult documentResult = new LocationDocumentResult();
                     identity.setResult(documentResult);
 
-                    annotatedSAXStore = new SAXStore(new XFormsExtractor.XFormsExtractorContentHandler(pipelineContext, identity));
-                    readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
-                    final Document staticStateDocument = documentResult.getDocument();
+                    final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
 
+                    annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
+                            new XFormsExtractor.XFormsExtractorContentHandler(pipelineContext, identity),
+                            digestContentHandler
+                    }));
+
+                    // Read the input
+                    readInputAsSAX(pipelineContext, processorInput, annotatedSAXStore);
+
+                    // Get the results
+                    final Document staticStateDocument = documentResult.getDocument();
+                    final String digest = Base64.encode(digestContentHandler.getResult());
+                    XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
+
+//                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument, digest);
                     xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
                 }
 

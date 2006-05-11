@@ -178,6 +178,7 @@
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
             <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
+            <exclude name="org/orbeon/oxf/processor/bpel/**/*.java"/>
             <exclude name="org/orbeon/faces/**/*.java"/>
             <exclude name="org/orbeon/faces11/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>

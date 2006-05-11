@@ -117,6 +117,12 @@
                         the command's standard output and standard error. [TODO: doc]
                     </p>
                 </li>
+                <li>
+                    <p>
+                        Some JAR files have been updated to their latest versions, including dom4j, Jaxen, and ant.
+                        [TODO]
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

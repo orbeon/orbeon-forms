@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Locator;
 
 /**
- * LocationData information with additional description.
+ * LocationData information with additional information.
  */
 public class ExtendedLocationData extends LocationData {
 
@@ -46,12 +46,13 @@ public class ExtendedLocationData extends LocationData {
     }
 
     /**
-     * Create extended location data with an element.
+     * Create extended location data with a description and an element.
      *
      * If defaultIfNecessary is true and locationData is null or the systemId provided by
      * defaultIfNecessary is null, then default Java location data of the caller is provided.
      *
      * @param locationData
+     * @param description
      * @param element
      */
     public ExtendedLocationData(LocationData locationData, String description, Element element) {
@@ -61,7 +62,19 @@ public class ExtendedLocationData extends LocationData {
     }
 
     /**
-     * Create extended location data with a description.
+     * Create extended location data with a description, an element and parameters.
+     *
+     * @param locationData
+     * @param description
+     * @param element
+     * @param parameters
+     */
+    public ExtendedLocationData(LocationData locationData, String description, Element element, String[] parameters) {
+        this(locationData, description, element, parameters, false);
+    }
+
+    /**
+     * Create extended location data with a description and parameters.
      *
      * If defaultIfNecessary is true and locationData is null or the systemId provided by
      * defaultIfNecessary is null, then default Java location data of the caller is provided.
@@ -74,12 +87,10 @@ public class ExtendedLocationData extends LocationData {
     public ExtendedLocationData(LocationData locationData, String description, String[] parameters, boolean defaultIfNecessary) {
         this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData(1, false) : locationData,
                 description, parameters);
-//        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
-//            System.out.println("xxx defaultIfNecessary = true xxx ");
     }
 
     /**
-     * Create extended location data with a description.
+     * Create extended location data with a description, an element and parameters.
      *
      * If defaultIfNecessary is true and locationData is null or the systemId provided by
      * defaultIfNecessary is null, then default Java location data of the caller is provided.
@@ -93,8 +104,6 @@ public class ExtendedLocationData extends LocationData {
     public ExtendedLocationData(LocationData locationData, String description, Element element, String[] parameters, boolean defaultIfNecessary) {
         this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData(1, false) : locationData,
                 description, parameters);
-//        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
-//            System.out.println("xxx defaultIfNecessary = true xxx ");
         if (element != null)
             this.elementString = Dom4jUtils.domToString(element);
     }

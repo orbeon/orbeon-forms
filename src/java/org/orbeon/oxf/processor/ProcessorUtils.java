@@ -153,7 +153,7 @@ public class ProcessorUtils {
             result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
-            // Etxernal URI
+            // External URI
             LocationData locationData = (LocationData) element.getData();
             URL url = createRelativeURL(locationData, urlString);
 

@@ -691,8 +691,8 @@ public class XFormsControls {
                 }
                 // Make sure there are no duplicate ids
                 if (idsToControlInfo.get(effectiveControlId) != null)
-                    throw new ValidationException("Duplicate id for XForms control", new ExtendedLocationData((LocationData) controlElement.getData(),
-                            "analyzing control element", controlElement));
+                    throw new ValidationException("Duplicate id for XForms control: " + effectiveControlId, new ExtendedLocationData((LocationData) controlElement.getData(),
+                            "analyzing control element", controlElement, new String[] { "id", effectiveControlId }));
 
                 idsToControlInfo.put(effectiveControlId, controlInfo);
 

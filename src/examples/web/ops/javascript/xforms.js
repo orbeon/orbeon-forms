@@ -634,7 +634,7 @@ function getEventTarget(event) {
     } else {
         // Case of normal HTML DOM events
         event = event ? event : window.event;
-        var target = event.srcElement ? event.srcElement : event.target;
+        var target = event.srcElement ? event.srcElement : event.currentTarget;
         if (target.xformsElement) {
             // HTML area on Gecko: event target is the document, return the textarea
             return target.xformsElement;

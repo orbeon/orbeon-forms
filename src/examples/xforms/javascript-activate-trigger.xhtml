@@ -38,6 +38,10 @@
             <xforms:output ref="number"/>
         </xhtml:p>
         <xhtml:script type="text/javascript">
+            function pageLoaded() {
+                document.getElementById('increment-trigger').click();
+            }
+            xformsAddEventListener(window, "load", pageLoaded);
         </xhtml:script>
         <xhtml:p>
             <xhtml:button onclick="document.getElementById('increment-trigger').click()">Run trigger</xhtml:button>

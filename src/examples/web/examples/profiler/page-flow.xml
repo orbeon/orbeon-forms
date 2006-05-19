@@ -14,7 +14,7 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/profiler/data" view="functionality-model.xpl"/>
+    <page path-info="/profiler/hotspots-data" view="hotspots-model.xpl"/>
     <page path-info="/profiler/hotspots" model="hotspots-model.xpl" view="hotspots-view.xsl"/>
     <page path-info="/profiler/functionality" model="functionality-model.xpl" view="functionality-view.xsl"/>
     <page path-info="/profiler/" view="view.xhtml"/>

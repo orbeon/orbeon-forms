@@ -91,7 +91,7 @@ public class XFormsExtractor extends ProcessorImpl {
             // Create xml:base stack
             try {
                 final String rootXMLBase = externalContext.getRequest().getRequestPath();
-                xmlBaseStack.push(new URI(rootXMLBase));
+                xmlBaseStack.push(new URI(null, null, rootXMLBase, null));
             } catch (URISyntaxException e) {
                 throw new ValidationException(e, new LocationData(locator));
             }

@@ -1011,11 +1011,13 @@ function xformsPageLoaded() {
         // Parse and store initial repeat hierarchy
         document.xformsRepeatTreeChildToParent = new Array();
         var repeatTreeString = xformsStringValue(document.getElementById("xforms-repeat-tree"));
+        repeatTreeString = repeatTreeString.replace(new RegExp("\\n", "g"), "");
+        repeatTreeString = repeatTreeString.replace(new RegExp("\\r", "g"), "");
         var repeatTree = repeatTreeString.split(",");
         for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
             var repeatInfo = repeatTree[repeatIndex].split(" ");
             var id = repeatInfo[0];
-            var parent = repeatInfo.length > 1 ? repeatInfo[1] : null;
+            var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
             document.xformsRepeatTreeChildToParent[id] = parent;
         }
         document.xformsRepeatTreeParentToAllChildren = new Array();
@@ -1749,6 +1751,8 @@ function xformsHandleResponse() {
                                     var newIndex = newRepeatIndexes[repeatId];
                                     if (newIndex != 0) {
                                         var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
+                                        if (newItemDelimiter == null)
+                                            throw "Can not find delimiter for repeatId '" + repeatId + "' index '" + newIndex + "'";
                                         cursor = newItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
                                                (!xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")

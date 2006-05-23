@@ -1,6 +1,6 @@
 <example-descriptor>
     <title>Instant Messaging and Web Services</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>

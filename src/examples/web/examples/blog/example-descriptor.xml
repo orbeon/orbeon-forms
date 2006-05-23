@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>Blog Example</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p xmlns="http://www.w3.org/1999/xhtml">
             This is a sample application for <a href="http://www.orbeon.com/software/">Orbeon

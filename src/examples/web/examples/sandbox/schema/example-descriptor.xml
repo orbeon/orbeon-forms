@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>W3C Schema Sandbox</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example provides a sandbox to run a W3C or Relax NG schema.

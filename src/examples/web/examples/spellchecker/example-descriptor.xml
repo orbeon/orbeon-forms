@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>Google Spell Checker</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             When you perform a search on Google, sometimes Google will <a

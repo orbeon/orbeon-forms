@@ -13,7 +13,7 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
     <title>XUpdate Sandbox</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>

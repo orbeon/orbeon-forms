@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>XML to URL</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example illustrates the use of <a href="http://tinyurl.com/">TinyURL.com</a> to

@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
-              xmlns:xi="http://www.w3.org/2003/XInclude"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
               schema="../data-access/document-id.rng">
     <xforms:instance>

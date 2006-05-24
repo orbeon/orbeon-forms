@@ -44,7 +44,7 @@
                             <!-- Case where this tab is inactive -->
                             <xforms:case id="{$tab-id}-inactive">
                                 <xhtml:div class="widget-tab-inactive">
-                                    <xforms:trigger appearance="xxforms:link">
+                                    <xforms:trigger appearance="xxforms:link" id="{@id}-trigger">
                                         <xsl:choose>
                                             <xsl:when test="widget:label/@ref">
                                                 <xforms:label ref="{widget:label/@ref}"/>

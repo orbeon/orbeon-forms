@@ -17,26 +17,12 @@
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This page shows how HTML controls can be mixed with links in the same form to create a
-                "report table", where you can choose how the data is sorted and what columns are
-                displayed.
+                This example shows how you can build a sortable table, where the contents of the table can be sorted by
+                the values of each column.
             </p>
             <p>
-                On the table below you can select:
-            </p>
-            <ol>
-                <li>
-                    What columns you want to display with the checkboxes on the right.
-                </li>
-                <li>
-                    How the data in the table is sorted by clicking on the icon next to the column
-                    header. The sort order will go from "no sorting", to "ascending", to "descending",
-                    back to "no sorting".
-                </li>
-            </ol>
-            <p>
-                The XForms instance is displayed at the bottom of the page and you can see how it is
-                changed as you change the columns to display and the sort order.
+                You can select how the data is sorted by clicking on the icon in the column header. The sort order goes
+                from "no sort", to "sort ascending", to "sort descending", and back to "no sort".
             </p>
         </div>
     </description>

@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XForms Report Table</title>
+    <title>XForms Sortable Table</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
     <description>
         <div xmlns="http://www.w3.org/1999/xhtml">

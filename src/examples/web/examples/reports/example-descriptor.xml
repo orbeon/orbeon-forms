@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>HTML, PDF, and Excel Reports</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             <img src="/examples/reports/process.png"/>

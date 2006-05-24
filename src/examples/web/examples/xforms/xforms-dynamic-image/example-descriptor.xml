@@ -13,7 +13,7 @@
 -->
 <example-descriptor>
     <title>Dynamic Images With XForms</title>
-    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example shows how an image can be dynamically changed in a page.

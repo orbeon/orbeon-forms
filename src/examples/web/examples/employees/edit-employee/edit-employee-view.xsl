@@ -16,7 +16,7 @@
  <html xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
        xmlns:xforms="http://www.w3.org/2002/xforms"
        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xi="http://www.w3.org/2003/XInclude"
        xmlns:xs="http://www.w3.org/2001/XMLSchema"
        xmlns:employee="http://orbeon.org/ops/examples/employee-demo/employee"
        xmlns="http://www.w3.org/1999/xhtml">

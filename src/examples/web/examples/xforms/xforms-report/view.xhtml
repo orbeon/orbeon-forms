@@ -110,9 +110,9 @@
                     <xxforms:img src="/images/sort-natural.gif"/>
                     <xforms:label/>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:setvalue ref="sort-by"><xsl:value-of select="$value"/></xforms:setvalue>
                         <xforms:setvalue ref="sort-order">ascending</xforms:setvalue>
                         <xforms:setvalue ref="sort-data-type"><xsl:value-of select="$data-type"/></xforms:setvalue>
+                        <xforms:setvalue ref="sort-by"><xsl:value-of select="$value"/></xforms:setvalue>
                         <xforms:send submission="sort"/>
                     </xforms:action>
                 </xforms:trigger>

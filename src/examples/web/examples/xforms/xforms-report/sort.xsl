@@ -21,12 +21,10 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
     <xsl:template match="/">
-        <xsl:message><xsl:copy-of select="doc('input:instance')"/></xsl:message>
         <xsl:apply-templates select="doc('input:instance')/*"/>
     </xsl:template>
 
     <xsl:template match="countries">
-        <xsl:message><xsl:copy-of select="/*"/></xsl:message>
         <xsl:copy>
             <xsl:for-each select="country">
                 <xsl:sort select="*[name() = /instance/sort-by]" order="{/instance/sort-order}"

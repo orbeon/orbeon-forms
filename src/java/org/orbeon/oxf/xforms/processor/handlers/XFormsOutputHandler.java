@@ -135,7 +135,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "help", controlInfo);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
+        if (elementAttributes.getValue("value") == null)
+            handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
 
         // xforms:hint
         handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);

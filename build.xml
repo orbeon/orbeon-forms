@@ -64,8 +64,6 @@
         <include name="jcommon*"/>
         <include name="activation-1_0_2.jar"/>
         <include name="jtidy-04aug2000r7.jar"/>
-        <include name="kawa-1_7.jar"/>
-        <include name="mondrian-0_5_orbeon.jar"/>
         <include name="junit.jar"/>
         <include name="saxon-6_5_2.jar"/>
         <include name="saxon-8_7_orbeon.jar"/>

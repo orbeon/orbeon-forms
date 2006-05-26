@@ -47,11 +47,17 @@
             </p>
         </section>
         <section>
-            <title>Changes in Version 3.0.2</title>
+            <title>Changes in Version 3.1</title>
             <p>
-                OPS 3.0.2 is an update containing the following changes:
+                OPS 3.1 is an update containing the following changes:
             </p>
             <ul>
+                <li>
+                    <p>
+                        Performance improvements, including in the following scenarios: [TODO: explain caching, serving
+                        static XForms, etc.]
+                    </p>
+                </li>
                 <li>
                     <p>
                         The embedded eXist database has been upgraded to the 20060316 snapshot.
@@ -78,17 +84,29 @@
                             attributes.
                         </li>
                         <li>
-                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>. [TODO:
-                            Elaborate on using REST APIs for eXist]
+                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
+                            Support for this method is not included in XForms 1.0, but will be added to XForms 1.1.
+                            [TODO: Elaborate on using REST APIs for eXist] [TODO: Elaborate on using REST APIs for
+                            eXist]
                         </li>
                         <li>
-                            Autocomplete control. [TODO]
+                            Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
                         </li>
                         <li>
-                            HTML editor control. [TODO]
+                            Autocomplete control. [TODO] [kindly sponsored by...]
+                        </li>
+                        <li>
+                            HTML editor control. [TODO] [kindly sponsored by...]
                         </li>
                         <li>
                             Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                        </li>
+                        <li>
+                            Improved support within Liferay portal. [TODO] [kindly sponsored by...] A new epilogue
+                            pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168
+                            portlets into liferay. In addition, some bugs have been fixed relative to conflicts between
+                            OPS JavaScript files and Liferay's, as well as ensuring that multiple OPS portlets do not
+                            conflict.
                         </li>
                         <li>
                             [TODO]

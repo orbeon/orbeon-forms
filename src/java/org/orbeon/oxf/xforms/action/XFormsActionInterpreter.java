@@ -345,8 +345,8 @@ public class XFormsActionInterpreter {
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
                 final Element elementToRemove;
-                final List siblingElements;
-                final int actualIndexInCollection;
+                final List parentContent;
+                final int actualIndexInParentContentCollection;
                 {
                     final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
                             xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
@@ -365,8 +365,17 @@ public class XFormsActionInterpreter {
                     // Find actual deletion point
                     elementToRemove = (Element) collectionToUpdate.get(tempDeletionIndex - 1);
                     final Element parentElement = elementToRemove.getParent();
-                    siblingElements = parentElement.elements();
-                    actualIndexInCollection = siblingElements.indexOf(elementToRemove);
+                    if (parentElement != null) {
+                        // Regular case
+                        parentContent = parentElement.elements();
+                        actualIndexInParentContentCollection = parentContent.indexOf(elementToRemove);
+                    } else if (elementToRemove == elementToRemove.getDocument().getRootElement()) {
+                        // case of root element
+                        parentContent = elementToRemove.getDocument().content();
+                        actualIndexInParentContentCollection = parentContent.indexOf(elementToRemove);
+                    } else {
+                        throw new OXFException("Element to remove doesn't have a parent.");
+                    }
                 }
 
                 // Get current repeat indexes
@@ -382,7 +391,7 @@ public class XFormsActionInterpreter {
                 XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls);
 
                 // Then only perform the deletion
-                siblingElements.remove(actualIndexInCollection);
+                parentContent.remove(actualIndexInParentContentCollection);
 
                 // Rebuild ControlsState
                 xformsControls.rebuildCurrentControlsState(pipelineContext);

@@ -157,6 +157,19 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>http://orbeon.org/oxf/xml/delegation</td>
+                        <td>delegation</td>
+                        <td>
+                            Delegation processor
+                        </td>
+                        <td>
+                            <code>delegation:execute</code>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <a href="/doc/processors-delegation">Delegation Processor</a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>http://orbeon.org/oxf/xml/datatypes</td>
                         <td>odt</td>
                         <td>

@@ -141,6 +141,14 @@
                         [TODO]
                     </p>
                 </li>
+                <li>
+                    <p>
+                        When using the delegation processor to call web services, by default the
+                        processor throws an exception when the remote service returns a SOAP fault.
+                        Now the delegation processor can also be configured to return the SOAP fault
+                        document instead of throwing an exception.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

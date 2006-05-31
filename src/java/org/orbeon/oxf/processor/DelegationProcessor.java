@@ -58,9 +58,9 @@ public class DelegationProcessor extends ProcessorImpl {
 
     private static final org.dom4j.QName xsiType = new org.dom4j.QName
             ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
-    private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/text() | /SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/*";
-    private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/SOAP-ENV:Envelope/SOAP-ENV:Body/text() | /SOAP-ENV:Envelope/SOAP-ENV:Body/*";
-    private static final String DEFAULT_SELECT_BUS = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/*:Envelope/*:Body/*[1]/text() | /*:Envelope/*:Body/*[1]/*";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/*:Envelope/*:Body/text() | /*:Envelope/*:Body/*";
+    private static final String DEFAULT_SELECT_BUS = "/*:Envelope/*:Body/*";
 
     public final String INPUT_INTERFACE = "interface";
     public final String INPUT_CALL = "call";
@@ -179,9 +179,6 @@ public class DelegationProcessor extends ProcessorImpl {
                                                 service.soapVersion != null && service.soapVersion.equals("1.2")
                                                 ? new SOAPEnvelope(SOAPConstants.SOAP12_CONSTANTS)
                                                 : new SOAPEnvelope();
-                                        SOAPConstants soapConstants  = requestEnvelope.getSOAPConstants();
-                                        final java.util.Map selectNamespaceContext = new java.util.HashMap();
-                                        selectNamespaceContext.put("SOAP-ENV", soapConstants.getEnvelopeURI());
                                         if (service.type == ServiceDefinition.BUS_SERVICE_TYPE || "document".equals(service.style)) {
                                             // Add elements to directly to body
                                             for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
@@ -267,8 +264,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         // Handle result
                                         if (resultEnvelope != null) {
 
-                                            // Throw exception if a fault is returned
-                                            if (resultEnvelope.getBody().getFault() != null) {
+                                            // Throw exception if a fault is returned and the user does not want the fault to be returned
+                                            if (resultEnvelope.getBody().getFault() != null && !service.returnFault) {
                                                 throw new OXFException("SOAP Fault. Request:\n"
                                                         + XMLUtils.domToString(requestEnvelope.getAsDocument())
                                                         + "\n\nResponse:\n"
@@ -278,10 +275,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Send body from result envelope
                                             LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
                                             locationSAXWriter.setContentHandler(contentHandler);
-                                            final NonLazyUserDataDocumentFactory fctry 
-                                                = NonLazyUserDataDocumentFactory
-                                                      .getInstance( null );
-                                            Document resultEnvelopeDOM4j = new DOMReader( fctry ).read(resultEnvelope.getAsDocument());
+                                            final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
+                                            Document resultEnvelopeDOM4j = new DOMReader(fctry).read(resultEnvelope.getAsDocument());
 
                                             String xpath =
                                                     operation != null && operation.select != null
@@ -293,7 +288,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     new DocumentWrapper(resultEnvelopeDOM4j, null, new Configuration()),
                                                     xpath,
                                                     operation != null && operation.select != null
-                                                            ? operation.selectNamespaceContext : selectNamespaceContext);
+                                                            ? operation.selectNamespaceContext : null);
                                             for (java.util.Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
                                                 // Create document with node from SOAP envelope
@@ -438,6 +433,7 @@ public class DelegationProcessor extends ProcessorImpl {
             service.clazz = serviceElement.attributeValue("class");
             service.style = serviceElement.attributeValue("style");
             service.soapVersion = serviceElement.attributeValue("soap-version");
+            service.returnFault = "true".equals(serviceElement.attributeValue("return-fault"));
 
             // Create operations
             for (java.util.Iterator j = XPathUtils.selectIterator(serviceElement, "operation"); j.hasNext();) {
@@ -474,6 +470,7 @@ public class DelegationProcessor extends ProcessorImpl {
         public String clazz;
         public String style;
         public String soapVersion;
+        public boolean returnFault;
         public java.util.List operations = new java.util.ArrayList();
     }
 

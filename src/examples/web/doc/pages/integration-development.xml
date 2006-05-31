@@ -77,10 +77,10 @@
             <title>Building With Ant</title>
             <p>
                 We build PresentationServer with Ant. The Ant configuration file (build.xml) is
-                located at the root of the source directory. You can start Ant from the command line
-                or if you are using an IDE like Eclipse or IntelliJ, use the builtin Ant support
-                provided by your IDE. The PresentationServer build.xml defines a number of targets,
-                but only a few are used frequently:
+                located at the root of the source directory. You can start Ant from the command
+                line. If you are using an IDE like Eclipse or IntelliJ, you can also use the
+                builtin Ant support provided by your IDE. The PresentationServer build.xml defines
+                a number of targets, but only a few are used frequently:
             </p>
             <ul>
                 <li>
@@ -102,10 +102,87 @@
                 </li>
             </ul>
         </section>
-        <!--<section>-->
-            <!--<title>Compiling Java Files From Your IDE</title>-->
-            <!--<p>-->
-            <!--</p>-->
-        <!--</section>-->
+        <section>
+            <title>Compiling Java Files From Your IDE</title>
+            <p>
+                During development, you can choose to compile Java files with your IDE instead of
+                compiling them with Ant. You might want to do this because the compiler that comes
+                in your IDE is faster than javac, or reports better errors. Often the main reason
+                is to be able to leverage <a
+                href="http://java.sun.com/j2se/1.4.2/docs/guide/jpda/enhancements.html">HotSwap</a>
+                in the JVM. HotSwap works by starting the VM in debug mode and connecting to the VM
+                with your IDE. As your application is running, you can then modify the Java code,
+                and recompile it with your IDE. After the IDE has successfully compiled any
+                modified Java file, it will send the new code to the JVM, which will replace the old
+                code with the new code.
+            </p>
+            <p>
+                HotSwap still has limitations: it is not a silver bullet and there will be cases
+                where you will need to redeploy the web application or restart the application
+                server. But you will spare yourself a redeployment or restart in most of the cases
+                where your modification to the Java code does not significantly change the structure
+                of the Java class. If you are using IntelliJ, you can find more <a
+                href="http://www.jetbrains.com/idea/docs/help/debugging/">information about
+                HotSwap</a> on their site.
+            </p>
+            <p>
+                To compile files from your IDE:
+            </p>
+            <ul>
+                <li>
+                     Ant setup:
+
+                    <ul>
+                        <li>
+                            Set the <code>skip.compilation</code> Ant property (you just need to
+                            have this property set some value; the value of the property does not
+                            matter).
+                        </li>
+                        <li>
+                            If you have compiled code before without this property, run first the
+                            <code>clean</code> Ant task.
+                        </li>
+                        <li>
+                            With the <code>skip.compilation</code> property set, run the
+                            <code>orbeon-war</code> Ant task.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    IDE setup:
+
+                    <ul>
+                        <li>
+                            Set your IDE to generate class files in
+                            <code>build/ops-war/WEB-INF/classes</code>.
+                        </li>
+                        <li>
+                            Point your IDE to the jar files in the <code>lib</code> directory, as
+                            the PresentationServer code has dependencies on those libraries.
+                        </li>
+                        <li>
+                            Setup your IDE to compile the files in <code>src/java</code> with the
+                            exclusion of files in the following packages:
+                            <code>orb.orbeon.faces</code>, <code>org.orbeon.faces11</code>, and
+                            <code>org.orbeon.oxf.processor.bpel</code>.
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Once this setup is done:
+
+                    <ul>
+                        <li>Compile all the sources a first time before you start the application server.</li>
+                        <li>Start the application server in debug mode.</li>
+                        <li>Connect to the application server with your IDE.</li>
+                        <li>
+                            Now comes the interesting part: modify Java code whenever you want,
+                            compile it, and your IDE will send the new code to the JVM which will
+                            on the fly use this new code instead of the old one.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
     </body>
 </document>

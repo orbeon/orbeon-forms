@@ -22,11 +22,50 @@
 		<section>
 			<title>Scope</title>
 			<p>
-                This section
+                This section is not about developing applications with PresentationServer, but about
+                developing PresentationServer itself. It is for those who want to modify the code of
+                PresentationServer. This documentation provided here is very much work in progress.
+                If you would like to contribute to the PresentationServer development and don't find
+                all the information you are looking for here, please feel free to <a
+                href="http://www.objectweb.org/wws/subrequest/ops-users">join the ops-users mailing
+                list</a> and ask your question on the list.
             </p>
 		</section>
+        <a name="nightly-builds"/>
+        <section>
+            <title>Nightly Builds</title>
+            <p>
+                At any time you can <a
+                href="http://forge.objectweb.org/nightlybuilds/ops/ops/">download a nightly
+                build</a>, which is a build of the latest PresentationServer source code.
+            </p>
+            <p>
+                Unlike <a
+                href="http://forge.objectweb.org/project/showfiles.php?group_id=168">released
+                versions of PresentationServer</a>, nightly builds are not tested before they are
+                made available. The only guarantee is that nightly builds will pass the
+                PresentationServer unit tests, as a build that does not pass a unit test would not
+                uploaded to nightly build directory. The PresentationServer developers are doing
+                their best not to cause any regression in nightly builds, so nightly builds can be
+                used for application development in most scenarios. So if you notice any regression
+                is a nightly build, please report it on <a
+                href="http://www.objectweb.org/wws/info/ops-users">ops-users</a>.
+            </p>
+            <p>
+                The name "nightly builds" seems to imply that they are created only once a day. In
+                fact, nightly builds are created at all time during the day, whenever a modification
+                occurs on the code repository. So there might in fact be several nightly builds in a
+                day of development is active during that day, or no new build if nothing was checked
+                in the repository that day.
+            </p>
+        </section>
         <section>
             <title>Getting The Source</title>
+            <p>
+                First note that if your main reason for getting the source is to have a build of
+                PresentationServer with the latest code, we recommend that you instead download a
+                nightly build (see above).
+            </p>
             <p>
                 The source code of PresentationServer is available on the CVS repository hosted by
                 ObjectWeb. To checkout the source code on your local machine, follow the
@@ -61,16 +100,12 @@
                     href="http://forge.objectweb.org/nightlybuilds/ops/ops/">directory</a>. The
                     produced file will be located in <tt>build/distrib/ops.war</tt></p>
                 </li>
-                <li>
-                    
-                </li>
             </ul>
         </section>
-        <section>
-            <title>Compiling Java Files From Your IDE</title>
-            <p>
-                You can build PresentationServer
-            </p>
-        </section>
+        <!--<section>-->
+            <!--<title>Compiling Java Files From Your IDE</title>-->
+            <!--<p>-->
+            <!--</p>-->
+        <!--</section>-->
     </body>
 </document>

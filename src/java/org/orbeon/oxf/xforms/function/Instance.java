@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function;
 import org.dom4j.Document;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
@@ -45,7 +46,7 @@ public class Instance extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
         // Get instance id
         final Expression instanceIdExpression = argument[0];
-        final String instanceId = instanceIdExpression.evaluateAsString(xpathContext);
+        final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(), instanceIdExpression.evaluateAsString(xpathContext));
 
         // Get model and instance with given id for that model only
         final XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();

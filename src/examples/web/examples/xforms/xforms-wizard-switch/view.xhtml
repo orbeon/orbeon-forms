@@ -55,6 +55,7 @@
                             <xhtml:td>
                                 <xforms:input ref="firstname" tabindex="1">
                                     <xforms:label class="fixed-width">First name:</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
@@ -78,6 +79,7 @@
                             <xhtml:td>
                                 <xforms:input ref="lastname" tabindex="3">
                                     <xforms:label class="fixed-width">Last name:</xforms:label>
+                                    <xforms:toggle ev:event="DOMActivate" case="age"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>
@@ -111,6 +113,7 @@
                                     <xforms:action ev:event="xforms-invalid">
                                         <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
                                     </xforms:action>
+                                    <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
                                 </xforms:input>
                             </xhtml:td>
                         </xhtml:tr>

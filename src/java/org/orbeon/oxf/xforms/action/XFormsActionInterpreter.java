@@ -131,7 +131,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_RESET_ACTION.equals(actionEventName)) {
             // 10.1.11 The reset Element
 
-            final String modelId = actionElement.attributeValue("model");
+            final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
 
             final Object modelObject = containingDocument.getObjectById(pipelineContext, modelId);
             if (modelObject instanceof XFormsModel) {
@@ -172,7 +172,8 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_REBUILD_ACTION.equals(actionEventName)) {
             // 10.1.3 The rebuild Element
 
-            final XFormsModel model = xformsControls.getCurrentModel();
+            final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+            final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
             containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -183,8 +184,8 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_RECALCULATE_ACTION.equals(actionEventName)) {
             // 10.1.4 The recalculate Element
 
-            // TODO: handle optional "model" attribute
-            final XFormsModel model = xformsControls.getCurrentModel();
+            final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+            final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -195,7 +196,8 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_REVALIDATE_ACTION.equals(actionEventName)) {
             // 10.1.5 The revalidate Element
 
-            final XFormsModel model = xformsControls.getCurrentModel();
+            final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+            final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -206,7 +208,8 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_REFRESH_ACTION.equals(actionEventName)) {
             // 10.1.6 The refresh Element
 
-            final XFormsModel model = xformsControls.getCurrentModel();
+            final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
+            final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
             containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -217,7 +220,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
 
-            final String caseId = actionElement.attributeValue("case");
+            final String caseId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("case"));
             final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
 
             // Update xforms:switch info and dispatch events
@@ -431,7 +434,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element
 
-            final String repeatId = actionElement.attributeValue("repeat");
+            final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
             final String indexXPath = actionElement.attributeValue("index");
 
             final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
@@ -445,12 +448,12 @@ public class XFormsActionInterpreter {
             // 10.1.10 The send Element
 
             // Find submission object
-            final String submissionId = actionElement.attributeValue("submission");
+            final String submissionId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("submission"));
             if (submissionId == null)
                 throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
             final Object submission = containingDocument.getObjectById(pipelineContext, submissionId);
             if (submission == null || !(submission instanceof XFormsModelSubmission))
-                throw new OXFException("submission attribute on xforms:send element does not refer to existing xforms:submission element.");
+                throw new OXFException("Submission attribute on xforms:send element does not refer to existing xforms:submission element: " + submissionId);
 
             // Dispatch event to submission object
             containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent((XFormsEventTarget) submission));
@@ -462,7 +465,7 @@ public class XFormsActionInterpreter {
             final String newEventName = actionElement.attributeValue("name");
             if (newEventName == null)
                 throw new OXFException("Missing mandatory name attribute on xforms:dispatch element.");
-            final String newEventTargetId = actionElement.attributeValue("target");
+            final String newEventTargetId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("target"));
             if (newEventTargetId == null)
                 throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
 
@@ -567,7 +570,7 @@ public class XFormsActionInterpreter {
 
             // 10.1.7 The setfocus Element
 
-            final String controlId = actionElement.attributeValue("control");
+            final String controlId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("control"));
             if (controlId == null)
                 throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
             final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(controlId);

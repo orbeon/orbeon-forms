@@ -134,7 +134,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 replace = submissionElement.attributeValue("replace");
 
                 if (replace.equals("instance")) {
-                    replaceInstanceId = submissionElement.attributeValue("instance");
+                    replaceInstanceId = XFormsUtils.namespaceId(containingDocument, submissionElement.attributeValue("instance"));
                 }
             }
             if (submissionElement.attributeValue("separator") != null) {

@@ -35,6 +35,7 @@ public interface ExternalContext extends WebAppExternalContext {
 
     public interface Request {
         public String getContainerType();
+        public String getContainerNamespace();
 
         public String getPathInfo();
         public String getRequestPath();

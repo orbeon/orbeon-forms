@@ -38,6 +38,10 @@ public class SimpleExternalContext implements ExternalContext {
             return "simple";
         }
 
+        public String getContainerNamespace() {
+            return "";
+        }
+
         public String getContextPath() {
             return "";
         }

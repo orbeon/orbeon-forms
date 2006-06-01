@@ -51,6 +51,10 @@ public class RequestWrapper implements ExternalContext.Request {
         return _request.getContainerType();
     }
 
+    public String getContainerNamespace() {
+        return _request.getContainerNamespace();
+    }
+
     public int getContentLength() {
         return _request.getContentLength();
     }

@@ -565,16 +565,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 charactersBuf.flip();
                 final char[] chs = charactersBuf.array();
                 final int chsStrt = charactersBuf.arrayOffset();
-                wsrprewriteMatcher.reset(charactersBuf);
                 int last = 0;
-                while (wsrprewriteMatcher.find()) {
-                    final int strt = wsrprewriteMatcher.start();
-                    final int len = strt - last;
-                    contentHandler.characters(chs, chsStrt + last, len);
-                    contentHandler.characters
-                            (WSRP_REWRITE_REPLACMENT_CHARS, 0, WSRP_REWRITE_REPLACMENT_CHARS.length);
-                    last = wsrprewriteMatcher.end();
-                }
+//                wsrprewriteMatcher.reset(charactersBuf);
+//                while (wsrprewriteMatcher.find()) {
+//                    final int strt = wsrprewriteMatcher.start();
+//                    final int len = strt - last;
+//                    contentHandler.characters(chs, chsStrt + last, len);
+//                    contentHandler.characters
+//                            (WSRP_REWRITE_REPLACMENT_CHARS, 0, WSRP_REWRITE_REPLACMENT_CHARS.length);
+//                    last = wsrprewriteMatcher.end();
+//                }
                 if (last < bfLen) {
                     final int len = bfLen - last;
                     contentHandler.characters(chs, chsStrt + last, len);

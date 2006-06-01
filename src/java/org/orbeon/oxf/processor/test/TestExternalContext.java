@@ -76,6 +76,10 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/container-type");
         }
 
+        public String getContainerNamespace() {
+            return "";
+        }
+
         public int getContentLength() {
             if (bodyInputStream == null)
                 setupBody();

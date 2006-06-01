@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -31,6 +32,8 @@ import java.util.Map;
 /**
  * This processor adds ids on all the XForms elements which don't have any, and adds xforms:alert
  * elements within relevant XForms element which don't have any.
+ *
+ * TODO: We shouldn't have to add those xforms:alert elements. Is this a legacy from the XSLT version of XFormsToXHTML?
  */
 public class XFormsDocumentAnnotator extends ProcessorImpl {
 
@@ -54,6 +57,12 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
+                final ExternalContext externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
+                final boolean isPortlet = "portlet".equals(externalContext.getRequest().getContainerType());
+                final String containerNamespace = externalContext.getRequest().getContainerNamespace();
+
+                logger.info("containerNamespace" + containerNamespace);
+
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
                     private int currentId = 1;
@@ -65,18 +74,27 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
                             // This is an XForms element
 
-                            final String initialIdAttribute = attributes.getValue("id");
+                            final int idIndex = attributes.getIndex("id");
                             final String newIdAttribute;
-                            if (initialIdAttribute == null) {
-                                // Create a new "id" attribute
+                            if (idIndex == -1) {
+                                // Create a new "id" attribute, prefixing if needed
                                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                final String newId = "xforms-element-" + currentId;
+                                final String newId = containerNamespace + "xforms-element-" + currentId;
                                 newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newId);
                                 attributes = newAttributes;
 
                                 newIdAttribute = newId;
+                            } else if (isPortlet) {
+                                // Then we must prefix the existing id
+                                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                                final String newId = containerNamespace + newAttributes.getValue(idIndex);
+                                newAttributes.setValue(idIndex, newId);
+                                attributes = newAttributes;
+
+                                newIdAttribute = newId;
                             } else {
-                                newIdAttribute = initialIdAttribute;
+                                // Keep existing id
+                                newIdAttribute = attributes.getValue(idIndex);
                             }
 
                             if (alertElements.get(localname) != null) {

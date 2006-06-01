@@ -163,6 +163,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Return the container namespace that generate the XForms page. Always "" for servlets.
+     */
+    public String getContainerNamespace() {
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getContainerNamespace();
+    }
+
+    /**
      * Return the state handling strategy for this document, either "client" or "session".
      */
     public String getStateHandling() {

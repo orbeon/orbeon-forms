@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.functions.SystemFunction;
 
 /**
@@ -22,25 +23,32 @@ import org.orbeon.saxon.functions.SystemFunction;
  */
 abstract public class XFormsFunction extends SystemFunction {
 
-    private XFormsModel xFormsModel;
-    private XFormsControls xFormsControls;
+    private XFormsContainingDocument xformsContainingDocument;
+    private XFormsModel xformsModel;
+    private XFormsControls xformsControls;
 
     protected XFormsFunction() {
     }
 
     public XFormsModel getXFormsModel() {
-        return xFormsModel;
+        return xformsModel;
     }
 
     public void setXFormsModel(XFormsModel xFormsModel) {
-        this.xFormsModel = xFormsModel;
+        this.xformsModel = xFormsModel;
+        this.xformsContainingDocument = xFormsModel.getContainingDocument();
     }
 
     public XFormsControls getXFormsControls() {
-        return xFormsControls;
+        return xformsControls;
     }
 
     public void setXFormsControls(XFormsControls xFormsControls) {
-        this.xFormsControls = xFormsControls;
+        this.xformsControls = xFormsControls;
+        this.xformsContainingDocument = xFormsControls.getContainingDocument();
+    }
+
+    public XFormsContainingDocument getXFormsContainingDocument() {
+        return xformsContainingDocument;
     }
 }

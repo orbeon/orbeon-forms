@@ -68,6 +68,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return "servlet";
         }
 
+        public String getContainerNamespace() {
+            return "";
+        }
+
         public String getContextPath() {
             return nativeRequest.getContextPath();
         }

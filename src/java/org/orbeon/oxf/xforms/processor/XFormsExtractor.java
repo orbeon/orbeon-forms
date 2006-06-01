@@ -108,6 +108,8 @@ public class XFormsExtractor extends ProcessorImpl {
                 attributesImp.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
                 // Add container-type attribute
                 attributesImp.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
+                // Add container-namespace attribute
+                attributesImp.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
                 // Add state-handling attribute
                 if (stateHandling != null)
                     attributesImp.addAttribute("", "state-handling", "state-handling", ContentHandlerHelper.CDATA, stateHandling);

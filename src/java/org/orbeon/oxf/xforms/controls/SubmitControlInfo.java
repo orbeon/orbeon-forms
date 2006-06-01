@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
@@ -35,7 +36,7 @@ public class SubmitControlInfo extends ControlInfo {
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(event.getEventName())) {
 
             // Find submission id
-            final String submissionId = getElement().attributeValue("submission");
+            final String submissionId =  XFormsUtils.namespaceId(containingDocument, getElement().attributeValue("submission"));
             if (submissionId == null)
                 throw new OXFException("xforms:submit requires a submission attribute.");
 
@@ -45,7 +46,7 @@ public class SubmitControlInfo extends ControlInfo {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
             } else {
-                throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element.");
+                throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element: " + submissionId);
             }
         }
         super.performDefaultAction(pipelineContext, event);

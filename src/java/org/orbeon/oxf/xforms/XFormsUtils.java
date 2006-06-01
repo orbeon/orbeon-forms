@@ -857,4 +857,18 @@ public class XFormsUtils {
 //        XFormsServer.logger.debug(debugMessage + ":\n" + Dom4jUtils.domToString(document));
         DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToString(document));
     }
+
+    /**
+     * Prefix an id with the container namespace if needed. If the id is null, return null.
+     *
+     * @param containingDocument    current ContainingDocument
+     * @param id                    id to prefix
+     * @return                      prefixed id or null
+     */
+    public static String namespaceId(XFormsContainingDocument containingDocument, String id) {
+        if (id == null)
+            return null;
+        else
+            return containingDocument.getContainerNamespace() + id;
+    }
 }

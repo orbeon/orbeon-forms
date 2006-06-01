@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -42,7 +43,7 @@ public class Index extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
-        final String repeatId = argument[0].evaluateAsString(xpathContext);
+        final String repeatId = XFormsUtils.namespaceId(getXFormsContainingDocument(), argument[0].evaluateAsString(xpathContext));
 
         if (getXFormsControls() instanceof XFormsElementContext) {
             // Legacy implementation

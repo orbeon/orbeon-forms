@@ -41,6 +41,7 @@ public class XFormsEngineStaticState {
     private String baseURI;
     private String stateHandling;
     private String containerType;
+    private String containerNamespace;
 
 //    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
     public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument) {
@@ -72,6 +73,7 @@ public class XFormsEngineStaticState {
 
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
+        containerNamespace = staticStateDocument.getRootElement().attributeValue("container-namespace");
 
         final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
         encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());
@@ -103,5 +105,9 @@ public class XFormsEngineStaticState {
 
     public String getContainerType() {
         return containerType;
+    }
+
+    public String getContainerNamespace() {
+        return containerNamespace;
     }
 }

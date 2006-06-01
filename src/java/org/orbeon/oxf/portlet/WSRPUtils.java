@@ -136,7 +136,7 @@ public class WSRPUtils {
      * This method parses a string containing WSRP Consumer URL and namespace
      * encodings and encode the URLs and namespaces as per the Portlet API.
      *
-     * FIXME: Right now, we do not support any type of escaping.
+     * It is possible to escape by using the string wsrp_rewritewsrp_rewrite.
      */
     public static void write(RenderResponse response, String s) throws IOException {
         int stringLength = s.length();

@@ -294,7 +294,7 @@ public class RequestGenerator extends ProcessorImpl {
         // Get complete request document from pipeline context, or create it if not there
         Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
-            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext, null);
+            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
         Document result = (Document) context.wholeRequest.clone();
 
         // Filter the request based on the config input
@@ -308,67 +308,42 @@ public class RequestGenerator extends ProcessorImpl {
             element.addElement(elementName).addText(text);
     }
 
-    private Document readWholeRequestAsDOM4J(PipelineContext context, Node config) {
+    private Document readWholeRequestAsDOM4J(PipelineContext context) {
         final ExternalContext.Request request = getRequest(context);
 
         final Document document = new NonLazyUserDataDocument();
         final Element requestElement = document.addElement("request");
 
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/container-type") != null)
-            addTextElement(requestElement, "container-type", request.getContainerType());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/character-encoding") != null)
-            addTextElement(requestElement, "character-encoding", request.getCharacterEncoding());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/content-length") != null)
-            addTextElement(requestElement, "content-length", Integer.toString(request.getContentLength()));
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/content-type") != null) {
+        addTextElement(requestElement, "container-type", request.getContainerType());
+        addTextElement(requestElement, "container-namespace", request.getContainerNamespace());
+        addTextElement(requestElement, "character-encoding", request.getCharacterEncoding());
+        addTextElement(requestElement, "content-length", Integer.toString(request.getContentLength()));
+        {
             final String contentType = request.getContentType();
             addTextElement(requestElement, "content-type", (contentType == null) ? "" : contentType);
         }
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/parameters") != null)
-            addParameters(context, requestElement, request);
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/body") != null)
-            addBody(context, requestElement);
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/protocol") != null)
-            addTextElement(requestElement, "protocol", request.getProtocol());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-addr") != null)
-            addTextElement(requestElement, "remote-addr", request.getRemoteAddr());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-host") != null)
-            addTextElement(requestElement, "remote-host", request.getRemoteHost());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/scheme") != null)
-            addTextElement(requestElement, "scheme", request.getScheme());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/server-name") != null)
-            addTextElement(requestElement, "server-name", request.getServerName());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/server-port") != null)
-            addTextElement(requestElement, "server-port", Integer.toString(request.getServerPort()));
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/is-secure") != null)
-            addTextElement(requestElement, "is-secure", new Boolean(request.isSecure()).toString());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/auth-type") != null)
-            addTextElement(requestElement, "auth-type", request.getAuthType());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/context-path") != null)
-            addTextElement(requestElement, "context-path", request.getContextPath());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/headers") != null)
-            addHeaders(context, requestElement, request);
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/method") != null)
-            addTextElement(requestElement, "method", request.getMethod());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/path-info") != null)
-            addTextElement(requestElement, "path-info", request.getPathInfo());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/path-translated") != null)
-            addTextElement(requestElement, "path-translated", request.getPathTranslated());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/query-string") != null)
-            addTextElement(requestElement, "query-string", request.getQueryString());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-user") != null)
-            addTextElement(requestElement, "remote-user", request.getRemoteUser());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/requested-session-id") != null)
-            addTextElement(requestElement, "requested-session-id", request.getRequestedSessionId());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-uri") != null)
-            addTextElement(requestElement, "request-uri", request.getRequestURI());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-url") != null)
-            addTextElement(requestElement, "request-url", request.getRequestURL());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/servlet-path") != null)
-            addTextElement(requestElement, "servlet-path", request.getServletPath());
-        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-path") != null) {
-            addTextElement(requestElement, "request-path", request.getRequestPath());
-        }
+        addParameters(context, requestElement, request);
+        addBody(context, requestElement);
+        addTextElement(requestElement, "protocol", request.getProtocol());
+        addTextElement(requestElement, "remote-addr", request.getRemoteAddr());
+        addTextElement(requestElement, "remote-host", request.getRemoteHost());
+        addTextElement(requestElement, "scheme", request.getScheme());
+        addTextElement(requestElement, "server-name", request.getServerName());
+        addTextElement(requestElement, "server-port", Integer.toString(request.getServerPort()));
+        addTextElement(requestElement, "is-secure", new Boolean(request.isSecure()).toString());
+        addTextElement(requestElement, "auth-type", request.getAuthType());
+        addTextElement(requestElement, "context-path", request.getContextPath());
+        addHeaders(context, requestElement, request);
+        addTextElement(requestElement, "method", request.getMethod());
+        addTextElement(requestElement, "path-info", request.getPathInfo());
+        addTextElement(requestElement, "path-translated", request.getPathTranslated());
+        addTextElement(requestElement, "query-string", request.getQueryString());
+        addTextElement(requestElement, "remote-user", request.getRemoteUser());
+        addTextElement(requestElement, "requested-session-id", request.getRequestedSessionId());
+        addTextElement(requestElement, "request-uri", request.getRequestURI());
+        addTextElement(requestElement, "request-url", request.getRequestURL());
+        addTextElement(requestElement, "servlet-path", request.getServletPath());
+        addTextElement(requestElement, "request-path", request.getRequestPath());
         return document;
     }
 
@@ -376,8 +351,7 @@ public class RequestGenerator extends ProcessorImpl {
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (externalContext == null)
             throw new OXFException("Missing external context");
-        ExternalContext.Request request = externalContext.getRequest();
-        return request;
+        return externalContext.getRequest();
     }
 
     private String MARK_ATTRIBUTE = "mark";

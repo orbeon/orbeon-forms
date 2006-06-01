@@ -17,6 +17,7 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -58,6 +59,9 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final String OUTPUT_CACHE_KEY = "dynamicState";
 
+    private static final String NAMESPACE_CACHE_KEY = "containerNamespace";
+    private static final Long CONSTANT_VALIDITY = new Long(0);
+
 //    private static final KeyValidity CONSTANT_KEY_VALIDITY
 //            = new KeyValidity(new InternalCacheKey("sessionId", "NO_SESSION_DEPENDENCY"), new Long(0));
 
@@ -97,6 +101,19 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 return outputCacheKey;
+            }
+
+            protected boolean supportsLocalKeyValidity() {
+                return true;
+            }
+
+            public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
+
+                // Use the container namespace as a dependency
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final String containerNamespace = externalContext.getRequest().getContainerNamespace();
+
+                return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
             }
         };
         addOutput(outputName, output);

@@ -74,6 +74,8 @@ public class XFormsEngineStaticState {
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
         containerNamespace = staticStateDocument.getRootElement().attributeValue("container-namespace");
+        if (containerNamespace == null)
+            containerNamespace = "";
 
         final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
         encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());

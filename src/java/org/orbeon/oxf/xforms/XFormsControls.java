@@ -370,7 +370,7 @@ public class XFormsControls {
                 (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null);
     }
 
-    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bindId,
+    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String modelId, String bindId,
                             Element bindingElement, Map bindingElementNamespaceContext) {
 
         // Check for mandatory and optional bindings
@@ -399,8 +399,8 @@ public class XFormsControls {
 
         // Handle model
         final XFormsModel newModel;
-        if (model != null) {
-            newModel = containingDocument.getModel(model);
+        if (modelId != null) {
+            newModel = containingDocument.getModel(modelId);
         } else {
             newModel = currentBindingContext.getModel();
         }
@@ -413,6 +413,7 @@ public class XFormsControls {
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bindId));
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
+
                 final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
                 if (currentSingleNodeForModel != null) {
                     newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,

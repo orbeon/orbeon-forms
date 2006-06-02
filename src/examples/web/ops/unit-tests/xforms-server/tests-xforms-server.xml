@@ -26,7 +26,7 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events" only="true">
 
     <!--
         TODO:
@@ -1466,7 +1466,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:static-state>
-                    <static-state xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                    <static-state xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <controls>
                             <xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), &apos;[MNn] [D], [Y]&apos;, &apos;en&apos;, (), ())"/>
                             <xforms:output id="id2" ref="date" xxforms:format="format-date(xs:date(.), &apos;[D]. [MNn] [Y]&apos;, &apos;de&apos;, (), ())"/>

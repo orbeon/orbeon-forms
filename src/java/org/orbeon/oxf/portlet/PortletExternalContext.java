@@ -258,6 +258,14 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public Object getNativeRequest() {
             return PortletExternalContext.this.getNativeRequest();
         }
+
+        public String getPortletMode() {
+            return portletRequest.getPortletMode().toString();
+        }
+
+        public String getWindowState() {
+            return portletRequest.getWindowState().toString();
+        }
     }
 
     private class Session implements ExternalContext.Session {

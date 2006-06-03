@@ -180,6 +180,14 @@ public class SimpleExternalContext implements ExternalContext {
         public Object getNativeRequest() {
             return SimpleExternalContext.this.getNativeRequest();
         }
+
+        public String getPortletMode() {
+            return null;
+        }
+
+        public String getWindowState() {
+            return null;
+        }
     }
 
     protected class Response implements ExternalContext.Response {

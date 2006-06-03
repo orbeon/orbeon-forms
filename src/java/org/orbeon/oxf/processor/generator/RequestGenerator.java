@@ -344,6 +344,13 @@ public class RequestGenerator extends ProcessorImpl {
         addTextElement(requestElement, "request-url", request.getRequestURL());
         addTextElement(requestElement, "servlet-path", request.getServletPath());
         addTextElement(requestElement, "request-path", request.getRequestPath());
+
+        // Portlet-specific features
+        if (request.getWindowState() != null)
+            addTextElement(requestElement, "window-state", request.getWindowState());
+        if (request.getPortletMode() != null)
+            addTextElement(requestElement, "portlet-mode", request.getPortletMode());
+
         return document;
     }
 

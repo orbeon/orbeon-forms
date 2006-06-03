@@ -303,6 +303,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return ServletExternalContext.this;
         }
 
+        public String getPortletMode() {
+            return null;
+        }
+
+        public String getWindowState() {
+            return null;
+        }
+
         public Object getNativeRequest() {
             return ServletExternalContext.this.getNativeRequest();
         }

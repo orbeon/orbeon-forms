@@ -186,4 +186,12 @@ public class RequestWrapper implements ExternalContext.Request {
     public ExternalContext.Request _getRequest() {
         return _request;
     }
+
+    public String getPortletMode() {
+        return _request.getPortletMode();
+    }
+
+    public String getWindowState() {
+        return _request.getWindowState();
+    }
 }

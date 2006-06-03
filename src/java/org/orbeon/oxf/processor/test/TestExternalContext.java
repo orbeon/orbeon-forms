@@ -327,6 +327,14 @@ public class TestExternalContext implements ExternalContext  {
             // NIY
         }
 
+        public String getPortletMode() {
+            return null;
+        }
+
+        public String getWindowState() {
+            return null;
+        }
+
         public Object getNativeRequest() {
             return TestExternalContext.this.getNativeRequest();
         }

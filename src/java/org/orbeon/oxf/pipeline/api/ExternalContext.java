@@ -79,6 +79,9 @@ public interface ExternalContext extends WebAppExternalContext {
         public String getRequestURI();
         public String getRequestURL();
 
+        public String getPortletMode();
+        public String getWindowState();
+
         public Object getNativeRequest();
     }
 

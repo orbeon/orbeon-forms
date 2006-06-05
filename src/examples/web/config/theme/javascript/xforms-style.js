@@ -41,13 +41,22 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
         var classes = element.className.split(" ");
         if (xformsArrayContains(classes, "xforms-input")) {
             // XForms input
-            var displayValue = element.childNodes[0];
+
+            // Display value
+            var displayValue = element.firstChild;
+            while (displayValue.nodeType != ELEMENT_TYPE) displayValue = displayValue.nextSibling;
             if (readonly) xformsAddClass(displayValue, "xforms-readonly");
             else xformsRemoveClass(displayValue, "xforms-readonly");
-            var textField = element.childNodes[1];
+
+            // Text field
+            var textField = displayValue.nextSibling;
+            while (textField.nodeType != ELEMENT_TYPE) textField = textField.nextSibling;
             if (readonly) textField.setAttribute("disabled", "disabled");
             else textField.removeAttribute("disabled");
-            var showCalendar = element.childNodes[2];
+
+            // Calendar picker
+            var showCalendar = textField.nextSibling;
+            while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
             if (readonly) xformsAddClass(showCalendar, "xforms-showcalendar-readonly");
             else xformsRemoveClass(showCalendar, "xforms-showcalendar-readonly");
         } else if (xformsArrayContains(classes, "xforms-output") || xformsArrayContains(classes, "xforms-group")) {

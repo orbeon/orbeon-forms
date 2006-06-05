@@ -907,8 +907,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String _instancePassing = instancePassingAttribute == null ? instancePassing : instancePassingAttribute.getValue();
         final String otherXForms = (String) pageIdToXFormsModel.get(resultPageId);
 
+        // Whethe we use the legacy XUpdate transformation
+        final boolean useLegacyTransformation =
+            (resultElement != null && !resultElement.elements().isEmpty() && resultElement.attribute("transform") == null);
+
+        // Whether we use the desintation page's instance
+        final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null || !useLegacyTransformation;
+
         final ASTOutput instanceToUpdate;
-        final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null;
         if (useCurrentPageInstance) {
             // We use the current page's submitted instance, if any.
             instanceToUpdate = paramedInstance;
@@ -1039,25 +1045,25 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }});
                 // Serialize the instance into the request if we are doing a server-side redirect
                 // TODO: do we still need this?
-                if (doServerSideRedirect) {
-                    when.addStatement(new ASTProcessorCall(XMLConstants.SCOPE_SERIALIZER_PROCESSOR_QNAME) {{
-                        Document config = null;
-                        try {
-                            config = Dom4jUtils.parseText
-                                    ("<config><key>" + XFormsInstance.REQUEST_FORWARD_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
-                        } catch (DocumentException e) {
-                            throw new OXFException(e);
-                        } catch ( final SAXException e ) {
-                            throw new OXFException( e );
-                        }
-                        addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("config", config));
-                        final String[] locationParams =
-                            new String[] { "result page id", resultPageId  };
-                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
-                                "serialization of XForms instance to request", resultElement, locationParams, true));
-                    }});
-                }
+//                if (doServerSideRedirect) {
+//                    when.addStatement(new ASTProcessorCall(XMLConstants.SCOPE_SERIALIZER_PROCESSOR_QNAME) {{
+//                        Document config = null;
+//                        try {
+//                            config = Dom4jUtils.parseText
+//                                    ("<config><key>" + XFormsInstance.REQUEST_FORWARD_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
+//                        } catch (DocumentException e) {
+//                            throw new OXFException(e);
+//                        } catch ( final SAXException e ) {
+//                            throw new OXFException( e );
+//                        }
+//                        addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
+//                        addInput(new ASTInput("config", config));
+//                        final String[] locationParams =
+//                            new String[] { "result page id", resultPageId  };
+//                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
+//                                "serialization of XForms instance to request", resultElement, locationParams, true));
+//                    }});
+//                }
                 // Aggregate redirect-url config
                 final ASTHref redirectURLData;
                 if (setvaluesDocument != null && isTransformedInstance) {

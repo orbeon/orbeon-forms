@@ -80,7 +80,8 @@ public class XFormsInput extends ProcessorImpl {
                     throw new OXFException(e);
                 }
 
-                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
+//                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
+                XFormsInstance contextInstance = null;
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
                     model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null, false);
@@ -111,13 +112,25 @@ public class XFormsInput extends ProcessorImpl {
                             {
                                 final List groupElements = readCacheInputAsDOM4J
                                         (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
-                                final List paramElements = readCacheInputAsDOM4J
-                                        (pipelineContext, INPUT_FILTER).getRootElement().elements("param");
-                                if (groupElements.size() != paramElements.size())
-                                    throw new OXFException("Number of parameters does not match number of groups in path expression");
-                                for (Iterator paramIterator = paramElements.iterator(),
-                                        groupIterator = groupElements.iterator(); paramIterator.hasNext();) {
-                                    final Element paramElement = (Element) paramIterator.next();
+
+                                final Element inputFilterRootElement = readCacheInputAsDOM4J
+                                        (pipelineContext, INPUT_FILTER).getRootElement();
+
+                                final List setValueElements;
+                                {
+                                    // Handle legacy <param> element
+                                    final List paramElements = inputFilterRootElement.elements("param");
+                                    if (paramElements != null && paramElements.size() > 0)
+                                        setValueElements = paramElements;
+                                    else
+                                        setValueElements = inputFilterRootElement.elements("setvalue");
+                                }
+
+                                if (groupElements.size() != setValueElements.size())
+                                    throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
+                                for (Iterator setValueIterator = setValueElements.iterator(),
+                                        groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
+                                    final Element paramElement = (Element) setValueIterator.next();
                                     final Element groupElement = (Element) groupIterator.next();
                                     final String value = groupElement.getStringValue();
                                     if (!"".equals(value))

@@ -27,6 +27,7 @@ import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.JMSUtils;
@@ -38,8 +39,8 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.*;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -344,12 +345,15 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         if (service.type == ServiceDefinition.STATELESS_EJB_TYPE) {
                                             // Call EJB method
-                                            Context jndiContext = (Context) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT);
-                                            Object home = jndiContext.lookup(service.jndiName);
-                                            Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
-                                            Object instance = create.invoke(home, new Object[]{});
-                                            String result = callMethod(instance.getClass(), operationName,
-                                                    parameterTypes, instance, parameterValues);
+                                            final Context jndiContext = (Context) context.getAttribute(PipelineContext.JNDI_CONTEXT);
+                                            if (jndiContext == null)
+                                                throw new ValidationException("JNDI context not found in pipeline context.", new LocationData(locator));
+                                            final Object home = jndiContext.lookup(service.jndiName);
+                                            if (home == null)
+                                                throw new ValidationException("Home interface not found in JNDI context: " + service.jndiName, new LocationData(locator));
+                                            final Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
+                                            final Object instance = create.invoke(home, new Object[]{});
+                                            final String result = callMethod(instance.getClass(), operationName, parameterTypes, instance, parameterValues);
                                             super.characters(result.toCharArray(), 0, result.length());
                                         } else if (service.type == ServiceDefinition.JAVABEAN_TYPE) {
                                             // Call JavaBean method

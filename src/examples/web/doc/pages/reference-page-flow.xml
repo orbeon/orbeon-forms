@@ -39,7 +39,6 @@
             <p>
                 The PFC encourages designing applications with a total separation between:
             </p>
-
             <ul>
                 <li>
                     <p>
@@ -598,15 +597,12 @@
                     </li>
                 </ul>
                 <p>
-                    A PFC page can easily extract data from the URL using the
-                    <code>&lt;setvalue&gt;</code> element nested within the
-                    <code>&lt;page&gt;</code> element. To do so, an XML submission must take place
-                    on the page. This can be achieved by using the default submission if no other
-                    submission is taking place. The default submission document must contain
-                    placeholders for for the values to extract from the URL. Given an URL query
-                    string of <code>first=12&amp;count=10</code> with two parameters,
-                    <code>first</code> and <code>count</code>, a default sumission document can look
-                    as follows:
+                    A PFC page can easily extract data from the URL using the <code>&lt;setvalue&gt;</code> element
+                    nested within the <code>&lt;page&gt;</code> element. To do so, an XML submission must take place on
+                    the page. This can be achieved by using the default submission if no other submission is taking
+                    place. The default submission document must contain placeholders for for the values to extract from
+                    the URL. Given an URL query string of <code>first=12&amp;count=10</code> with two parameters,
+                    <code>first</code> and <code>count</code>, a default sumission document can look as follows:
                 </p>
                 <xml-source>
                     <submission>
@@ -673,11 +669,10 @@
                     the element or attribute separated by spaces.
                 </p>
                 <p>
-                    It is also possible to extract data from the URL path. To do so, use a
-                    <code>matcher</code> attribute on the page as <a href="#matchers">documented
-                    below</a>. You can then extract regular expression groups using the
-                    <code>&lt;setvalue&gt;</code> element with the <code>matcher-group</code>
-                    attribute:
+                    It is also possible to extract data from the URL path. To do so, use a <code>matcher</code>
+                    attribute on the page as <a href="#matchers">documented below</a>. You can then extract regular
+                    expression groups using the <code>&lt;setvalue&gt;</code> element with the
+                    <code>matcher-group</code> attribute:
                 </p>
                 <xml-source>
                     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
@@ -1136,6 +1131,157 @@
                 </p>
             </section>
         </section>
+        <a name="matchers"/>
+        <section>
+            <title>Paths and Matchers</title>
+            <section>
+                <title>Patterns</title>
+                <p>
+                    The value of the <code>path-info</code> attribute can be either a simple pattern
+                    or a custom pattern.
+                </p>
+                <table ca="|l|p{0.5\textwidth}|">
+                    <tr>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>Simple Pattern</td>
+                        <td>
+                            Simple patterns optionally start or end with a star character ( <code>*</code>). For
+                            instance: <code>/about/company.html</code> matches exactly this URL, <code>about/*</code>
+                            matches any URL that starts with <code>about/</code>, <code>*.gif</code> matches any URL
+                            that ends with <code>.gif</code>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Custom Pattern</td>
+                        <td>
+                            In this case, an additional <code>matcher</code> attribute must be specified on the
+                            <code>&lt;page&gt;</code> element. The <code>matcher</code> argument points to a matcher
+                            processor qualified name. Two matcher processors are provided with OPS: the Perl5 matcher
+                            (<code>oxf:perl5-matcher</code>) and the Glob matcher (<code>oxf:glob-matcher</code>). The
+                            Perl5 matcher accepts <link href="http://www.perl.com/doc/manual/html/pod/perlre.html">Perl
+                            regular expressions</link> and the Glob matcher accepts <link
+                            href="http://jakarta.apache.org/oro/api/org/apache/oro/text/GlobCompiler.html">Unix shell
+                            glob expressions</link>.
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>Matching Files and Pages With the Perl5 Matcher</title>
+                <p>
+                    Groups of files can be matched using a single <code>&lt;files&gt;</code> element with the Perl5
+                    matcher:
+                </p>
+                <xml-source>
+                    <files path-info="/doc/[^.]*\.html" matcher="oxf:perl5-matcher"/>
+                </xml-source>
+                <p>
+                    A matcher can also be specified on a <code>&lt;page&gt;</code> element:
+                </p>
+                <xml-source>
+                    <page path-info="/forms/([_A-Za-z\-0-9]+)/page/([0-9]{1,3})" matcher="oxf:perl5-matcher"/>
+                </xml-source>
+                <p>
+                    When using a matcher that allows for groups, the part of the path matched by those groups can be
+                    extracted as documented above with the <code>&lt;setvalue&gt;</code> element. Note that the only
+                    matcher bundled with OPS that accepts groups is the Perl5 matcher, referenced with
+                    <code>oxf:perl5-matcher</code>.
+                </p>
+            </section>
+            <section>
+                <title>Parametrizing the <code>model</code> and <code>view</code> Attributes</title>
+                <p>
+                    The result of matches can be referred to directly in the <code>model</code> and <code>view</code>
+                    attributes using the notation <code>${<i>group-number</i>}</code>:
+                </p>
+                <xml-source>
+                    <page path-info="/forms/([_A-Za-z\-0-9]+)/page/([0-9]{1,3})" matcher="oxf:perl5-matcher"
+                          model="oxf:/forms/${1}/model.xpl" view="oxf:/forms/${1}/view-${2}.xhtml"/>
+                </xml-source>
+                <p>
+                    In this case, if the path contains: <code>/forms/my-form/page/12</code>:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The model file read will be <code>oxf:/forms/my-form/model.xpl</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The view file <code>oxf:/forms/my-form/view-12.xhtml</code>
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Parametrizing <code>model</code> and <code>view</code> attributes this way often allows greatly
+                    reducing the size of page flows that contain many similar pages.
+                </p>
+            </section>
+            <a name="navigating-to-matchers-pages"/>
+            <section>
+                <title>Navigating to Pages That Use Matchers</title>
+                <p>
+                    When a <code>result</code> element directs flow to a page that uses matchers and
+                    <code>&lt;setvalue></code> elements, the PFC attemps to rebuild the destination path accordingly.
+                    Consider the following example:
+                </p>
+                <xml-source>
+                    <page id="source" path-info="/">
+                        <action>
+                            <result page="destination" transform="oxf:xslt">
+                                <form xsl:version="2.0">
+                                    <username>orbeon</username>
+                                    <blog-id>12345</blog-id>
+                                </form>
+                            </result>
+                        </action>
+                    </page>
+                    <page id="destination" path-info="/user/([^/]+)/blog/([^/]+)" matcher="oxf:perl5-matcher"
+                          view="blogs/${1}/blog-${2}.xhtml">
+                        <setvalue ref="/form/username" matcher-group="1"/>
+                        <setvalue ref="/form/blog-id" matcher-group="2"/>
+                    </page>
+                </xml-source>
+                <p>
+                    In this example, accessing the <code>source</code> page directly causes navigation to the
+                    <code>destination</code> page. Using the following information:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The internal XML submission
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The destination page's matcher groups
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>&lt;setvalue></code> elements
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The PFC reconstructs the path to <code>/user/orbeon/blog/12345</code>. This path is used to request
+                    the <code>destination</code> page. In this case, the <code>view</code> attribute evaluates to
+                    <code>blogs/orbeon/blog-12345.xhtml</code>.
+                </p>
+                <note>
+                    <p>
+                        Navigation to pages that use matchers but that do not provide an internal XML submission or
+                        <code>&lt;setvalue></code> elements will cause the requested path to have its literal value, in
+                        the example above <code>/user/([^/]+)/blog/([^/]+)</code>. It is not advised to perform
+                        navigation this way.
+                    </p>
+                </note>
+            </section>
+        </section>
         <a name="other-elements"/>
         <section>
             <title>Other Configuration Elements</title>
@@ -1207,59 +1353,6 @@
                     to the client with the files. The PFC uses defaults for well-known extension,
                     as defined by the <a href="processors-other#resource-server">Resource Server
                     processor</a>. In doubt, you can specify the <code>mime-type</code> attribute.
-                </p>
-            </section>
-            <a name="matchers"/>
-            <section>
-                <title>Paths and Matchers</title>
-                <p>
-                    The value of the <code>path-info</code> attribute can be either a simple pattern
-                    or a custom pattern.
-                </p>
-                <table ca="|l|p{0.5\textwidth}|">
-                    <tr>
-                        <th>Value</th>
-                        <th>Description</th>
-                    </tr>
-                    <tr>
-                        <td>Simple Pattern</td>
-                        <td>
-                            Simple patterns optionally start or end with a star character (
-                            <code>*</code>). For instance: <code>/about/company.html</code> matches
-                            exactly this URL, <code>about/*</code> matches any URL that starts with
-                            <code>about/</code>, <code>*.gif</code> matches any URL that ends with
-                            <code>.gif</code>.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Custom Pattern</td>
-                        <td>
-                            In this case, an additional <code>matcher</code> attribute must be
-                            specified on the <code>&lt;page&gt;</code> element. The
-                            <code>matcher</code> argument points to a matcher processor qualified
-                            name. Two matcher processors are provided with OPS: the Perl5 matcher
-                            (<code>oxf:perl5-matcher</code>) and the Glob matcher
-                            (<code>oxf:glob-matcher</code>). The Perl5 matcher accepts <link
-                            href="http://www.perl.com/doc/manual/html/pod/perlre.html">Perl regular
-                            expressions</link> and the Glob matcher accepts <link
-                            href="http://jakarta.apache.org/oro/api/org/apache/oro/text/GlobCompiler.html">Unix
-                            shell glob expressions</link>.
-                        </td>
-                    </tr>
-                </table>
-                <p>
-                    This is an example of <code>&lt;files&gt;</code> element using the Perl5
-                    matcher:
-                </p>
-                <xml-source>
-                    <files path-info="/doc/[^.]*\.html" matcher="oxf:perl5-matcher"/>
-                </xml-source>
-                <p>
-                    As with the <code>&lt;files&gt;</code> element, a matcher can also be specified
-                    on a <code>&lt;page&gt;</code> element. When using a matcher that allows for
-                    groups, the part of the path matched by those groups can be extracted as
-                    documented above with the <code>&lt;setvalue&gt;</code> element. Note that the
-                    only matcher bundled with OPS that accepts groups is the Perl5 matcher.
                 </p>
             </section>
             <a name="epilogue-element"/>
@@ -1512,13 +1605,5 @@
                 </p>
             </section>
         </section>
-        <!--
-        <section>
-            <title>Differences with OPS 2.8</title>
-            <p>
-                TODO
-            </p>
-        </section>
-        -->
     </body>
 </document>

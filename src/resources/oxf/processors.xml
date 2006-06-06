@@ -161,6 +161,21 @@
         </instantiation>
     </processor>
 
+    <processor name="oxf:saxon8sa">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>com.saxonica.SchemaAwareTransformerFactory</class>
+                </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="true"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
     <processor name="oxf:xslt" uri="oxf/processor/xslt">
         <instantiation name="oxf:saxon8"/>
     </processor>

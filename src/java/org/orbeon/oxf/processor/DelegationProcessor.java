@@ -322,9 +322,12 @@ public class DelegationProcessor extends ProcessorImpl {
                                         SAXStoreGenerator saxGenerator = new SAXStoreGenerator(parametersWellFormed);
                                         DOMSerializer domSerializer = new DOMSerializer();
                                         PipelineUtils.connect(saxGenerator, "data", domSerializer, "data");
-                                        org.orbeon.oxf.pipeline.api.PipelineContext context = new org.orbeon.oxf.pipeline.api.PipelineContext();
-                                        domSerializer.start(context);
-                                        org.dom4j.Document parametersDocument = domSerializer.getDocument(context);
+                                        final Document parametersDocument;
+                                        {
+                                            final PipelineContext tempContext = new PipelineContext();
+                                            domSerializer.start(tempContext);
+                                            parametersDocument = domSerializer.getDocument(tempContext);
+                                        }
                                         // Get parameter values and types
                                         java.util.List parameterTypes = new java.util.ArrayList();
                                         java.util.List parameterValues = new java.util.ArrayList();

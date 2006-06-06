@@ -15,9 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -41,7 +39,6 @@ import java.util.Map;
  */
 public class XFormsInstance implements XFormsEventTarget {
 
-    public static final String REQUEST_FORWARD_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.forward-xforms-instance-document";
     public static final String REQUEST_PORTAL_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
 
     private PipelineContext pipelineContext;
@@ -336,23 +333,6 @@ public class XFormsInstance implements XFormsEventTarget {
         });
 
         XFormsUtils.logDebugDocument("MIPs: ", result);
-    }
-
-
-    /**
-     * @deprecated legacy XForms engine
-     */
-    public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
-        ExternalContext.Request request = getRequest(pipelineContext);
-        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
-    }
-
-    private static ExternalContext.Request getRequest(PipelineContext context) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        if (externalContext == null)
-            throw new OXFException("Missing external context");
-        return externalContext.getRequest();
     }
 
     /**

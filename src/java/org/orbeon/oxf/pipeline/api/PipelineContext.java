@@ -177,14 +177,19 @@ public class PipelineContext {
      */
     public void destroy(boolean success) {
         if (!destroyed) {
-        	if ( trace != null ) trace.contextDestroyed( success );
-            if (listeners != null) {
-                for (Iterator i = listeners.iterator(); i.hasNext();) {
-                    ContextListener contextListener = (ContextListener) i.next();
-                    contextListener.contextDestroyed(success);
+            try {
+                if (trace != null) {
+                    trace.contextDestroyed(success);
                 }
+                if (listeners != null) {
+                    for (Iterator i = listeners.iterator(); i.hasNext();) {
+                        ContextListener contextListener = (ContextListener) i.next();
+                        contextListener.contextDestroyed(success);
+                    }
+                }
+            } finally {
+                destroyed = true;
             }
-            destroyed = true;
         }
     }
 

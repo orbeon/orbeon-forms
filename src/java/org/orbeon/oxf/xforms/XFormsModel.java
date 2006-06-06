@@ -726,14 +726,25 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
             //    Instance may not be specified.
 
+//            if (instances == null) {
             if (instances == null) {
+                instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
+                instancesMap = new HashMap(instanceIds.size());
+            }
+            {
                 // Build initial instance document
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
+
                         final Element instanceContainerElement = (Element) i.next();
+
+                        // Skip processing in case somebody has already set this particular instance
+                        if (instances.get(instancePosition) != null)
+                            continue;
+
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
 
                         final Document instanceDocument;
@@ -857,8 +868,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Call special listener to update instance
             if (instanceConstructListener != null) {
-                for (Iterator i = getInstances().iterator(); i.hasNext();) {
-                    instanceConstructListener.updateInstance((XFormsInstance) i.next());
+                int position = 0;
+                for (Iterator i = getInstances().iterator(); i.hasNext(); position++) {
+                    instanceConstructListener.updateInstance(position, (XFormsInstance) i.next());
                 }
             }
 
@@ -1227,7 +1239,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public static interface InstanceConstructListener {
-        public void updateInstance(XFormsInstance instance);
+        public void updateInstance(int position, XFormsInstance instance);
     }
 
     public void setInstanceConstructListener(InstanceConstructListener instanceConstructListener) {

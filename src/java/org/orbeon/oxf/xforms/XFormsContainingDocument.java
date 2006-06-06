@@ -60,7 +60,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
 
-
     // Client state
     private XFormsModelSubmission activeSubmission;
     private boolean gotSubmission;
@@ -69,6 +68,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String focusEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
+
+    // Legacy information
+    private String legacyContainerType;
+    private String legacyContainerNamespace;
 
     /**
      * Construct a ContainingDocument from a static state and repeat indexes elements.
@@ -101,13 +104,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Legacy constructor for XForms Classic.
      */
-    public XFormsContainingDocument(XFormsModel xformsModel) {
+    public XFormsContainingDocument(XFormsModel xformsModel, ExternalContext externalContext) {
         this.models = Collections.singletonList(xformsModel);
         this.xformsControls = new XFormsControls(this, null, null);
 
         if (xformsModel.getId() != null)
             modelsMap.put(xformsModel.getId(), xformsModel);
         xformsModel.setContainingDocument(this);
+
+        this.legacyContainerType = externalContext.getRequest().getContainerType();
+        this.legacyContainerNamespace = externalContext.getRequest().getContainerNamespace();
     }
 
     public void setSourceObjectPool(ObjectPool sourceObjectPool) {
@@ -159,14 +165,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Return the container type that generate the XForms page, either "servlet" or "portlet".
      */
     public String getContainerType() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getContainerType();
+        return (xformsEngineStaticState == null) ? legacyContainerType : xformsEngineStaticState.getContainerType();
     }
 
     /**
      * Return the container namespace that generate the XForms page. Always "" for servlets.
      */
     public String getContainerNamespace() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getContainerNamespace();
+        return (xformsEngineStaticState == null) ? legacyContainerNamespace : xformsEngineStaticState.getContainerNamespace();
     }
 
     /**

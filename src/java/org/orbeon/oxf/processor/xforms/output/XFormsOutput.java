@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.xforms.output;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -58,15 +59,16 @@ public class XFormsOutput extends ProcessorImpl {
                 }
 
                 // Set annotated instance on model
-                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();// TODO: Check this: why do we cache?
+                final Document instanceDocument = (Document) readInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
                 model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, false);
 
                 // Create and initialize XForms Engine
-                XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 // Create evaluation context
-                XFormsElementContext elementContext =
+                final XFormsElementContext elementContext =
                         new XFormsElementContext(pipelineContext, containingDocument, contentHandler);
 
                 // Send SAX events of view to ViewContentHandler

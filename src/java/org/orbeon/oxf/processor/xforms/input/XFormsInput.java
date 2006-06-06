@@ -18,7 +18,9 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -46,6 +48,8 @@ import java.util.List;
  * </params>
  */
 public class XFormsInput extends ProcessorImpl {
+
+    public static final String REQUEST_FORWARD_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.forward-xforms-instance-document";
 
     static private Logger logger = LoggerFactory.createLogger(XFormsInput.class);
 
@@ -99,67 +103,70 @@ public class XFormsInput extends ProcessorImpl {
                         model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null, false);
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
-                        public void updateInstance(XFormsInstance localInstance) {
+                        public void updateInstance(int position, XFormsInstance localInstance) {
+                            if (position == 0) {
 
-                            // Update instance from request
-                            int[] ids = requestParameters.getIds();
-                            for (int i = 0; i < ids.length; i++) {
-                                int id = ids[i];
-                                localInstance.setValueForId(id, requestParameters.getValue(id), requestParameters.getType(id));
-                            }
+                                // Update instance from request
+                                int[] ids = requestParameters.getIds();
+                                for (int i = 0; i < ids.length; i++) {
+                                    int id = ids[i];
+                                    localInstance.setValueForId(id, requestParameters.getValue(id), requestParameters.getType(id));
+                                }
 
-                            // Update instance from path info
-                            {
-                                final List groupElements = readCacheInputAsDOM4J
-                                        (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
-
-                                final Element inputFilterRootElement = readCacheInputAsDOM4J
-                                        (pipelineContext, INPUT_FILTER).getRootElement();
-
-                                final List setValueElements;
+                                // Update instance from path info
                                 {
-                                    // Handle legacy <param> element
-                                    final List paramElements = inputFilterRootElement.elements("param");
-                                    if (paramElements != null && paramElements.size() > 0)
-                                        setValueElements = paramElements;
-                                    else
-                                        setValueElements = inputFilterRootElement.elements("setvalue");
+                                    final List groupElements = readCacheInputAsDOM4J
+                                            (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
+
+                                    final Element inputFilterRootElement = readCacheInputAsDOM4J
+                                            (pipelineContext, INPUT_FILTER).getRootElement();
+
+                                    final List setValueElements;
+                                    {
+                                        // Handle legacy <param> element
+                                        final List paramElements = inputFilterRootElement.elements("param");
+                                        if (paramElements != null && paramElements.size() > 0)
+                                            setValueElements = paramElements;
+                                        else
+                                            setValueElements = inputFilterRootElement.elements("setvalue");
+                                    }
+
+                                    if (groupElements.size() != setValueElements.size())
+                                        throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
+                                    for (Iterator setValueIterator = setValueElements.iterator(),
+                                            groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
+                                        final Element paramElement = (Element) setValueIterator.next();
+                                        final Element groupElement = (Element) groupIterator.next();
+                                        final String value = groupElement.getStringValue();
+                                        if (!"".equals(value))
+                                            localInstance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
+                                                    Dom4jUtils.getNamespaceContext(paramElement), value);
+                                    }
                                 }
 
-                                if (groupElements.size() != setValueElements.size())
-                                    throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
-                                for (Iterator setValueIterator = setValueElements.iterator(),
-                                        groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
-                                    final Element paramElement = (Element) setValueIterator.next();
-                                    final Element groupElement = (Element) groupIterator.next();
-                                    final String value = groupElement.getStringValue();
-                                    if (!"".equals(value))
-                                        localInstance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
-                                                Dom4jUtils.getNamespaceContext(paramElement), value);
+                                if (logger.isDebugEnabled())
+                                    logger.debug("1) Instance recontructed from request:\n"
+                                            + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
+
+                                // Run actions
+                                // TODO: this has to be done in Model
+                                Action[] actions = requestParameters.getActions();
+                                for (int i = 0; i < actions.length; i++) {
+                                    Action action = actions[i];
+                                    action.run(pipelineContext, new ActionFunctionContext(),
+                                            requestParameters.getEncryptionKey(), localInstance.getInstanceDocument());
                                 }
+                                if (logger.isDebugEnabled())
+                                    logger.debug("2) Instance with actions applied:\n"
+                                            + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
                             }
-
-                            if (logger.isDebugEnabled())
-                                logger.debug("1) Instance recontructed from request:\n"
-                                        + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
-
-                            // Run actions
-                            // TODO: this has to be done in Model
-                            Action[] actions = requestParameters.getActions();
-                            for (int i = 0; i < actions.length; i++) {
-                                Action action = actions[i];
-                                action.run(pipelineContext, new ActionFunctionContext(),
-                                        requestParameters.getEncryptionKey(), localInstance.getInstanceDocument());
-                            }
-                            if (logger.isDebugEnabled())
-                                logger.debug("2) Instance with actions applied:\n"
-                                        + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
                         }
                     });
                 }
 
                 // Create and initialize XForms Engine
-                XFormsContainingDocument containingDocument = new XFormsContainingDocument(model);
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
                 containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 if (logger.isDebugEnabled())
@@ -176,5 +183,18 @@ public class XFormsInput extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
+        ExternalContext.Request request = getRequest(pipelineContext);
+        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
+    }
+
+    private static ExternalContext.Request getRequest(PipelineContext context) {
+        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        if (externalContext == null)
+            throw new OXFException("Missing external context");
+        return externalContext.getRequest();
     }
 }

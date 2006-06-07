@@ -41,7 +41,9 @@ public class TeeProcessor extends ProcessorImpl {
     private ProcessorKey resetProcessorKey;
 
     public TeeProcessor(LocationData locationData) {
-        creationException = new ValidationException("", locationData);
+        if (logger.isDebugEnabled()) {
+            creationException = new ValidationException("", locationData);
+        }
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -68,10 +70,12 @@ public class TeeProcessor extends ProcessorImpl {
                 try {
                     state = (State) getState(context);
                 } catch (OXFException e) {
-                    logger.error("creation", creationException);
-                    logger.error("reset", resetException);
-                    logger.error("current processor key: " + getProcessorKey(context));
-                    logger.error("reset processor key: " + resetProcessorKey);
+                    if (logger.isDebugEnabled()) {
+                        logger.error("creation", creationException);
+                        logger.error("reset", resetException);
+                        logger.error("current processor key: " + getProcessorKey(context));
+                        logger.error("reset processor key: " + resetProcessorKey);
+                    }
                     throw e;
                 }
                 if (state.outputCacheKey == null) {
@@ -95,8 +99,10 @@ public class TeeProcessor extends ProcessorImpl {
     }
 
     public void reset(PipelineContext context) {
-        resetException = new Exception(Integer.toString(hashCode()));
-        resetProcessorKey = getProcessorKey(context);
+        if (logger.isDebugEnabled()) {
+            resetException = new Exception(Integer.toString(hashCode()));
+            resetProcessorKey = getProcessorKey(context);
+        }
         setState(context, new State());
     }
 

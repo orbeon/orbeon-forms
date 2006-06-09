@@ -496,7 +496,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
                             List statementsList, final Element pageElement, final int pageNumber,
                             final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
-                            final ASTOutput html, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
+                            final ASTOutput viewData, final ASTOutput viewInstance, final ASTOutput epilogueXFormsModel,
                             final Map pageIdToPathInfo,
                             final Map pageIdToXFormsModel,
                             final Map pageIdToSetvaluesDocument,
@@ -785,14 +785,18 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                        final ASTOutput dataOutput = new ASTOutput("data", modelData);
                         final String[] locationParams =
-                            new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
-                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", pageElement, locationParams, true));
-                        addOutput(dataOutput);
-                        final ASTOutput instanceOutput = new ASTOutput("instance", modelInstance);
-                        addOutput(instanceOutput);
-                        instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", pageElement, locationParams, true));
+                                new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
+                        {
+                            final ASTOutput dataOutput = new ASTOutput("data", modelData);
+                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", pageElement, locationParams, true));
+                            addOutput(dataOutput);
+                        }
+                        {
+                            final ASTOutput instanceOutput = new ASTOutput("instance", modelInstance);
+                            addOutput(instanceOutput);
+                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", pageElement, locationParams, true));
+                        }
                         setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", pageElement, locationParams, true));
                     }});
                 } else if (viewAttribute != null) {
@@ -813,23 +817,21 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                        final ASTOutput dataOutput = new ASTOutput("data", html);
                         final String[] locationParams =
-                            new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
-                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", pageElement, locationParams, true));
-                        addOutput(dataOutput);
-                        if (xformsAttribute != null) {// TODO: this may not do what is intended with XForms NG
-                            final ASTOutput instanceOutput = new ASTOutput("instance", epilogueInstance);
+                                new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
+                        {
+                            final ASTOutput dataOutput = new ASTOutput("data", viewData);
+                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", pageElement, locationParams, true));
+                            addOutput(dataOutput);
+                        }
+                        {
+                            final ASTOutput instanceOutput = new ASTOutput("instance", viewInstance);
                             instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view instance output", pageElement, locationParams, true));
                             addOutput(instanceOutput);
                         }
                         setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page view", pageElement, locationParams, true));
                     }});
                     if (xformsAttribute == null) {
-                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                            addOutput(new ASTOutput("data", epilogueInstance));
-                        }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addOutput(new ASTOutput("data", epilogueXFormsModel));
@@ -844,11 +846,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Send nothing to epilogue
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                        addOutput(new ASTOutput("data", html));
+                        addOutput(new ASTOutput("data", viewData));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                        addOutput(new ASTOutput("data", epilogueInstance));
+                        addOutput(new ASTOutput("data", viewInstance));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
@@ -880,11 +882,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                    addOutput(new ASTOutput("data", html));
+                    addOutput(new ASTOutput("data", viewData));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                    addOutput(new ASTOutput("data", epilogueInstance));
+                    addOutput(new ASTOutput("data", viewInstance));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));

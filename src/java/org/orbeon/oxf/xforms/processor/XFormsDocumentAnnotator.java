@@ -61,8 +61,6 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                 final boolean isPortlet = "portlet".equals(externalContext.getRequest().getContainerType());
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
-                logger.info("containerNamespace" + containerNamespace);
-
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
                     private int currentId = 1;

@@ -90,8 +90,7 @@ public class Dom4jUtils {
         }
     }
 
-    private static String domToString
-            (final Branch brnch, final boolean trm, final boolean cmpct) {
+    private static String domToString(final Branch brnch, final boolean trm, final boolean cmpct) {
         final OutputFormat frmt = new OutputFormat();
         if (cmpct) {
             frmt.setIndent(false);
@@ -186,8 +185,8 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Element e, final boolean trm, final boolean cmpct) {
-        final Branch cpy = e.createCopy();
-        return Dom4jUtils.domToString(cpy, trm, cmpct);
+//        final Branch cpy = e.createCopy(); // TODO FIXME: why did we clone here???
+        return Dom4jUtils.domToString((Branch) e, trm, cmpct);
     }
 
     public static String domToString(final Element e) {

@@ -148,7 +148,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
 
                     annotatedSAXStore = new SAXStore(new TeeContentHandler(new ContentHandler[] {
-                            new XFormsExtractor.XFormsExtractorContentHandler(pipelineContext, identity),
+                            new XFormsExtractorContentHandler(pipelineContext, identity),
                             digestContentHandler
                     }));
 
@@ -363,6 +363,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                                         return;
                                     if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
                                         return;
+
+//                                    System.out.println("xxx SAX feature 2: " + name + " " + state);
 
                                     // Otherwise we throw
                                     throw new SAXNotRecognizedException("Feature: " + name);

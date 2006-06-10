@@ -12,44 +12,47 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <grammar 
-  datatypeLibrary='http://www.w3.org/2001/XMLSchema-datatypes'
-  xmlns='http://relaxng.org/ns/structure/1.0'
->
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+  xmlns="http://relaxng.org/ns/structure/1.0">
+
     <start>
-        <ref name='config' />
+        <ref name="config"/>
     </start>
     
-    <define name='config' >
-        <element name='config' >
+    <define name="config" >
+        <element name="config" >
             <interleave>
                 <zeroOrMore>
-                    <element name='start-task'>
+                    <element name="start-task">
                         <interleave>
-                            <element name='name'>
-                                <data type='string'/>
+                            <element name="name">
+                                <data type="string"/>
                             </element>
                             <choice>
-                                <element name='processor-name'>
-                                    <data type='QName'/>
+                                <element name="processor-name">
+                                    <data type="QName"/>
                                 </element>
                             </choice>
-                            <element name='start-time'>
-                                <data type='string'/>
+                            <element name="start-time">
+                                <choice>
+                                    <data type="dateTime"/>
+                                    <value>now</value>
+                                </choice>
                             </element>
-                            <element name='interval'>
-                                <data type='long'/>
+                            <element name="interval">
+                                <data type="long"/>
                             </element>
                             <optional>
-                                <element name='synchronized'>
-                                    <data type='boolean'/>
+                                <element name="synchronized">
+                                    <data type="boolean"/>
                                 </element>
                             </optional>
                             <zeroOrMore>
-                                <element name='input'>
-                                    <attribute name='name'/>
+                                <element name="input">
+                                    <attribute name="name"/>
                                     <choice>
-                                        <attribute name='url'/>
-                                        <ref name='anyElement'/>
+                                        <attribute name="url"/>
+                                        <ref name="anyElement"/>
                                     </choice>
                                 </element>
                             </zeroOrMore>
@@ -57,9 +60,9 @@
                     </element>
                 </zeroOrMore>
                 <zeroOrMore>
-                    <element name='stop-task'>
-                        <element name='name'>
-                            <data type='string'/>
+                    <element name="stop-task">
+                        <element name="name">
+                            <data type="string"/>
                         </element>
                     </element>
                 </zeroOrMore>
@@ -67,7 +70,7 @@
         </element>
     </define>
     
-    <define name='anyElement'>
+    <define name="anyElement">
         <element>
             <anyName/>
             <zeroOrMore>
@@ -76,7 +79,7 @@
                         <anyName/>
                     </attribute>
                     <text/>
-                    <ref name='anyElement'/>
+                    <ref name="anyElement"/>
                 </choice>
             </zeroOrMore>
         </element>

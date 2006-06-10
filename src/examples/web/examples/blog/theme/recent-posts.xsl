@@ -49,7 +49,7 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
               xmlns:xi="http://www.w3.org/2003/XInclude"
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes">
+              xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
 
             <xforms:instance id="main">
                 <xsl:copy-of select="/*"/>

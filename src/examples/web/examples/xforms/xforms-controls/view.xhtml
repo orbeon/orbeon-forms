@@ -114,7 +114,7 @@
             <xforms:submission ref="instance('country-details')" id="country-details-submission"
                 method="post" action="/xforms-controls/update-country-details" replace="instance"/>
             <!-- Submission when country name changed -->
-            <xforms:submission ref="instance('instance')" id="country-name-updated"
+            <xforms:submission ref="instance('instance')" id="country-name-updated" validate="false"
                 method="post" action="/direct/xforms-controls/countries" replace="instance" instance="countries-name"/>
         </xforms:model>
         <xhtml:style type="text/css">

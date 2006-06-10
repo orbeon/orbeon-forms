@@ -243,7 +243,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>http://www.w3.org/2004/07/xpath-datatypes</td>
+                        <td>http://www.w3.org/2005/xpath-datatypes</td>
                         <td>xdt</td>
                         <td>
                             XPath 2.0 datatypes

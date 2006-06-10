@@ -17,8 +17,9 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
-    
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
+
     <xhtml:head>
         <xhtml:title>XForms Controls</xhtml:title>
         <xhtml:style type="text/css">
@@ -86,7 +87,11 @@
                 <xforms:bind nodeset="age" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
-                <xforms:bind nodeset="date" type="xs:date"/>
+                <xforms:bind nodeset="date" type="xs:date" constraint="if (. castable as xs:date)
+                                      then current-date() + xdt:dayTimeDuration('P1D') >= xs:date(.)
+                                      else false()"
+                                      readonly="false()"
+                                      calculate="if (. = '') then current-date() else ."/>
                 <!--<xforms:bind nodeset="time" type="xs:time"/>-->
                 <xforms:bind nodeset="range/value" type="xs:integer"/>
                 <xforms:bind nodeset="range/letter" calculate="
@@ -105,6 +110,7 @@
 
             <xforms:submission ref="instance('countries')" id="countries-submission"
                 method="post" action="/xforms-controls/update-countries" replace="instance"/>
+
             <xforms:submission ref="instance('country-details')" id="country-details-submission"
                 method="post" action="/xforms-controls/update-country-details" replace="instance"/>
             <!-- Submission when country name changed -->
@@ -145,7 +151,8 @@
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:input ref="date">
-                            <xforms:label class="fixed-width">Birth date:</xforms:label>
+                            <xforms:label class="fixed-width">Date:</xforms:label>
+                            <xforms:hint>At most one day in the future</xforms:hint>
                             <xforms:help>
                                 This is supposed to be a help message explaining what a birth date is.
                                 But since you already know, it mostly serves the purpose of showing how

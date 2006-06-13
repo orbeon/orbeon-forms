@@ -38,7 +38,7 @@ import java.util.Enumeration;
  * For now, this processor only supports <xi:include href="..." parse="xml"/> with no xpointer,
  * encoding, accept, or accept-language attribute. <xi:fallback> is not supported.
  *
- * TODO: Merge caching with URL generator, possibly XSLT transformer.
+ * TODO: Merge caching with URL generator, possibly XSLT transformer. See also XFormsToXHTML processor.
  */
 public class XIncludeProcessor extends ProcessorImpl {
 
@@ -89,18 +89,20 @@ public class XIncludeProcessor extends ProcessorImpl {
         private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
         private int level;
-        private boolean inInclude;
+//        private boolean inInclude;
         private int includeLevel = -1;
 
+        private boolean generateXMLBase;
+
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null);
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true);
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase) {
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport, generateXMLBase);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;
@@ -108,6 +110,7 @@ public class XIncludeProcessor extends ProcessorImpl {
             this.topLevelContentHandler = topLevelContentHandler;
             this.xmlBase = xmlBase;
             this.paremtNamespaceSupport = paremtNamespaceSupport;
+            this.generateXMLBase = generateXMLBase;
         }
 
         public void startDocument() throws SAXException {
@@ -132,7 +135,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
             namespaceSupport.startElement();
 
-            if (!topLevelContentHandler && level == 0) {
+            if (!topLevelContentHandler && level == 0 && generateXMLBase) {
                 // Add or replace xml:base attribute
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, XMLConstants.XML_URI, "xml", "base", xmlBase);
             }
@@ -147,10 +150,17 @@ public class XIncludeProcessor extends ProcessorImpl {
                 if ("include".equals(localname)) {
                     // Start inclusion
 
-                    inInclude = true;
+//                    inInclude = true;
 
                     final String href = attributes.getValue("href");
                     final String parse = attributes.getValue("parse");
+
+                    // Whether to create/update xml:base attribute or not
+                    final boolean generateXMLBase;
+                    {
+                        final String disableXMLBase = attributes.getValue(XMLConstants.XXINCLUDE_NAMESPACE_URI, "omit-xml-base");
+                        generateXMLBase = !"true".equals(disableXMLBase);
+                    }
 
                     if (parse != null && !parse.equals("xml"))
                         throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(locator));
@@ -160,7 +170,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                         final String base = locator.getSystemId();
                         final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
                         final XMLReader xmlReader = source.getXMLReader();
-                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport));
+                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase));
 
                         // Keep URI reference
                         if (uriReferences != null)

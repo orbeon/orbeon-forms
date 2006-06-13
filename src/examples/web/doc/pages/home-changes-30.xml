@@ -125,6 +125,15 @@
                 </li>
                 <li>
                     <p>
+                        The <a href="processors-xinclude">XInclude processor</a> now supports an extension attribute,
+                        <code>xxi:omit-xml-base</code>, which disables producing <code>xml:base</code> attributes upon
+                        inclusion. This can be quite useful when performing schema validation on the result, or when
+                        <code>xml:base</code> resolution on the result must be performed relative to the URL base of the
+                        including document.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         The XUpdate processor now supports an extension element, <code>xu:node-set</code>, which allows
                         functions to return node-sets. [TODO: show example, add this to XUpdate doc]
                     </p>

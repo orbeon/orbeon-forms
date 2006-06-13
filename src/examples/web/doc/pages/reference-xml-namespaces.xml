@@ -87,6 +87,19 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>http://orbeon.org/oxf/xml/xinclude</td>
+                        <td>xxi</td>
+                        <td>
+                            OPS extensions to XInclude
+                        </td>
+                        <td>
+                            <code>xxi:omit-xml-base</code>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <a href="/doc/processors-xinclude">XInclude Processor</a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>http://orbeon.org/oxf/xml/formatting</td>
                         <td>f</td>
                         <td>

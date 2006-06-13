@@ -36,6 +36,7 @@ public class XMLConstants {
     // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
     public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";
     public static final String OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude";
+    public static final String XXINCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xinclude";
 
     public static final Namespace XINCLUDE_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 

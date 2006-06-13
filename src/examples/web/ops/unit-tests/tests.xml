@@ -42,6 +42,7 @@
     <xi:include href="tests-matchers.xml"/>
     <xi:include href="tests-url-rewrite.xml"/>
     <xi:include href="url-generator/tests.xml"/>
+    <xi:include href="xinclude/tests-xinclude.xml"/>
     <xi:include href="cache/tests-cache.xml"/>
 
     <!-- This test should probably be hand-customized to be clearer -->

@@ -232,7 +232,7 @@
                 <p>
                     The processor is configured as follows:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false">
                     <p:processor name="oxf:xinclude">
                         <p:input name="config" href="view.xhtml"/>
                         <p:output name="data" id="result"/>
@@ -241,7 +241,7 @@
                 <p>
                     The result of the inclusion on the <code>data</code> output is:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false">
                     <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
                                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                                 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -265,23 +265,77 @@
                     </xhtml:html>
                 </xml-source>
                 <p>
-                    Notice how the <code>xi:include</code> element has been replaced with the entire
-                    content of the included file. In addition, a new <code>xml:base</code> attribute
-                    has been added, as per the XInclude specification. It specifies the base URI
-                    that must be used to resolve relative URIs in the included document.
+                    Notice how the <code>xi:include</code> element has been replaced with the entire content of the
+                    included file. In addition, a new <code>xml:base</code> attribute has been added, as per the
+                    XInclude specification. It specifies the base URI that must be used to resolve relative URIs in the
+                    included document.
                 </p>
                 <p>
                     An included document may in turn use further <code>xi:include</code> elements to
                     perform nested inclusions.
                 </p>
+                <p>
+                    It is possible to tell the XInclude processor <i>not</i> to produce <code>xml:base</code> on an
+                    inclusion by using the <code>xxi:omit-xml-base</code> extension attribute (the XInclude <a
+                    href="http://www.w3.org/2004/12/xinclude-errata/">errata</a> now allow such a feature to be provided
+                    by implementations). The attribute takes value <code>false</code> (the default) or
+                    <code>true</code>, and the namespace must be mapped for example using
+                    <code>xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"</code>. Example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+                                xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                                xmlns:xi="http://www.w3.org/2001/XInclude-doc"
+                                xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+                        <xhtml:head>
+                            <xhtml:title>XForms Text Controls</xhtml:title>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="instance">
+                                    <comment> This is where the inclusion is performed </comment>
+                                    <xi:include href="main-xforms-instance.xml" xxi:omit-xml-base="true"/>
+                                </xforms:instance>
+                            </xforms:model>
+                        </xhtml:head>
+                        ...
+                    </xhtml:html>
+                </xml-source>
+                <p>
+                    This produces:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+                                xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                                xmlns:xi="http://www.w3.org/2001/XInclude-doc">
+                        <xhtml:head>
+                            <xhtml:title>XForms Text Controls</xhtml:title>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="instance">
+                                    <instance>
+                                        <age>35</age>
+                                        <secret>42</secret>
+                                        <textarea>The world is but a canvas for the imagination.</textarea>
+                                        <label>Hello, World!</label>
+                                        <date>2004-01-07</date>
+                                        ...
+                                    </instance>
+                                </xforms:instance>
+                            </xforms:model>
+                        </xhtml:head>
+                        ...
+                    </xhtml:html>
+                </xml-source>
+                <p>
+                    Notice how there is no longer an <code>xml:base</code> attribute at the point of inclusion. This can
+                    be quite useful when performing schema validation on the result, or when <code>xml:base</code>
+                    resolution on the result must be performed relative to the URL base of the including document.
+                </p>
                 <note>
-                    The XInclude processor only supports <code>xi:include</code> with the
-                    <code>href</code> attribute and an optional <code>parse</code> attribute set to
-                    the constant <code>xml</code>. Other features of XInclude such as the
-                    <code>xpointer</code>, <code>encoding</code>, <code>accept</code> or
-                    <code>accept-language</code> attributes, and <code>xi:fallback</code> are not
-                    supported. It is planned to enhance the XInclude processor over time to support
-                    those features.
+                    The XInclude processor only supports <code>xi:include</code> with the <code>href</code> attribute
+                    and an optional <code>parse</code> attribute set to the constant <code>xml</code>. Other features of
+                    XInclude such as the <code>xpointer</code>, <code>encoding</code>, <code>accept</code> or
+                    <code>accept-language</code> attributes, and <code>xi:fallback</code> are not supported. It is
+                    planned to enhance the XInclude processor over time to support those features.
                 </note>
             </section>
             <a name="user-defined"/>
@@ -292,7 +346,7 @@
                     generated XML documents. For example, connecting the XInclude processor as
                     follows:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false">
                     <p:processor name="oxf:xinclude">
                         <p:input name="config" href="view.xhtml"/>
                         <p:input name="my-dynamic-content" href="#some-dynamic-content"/>

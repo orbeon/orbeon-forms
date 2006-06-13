@@ -713,6 +713,10 @@ public class XFormsActionInterpreter {
         if (insertionNode instanceof Element) {
             final Element insertContextElement = (Element) insertionNode;
             if (clonedNode instanceof Attribute) {
+                final Attribute clonedAttribute = (Attribute) clonedNode;
+                final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
+                if (existingAttribute != null)
+                    insertContextElement.attributes().remove(existingAttribute);
                 insertContextElement.attributes().add(0, clonedNode);
             } else if (!(clonedNode instanceof Document)) {
                 insertContextElement.content().add(0, clonedNode);

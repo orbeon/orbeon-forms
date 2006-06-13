@@ -22,10 +22,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.resources.OXFProperties;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class TaminoProcessor extends ProcessorImpl {
 
@@ -75,10 +74,9 @@ public abstract class TaminoProcessor extends ProcessorImpl {
         config.setUsername(username != null ? username : getPropertySet().getString(USERNAME_PROPERTY));
         config.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
 		// Set isolation and locking properties, override from global if set
-		OXFProperties.PropertySet propertySet = getPropertySet();
-        config.setIsolationDegree(isolationDegree != null ? isolationDegree : propertySet.getString(ISOLATION_DEGREE_PROPERTY));
-		config.setLockMode(lockMode != null ? lockMode : propertySet.getString(LOCK_MODE_PROPERTY));
-		config.setLockWait(lockWait != null ? lockWait : propertySet.getString(LOCK_WAIT_PROPERTY));
+        config.setIsolationDegree(isolationDegree != null ? isolationDegree : getPropertySet().getString(ISOLATION_DEGREE_PROPERTY));
+		config.setLockMode(lockMode != null ? lockMode : getPropertySet().getString(LOCK_MODE_PROPERTY));
+		config.setLockWait(lockWait != null ? lockWait : getPropertySet().getString(LOCK_WAIT_PROPERTY));
 
         config.setCollection(TAccessLocation.newInstance(XPathUtils.selectStringValueNormalize(doc, "/config/collection")));
 

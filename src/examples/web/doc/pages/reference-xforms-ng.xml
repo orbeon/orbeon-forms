@@ -2620,6 +2620,19 @@
                         </xforms:instance>
                     </xml-source>
                 </section>
+                <a name="context-attribute"/>
+                <section>
+                    <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
+                    <p>
+                        Based on a proposal in a draft version of XForms 1.1, OPS supports a <code>context</code>
+                        attribute on the <code>xforms:insert</code> action. This attribute allows specifying a context
+                        for insertion, which along with the <code>origin</code> attribute allows inserting content into
+                        elements.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:insert context="instance('main-instance')/books" nodeset="book" origin="instance('book-instance')"/>
+                    </xml-source>
+                </section>
                 <a name="validate-relevant-attributes"/>
                 <section>
                     <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>

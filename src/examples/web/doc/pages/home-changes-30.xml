@@ -93,6 +93,12 @@
                             Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
                         </li>
                         <li>
+                            Support for the XForms 1.1 <a
+                            href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
+                            <code>xforms:insert</code>. Improvements to <code>xforms:insert</code> as per the XForms 1.1
+                            draft.
+                        </li>
+                        <li>
                             Autocomplete control. [TODO] [kindly sponsored by...]
                         </li>
                         <li>

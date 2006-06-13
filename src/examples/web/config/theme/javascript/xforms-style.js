@@ -289,8 +289,8 @@ function xformsUpdateStyle(element) {
             }
 
             // Change message if necessary
-            if (control.alertMessage && control.xformsMessageLabel)
-                xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
+            if (control.alertMessage)
+                xformsReplaceNodeText(element, control.alertMessage);
 
             // Set title of label with content of label
             element.title = xformsStringValue(element);

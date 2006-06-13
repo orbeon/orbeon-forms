@@ -75,7 +75,7 @@ public class XFormsSwitchUtils {
         return found;
     }
 
-    public static void prepareSwitches(PipelineContext pipelineContext, XFormsControls xformsControls, Element sourceElement, Element clonedElement) {
+    public static void prepareSwitches(PipelineContext pipelineContext, XFormsControls xformsControls, Node sourceElement, Node clonedElement) {
         final boolean found = prepareSwitches(pipelineContext, xformsControls);
         if (found) {
             // Propagate temporary switch information to new nodes
@@ -83,32 +83,36 @@ public class XFormsSwitchUtils {
         }
     }
 
-    private static void copySwitchInfo(Element sourceElement, Element destElement) {
+    private static void copySwitchInfo(Node sourceNode, Node destNode) {
 
-        final InstanceData sourceInstanceData = XFormsUtils.getLocalInstanceData(sourceElement);
-        final InstanceData destInstanceData = XFormsUtils.getLocalInstanceData(destElement);
+        final InstanceData sourceInstanceData = XFormsUtils.getLocalInstanceData(sourceNode);
+        final InstanceData destInstanceData = XFormsUtils.getLocalInstanceData(destNode);
         destInstanceData.setSwitchIdsToCaseIds(sourceInstanceData.getSwitchIdsToCaseIds());
 
-        // Recurse over attributes
-        {
-            final Iterator j = destElement.attributes().iterator();
-            for (Iterator i = sourceElement.attributes().iterator(); i.hasNext();) {
-                final Attribute sourceAttribute = (Attribute) i.next();
-                final Attribute destAttribute = (Attribute) j.next();
+        if (sourceNode instanceof Element) {
+            final Element sourceElement = (Element) sourceNode;
+            final Element destElement = (Element) destNode;
+            // Recurse over attributes
+            {
+                final Iterator j = destElement.attributes().iterator();
+                for (Iterator i = sourceElement.attributes().iterator(); i.hasNext();) {
+                    final Attribute sourceAttribute = (Attribute) i.next();
+                    final Attribute destAttribute = (Attribute) j.next();
 
-                final InstanceData sourceAttributeInstanceData = XFormsUtils.getLocalInstanceData(sourceAttribute);
-                final InstanceData destAttributeInstanceData = XFormsUtils.getLocalInstanceData(destAttribute);
+                    final InstanceData sourceAttributeInstanceData = XFormsUtils.getLocalInstanceData(sourceAttribute);
+                    final InstanceData destAttributeInstanceData = XFormsUtils.getLocalInstanceData(destAttribute);
 
-                destAttributeInstanceData.setSwitchIdsToCaseIds(sourceAttributeInstanceData.getSwitchIdsToCaseIds());
+                    destAttributeInstanceData.setSwitchIdsToCaseIds(sourceAttributeInstanceData.getSwitchIdsToCaseIds());
+                }
             }
-        }
-        // Recurse over children elements
-        {
-            final Iterator j = destElement.elements().iterator();
-            for (Iterator i = sourceElement.elements().iterator(); i.hasNext();) {
-                final Element sourceChild = (Element) i.next();
-                final Element destChild = (Element) j.next();
-                copySwitchInfo(sourceChild, destChild);
+            // Recurse over children elements
+            {
+                final Iterator j = destElement.elements().iterator();
+                for (Iterator i = sourceElement.elements().iterator(); i.hasNext();) {
+                    final Element sourceChild = (Element) i.next();
+                    final Element destChild = (Element) j.next();
+                    copySwitchInfo(sourceChild, destChild);
+                }
             }
         }
     }

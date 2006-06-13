@@ -305,6 +305,7 @@ public class XFormsControls {
             // Regular ControlInfo backed by an element
 
             final String ref = bindingElement.attributeValue("ref");
+            final String context = bindingElement.attributeValue("context");
             final String nodeset = bindingElement.attributeValue("nodeset");
             final String modelId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
             final String bindId = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
@@ -312,7 +313,7 @@ public class XFormsControls {
             final Map bindingElementNamespaceContext =
                     (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null;
 
-            pushBinding(pipelineContext, ref, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
+            pushBinding(pipelineContext, ref, context, nodeset, modelId, bindId, bindingElement, bindingElementNamespaceContext);
         } else {
             // RepeatIterationInfo
 
@@ -362,15 +363,16 @@ public class XFormsControls {
      */
     public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
         final String ref = bindingElement.attributeValue("ref");
+        final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
         final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        pushBinding(pipelineContext, ref, nodeset, model, bind, bindingElement,
+        pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement,
                 (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null);
     }
 
-    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String modelId, String bindId,
+    public void pushBinding(PipelineContext pipelineContext, String ref, String context, String nodeset, String modelId, String bindId,
                             Element bindingElement, Map bindingElementNamespaceContext) {
 
         // Check for mandatory and optional bindings
@@ -412,8 +414,13 @@ public class XFormsControls {
                 // Resolve the bind id to a node
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bindId));
             } else if (ref != null || nodeset != null) {
-                // Evaluate new XPath in context of current node
 
+                // Check whether there is an optional context
+                if (nodeset != null && context != null) {
+                    pushBinding(pipelineContext, null, null, context, modelId, null, null, bindingElementNamespaceContext);
+                }
+
+                // Evaluate new XPath in context
                 final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
                 if (currentSingleNodeForModel != null) {
                     newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
@@ -421,6 +428,12 @@ public class XFormsControls {
                 } else {
                     newNodeset = null;
                 }
+
+                // Restore optional context
+                if (nodeset != null && context != null) {
+                    popBinding();
+                }
+
             } else {
                 // No change to current nodeset
                 newNodeset = currentBindingContext.getNodeset();

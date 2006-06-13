@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -111,10 +112,10 @@ public class XFormsIndexUtils {
      * @param pipelineContext
      * @param xformsControls
      * @param currentControlsState
-     * @param clonedElement
+     * @param clonedNode
      */
     public static void ajustIndexesAfterInsert(PipelineContext pipelineContext, final XFormsControls xformsControls,
-                                               final XFormsControls.ControlsState currentControlsState, final Element clonedElement) {
+                                               final XFormsControls.ControlsState currentControlsState, final Node clonedNode) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
         currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
@@ -135,8 +136,8 @@ public class XFormsIndexUtils {
                             // Find whether one node of the repeat node-set contains the inserted node
                             int index = 1;
                             for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); index++) {
-                                final Element currentNode = (Element) i.next();
-                                if (currentNode == clonedElement) {
+                                final Node currentNode = (Element) i.next();
+                                if (currentNode == clonedNode) {
                                     // Found xforms:repeat affected by the change
 
                                     // "The index for any repeating sequence that is bound

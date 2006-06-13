@@ -231,86 +231,166 @@ public class XFormsActionInterpreter {
             final String atAttribute = actionElement.attributeValue("at");
             final String positionAttribute = actionElement.attributeValue("position");
             final String originAttribute = actionElement.attributeValue("origin");
+            final String contextAttribute = actionElement.attributeValue("context");
 
             // Set current binding in order to evaluate the current nodeset
             // "1. The homogeneous collection to be updated is determined by evaluating the Node Set Binding."
 
             final List collectionToBeUpdated = xformsControls.getCurrentNodeset();
+            final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
-            if (collectionToBeUpdated.size() > 0) {
-                // "If the collection is empty, the insert action has no effect."
+            // "The insert action is terminated with no effect if [...] the context attribute is not given and the Node
+            // Set Binding node-set is empty."
+            if (contextAttribute == null && isEmptyNodesetBinding)
+                return;
 
-                // "2. The node-set binding identifies a homogeneous collection in the instance
-                // data. The final member of this collection is cloned to produce the node that will
-                // be inserted."
-                final Element sourceElement;
-                final Element clonedElement;
+            // Now that we have evaluated the nodeset, restore context to in-scope evaluation context
+            xformsControls.popBinding();
+
+            // Handle @context attribute
+            if (contextAttribute != null) {
+                xformsControls.pushBinding(pipelineContext, null, null, contextAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+            }
+            // We are now in the insert context
+
+            // "The insert action is terminated with no effect if the insert context is the empty node-set [...]."
+            if (xformsControls.getCurrentSingleNode() == null)
+                return;
+
+            {
+                // "2. The node-set binding identifies a homogeneous collection in the instance data. The final member
+                // of this collection is cloned to produce the node that will be inserted."
+                final Node sourceNode;
+                final Node clonedNode;
                 {
                     if (originAttribute == null) {
-                        sourceElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
-                        clonedElement = (Element) sourceElement.createCopy();
-                        XFormsUtils.setInitialDecoration(clonedElement);
+                        // "If the attribute is not given and the Node Set Binding node-set is empty, then the insert
+                        // action is terminated with no effect."
+                        if (isEmptyNodesetBinding)
+                            return;
+
+                        // "if this attribute is not given, then the last node of the Node Set Binding node-set is
+                        // cloned"
+                        sourceNode = (Node) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
+                        clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                     } else {
-                        xformsControls.pushBinding(pipelineContext, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
-                        sourceElement =  (Element) xformsControls.getCurrentSingleNode();// TODO: for now only support Element
-                        clonedElement = sourceElement.createCopy();
-                        XFormsUtils.setInitialDecoration(clonedElement);
+                        // "If the attribute is given, it is evaluated in the insert context using the first node rule.
+                        // If the result is a node, then it is cloned, and otherwise the insert action is terminated
+                        // with no effect."
+                        xformsControls.pushBinding(pipelineContext, null, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+                        final Object originObject = xformsControls.getCurrentSingleNode();
+                        if (!(originObject instanceof Node))
+                            return;
+                        sourceNode = (Node) originObject;
+                        clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                         xformsControls.popBinding();
                     }
+                    if (clonedNode instanceof Element)
+                        XFormsUtils.setInitialDecoration((Element) clonedNode);
+                    else if (clonedNode instanceof Attribute)
+                        XFormsUtils.setInitialDecoration((Attribute) clonedNode);
+                    // TODO: we incorrectly don't handle instance data on text nodes and other nodes
                 }
 
                 // "Finally, this newly created node is inserted into the instance data at the location
                 // specified by attributes position and at."
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-                final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
-                        xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                        "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+                int insertionIndex;
+                {
+                    if (isEmptyNodesetBinding) {
+                        // "If the Node Set Binding node-set empty, then this attribute is ignored"
+                        insertionIndex = 0;
+                    } else if (atAttribute == null) {
+                        // "If the attribute is not given, then the default is the size of the Node Set Binding node-set"
+                        insertionIndex = collectionToBeUpdated.size();
+                    } else {
+                        // "1. The evaluation context node is the first node in document order from the Node Set Binding
+                        // node-set, the context size is the size of the Node Set Binding node-set, and the context
+                        // position is 1."
 
-                // Don't think we will get NaN with XPath 2.0...
-                int insertionIndex = "NaN".equals(insertionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(insertionIndexString) ;
+                        // "2. The return value is processed according to the rules of the XPath function round()"
+                        final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                            collectionToBeUpdated, 1,
+                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
-                // Adjust index to be in range
-                if (insertionIndex > collectionToBeUpdated.size())
-                    insertionIndex = collectionToBeUpdated.size();
+                        // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
+                        // location is equal to the result. If the result is non-positive, then the insert location is
+                        // 1. Otherwise, the result is NaN or exceeds the Node Set Binding node-set size, so the insert
+                        // location is the Node Set Binding node-set size."
 
-                if (insertionIndex < 1)
-                    insertionIndex = 1;
+                        // Don't think we will get NaN with XPath 2.0...
+                        insertionIndex = "NaN".equals(insertionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(insertionIndexString) ;
 
-                // Find actual insertion point and insert
-                final Element indexElement = (Element) collectionToBeUpdated.get(insertionIndex - 1);
+                        // Adjust index to be in range
+                        if (insertionIndex > collectionToBeUpdated.size())
+                            insertionIndex = collectionToBeUpdated.size();
 
-                final Element parentElement = indexElement.getParent();
-                final List siblingElements = parentElement.content();
-                final int actualIndex = siblingElements.indexOf(indexElement);
-
-                // Prepare insertion of new element
-                final int actualInsertionIndex;
-                if ("after".equals(positionAttribute) || "NaN".equals(insertionIndexString)) {
-                    actualInsertionIndex = actualIndex + 1;
-                } else if ("before".equals(positionAttribute)) {
-                    actualInsertionIndex = actualIndex;
-                } else {
-                    throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
+                        if (insertionIndex < 1)
+                            insertionIndex = 1;
+                    }
                 }
 
                 // Prepare switches
-                XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls, sourceElement, clonedElement);
+                XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls, sourceNode, clonedNode);
 
-                // "3. The index for any repeating sequence that is bound to the homogeneous
-                // collection where the node was added is updated to point to the newly added node.
-                // The indexes for inner nested repeat collections are re-initialized to
-                // startindex."
+                // Find actual insertion point and insert
+                if (isEmptyNodesetBinding) {
+                    // "1. If the Node Set Binding node-set is empty, then the target location is before the first
+                    // child or attribute of the insert context node, based on the node type of the cloned node."
 
-                // Perform the insertion
-                siblingElements.add(actualInsertionIndex, clonedElement);
+                    final Node insertContextNode = xformsControls.getCurrentSingleNode();
+                    doInsert(insertContextNode, clonedNode);
+                } else {
+                    final Node insertLocationNode = (Node) collectionToBeUpdated.get(insertionIndex - 1);
+                    if (insertLocationNode.getClass() != clonedNode.getClass()) {
+                        // "2. If the node type of the cloned node does not match the node type of the insert location
+                        // node, then the target location is before the first child or attribute of the insert location
+                        // node, based on the node type of the cloned node."
+
+                        doInsert(insertLocationNode, clonedNode);
+                    } else {
+
+                        if (insertLocationNode.getDocument().getRootElement() == insertLocationNode) {
+                            // "3. If the Node Set Binding node-set and insert location indicate the root element of an
+                            // instance, then that instance root element location is the target location."
+
+                            doInsert(insertLocationNode.getDocument(), clonedNode);
+                        } else {
+                            // "4. Otherwise, the target location is immediately before or after the insert location
+                            // node, based on the position attribute setting or its default."
+
+                            final Element parentNode = insertLocationNode.getParent();
+                            final List siblingElements = parentNode.content();
+                            final int actualIndex = siblingElements.indexOf(insertLocationNode);
+
+                            // Prepare insertion of new element
+                            final int actualInsertionIndex;
+                            if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
+                                actualInsertionIndex = actualIndex + 1;
+                            } else if ("before".equals(positionAttribute)) {
+                                actualInsertionIndex = actualIndex;
+                            } else {
+                                throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
+                            }
+
+                            // "3. The index for any repeating sequence that is bound to the homogeneous
+                            // collection where the node was added is updated to point to the newly added node.
+                            // The indexes for inner nested repeat collections are re-initialized to
+                            // startindex."
+
+                            // Perform the insertion
+                            siblingElements.add(actualInsertionIndex, clonedNode);
+                        }
+                    }
+                }
 
                 // Rebuild ControlsState
                 xformsControls.rebuildCurrentControlsState(pipelineContext);
                 final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
                 // Update repeat indexes
-                XFormsIndexUtils.ajustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedElement);
+                XFormsIndexUtils.ajustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedNode);
 
                 // Update switches
                 XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
@@ -626,6 +706,26 @@ public class XFormsActionInterpreter {
             }
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);
+        }
+    }
+
+    private void doInsert(Node insertionNode, Node clonedNode) {
+        if (insertionNode instanceof Element) {
+            final Element insertContextElement = (Element) insertionNode;
+            if (clonedNode instanceof Attribute) {
+                insertContextElement.attributes().add(0, clonedNode);
+            } else if (!(clonedNode instanceof Document)) {
+                insertContextElement.content().add(0, clonedNode);
+            }
+        } else if (insertionNode instanceof Document) {
+            final Document insertContextDocument = (Document) insertionNode;
+
+            if (!(clonedNode instanceof Element))
+                return; // TODO: can we insert comments and PIs?
+
+            insertContextDocument.setRootElement((Element) clonedNode);
+        } else {
+            throw new OXFException("Unsupported insertion node: " + insertionNode.getClass().getName());
         }
     }
 

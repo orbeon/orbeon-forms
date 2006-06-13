@@ -76,8 +76,8 @@ public class XFormsElementContext extends XFormsControls {
         return encryptionPassword;
     }
 
-    public void pushBinding(String ref, String nodeset, String model, String bind) {
-        super.pushBinding(pipelineContext, ref, nodeset, model, bind, null, getCurrentPrefixToURIMap());
+    public void pushBinding(String ref, String context, String nodeset, String model, String bind) {
+        super.pushBinding(pipelineContext, ref, context, nodeset, model, bind, null, getCurrentPrefixToURIMap());
     }
 
     public void setRepeatIdIndex(String repeatId, int index) {

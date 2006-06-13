@@ -126,6 +126,10 @@ public class XFormsUtils {
         setInitialDecorationWorker(element, null, null);
     }
 
+    public static void setInitialDecoration(Attribute attribute) {
+        attribute.setData(newInstanceData(attribute.getData(), -1));
+    }
+
     private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
         // NOTE: ids are only used by the legacy XForms engine
         int elementId = (currentId != null) ? ++currentId[0] : -1;

@@ -80,7 +80,7 @@
         <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>
-        <example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>
+        <!--<example id="flickr-spell" label="Flickr Spell" xforms-ng="true"/>-->
         <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
     </section>
     <section label="Query &amp; Transformation">

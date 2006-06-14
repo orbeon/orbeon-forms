@@ -53,7 +53,7 @@ public class XXFormsContext extends XFormsFunction {
 
         // Get context for id
         final XFormsControls xformsControls = getXFormsControls();
-        final List currentNodeset = xformsControls.getCurrentContext(contextId);
+        final List currentNodeset = xformsControls.getContextForId(contextId);
 
         // Build results by wrapping each node
         final List results = new ArrayList(currentNodeset.size());

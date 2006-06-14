@@ -49,8 +49,14 @@ public class Instance extends XFormsFunction {
         final String instanceId = XFormsUtils.namespaceId(getXFormsContainingDocument(), instanceIdExpression.evaluateAsString(xpathContext));
 
         // Get model and instance with given id for that model only
+        
+        // "If a match is located, and the matching instance data is associated with the same XForms Model as the
+        // current context node, this function returns a node-set containing just the root element node (also called the
+        // document element node) of the referenced instance data. In all other cases, an empty node-set is returned."
+
         final XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();
         final XFormsInstance instance = model.getInstance(instanceId);
+
 
         // Return instance document
         if (instance != null) {

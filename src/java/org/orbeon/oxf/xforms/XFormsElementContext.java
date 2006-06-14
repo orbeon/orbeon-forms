@@ -85,7 +85,7 @@ public class XFormsElementContext extends XFormsControls {
         popBinding();
         List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
-        contextStack.push(new BindingContext(getCurrentContext().getModel(), newNodeset, 1, repeatId, true, null));//TODO: check this
+        contextStack.push(new BindingContext(getCurrentBindingContext().getModel(), newNodeset, 1, repeatId, true, null));//TODO: check this
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));
@@ -122,7 +122,7 @@ public class XFormsElementContext extends XFormsControls {
      * Returns the text value of the currently referenced node in the instance.
      */
     public String getRefValue() {
-        Node node = getCurrentContext().getSingleNode();
+        Node node = getCurrentBindingContext().getSingleNode();
         return node instanceof Element ? ((Element) node).getStringValue()
                 : node instanceof Attribute ? ((Attribute) node).getValue()
                 : null;

@@ -223,8 +223,8 @@
                                 </xforms:group>
                             </xforms:group>
                             <!-- Mixed models -->
-                            <xforms:group ref="/" id="group211">
-                                <xforms:group ref="nested211" model="model2" id="group212">
+                            <xforms:group model="model2" ref="/" id="group211">
+                                <xforms:group ref="nested211" id="group212">
                                     <xforms:group ref="nested212" id="group213">
                                         <xforms:output ref="first" id="id211"/>
                                         <xforms:output ref="second" id="id212"/>
@@ -327,8 +327,8 @@
                                     <xforms:output id="id124" ref="fourth"/>
                                 </xforms:group>
                             </xforms:group>
-                            <xforms:group id="group211" ref="/">
-                                <xforms:group id="group212" model="model2" ref="nested211">
+                            <xforms:group id="group211" model="model2" ref="/">
+                                <xforms:group id="group212" ref="nested211">
                                     <xforms:group id="group213" ref="nested212">
                                         <xforms:output id="id211" ref="first"/>
                                         <xforms:output id="id212" ref="second"/>

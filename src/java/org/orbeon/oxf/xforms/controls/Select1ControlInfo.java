@@ -43,7 +43,7 @@ public class Select1ControlInfo extends ControlInfo {
         if (itemsetElement != null) {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
             xformsControls.pushBinding(pipelineContext, itemsetElement); // when entering this method, binding must be on control
-            final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentContext();
+            final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
 
             //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
             items = new ArrayList();

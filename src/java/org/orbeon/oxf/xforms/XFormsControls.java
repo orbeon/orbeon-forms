@@ -397,14 +397,17 @@ public class XFormsControls {
         }
 
         // Determine current context
-        final BindingContext currentBindingContext = getCurrentContext();
+        final BindingContext currentBindingContext = getCurrentBindingContext();
 
         // Handle model
         final XFormsModel newModel;
+        final boolean isNewModel;
         if (modelId != null) {
             newModel = containingDocument.getModel(modelId);
+            isNewModel = true;
         } else {
             newModel = currentBindingContext.getModel();
+            isNewModel = false;
         }
 
         // Handle nodeset
@@ -421,12 +424,38 @@ public class XFormsControls {
                 }
 
                 // Evaluate new XPath in context
-                final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
-                if (currentSingleNodeForModel != null) {
-                    newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
-                            ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+                if (isNewModel) {
+                    // Model was switched
+
+                    final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
+                    if (currentSingleNodeForModel != null) {
+
+                        // Temporarily update the context so that the function library's instance() function works
+                        final BindingContext modelBindingContext = getCurrentBindingContext(newModel.getId());
+                        if (modelBindingContext != null)
+                            contextStack.push(new BindingContext(newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null));
+                        else
+                            contextStack.push(new BindingContext(newModel, getCurrentNodeset(newModel.getId()), 1, null, false, null));
+
+                        // Evaluate new node-set
+                        newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+
+                        // Restore context
+                        contextStack.pop();
+                    } else {
+                        newNodeset = null;
+                    }
+
                 } else {
-                    newNodeset = null;
+                    // Simply evaluate new node-set
+                    final Node currentSingleNode = currentBindingContext.getSingleNode();
+                    if (currentSingleNode != null) {
+                        newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNode,
+                                ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+                    } else {
+                        newNodeset = null;
+                    }
                 }
 
                 // Restore optional context
@@ -441,9 +470,9 @@ public class XFormsControls {
         }
 
         // Push new context
-        final boolean newBind = newNodeset != currentBindingContext.getNodeset();
+        final boolean isNewBind = newNodeset != currentBindingContext.getNodeset();// TODO: this is used only in one place later; check
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), id, newBind, bindingElement));
+        contextStack.push(new BindingContext(newModel, newNodeset, isNewBind ? 1 : currentBindingContext.getPosition(), id, isNewBind, bindingElement));
     }
 
     /**
@@ -456,32 +485,54 @@ public class XFormsControls {
     /**
      * NOTE: Not sure this should be exposed.
      */
-    public BindingContext getCurrentContext() {
+    public BindingContext getCurrentBindingContext() {
         return (BindingContext) contextStack.peek();
     }
 
     /**
-     * Get the current single node binding for the given model id.
+     * Get the current node-set binding for the given model id.
      */
-    public Node getCurrentSingleNode(String modelId) {
+    public BindingContext getCurrentBindingContext(String modelId) {
 
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
             final String currentModelId = currentBindingContext.getModel().getId();
             if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
-                return currentBindingContext.getSingleNode();
+                return currentBindingContext;
         }
 
+        return null;
+    }
+
+    /**
+     * Get the current node-set binding for the given model id.
+     */
+    public List getCurrentNodeset(String modelId) {
+
+        final BindingContext bindingContext = getCurrentBindingContext(modelId);
+
+        // If a context exists, return its node-set
+        if (bindingContext != null)
+            return bindingContext.getNodeset();
+
         // If not found, return the document element of the model's default instance
-        return containingDocument.getModel(modelId).getDefaultInstance().getInstanceDocument();
+        return Collections.singletonList(containingDocument.getModel(modelId).getDefaultInstance().getInstanceDocument().getRootElement());
+    }
+
+    /**
+     * Get the current single node binding for the given model id.
+     */
+    public Node getCurrentSingleNode(String modelId) {
+        final List currentNodeset = getCurrentNodeset(modelId);
+        return (Node) ((currentNodeset == null || currentNodeset.size() == 0) ? null : currentNodeset.get(0));
     }
 
     /**
      * Get the current single node binding, if any.
      */
     public Node getCurrentSingleNode() {
-        return getCurrentContext().getSingleNode();
+        return getCurrentBindingContext().getSingleNode();
     }
 
     public String getCurrentSingleNodeValue() {
@@ -496,14 +547,14 @@ public class XFormsControls {
      * Get the current nodeset binding, if any.
      */
     public List getCurrentNodeset() {
-        return getCurrentContext().getNodeset();
+        return getCurrentBindingContext().getNodeset();
     }
 
     /**
      * Get the current position in current nodeset binding.
      */
     public int getCurrentPosition() {
-        return getCurrentContext().getPosition();
+        return getCurrentBindingContext().getPosition();
     }
 
     /**
@@ -555,7 +606,7 @@ public class XFormsControls {
      * @param contextId  enclosing context id, or null
      * @return           the node-set
      */
-    public List getCurrentContext(String contextId) {
+    public List getContextForId(String contextId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
@@ -579,7 +630,7 @@ public class XFormsControls {
      * Return the currrent model for the current nodeset binding.
      */
     public XFormsModel getCurrentModel() {
-        return getCurrentContext().getModel();
+        return getCurrentBindingContext().getModel();
     }
 
     /**
@@ -736,7 +787,7 @@ public class XFormsControls {
                 controlInfo.setAlert(getAlertValue(pipelineContext));
 
                 // Set current binding for control element
-                final BindingContext currentBindingContext = getCurrentContext();
+                final BindingContext currentBindingContext = getCurrentBindingContext();
                 final List currentNodeSet = currentBindingContext.getNodeset();
 
                 if (!(controlInfo instanceof RepeatControlInfo && currentNodeSet != null && currentNodeSet.size() == 0)) {
@@ -967,7 +1018,7 @@ public class XFormsControls {
                 // Push binding for xforms:repeat
                 pushBinding(pipelineContext, controlElement);
                 try {
-                    final BindingContext currentBindingContext = getCurrentContext();
+                    final BindingContext currentBindingContext = getCurrentBindingContext();
 
                     // Visit xforms:repeat element
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
@@ -1123,7 +1174,7 @@ public class XFormsControls {
     private String getChildElementValue(PipelineContext pipelineContext, QName qName) {
 
         // Check first if there is a current control element
-        Element controlElement = getCurrentContext().getControlElement();
+        Element controlElement = getCurrentBindingContext().getControlElement();
         if (controlElement == null)
             return null;
 
@@ -1139,7 +1190,7 @@ public class XFormsControls {
         // "the order of precedence is: single node binding attributes, linking attributes, inline text."
 
         // Try to get single node binding
-        if (getCurrentContext().isNewBind()) {
+        if (getCurrentBindingContext().isNewBind()) {
             final Node currentNode = getCurrentSingleNode();
             if (currentNode != null)
                 result = XFormsInstance.getValueForNode(currentNode);

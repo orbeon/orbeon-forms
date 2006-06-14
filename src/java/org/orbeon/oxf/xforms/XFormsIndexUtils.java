@@ -232,11 +232,11 @@ public class XFormsIndexUtils {
      * @param previousRepeatIdToIndex
      * @param repeatIndexUpdates
      * @param nestedRepeatIndexUpdates
-     * @param elementToRemove
+     * @param nodeToRemove
      */
     public static void adjustIndexesForDelete(PipelineContext pipelineContext, final XFormsControls xformsControls,
                                               final Map previousRepeatIdToIndex, final Map repeatIndexUpdates,
-                                              final Map nestedRepeatIndexUpdates, final Element elementToRemove) {
+                                              final Map nestedRepeatIndexUpdates, final Node nodeToRemove) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
         xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
@@ -258,7 +258,7 @@ public class XFormsIndexUtils {
                             // Find whether one node of the repeat node-set contains the inserted node
                             for (Iterator i = repeatNodeSet.iterator(); i.hasNext();) {
                                 final Element currentNode = (Element) i.next();
-                                if (currentNode == elementToRemove) {
+                                if (currentNode == nodeToRemove) {
                                     // Found xforms:repeat affected by the change
 
                                     final int newIndex;
@@ -271,7 +271,7 @@ public class XFormsIndexUtils {
                                         final int currentIndex = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
 
                                         // Index of deleted element for this repeat
-                                        final int deletionIndexInRepeat = repeatNodeSet.indexOf(elementToRemove) + 1;
+                                        final int deletionIndexInRepeat = repeatNodeSet.indexOf(nodeToRemove) + 1;
 
                                         if (currentIndex == deletionIndexInRepeat) {
                                             if (deletionIndexInRepeat == repeatNodeSet.size()) {

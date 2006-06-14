@@ -233,9 +233,6 @@ public class XFormsActionInterpreter {
             final String originAttribute = actionElement.attributeValue("origin");
             final String contextAttribute = actionElement.attributeValue("context");
 
-            // Set current binding in order to evaluate the current nodeset
-            // "1. The homogeneous collection to be updated is determined by evaluating the Node Set Binding."
-
             final List collectionToBeUpdated = xformsControls.getCurrentNodeset();
             final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -258,8 +255,6 @@ public class XFormsActionInterpreter {
                 return;
 
             {
-                // "2. The node-set binding identifies a homogeneous collection in the instance data. The final member
-                // of this collection is cloned to produce the node that will be inserted."
                 final Node sourceNode;
                 final Node clonedNode;
                 {
@@ -417,47 +412,99 @@ public class XFormsActionInterpreter {
             // 9.3.6 The delete Element
 
             final String atAttribute = actionElement.attributeValue("at");
-
-            // Set current binding in order to evaluate the current nodeset
-            // "1. The homogeneous collection to be updated is determined by evaluating the Node Set Binding."
+            final String contextAttribute = actionElement.attributeValue("context");
 
             final List collectionToUpdate = xformsControls.getCurrentNodeset();
+            final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
 
-            if (collectionToUpdate != null && collectionToUpdate.size() > 0) {
-                // "If the collection is empty, the delete action has no effect."
+            // "The delete action is terminated with no effect if [...] the context attribute is not given and the Node
+            // Set Binding node-set is empty."
+            if (contextAttribute == null && isEmptyNodesetBinding)
+                return;
 
+            // Now that we have evaluated the nodeset, restore context to in-scope evaluation context
+            xformsControls.popBinding();
+
+            // Handle @context attribute
+            if (contextAttribute != null) {
+                xformsControls.pushBinding(pipelineContext, null, null, contextAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
+            }
+            // We are now in the insert context
+
+            // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
+            if (xformsControls.getCurrentSingleNode() == null)
+                return;
+
+            {
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-                final Element elementToRemove;
+                final Node nodeToRemove;
                 final List parentContent;
                 final int actualIndexInParentContentCollection;
                 {
-                    final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
-                            xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+                    int deleteIndex;
+                    {
+                        if (isEmptyNodesetBinding) {
+                            // "If the Node Set Binding node-set empty, then this attribute is ignored"
+                            deleteIndex = 0;
+                        } else if (atAttribute == null) {
+                            // "If the attribute is not given, then the default is the size of the Node Set Binding node-set"
+                            deleteIndex = collectionToUpdate.size();
+                        } else {
+                            // "1. The evaluation context node is the first node in document order from the Node Set Binding
+                            // node-set, the context size is the size of the Node Set Binding node-set, and the context
+                            // position is 1."
 
-                    // We will not get NaN with XPath 2.0...
-                    int tempDeletionIndex = "NaN".equals(deletionIndexString) ? collectionToUpdate.size() : Integer.parseInt(deletionIndexString) ;
+                            // "2. The return value is processed according to the rules of the XPath function round()"
+                            final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                                collectionToUpdate, 1,
+                                "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
-                    // Adjust index to be in range
-                    if (tempDeletionIndex > collectionToUpdate.size())
-                        tempDeletionIndex = collectionToUpdate.size();
+                            // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
+                            // location is equal to the result. If the result is non-positive, then the insert location is
+                            // 1. Otherwise, the result is NaN or exceeds the Node Set Binding node-set size, so the insert
+                            // location is the Node Set Binding node-set size."
 
-                    if (tempDeletionIndex < 1)
-                        tempDeletionIndex = 1;
+                            // Don't think we will get NaN with XPath 2.0...
+                            deleteIndex = "NaN".equals(insertionIndexString) ? collectionToUpdate.size() : Integer.parseInt(insertionIndexString) ;
 
-                    // Find actual deletion point
-                    elementToRemove = (Element) collectionToUpdate.get(tempDeletionIndex - 1);
-                    final Element parentElement = elementToRemove.getParent();
-                    if (parentElement != null) {
-                        // Regular case
-                        parentContent = parentElement.elements();
-                        actualIndexInParentContentCollection = parentContent.indexOf(elementToRemove);
-                    } else if (elementToRemove == elementToRemove.getDocument().getRootElement()) {
-                        // case of root element
-                        parentContent = elementToRemove.getDocument().content();
-                        actualIndexInParentContentCollection = parentContent.indexOf(elementToRemove);
+                            // Adjust index to be in range
+                            if (deleteIndex > collectionToUpdate.size())
+                                deleteIndex = collectionToUpdate.size();
+
+                            if (deleteIndex < 1)
+                                deleteIndex = 1;
+                        }
+                    }
+
+                    if (isEmptyNodesetBinding) {
+                        // TODO: not specified by spec
+                        return;
                     } else {
-                        throw new OXFException("Element to remove doesn't have a parent.");
+                        // Find actual deletion point
+                        nodeToRemove = (Node) collectionToUpdate.get(deleteIndex - 1);
+
+                        final Element parentElement = nodeToRemove.getParent();
+                        if (parentElement != null) {
+                            // Regular case
+                            if (nodeToRemove instanceof Attribute) {
+                                parentContent = parentElement.attributes();
+                            } else {
+                                parentContent = parentElement.content();
+                            }
+                            actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+                        } else if (nodeToRemove == nodeToRemove.getDocument().getRootElement()) {
+                            // Case of root element where parent is Document
+                            parentContent = nodeToRemove.getDocument().content();
+                            actualIndexInParentContentCollection = parentContent.indexOf(nodeToRemove);
+                        } else if (nodeToRemove instanceof Document) {
+                            // Case where node to remove is Document
+
+                            // "except if the node is the root document element of an instance then the delete action
+                            // is terminated with no effect."
+                            return;
+                        } else {
+                            throw new OXFException("Node to delete doesn't have a parent.");
+                        }
                     }
                 }
 
@@ -468,12 +515,13 @@ public class XFormsActionInterpreter {
                 final Map repeatIndexUpdates = new HashMap();
                 final Map nestedRepeatIndexUpdates = new HashMap();
                 XFormsIndexUtils.adjustIndexesForDelete(pipelineContext, xformsControls, previousRepeatIdToIndex,
-                        repeatIndexUpdates, nestedRepeatIndexUpdates, elementToRemove);
+                        repeatIndexUpdates, nestedRepeatIndexUpdates, nodeToRemove);
 
                 // Prepare switches
                 XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls);
 
                 // Then only perform the deletion
+                // "The node at the delete location in the Node Set Binding node-set is deleted"
                 parentContent.remove(actualIndexInParentContentCollection);
 
                 // Rebuild ControlsState

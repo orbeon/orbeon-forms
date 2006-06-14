@@ -321,37 +321,38 @@ function xformsLogProperties(object) {
 }
 
 function xformsDisplayIndicator(state) {
+    var form = document.xformsRequestForm;
     switch (state) {
         case "loading" :
-            if (document.xformsLoadingLoading != null)
-                document.xformsLoadingLoading.style.display = "block";
-            if (document.xformsLoadingError != null)
-                document.xformsLoadingError.style.display = "none";
-            if (document.xformsLoadingNone != null)
-                document.xformsLoadingNone.style.display = "block";
+            if (form.xformsLoadingLoading != null)
+                form.xformsLoadingLoading.style.display = "block";
+            if (form.xformsLoadingError != null)
+                form.xformsLoadingError.style.display = "none";
+            if (form.xformsLoadingNone != null)
+                form.xformsLoadingNone.style.display = "block";
             break;
         case "error":
-            if (document.xformsLoadingLoading != null)
-                document.xformsLoadingLoading.style.display = "none";
-            if (document.xformsLoadingError != null)
-                document.xformsLoadingError.style.display = "block";
-            if (document.xformsLoadingNone != null)
-                document.xformsLoadingNone.style.display = "none";
+            if (form.xformsLoadingLoading != null)
+                form.xformsLoadingLoading.style.display = "none";
+            if (form.xformsLoadingError != null)
+                form.xformsLoadingError.style.display = "block";
+            if (form.xformsLoadingNone != null)
+                form.xformsLoadingNone.style.display = "none";
             break;
         case "none":
-            if (document.xformsLoadingLoading != null)
-                document.xformsLoadingLoading.style.display = "none";
-            if (document.xformsLoadingError != null)
-                document.xformsLoadingError.style.display = "none";
-            if (document.xformsLoadingNone != null)
-                document.xformsLoadingNone.style.display = "block";
+            if (form.xformsLoadingLoading != null)
+                form.xformsLoadingLoading.style.display = "none";
+            if (form.xformsLoadingError != null)
+                form.xformsLoadingError.style.display = "none";
+            if (form.xformsLoadingNone != null)
+                form.xformsLoadingNone.style.display = "block";
             break;
     }
 }
 
 // Gets a value stored in the hidden client-state input field
-function xformsGetFromClientState(key) {
-    var keyValues = document.xformsClientState.value.split("&");
+function xformsGetFromClientState(form, key) {
+    var keyValues = form.xformsClientState.value.split("&");
     for (var i = 0; i < keyValues.length; i = i + 2)
         if (keyValues[i] == key)
             return unescape(keyValues[i + 1]);
@@ -359,8 +360,8 @@ function xformsGetFromClientState(key) {
 }
 
 // Returns a value stored in the hidden client-state input field
-function xformsStoreInClientState(key, value) {
-    var keyValues = document.xformsClientState.value == ""? new Array() : document.xformsClientState.value.split("&");
+function xformsStoreInClientState(form, key, value) {
+    var keyValues = form.xformsClientState.value == ""? new Array() : form.xformsClientState.value.split("&");
     var found = false;
     // If we found the key, replace the value
     for (var i = 0; i < keyValues.length; i = i + 2) {
@@ -375,7 +376,7 @@ function xformsStoreInClientState(key, value) {
         keyValues.push(key);
         keyValues.push(escape(value));
     }
-    document.xformsClientState.value = keyValues.join("&");
+    form.xformsClientState.value = keyValues.join("&");
 }
 
 /**
@@ -712,13 +713,13 @@ function FCKeditor_OnComplete(editorInstance) {
 /**
  * Initializes attributes on the document object:
  *
- *     Form            xformsForm
  *     Array[]         xformsEvents
  *     Div             xformsLoadingLoading
  *     Div             xformsLoadingError
  *     Div             xformsLoadingNone
  *     Input           xformsStaticState
  *     Input           xformsDynamicState
+ *     Form            xformsRequestForm
  *     boolean         xformsRequestInProgress
  *     XMLHttpRequest  xformsXMLHttpRequest
  *     Array           xformsChangedIdsRequest        Ids of controls changed while request is processed by server
@@ -802,6 +803,29 @@ function xformsInitializeControlsUnder(root) {
 
         if (isXFormsElement && !isXFormsNoInitElement) {
             xformsElementCount++;
+
+            // For elements that correspond to XForms controls
+            if (xformsArrayContains(classes, "xforms-control")) {
+
+                // Set initial values for disabled, readonly, required, and valid
+                control.isRelevant = !xformsArrayContains(classes, "xforms-disabled");
+                control.isReadonly = xformsArrayContains(classes, "xforms-readonly");
+                control.isRequired = xformsArrayContains(classes, "xforms-required");
+                control.isValid = !xformsArrayContains(classes, "xforms-invalid");
+
+                // Initialize control.xformsForm
+                if (typeof control.form == "undefined") {
+                    // There is a span around the control go through parents until we find the form element
+                    var candidateForm = control.parentNode;
+                    while (candidateForm.tagName.toLowerCase() != "form")
+                        candidateForm = candidateForm.parentNode;
+                    control.xformsForm = candidateForm;
+                } else {
+                    // We have directly a form control
+                    control.xformsForm = control.form;
+                }
+            }
+
             if (isXFormsTrigger) {
                 // Handle click on trigger
                 control.onclick = xformsHandleClick;
@@ -899,14 +923,6 @@ function xformsInitializeControlsUnder(root) {
                 }
             }
 
-            // Set initial values for disabled, readonly, required, and valid
-            if (xformsArrayContains(classes, "xforms-control")) {
-                control.isRelevant = !xformsArrayContains(classes, "xforms-disabled");
-                control.isReadonly = xformsArrayContains(classes, "xforms-readonly");
-                control.isRequired = xformsArrayContains(classes, "xforms-required");
-                control.isValid = !xformsArrayContains(classes, "xforms-invalid");
-            }
-
             // Initialize HTML area
             if (isXFormsMediatypeTextHTML && isXFormsTextarea) {
                 document.xformsHTMLAreaNames = new Array();
@@ -927,8 +943,17 @@ function xformsInitializeControlsUnder(root) {
 function xformsPageLoaded() {
 
     xformsLogTime("Start xformsPageLoaded");
-    window.start = new Date().getTime();
-    if (document.getElementById("xforms-form")) {
+
+    // See if there is an XForms form
+    var allForms = document.forms;
+    var foundXFormsForm = false;
+    for (var formIndex = 0; formIndex < allForms.length; formIndex++) {
+        if (xformsArrayContains(allForms[formIndex].className.split(" "), "xforms-form")) {
+            foundXFormsForm = true;
+            break;
+        }
+    }
+    if (foundXFormsForm) {
 
         // Initialize tooltip library
         tt_init();
@@ -974,81 +999,89 @@ function xformsPageLoaded() {
         var forms = document.getElementsByTagName("form");
         for (var formIndex = 0; formIndex < forms.length; formIndex++) {
             var form = forms[formIndex];
-            if (xformsArrayContains(form.className.split(" "), "xforms-form")) {
-                // This is a XForms form
-                document.xformsForm = form;
-                document.xformsLoadingLoading = null;
-                document.xformsLoadingError = null;
-                document.xformsLoadingNone = null;
+            // Store in the form if this is an XForms form for faster lookup when iterating on form later on
+            form.xformsIsXFormsForm = xformsArrayContains(form.className.split(" "), "xforms-form");
+            // If this is an XForms form, procede with initialization
+            if (form.xformsIsXFormsForm) {
+
+                // Initialize loading and error indicator
+                form.xformsLoadingLoading = null;
+                form.xformsLoadingError = null;
+                form.xformsLoadingNone = null;
                 var spans = form.getElementsByTagName("span");
                 for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
                     if (spans[spanIndex].className == "xforms-loading-loading")
-                        document.xformsLoadingLoading = spans[spanIndex];
+                        form.xformsLoadingLoading = spans[spanIndex];
                     if (spans[spanIndex].className == "xforms-loading-error")
-                        document.xformsLoadingError = spans[spanIndex];
+                        form.xformsLoadingError = spans[spanIndex];
                     if (spans[spanIndex].className == "xforms-loading-none")
-                        document.xformsLoadingNone = spans[spanIndex];
+                        form.xformsLoadingNone = spans[spanIndex];
                 }
+
                 var elements = form.elements;
+                var xformsRepeatTree;
+                var xformsRepeatIndices;
                 for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
                     var element = elements[elementIndex];
                     if (element.name) {
-                        if (element.name.indexOf("$static-state") != -1)
-                            document.xformsStaticState = element;
-                        if (element.name.indexOf("$dynamic-state") != -1) {
-                            document.xformsDynamicState = element;
-                        }
-                        if (element.name.indexOf("$client-state") != -1) {
-                            document.xformsClientState = element;
+                        // Store pointer to elements with state
+                        if (element.name.indexOf("$static-state") != -1) {
+                            form.xformsStaticState = element;
+                        } else if (element.name.indexOf("$dynamic-state") != -1) {
+                            form.xformsDynamicState = element;
+                        } else if (element.name.indexOf("$client-state") != -1) {
+                            form.xformsClientState = element;
                             if (element.value == "")
-                                xformsStoreInClientState("ajax-dynamic-state", document.xformsDynamicState.value);
+                                xformsStoreInClientState(form, "ajax-dynamic-state", form.xformsDynamicState.value);
+                        }
+                        // Store points to elements with repeat hierarchy
+                        else if (element.name.indexOf("$repeat-tree") != -1) {
+                            xformsRepeatTree = element;
+                        } else if (element.name.indexOf("$repeat-indexes") != -1) {
+                            xformsRepeatIndices = element;
                         }
                     }
                 }
+
+                // Parse and store initial repeat hierarchy
+                document.xformsRepeatTreeChildToParent = new Array();
+                var repeatTreeString = xformsRepeatTree.value;
+                var repeatTree = repeatTreeString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
+                    var repeatInfo = repeatTree[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
+                    document.xformsRepeatTreeChildToParent[id] = parent;
+                }
+                document.xformsRepeatTreeParentToAllChildren = new Array();
+                for (var child in document.xformsRepeatTreeChildToParent) {
+                    var parent = document.xformsRepeatTreeChildToParent[child];
+                    while (parent != null) {
+                        if (!document.xformsRepeatTreeParentToAllChildren[parent])
+                            document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
+                        document.xformsRepeatTreeParentToAllChildren[parent].push(child);
+                        parent = document.xformsRepeatTreeChildToParent[parent];
+                    }
+                }
+
+                // Parse and store initial repeat indexes
+                document.xformsRepeatIndexes = new Array();
+                var repeatIndexesString = xformsRepeatIndices.value;
+                var repeatIndexes = repeatIndexesString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
+                    var repeatInfo = repeatIndexes[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    var index = repeatInfo[repeatInfo.length - 1];
+                    document.xformsRepeatIndexes[id] = index;
+                }
+
+                // Ask server to resend events if this is not the first time load is called
+                if (xformsGetFromClientState(form, "load-did-run") == null) {
+                    xformsStoreInClientState(form, "load-did-run", "true");
+                } else {
+                    xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
+                }
             }
-        }
-
-        // Parse and store initial repeat hierarchy
-        document.xformsRepeatTreeChildToParent = new Array();
-        var repeatTreeString = xformsStringValue(document.getElementById("xforms-repeat-tree"));
-        repeatTreeString = repeatTreeString.replace(new RegExp("\\n", "g"), "");
-        repeatTreeString = repeatTreeString.replace(new RegExp("\\r", "g"), "");
-        var repeatTree = repeatTreeString.split(",");
-        for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
-            var repeatInfo = repeatTree[repeatIndex].split(" ");
-            var id = repeatInfo[0];
-            var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
-            document.xformsRepeatTreeChildToParent[id] = parent;
-        }
-        document.xformsRepeatTreeParentToAllChildren = new Array();
-        for (var child in document.xformsRepeatTreeChildToParent) {
-            var parent = document.xformsRepeatTreeChildToParent[child];
-            while (parent != null) {
-                if (!document.xformsRepeatTreeParentToAllChildren[parent])
-                    document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
-                document.xformsRepeatTreeParentToAllChildren[parent].push(child);
-                parent = document.xformsRepeatTreeChildToParent[parent];
-            }
-        }
-
-        // Parse and store initial repeat indexes
-        document.xformsRepeatIndexes = new Array();
-        var repeatIndexesString = xformsStringValue(document.getElementById("xforms-repeat-indexes"));
-        repeatIndexesString = repeatIndexesString.split("\n").join(""); // Remove \n added by serializer
-
-        var repeatIndexes = repeatIndexesString.split(",");
-        for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
-            var repeatInfo = repeatIndexes[repeatIndex].split(" ");
-            var id = repeatInfo[0];
-            var index = repeatInfo[repeatInfo.length - 1];
-            document.xformsRepeatIndexes[id] = index;
-        }
-
-        // Ask server to resend events if this is not the first time load is called
-        if (xformsGetFromClientState("load-did-run") == null) {
-            xformsStoreInClientState("load-did-run", "true");
-        } else {
-            xformsFireEvents(new Array(xformsCreateEventArray(null, "xxforms-all-events-required", null, null)), false);
         }
     }
 
@@ -1773,8 +1806,8 @@ function xformsHandleResponse() {
                             case "submission": {
                                 if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
                                     newDynamicStateTriggersPost = true;
-                                    document.xformsDynamicState.value = newDynamicState;
-                                    document.xformsForm.submit();
+                                    document.xformsRequestForm.xformsDynamicState.value = newDynamicState;
+                                    document.xformsRequestForm.submit();
                                 }
                                 break;
                             }
@@ -1825,7 +1858,7 @@ function xformsHandleResponse() {
 
             // Store new dynamic state if that state did not trigger a post
             if (!newDynamicStateTriggersPost) {
-                xformsStoreInClientState("ajax-dynamic-state", newDynamicState);
+                xformsStoreInClientState(document.xformsRequestForm, "ajax-dynamic-state", newDynamicState);
             }
 
             if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
@@ -1851,12 +1884,12 @@ function xformsHandleResponse() {
                 }
             }
             // Display error
-            var errorContainer = document.xformsLoadingError;
+            var errorContainer = document.xformsRequestForm.xformsLoadingError;
             xformsReplaceNodeText(errorContainer, errorMessage);
             xformsDisplayIndicator("error");
         } else {
             // The server didn't send valid XML
-            document.xformsLoadingError.innerHTML = "Unexpected response received from server";
+            document.xformsRequestForm.xformsLoadingError.innerHTML = "Unexpected response received from server";
             xformsDisplayIndicator("error");
             
         }
@@ -1880,6 +1913,9 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
             && document.xformsEvents.length > 0
             && (bypassRequestQueue || document.xformsExecuteNextRequestInQueue == 0)) {
 
+        // Save the form for this request
+        document.xformsRequestForm = document.xformsEvents[0][0].xformsForm;
+
         // Mark this as loading
         document.xformsRequestInProgress = true;
         if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
@@ -1892,19 +1928,21 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
 
             // Add static state
             var staticStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:static-state");
-            staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(document.xformsStaticState.value));
+            staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(document.xformsRequestForm.xformsStaticState.value));
             eventFiredElement.appendChild(staticStateElement);
 
             // Add dynamic state (element is just created and will be filled just before we send the request)
             var dynamicStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:dynamic-state");
-            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(xformsGetFromClientState("ajax-dynamic-state")));
+            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode
+                    (xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state")));
             eventFiredElement.appendChild(dynamicStateElement);
 
             // Add action
             var actionElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:action");
             eventFiredElement.appendChild(actionElement);
 
-            // Add event
+            // Add events
+            var handledEvents = [];
             for (var i = 0; i < document.xformsEvents.length; i++) {
                 // Extract information from event array
                 var event = document.xformsEvents[i];
@@ -1912,22 +1950,29 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
                 var eventName = event[1];
                 var value = event[2];
                 var other = event[3];
-                // Create <xxforms:event> element
-                var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
-                actionElement.appendChild(eventElement);
-                eventElement.setAttribute("name", eventName);
-                if (target != null)
-                    eventElement.setAttribute("source-control-id", target.id);
-                if (other != null)
-                    eventElement.setAttribute("other-control-id", other.id);
-                if (value != null)
-                    eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
+
+                // Only handle this event if it is for the form we chose
+                if (target.xformsForm == document.xformsRequestForm) {
+                    // Create <xxforms:event> element
+                    var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
+                    actionElement.appendChild(eventElement);
+                    eventElement.setAttribute("name", eventName);
+                    if (target != null)
+                        eventElement.setAttribute("source-control-id", target.id);
+                    if (other != null)
+                        eventElement.setAttribute("other-control-id", other.id);
+                    if (value != null)
+                        eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
+                    handledEvents.unshift(i);
+                }
             }
-            document.xformsEvents = new Array();
+
+            // Remove events we have handled from event queue
+            for (var i = 0; i < handledEvents.length; i++)
+                document.xformsEvents.splice(handledEvents[i], 1);
 
             // Reset changes, as changes are included in this bach of events
             document.xformsChangedIdsRequest = new Array();
-
             requestDocument = eventFiredElement.ownerDocument;
         }
 

@@ -187,11 +187,9 @@ public class XHTMLBodyHandler extends HandlerBase {
                 }
             });
 
-            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{
-                    "id", "xforms-repeat-tree"
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                    "type", "hidden", "name", "$repeat-tree", "value", repeatHierarchyStringBuffer.toString()
             });
-            helper.text(repeatHierarchyStringBuffer.toString());
-            helper.endElement();
         }
 
         // Store information about the initial index of each repeat
@@ -213,11 +211,9 @@ public class XHTMLBodyHandler extends HandlerBase {
                 }
             }
 
-            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{
-                    "id", "xforms-repeat-indexes"
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                    "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesStringBuffer.toString()
             });
-            helper.text(repeatIndexesStringBuffer.toString());
-            helper.endElement();
         }
 
         // Ajax loading icon

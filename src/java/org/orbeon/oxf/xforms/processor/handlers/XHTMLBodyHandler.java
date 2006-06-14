@@ -81,9 +81,8 @@ public class XHTMLBodyHandler extends HandlerBase {
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
                 PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
 
-        helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[]{
-                "id", "xforms-form", "class", "xforms-form",
-                "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
+        helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
+                "class", "xforms-form", "action", xformsSubmissionPath, "method", "POST", "onsubmit", "return false",
                 hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
 
         // Store private information used by the client-side JavaScript

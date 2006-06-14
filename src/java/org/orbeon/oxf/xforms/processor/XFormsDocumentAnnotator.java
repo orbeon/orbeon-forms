@@ -20,10 +20,14 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.common.ValidationException;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.Locator;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
@@ -61,11 +65,14 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                 final boolean isPortlet = "portlet".equals(externalContext.getRequest().getContainerType());
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
+                final Map ids = new HashMap();
+
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
                     private int currentId = 1;
                     private String alertParentIdAttribute;
                     private boolean hasAlert;
+                    private Locator documentLocator;
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
@@ -73,27 +80,34 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                             // This is an XForms element
 
                             final int idIndex = attributes.getIndex("id");
+                            final String newIdAttributeUnprefixed;
                             final String newIdAttribute;
                             if (idIndex == -1) {
                                 // Create a new "id" attribute, prefixing if needed
                                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                final String newId = containerNamespace + "xforms-element-" + currentId;
-                                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newId);
+                                newIdAttributeUnprefixed = "xforms-element-" + currentId;
+                                newIdAttribute = containerNamespace + newIdAttributeUnprefixed;
+                                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute);
                                 attributes = newAttributes;
-
-                                newIdAttribute = newId;
                             } else if (isPortlet) {
                                 // Then we must prefix the existing id
                                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                final String newId = containerNamespace + newAttributes.getValue(idIndex);
-                                newAttributes.setValue(idIndex, newId);
+                                newIdAttributeUnprefixed = newAttributes.getValue(idIndex);
+                                newIdAttribute = containerNamespace + newIdAttributeUnprefixed;
+                                newAttributes.setValue(idIndex, newIdAttribute);
                                 attributes = newAttributes;
-
-                                newIdAttribute = newId;
                             } else {
                                 // Keep existing id
-                                newIdAttribute = attributes.getValue(idIndex);
+                                newIdAttributeUnprefixed = newIdAttribute = attributes.getValue(idIndex);
                             }
+
+                            // Check for duplicate ids
+                            if (ids.get(newIdAttribute) != null) // TODO: create Element to provide more info?
+                                throw new ValidationException("Duplicate id for XForms element: " + newIdAttributeUnprefixed,
+                                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", new String[] { "id", newIdAttributeUnprefixed }, false));
+
+                            // Remember that this id was used
+                            ids.put(newIdAttribute, "");
 
                             if (alertElements.get(localname) != null) {
                                 // Control may have an alert
@@ -135,6 +149,15 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                         }
 
                         super.endElement(uri, localname, qName);
+                    }
+
+                    public void setDocumentLocator(Locator locator) {
+                        this.documentLocator = locator;
+                        super.setDocumentLocator(locator);
+                    }
+
+                    public Locator getDocumentLocator() {
+                        return documentLocator;
                     }
                 });
             }

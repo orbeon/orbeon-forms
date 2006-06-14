@@ -70,11 +70,11 @@
                 <xforms:bind nodeset="pdf-detail-uri"
                              calculate="concat('/direct/forms/pdf-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
 
-                <xforms:bind id="non-empty-bind" nodeset="non-empty" relevant="count(instance('main-instance')/document-info) > 0"/>
-                <xforms:bind id="empty-bind" nodeset="empty" relevant="count(instance('main-instance')/document-info) = 0"/>
+                <xforms:bind nodeset="non-empty" relevant="count(instance('main-instance')/document-info) > 0"/>
+                <xforms:bind nodeset="empty" relevant="count(instance('main-instance')/document-info) = 0"/>
 
-                <xforms:bind id="non-empty-bind" nodeset="non-empty-triggers" readonly="not(count(instance('main-instance')/document-info) > 0)"/>
-                <xforms:bind id="empty-bind" nodeset="empty-triggers" readonly="not(count(instance('main-instance')/document-info) = 0)"/>
+                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('main-instance')/document-info) > 0)"/>
+                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('main-instance')/document-info) = 0)"/>
             </xforms:bind>
 
             <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"

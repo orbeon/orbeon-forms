@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
@@ -25,6 +26,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsInputHandler extends XFormsValueControlHandler {
 
+    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength" };
     private Attributes elementAttributes;
 
     public XFormsInputHandler() {
@@ -111,6 +113,9 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 if (isReadOnly) {
                     reusableAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
                 }
+
+                // Copy special attributes in xxforms namespace
+                copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);

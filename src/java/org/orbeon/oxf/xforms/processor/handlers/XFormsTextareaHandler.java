@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
@@ -25,6 +26,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
+    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "rows", "cols" };
     private Attributes elementAttributes;
 
     public XFormsTextareaHandler() {
@@ -71,6 +73,9 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
             newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+
+            // Copy special attributes in xxforms namespace
+            copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
 
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
             if (!handlerContext.isGenerateTemplate()) {

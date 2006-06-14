@@ -134,4 +134,13 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
     }
+
+    protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {
+        for (int i = 0; i < sourceAttributeLocalNames.length; i++) {
+            final String attributeName = sourceAttributeLocalNames[i];
+            final String attributeValue = sourceAttributes.getValue(sourceNamespaceURI, attributeName);
+            if (attributeValue != null)
+                destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
+        }
+    }
 }

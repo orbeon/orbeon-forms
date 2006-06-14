@@ -44,6 +44,7 @@ public class XFormsEvents {
     public static final String XFORMS_REFRESH = "xforms-refresh";
     public static final String XFORMS_RESET = "xforms-reset";
     public static final String XFORMS_SUBMIT = "xforms-submit";
+    public static final String XFORMS_SUBMIT_SERIALIZE = "xforms-submit-serialize";
     public static final String XFORMS_SUBMIT_DONE = "xforms-submit-done";
 
     public static final String XFORMS_VALUE_CHANGED = "xforms-value-changed";

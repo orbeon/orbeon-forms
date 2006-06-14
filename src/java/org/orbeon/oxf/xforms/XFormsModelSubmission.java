@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.controls.UploadControlInfo;
@@ -26,7 +28,6 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -53,14 +54,16 @@ import java.util.Map;
  */
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHandlerContainer {
 
-    private XFormsContainingDocument containingDocument;
-    private String id;
-    private XFormsModel model;
-    private Element submissionElement;
+	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
+
+    private final XFormsContainingDocument containingDocument;
+    private final String id;
+    private final XFormsModel model;
+    private final Element submissionElement;
     private boolean submissionElementExtracted = false;
 
     // Event handlers
-    private List eventHandlers;
+    private final List eventHandlers;
 
     private String avtAction; // required
     private String resolvedAction;
@@ -237,14 +240,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 //                            {
 //                                currentInstance.readOut();
 //                            }
-                            if (XFormsServer.logger.isDebugEnabled()) {
+                            if (logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
                                 identity.setResult(documentResult);
                                 currentInstance.read(identity);
                                 final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
 
-                                XFormsServer.logger.debug("XForms - instance document or subset thereof cannot be submitted:\n" + documentString);
+                                logger.debug("XForms - instance document or subset thereof cannot be submitted:\n" + documentString);
                             }
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
@@ -352,6 +355,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
+                // Fire xforms-submit-serialize
+                containingDocument.dispatchEvent(pipelineContext,
+                		XFormsEventFactory.createEvent(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, XFormsModelSubmission.this));
+
                 // Serialize
                 // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data
                 final byte[] serializedInstance;
@@ -395,7 +402,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                
+
                 // Result information
                 ConnectionResult connectionResult = null;
                 try {
@@ -572,7 +579,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             // Forward redirect
                             response.setStatus(connectionResult.resultCode);
-                            
+
                         } else {
                             // Error code received
                             throw new OXFException("Error code received when submitting instance: " + connectionResult.resultCode);
@@ -708,8 +715,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("Found invalid element: " + element.getQName() + ", value:" + element.getText());
+                    if (!valid && logger.isDebugEnabled()) {
+                        logger.debug("Found invalid element: " + element.getQName() + ", value:" + element.getText());
                     }
                 }
 
@@ -719,8 +726,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("Found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
+                    if (!valid && logger.isDebugEnabled()) {
+                        logger.debug("Found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
                     }
                 }
 

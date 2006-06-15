@@ -25,28 +25,27 @@ function xformsUpdateStyleLabel(label, message) {
 function xformsUpdateReadonlyFormElement(element, readonly) {
     if (readonly) {
         element.setAttribute("disabled", "disabled");
-        xformsAddClass(element, "xforms-readonly");
+        YAHOO.util.Dom.addClass(element, "xforms-readonly");
     } else {
         element.removeAttribute("disabled");
-        xformsRemoveClass(element, "xforms-readonly");
+        YAHOO.util.Dom.removeClass(element, "xforms-readonly");
     }
 }
 
 function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required, valid) {
     if (xformsIsDefined(relevant)) {
-        if (relevant) xformsRemoveClass(element, "xforms-disabled")
-        else xformsAddClass(element, "xforms-disabled");
+        if (relevant) YAHOO.util.Dom.removeClass(element, "xforms-disabled")
+        else YAHOO.util.Dom.addClass(element, "xforms-disabled");
     }
     if (xformsIsDefined(readonly)) {
-        var classes = element.className.split(" ");
-        if (xformsArrayContains(classes, "xforms-input")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-input")) {
             // XForms input
 
             // Display value
             var displayValue = element.firstChild;
             while (displayValue.nodeType != ELEMENT_TYPE) displayValue = displayValue.nextSibling;
-            if (readonly) xformsAddClass(displayValue, "xforms-readonly");
-            else xformsRemoveClass(displayValue, "xforms-readonly");
+            if (readonly) YAHOO.util.Dom.addClass(displayValue, "xforms-readonly");
+            else YAHOO.util.Dom.removeClass(displayValue, "xforms-readonly");
 
             // Text field
             var textField = displayValue.nextSibling;
@@ -57,13 +56,13 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
             // Calendar picker
             var showCalendar = textField.nextSibling;
             while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
-            if (readonly) xformsAddClass(showCalendar, "xforms-showcalendar-readonly");
-            else xformsRemoveClass(showCalendar, "xforms-showcalendar-readonly");
-        } else if (xformsArrayContains(classes, "xforms-output") || xformsArrayContains(classes, "xforms-group")) {
+            if (readonly) YAHOO.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
+            else YAHOO.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
+        } else if (YAHOO.util.Dom.hasClass(element, "xforms-output") || YAHOO.util.Dom.hasClass(element, "xforms-group")) {
             // XForms output and group
-            if (readonly) xformsAddClass(element, "xforms-readonly");
-            else xformsRemoveClass(element, "xforms-readonly");
-        } else if (xformsArrayContains(classes, "xforms-select1-full") || xformsArrayContains(classes, "xforms-select-full")) {
+            if (readonly) YAHOO.util.Dom.addClass(element, "xforms-readonly");
+            else YAHOO.util.Dom.removeClass(element, "xforms-readonly");
+        } else if (YAHOO.util.Dom.hasClass(element, "xforms-select1-full") || YAHOO.util.Dom.hasClass(element, "xforms-select-full")) {
             // XForms radio buttons
             for (var spanIndex = 0; spanIndex < element.childNodes.length; spanIndex++) {
                 var span = element.childNodes[spanIndex];
@@ -78,35 +77,35 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
     if (xformsIsDefined(required)) {
         var classes = element.className.split(" ");
         if (required) {
-            xformsAddClass(element, "xforms-required");
+            YAHOO.util.Dom.addClass(element, "xforms-required");
             if (element.value == "") {
-                xformsAddClass(element, "xforms-required-empty");
-                xformsRemoveClass(element, "xforms-required-filled");
+                YAHOO.util.Dom.addClass(element, "xforms-required-empty");
+                YAHOO.util.Dom.removeClass(element, "xforms-required-filled");
             } else {
-                xformsAddClass(element, "xforms-required-filled");
-                xformsRemoveClass(element, "xforms-required-empty");
+                YAHOO.util.Dom.addClass(element, "xforms-required-filled");
+                YAHOO.util.Dom.removeClass(element, "xforms-required-empty");
             }
         } else {
-            xformsRemoveClass(element, "xforms-required");
-            xformsRemoveClass(element, "xforms-required-filled");
-            xformsRemoveClass(element, "xforms-required-empty");
+            YAHOO.util.Dom.removeClass(element, "xforms-required");
+            YAHOO.util.Dom.removeClass(element, "xforms-required-filled");
+            YAHOO.util.Dom.removeClass(element, "xforms-required-empty");
         }
     }
     if (xformsIsDefined(valid)) {
-        if (valid) xformsRemoveClass(element, "xforms-invalid")
-        else xformsAddClass(element, "xforms-invalid");
+        if (valid) YAHOO.util.Dom.removeClass(element, "xforms-invalid")
+        else YAHOO.util.Dom.addClass(element, "xforms-invalid");
     }
 }
 
 function xformsSytleGetFocus(event) {
     var target = getEventTarget(event);
-    if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
+    if (!YAHOO.util.Dom.hasClass(target, "xforms-control"))
         target = target.parentNode;
     var hintLabel = target;
     while (true) {
-        if (xformsArrayContains(hintLabel.className.split(" "), "xforms-hint") && hintLabel.htmlFor == target.id) {
-            xformsRemoveClass(hintLabel, "xforms-hint");
-            xformsAddClass(hintLabel, "xforms-hint-active");
+        if (YAHOO.util.Dom.hasClass(hintLabel, "xforms-hint") && hintLabel.htmlFor == target.id) {
+            YAHOO.util.Dom.removeClass(hintLabel, "xforms-hint");
+            YAHOO.util.Dom.addClass(hintLabel, "xforms-hint-active");
             break;
         }
         hintLabel = hintLabel.nextSibling;
@@ -116,13 +115,13 @@ function xformsSytleGetFocus(event) {
 
 function xformsStyleLoosesFocus(event) {
     var target = getEventTarget(event);
-    if (!xformsArrayContains(target.className.split(" "), "xforms-control"))
+    if (!YAHOO.util.Dom.hasClass(target, "xforms-control"))
         target = target.parentNode;
     var hintLabel = target;
     while (true) {
-        if (xformsArrayContains(hintLabel.className.split(" "), "xforms-hint-active") && hintLabel.htmlFor == target.id) {
-            xformsRemoveClass(hintLabel, "xforms-hint-active");
-            xformsAddClass(hintLabel, "xforms-hint");
+        if (YAHOO.util.Dom.hasClass(hintLabel, "xforms-hint-active") && hintLabel.htmlFor == target.id) {
+            YAHOO.util.Dom.removeClass(hintLabel, "xforms-hint-active");
+            YAHOO.util.Dom.addClass(hintLabel, "xforms-hint");
             break;
         }
         hintLabel = hintLabel.nextSibling;
@@ -149,7 +148,7 @@ function xformsCalendarClick(event) {
     // Event can be received on calendar picker span, or on the containing span
     var span = target.childNodes.length != 3 ? target.parentNode : target
     var inputField = span.childNodes[1];
-    if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
+    if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date")
             && !inputField.disabled)
         span.xformsJscalendarOnClick();
 }
@@ -171,17 +170,18 @@ function xformsUpdateStyle(element) {
     if (element.className) {
         var classes = element.className.split(" ");
 
-        if (xformsArrayContains(classes, "xforms-mediatype-text-html") && xformsArrayContains(classes, "xforms-output")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")
+                && YAHOO.util.Dom.hasClass(element, "xforms-output")) {
             if (element.firstChild != null)
                 element.innerHTML = xformsStringValue(element);
         }
 
-        if (xformsArrayContains(classes, "xforms-output-html-initial")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-output-html-initial")) {
             // Make the content of the element visible
-            xformsRemoveClass(element, "xforms-output-html-initial");
+            YAHOO.util.Dom.removeClass(element, "xforms-output-html-initial");
         }
 
-        if (xformsArrayContains(classes, "xforms-label")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-label")) {
 
             // Initialize hint message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -200,7 +200,7 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (xformsArrayContains(classes, "xforms-hint")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-hint")) {
 
             // Initialize hint message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -219,17 +219,17 @@ function xformsUpdateStyle(element) {
             if (!element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
                 // Add listeners on control
-                var controlGeneratingEvent = xformsArrayContains(control.className.split(" "), "xforms-input")
+                var controlGeneratingEvent = YAHOO.util.Dom.hasClass(control, "xforms-input")
                     ? control.childNodes[1] : control;
-                xformsAddEventListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
-                xformsAddEventListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
+                YAHOO.util.Event.addListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
+                YAHOO.util.Event.addListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
             }
 
             // Disable or enable hint depending if control is relevant
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (xformsArrayContains(classes, "xforms-help")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-help")) {
 
             // Initialize help message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -267,15 +267,15 @@ function xformsUpdateStyle(element) {
             // Only add listener once
             if (!element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
-                xformsAddEventListener(element, "mouseover", xformsHelpMouseOver);
-                xformsAddEventListener(element, "mouseout", tt_Hide);
+                YAHOO.util.Event.addListener(element, "mouseover", xformsHelpMouseOver);
+                YAHOO.util.Event.addListener(element, "mouseout", tt_Hide);
             }
 
             // Disable or enable help depending if control is relevant
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (xformsArrayContains(classes, "xforms-alert-inactive") || xformsArrayContains(classes, "xforms-alert-active")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-alert-inactive") || YAHOO.util.Dom.hasClass(element, "xforms-alert-active")) {
 
             // Initialize alert control when necessary
             var control = document.getElementById(element.htmlFor);
@@ -284,8 +284,8 @@ function xformsUpdateStyle(element) {
 
             // Change alert status when necessary
             if (xformsIsDefined(control.isValid)) {
-                xformsAddClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
-                xformsRemoveClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
+                YAHOO.util.Dom.addClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
+                YAHOO.util.Dom.removeClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
             }
 
             // Change message if necessary
@@ -299,12 +299,12 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (xformsArrayContains(classes, "xforms-input")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-input")) {
 
             var inputField = element.childNodes[1];
             var showCalendar = element.childNodes[2];
 
-            if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date")
+            if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date")
                     && !element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
 
@@ -329,12 +329,12 @@ function xformsUpdateStyle(element) {
             }
         }
 
-        if (xformsArrayContains(classes, "xforms-select1-compact")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-select1-compact")) {
             // Prevent end-user from selecting multiple values
-            xformsAddEventListener(element, "change", xformsSelect1CompactChanged);
+            YAHOO.util.Event.addListener(element, "change", xformsSelect1CompactChanged);
         }
 
-        if (xformsArrayContains(classes, "xforms-trigger")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-trigger")) {
             // Update label on trigger
             if (typeof element.labelMessage != "undefined" && element.labelMessage != xformsStringValue(element)) {
                 if (element.tagName.toLowerCase() == "input")
@@ -344,18 +344,18 @@ function xformsUpdateStyle(element) {
             }
         }
 
-        if (xformsArrayContains(classes, "wide-textarea")) {
+        if (YAHOO.util.Dom.hasClass(element, "wide-textarea")) {
             if (!element.changeHeightHandlerRegistered) {
                 element.changeHeightHandlerRegistered = true;
                 xformsChangeHeightHandler(element);
-                xformsAddEventListener(element, "keyup", xformsChangeHeightHandler);
+                YAHOO.util.Event.addListener(element, "keyup", xformsChangeHeightHandler);
             }
         }
 
         // This is for widgets. Code for widgets should be modularized and moved out of this file
-        if (xformsArrayContains(classes, "widget-tabs") || xformsArrayContains(classes, "widget-tab-inactive")
-                || xformsArrayContains(classes, "widget-tab-active") || xformsArrayContains(classes, "widget-tab-spacer-side")
-                || xformsArrayContains(classes, "widget-tab-spacer-between")) {
+        if (YAHOO.util.Dom.hasClass(element, "widget-tabs") || YAHOO.util.Dom.hasClass(element, "widget-tab-inactive")
+                || YAHOO.util.Dom.hasClass(element, "widget-tab-active") || YAHOO.util.Dom.hasClass(element, "widget-tab-spacer-side")
+                || YAHOO.util.Dom.hasClass(element, "widget-tab-spacer-between")) {
             // Once the size of the table is set, do not change it
             if (!element.width)
                 element.width = element.clientWidth;

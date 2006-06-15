@@ -51,22 +51,6 @@ function xformsCreateElementNS(namespaceURI, qname) {
     return request.documentElement;
 }
 
-function xformsAddEventListener(target, eventName, handler) {
-    if (target.addEventListener) {
-        target.addEventListener(eventName, handler, false);
-    } else {
-        target.attachEvent("on" + eventName, handler);
-    }
-}
-
-function xformsRemoveEventListener(target, eventName, handler) {
-    if (target.removeEventListener) {
-        target.removeEventListener(eventName, handler, false);
-    } else {
-        target.detachEvent("on" + eventName, handler);
-    }
-}
-
 function xformsDispatchEvent(target, eventName) {
     if (target.dispatchEvent) {
         var event = document.createEvent("HTMLEvents");
@@ -231,7 +215,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
-        while (cursor.nodeType != ELEMENT_TYPE || !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")) {
+        while (cursor.nodeType != ELEMENT_TYPE || !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
             cursor = cursor.nextSibling;
             if (!cursor) return null;
         }
@@ -273,7 +257,7 @@ function xformsLog(text) {
         document.body.insertBefore(debugDiv, document.body.firstChild);
 
         // Handle click on clear button
-        xformsAddEventListener(clear, "click", function (event) {
+        YAHOO.util.Event.addListener(clear, "click", function (event) {
             var target = getEventTarget(event);
             alert("click");
             while (target.nextSibling)
@@ -282,15 +266,15 @@ function xformsLog(text) {
         });
 
         // Make it so user can move the debug window
-        xformsAddEventListener(debugDiv, "mousedown", function (event) {
+        YAHOO.util.Event.addListener(debugDiv, "mousedown", function (event) {
             document.xformsDebugDiv = getEventTarget(event);
             return false;
         });
-        xformsAddEventListener(document, "mouseup", function (event) {
+        YAHOO.util.Event.addListener(document, "mouseup", function (event) {
             document.xformsDebugDiv = null;
             return false;
         });
-        xformsAddEventListener(document, "mousemove", function (event) {
+        YAHOO.util.Event.addListener(document, "mousemove", function (event) {
             if (document.xformsDebugDiv) {
                 document.xformsDebugDiv.style.left = event.clientX;
                 document.xformsDebugDiv.style.top = event.clientY;
@@ -390,14 +374,14 @@ function xformsStoreInClientState(form, key, value) {
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
     // We don't send value change events for the XForms upload control
-    var isUploadControl = xformsArrayContains(target.className.split(" "), "xforms-upload");
+    var isUploadControl = YAHOO.util.Dom.hasClass(target, "xforms-upload");
     if (valueChanged && !isUploadControl) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
         var events = new Array(xformsCreateEventArray
                 (target, "xxforms-value-change-with-focus-change", target.value, other));
         var incremental = other == null
-                && xformsArrayContains(target.className.split(" "), "xforms-incremental");
+                && YAHOO.util.Dom.hasClass(target, "xforms-incremental");
         xformsFireEvents(events, incremental);
     }
     return valueChanged;
@@ -418,8 +402,8 @@ function xformsHandleValueChange(event) {
         return xformsPreventDefault(event);
     } else {
         // If this is an input field, set value on parent and send event on parent element
-        if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")
-                || xformsArrayContains(target.parentNode.className.split(" "), "xforms-select1-open")) {
+        if (YAHOO.util.Dom.hasClass(target.parentNode, "xforms-input")
+                || YAHOO.util.Dom.hasClass(target.parentNode, "xforms-select1-open")) {
             target.parentNode.valueSetByXForms++;
             target.parentNode.value = target.value;
             target = target.parentNode;
@@ -434,8 +418,7 @@ function xformsHandleValueChange(event) {
 function xformsHandleClick(event) {
     var target = getEventTarget(event);
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-    var targetClasses = target.className.split(" ")
-    if (xformsArrayContains(targetClasses, "xforms-trigger") && !xformsArrayContains(targetClasses, "xforms-readonly"))
+    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") && !YAHOO.util.Dom.hasClass(target, "xforms-readonly"))
         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)), false);
     return false;
 }
@@ -473,7 +456,7 @@ function xformsHandleOutputClick(event) {
     // In the case of appearance="xxforms:html, target can be an element inside
     // the xforms-output, not the xforms-output itself. So we are here looking for the
     // xforms-parent when necessary.
-    while (!xformsArrayContains(target.className.split(" "), "xforms-output"))
+    while (!YAHOO.util.Dom.hasClass(target, "xforms-output"))
         target = target.parentNode;
     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
     xformsFireEvents(events, false);
@@ -531,12 +514,10 @@ function xformsHandleBlur(event) {
         var target = getEventTarget(event);
 
         // Look for first parent-or-self that is an XForms control
-        var targetClasses;
         while (true) {
             if (!target) break; // No more parent, stop search
             if (target.className != null) {
-                targetClasses = target.className.split(" ");
-                if (xformsArrayContains(targetClasses, "xforms-control")) {
+                if (YAHOO.util.Dom.hasClass(target, "xforms-control")) {
                     // We found our XForms element target
                     break;
                 }
@@ -549,8 +530,8 @@ function xformsHandleBlur(event) {
             // This is an event for an XForms control
             document.xformsPreviousDOMFocusOut = target;
             // HTML area does not throw value change event, so we throw it on blur
-            if (xformsArrayContains(targetClasses, "xforms-textarea")
-                    && xformsArrayContains(targetClasses, "xforms-mediatype-text-html"))
+            if (YAHOO.util.Dom.hasClass(target, "xforms-textarea")
+                    && YAHOO.util.Dom.hasClass(target, "xforms-mediatype-text-html"))
                 xformsValueChanged(target, null);
         }
     }
@@ -559,7 +540,7 @@ function xformsHandleBlur(event) {
 function xformsHandleFocus(event) {
     if (!document.xformsMaskFocusEvents) {
         var target = getEventTarget(event);
-        while (target && (target.className == null || !xformsArrayContains(target.className.split(" "), "xforms-control")))
+        while (target && (target.className == null || !YAHOO.util.Dom.hasClass(target, "xforms-control")))
             target = target.parentNode;
 
         // Send focus events
@@ -591,8 +572,8 @@ function xformsHandleFocus(event) {
 function xformsRegisterForFocusBlurEvents(control) {
     if (!control.focusBlurEventListenerRegistered) {
         control.focusBlurEventListenerRegistered = true;
-        xformsAddEventListener(control, "blur", xformsHandleBlur);
-        xformsAddEventListener(control, "focus", xformsHandleFocus);
+        YAHOO.util.Event.addListener(control, "blur", xformsHandleBlur);
+        YAHOO.util.Event.addListener(control, "focus", xformsHandleFocus);
     }
 }
 
@@ -666,9 +647,8 @@ function xformsInitCheckesRadios(control) {
         var checkbox = getEventTarget(event);
         var span = checkbox;
         while (true) {
-            var spanClasses = span.className.split(" ");
-            if (xformsArrayContains(spanClasses, "xforms-select-full")
-                    || xformsArrayContains(spanClasses, "xforms-select1-full"))
+            if (YAHOO.util.Dom.hasClass(span, "xforms-select-full")
+                    || YAHOO.util.Dom.hasClass(span, "xforms-select1-full"))
                 break;
             span = span.parentNode;
         }
@@ -680,7 +660,7 @@ function xformsInitCheckesRadios(control) {
     // Register event listener on every checkbox
     var inputs = control.getElementsByTagName("input");
     for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
-        xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
+        YAHOO.util.Event.addListener(inputs[inputIndex], "click", inputSelected);
 
     // Compute the checkes value for the first time
     xformsInitCheckesRadiosComputeSpanValue(control);
@@ -689,7 +669,7 @@ function xformsInitCheckesRadios(control) {
 function xformsHtmlEditorChange(editorInstance) {
     editorInstance.LinkedField.value = editorInstance.GetXHTML();
     // Throw value change event if the field is in incremental mode
-    if (xformsArrayContains(editorInstance.LinkedField.className.split(" "), "xforms-incremental"))
+    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
         xformsValueChanged(editorInstance.LinkedField, null);
 }
 
@@ -703,11 +683,11 @@ function FCKeditor_OnComplete(editorInstance) {
     // Register value change handler
     editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
     // Register focus/blur events for Gecko
-    xformsAddEventListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
-    xformsAddEventListener(editorInstance.EditorDocument, "blur", xformsHandleBlur);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "blur", xformsHandleBlur);
     // Register focus/blur events for IE
-    xformsAddEventListener(editorInstance.EditorDocument, "focusin", xformsHandleFocus);
-    xformsAddEventListener(editorInstance.EditorDocument, "focusout", xformsHandleBlur);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusin", xformsHandleFocus);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusout", xformsHandleBlur);
 }
 
 /**
@@ -805,13 +785,13 @@ function xformsInitializeControlsUnder(root) {
             xformsElementCount++;
 
             // For elements that correspond to XForms controls
-            if (xformsArrayContains(classes, "xforms-control")) {
+            if (YAHOO.util.Dom.hasClass(control, "xforms-control")) {
 
                 // Set initial values for disabled, readonly, required, and valid
-                control.isRelevant = !xformsArrayContains(classes, "xforms-disabled");
-                control.isReadonly = xformsArrayContains(classes, "xforms-readonly");
-                control.isRequired = xformsArrayContains(classes, "xforms-required");
-                control.isValid = !xformsArrayContains(classes, "xforms-invalid");
+                control.isRelevant = !YAHOO.util.Dom.hasClass(control, "xforms-disabled");
+                control.isReadonly = YAHOO.util.Dom.hasClass(control, "xforms-readonly");
+                control.isRequired = YAHOO.util.Dom.hasClass(control, "xforms-required");
+                control.isValid = !YAHOO.util.Dom.hasClass(control, "xforms-invalid");
 
                 // Initialize control.xformsForm
                 if (typeof control.form == "undefined") {
@@ -837,22 +817,22 @@ function xformsInitializeControlsUnder(root) {
                 for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
                     values.push(select.options[optionIndex].value);
                 // Initialize auto-complete input
-                var noFilter = xformsArrayContains(classes, "xforms-select1-open-autocomplete-nofilter");
+                var noFilter = YAHOO.util.Dom.hasClass(control, "xforms-select1-open-autocomplete-nofilter");
                 actb(textfield, values, noFilter);
                 // Initialize span
                 control.value = textfield.value;
                 control.previousValue = textfield.value;
                 control.valueSetByXForms = 0;
                 // Intercept end-user pressing enter in text field
-                xformsAddEventListener(textfield, "keypress", xformsHandleInputKeyPress);
+                YAHOO.util.Event.addListener(textfield, "keypress", xformsHandleInputKeyPress);
                 // Intercept incremental modifications
                 if (isIncremental)
-                    xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
+                    YAHOO.util.Event.addListener(textfield, "keyup", xformsHandleValueChange);
             } else if (isXFormsCheckboxRadio) {
                 xformsInitCheckesRadios(control);
             } else if (isXFormsComboboxList) {
                 // Register event listener on select
-                xformsAddEventListener(control, "change", xformsHandleSelectChanged);
+                YAHOO.util.Event.addListener(control, "change", xformsHandleSelectChanged);
                 // Compute the checkes value for the first time
                 xformsComputeSelectValue(control);
             } else if (isXFormsRange) {
@@ -863,7 +843,7 @@ function xformsInitializeControlsUnder(root) {
                 var slider = YAHOO.widget.Slider.getHorizSlider(control.id, thumbDiv.id, 0, 200);
                 slider.onChange = xformsSliderValueChange;
             } else if (isXFormsOutput) {
-                xformsAddEventListener(control, "click", xformsHandleOutputClick);
+                YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
                 control.value = control.childNodes[1].value;
                 var textfield = control.childNodes[1];
@@ -875,13 +855,13 @@ function xformsInitializeControlsUnder(root) {
                     control.watch("value", xformsHandleFirefoxValueChange);
                 } else {
                     // IE throws a propertychange event
-                    xformsAddEventListener(control, "propertychange", xformsHandleIEValueChange);
+                    YAHOO.util.Event.addListener(control, "propertychange", xformsHandleIEValueChange);
                 }
                 // Intercept end-user pressing enter in text field
-                xformsAddEventListener(textfield, "keypress", xformsHandleInputKeyPress);
+                YAHOO.util.Event.addListener(textfield, "keypress", xformsHandleInputKeyPress);
                 // Intercept incremental modifications
                 if (isIncremental)
-                    xformsAddEventListener(textfield, "keyup", xformsHandleValueChange);
+                    YAHOO.util.Event.addListener(textfield, "keyup", xformsHandleValueChange);
             } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
                 // Don't add listeners on spans
             } else {
@@ -889,9 +869,9 @@ function xformsInitializeControlsUnder(root) {
                 control.previousValue = control.value;
                 control.userModications = false;
                 // Register listeners
-                xformsAddEventListener(control, "change", xformsHandleValueChange);
+                YAHOO.util.Event.addListener(control, "change", xformsHandleValueChange);
                 if (isIncremental) {
-                    xformsAddEventListener(control, "keyup", xformsHandleValueChange);
+                    YAHOO.util.Event.addListener(control, "keyup", xformsHandleValueChange);
                 }
             }
 
@@ -907,7 +887,7 @@ function xformsInitializeControlsUnder(root) {
 
             // Alert label next to the control
             if (isXFormsAlert) {
-                var isActive = xformsArrayContains(control.className.split(" "), "xforms-alert-active");
+                var isActive = YAHOO.util.Dom.hasClass(control, "xforms-alert-active");
 
                 // Store reference in control element to this alert element
                 var alertFor = document.getElementById(control.htmlFor);
@@ -948,7 +928,7 @@ function xformsPageLoaded() {
     var allForms = document.forms;
     var foundXFormsForm = false;
     for (var formIndex = 0; formIndex < allForms.length; formIndex++) {
-        if (xformsArrayContains(allForms[formIndex].className.split(" "), "xforms-form")) {
+        if (YAHOO.util.Dom.hasClass(allForms[formIndex], "xforms-form")) {
             foundXFormsForm = true;
             break;
         }
@@ -1000,7 +980,7 @@ function xformsPageLoaded() {
         for (var formIndex = 0; formIndex < forms.length; formIndex++) {
             var form = forms[formIndex];
             // Store in the form if this is an XForms form for faster lookup when iterating on form later on
-            form.xformsIsXFormsForm = xformsArrayContains(form.className.split(" "), "xforms-form");
+            form.xformsIsXFormsForm = YAHOO.util.Dom.hasClass(form, "xforms-form");
             // If this is an XForms form, procede with initialization
             if (form.xformsIsXFormsForm) {
 
@@ -1201,19 +1181,19 @@ function xformsHandleResponse() {
                                                 var templateNode = templateRepeatEnd.previousSibling;
                                                 var nestedRepeatLevel = 0;
                                                 while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
-                                                         && xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-delimiter"))) {
+                                                         && YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-delimiter"))) {
                                                     var nodeCopy = templateNode.cloneNode(true);
                                                     if (templateNode.nodeType == ELEMENT_TYPE) {
                                                         // Save tag name to be used for delimiter
                                                         delimiterTagName = templateNode.tagName;
                                                         // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                                        if (xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-begin-end") &&
+                                                        if (YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                                 templateNode.id.indexOf("repeat-begin-") == 0)
                                                             nestedRepeatLevel--;
                                                         // Add suffix to all the ids
                                                         xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + XFORMS_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
                                                         // Increment nestedRepeatLevel when we enter a nested repeat
-                                                        if (xformsArrayContains(templateNode.className.split(" "), "xforms-repeat-begin-end") &&
+                                                        if (YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                                 templateNode.id.indexOf("repeat-end-") == 0)
                                                             nestedRepeatLevel++;
                                                         // Remove "xforms-repeat-template" from classes on copy of element
@@ -1244,8 +1224,8 @@ function xformsHandleResponse() {
                                                     var repeatEnd = document.getElementById("repeat-end-" + repeatId);
                                                     var cursor = repeatEnd.previousSibling;
                                                     while (!(cursor.nodeType == ELEMENT_TYPE
-                                                            && xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
-                                                            && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-template"))) {
+                                                            && YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                            && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-template"))) {
                                                         cursor = cursor.previousSibling;
                                                     }
                                                     afterInsertionPoint = cursor;
@@ -1287,7 +1267,7 @@ function xformsHandleResponse() {
                                                 if (parentIndexes == "") {
                                                     // Top-level repeat: need to go over template
                                                     while (lastElementToDelete.nodeType != ELEMENT_TYPE
-                                                            || !xformsArrayContains(lastElementToDelete.className.split(" "), "xforms-repeat-delimiter"))
+                                                            || !YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter"))
                                                         lastElementToDelete = lastElementToDelete.previousSibling;
                                                     lastElementToDelete = lastElementToDelete.previousSibling;
                                                 }
@@ -1296,7 +1276,7 @@ function xformsHandleResponse() {
                                             for (var countIndex = 0; countIndex < count; countIndex++) {
                                                 while (true) {
                                                     var wasDelimiter = lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                        && xformsArrayContains(lastElementToDelete.className.split(" "), "xforms-repeat-delimiter");
+                                                        && YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
                                                     var previous = lastElementToDelete.previousSibling;
                                                     lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                     lastElementToDelete = previous;
@@ -1324,7 +1304,7 @@ function xformsHandleResponse() {
                                     var documentElement = document.getElementById(controlId);
                                     var documentElementClasses = documentElement.className.split(" ");
 
-                                    if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                    if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                         // Build list with new values
                                         var newValues = new Array();
                                         for (var k = 0; k < itemsetElement.childNodes.length; k++) {
@@ -1481,14 +1461,14 @@ function xformsHandleResponse() {
                                             // and it is possible to receive a response from the server after the value is modified but
                                             // before the keyup event is dispatched.
                                             var foundControlModified = false;
-                                            if (xformsArrayContains(documentElementClasses, "xforms-input")) {
+                                            if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                 if (documentElement.childNodes[1].value != documentElement.previousValue)
                                                     foundControlModified = true;
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                                 if (documentElement.childNodes[0].value != documentElement.previousValue)
                                                     foundControlModified = true;
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-textarea")
-                                                    && xformsArrayContains(documentElementClasses, "xforms-mediatype-text-html")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                    && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                 // For HTML area, compare previous value to value of the HTML area widget
                                                 var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                                 if (documentElement.previousValue != htmlEditor.GetXHTML())
@@ -1511,9 +1491,9 @@ function xformsHandleResponse() {
                                             if (foundControlModified) {
                                                 // User has modified the value of this control since we sent our request:
                                                 // so don't try to update it
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-trigger")) {
                                                 // Triggers don't have a value: don't update them
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select1-open")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                                 // Auto-complete
                                                 var textfield = documentElement.childNodes[0];
                                                 var select = documentElement.childNodes[1];
@@ -1521,36 +1501,36 @@ function xformsHandleResponse() {
                                                 // Populate values
                                                 if (textfield.value != newControlValue)
                                                     textfield.value = newControlValue;
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
-                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-full")
+                                                    || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-full")) {
                                                 // Handle checkboxes and radio buttons
-                                                var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-full")
+                                                var selectedValues = YAHOO.util.Dom.hasClass(documentElement, "xforms-select-full")
                                                     ? newControlValue.split(" ") : new Array(newControlValue);
                                                 var checkboxInputs = documentElement.getElementsByTagName("input");
                                                 for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
                                                     var checkboxInput = checkboxInputs[checkboxInputIndex];
                                                     checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
                                                 }
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select-compact")
-                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-compact")
-                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-minimal")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-compact")
+                                                    || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-compact")
+                                                    || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-minimal")) {
                                                 // Handle lists and comboboxes
-                                                var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                                var selectedValues = YAHOO.util.Dom.hasClass(documentElement, "xforms-select-compact")
                                                     ? newControlValue.split(" ") : new Array(newControlValue);
                                                 var options = documentElement.options;
                                                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                                                     var option = options[optionIndex];
                                                     option.selected = xformsArrayContains(selectedValues, option.value);
                                                 }
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output")) {
                                                 // XForms output
                                                 var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
-                                                if (xformsArrayContains(documentElementClasses, "xforms-mediatype-image")) {
+                                                if (YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
                                                     documentElement.firstChild.src = newOutputControlValue;
                                                 } else {
                                                     xformsReplaceNodeText(documentElement, newOutputControlValue);
                                                 }
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-input")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                 // XForms input
                                                 var displayField = documentElement.childNodes[0];
                                                 var inputField = documentElement.childNodes[1];
@@ -1560,19 +1540,19 @@ function xformsHandleResponse() {
                                                 if (type == "{http://www.w3.org/2001/XMLSchema}date") {
                                                     for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
                                                         var child = documentElement.childNodes[childIndex];
-                                                        xformsAddClass(child, "xforms-type-date");
-                                                        xformsRemoveClass(child, "xforms-type-string");
+                                                        YAHOO.util.Dom.addClass(child, "xforms-type-date");
+                                                        YAHOO.util.Dom.removeClass(child, "xforms-type-string");
                                                     }
                                                 } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date") {
                                                     for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
                                                         var child = documentElement.childNodes[childIndex];
-                                                        xformsAddClass(child, "xforms-type-string");
-                                                        xformsRemoveClass(child, "xforms-type-date");
+                                                        YAHOO.util.Dom.addClass(child, "xforms-type-string");
+                                                        YAHOO.util.Dom.removeClass(child, "xforms-type-date");
                                                     }
                                                 }
 
                                                 // Populate values
-                                                if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date"))
+                                                if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date"))
                                                     xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.previousValue = newControlValue;
@@ -1581,8 +1561,8 @@ function xformsHandleResponse() {
                                                 }
                                                 if (inputField.value != newControlValue)
                                                     inputField.value = newControlValue;
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-textarea")
-                                                    && xformsArrayContains(documentElementClasses, "xforms-mediatype-text-html")) {
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                    && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                 // HTML area
                                                 var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                                 if (xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)) {
@@ -1590,7 +1570,7 @@ function xformsHandleResponse() {
                                                     documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
                                                 }
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-control")
+                                            } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Textarea, password
                                                 if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {
@@ -1670,12 +1650,12 @@ function xformsHandleResponse() {
                                             // Remove or add xforms-disabled on elements after this delimiter
                                             var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
                                             while (!(cursor.nodeType == ELEMENT_TYPE &&
-                                                     (xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
-                                                        || xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end")))) {
+                                                     (YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                        || YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
                                                 if (cursor.nodeType == ELEMENT_TYPE) {
                                                     if (relevant) {
-                                                        if (relevant == "true") xformsRemoveClass(cursor, "xforms-disabled");
-                                                        else xformsAddClass(cursor, "xforms-disabled");
+                                                        if (relevant == "true") YAHOO.util.Dom.removeClass(cursor, "xforms-disabled");
+                                                        else YAHOO.util.Dom.addClass(cursor, "xforms-disabled");
                                                     }
                                                 }
                                                 cursor = cursor.nextSibling;
@@ -1709,8 +1689,8 @@ function xformsHandleResponse() {
                                             }
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 if (cursor.id == "xforms-case-end-" + controlId) break;
-                                                xformsAddClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
-                                                xformsRemoveClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
+                                                YAHOO.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
+                                                YAHOO.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
                                             }
                                         }
                                     }
@@ -1765,10 +1745,10 @@ function xformsHandleResponse() {
                                         if (oldItemDelimiter != null) {
                                             cursor = oldItemDelimiter.nextSibling;
                                             while (cursor.nodeType != ELEMENT_TYPE ||
-                                                   (!xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
-                                                   && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end"))) {
+                                                   (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                   && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                                 if (cursor.nodeType == ELEMENT_TYPE)
-                                                    xformsRemoveClass(cursor, xformsGetClassForReapeatId(repeatId));
+                                                    YAHOO.util.Dom.removeClass(cursor, xformsGetClassForReapeatId(repeatId));
                                                 cursor = cursor.nextSibling;
                                             }
                                         }
@@ -1788,8 +1768,8 @@ function xformsHandleResponse() {
                                             throw "Can not find delimiter for repeatId '" + repeatId + "' index '" + newIndex + "'";
                                         cursor = newItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
-                                               (!xformsArrayContains(cursor.className.split(" "), "xforms-repeat-delimiter")
-                                               && !xformsArrayContains(cursor.className.split(" "), "xforms-repeat-begin-end"))) {
+                                               (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                               && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 var classNameArray = cursor.className.split(" ");
                                                 classNameArray.push(xformsGetClassForReapeatId(repeatId));
@@ -1845,7 +1825,7 @@ function xformsHandleResponse() {
                                 var setfocusElement = actionElement.childNodes[actionIndex];
                                 var controlId = setfocusElement.getAttribute("control-id");
                                 var control = document.getElementById(controlId);
-                                if (xformsArrayContains(control.className.split(" "), "xforms-input"))
+                                if (YAHOO.util.Dom.hasClass(control, "xforms-input"))
                                     control = control.childNodes[1];
                                 document.xformsMaskFocusEvents = true;
                                 control.focus();
@@ -1985,5 +1965,5 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page
-xformsAddEventListener(window, "load", xformsPageLoaded);
+YAHOO.util.Event.addListener(window, "load", xformsPageLoaded);
 document.xformsTime = new Date().getTime();

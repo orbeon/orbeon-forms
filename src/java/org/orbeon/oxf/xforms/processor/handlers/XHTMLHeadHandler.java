@@ -28,6 +28,8 @@ public class XHTMLHeadHandler extends HandlerBase {
     private static final String[] stylesheets = {
             // Calendar stylesheets
             "/config/theme/jscalendar/calendar-blue.css",
+            // Yahoo! UI Library tree
+            "/ops/css/tree.css",
             // Other standard stylesheets
             "/config/theme/xforms.css"
     };
@@ -45,6 +47,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/animation.js",
             "/ops/javascript/dragdrop.js",
             "/ops/javascript/slider.js",
+            "/ops/javascript/treeview.js",
             // HTML area
             "/ops/fckeditor/fckeditor.js",
             // Other standard scripts

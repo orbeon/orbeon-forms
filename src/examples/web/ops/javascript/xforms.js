@@ -541,7 +541,6 @@ function xformsRegisterForFocusBlurEvents(control) {
  * @param incremental  Are these incremental events
  */
 function xformsFireEvents(events, incremental) {
-
     // Store the time of the first event to be sent in the queue
     var currentTime = new Date().getTime();
     if (document.xformsEvents.length == 0)
@@ -695,6 +694,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
+        var isXFormsTree = false;
         var isXFormsMediatypeTextHTML = false;
         var isXFormsTextarea = false;
         var isXFormsNoInitElement = false;
@@ -708,6 +708,8 @@ function xformsInitializeControlsUnder(root) {
                 isIncremental = true;
             if (className == "xforms-range-background")
                 isXFormsRange = true;
+            if (className == "xforms-tree")
+                isXFormsTree = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal" || className == "xforms-select1-compact")
@@ -793,11 +795,28 @@ function xformsInitializeControlsUnder(root) {
                 xformsComputeSelectValue(control);
             } else if (isXFormsRange) {
                 control.tabIndex = 0;
+                control.previousValue = 0; // Will be modified once the initial value can be set
                 var thumbDiv = control.firstChild;
                 if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
                 thumbDiv.id = control.id + XFORMS_SEPARATOR_1 + "thumb";
                 var slider = YAHOO.widget.Slider.getHorizSlider(control.id, thumbDiv.id, 0, 200);
                 slider.onChange = xformsSliderValueChange;
+            } else if (isXFormsTree) {
+                // This is a tree
+                function addToTree(nameValueArray, treeNode, firstPosition) {
+                    for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
+                        var childArray = nameValueArray[arrayIndex];
+                        var name = childArray[0];
+                        var value = childArray[1];
+                        var childNode = new YAHOO.widget.TextNode(name, treeNode, false);
+                        addToTree(childArray, childNode, 2);
+                    }
+                }
+                var yahooTree = new YAHOO.widget.TreeView(control.id);
+                var treeArray = eval(control.firstChild.nodeValue);
+                var treeRoot = yahooTree.getRoot();
+                addToTree(treeArray, treeRoot, 0);
+                yahooTree.draw();
             } else if (isXFormsOutput) {
                 YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
@@ -1899,8 +1918,12 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
                     if (other != null)
                         requestDocumentString += ' other-control-id="' + other.id + '"';
                     requestDocumentString += '>';
-                    if (value != null)
-                        requestDocumentString += value.replace(new RegExp("<", "g"), "&lt;");
+                    if (value != null) {
+                        // When the range is used we get an int here when the page is first loaded
+                        if (typeof value == "string")
+                            value = value.replace(new RegExp("<", "g"), "&lt;");
+                        requestDocumentString += value;
+                    }
                     requestDocumentString += '</xxforms:event>\n';
                     handledEvents.unshift(i);
                 }

@@ -41,6 +41,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/yahoo.js",
             "/ops/javascript/event.js",
             "/ops/javascript/dom.js",
+            "/ops/javascript/connection.js",
             "/ops/javascript/animation.js",
             "/ops/javascript/dragdrop.js",
             "/ops/javascript/slider.js",
@@ -51,7 +52,6 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/wz_tooltip.js",
             "/ops/javascript/overlib_mini.js",
             "/ops/javascript/time-utils.js",
-            "/ops/javascript/sarissa.js",
             "/ops/javascript/xforms.js",
             "/ops/javascript/suggest-common.js",
             "/ops/javascript/suggest-actb.js"

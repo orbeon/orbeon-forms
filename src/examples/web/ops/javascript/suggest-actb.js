@@ -179,8 +179,7 @@ function actb(obj,ca,no_filter) {
         if (YAHOO.util.Event.isIE) {
             listPosition[1] += actb_curr.offsetHeight;
         } else {
-            listPosition[0] -= 1;
-            listPosition[1] += actb_curr.offsetHeight - 12;
+            listPosition[1] += actb_curr.offsetHeight - 9;
         }
         YAHOO.util.Dom.setXY(a, listPosition);
 

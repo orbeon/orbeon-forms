@@ -38,7 +38,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/config/theme/jscalendar/lang/calendar-en.js",
             "/config/theme/jscalendar/calendar-setup.js",
             // Yahoo UI Library
-            "/ops/javascript/YAHOO.js",
+            "/ops/javascript/yahoo.js",
             "/ops/javascript/event.js",
             "/ops/javascript/dom.js",
             "/ops/javascript/animation.js",

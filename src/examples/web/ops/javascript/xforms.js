@@ -78,39 +78,6 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
-function xformsRemoveClass(element, classToRemove) {
-    var array = element.className.split(" ");
-    var newClassName = "";
-    for (var i in array) {
-        var currentClass = array[i];
-        if (currentClass != classToRemove) {
-            if (newClassName != "") newClassName += " ";
-            newClassName += currentClass;
-        }
-    }
-    element.className = newClassName;
-}
-
-function xformsAddClass(element, classToAdd) {
-    var array = element.className.split(" ");
-    // Check if the class to add is already present
-    var classAlreadyThere = false;
-    for (var i in array) {
-        var currentClass = array[i];
-        if (currentClass == classToAdd) {
-            classAlreadyThere = true;
-            break;
-        }
-    }
-    // Add new class if necessary
-    if (!classAlreadyThere) {
-        var newClassName = element.className;
-        if (newClassName != "") newClassName += " ";
-        newClassName += classToAdd;
-        element.className = newClassName;
-    }
-}
-
 function xformsGetElementPosition(element) {
     var offsetTrail = element;
     var offsetLeft = 0;

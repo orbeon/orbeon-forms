@@ -729,18 +729,19 @@ public class XFormsActionInterpreter {
             final String target = actionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
             final String urlType = actionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
 
-            if (ref != null && resource != null) {
-                // "If both are present, the action has no effect."
-                // NOP
-            } else if (ref != null) {
+            // "If both are present, the action has no effect."
+            if (ref != null && resource != null)
+                return;
+
+            if (ref != null) {
                 // Use single-node binding
                 final Node currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
                     resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType);
                 } else {
-                    // Should we do this here?
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
+                    // The action is a NOP if it's not bound to a node
+                    return;
                 }
                 // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {

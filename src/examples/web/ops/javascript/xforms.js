@@ -33,6 +33,9 @@ var XFORMS_IS_GECKO = navigator.userAgent.toLowerCase().indexOf("gecko") != -1;
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
+var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
+var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
+var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 
 /* * * * * * Utility functions * * * * * */
 
@@ -132,7 +135,7 @@ function xformsStringReplace(node, placeholder, replacement) {
 }
 
 function xformsNormalizeEndlines(text) {
-    return text.replace(new RegExp("\\r", "g"), "");
+    return text.replace(XFORMS_REGEXP_CR, "");
 }
 
 function xformsAppendRepeatSuffix(id, suffix) {
@@ -629,6 +632,36 @@ function xformsHtmlEditorChange(editorInstance) {
 }
 
 /**
+ * Handle selection in tree that corresponds to xforms:select, where only one item can be selected.
+ */
+function xformsSelect1TreeSelect(id, value) {
+    var control = document.getElementById(id);
+    control.value = value;
+    xformsValueChanged(control);
+}
+
+/**
+ * Handle selection in tree that corresponds to xforms:select1, where we have checkboxes and
+ * multiple nodes can be selected.
+ */
+function xformsSelectTreeSelect() {
+    var tree = this.tree;
+    var control = document.getElementById(tree.id);
+    control.value = "";
+    var nodeIndex = 1;
+    while (true) {
+        var node = tree.getNodeByIndex(nodeIndex);
+        if (node == null) break;
+        if (node.checked) {
+            if (control.value != "") control.value += " ";
+            control.value += node.data.value;
+        }
+        nodeIndex++;
+    }
+    xformsValueChanged(control);
+}
+
+/**
  * Called by FCKeditor when an editor is fully loaded. This is our opportunity
  * to listen for events on this editor.
  */
@@ -708,7 +741,7 @@ function xformsInitializeControlsUnder(root) {
                 isIncremental = true;
             if (className == "xforms-range-background")
                 isXFormsRange = true;
-            if (className == "xforms-tree")
+            if (className == "xforms-select1-tree" || className == "xforms-select-tree")
                 isXFormsTree = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
@@ -805,18 +838,45 @@ function xformsInitializeControlsUnder(root) {
                 // This is a tree
                 function addToTree(nameValueArray, treeNode, firstPosition) {
                     for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
+                        // Extract information from the first 3 position in the array
                         var childArray = nameValueArray[arrayIndex];
                         var name = childArray[0];
                         var value = childArray[1];
-                        var childNode = new YAHOO.widget.TextNode(name, treeNode, false);
-                        addToTree(childArray, childNode, 2);
+                        var selected = childArray[2];
+                        // Create node and add to tree
+                        var nodeInformation = { label: name, value: value };
+                        var childNode;
+                        if (control.xformsAllowMultipleSelection) {
+                            childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
+                            childNode.onCheckClick = xformsSelectTreeSelect;
+                        } else {
+                            nodeInformation.href = "javascript:xformsSelect1TreeSelect('"
+                                    + control.id + "', '"
+                                    + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
+                                    + "')";
+                            childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
+                        }
+                        addToTree(childArray, childNode, 3);
+                        // Add this value to the list if selected
+                        if (selected) {
+                            if (control.value != "") control.value += " ";
+                            control.value += value;
+                        }
                     }
                 }
-                var yahooTree = new YAHOO.widget.TreeView(control.id);
+                // Save in the control if it allows multiple selection
+                control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
+                // Parse data put by the server in the div
                 var treeArray = eval(control.firstChild.nodeValue);
+                // Create, populate, and show the tree
+                var yahooTree = new YAHOO.widget.TreeView(control.id);
                 var treeRoot = yahooTree.getRoot();
+                control.value = "";
                 addToTree(treeArray, treeRoot, 0);
+                control.previousValue = control.value;
                 yahooTree.draw();
+                // Remove initial class which was hidding the div
+                YAHOO.util.Dom.removeClass(control, "xforms-select1-tree-initial");
             } else if (isXFormsOutput) {
                 YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
@@ -1921,7 +1981,7 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
                     if (value != null) {
                         // When the range is used we get an int here when the page is first loaded
                         if (typeof value == "string")
-                            value = value.replace(new RegExp("<", "g"), "&lt;");
+                            value = value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
                         requestDocumentString += value;
                     }
                     requestDocumentString += '</xxforms:event>\n';

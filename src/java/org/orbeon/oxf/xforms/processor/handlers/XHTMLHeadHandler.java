@@ -30,6 +30,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/config/theme/jscalendar/calendar-blue.css",
             // Yahoo! UI Library tree
             "/ops/css/tree.css",
+            "/ops/css/tree-check.css",
             // Other standard stylesheets
             "/config/theme/xforms.css"
     };
@@ -48,6 +49,8 @@ public class XHTMLHeadHandler extends HandlerBase {
             "/ops/javascript/dragdrop.js",
             "/ops/javascript/slider.js",
             "/ops/javascript/treeview.js",
+            "/ops/javascript/treeview-tasknode.js",
+            "/ops/javascript/treeview-checkonclicknode.js",
             // HTML area
             "/ops/fckeditor/fckeditor.js",
             // Other standard scripts

@@ -149,7 +149,7 @@ fieldset {
     height:3em;
 }
 
-p,h1,pre,table {
+p,h1,pre {
     margin-top: .71em;
     margin-bottom: .71em;
 }

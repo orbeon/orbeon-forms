@@ -20,13 +20,13 @@
     </titles>
     <messages>
         <save-success>Document saved successfully!</save-success>
-        <save-error-form>Document could not be saved. Please check for errors in your form before saving again.</save-error-form>
-        <save-error-submission>Document could not be saved. Please contact your system administrator.</save-error-submission>
+        <save-error-form>Document not saved: please check for errors in your form before saving again.</save-error-form>
+        <save-error-submission>Document not saved: please contact your system administrator.</save-error-submission>
     </messages>
     <labels>
         <!-- Triggers labels -->
         <save-document>Save Document</save-document>
-        <return>Return to Forms List</return>
+        <return>Return to Forms L</return>
         <remove-mailing-address>Remove Mailing Address</remove-mailing-address>
         <clear-address>Clear Address</clear-address>
         <add-mailing-address>Add Mailing Address</add-mailing-address>

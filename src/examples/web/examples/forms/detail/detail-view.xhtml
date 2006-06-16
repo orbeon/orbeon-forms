@@ -148,7 +148,7 @@
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
                                method="post" replace="none" action="/forms/service/save-document">
-                <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">serialized</xforms:setvalue>
+                <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">validated</xforms:setvalue>
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-success"/>
                     <xforms:setvalue ref="instance('control-instance')/data-status"/>
@@ -156,14 +156,18 @@
                     <xforms:toggle case="ok-message"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
-                    <xforms:setvalue if="not(instance('control-instance')/save-status = 'serialized')"
-                                     ref="instance('control-instance')/message"
-                                     value="instance('resources-instance')/messages/save-error-form"/>
-                    <xforms:setvalue if="instance('control-instance')/save-status = 'serialized'"
-                                     ref="instance('control-instance')/message"
-                                     value="instance('resources-instance')/messages/save-error-submission"/>
+                    <xforms:action if="not(instance('control-instance')/save-status = 'validated')">
+                        <xforms:setvalue ref="instance('control-instance')/message"
+                                         value="instance('resources-instance')/messages/save-error-form"/>
+                        <xforms:toggle case="validation-error-message"/>
+                    </xforms:action>
+                    <xforms:action if="instance('control-instance')/save-status = 'validated'">
+                        <xforms:setvalue ref="instance('control-instance')/message"
+                                        value="instance('resources-instance')/messages/save-error-submission"/>
+                        <xforms:toggle case="fatal-error-message"/>
+                    </xforms:action>
+
                     <xforms:setvalue ref="instance('control-instance')/save-status"/>
-                    <xforms:toggle case="error-message"/>
                 </xforms:action>
             </xforms:submission>
 
@@ -226,8 +230,13 @@
                                                 <xforms:output ref="instance('control-instance')/message"/>
                                             </span>
                                         </xforms:case>
-                                        <xforms:case id="error-message">
+                                        <xforms:case id="validation-error-message">
                                             <span class="dmv-message-negative">
+                                                <xforms:output ref="instance('control-instance')/message"/>
+                                            </span>
+                                        </xforms:case>
+                                        <xforms:case id="fatal-error-message">
+                                            <span class="dmv-message-fatal">
                                                 <xforms:output ref="instance('control-instance')/message"/>
                                             </span>
                                         </xforms:case>

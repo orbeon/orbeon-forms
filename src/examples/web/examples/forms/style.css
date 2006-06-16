@@ -39,7 +39,8 @@ td { vertical-align: top }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; text-align: center }
 .dmv-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana }
 .dmv-message-positive { color: green }
-.dmv-message-negative { color: red }
+.dmv-message-negative { color: orange }
+.dmv-message-fatal { color: red }
 .dmv-main-table td { white-space: nowrap }
 .xforms-label { margin-right: 1em }
 .xforms-repeat-selected-item-1 td { cursor: default }

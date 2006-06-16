@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="windows-1252"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -593,6 +593,43 @@
         </section>
         <section>
             <title>Other Orbeon PresentationServer FAQ</title>
+            <a name="illgal-html-character"/>
+            <section added="2006-06-16">
+                <title>Why am I getting an "Illegal HTML character" exception?</title>
+                <p>
+                    The exception typically looks like:
+                </p>
+                <blockquote>
+                    <code>
+                        org.orbeon.saxon.trans.DynamicError: Illegal HTML character: decimal 150<br/>
+                        at org.orbeon.saxon.event.HTMLEmitter.writeEscape(HTMLEmitter.java:321)
+                    </code>
+                </blockquote>
+                <p>
+                    In general, you get this error when the encoding on your XML file missing or is
+                    incorrect. In the example above, we had specified the encoding to be ISO-8859-1,
+                    while editing the file on a Windows machine. The file contained a dash encoded
+                    as the character 150 in decimal, 96 in hexadecimal, which is not a valid
+                    character for the ISO-8859-1 encoding. In this case changing the encoding to
+                    windows-1252 solves the problem.
+                </p>
+                <p>
+                    Specifying ISO-8859-1 instead of windows-1252 on files that contain characters
+                    invalid in ISO-8859-1 does sometimes work, but not always. In particular, more
+                    recent versions of Saxon became stricter checking for invalid characters. So
+                    we recommend you use windows-1252 instead of ISO-8859-1 when appropriate. You
+                    specify the windows-1252 encoding by starting your XML file with the following
+                    XML declaration:
+                </p>
+                <code>
+                    &lt;?xml version="1.0" encoding="windows-1252"?>
+                </code>
+                <p>
+                    For more information, see this discussion on the <a
+                    href="http://www.orbeon.com/blog/2006/06/14/how-browser-have-been-saving-us-from-incorrect-encodings/">difference
+                    between ISO-8859-1 and Windows-1252</a>.
+                </p>
+            </section>
             <a name="performance-numbers"/>
             <section added="2006-01-11">
                 <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>

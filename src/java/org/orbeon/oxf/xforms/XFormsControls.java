@@ -1626,10 +1626,13 @@ public class XFormsControls {
         private String label;
         private String value;
 
-        public ItemsetInfo(String id, String label, String value) {
+        private Node node;
+
+        public ItemsetInfo(String id, String label, String value, Node node) {
             this.id = id;
             this.label = label;
             this.value = value;
+            this.node = node;
         }
 
         public String getId() {
@@ -1642,6 +1645,10 @@ public class XFormsControls {
 
         public String getValue() {
             return value;
+        }
+
+        public Node getNode() {
+            return node;
         }
 
         public boolean equals(Object obj) {

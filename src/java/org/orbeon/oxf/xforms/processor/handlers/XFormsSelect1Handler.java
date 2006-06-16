@@ -25,6 +25,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Node;
 
 import java.util.*;
 
@@ -146,8 +147,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     public void end(String uri, String localname, String qName) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final Select1ControlInfo controlInfo = (Select1ControlInfo) (handlerContext.isGenerateTemplate()
+                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
 
         final boolean isMany = localname.equals("select");
         final String type = isMany ? "checkbox" : "radio";
@@ -170,6 +171,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final boolean isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
                 && "autocomplete".equals(appearanceLocalname);
+        final boolean isTree = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
+                && "tree".equals(appearanceLocalname);
 
         final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
@@ -285,7 +288,82 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     throw new OXFException("Open selection currently only supports the xxforms:autocomplete appearance.");
                     // TODO: Use ValidationException.
                 }
-                
+
+            } else if (isTree) {
+                // xxforms:tree appearance
+
+                // Create xhtml:div containing the initial information required by the client
+
+                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+
+                handleReadOnlyAttribute(newAttributes, controlInfo);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
+
+                if (hasItemset) {
+
+                    if (!handlerContext.isGenerateTemplate()) {
+
+                        final List itemsetInfos = (List) controlInfo.getItemset();
+                        final String controlValue = controlInfo.getValue();
+                        if (itemsetInfos != null) { // may be null when there is no item in the itemset
+
+                            final StringBuffer sb = new StringBuffer();
+                            final Stack stack = new Stack();
+
+                            int level = 0;
+                            for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
+                                final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                                final String label = itemsetInfo.getLabel();
+                                final String value = itemsetInfo.getValue();
+                                final Node node = itemsetInfo.getNode();
+
+                                final int newLevel = getNodeLevel(node, stack);
+
+                                if (level - newLevel >= 0) {
+                                    //  We are going down one or more levels
+                                    for (int i = newLevel; i <= level; i++) {
+                                        sb.append("]");
+                                        stack.pop();
+                                    }
+                                    sb.append(",[");
+                                } else {
+                                    // We are going up one level
+                                    if (level > 0)
+                                        sb.append(",");
+
+                                    sb.append("[");
+                                }
+
+                                sb.append('"');
+                                sb.append(label);
+                                sb.append("\",\"");
+                                sb.append(value);
+                                sb.append("\",");
+                                sb.append(isSelected(isMany, controlValue, value));
+
+                                stack.push(node);
+                                level = newLevel;
+                            }
+
+                            // Close brackets
+                            for (int i = level; i >= 0; i--) {
+                                sb.append("]");
+                            }
+
+                            final String result = sb.toString();
+                            contentHandler.characters(result.toCharArray(), 0, result.length());
+                        }
+                    } else {
+                        // TODO
+                    }
+
+                } else {
+                    // TODO
+                    throw new OXFException("Only xforms:itemset is currently supported in a tree.");
+                }
+
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
             } else {
                 // Create xhtml:select
                 final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
@@ -314,6 +392,31 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         // xforms:hint
         handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+    }
+
+    private int getNodeLevel(Node node, Stack stack) {
+        Collections.reverse(stack);
+        int level = stack.size() + 1;
+        for (Iterator i = stack.iterator(); i.hasNext(); level--) {
+            final Node currentNode = (Node) i.next();
+            if (isAncestorNode(node, currentNode)) {
+                Collections.reverse(stack);
+                return level;
+            }
+        }
+        Collections.reverse(stack);
+        return level;
+    }
+
+    private boolean isAncestorNode(Node node, Node potentialAncestor) {
+        Node parent = node.getParent();
+        while (parent != null) {
+            if (parent == potentialAncestor)
+                return true;
+            parent = parent.getParent();
+        }
+
+        return false;
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
@@ -373,24 +476,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         // Figure out whether what items are selected
         final String value = item.getValue();
         if (!handlerContext.isGenerateTemplate() && controlInfo != null) {
-
-            boolean selected = false;
-            {
-                final String controlValue = controlInfo.getValue();
-                if (controlValue != null) {
-                    if (isMany) {
-                        for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
-                            final String token = st.nextToken();
-                            if (token.equals(value)) {
-                                selected = true;
-                                break;
-                            }
-                        }
-                    } else {
-                        selected = controlValue.equals(value);
-                    }
-                }
-            }
+            final String controlValue = controlInfo.getValue();
+            final boolean selected = (controlValue != null) && isSelected(isMany, controlValue, value);
             if (selected)
                 optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");
         }
@@ -401,6 +488,22 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         if (label != null)
             contentHandler.characters(label.toCharArray(), 0, label.length());
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName);
+    }
+
+    private boolean isSelected(boolean isMany, String controlValue, String itemValue) {
+        boolean selected = false;
+        if (isMany) {
+            for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                final String token = st.nextToken();
+                if (token.equals(itemValue)) {
+                    selected = true;
+                    break;
+                }
+            }
+        } else {
+            selected = controlValue.equals(itemValue);
+        }
+        return selected;
     }
 
     private static class Item {

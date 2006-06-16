@@ -29,20 +29,20 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:div id="the-tree-div-id" class="xforms-control xforms-tree">
+        <xhtml:div id="the-tree-div-id" class="xforms-control xforms-select1-tree xforms-initially-hidden">
             [
-                ["Encyclopedia", "e",
-                    ["Science", "s"],
-                    ["Culture", "c",
-                        ["Art", "a"],
-                        ["Craft", "c"]
+                ["Encyclopedia", "e", false,
+                    ["Science", "s", true],
+                    ["Culture", "c", true,
+                        ["Art", "a", false],
+                        ["Craft", "c", false]
                     ]
                 ],
-                ["Encyclopedia", "e",
-                    ["Science", "s"],
-                    ["Culture", "c",
-                        ["Art", "a"],
-                        ["Craft", "c"]
+                ["Encyclopedia", "e", false,
+                    ["Science", "s", false],
+                    ["Culture", "c", false,
+                        ["Art", "a", false],
+                        ["Craft", "c", false]
                     ]
                 ]
             ]

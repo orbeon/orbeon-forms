@@ -16,7 +16,7 @@
     display: inline;
 }
 
-.xforms-output-html-initial {
+.xforms-initially-hidden {
     display: none;
 }
 

@@ -176,9 +176,9 @@ function xformsUpdateStyle(element) {
                 element.innerHTML = xformsStringValue(element);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-output-html-initial")) {
+        if (YAHOO.util.Dom.hasClass(element, "xforms-initially-hidden")) {
             // Make the content of the element visible
-            YAHOO.util.Dom.removeClass(element, "xforms-output-html-initial");
+            YAHOO.util.Dom.removeClass(element, "xforms-initially-hidden");
         }
 
         if (YAHOO.util.Dom.hasClass(element, "xforms-label")) {

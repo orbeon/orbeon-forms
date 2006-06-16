@@ -1064,6 +1064,37 @@
         </section>
         <section>
             <title>Studio FAQ</title>
+            <a name="studio-xpl-trace"/>
+            <section>
+                <title>In Studio, why nothing shows up in the XPL Trace Views?</title>
+                <p>
+                    The XPL Trace facility provides information for a given page served by
+                    PresentationServer. For that page, it shows a tree of processor calls and
+                    indicates on that tree how much time has been spent on each node. This
+                    information collected by XPL Trace can be either sent to the standard output, or
+                    to Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL
+                    Trace Tree views. For this to work as expected:
+                </p>
+                <ul>
+                    <li>
+                        You need to setup the port Studio listens to, from Preferences / Orbeon. That
+                        port must match the one you have setup in the PresentationServer <a
+                        href="reference-properties#trace">properties</a>.
+                    </li>
+                    <li>
+                        After changing the port number in Studio, you might have to restart
+                        Eclipse.
+                    </li>
+                    <li>
+                        For Studio to listen on the specified port, you need to have two views (XPL
+                        Trace Table and XPL Trace Tree) open. You might also need to at least make
+                        one of the views active before Studio starts listening on the specified
+                        port. On Windows, you can check if Studio is listening on the port you
+                        specified using <a
+                        href="http://www.sysinternals.com/Utilities/TcpView.html">TCPView</a>.
+                    </li>
+                </ul>
+            </section>
             <a name="studio-vm-args"/>
             <section>
                 <title>

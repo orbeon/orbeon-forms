@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2003/XInclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <header>
+        <title>Changes in Version 3.1</title>
+    </header>
+    <body>
+        <a name="introduction"/>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Welcome to Orbeon PresentationServer (OPS) 3.1!
+            </p>
+            <p>
+                OPS 3.1 features [TODO]
+            </p>
+            <p>
+                This document describes changes made between OPS 3.0.1 and OPS 3.1.
+            </p>
+        </section>
+        <section>
+            <title>Changes in Version 3.1</title>
+            <p>
+                OPS 3.1 contains the following changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Performance improvements, including in the following scenarios: [TODO: explain caching, serving
+                        static XForms, etc.]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The embedded eXist database has been upgraded to the 20060316 snapshot.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.7. [TODO:
+                        details]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        XForms improvements, including [TODO: link, elaborate]:
+                    </p>
+                    <ul>
+                        <li>
+                            Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
+                            <code>xforms:submission</code>.
+                        </li>
+                        <li>
+                            Support for attribute value templates (AVT) on <code>xforms:submission</code>
+                            <code>action</code>, <code>xxforms:username</code> and <code>xxforms:password</code>
+                            attributes.
+                        </li>
+                        <li>
+                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
+                            Support for this method is not included in XForms 1.0, but will be added to XForms 1.1.
+                            [TODO: Elaborate on using REST APIs for eXist] [TODO: Elaborate on using REST APIs for
+                            eXist]
+                        </li>
+                        <li>
+                            Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
+                        </li>
+                        <li>
+                            Support for the XForms 1.1 <a
+                            href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
+                            <code>xforms:insert</code> and <code>xforms:delete</code>. Improvements to
+                            <code>xforms:insert</code> and <code>xforms:delete</code> as per the XForms 1.1 draft.
+                            [TODO: point to example, insertion into empty elements, attributes, etc.]
+                        </li>
+                        <li>
+                            Autocomplete control. [TODO] [kindly sponsored by...]
+                        </li>
+                        <li>
+                            HTML editor control. [TODO] [kindly sponsored by...]
+                        </li>
+                        <li>
+                            Tree control and menu control. [TODO] [kindly sponsored by...]
+                        </li>
+                        <li>
+                            Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                        </li>
+                        <li>
+                            Support for XForms 1.1 conditional actions with the <code>if</code> attribute. [TODO]
+                        </li>
+                        <li>
+                            Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
+                            <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
+                            <code>xxforms:cols</code>. [TODO]
+                        </li>
+                        <li>
+                            Upgrade to latest version of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
+                            library</code>. We no longer use <a
+                            href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
+                        </li>
+                        <li>
+                            Improved support within Liferay portal. [TODO] [kindly sponsored by...] A new epilogue
+                            pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168
+                            portlets into liferay. In addition, some bugs have been fixed relative to conflicts between
+                            OPS JavaScript files and Liferay's, as well as ensuring that multiple OPS portlets do not
+                            conflict.
+                        </li>
+                        <li>
+                            [TODO]
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        Bug-fixes, including:
+                    </p>
+                    <ul>
+                        <li>
+                            <a href="">TODO</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        The <a href="processors-xinclude">XInclude processor</a> now supports an extension attribute,
+                        <code>xxi:omit-xml-base</code>, which disables producing <code>xml:base</code> attributes upon
+                        inclusion. This can be quite useful when performing schema validation on the result, or when
+                        <code>xml:base</code> resolution on the result must be performed relative to the URL base of the
+                        including document.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The XUpdate processor now supports an extension element, <code>xu:node-set</code>, which allows
+                        functions to return node-sets. [TODO: show example, add this to XUpdate doc]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        A new Execute processor has been added. It allows executing external commands and retrieving
+                        the command's standard output and standard error. [TODO: doc]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Some JAR files have been updated to their latest versions, including dom4j, Jaxen, and ant.
+                        [TODO]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        When using the delegation processor to call web services, by default the
+                        processor throws an exception when the remote service returns a SOAP fault.
+                        Now the delegation processor can also be configured to return the SOAP fault
+                        document instead of throwing an exception.
+                    </p>
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

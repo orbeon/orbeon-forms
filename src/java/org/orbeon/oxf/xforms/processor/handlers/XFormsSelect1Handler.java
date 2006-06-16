@@ -305,7 +305,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                         final List itemsetInfos = (List) controlInfo.getItemset();
                         final String controlValue = controlInfo.getValue();
-                        if (itemsetInfos != null) { // may be null when there is no item in the itemset
+                        if (itemsetInfos != null && itemsetInfos.size() > 0) { // may be null when there is no item in the itemset
 
                             final StringBuffer sb = new StringBuffer();
                             final Stack stack = new Stack();

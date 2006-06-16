@@ -358,6 +358,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Fire xforms-submit-serialize
                 containingDocument.dispatchEvent(pipelineContext,
                 		XFormsEventFactory.createEvent(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, XFormsModelSubmission.this));
+                // TODO: what follows must be executed as the default action of xforms-submit-serialize
 
                 // Serialize
                 // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data

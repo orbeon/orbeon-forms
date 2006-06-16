@@ -90,6 +90,7 @@
                     <!-- Native XForms Initialization -->
                     <p:processor name="oxf:xforms-to-xhtml">
                         <p:input name="annotated-document" href="#annotated-view"/>
+                        <p:input name="instance" href="#instance"/>
                         <p:output name="document" ref="xformed-data"/>
                     </p:processor>
                     <!--<p:processor name="oxf:sax-debugger">-->

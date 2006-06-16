@@ -77,6 +77,9 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
             // Copy special attributes in xxforms namespace
             copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
 
+            // Handle accessibility attributes
+            handleAccessibilityAttributes(elementAttributes, newAttributes);
+
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
             if (!handlerContext.isGenerateTemplate()) {
                 final String value = controlInfo.getValue();

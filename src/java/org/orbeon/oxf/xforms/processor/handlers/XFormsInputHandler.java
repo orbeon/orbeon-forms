@@ -117,6 +117,9 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 // Copy special attributes in xxforms namespace
                 copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
 
+                // Handle accessibility attributes
+                handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }

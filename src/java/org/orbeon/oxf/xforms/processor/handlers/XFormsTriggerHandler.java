@@ -28,14 +28,14 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsTriggerHandler extends HandlerBase {
 
     private AttributesImpl xxformsImgAttributes;
-    private AttributesImpl controlAttributes;
+    private AttributesImpl elementAttributes;
 
     public XFormsTriggerHandler() {
         super(false, false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        controlAttributes = new AttributesImpl(attributes);
+        elementAttributes = new AttributesImpl(attributes);
 
         // Reset state, as this handler is reused
         xxformsImgAttributes = null;
@@ -57,7 +57,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         // xforms:trigger and xforms:submit
 
-        final String effectiveId = handlerContext.getEffectiveId(controlAttributes);
+        final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
 
         final ControlInfo controlInfo = handlerContext.isGenerateTemplate() ? null : ((ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
 
@@ -66,14 +66,17 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : controlInfo.getLabel();
 
-        final String appearanceValue = controlAttributes.getValue("appearance");
+        final String appearanceValue = elementAttributes.getValue("appearance");
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
         final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
 
         final StringBuffer classes = new StringBuffer("xforms-control xforms-trigger");
         if (!handlerContext.isGenerateTemplate())
             handleMIPClasses(classes, controlInfo);
-        final AttributesImpl newAttributes = getAttributes(controlAttributes, classes.toString(), effectiveId);
+        final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
+
+        // Handle accessibility attributes
+        handleAccessibilityAttributes(elementAttributes, newAttributes);
 
         if (appearanceValue != null
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname)) {

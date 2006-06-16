@@ -130,27 +130,27 @@
                 <widget:tab id="text-controls" selected="true">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
-                        <xforms:input ref="age" incremental="true" class="input" xxforms:maxlength="3">
+                        <xforms:input ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
                             <xforms:label class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:secret ref="secret" incremental="true" class="password">
+                        <xforms:secret ref="secret" incremental="true" class="password" navindex="2">
                             <xforms:label class="fixed-width">Password:</xforms:label>
                             <xforms:hint>The password is 42 ;)</xforms:hint>
                             <xforms:alert>Invalid password</xforms:alert>
                         </xforms:secret>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:textarea ref="textarea" class="textarea">
+                        <xforms:textarea ref="textarea" class="textarea" navindex="3">
                             <xforms:label class="fixed-width">Text area:</xforms:label>
                             <xforms:hint>Enter at least 11 characters</xforms:hint>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
                         </xforms:textarea>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:input ref="date">
+                        <xforms:input ref="date" navindex="4">
                             <xforms:label class="fixed-width">Date:</xforms:label>
                             <xforms:hint>At most one day in the future</xforms:hint>
                             <xforms:help>

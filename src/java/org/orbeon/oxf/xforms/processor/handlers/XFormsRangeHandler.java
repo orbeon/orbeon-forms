@@ -72,7 +72,6 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
             }
 
-
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
         }
 

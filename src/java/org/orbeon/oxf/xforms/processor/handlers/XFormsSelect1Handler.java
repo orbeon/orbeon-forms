@@ -263,6 +263,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             if ("compact".equals(appearanceLocalname))
                                 reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
+                            // Handle accessibility attributes
+                            handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
 
                             final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");

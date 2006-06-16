@@ -95,8 +95,9 @@
                         <li>
                             Support for the XForms 1.1 <a
                             href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
-                            <code>xforms:insert</code>. Improvements to <code>xforms:insert</code> as per the XForms 1.1
-                            draft.
+                            <code>xforms:insert</code> and <code>xforms:delete</code>. Improvements to
+                            <code>xforms:insert</code> and <code>xforms:delete</code> as per the XForms 1.1 draft.
+                            [TODO: point to example, insertion into empty elements, attributes, etc.]
                         </li>
                         <li>
                             Autocomplete control. [TODO] [kindly sponsored by...]
@@ -105,7 +106,20 @@
                             HTML editor control. [TODO] [kindly sponsored by...]
                         </li>
                         <li>
+                            Tree control and menu control. [TODO] [kindly sponsored by...]
+                        </li>
+                        <li>
                             Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                        </li>
+                        <li>
+                            Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
+                            <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
+                            <code>xxforms:cols</code>. [TODO]
+                        </li>
+                        <li>
+                            Upgrade to latest version of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
+                            library</code>. We no longer use <a
+                            href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
                         </li>
                         <li>
                             Improved support within Liferay portal. [TODO] [kindly sponsored by...] A new epilogue

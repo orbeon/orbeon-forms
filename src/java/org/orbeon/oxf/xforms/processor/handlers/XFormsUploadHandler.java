@@ -57,6 +57,9 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             }
         }
 
+        // Handle accessibility attributes
+        handleAccessibilityAttributes(elementAttributes, newAttributes);
+
         // Create xhtml:input
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");

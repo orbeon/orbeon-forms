@@ -112,6 +112,9 @@
                             Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
                         </li>
                         <li>
+                            Support for XForms 1.1 conditional actions with the <code>if</code> attribute. [TODO]
+                        </li>
+                        <li>
                             Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
                             <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
                             <code>xxforms:cols</code>. [TODO]

@@ -96,6 +96,7 @@
                 <control xmlns="">
                     <message/>
                     <data-status/>
+                    <save-status/>
                     <vehicle-insert-trigger/>
                     <vehicle-delete-trigger/>
                     <save-trigger/>
@@ -123,37 +124,45 @@
             </xforms:bind>
 
             <!-- XForms instance for license plate information -->
-            <xforms:instance id="plate-instance">
-                <control xmlns="">
-                    <plate>
-                        <character/>
-                        <character/>
-                        <character/>
-                        <character/>
-                        <character/>
-                        <character/>
-                        <character/>
-                        <character/>
-                    </plate>
-                </control>
-            </xforms:instance>
+            <!--<xforms:instance id="plate-instance">-->
+                <!--<control xmlns="">-->
+                    <!--<plate>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                        <!--<character/>-->
+                    <!--</plate>-->
+                <!--</control>-->
+            <!--</xforms:instance>-->
 
-            <xforms:bind nodeset="instance('plate-instance')">
-                <xforms:bind nodeset="plate[1]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[1], count(preceding-sibling::character) + 1, 1)"/>
+            <!--<xforms:bind nodeset="instance('plate-instance')">-->
+                <!--<xforms:bind nodeset="plate[1]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[1], count(preceding-sibling::character) + 1, 1)"/>-->
                 <!--<xforms:bind nodeset="plate[2]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[2], count(preceding-sibling::character) + 1, 1)"/>-->
                 <!--<xforms:bind nodeset="plate[3]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[3], count(preceding-sibling::character) + 1, 1)"/>-->
-            </xforms:bind>
+            <!--</xforms:bind>-->
 
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
                                method="post" replace="none" action="/forms/service/save-document">
+                <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">serialized</xforms:setvalue>
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-success"/>
                     <xforms:setvalue ref="instance('control-instance')/data-status"/>
+                    <xforms:setvalue ref="instance('control-instance')/save-status"/>
                     <xforms:toggle case="ok-message"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
-                    <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-error"/>
+                    <xforms:setvalue if="not(instance('control-instance')/save-status = 'serialized')"
+                                     ref="instance('control-instance')/message"
+                                     value="instance('resources-instance')/messages/save-error-form"/>
+                    <xforms:setvalue if="instance('control-instance')/save-status = 'serialized'"
+                                     ref="instance('control-instance')/message"
+                                     value="instance('resources-instance')/messages/save-error-submission"/>
+                    <xforms:setvalue ref="instance('control-instance')/save-status"/>
                     <xforms:toggle case="error-message"/>
                 </xforms:action>
             </xforms:submission>

@@ -20,7 +20,8 @@
     </titles>
     <messages>
         <save-success>Document saved successfully!</save-success>
-        <save-error>Document could not be saved. Please check for errors in your form.</save-error>
+        <save-error-form>Document could not be saved. Please check for errors in your form before saving again.</save-error-form>
+        <save-error-submission>Document could not be saved. Please contact your system administrator.</save-error-submission>
     </messages>
     <labels>
         <!-- Triggers labels -->

@@ -67,6 +67,25 @@ public class XFormsActionInterpreter {
 
         final String actionEventName = actionElement.getName();
 
+        // Handle conditional action
+        final String ifAttribute = actionElement.attributeValue("if");
+        if (ifAttribute != null) {
+
+            final List conditionResult = xformsControls.getCurrentInstance().evaluateXPath(pipelineContext,
+                xformsControls.getCurrentSingleNode(), "boolean(" + ifAttribute + ")",
+                Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+
+            if (!((Boolean) conditionResult.get(0)).booleanValue()) {
+                // Don't execute action
+
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - not executing conditional action: " + actionEventName);
+
+                return;
+            }
+        }
+
+        // We are executing the action
         if (XFormsServer.logger.isDebugEnabled())
             XFormsServer.logger.debug("XForms - executing action: " + actionEventName);
 

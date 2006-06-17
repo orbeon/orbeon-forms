@@ -193,6 +193,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (isAutocompleteNoFilter)
                 classes.append(" xforms-select1-open-autocomplete-nofilter");
 
+            if (isTree)
+                classes.append(" xforms-initially-hidden");
+
             if (!handlerContext.isGenerateTemplate()) {
                 handleMIPClasses(classes, controlInfo);
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
@@ -309,6 +312,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                             final StringBuffer sb = new StringBuffer();
                             final Stack stack = new Stack();
+
+                            sb.append("[");
 
                             int level = 0;
                             for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {

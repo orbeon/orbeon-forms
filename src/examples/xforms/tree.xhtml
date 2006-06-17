@@ -24,8 +24,8 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <select1>en cr</select1>
-                    <select>en cr</select>
+                    <select1>en1</select1>
+                    <select>en1 cu1 cr1</select>
                 </instance>
             </xforms:instance>
             <xforms:instance id="items">
@@ -70,6 +70,50 @@
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
+        </xforms:select>
+        <xhtml:h2>select tree without itemset</xhtml:h2>
+        <xhtml:p>
+            Selected values:
+            <xforms:output ref="select"/>
+        </xhtml:p>
+        <xforms:select ref="select" appearance="xxforms:tree">
+        <!--<xforms:select ref="select" appearance="compact">-->
+            <xforms:choices>
+                <xforms:label>Encyclopedia</xforms:label>
+                <xforms:item>
+                    <xforms:label>Science</xforms:label>
+                    <xforms:value>sc1</xforms:value>
+                </xforms:item>
+                <xforms:choices>
+                    <xforms:label>Culture</xforms:label>
+                    <xforms:item>
+                        <xforms:label>Art</xforms:label>
+                        <xforms:value>ar1</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Craft</xforms:label>
+                        <xforms:value>cr1</xforms:value>
+                    </xforms:item>
+                </xforms:choices>
+            </xforms:choices>
+            <xforms:choices>
+                <xforms:label>Encyclopedia</xforms:label>
+                <xforms:item>
+                    <xforms:label>Science</xforms:label>
+                    <xforms:value>sc2</xforms:value>
+                </xforms:item>
+                <xforms:choices>
+                    <xforms:label>Culture</xforms:label>
+                    <xforms:item>
+                        <xforms:label>Art</xforms:label>
+                        <xforms:value>ar2</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Craft</xforms:label>
+                        <xforms:value>cr2</xforms:value>
+                    </xforms:item>
+                </xforms:choices>
+            </xforms:choices>
         </xforms:select>
     </xhtml:body>
 </xhtml:html>

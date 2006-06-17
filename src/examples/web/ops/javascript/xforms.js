@@ -1016,6 +1016,9 @@ function xformsPageLoaded() {
             // If this is an XForms form, procede with initialization
             if (form.xformsIsXFormsForm) {
 
+                // Used when the form is the target event
+                form.xformsForm = form;
+
                 // Initialize loading and error indicator
                 form.xformsLoadingLoading = null;
                 form.xformsLoadingError = null;

@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2005 Orbeon, Inc.
+    Copyright (C) 2006 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -20,8 +20,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Tree Widget</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+        <xhtml:title>Menu Widget</xhtml:title>
+        <xforms:model>
             <xforms:instance id="instance">
                 <instance>
                     <selected>en cr</selected>
@@ -29,18 +29,18 @@
             </xforms:instance>
             <xforms:instance id="items">
                 <items>
-                    <item label="Encyclopedia" value="en">
-                        <item label="Science" value="sc"/>
-                        <item label="Culture" value="cu">
-                            <item label="Art" value="ar"/>
-                            <item label="Craft" value="cr"/>
+                    <item label="Encyclopedia" value="en1">
+                        <item label="Science" value="sc1"/>
+                        <item label="Culture" value="cu1">
+                            <item label="Art" value="ar1"/>
+                            <item label="Craft" value="cr1"/>
                         </item>
                     </item>
-                    <item label="Encyclopedia" value="en">
-                        <item label="Science" value="sc"/>
-                        <item label="Culture" value="cu">
-                            <item label="Art" value="ar"/>
-                            <item label="Craft" value="cr"/>
+                    <item label="Encyclopedia" value="en2">
+                        <item label="Science" value="sc2"/>
+                        <item label="Culture" value="cu2">
+                            <item label="Art" value="ar2"/>
+                            <item label="Craft" value="cr2"/>
                         </item>
                     </item>
                 </items>
@@ -48,30 +48,11 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <!--<xforms:select ref="selected" appearance="xxforms:tree">-->
-            <!--<xforms:itemset nodeset="instance('items')//item">-->
-                <!--<xforms:label ref="@label"/>-->
-                <!--<xforms:value ref="@value"/>-->
-            <!--</xforms:itemset>-->
-        <!--</xforms:select>-->
-
-        <xhtml:div id="the-tree-div-id" class="xforms-control xforms-select1-tree xforms-initially-hidden">
-            [
-                ["Encyclopedia", "e", false,
-                    ["Science", "s", true],
-                    ["Culture", "c", true,
-                        ["Art", "a", false],
-                        ["Craft", "c", false]
-                    ]
-                ],
-                ["Encyclopedia", "e", false,
-                    ["Science", "s", false],
-                    ["Culture", "c", false,
-                        ["Art", "a", false],
-                        ["Craft", "c", false]
-                    ]
-                ]
-            ]
-        </xhtml:div>
+        <xforms:select ref="selected" appearance="xxforms:menu">
+            <xforms:itemset nodeset="instance('items')//item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </xforms:select>
     </xhtml:body>
 </xhtml:html>

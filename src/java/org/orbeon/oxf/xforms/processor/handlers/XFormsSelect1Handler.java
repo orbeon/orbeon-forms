@@ -238,8 +238,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final boolean isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
                 && "autocomplete".equals(appearanceLocalname);
-        final boolean isTree = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
-                && "tree".equals(appearanceLocalname);
+        final boolean isTreeOrMenu = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
+                && ("tree".equals(appearanceLocalname) || "menu".equals(appearanceLocalname));
 
         final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
@@ -260,7 +260,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (isAutocompleteNoFilter)
                 classes.append(" xforms-select1-open-autocomplete-nofilter");
 
-            if (isTree)
+            if (isTreeOrMenu)
                 classes.append(" xforms-initially-hidden");
 
             if (!handlerContext.isGenerateTemplate()) {
@@ -361,8 +361,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // TODO: Use ValidationException.
                 }
 
-            } else if (isTree) {
-                // xxforms:tree appearance
+            } else if (isTreeOrMenu) {
+                // xxforms:tree or xxforms:menu appearance
 
                 // Create xhtml:div containing the initial information required by the client
                 final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
@@ -371,7 +371,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
                 if (!handlerContext.isGenerateTemplate()) {
-                    // Produce a JSON fragment with tree information
+                    // Produce a JSON fragment with hierachical information
                     final String controlValue = controlInfo.getValue();
                     if (items.size() > 0) { // may be null when there is no item in the itemset
 

@@ -296,7 +296,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 // xxforms:tree appearance
 
                 // Create xhtml:div containing the initial information required by the client
-
                 final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
 
                 handleReadOnlyAttribute(newAttributes, controlInfo);
@@ -305,7 +304,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 if (hasItemset) {
 
                     if (!handlerContext.isGenerateTemplate()) {
-
+                        // Produce a JSON fragment with tree information
                         final List itemsetInfos = (List) controlInfo.getItemset();
                         final String controlValue = controlInfo.getValue();
                         if (itemsetInfos != null && itemsetInfos.size() > 0) { // may be null when there is no item in the itemset

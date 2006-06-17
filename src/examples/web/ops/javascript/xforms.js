@@ -849,6 +849,7 @@ function xformsInitializeControlsUnder(root) {
                         if (control.xformsAllowMultipleSelection) {
                             childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
                             childNode.onCheckClick = xformsSelectTreeSelect;
+                            if (selected) childNode.check();
                         } else {
                             nodeInformation.href = "javascript:xformsSelect1TreeSelect('"
                                     + control.id + "', '"
@@ -868,6 +869,7 @@ function xformsInitializeControlsUnder(root) {
                 control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
                 var treeArray = eval(control.firstChild.nodeValue);
+                control.firstChild.nodeValue = "";
                 // Create, populate, and show the tree
                 var yahooTree = new YAHOO.widget.TreeView(control.id);
                 var treeRoot = yahooTree.getRoot();
@@ -875,8 +877,6 @@ function xformsInitializeControlsUnder(root) {
                 addToTree(treeArray, treeRoot, 0);
                 control.previousValue = control.value;
                 yahooTree.draw();
-                // Remove initial class which was hidding the div
-                YAHOO.util.Dom.removeClass(control, "xforms-select1-tree-initial");
             } else if (isXFormsOutput) {
                 YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {

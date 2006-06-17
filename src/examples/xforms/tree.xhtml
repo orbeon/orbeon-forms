@@ -24,23 +24,24 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <selected>en cr</selected>
+                    <select1>en cr</select1>
+                    <select>en cr</select>
                 </instance>
             </xforms:instance>
             <xforms:instance id="items">
                 <items>
-                    <item label="Encyclopedia" value="en">
-                        <item label="Science" value="sc"/>
-                        <item label="Culture" value="cu">
-                            <item label="Art" value="ar"/>
-                            <item label="Craft" value="cr"/>
+                    <item label="Encyclopedia" value="en1">
+                        <item label="Science" value="sc1"/>
+                        <item label="Culture" value="cu1">
+                            <item label="Art" value="ar1"/>
+                            <item label="Craft" value="cr1"/>
                         </item>
                     </item>
-                    <item label="Encyclopedia" value="en">
-                        <item label="Science" value="sc"/>
-                        <item label="Culture" value="cu">
-                            <item label="Art" value="ar"/>
-                            <item label="Craft" value="cr"/>
+                    <item label="Encyclopedia" value="en2">
+                        <item label="Science" value="sc2"/>
+                        <item label="Culture" value="cu2">
+                            <item label="Art" value="ar2"/>
+                            <item label="Craft" value="cr2"/>
                         </item>
                     </item>
                 </items>
@@ -48,30 +49,27 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:select1 ref="selected" appearance="xxforms:tree">
+        <xhtml:h2>select1 tree</xhtml:h2>
+        <xhtml:p>
+            Selected values:
+            <xforms:output ref="select1"/>
+        </xhtml:p>
+        <xforms:select1 ref="select1" appearance="xxforms:tree">
             <xforms:itemset nodeset="instance('items')//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
         </xforms:select1>
-
-        <!--<xhtml:div id="the-tree-div-id" class="xforms-control xforms-select1-tree xforms-initially-hidden">-->
-            <!--[-->
-                <!--["Encyclopedia", "e", false,-->
-                    <!--["Science", "s", true],-->
-                    <!--["Culture", "c", true,-->
-                        <!--["Art", "a", false],-->
-                        <!--["Craft", "c", false]-->
-                    <!--]-->
-                <!--],-->
-                <!--["Encyclopedia", "e", false,-->
-                    <!--["Science", "s", false],-->
-                    <!--["Culture", "c", false,-->
-                        <!--["Art", "a", false],-->
-                        <!--["Craft", "c", false]-->
-                    <!--]-->
-                <!--]-->
-            <!--]-->
-        <!--</xhtml:div>-->
+        <xhtml:h2>select tree</xhtml:h2>
+        <xhtml:p>
+            Selected values:
+            <xforms:output ref="select"/>
+        </xhtml:p>
+        <xforms:select ref="select" appearance="xxforms:tree">
+            <xforms:itemset nodeset="instance('items')//item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </xforms:select>
     </xhtml:body>
 </xhtml:html>

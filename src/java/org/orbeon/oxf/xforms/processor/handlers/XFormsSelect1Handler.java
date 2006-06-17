@@ -278,9 +278,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
+                boolean isFirst = true;
                 for (Iterator i = items.iterator(); i.hasNext();) {
                     final Item item = (Item) i.next();
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, effectiveId, type, item);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, effectiveId, type, item, isFirst);
+                    isFirst = false;
                 }
 
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -293,7 +295,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, type, new Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1));
+                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, type, new Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), false);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                 // TODO: in the future we should be able to handle multiple itemsets
@@ -431,6 +433,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 if ("compact".equals(appearanceLocalname))
                     newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
+                // Handle accessibility attributes
+                handleAccessibilityAttributes(elementAttributes, newAttributes);
+
                 handleReadOnlyAttribute(newAttributes, controlInfo);
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
 
@@ -516,7 +521,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                ControlInfo controlInfo, String effectiveId, String type, Item item) throws SAXException {
+                                ControlInfo controlInfo, String effectiveId, String type, Item item, boolean isFirst) throws SAXException {
 
         // xhtml:span
 
@@ -550,6 +555,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             break;
                         }
                     }
+                }
+
+                if (isFirst) {
+                    // Handle accessibility attributes
+                    handleAccessibilityAttributes(elementAttributes, reusableAttributes);
                 }
             }
 

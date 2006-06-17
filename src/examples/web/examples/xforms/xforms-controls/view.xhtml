@@ -167,7 +167,7 @@
                     <xforms:group>
                         <xforms:label>Single Value Selection</xforms:label>
                         <xhtml:p>
-                            <xforms:select1 ref="carrier" appearance="full">
+                            <xforms:select1 ref="carrier" appearance="full" navindex="5">
                                 <xforms:label class="fixed-width">Carrier:</xforms:label>
                                 <xforms:itemset nodeset="instance('items')/carriers/carrier">
                                     <xforms:label ref="label"/>
@@ -176,7 +176,7 @@
                             </xforms:select1>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:select1 ref="carrier" appearance="compact">
+                            <xforms:select1 ref="carrier" appearance="compact" navindex="6">
                                 <xforms:label class="fixed-width"/>
                                 <xforms:itemset nodeset="instance('items')/carriers/carrier">
                                     <xforms:label ref="label"/>
@@ -185,7 +185,7 @@
                             </xforms:select1>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:select1 ref="carrier" appearance="minimal">
+                            <xforms:select1 ref="carrier" appearance="minimal" navindex="7">
                                 <xforms:label class="fixed-width"/>
                                 <xforms:itemset nodeset="instance('items')/carriers/carrier">
                                     <xforms:label ref="label"/>
@@ -197,7 +197,7 @@
                     <xforms:group>
                         <xforms:label>Multiple Value Selection</xforms:label>
                         <xhtml:p>
-                            <xforms:select ref="flavor" appearance="full">
+                            <xforms:select ref="flavor" appearance="full" navindex="8">
                                 <xforms:label class="fixed-width">Flavor:</xforms:label>
                                 <xforms:itemset nodeset="instance('items')/flavors/flavor">
                                     <xforms:label ref="label"/>
@@ -206,7 +206,7 @@
                             </xforms:select>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:select ref="flavor" appearance="compact">
+                            <xforms:select ref="flavor" appearance="compact" navindex="9">
                                 <xforms:label class="fixed-width"/>
                                 <xforms:itemset nodeset="instance('items')/flavors/flavor">
                                     <xforms:label ref="label"/>
@@ -218,18 +218,18 @@
                     <xforms:group>
                         <xforms:label>Add</xforms:label>
                         <xhtml:p>
-                            <xforms:input ref="new-item/label">
+                            <xforms:input ref="new-item/label" navindex="10">
                                 <xforms:label class="fixed-width">Label:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:input ref="new-item/value">
+                            <xforms:input ref="new-item/value" navindex="11">
                                 <xforms:label class="fixed-width">Value:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
                             <xhtml:span class="fixed-width"/>
-                            <xforms:trigger>
+                            <xforms:trigger navindex="12">
                                 <xforms:label>Add carrier</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
                                     <xforms:insert nodeset="instance('items')/carriers/carrier"
@@ -240,7 +240,7 @@
                                         value="instance('instance')/new-item/label"/>
                                 </xforms:action>
                             </xforms:trigger>
-                            <xforms:trigger>
+                            <xforms:trigger navindex="13">
                                 <xforms:label>Add flavor</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
                                     <xforms:insert nodeset="instance('items')/flavors/flavor"

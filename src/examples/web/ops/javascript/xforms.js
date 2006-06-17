@@ -648,15 +648,12 @@ function xformsSelectTreeSelect() {
     var tree = this.tree;
     var control = document.getElementById(tree.id);
     control.value = "";
-    var nodeIndex = 1;
-    while (true) {
-        var node = tree.getNodeByIndex(nodeIndex);
-        if (node == null) break;
+    for (nodeIndex in tree._nodes) {
+        var node = tree._nodes[nodeIndex];
         if (node.checked) {
             if (control.value != "") control.value += " ";
             control.value += node.data.value;
         }
-        nodeIndex++;
     }
     xformsValueChanged(control);
 }

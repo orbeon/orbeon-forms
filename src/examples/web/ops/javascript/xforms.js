@@ -865,7 +865,7 @@ function xformsInitializeControlsUnder(root) {
                 // Save in the control if it allows multiple selection
                 control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
-                var treeArray = eval(control.firstChild.nodeValue);
+                var treeArray = xformsStringValue(control);
                 control.firstChild.nodeValue = "";
                 // Create, populate, and show the tree
                 var yahooTree = new YAHOO.widget.TreeView(control.id);

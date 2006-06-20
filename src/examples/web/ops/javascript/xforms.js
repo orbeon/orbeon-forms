@@ -866,15 +866,14 @@ function xformsInitializeControlsUnder(root) {
                 control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
                 var treeArray = eval(xformsStringValue(control));
-
                 control.firstChild.nodeValue = "";
-                // Create, populate, and show the tree
-                var yahooTree = new YAHOO.widget.TreeView(control.id);
-                var treeRoot = yahooTree.getRoot();
                 control.value = "";
+                // Create, populate, and show the tree
+                control.xformsTree = new YAHOO.widget.TreeView(control.id);
+                var treeRoot = control.xformsTree.getRoot();
                 addToTree(treeArray, treeRoot, 0);
                 control.previousValue = control.value;
-                yahooTree.draw();
+                control.xformsTree.draw();
             } else if (isXFormsOutput) {
                 YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {
@@ -1605,6 +1604,18 @@ function xformsHandleResponse(o) {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             }
+                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-tree")) {
+                                            // Tree
+                                            var values = newControlValue.split(" ");
+                                            for (nodeIndex in documentElement.xformsTree._nodes) {
+                                                var node = documentElement.xformsTree._nodes[nodeIndex];
+                                                if (node.children.length == 0) {
+                                                    var checked = xformsArrayContains(values, node.data.value);
+                                                    if (checked) node.check(); else node.uncheck();
+                                                }
+                                            }
+                                            documentElement.value = newControlValue;
+                                            documentElement.previousValue = newControlValue;
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-control")
                                                 && typeof(documentElement.value) == "string") {
                                             // Textarea, password

@@ -658,6 +658,34 @@ function xformsSelectTreeSelect() {
     xformsValueChanged(control);
 }
 
+function xformsOnMenuBarItemMouseOver(p_sType, p_aArguments, p_oMenuItem) {
+    var oActiveItem = this.parent.activeItem;
+    // Hide any other submenus that might be visible
+    if(oActiveItem && oActiveItem != this) {
+        this.parent.clearActiveItem();
+    }
+    // Select and focus the current MenuItem instance
+    this.cfg.setProperty("selected", true);
+    this.focus();
+    // Show the submenu for this instance
+    var oSubmenu = this.cfg.getProperty("submenu");
+    if(oSubmenu) {
+        oSubmenu.show();
+    }
+}
+
+function xformsOnMenuBarItemMouseOut(p_sType, p_aArguments, p_oMenuItem) {
+    this.cfg.setProperty("selected", false);
+    var oSubmenu = this.cfg.getProperty("submenu");
+    if(oSubmenu) {
+        var oEvent = p_aArguments[0], oRelatedTarget = YAHOO.util.Event.getRelatedTarget(oEvent);
+        if(!(oRelatedTarget == oSubmenu.element
+                ||  this._oDom.isAncestor(oSubmenu.element, oRelatedTarget))) {
+            oSubmenu.hide();
+        }
+    }
+}
+
 /**
  * Called by FCKeditor when an editor is fully loaded. This is our opportunity
  * to listen for events on this editor.
@@ -897,6 +925,9 @@ function xformsInitializeControlsUnder(root) {
                     // Assign id to menu item
                     if (menuItem.element.id == "")
                         YAHOO.util.Dom.generateId(menuItem.element);
+                    // Show submenu when mouse over menu item
+                    menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver, this);
+                    menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut, this);
                     // Create submenu
                     var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
                     //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
@@ -941,6 +972,12 @@ function xformsInitializeControlsUnder(root) {
                     var menuItem = control.xformsMenu.getItem(topLevelIndex);
                     addToMenu(topLevelArray, menuItem);
                 }
+                // Hide menu when user click on document
+                if (!document.xformsMenuDocumentMouseOutInitialized) {
+                    document.xformsMenuDocumentMouseOutInitialized = true;
+                    //YAHOO.util.Event.addListener(document, "mousedown", YAHOO.example.OverlayManager.hideAll);
+                }
+
                 control.xformsMenu.render();
                 control.xformsMenu.show();
 

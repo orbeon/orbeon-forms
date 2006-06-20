@@ -37,6 +37,19 @@ public class ContentHandlerHelper {
         this.contentHandler = contentHandler;
     }
 
+    /**
+     * ContentHandler to write to. 
+     *
+     * @param contentHandler
+     * @param validateStream
+     */
+    public ContentHandlerHelper(ContentHandler contentHandler, boolean validateStream) {
+        if (validateStream)
+            this.contentHandler = new InspectingContentHandler(contentHandler);
+        else
+            this.contentHandler = contentHandler;
+    }
+
     public AttributesImpl getAttributesImpl() {
         attributesImpl.clear();
         return attributesImpl;

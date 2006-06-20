@@ -631,8 +631,12 @@
         <class name="org.orbeon.oxf.processor.test.TestScriptProcessor"/>
     </processor>
 
-    <processor name="oxf:sax-debugger">
+    <processor name="oxf:sax-logger">
         <class name="org.orbeon.oxf.processor.SAXDebuggerProcessor"/>
+    </processor>
+
+    <processor name="oxf:sax-inspector">
+        <class name="org.orbeon.oxf.processor.SAXInspectorProcessor"/>
     </processor>
 
     <processor name="oxf:counter">
@@ -676,8 +680,12 @@
         <class name="org.orbeon.oxf.processor.transformer.QexoXQueryProcessor"/>
     </processor>
 
+    <processor name="oxf:sax-debugger">
+        <class name="org.orbeon.oxf.processor.SAXDebuggerProcessor"/>
+    </processor>
+
     <!-- Scratchpad -->
-    <processor name="oxf:pdf-template" uri="oxf/processor/pdf-template">
+    <processor name="oxf:pdf-template">
         <class name="org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor"/>
     </processor>
 

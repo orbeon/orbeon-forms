@@ -13,15 +13,20 @@
  */
 package org.orbeon.oxf.processor.test;
 
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.dom4j.Document;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.ContentHandler;
-import org.dom4j.Document;
 
+/**
+ * This processor reads its data input, sleeps for a delay specified on its config input, and then sends the data input
+ * to its data output. It behaves like an identity processor with a delay.
+ */
 public class SleepProcessor extends ProcessorImpl {
 
     public SleepProcessor() {
@@ -34,11 +39,13 @@ public class SleepProcessor extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
-                    Document delayDocument = readInputAsDOM4J(context, INPUT_CONFIG);
-                    String delayString = (String) delayDocument.selectObject("string()");
+                    final SAXStore inputStore = new SAXStore();
+                    readInputAsSAX(context, INPUT_DATA, inputStore);
+                    final Document delayDocument = readInputAsDOM4J(context, INPUT_CONFIG);
+                    final String delayString = (String) delayDocument.selectObject("string()");
                     Thread.sleep(Long.parseLong(delayString));
-                    readInputAsSAX(context, INPUT_DATA, contentHandler);
-                } catch (InterruptedException e) {
+                    inputStore.replay(contentHandler);
+                } catch (Exception e) {
                     throw new OXFException(e);
                 }
             }

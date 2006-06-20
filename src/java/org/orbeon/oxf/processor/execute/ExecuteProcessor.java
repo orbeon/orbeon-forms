@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.execute;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Commandline;
@@ -21,13 +20,12 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
-import java.io.File;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 /**
  * The Execute Processor allows executing an external command.

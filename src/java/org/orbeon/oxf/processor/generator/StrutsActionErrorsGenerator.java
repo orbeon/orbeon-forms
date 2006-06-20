@@ -64,8 +64,8 @@ public class StrutsActionErrorsGenerator extends org.orbeon.oxf.processor.Proces
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    protected void readOutput(PipelineContext context, ContentHandler contentHandler) {
-        ExternalContext external = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+    protected void readOutput(PipelineContext pipelineContext, ContentHandler contentHandler) {
+        ExternalContext external = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (!(external instanceof ServletExternalContext))
             throw new OXFException("PresentationServer is not running as a servlet. This is not supported.");
 

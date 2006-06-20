@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,6 +25,8 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -224,7 +227,7 @@ public class XFormsSubmissionUtils {
                     throw new OXFException("xforms:submission: invalid submission method requested: " + method);
                 }
             } catch (IOException e) {
-                throw new OXFException(e);
+                throw new ValidationException(e, new LocationData(submissionURL.toExternalForm(), -1, -1));
             }
         } else if (!isGet(method) && (scheme.equals("file") || scheme.equals("oxf"))) {
             // TODO: implement writing to file: and oxf:

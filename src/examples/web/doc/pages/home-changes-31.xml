@@ -120,7 +120,8 @@
                             pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168
                             portlets into liferay. In addition, some bugs have been fixed relative to conflicts between
                             OPS JavaScript files and Liferay's, as well as ensuring that multiple OPS portlets do not
-                            conflict.
+                            conflict. Finally, support for multiple OPS portlets within the same portal page is
+                            available.
                         </li>
                         <li>
                             [TODO]

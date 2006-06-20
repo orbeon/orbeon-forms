@@ -101,8 +101,8 @@
                         </tr>
                         <!-- Group so that if by any chance multiple location data for the same point occur, we show only one -->
                         <xsl:choose>
-                            <xsl:when test="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]">
-                                <xsl:for-each-group select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]"
+                            <xsl:when test="/exceptions/exception[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]">
+                                <xsl:for-each-group select="/exceptions/exception[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]"
                                         group-by="concat(system-id, '-', line, '-', column)">
                                     <tr>
                                         <td><xsl:value-of select="system-id"/></td>

@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -827,7 +828,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         // Read result as XML
                                         instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
                                     } catch (Exception e) {
-                                        throw new OXFException(e);
+                                        if (connectionResult != null && connectionResult.resourceURI != null)
+                                            throw new ValidationException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
+                                                    "reading external instance", instanceContainerElement));
+                                        else
+                                            throw new OXFException(e);
                                     } finally {
                                         // Clean-up
                                         if (connectionResult != null)
@@ -853,9 +858,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
 
-                                    instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
-                                    hasUsername = false;
-                                    instanceSourceURI = urlString;
+                                    try {
+                                        instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
+                                        hasUsername = false;
+                                        instanceSourceURI = urlString;
+                                    } catch (Exception e) {
+                                        throw new ValidationException(e, new ExtendedLocationData(new LocationData(urlString, -1, -1),
+                                                "reading external instance", instanceContainerElement));
+                                    }
                                 }
                             }
                         }

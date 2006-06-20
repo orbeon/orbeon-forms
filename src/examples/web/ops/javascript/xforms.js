@@ -725,6 +725,7 @@ function xformsInitializeControlsUnder(root) {
         var isWidget = false;
         var isXFormsRange = false;
         var isXFormsTree = false;
+        var isXFormsMenu = false;
         var isXFormsMediatypeTextHTML = false;
         var isXFormsTextarea = false;
         var isXFormsNoInitElement = false;
@@ -740,6 +741,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsRange = true;
             if (className == "xforms-select1-tree" || className == "xforms-select-tree")
                 isXFormsTree = true;
+            if (className == "xforms-select1-menu")
+                isXFormsMenu = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal" || className == "xforms-select1-compact")
@@ -832,7 +835,7 @@ function xformsInitializeControlsUnder(root) {
                 var slider = YAHOO.widget.Slider.getHorizSlider(control.id, thumbDiv.id, 0, 200);
                 slider.onChange = xformsSliderValueChange;
             } else if (isXFormsTree) {
-                // This is a tree
+
                 function addToTree(nameValueArray, treeNode, firstPosition) {
                     for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
                         // Extract information from the first 3 position in the array
@@ -865,8 +868,9 @@ function xformsInitializeControlsUnder(root) {
                 // Save in the control if it allows multiple selection
                 control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
+                console.log(xformsStringValue(control));
                 var treeArray = eval(xformsStringValue(control));
-                control.firstChild.nodeValue = "";
+                xformsReplaceNodeText(control, "");
                 control.value = "";
                 // Create, populate, and show the tree
                 control.xformsTree = new YAHOO.widget.TreeView(control.id);
@@ -887,6 +891,59 @@ function xformsInitializeControlsUnder(root) {
                 // Save value in control
                 control.previousValue = control.value;
                 control.xformsTree.draw();
+            } else if (isXFormsMenu) {
+
+                function addToMenu(nameValueArray, menuItem) {
+                    // Assign id to menu item
+                    if (menuItem.element.id == "")
+                        YAHOO.util.Dom.generateId(menuItem.element);
+                    // Create submenu
+                    var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
+                    //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
+                    //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
+                    // Add menu items to submenu
+                    for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
+                        // Extract information from the first 3 position in the array
+                        var childArray = nameValueArray[arrayIndex];
+                        var name = childArray[0];
+                        var value = childArray[1];
+                        var selected = childArray[2];
+                        // Create menu item and add to menu
+                        var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
+                        subMenu.addItem(subMenuItem);
+                    }
+                    menuItem.cfg.setProperty("submenu", subMenu);
+                }
+
+                // Find the divs for the tree and for the values inside the control
+                var treeDiv;
+                var valuesDiv;
+                for (var i = 0; i < control.childNodes.length; i++) {
+                    var childNode =  control.childNodes[i];
+                    if (childNode.nodeType == ELEMENT_TYPE) {
+                        if (YAHOO.util.Dom.hasClass(childNode, "yuimenubar")) {
+                            treeDiv = childNode;
+                        } else if (YAHOO.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
+                            valuesDiv = childNode;
+                        }
+                    }
+                }
+
+                // Extract menu hierarchy from HTML
+                var menuArray = eval(xformsStringValue(valuesDiv));
+                xformsReplaceNodeText(valuesDiv, "");
+
+                // Initialize tree
+                YAHOO.util.Dom.generateId(treeDiv);
+                control.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
+                for (var topLevelIndex = 0; topLevelIndex < control.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
+                    var topLevelArray = menuArray[topLevelIndex];
+                    var menuItem = control.xformsMenu.getItem(topLevelIndex);
+                    addToMenu(topLevelArray, menuItem);
+                }
+                control.xformsMenu.render();
+                control.xformsMenu.show();
+
             } else if (isXFormsOutput) {
                 YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
             } else if (isXFormsInput) {

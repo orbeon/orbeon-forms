@@ -12,12 +12,12 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:widget="http://orbeon.org/oxf/xml/widget"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
         <xhtml:title>Menu Widget</xhtml:title>
@@ -48,11 +48,20 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:select ref="selected" appearance="xxforms:menu">
-            <xforms:itemset nodeset="instance('items')//item">
-                <xforms:label ref="@label"/>
-                <xforms:value ref="@value"/>
-            </xforms:itemset>
-        </xforms:select>
+        <xhtml:div id="xforms-control-id" class="xforms-control xforms-select1-menu">
+            <!-- Top level entries for the menu, which will be nicely displayed even before JS code runs -->
+            <xhtml:div class="yuimenubar">
+                <xhtml:div class="bd">
+                    <xhtml:ul class="first">
+                        <xhtml:li class="yuimenubaritem first">Encyclopedia</xhtml:li>
+                        <xhtml:li class="yuimenubaritem">Encyclopedia</xhtml:li>
+                    </xhtml:ul>
+                </xhtml:div>
+            </xhtml:div>
+            <!-- Tree structure, as we do for the xforms-select(1)-tree -->
+            <xhtml:div class="xforms-initially-hidden">
+                [["Encyclopedia","en1",false,["Science","sc1",false],["Culture","cu1",false,["Art","ar1",true],["Craft","cr1",false]]],["Encyclopedia","en2",false,["Science","sc2",false],["Culture","cu2",false,["Art","ar2",false],["Craft","cr2",false]]]]
+            </xhtml:div>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

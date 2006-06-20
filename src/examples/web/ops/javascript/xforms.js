@@ -872,6 +872,19 @@ function xformsInitializeControlsUnder(root) {
                 control.xformsTree = new YAHOO.widget.TreeView(control.id);
                 var treeRoot = control.xformsTree.getRoot();
                 addToTree(treeArray, treeRoot, 0);
+                // Make selected nodes visible'
+                var values = control.xformsAllowMultipleSelection ? control.value.split(" ") : [ control.value ];
+                for (nodeIndex in control.xformsTree._nodes) {
+                    var node = control.xformsTree._nodes[nodeIndex];
+                    if (xformsArrayContains(values, node.data.value)) {
+                        var nodeParent = node.parent;
+                        while (nodeParent != null) {
+                            nodeParent.expand();
+                            nodeParent = nodeParent.parent;
+                        }
+                    }
+                }
+                // Save value in control
                 control.previousValue = control.value;
                 control.xformsTree.draw();
             } else if (isXFormsOutput) {

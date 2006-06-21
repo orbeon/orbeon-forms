@@ -131,7 +131,7 @@
 .xforms-range-background {
     position: relative;
     width: 218px;
-    background: url(/ops/config/theme/images/slider-horizontal-background.png) no-repeat;
+    background: url(images/slider-horizontal-background.png) no-repeat;
     height: 26px;
     width: 218px;
     zindex: 5;
@@ -144,7 +144,7 @@
     cursor: default;
     width: 18px;
     height: 20px;
-    background: url(/ops/config/theme/images/slider-horizontal-thumb.png) no-repeat;
+    background: url(images/slider-horizontal-thumb.png) no-repeat;
 }
 
 .xforms-select-template {

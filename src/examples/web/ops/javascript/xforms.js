@@ -658,7 +658,7 @@ function xformsSelectTreeSelect() {
     xformsValueChanged(control);
 }
 
-function xformsOnMenuBarItemMouseOver(p_sType, p_aArguments, p_oMenuItem) {
+function xformsOnMenuBarItemMouseOver() {
     var oActiveItem = this.parent.activeItem;
     // Hide any other submenus that might be visible
     if(oActiveItem && oActiveItem != this) {
@@ -674,16 +674,28 @@ function xformsOnMenuBarItemMouseOver(p_sType, p_aArguments, p_oMenuItem) {
     }
 }
 
-function xformsOnMenuBarItemMouseOut(p_sType, p_aArguments, p_oMenuItem) {
+function xformsOnMenuBarItemMouseOut(eventType, arguments) {
     this.cfg.setProperty("selected", false);
     var oSubmenu = this.cfg.getProperty("submenu");
     if(oSubmenu) {
-        var oEvent = p_aArguments[0], oRelatedTarget = YAHOO.util.Event.getRelatedTarget(oEvent);
+        var oEvent = arguments[0], oRelatedTarget = YAHOO.util.Event.getRelatedTarget(oEvent);
         if(!(oRelatedTarget == oSubmenu.element
                 ||  this._oDom.isAncestor(oSubmenu.element, oRelatedTarget))) {
             oSubmenu.hide();
         }
     }
+}
+
+function xformsOnMenuBarItemClick(eventTyoe, arguments, userObject) {
+    var control = userObject["control"];
+    var value = userObject["value"];
+    control.value = value;
+    document.xformsOverlayManager.hideAll();
+    xformsValueChanged(control);
+}
+
+function xformsOnDocumentMouseDown(p_oEvent) {
+    document.xformsOverlayManager.hideAll();
 }
 
 /**
@@ -896,7 +908,6 @@ function xformsInitializeControlsUnder(root) {
                 // Save in the control if it allows multiple selection
                 control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
-                console.log(xformsStringValue(control));
                 var treeArray = eval(xformsStringValue(control));
                 xformsReplaceNodeText(control, "");
                 control.value = "";
@@ -921,29 +932,44 @@ function xformsInitializeControlsUnder(root) {
                 control.xformsTree.draw();
             } else if (isXFormsMenu) {
 
-                function addToMenu(nameValueArray, menuItem) {
+                /**
+                 * Create a sub-menu attached to the given menu item. In the nameValueArray we
+                 * ignore the first 3 items that correspond to the menuItem.
+                 */
+                function addToMenuItem(nameValueArray, menuItem) {
                     // Assign id to menu item
                     if (menuItem.element.id == "")
                         YAHOO.util.Dom.generateId(menuItem.element);
-                    // Show submenu when mouse over menu item
-                    menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver, this);
-                    menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut, this);
-                    // Create submenu
-                    var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
-                    //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
-                    //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
-                    // Add menu items to submenu
-                    for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
-                        // Extract information from the first 3 position in the array
-                        var childArray = nameValueArray[arrayIndex];
-                        var name = childArray[0];
-                        var value = childArray[1];
-                        var selected = childArray[2];
-                        // Create menu item and add to menu
-                        var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
-                        subMenu.addItem(subMenuItem);
+                    // Handle click on menu item
+                    menuItem.clickEvent.subscribe(xformsOnMenuBarItemClick,
+                        {"control": control, "value": nameValueArray[1]});
+
+                    // Create sub-menu if necessary
+                    if (nameValueArray.length > 3) {
+                        // Show submenu when mouse over menu item
+                        menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver);
+                        menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut);
+                        // Create submenu
+                        var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
+                        //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
+                        //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
+                        // Add menu items to submenu
+                        for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
+                            // Extract information from the first 3 position in the array
+                            var childArray = nameValueArray[arrayIndex];
+                            var name = childArray[0];
+                            var value = childArray[1];
+                            var selected = childArray[2];
+                            // Create menu item and add to menu
+                            var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
+                            console.log(subMenuItem);
+                            subMenu.addItem(subMenuItem);
+                            // Add sub-sub menu
+                            addToMenuItem(childArray, subMenuItem)
+                        }
+                        menuItem.cfg.setProperty("submenu", subMenu);
+                        document.xformsOverlayManager.register(subMenu);
                     }
-                    menuItem.cfg.setProperty("submenu", subMenu);
                 }
 
                 // Find the divs for the tree and for the values inside the control
@@ -960,22 +986,24 @@ function xformsInitializeControlsUnder(root) {
                     }
                 }
 
+                // Create overlay manager, if we don't have one already
+                if (typeof document.xformsOverlayManager == "undefined")
+                    document.xformsOverlayManager = new YAHOO.widget.OverlayManager();
                 // Extract menu hierarchy from HTML
                 var menuArray = eval(xformsStringValue(valuesDiv));
                 xformsReplaceNodeText(valuesDiv, "");
-
                 // Initialize tree
                 YAHOO.util.Dom.generateId(treeDiv);
                 control.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
                 for (var topLevelIndex = 0; topLevelIndex < control.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
                     var topLevelArray = menuArray[topLevelIndex];
                     var menuItem = control.xformsMenu.getItem(topLevelIndex);
-                    addToMenu(topLevelArray, menuItem);
+                    addToMenuItem(topLevelArray, menuItem);
                 }
                 // Hide menu when user click on document
                 if (!document.xformsMenuDocumentMouseOutInitialized) {
                     document.xformsMenuDocumentMouseOutInitialized = true;
-                    //YAHOO.util.Event.addListener(document, "mousedown", YAHOO.example.OverlayManager.hideAll);
+                    YAHOO.util.Event.addListener(document, "mousedown", xformsOnDocumentMouseDown);
                 }
 
                 control.xformsMenu.render();

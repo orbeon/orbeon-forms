@@ -113,6 +113,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
+//                System.out.println("  XFormsToXHTML namespace: " + containerNamespace);
+
                 return new KeyValidity(new InternalCacheKey(XFormsToXHTML.this, NAMESPACE_CACHE_KEY, containerNamespace), CONSTANT_VALIDITY);
             }
         };

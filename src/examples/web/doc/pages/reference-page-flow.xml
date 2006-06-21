@@ -914,11 +914,10 @@
                             <ul>
                                 <li>
                                     <p>
-                                        An <code>instance</code> input, containing the current XML
-                                        submission. From XSLT, XQuery and XUpdate, this input is
-                                        available with the <code>doc('input:instance')</code>
-                                        function. If there is no current XML submission, a "null"
-                                        document is available instead:
+                                        An <code>instance</code> input, containing the current XML submission. From
+                                        XSLT, XQuery and XUpdate, this input is available with the
+                                        <code>doc('input:instance')</code> function. If there is no current XML
+                                        submission, a "null" document is available instead:
                                     </p>
                                     <xml-source>
                                         <null xsi:nil="true"/>
@@ -926,12 +925,10 @@
                                 </li>
                                 <li>
                                     <p>
-                                        An <code>action</code> input, containing the result of the
-                                        action <a href="reference-xpl-pipelines">XPL pipeline</a> if
-                                        present. From XSLT, XQuery and XUpdate, this input is
-                                        available with the <code>doc('input:action')</code>
-                                        function. If there is no action result, a "null" document
-                                        is available instead:
+                                        An <code>action</code> input, containing the result of the action <a
+                                        href="reference-xpl-pipelines">XPL pipeline</a> if present. From XSLT, XQuery
+                                        and XUpdate, this input is available with the <code>doc('input:action')</code>
+                                        function. If there is no action result, a "null" document is available instead:
                                     </p>
                                     <xml-source>
                                         <null xsi:nil="true"/>
@@ -939,16 +936,14 @@
                                 </li>
                                 <li>
                                     <p>
-                                        The default usually contains the current current XML
-                                        submission as available from the <code>instance</code>
-                                        input.
+                                        The default input contains the current current XML submission as available from
+                                        the <code>instance</code> input.
                                     </p>
-                                    <p>
-                                        For backward compatibility however, when the destination
-                                        page has an <code>xforms</code> attribute, the default input
-                                        contains instead the destination page's resulting XForms
-                                        instance.
-                                    </p>
+                                    <note>
+                                        For backward compatibility however, when the destination page has an
+                                        <code>xforms</code> attribute, the default input contains instead the
+                                        destination page's resulting XForms instance.
+                                    </note>
                                 </li>
                             </ul>
                             <p>
@@ -1590,6 +1585,7 @@
                             <p:output name="data" id="response"/>
                         </p:processor>
 
+                        <!--  TODO: update this, it's obsolete, must use xml-converter -->
                         <comment> Generate a response </comment>
                         <p:processor name="oxf:xml-serializer">
                             <p:input name="data" href="#response" schema-href="response.rng"/>

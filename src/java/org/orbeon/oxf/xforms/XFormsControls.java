@@ -489,6 +489,12 @@ public class XFormsControls {
         return (BindingContext) contextStack.peek();
     }
 
+    public void popBinding() {
+        if (contextStack.size() == 1)
+            throw new OXFException("Attempt to clear XForms controls context stack.");
+        contextStack.pop();
+    }
+
     /**
      * Get the current node-set binding for the given model id.
      */
@@ -649,10 +655,21 @@ public class XFormsControls {
         return null;
     }
 
-    public void popBinding() {
-        if (contextStack.size() == 1)
-            throw new OXFException("Attempt to clear XForms controls context stack.");
-        contextStack.pop();
+    /**
+     * Find the instance containing the specified node, in any model.
+     *
+     * @param node  node contained in an instance
+     * @return      instance containing the node
+     */
+    public XFormsInstance getInstanceForNode(Node node) {
+        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            final XFormsInstance currentInstance = currentModel.getInstanceForNode(node);
+            if (currentInstance != null)
+                return currentInstance;
+        }
+        // This should not happen if the node is currently in an instance!
+        return null;
     }
 
     public FunctionLibrary getFunctionLibrary() {

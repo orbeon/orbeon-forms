@@ -58,21 +58,9 @@ public class XXFormsContext extends XFormsFunction {
         // Build results by wrapping each node
         final List results = new ArrayList(currentNodeset.size());
 
-        int nodeIndex = 0;
-        for (Iterator k = currentNodeset.iterator(); k.hasNext(); nodeIndex++) {
-
+        for (Iterator k = currentNodeset.iterator(); k.hasNext();) {
             final Node currentNode = (Node) k.next();
-            final Document currentDocument = currentNode.getDocument();
-
-            for (Iterator i = xformsControls.getContainingDocument().getModels().iterator(); i.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) i.next();
-                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                    if (currentInstance.getInstanceDocument() == currentDocument) {
-                        results.set(nodeIndex, currentInstance.wrapNode(currentNode));
-                    }
-                }
-            }
+            results.add(xformsControls.getInstanceForNode(currentNode).wrapNode(currentNode));
         }
 
         return new ListIterator(results);

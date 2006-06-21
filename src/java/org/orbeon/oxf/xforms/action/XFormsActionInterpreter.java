@@ -70,16 +70,26 @@ public class XFormsActionInterpreter {
         // Handle conditional action
         final String ifAttribute = actionElement.attributeValue("if");
         if (ifAttribute != null) {
+            // Don't evaluate the condition if the context has gone missing
+            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            if (currentSingleNode == null) {
+                if (XFormsServer.logger.isDebugEnabled())
+                    XFormsServer.logger.debug("XForms - not executing conditional action (missing context): " + actionEventName);
 
-            final List conditionResult = xformsControls.getCurrentInstance().evaluateXPath(pipelineContext,
-                xformsControls.getCurrentSingleNode(), "boolean(" + ifAttribute + ")",
+                return;
+            }
+
+            final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
+
+            final List conditionResult = currentInstance.evaluateXPath(pipelineContext,
+                currentSingleNode, "boolean(" + ifAttribute + ")",
                 Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
             if (!((Boolean) conditionResult.get(0)).booleanValue()) {
                 // Don't execute action
 
                 if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing conditional action: " + actionEventName);
+                    XFormsServer.logger.debug("XForms - not executing conditional action (condition evaluated to 'false'): " + actionEventName);
 
                 return;
             }
@@ -96,24 +106,29 @@ public class XFormsActionInterpreter {
             final String value = actionElement.attributeValue("value");
             final String content = actionElement.getStringValue();
 
-            final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
             final String valueToSet;
             if (value != null) {
                 // Value to set is computed with an XPath expression
                 final Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
 
-                final List currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0) ?
+                final List currentNodeset;
+                {
+                    final XFormsInstance currentInstance = xformsControls.getCurrentInstance();// TODO: we should not use this
+                    currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0) ?
                         xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocument());
-                // NOTE: The above is actually not correct: the context should not become null or empty. This is
-                // therefore just a workaround for a bug we hit:
 
-                // o Do 2 setvalue in sequence
-                // o The first one changes the context around the control containing the actions
-                // o When the second one runs, context is empty, and setvalue either crashes or does nothing
-                //
-                // The correct solution is probably to NOT reevaluate the context of actions unless a rebuild is done.
-                // This would require an update to the way we impelement the processing model.
+                    // NOTE: The above is actually not correct: the context should not become null or empty. This is
+                    // therefore just a workaround for a bug we hit:
 
+                    // o Do 2 setvalue in sequence
+                    // o The first one changes the context around the control containing the actions
+                    // o When the second one runs, context is empty, and setvalue either crashes or does nothing
+                    //
+                    // The correct solution is probably to NOT reevaluate the context of actions unless a rebuild is done.
+                    // This would require an update to the way we impelement the processing model.
+                }
+
+                final XFormsInstance currentInstance = xformsControls.getInstanceForNode((Node) currentNodeset.get(0));
                 valueToSet = currentInstance.evaluateXPathAsString(pipelineContext,
                         currentNodeset, xformsControls.getCurrentPosition(),
                         value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
@@ -270,7 +285,8 @@ public class XFormsActionInterpreter {
             // We are now in the insert context
 
             // "The insert action is terminated with no effect if the insert context is the empty node-set [...]."
-            if (xformsControls.getCurrentSingleNode() == null)
+            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            if (currentSingleNode == null)
                 return;
 
             {
@@ -309,7 +325,7 @@ public class XFormsActionInterpreter {
                 // "Finally, this newly created node is inserted into the instance data at the location
                 // specified by attributes position and at."
 
-                final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+                final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
                 int insertionIndex;
                 {
                     if (isEmptyNodesetBinding) {
@@ -451,11 +467,12 @@ public class XFormsActionInterpreter {
             // We are now in the insert context
 
             // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
-            if (xformsControls.getCurrentSingleNode() == null)
+            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            if (currentSingleNode == null)
                 return;
 
             {
-                final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+                final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
                 final Node nodeToRemove;
                 final List parentContent;
                 final int actualIndexInParentContentCollection;
@@ -584,7 +601,11 @@ public class XFormsActionInterpreter {
             final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
             final String indexXPath = actionElement.attributeValue("index");
 
-            final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            if (currentSingleNode == null)
+                return;
+
+            final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
             final String indexString = currentInstance.evaluateXPathAsString(pipelineContext,
                     xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
                     "string(number(" + indexXPath + "))", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.*;
@@ -330,8 +331,9 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             }
 
             if (format != null) {
-                result = containingDocument.getXFormsControls().getCurrentInstance()
-                    .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
+                final Node currentSingleNode = currentBindingContext.getSingleNode();
+                final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
+                result = currentInstance.evaluateXPathAsString(pipelineContext, currentSingleNode,
                             format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
             } else {
                 result = null;
@@ -341,8 +343,10 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             // Format value according to format attribute
             final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
 
-            result = containingDocument.getXFormsControls().getCurrentInstance()
-                .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
+            final Node currentSingleNode = currentBindingContext.getSingleNode();
+            final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
+
+            result = currentInstance.evaluateXPathAsString(pipelineContext, currentSingleNode,
                         format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
         }
         setDisplayValue(result);

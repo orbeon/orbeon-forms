@@ -2703,54 +2703,47 @@
                     <ul>
                         <li>
                             <p>
-                                <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as
-                                xs:string*, $inputElements as element()*, $outputNames as
-                                xs:string+)</code>.
+                                <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as xs:string*, $inputElements
+                                as element()*, $outputNames as xs:string+)</code>.
                             </p>
                             <p>
                                 This function lets you call an XPL pipeline.
                             </p>
                             <ol>
                                 <li>
-                                    The first argument, <code>$XPLurl</code>, is the URL of the
-                                    pipeline. It must be an absolute URL.
+                                    The first argument, <code>$XPLurl</code>, is the URL of the pipeline. It must be an
+                                    absolute URL.
                                 </li>
                                 <li>
-                                    The second argument, <code>$inputNames</code>, is a sequence of
-                                    strings, each one representing the name of an input of the
-                                    pipeline that you want to connect.
+                                    The second argument, <code>$inputNames</code>, is a sequence of strings, each one
+                                    representing the name of an input of the pipeline that you want to connect.
                                 </li>
                                 <li>
-                                    The third argument, <code>$inputElements</code>, is a sequence
-                                    of elements to be used as input for the pipeline. The
-                                    <code>$inputNames</code> and <code>$inputElements</code>
-                                    sequences must have the same length. For each element in
-                                    <code>$inputElements</code>, a document is created and
-                                    connected to an input of the pipeline. Elements are matched to
-                                    input name by position, for instance the element at position 3
-                                    of <code>$inputElements</code> is connected to the input with
+                                    The third argument, <code>$inputElements</code>, is a sequence of elements to be
+                                    used as input for the pipeline. The <code>$inputNames</code> and
+                                    <code>$inputElements</code> sequences must have the same length. For each element
+                                    in <code>$inputElements</code>, a document is created and connected to an input of
+                                    the pipeline. Elements are matched to input name by position, for instance the
+                                    element at position 3 of <code>$inputElements</code> is connected to the input with
                                     the name specified at position 3 in <code>$inputNames</code>.
                                 </li>
                                 <li>
-                                    The fourth argument, <code>$outputNames</code>, is a sequence
-                                    of output names to read.
+                                    The fourth argument, <code>$outputNames</code>, is a sequence of output names to
+                                    read.
                                 </li>
                                 <li>
-                                    The function returns a sequence of elements corresponding the
-                                    output of the pipeline. The returned sequence will have the same
-                                    length as <code>$outputNames</code> and will correspond to the
-                                    pipeline output with the name specified on
-                                    <code>$outputNames</code> based on position.
+                                    The function returns a sequence of elements corresponding the output of the
+                                    pipeline. The returned sequence will have the same length as
+                                    <code>$outputNames</code> and will correspond to the pipeline output with the name
+                                    specified on <code>$outputNames</code> based on position.
                                 </li>
                             </ol>
                             <p>
-                                The example below shows a call to the <code>xxforms:call-xpl</code>
-                                function:
+                                The example below shows a call to the <code>xxforms:call-xpl</code> function:
                             </p>
                             <xml-source>
-                                xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl',
-                                ('input', 'xpath'), (instance('instance')/input,
-                                instance('instance')/xpath), 'formatted-output')/*, 'html')
+                                xxforms:call-xpl ('oxf:/examples/sandbox/xpath/run-xpath.xpl', ('input', 'xpath'),
+                                (instance('instance')/input, instance('instance')/xpath), 'formatted-output')/*, 'html')
                             </xml-source>
                         </li>
                         <li>
@@ -2758,8 +2751,8 @@
                                 <code>xxforms:evaluate($xpath as xs:string)</code>.
                             </p>
                             <p>
-                                The <code>xxforms:evaluate()</code> function allows you to evaluate
-                                XPath expressions dynamically. For example:
+                                The <code>xxforms:evaluate()</code> function allows you to evaluate XPath expressions
+                                dynamically. For example:
                             </p>
                             <xml-source show-namespaces="false">
                                 <xforms:input ref="xxforms:evaluate(concat('instance(''my-instance'')/document', my-xpath))">
@@ -2772,11 +2765,10 @@
                                 <code>xxforms:repeat-current($repeat-id as xs:string?)</code>.
                             </p>
                             <p>
-                                The <code>xxforms:repeat-current()</code> function allows you to
-                                obtain a reference to an enclosing <code>xforms:repeat</code>'s
-                                current node. It takes one optional string parameter. If present,
-                                the id of the enclosing <code>xforms:repeat</code> is searched. If
-                                absent, the function looks for the closest enclosing
+                                The <code>xxforms:repeat-current()</code> function allows you to obtain a reference to
+                                an enclosing <code>xforms:repeat</code>'s current iteration node. It takes one optional
+                                string parameter. If present, the id of the enclosing <code>xforms:repeat</code> is
+                                searched. If absent, the function looks for the closest enclosing
                                 <code>xforms:repeat</code>.
                             </p>
                             <xml-source show-namespaces="false">
@@ -2795,9 +2787,31 @@
                                 </xforms:repeat>
                             </xml-source>
                             <p>
-                                The <code>xxforms:repeat-current()</code> function must be called
-                                from within an <code>xforms:repeat</code> element.
+                                The <code>xxforms:repeat-current()</code> function must be called from within an
+                                <code>xforms:repeat</code> element.
                             </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>xxforms:context($element-id as xs:string)</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:context()</code> function allows you to obtain the evaluation context
+                                for an enclosing <code>xforms:group</code>, <code>xforms:repeat</code>, or
+                                <code>xforms:switch</code>. It takes one required string parameter containing the id of
+                                an enclosing XForms element.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:group ref="employee" id="employee-group">
+                                    <comment> The context is being set to another instance that controls the visibility of the group. </comment>
+                                    <xforms:group ref="instance('control-instance')/input">
+                                        <comment> Using xxforms:context() allows reclaiming the context of the enclosing group. </comment>
+                                        <xforms:input ref="xxforms:context('employee-group')/name">
+                                            <xforms:label>Employee Name</xforms:label>
+                                        </xforms:input>
+                                    </xforms:group>
+                                </xforms:group>
+                            </xml-source>
                         </li>
                     </ul>
                 </section>

@@ -167,7 +167,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                     try {
                         // Get SAXSource
-                        final String base = locator.getSystemId();
+                        final String base = locator == null ? null : locator.getSystemId();
                         final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
                         final XMLReader xmlReader = source.getXMLReader();
                         xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase));

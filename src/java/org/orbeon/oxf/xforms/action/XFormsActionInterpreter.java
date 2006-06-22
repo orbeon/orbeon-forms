@@ -67,9 +67,16 @@ public class XFormsActionInterpreter {
 
         final String actionEventName = actionElement.getName();
 
-        // Handle conditional action
-        final String ifAttribute = actionElement.attributeValue("if");
-        if (ifAttribute != null) {
+        // Handle conditional action (@if / @exf:if)
+        final String conditionAttribute;
+        {
+            final String ifAttribute = actionElement.attributeValue("if");
+            if (ifAttribute != null)
+                conditionAttribute = ifAttribute;
+            else
+                conditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
+        }
+        if (conditionAttribute != null) {
             // Don't evaluate the condition if the context has gone missing
             final Node currentSingleNode = xformsControls.getCurrentSingleNode();
             if (currentSingleNode == null) {
@@ -82,7 +89,7 @@ public class XFormsActionInterpreter {
             final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
 
             final List conditionResult = currentInstance.evaluateXPath(pipelineContext,
-                currentSingleNode, "boolean(" + ifAttribute + ")",
+                currentSingleNode, "boolean(" + conditionAttribute + ")",
                 Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
             if (!((Boolean) conditionResult.get(0)).booleanValue()) {

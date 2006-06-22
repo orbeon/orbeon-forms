@@ -103,7 +103,12 @@
                             Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
                         </li>
                         <li>
-                            Support for XForms 1.1 conditional actions with the <code>if</code> attribute. [TODO]
+                            Support for XForms 1.1 conditional actions with the <code>if</code> (and
+                            <code>exf:if</code>) attribute. [TODO]
+                        </li>
+                        <li>
+                            New extension function <code>xxforms:context()</code> [TODO: details; already documented,
+                            just link]
                         </li>
                         <li>
                             Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:

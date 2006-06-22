@@ -238,8 +238,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final boolean isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
                 && "autocomplete".equals(appearanceLocalname);
-        final boolean isTreeOrMenu = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
-                && ("tree".equals(appearanceLocalname) || "menu".equals(appearanceLocalname));
+        final boolean isTree = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("tree".equals(appearanceLocalname));
+        final boolean isMenu = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("menu".equals(appearanceLocalname));
 
         final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
@@ -260,7 +260,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (isAutocompleteNoFilter)
                 classes.append(" xforms-select1-open-autocomplete-nofilter");
 
-            if (isTreeOrMenu)
+            if (isTree)
                 classes.append(" xforms-initially-hidden");
 
             if (!handlerContext.isGenerateTemplate()) {
@@ -361,68 +361,86 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // TODO: Use ValidationException.
                 }
 
-            } else if (isTreeOrMenu) {
-                // xxforms:tree or xxforms:menu appearance
+            } else if (isTree) {
+                // xxforms:tree appearance
 
-                // Create xhtml:div containing the initial information required by the client
+                // Create xhtml:div with tree info
                 final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
 
                 handleReadOnlyAttribute(newAttributes, controlInfo);
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
-                if (!handlerContext.isGenerateTemplate()) {
-                    // Produce a JSON fragment with hierachical information
-                    final String controlValue = controlInfo.getValue();
-                    if (items.size() > 0) { // may be null when there is no item in the itemset
+                outputJSONTreeInfo(controlInfo, isMany, contentHandler);
 
-                        final StringBuffer sb = new StringBuffer();
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
-                        sb.append("[");
+            } else if (isMenu) {
+                // xxforms:menu appearance
 
-                        int level = 0;
-                        for (Iterator j = items.iterator(); j.hasNext();) {
-                            final Item currentItem = (Item) j.next();
-                            final String label = currentItem.getLabel();
-                            final String value = currentItem.getValue();
+                // Create enclosing xhtml:div
+                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+                final String ulQName = XMLUtils.buildQName(xhtmlPrefix, "ul");
+                final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
+                final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
 
-                            final int newLevel = currentItem.getLevel();
+                handleReadOnlyAttribute(newAttributes, controlInfo);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
-                            if (level - newLevel >= 0) {
-                                //  We are going down one or more levels
-                                for (int i = newLevel; i <= level; i++) {
-                                    sb.append("]");
+                // Create xhtml:div with initial menu entries
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "yuimenubar");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                {
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                    {
+                        reusableAttributes.clear();
+                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first");
+
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
+                        {
+                            reusableAttributes.clear();
+
+                            int index = 0;
+                            for (Iterator j = items.iterator(); j.hasNext(); index++) {
+                                final Item currentItem = (Item) j.next();
+
+                                // Only care about item at level 1
+                                if (currentItem.getLevel() != 1)
+                                    continue;
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
+                                        (index == 0) ? "yuimenubaritem first" : "yuimenubaritem");
+
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
+
+                                {
+                                    reusableAttributes.clear();
+                                    reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
+                                    final String text = currentItem.getLabel();
+                                    contentHandler.characters(text.toCharArray(), 0, text.length());
+                                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
                                 }
-                                sb.append(",[");
-                            } else {
-                                // We are going up one level
-                                if (level > 0)
-                                    sb.append(",");
 
-                                sb.append("[");
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
                             }
-
-                            sb.append('"');
-                            sb.append(label);
-                            sb.append("\",\"");
-                            if (value != null)
-                                sb.append(value);
-                            sb.append("\",");
-                            sb.append((value != null) && isSelected(isMany, controlValue, value));
-
-                            level = newLevel;
                         }
-
-                        // Close brackets
-                        for (int i = level; i >= 0; i--) {
-                            sb.append("]");
-                        }
-
-                        final String result = sb.toString();
-                        contentHandler.characters(result.toCharArray(), 0, result.length());
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
                     }
-                } else {
-                    // Don't produce any content when generating a template
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
                 }
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
+                // Create xhtml:div with tree info
+                reusableAttributes.clear();
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
+
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                outputJSONTreeInfo(controlInfo, isMany, contentHandler);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
@@ -493,6 +511,61 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         // xforms:hint
         handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+    }
+
+    private void outputJSONTreeInfo(ControlInfo controlInfo, boolean many, ContentHandler contentHandler) throws SAXException {
+        if (!handlerContext.isGenerateTemplate()) {
+            // Produce a JSON fragment with hierachical information
+            if (items.size() > 0) { // may be null when there is no item in the itemset
+                final String controlValue = controlInfo.getValue();
+                final StringBuffer sb = new StringBuffer();
+
+                sb.append("[");
+
+                int level = 0;
+                for (Iterator j = items.iterator(); j.hasNext();) {
+                    final Item currentItem = (Item) j.next();
+                    final String label = currentItem.getLabel();
+                    final String value = currentItem.getValue();
+
+                    final int newLevel = currentItem.getLevel();
+
+                    if (level - newLevel >= 0) {
+                        //  We are going down one or more levels
+                        for (int i = newLevel; i <= level; i++) {
+                            sb.append("]");
+                        }
+                        sb.append(",[");
+                    } else {
+                        // We are going up one level
+                        if (level > 0)
+                            sb.append(",");
+
+                        sb.append("[");
+                    }
+
+                    sb.append('"');
+                    sb.append(label);
+                    sb.append("\",\"");
+                    if (value != null)
+                        sb.append(value);
+                    sb.append("\",");
+                    sb.append((value != null) && isSelected(many, controlValue, value));
+
+                    level = newLevel;
+                }
+
+                // Close brackets
+                for (int i = level; i >= 0; i--) {
+                    sb.append("]");
+                }
+
+                final String result = sb.toString();
+                contentHandler.characters(result.toCharArray(), 0, result.length());
+            }
+        } else {
+            // Don't produce any content when generating a template
+        }
     }
 
     private int getNodeLevel(Node node, Stack stack) {

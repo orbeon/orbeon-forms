@@ -176,11 +176,7 @@ function actb(obj,ca,no_filter) {
 
         // avernet: Perform position relative to input field
         var listPosition = YAHOO.util.Dom.getXY(actb_curr);
-        if (YAHOO.util.Event.isIE) {
-            listPosition[1] += actb_curr.offsetHeight;
-        } else {
-            listPosition[1] += actb_curr.offsetHeight - 9;
-        }
+        listPosition[1] += actb_curr.offsetHeight;
         YAHOO.util.Dom.setXY(a, listPosition);
 
         actb_rangeu = 1;

@@ -338,7 +338,7 @@ public class XFormsControls {
      * Set the specified element with binding at the top of the stack and build the stack for the
      * parents.
      */
-    public void setBinding(PipelineContext pipelineContext, Element bindingElement) {
+    public void setBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
 
         // Reinitialize context stack
         resetBindingContext();
@@ -354,7 +354,7 @@ public class XFormsControls {
 
         // Bind up to the specified element
         for (Iterator i = ancestorsOrSelf.iterator(); i.hasNext();) {
-            pushBinding(pipelineContext, (Element) i.next());
+            pushBinding(pipelineContext, (Element) i.next(), model);
         }
     }
 
@@ -362,10 +362,22 @@ public class XFormsControls {
      * Push an element containing either single-node or nodeset binding attributes.
      */
     public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
+        pushBinding(pipelineContext, bindingElement, null);
+    }
+
+    /**
+     * Push an element containing either single-node or nodeset binding attributes.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param bindingElement    current element containing node binding attributes
+     * @param model             if specified, overrides a potential @model attribute on the element
+     */
+    public void pushBinding(PipelineContext pipelineContext, Element bindingElement, String model) {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
-        final String model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
+        if (model == null)
+            model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
         pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement,

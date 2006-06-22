@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.controls.OutputControlInfo;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.util.NetUtils;
 import org.apache.commons.pool.ObjectPool;
@@ -376,10 +377,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
-        // Don't allow for DOMActivate on non-relevant or readonly control
-        if (eventName.equals("DOMActivate") && eventTarget instanceof ControlInfo) {
+        // Don't allow for events on non-relevant, readonly or xforms:output controls
+        if (eventTarget instanceof ControlInfo) {
             final ControlInfo controlInfo = (ControlInfo) eventTarget;
-            if (!controlInfo.isRelevant() || controlInfo.isReadonly()) {
+            if (!controlInfo.isRelevant() || controlInfo.isReadonly() || (controlInfo instanceof OutputControlInfo)) {
                 return;
             }
         }

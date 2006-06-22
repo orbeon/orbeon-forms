@@ -54,6 +54,7 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
 
     public XFormsDocumentAnnotator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo("namespace")); // This input ensures that we depend on a portlet namespace
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 

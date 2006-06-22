@@ -122,6 +122,7 @@
             .password { width: 20em; }
             .textarea { height: 6em; width: 20em; }
             .widget-tab-panel { padding-top: 1em; }
+            .widget-tabs { width: 50em; }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -150,15 +151,9 @@
                         </xforms:textarea>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:input ref="date" navindex="4">
+                        <xforms:input ref="date" navindex="4" class="datafield">
                             <xforms:label class="fixed-width">Date:</xforms:label>
-                            <xforms:hint>At most one day in the future</xforms:hint>
-                            <xforms:help>
-                                This is supposed to be a help message explaining what a birth date is.
-                                But since you already know, it mostly serves the purpose of showing how
-                                help messages can be attached to controls, and that they can be pretty
-                                long as they can be displayed on multiple lines.
-                            </xforms:help>
+                            <xforms:help>At most one day in the future</xforms:help>
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>

@@ -100,6 +100,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input-" + effectiveId);
 
                 if (!handlerContext.isGenerateTemplate()) {
                     final String value = controlInfo.getValue();
@@ -136,6 +137,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

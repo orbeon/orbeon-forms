@@ -962,7 +962,6 @@ function xformsInitializeControlsUnder(root) {
                             var selected = childArray[2];
                             // Create menu item and add to menu
                             var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
-//                            console.log(subMenuItem);
                             subMenu.addItem(subMenuItem);
                             // Add sub-sub menu
                             addToMenuItem(childArray, subMenuItem)

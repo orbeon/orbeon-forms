@@ -308,10 +308,6 @@ function xformsUpdateStyle(element) {
                     && !element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
 
-                // Assign ids to input field and icon for date picker
-                inputField.id = "input-" + element.id;
-                showCalendar.id = "showcalendar-" + element.id;
-
                 // Setup calendar library
                 Calendar.setup({
                     inputField     :    inputField.id,
@@ -350,15 +346,6 @@ function xformsUpdateStyle(element) {
                 xformsChangeHeightHandler(element);
                 YAHOO.util.Event.addListener(element, "keyup", xformsChangeHeightHandler);
             }
-        }
-
-        // This is for widgets. Code for widgets should be modularized and moved out of this file
-        if (YAHOO.util.Dom.hasClass(element, "widget-tabs") || YAHOO.util.Dom.hasClass(element, "widget-tab-inactive")
-                || YAHOO.util.Dom.hasClass(element, "widget-tab-active") || YAHOO.util.Dom.hasClass(element, "widget-tab-spacer-side")
-                || YAHOO.util.Dom.hasClass(element, "widget-tab-spacer-between")) {
-            // Once the size of the table is set, do not change it
-            if (!element.width)
-                element.width = element.clientWidth;
         }
 
         // Update class on element based on its attributes

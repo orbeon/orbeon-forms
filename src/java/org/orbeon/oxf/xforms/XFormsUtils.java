@@ -58,6 +58,7 @@ public class XFormsUtils {
                 ? (InstanceData) ((Element) node).getData()
                 : node instanceof Attribute
                 ? (InstanceData) ((Attribute) node).getData() : null;
+        // TODO: other node types
     }
 
     /**
@@ -875,4 +876,32 @@ public class XFormsUtils {
         else
             return containingDocument.getContainerNamespace() + id;
     }
+
+    /**
+     * Return LocationData for a given node, null if not found.
+     *
+     * @param node  node containing the LocationData
+     * @return      LocationData or null
+     */
+    public static LocationData getNodeLocationData(Node node) {
+        final Object data;
+        {
+            if (node instanceof Element)
+                data = ((Element) node).getData();
+            else if (node instanceof Attribute)
+                data = ((Attribute) node).getData();
+            else
+                data = null;
+            // TODO: other node types
+        }
+        if (data == null)
+            return null;
+        if (data instanceof LocationData)
+            return (LocationData) node;
+        if (data instanceof InstanceData)
+            return ((InstanceData) data).getLocationData();
+
+        return null;
+    }
+
 }

@@ -343,7 +343,7 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public LocationData getLocationData() {
-        return (LocationData) instanceDocument.getRootElement().getData();
+        return XFormsUtils.getNodeLocationData(instanceDocument.getRootElement());
     }
 
     public XFormsEventHandlerContainer getParentContainer() {

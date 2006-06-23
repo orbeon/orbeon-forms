@@ -55,10 +55,12 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public String getContainerNamespace() {
             final String namespace;
             if (getNativeResponse() instanceof RenderResponse) {
+//                System.out.println("getContainerNamespace() 1: ");
                 // We have a render response, so we can get the namespace directly and remember it
-                namespace = ((RenderResponse) getNativeResponse()).getNamespace();
+                namespace = ((RenderResponse) getNativeResponse()).getNamespace().replace(' ', '_');
                 PortletExternalContext.this.getAttributesMap().put(OPS_CONTEXT_NAMESPACE_KEY, namespace);
             } else {
+//                System.out.println("getContainerNamespace() 2: ");
                 // We don't have a render response, and we hope for two things:
                 // 1. For a given portlet, the namespace tends to remain constant for the lifetime of the portlet
                 // 2. Even if it is not constant, we hope that it tends to be between a render and action requests
@@ -66,6 +68,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 if (namespace == null)
                     throw new OXFException("Unable to find portlet namespace in portlet context.");
             }
+//            System.out.println("  namespace: " + namespace);
             return namespace;
         }
 

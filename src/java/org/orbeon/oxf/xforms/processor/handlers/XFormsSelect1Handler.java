@@ -218,9 +218,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
 
         final boolean isMany = localname.equals("select");
-        final String type = isMany ? "checkbox" : "radio";
 
-        final String appearanceValue;
+        String appearanceValue;
         {
             final String appearanceAttribute = elementAttributes.getValue("appearance");
             if (appearanceAttribute != null)
@@ -230,14 +229,24 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             else
                 appearanceValue = "minimal";// default for xforms:select1
         }
-        final String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
-        final String appearanceURI = uriFromQName(appearanceValue);
+        String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
+        String appearanceURI = uriFromQName(appearanceValue);
 
-        final boolean isFull = "full".equals(appearanceLocalname);
-        final boolean isOpenSelection = "open".equals(elementAttributes.getValue("selection"));
-        final boolean isAutocomplete = isOpenSelection
+        boolean isOpenSelection = "open".equals(elementAttributes.getValue("selection"));
+        boolean isAutocomplete = isOpenSelection
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
                 && "autocomplete".equals(appearanceLocalname);
+
+        // NOTE: We don't support autocompletion with xforms:select for now, only with xforms:select1
+        if (isAutocomplete && isMany) {
+            appearanceValue = "compact";
+            appearanceLocalname = appearanceValue;
+            appearanceURI = "";
+            isOpenSelection = false;
+            isAutocomplete = false;
+        }
+
+        final boolean isFull = "full".equals(appearanceLocalname);
         final boolean isTree = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("tree".equals(appearanceLocalname));
         final boolean isMenu = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("menu".equals(appearanceLocalname));
 
@@ -273,7 +282,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         if (isFull) {
-
+            final String fullItemType = isMany ? "checkbox" : "radio";
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
@@ -281,7 +290,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 boolean isFirst = true;
                 for (Iterator i = items.iterator(); i.hasNext();) {
                     final Item item = (Item) i.next();
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, effectiveId, type, item, isFirst);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, effectiveId, fullItemType, item, isFirst);
                     isFirst = false;
                 }
 
@@ -295,7 +304,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, type, new Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), false);
+                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, fullItemType, new Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), false);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                 // TODO: in the future we should be able to handle multiple itemsets

@@ -490,8 +490,11 @@ function xformsHandleBlur(event) {
             document.xformsPreviousDOMFocusOut = target;
             // HTML area does not throw value change event, so we throw it on blur
             if (YAHOO.util.Dom.hasClass(target, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(target, "xforms-mediatype-text-html"))
+                    && YAHOO.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
+                var editorInstance = FCKeditorAPI.GetInstance(target.name);
+                target.value = editorInstance.GetXHTML();
                 xformsValueChanged(target, null);
+            }
         }
     }
 }
@@ -705,8 +708,9 @@ function xformsOnDocumentMouseDown(p_oEvent) {
 function FCKeditor_OnComplete(editorInstance) {
     // Save reference to XForms element (textarea) in document for event handlers that receive the document
     editorInstance.EditorDocument.xformsElement = editorInstance.LinkedField;
-    // Register value change handler
-    editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
+    // Register value change handler when in incremental mode
+    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
+        editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
     // Register focus/blur events for Gecko
     YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
     YAHOO.util.Event.addListener(editorInstance.EditorDocument, "blur", xformsHandleBlur);
@@ -1071,6 +1075,8 @@ function xformsInitializeControlsUnder(root) {
 
             // Initialize HTML area
             if (isXFormsMediatypeTextHTML && isXFormsTextarea) {
+                // We dont' register a listener here but our FCKeditor_OnComplete() will be called automatically
+                // when an FCK editor is initialized
                 document.xformsHTMLAreaNames = new Array();
                 var fckEditor = new FCKeditor(control.name);
                 if (!xformsArrayContains(document.xformsHTMLAreaNames, control.name))
@@ -1100,6 +1106,11 @@ function xformsPageLoaded() {
         }
     }
     if (foundXFormsForm) {
+
+        // Initialize logging
+        if (typeof window.console == "undefined") {
+            window.console = { log: xformsLog }
+        }
 
         // Initialize tooltip library
         tt_init();

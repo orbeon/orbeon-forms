@@ -1210,7 +1210,7 @@
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="action">
                         <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id125·1-1" other-control-id="id125·3-2">Hello!</xxforms:event>
+                            <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
@@ -1242,7 +1242,7 @@
                             <form>
                                 <departments>
                                     <department>
-                                        <employee first="Hello!" last="l11"/>
+                                        <employee first="f11" last="l11"/>
                                         <employee first="f12" last="l12"/>
                                     </department>
                                     <department>
@@ -1265,9 +1265,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="id125·1-1">Hello!</xxf:control>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>

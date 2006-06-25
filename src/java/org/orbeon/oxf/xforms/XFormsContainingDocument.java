@@ -377,10 +377,19 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
-        // Don't allow for events on non-relevant, readonly or xforms:output controls
+        // Don't allow for events on non-relevant, readonly or xforms:output controls (we accept focus events on
+        // xforms:output though).
+        // This is also a security measures that also ensures that somebody is not able to change values in an instance
+        // by hacking external events.
         if (eventTarget instanceof ControlInfo) {
             final ControlInfo controlInfo = (ControlInfo) eventTarget;
-            if (!controlInfo.isRelevant() || controlInfo.isReadonly() || (controlInfo instanceof OutputControlInfo)) {
+            if (controlInfo instanceof OutputControlInfo) {
+                if (!(eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN) || eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT))) {
+                    // Event on xforms:output which is not a focus event
+                    return;
+                }
+            } else if (!controlInfo.isRelevant() || controlInfo.isReadonly()) {
+                // Other controls accept event only if they are relevant and not readonly
                 return;
             }
         }

@@ -2704,7 +2704,7 @@
                         <li>
                             <p>
                                 <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as xs:string*, $inputElements
-                                as element()*, $outputNames as xs:string+)</code>.
+                                as element()*, $outputNames as xs:string+) as document-node()*</code>.
                             </p>
                             <p>
                                 This function lets you call an XPL pipeline.
@@ -2732,7 +2732,7 @@
                                     read.
                                 </li>
                                 <li>
-                                    The function returns a sequence of elements corresponding the output of the
+                                    The function returns a sequence of document nodes corresponding the output of the
                                     pipeline. The returned sequence will have the same length as
                                     <code>$outputNames</code> and will correspond to the pipeline output with the name
                                     specified on <code>$outputNames</code> based on position.
@@ -2748,7 +2748,7 @@
                         </li>
                         <li>
                             <p>
-                                <code>xxforms:evaluate($xpath as xs:string)</code>.
+                                <code>xxforms:evaluate($xpath as xs:string) as item()*</code>.
                             </p>
                             <p>
                                 The <code>xxforms:evaluate()</code> function allows you to evaluate XPath expressions
@@ -2762,7 +2762,7 @@
                         </li>
                         <li>
                             <p>
-                                <code>xxforms:repeat-current($repeat-id as xs:string?)</code>.
+                                <code>xxforms:repeat-current($repeat-id as xs:string?) as xs:string</code>.
                             </p>
                             <p>
                                 The <code>xxforms:repeat-current()</code> function allows you to obtain a reference to
@@ -2793,7 +2793,7 @@
                         </li>
                         <li>
                             <p>
-                                <code>xxforms:context($element-id as xs:string)</code>.
+                                <code>xxforms:context($element-id as xs:string) as xs:string</code>.
                             </p>
                             <p>
                                 The <code>xxforms:context()</code> function allows you to obtain the evaluation context

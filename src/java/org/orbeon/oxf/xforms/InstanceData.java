@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.mip.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
@@ -233,17 +233,17 @@ public class InstanceData {
         return previousInheritedReadonlyState;
     }
 
-    public void updateRequired(boolean value, Node node, String modelBindId) {
-        required.set(value, node.getStringValue());
+    public void updateRequired(boolean value, NodeInfo nodeInfo, String modelBindId) {
+        required.set(value, nodeInfo.getStringValue());
     }
 
-    public void updateConstraint(boolean value, Node node, String modelBindId) {
-        constraint.set(value, node.getStringValue());
+    public void updateConstraint(boolean value, NodeInfo nodeInfo, String modelBindId) {
+        constraint.set(value, nodeInfo.getStringValue());
     }
 
-    public void updateValueValid(boolean value, Node node, String modelBindId) {
+    public void updateValueValid(boolean value, NodeInfo nodeInfo, String modelBindId) {
         if (!value) {
-            valueValid.set(value, node.getStringValue());
+            valueValid.set(value, nodeInfo.getStringValue());
 
             if (modelBindId != null)
                 setInvalidBindIds(getInvalidBindIds() == null ? modelBindId : getInvalidBindIds() + " " + modelBindId);

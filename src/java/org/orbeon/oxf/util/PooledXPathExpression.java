@@ -15,7 +15,9 @@ package org.orbeon.oxf.util;
 
 import org.apache.commons.pool.ObjectPool;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
@@ -25,14 +27,15 @@ import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.AtomicValue;
 import org.orbeon.saxon.value.SequenceExtent;
-import org.orbeon.saxon.value.Value;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.value.Value;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
 
 public class PooledXPathExpression {
 
@@ -66,6 +69,9 @@ public class PooledXPathExpression {
         }
     }
 
+    /**
+     * Evaluate and return a List of native Java objects, including underlying wrapped nodes.
+     */
     public List evaluate() throws XPathException {
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
@@ -76,17 +82,72 @@ public class PooledXPathExpression {
         return (List) extent.convertToJava(Object.class, xpathContext);
     }
 
+    /**
+     * Evaluate and return a List of native Java objects, but keep NodeInfo objects.
+     */
+    public List evaluateKeepNodeInfo() throws XPathException {
+        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext);
+
+        final SequenceExtent extent = new SequenceExtent(iter);
+        return convertToJavaKeepNodeInfo(extent, xpathContext);
+    }
+
+    private List convertToJavaKeepNodeInfo(SequenceExtent extent, XPathContext context) throws XPathException {
+        final List result = new ArrayList(extent.getLength());
+        final SequenceIterator iter = extent.iterate(null);
+        while (true) {
+            final Item currentItem = iter.next();
+            if (currentItem == null) {
+                return result;
+            }
+            if (currentItem instanceof AtomicValue) {
+                result.add(((AtomicValue) currentItem).convertToJava(Object.class, context));
+            } else {
+                result.add(currentItem);
+            }
+        }
+    }
+
+    /**
+     * Evaluate and return a single native Java object, including underlying wrapped nodes. Return null if the
+     * evaluation doesn't return any item.
+     */
     public Object evaluateSingle() throws XPathException {
 
         final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
         final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
         final SequenceIterator iter = evaluate(xpathContext);
 
-        Item item = iter.next();
-        if (item == null) {
+        final Item firstItem = iter.next();
+        if (firstItem == null) {
             return null;
         } else {
-            return Value.convert(item);
+            return Value.convert(firstItem);
+        }
+    }
+
+    /**
+     * Evaluate and return a single native Java object, but keep NodeInfo objects. Return null if the evaluation
+     * doesn't return any item.
+     */
+    public Object evaluateSingleKeepNodeInfo() throws XPathException {
+
+        final NodeInfo contextNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
+        final XPathContextMajor xpathContext = new XPathContextMajor(contextNode, this.configuration);
+        final SequenceIterator iter = evaluate(xpathContext);
+
+        final Item firstItem = iter.next();
+        if (firstItem == null) {
+            return null;
+        } else {
+
+            if (firstItem instanceof AtomicValue) {
+                return Value.convert(firstItem);
+            } else {
+                return firstItem;
+            }
         }
     }
 

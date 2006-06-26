@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Node;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ModelBind {
     private LocationData locationData;
     private ModelBind parent;
     private List children = new ArrayList();
-    private Node currentNode;
+    private NodeInfo currentNodeInfo;
 
     public ModelBind(Element bindElement, ModelBind parent) {
         this(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
@@ -130,12 +130,12 @@ public class ModelBind {
         return children;
     }
 
-    public Node getCurrentNode() {
-        return currentNode;
+    public NodeInfo getCurrentNodeInfo() {
+        return currentNodeInfo;
     }
 
-    public void setCurrentNode(Node currentNode) {
-        this.currentNode = currentNode;
+    public void setCurrentNodeInfo(NodeInfo currentNodeInfo) {
+        this.currentNodeInfo = currentNodeInfo;
     }
 
     public ModelBind getParent() {

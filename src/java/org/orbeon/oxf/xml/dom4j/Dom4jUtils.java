@@ -240,6 +240,40 @@ public class Dom4jUtils {
         return domToString(nd, true, false);
     }
 
+    /**
+     * Go over the Document and make sure that there are no two contiguous text nodes so as to ensure that XPath
+     * expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
+     *
+     * "As much character data as possible is grouped into each text node: a text node never has an immediately
+     * following or preceding sibling that is a text node. "
+     *
+     * @param document  Document to normalize
+     * @return          normalized Document (the same Document object, but children text nodes may have been adjusted)
+     */
+    public static Document normalizeTextNodes(Document document) {
+        document.accept(new VisitorSupport() {
+            public void visit(Element element) {
+                final List children = element.content();
+                Node previousNode = null;
+                for (Iterator i = children.iterator(); i.hasNext();) {
+                    final Node currentNode = (Node) i.next();
+                    if (previousNode != null) {
+                        if (previousNode instanceof Text && currentNode instanceof Text) {
+                            final Text previousNodeText = (Text) previousNode;
+                            previousNodeText.setText(previousNodeText.getText() + ((Text) currentNode).getText());
+                            i.remove();
+                        } else {
+                            previousNode = currentNode;
+                        }
+                    } else {
+                        previousNode = currentNode;
+                    }
+                }
+            }
+        });
+        return document;
+    }
+
     public static DocumentSource getDocumentSource(final Document d) {
         /*
          * Saxon's error handler is expensive for the service it provides so we just use our 

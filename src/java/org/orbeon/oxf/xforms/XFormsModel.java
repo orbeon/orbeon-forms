@@ -21,36 +21,35 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.IndependentContext;
-import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.BuiltInSchemaFactory;
 import org.orbeon.saxon.type.BuiltInAtomicType;
-import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.type.BuiltInSchemaFactory;
 import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.ValidationErrorValue;
-import org.orbeon.saxon.style.StandardNames;
-import org.orbeon.saxon.Configuration;
 
-import java.util.*;
 import java.net.URI;
 import java.net.URL;
+import java.util.*;
 
 /**
  * Represents an XForms model.
@@ -84,6 +83,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Containing document
     private XFormsContainingDocument containingDocument;
+
+    // XPath evaluator
+    private DocumentXPathEvaluator documentXPathEvaluator = new DocumentXPathEvaluator();
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -149,6 +151,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public Document getModelDocument() {
         return modelDocument;
+    }
+
+    public DocumentXPathEvaluator getEvaluator() {
+        return documentXPathEvaluator;
     }
 
     /**
@@ -228,13 +234,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     /**
      * Return the XFormsInstance object containing the given node.
      */
-    public XFormsInstance getInstanceForNode(Node node) {
-        final Document document = node.getDocument();
+    public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
+
+        final DocumentInfo documentInfo = nodeInfo.getDocumentRoot();
 
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                if (currentInstance.getInstanceDocument() == document)
+                if (currentInstance.getInstanceDocumentInfo() == documentInfo)
                     return currentInstance;
             }
         }
@@ -267,8 +274,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      */
     public void applyCalculateBinds(final PipelineContext pipelineContext) {
         applyBinds(new BindRunner() {
-            public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleCalculateBinds(pipelineContext, modelBind, documentWrapper, this);
+            public void applyBind(ModelBind modelBind) {
+                handleCalculateBinds(pipelineContext, modelBind, this);
             }
         });
     }
@@ -278,14 +285,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      */
     public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
         applyBinds(new BindRunner() {
-            public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, this);
+            public void applyBind(ModelBind modelBind) {
+                handleComputedExpressionBinds(pipelineContext, modelBind, this);
             }
         });
     }
 
     private static interface BindRunner {
-        public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper);
+        public void applyBind(ModelBind modelBind);
     }
 
     /**
@@ -302,9 +309,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // But only consider top-level binds, as children are handled recursively
             if (modelBind.getParent() == null) {
                 try {
-                    // Create XPath evaluator for this bind
-                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getInstanceDocument(), null, new Configuration());
-                    bindRunner.applyBind(modelBind, documentWrapper);
+                    modelBind.setCurrentNodeInfo(getDefaultInstance().getInstanceRootElementInfo());
+                    bindRunner.applyBind(modelBind);
                 } catch (final Exception e) {
                     throw new ValidationException(e, modelBind.getLocationData());
                 }
@@ -312,55 +318,47 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void handleCalculateBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleCalculateBinds(final PipelineContext pipelineContext, final ModelBind modelBind, BindRunner bindRunner) {
         // Handle calculate MIP
         if (modelBind.getCalculate() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Compute calculated value
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                     try {
-                        final Object result = expr.evaluateSingle();
-                        final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
-                        // Place in element
-                        XFormsInstance.setValueForNode(pipelineContext, node, stringResult, null);
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                        final String xpath = "string(" + modelBind.getCalculate() + ")";
+                        final String stringResult = getEvaluator().evaluateAsString(pipelineContext, nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+
+                        XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);
+
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating string expression '" + modelBind.getCalculate() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
         }
 
-        handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
+        handleChildrenBinds(pipelineContext, modelBind, bindRunner);
     }
 
-    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, BindRunner bindRunner) {
 
         // Handle required MIP
         if (modelBind.getRequired() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Evaluate "required" XPath expression on this node
-                    String xpath = "boolean(" + modelBind.getRequired() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
                     try {
                         // Mark node
-                        final boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-                        instanceData.updateRequired(required, node, modelBind.getId());
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                        final String xpath = "boolean(" + modelBind.getRequired() + ")";
+                        final boolean required = ((Boolean) getEvaluator().evaluateSingle(pipelineContext,
+                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
+
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
+                        instanceData.updateRequired(required, nodeInfo, modelBind.getId());
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getRequired() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
@@ -368,23 +366,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Handle relevant MIP
         if (modelBind.getRelevant() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Evaluate "relevant" XPath expression on this node
-                    String xpath = "boolean(" + modelBind.getRelevant() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                     try {
-                        boolean relevant = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        final String xpath = "boolean(" + modelBind.getRelevant() + ")";
+                        boolean relevant = ((Boolean) getEvaluator().evaluateSingle(pipelineContext,
+                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getRelevant().set(relevant);
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getRelevant() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
@@ -393,34 +387,29 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Handle readonly MIP
         if (modelBind.getReadonly() != null) {
             // The bind has a readonly attribute
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Evaluate "readonly" XPath expression on this node
-                    String xpath = "boolean(" + modelBind.getReadonly() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
                     try {
-                        boolean readonly = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        final String xpath = "boolean(" + modelBind.getReadonly() + ")";
+                        boolean readonly = ((Boolean) getEvaluator().evaluateSingle(pipelineContext,
+                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
 
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getReadonly().set(readonly);
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getReadonly() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
         } else if (modelBind.getCalculate() != null) {
             // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Mark node
-                    InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                    InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                     instanceData.getReadonly().set(true);
                 }
             });
@@ -429,54 +418,44 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Handle xxforms:externalize bind
         if (modelBind.getXXFormsExternalize() != null) {
             // The bind has an xxforms:externalize attribute
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Evaluate "externalize" XPath expression on this node
-                    final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
-                    final PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
                     try {
-                        boolean xxformsExternalize = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        final String xpath = "boolean(" + modelBind.getXXFormsExternalize() + ")";
+                        boolean xxformsExternalize = ((Boolean) getEvaluator().evaluateSingle(pipelineContext,
+                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID())).booleanValue();
 
                         // Mark node
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                         instanceData.getXXFormsExternalize().set(xxformsExternalize);
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getXXFormsExternalize() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
         }
 
-        handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
+        handleChildrenBinds(pipelineContext, modelBind, bindRunner);
     }
 
-    private void handleValidationBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleValidationBind(final PipelineContext pipelineContext, final ModelBind modelBind, BindRunner bindRunner) {
 
         // Handle XPath constraint MIP
         if (modelBind.getConstraint() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
                     // Evaluate constraint
-                    String xpath = "boolean(" + modelBind.getConstraint() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
                     try {
-                        final Boolean valid = (Boolean) expr.evaluateSingle();
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                        instanceData.updateConstraint(valid.booleanValue(), node, modelBind.getId());
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                        final String xpath = "boolean(" + modelBind.getConstraint() + ")";
+                        final Boolean valid = (Boolean) getEvaluator().evaluateSingle(pipelineContext,
+                            nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
+                        instanceData.updateConstraint(valid.booleanValue(), nodeInfo, modelBind.getId());
+                    } catch (Exception e) {
+                        throw new ValidationException("Error when evaluating boolean expression '" + modelBind.getConstraint() + "'", e, modelBind.getLocationData());
                     }
                 }
             });
@@ -499,8 +478,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 throw new OXFException(e);
             }
 
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
+            iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
+                public void handleNode(NodeInfo nodeInfo) {
 
                     // Get type information
                     int requiredTypeFingerprint = -1;
@@ -522,78 +501,64 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 modelBind.getLocationData());
 
                     // Pass-through the type value
-                    InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                    InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                     instanceData.getType().set(requiredTypeFingerprint);
 
                     // Try to perform casting
-                    final String nodeStringValue = node.getStringValue().trim();
-                    if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
+                    final String nodeStringValue = nodeInfo.getStringValue().trim();
+                    if (XFormsUtils.getLocalInstanceData(nodeInfo).getRequired().get() || nodeStringValue.length() != 0) {
                         StringValue stringValue = new StringValue(nodeStringValue);
                         XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
                         AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
 
-                        instanceData.updateValueValid(!(result instanceof ValidationErrorValue), node, modelBind.getId());
+                        instanceData.updateValueValid(!(result instanceof ValidationErrorValue), nodeInfo, modelBind.getId());
                     }
                 }
             });
         }
 
-        handleChildrenBinds(pipelineContext, modelBind, documentWrapper, bindRunner);
+        handleChildrenBinds(pipelineContext, modelBind, bindRunner);
     }
 
-    private void handleChildrenBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleChildrenBinds(final PipelineContext pipelineContext, final ModelBind modelBind, BindRunner bindRunner) {
         // Handle children binds
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                documentWrapper.wrap(modelBind.getCurrentNode() == null
-                        ? ((Document) documentWrapper.getUnderlyingNode()).getRootElement()
-                        : modelBind.getCurrentNode()),
+        try {
+            final List nodeset = getEvaluator().evaluate(pipelineContext,
+                modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
                 null, xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-        try {
-            List nodeset = expr.evaluate();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
-                Node node = (Node) j.next();
+                final NodeInfo nodeInfo = (NodeInfo) j.next();
                 for (Iterator childIterator = modelBind.getChildren().iterator(); childIterator.hasNext();) {
-                    ModelBind child = (ModelBind) childIterator.next();
-                    child.setCurrentNode(node);
-                    bindRunner.applyBind(child, documentWrapper);
+                    final ModelBind child = (ModelBind) childIterator.next();
+                    child.setCurrentNodeInfo(nodeInfo);
+                    bindRunner.applyBind(child);
                 }
             }
-        } catch (XPathException e) {
-            throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getNodeset() + "'", modelBind.getLocationData());
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
+        } catch (Exception e) {
+            throw new ValidationException("Error when evaluating bind node-set '" + modelBind.getNodeset() + "'", e, modelBind.getLocationData());
         }
     }
 
-    private void iterateNodeSet(PipelineContext pipelineContext, DocumentWrapper documentWrapper,
-                                ModelBind modelBind, NodeHandler nodeHandler) {
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                documentWrapper.wrap(modelBind.getCurrentNode() == null
-                        ? ((Document) documentWrapper.getUnderlyingNode()).getRootElement()
-                        : modelBind.getCurrentNode()),
+    private void iterateNodeSet(PipelineContext pipelineContext, ModelBind modelBind, NodeHandler nodeHandler) {
+        try {
+            final List nodeset = getEvaluator().evaluate(pipelineContext,
+                modelBind.getCurrentNodeInfo(),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
-                null, xformsFunctionLibrary);
-        try {
-            List nodeset = expr.evaluate();
+                null, xformsFunctionLibrary, null);
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
-                Node node = (Node) j.next();
-                nodeHandler.handleNode(node);
+                final NodeInfo nodeInfo = (NodeInfo) j.next();
+                nodeHandler.handleNode(nodeInfo);
             }
-        } catch (XPathException e) {
-            throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getNodeset() + "'", modelBind.getLocationData());
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
+        } catch (Exception e) {
+            throw new ValidationException("Error when evaluating bind node-set '" + modelBind.getNodeset() + "'", e, modelBind.getLocationData());
         }
-
     }
 
     private interface NodeHandler {
-        void handleNode(Node node);
+        void handleNode(NodeInfo node);
     }
 
     public String getId() {
@@ -606,25 +571,27 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public List getBindNodeset(PipelineContext pipelineContext, ModelBind bind) {
         // Get a list of parents, ordered by grandfather first
-        List parents = new ArrayList();
-        parents.add(bind);
-        ModelBind parent = bind;
-        while ((parent = parent.getParent()) != null) {
-            parents.add(parent);
+        final List parents = new ArrayList();
+        {
+            parents.add(bind);
+            ModelBind parent = bind;
+            while ((parent = parent.getParent()) != null) {
+                parents.add(parent);
+            }
+            Collections.reverse(parents);
         }
-        Collections.reverse(parents);
 
         // Find the final node
         final List nodeset = new ArrayList();
         final XFormsInstance defaultInstance = getDefaultInstance();
-        nodeset.add(defaultInstance.getInstanceDocument());
+        nodeset.add(defaultInstance.getInstanceDocumentInfo());
         for (Iterator i = parents.iterator(); i.hasNext();) {
-            ModelBind current = (ModelBind) i.next();
-            List currentModelBindResults = new ArrayList();
+            final ModelBind current = (ModelBind) i.next();
+            final List currentModelBindResults = new ArrayList();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
-                Node node = (Node) j.next();
+                final NodeInfo node = (NodeInfo) j.next();
                 // Execute XPath expresssion
-                currentModelBindResults.addAll(defaultInstance.evaluateXPath(pipelineContext, node, current.getNodeset(),
+                currentModelBindResults.addAll(defaultInstance.getEvaluator().evaluate(pipelineContext, node, current.getNodeset(),
                         current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID()));
             }
             nodeset.addAll(currentModelBindResults);
@@ -741,6 +708,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
 
                         final Element instanceContainerElement = (Element) i.next();
+                        final boolean isReadonlyHint = "true".equals(instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
 
                         // Skip processing in case somebody has already set this particular instance
                         if (instances.get(instancePosition) != null)
@@ -749,6 +717,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
 
                         final Document instanceDocument;
+                        final DocumentInfo instanceDocumentInfo;
                         final String instanceSourceURI;
                         final boolean hasUsername;
                         if (srcAttribute == null) {
@@ -757,6 +726,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (children == null || children.size() == 0)
                                 throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+                            instanceDocumentInfo = null;// TODO
                             instanceSourceURI = null;
                             hasUsername = false;
                         } else {
@@ -790,7 +760,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
 
                                     // Read result as XML
-                                    instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                    if (!isReadonlyHint) {
+                                        instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                        instanceDocumentInfo = null;
+                                    } else {
+                                        instanceDocumentInfo = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                        instanceDocument = null;
+                                    }
                                 } catch (Exception e) {
                                     throw new OXFException(e);
                                 } finally {
@@ -826,7 +802,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
 
                                         // Read result as XML
-                                        instanceDocument = Dom4jUtils.read(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                        if (!isReadonlyHint) {
+                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                            instanceDocumentInfo = null;
+                                        } else {
+                                            instanceDocumentInfo = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                            instanceDocument = null;
+                                        }
                                     } catch (Exception e) {
                                         if (connectionResult != null && connectionResult.resourceURI != null)
                                             throw new ValidationException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
@@ -859,7 +841,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         XFormsServer.logger.debug("XForms - getting document from resolver for: " + urlString);
 
                                     try {
-                                        instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
+                                        if (!isReadonlyHint) {
+                                            instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
+                                            instanceDocumentInfo = null;
+                                        } else {
+                                            instanceDocument = null;
+                                            instanceDocumentInfo = TransformerURIResolver.readURLAsDocumentInfo(containingDocument.getURIResolver(), urlString);
+                                        }
                                         hasUsername = false;
                                         instanceSourceURI = urlString;
                                     } catch (Exception e) {
@@ -990,8 +978,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private void clearInstanceDataEventState() {
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
-                    public void walk(Node node, InstanceData updatedInstanceData) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+                    public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
                         if (updatedInstanceData != null) {
                             updatedInstanceData.clearInstanceDataEventState();
                         }
@@ -1012,8 +1000,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Clear state
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
-                    public void walk(Node node, InstanceData updatedInstanceData) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+                    public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
                         if (updatedInstanceData != null) {
                             updatedInstanceData.clearOtherState();
                         }
@@ -1034,8 +1022,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Clear validation state
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getInstanceDocument(), new XFormsUtils.InstanceWalker() {
-                    public void walk(Node node, InstanceData updatedInstanceData) {
+                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
+                    public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
                         if (updatedInstanceData != null) {
                             updatedInstanceData.clearValidationState();
                         }
@@ -1046,8 +1034,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Run validation
             applySchemasIfNeeded();
             applyBinds(new BindRunner() {
-                public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                    handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
+                public void applyBind(ModelBind modelBind) {
+                    handleValidationBind(pipelineContext, modelBind, this);
                 }
             });
         }
@@ -1086,12 +1074,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
                 public void startVisitControl(ControlInfo controlInfo) {
                     xformsControls.setBinding(pipelineContext, controlInfo);
-                    final Node currentNode = xformsControls.getCurrentSingleNode();
+                    final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
 
-                    if (currentNode == null) // can happen if control is not bound to anything
+                    // This can happen if control is not bound to anything
+                    if (currentNodeInfo == null)
                         return;
 
-                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                    // We only dispatch value-changed events for controls bound to a mutable document
+                    if (!(currentNodeInfo instanceof NodeWrapper))
+                        return;
+
+                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();// NOTE: we don't actually use the node later below
+
+                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
 
                     // Check if value has changed
                     final boolean valueChanged = updatedInstanceData.isValueChanged();
@@ -1168,15 +1163,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                 // Re-obtain node to which control is bound, in case things have shifted
                 xformsControls.setBinding(pipelineContext, controlInfo);
-                final Node currentNode = xformsControls.getCurrentSingleNode();
+                final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
 
                 final int type = eventSchedule.getType();
                 if ((type & EventSchedule.VALUE) != 0) {
                     containingDocument.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(controlInfo));
                 }
-                if (currentNode != null) {
+                if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
+
+//                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+
                     if ((type & EventSchedule.REQUIRED) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentRequiredState = updatedInstanceData.getRequired().get();
                         if (currentRequiredState) {
                             containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent(controlInfo));
@@ -1185,7 +1183,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
                     }
                     if ((type & EventSchedule.RELEVANT) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentRelevantState = updatedInstanceData.getInheritedRelevant().get();
                         if (currentRelevantState) {
                             containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent(controlInfo));
@@ -1194,7 +1192,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
                     }
                     if ((type & EventSchedule.READONLY) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentReadonlyState = updatedInstanceData.getInheritedReadonly().get();
                         if (currentReadonlyState) {
                             containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(controlInfo));
@@ -1203,7 +1201,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
                     }
                     if ((type & EventSchedule.VALID) != 0) {
-                        final InstanceData inheritedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                        final InstanceData inheritedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentValidState = inheritedInstanceData.getValid().get();
                         if (currentValidState) {
                             containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent(controlInfo));

@@ -13,17 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
-import org.dom4j.Node;
-import org.dom4j.Document;
-
-import java.util.Iterator;
 
 /**
  * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
@@ -50,22 +46,22 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
         final XFormsControls xformsControls = getXFormsControls();
 
         // Get current single node
-        final Node currentNode = xformsControls.getRepeatCurrentSingleNode(repeatId);
+        return xformsControls.getRepeatCurrentSingleNode(repeatId);
 
         // Wrap and return result
-        final Document currentDocument = currentNode.getDocument();
-
-        for (Iterator i = xformsControls.getContainingDocument().getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                if (currentInstance.getInstanceDocument() == currentDocument) {
-                    return currentInstance.wrapNode(currentNode);
-                }
-            }
-        }
+//        final Document currentDocument = currentNode.getDocument();
+//
+//        for (Iterator i = xformsControls.getContainingDocument().getModels().iterator(); i.hasNext();) {
+//            final XFormsModel currentModel = (XFormsModel) i.next();
+//            for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+//                final XFormsInstance currentInstance = (XFormsInstance) j.next();
+//                if (currentInstance.getInstanceDocument() == currentDocument) {
+//                    return currentInstance.wrapNode(currentNode);
+//                }
+//            }
+//        }
 
         // Should not happen
-        throw new IllegalStateException("Node not found in any XForms intance.");
+//        throw new IllegalStateException("Node not found in any XForms instance.");
     }
 }

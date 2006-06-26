@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -136,8 +137,8 @@ public class XFormsIndexUtils {
                             // Find whether one node of the repeat node-set contains the inserted node
                             int index = 1;
                             for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); index++) {
-                                final Node currentNode = (Element) i.next();
-                                if (currentNode == clonedNode) {
+                                final NodeInfo currentNode = (NodeInfo) i.next();
+                                if (((NodeWrapper) currentNode).getUnderlyingNode() == clonedNode) {
                                     // Found xforms:repeat affected by the change
 
                                     // "The index for any repeating sequence that is bound
@@ -257,8 +258,8 @@ public class XFormsIndexUtils {
                         if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
                             // Find whether one node of the repeat node-set contains the inserted node
                             for (Iterator i = repeatNodeSet.iterator(); i.hasNext();) {
-                                final Element currentNode = (Element) i.next();
-                                if (currentNode == nodeToRemove) {
+                                final NodeInfo currentNode = (NodeInfo) i.next();
+                                if (((NodeWrapper) currentNode).getUnderlyingNode() == nodeToRemove) {
                                     // Found xforms:repeat affected by the change
 
                                     final int newIndex;

@@ -19,17 +19,21 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.saxon.tree.TreeBuilder;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.*;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
+import java.io.InputStream;
 
 /**
  * Utility class for XSLT and other transformations.
@@ -311,6 +315,38 @@ public class TransformerUtils {
 
     public static TransformerHandler testCreateTransformerHandlerWrapper(TransformerHandler transformerHandler, String publicProperty, String privateProperty) {
         return new TransformerHandlerWrapper(transformerHandler, publicProperty, privateProperty);
+    }
+
+    public static Document readDom4j(InputStream inputStream, String systemId) {
+        return readDom4j(new StreamSource(inputStream, systemId));
+    }
+
+    public static Document readDom4j(Source source) {
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
+        final Transformer identity;
+        try {
+            identity = getIdentityTransformer();
+            identity.transform(source, documentResult);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+        return documentResult.getDocument();
+    }
+
+    public static DocumentInfo readTinyTree(InputStream inputStream, String systemId) {
+        return readTinyTree(new StreamSource(inputStream, systemId));
+    }
+
+    public static DocumentInfo readTinyTree(Source source) {
+        final TreeBuilder treeBuilder = new TreeBuilder();
+        final Transformer identity;
+        try {
+            identity = getIdentityTransformer();
+            identity.transform(source, treeBuilder);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 }
 

@@ -34,6 +34,9 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
@@ -203,19 +206,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 xformsControls.setBinding(pipelineContext, submissionElement, model.getId()); // TODO FIXME: the submission element is not a control...
 
-                final Node currentNode = xformsControls.getCurrentSingleNode();
+                // Check that we have a current node and that it is pointing to a document or an element
+                final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
 
-                if (currentNode == null)
+                if (currentNodeInfo == null)
                     throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
+
+                if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+                    throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
+                }
+
+                // For now, we can't submit a read-only instance (but we could in the future)
+                if (!(currentNodeInfo instanceof NodeWrapper))
+                    throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
+
+                final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
                 // Evaluate AVTs
                 resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
                 resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsUsername);
                 resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsPassword);
-
-                if (!(currentNode instanceof Document || currentNode instanceof Element)) {
-                    throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
-                }
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
 
@@ -297,31 +307,31 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 // Set value into the instance
                                 xformsControls.setBinding(pipelineContext, uploadControl);
                                 {
-                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
+                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, paramValueType);
                                 }
 
                                 // Handle filename if any
                                 if (uploadControl.getFilenameElement() != null) {
                                     xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
-                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
+                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, filename, null);
                                     xformsControls.popBinding();
                                 }
 
                                 // Handle mediatype if any
                                 if (uploadControl.getMediatypeElement() != null) {
                                     xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
-                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
+                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, mediatype, null);
                                     xformsControls.popBinding();
                                 }
 
                                 // Handle file size if any
                                 if (uploadControl.getSizeElement() != null) {
                                     xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
-                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
+                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, size, null);
                                     xformsControls.popBinding();
                                 }
                             }
@@ -531,7 +541,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
-                                                XFormsUtils.markAllValuesChanged(replaceInstance.getInstanceDocument());
+                                                XFormsUtils.markAllValuesChanged(replaceInstance);
 
                                                 // Handle new instance and associated events
                                                 model.handleNewInstanceDocuments(pipelineContext);

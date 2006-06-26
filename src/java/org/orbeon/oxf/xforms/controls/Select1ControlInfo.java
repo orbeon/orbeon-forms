@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.controls;
 
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class Select1ControlInfo extends ControlInfo {
                         final Element labelElement = itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
                         if (labelElement == null)
                             throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
-                        final Node currentNode = xformsControls.getCurrentSingleNode();
+                        final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
                         xformsControls.pushBinding(pipelineContext, labelElement);
                         final String label = xformsControls.getCurrentSingleNodeValue();
                         xformsControls.popBinding();
@@ -75,7 +75,7 @@ public class Select1ControlInfo extends ControlInfo {
                         final String value = xformsControls.getCurrentSingleNodeValue();
                         // TODO: handle xforms:copy
                         if (value != null)
-                            items.add(new XFormsControls.ItemsetInfo(getId(), label != null ? label : "", value, currentNode)); // don't allow for null label
+                            items.add(new XFormsControls.ItemsetInfo(getId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
 
                         xformsControls.popBinding();
                     }

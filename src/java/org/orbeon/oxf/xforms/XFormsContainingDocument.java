@@ -13,26 +13,26 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.pool.ObjectPool;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.controls.OutputControlInfo;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.oxf.xforms.controls.OutputControlInfo;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.NetUtils;
-import org.apache.commons.pool.ObjectPool;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.URIResolver;
-import java.util.*;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * Represents an XForms containing document.
@@ -184,7 +184,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public boolean isSessionStateHandling() {
-        return (xformsEngineStaticState == null) ? false : xformsEngineStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+        return (xformsEngineStaticState != null) && xformsEngineStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
     /**
@@ -456,9 +456,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 xformsControls.setBinding(pipelineContext, valueControlInfo);
 
                 // Set value into the instance
-                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
                 final String eventValue = concreteEvent.getNewValue();
-                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, valueControlInfo.convertFromExternalValue(eventValue), null);
+                XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, valueControlInfo.convertFromExternalValue(eventValue), null);
 
                 // Update this particular control's value
                 valueControlInfo.evaluateValue(pipelineContext);

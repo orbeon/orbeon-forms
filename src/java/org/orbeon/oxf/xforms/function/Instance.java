@@ -13,18 +13,15 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.dom4j.Document;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
 
 import java.util.Collections;
 
@@ -60,9 +57,8 @@ public class Instance extends XFormsFunction {
 
         // Return instance document
         if (instance != null) {
-            final Document instanceDocument = instance.getInstanceDocument();
             // "this function returns a node-set containing just the root element node"
-            return new ListIterator(Collections.singletonList(new DocumentWrapper(instanceDocument, null, new Configuration()).wrap(instanceDocument.getRootElement())));
+            return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));
         } else {
             // "an empty node-set is returned"
             return new ListIterator(Collections.EMPTY_LIST);

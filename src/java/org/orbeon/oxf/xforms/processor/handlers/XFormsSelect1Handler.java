@@ -13,19 +13,19 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.controls.Select1ControlInfo;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.controls.Select1ControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Node;
 
 import java.util.*;
 
@@ -112,9 +112,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                         int level = 0;
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
                             final XFormsControls.ItemsetInfo currentItemsetInfo = (XFormsControls.ItemsetInfo) j.next();
-                            final Node currentNode = currentItemsetInfo.getNode();
+                            final NodeInfo currentNodeInfo = currentItemsetInfo.getNodeInfo();
 
-                            final int newLevel = getNodeLevel(currentNode, nodeStack);
+                            final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
                             if (level - newLevel >= 0) {
                                 //  We are going down one or more levels
                                 for (int i = newLevel; i <= level; i++) {
@@ -123,7 +123,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             }
 
                             items.add(new Item(true, itemsetAttributes, currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));
-                            nodeStack.push(currentNode);
+                            nodeStack.push(currentNodeInfo);
                             level = newLevel;
                         }
                     }
@@ -577,12 +577,12 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         }
     }
 
-    private int getNodeLevel(Node node, Stack stack) {
+    private int getNodeLevel(NodeInfo nodeInfo, Stack stack) {
         Collections.reverse(stack);
         int level = stack.size() + 1;
         for (Iterator i = stack.iterator(); i.hasNext(); level--) {
-            final Node currentNode = (Node) i.next();
-            if (isAncestorNode(node, currentNode)) {
+            final NodeInfo currentNode = (NodeInfo) i.next();
+            if (isAncestorNode(nodeInfo, currentNode)) {
                 Collections.reverse(stack);
                 return level;
             }
@@ -591,8 +591,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         return level;
     }
 
-    private boolean isAncestorNode(Node node, Node potentialAncestor) {
-        Node parent = node.getParent();
+    private boolean isAncestorNode(NodeInfo node, NodeInfo potentialAncestor) {
+        NodeInfo parent = node.getParent();
         while (parent != null) {
             if (parent == potentialAncestor)
                 return true;

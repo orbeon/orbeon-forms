@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -35,8 +37,8 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
+import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.dom4j.NodeWrapper;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -44,7 +46,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
-import java.util.zip.*;
+import java.util.zip.CRC32;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
 
@@ -53,17 +58,51 @@ public class XFormsUtils {
     /**
      * Return the local XForms instance data for the given node, null if not available.
      */
+    public static InstanceData getLocalInstanceData(NodeInfo nodeInfo) {
+        if (nodeInfo instanceof NodeWrapper) {
+            return getLocalInstanceData(getNodeFromNodeInfo(nodeInfo, ""));
+        } else {
+            // TODO: check how we proceed for TinyTree: should we return something anyway?
+            return null;
+        }
+    }
+
     public static InstanceData getLocalInstanceData(Node node) {
-        return node instanceof Element
-                ? (InstanceData) ((Element) node).getData()
-                : node instanceof Attribute
-                ? (InstanceData) ((Attribute) node).getData() : null;
-        // TODO: other node types
+        if (node instanceof Element) {
+            return (InstanceData) ((Element) node).getData();
+        } else if (node instanceof Attribute) {
+            return (InstanceData) ((Attribute) node).getData();
+        } else if (node instanceof Document) {
+            // We can't store data on the Document object. Use root element instead.
+            return (InstanceData) ((Document) node).getRootElement().getData();
+        } else {
+            return null;
+        }
+        // TODO: other node types once we update to handling text nodes correctly
+    }
+
+    public static Map getIdToNodeMap(NodeInfo nodeInfo) {
+        if (nodeInfo instanceof NodeWrapper) {
+            final Node node = getNodeFromNodeInfo(nodeInfo, "");
+            return ((InstanceData) ((Document) node.getDocument()).getRootElement().getData()).getIdToNodeMap();
+        } else {
+            // TODO: check how we proceed for TinyTree: should we return something anyway?
+            return null;
+        }
     }
 
     /**
      * Return the XForms instance data for the given node with updated inherited MIPs, null if not available.
      */
+    public static InstanceData getInstanceDataUpdateInherited(NodeInfo nodeInfo) {
+        if (nodeInfo instanceof NodeWrapper) {
+            return getInstanceDataUpdateInherited(getNodeFromNodeInfo(nodeInfo, ""));
+        } else {
+            // TODO: check how we proceed for TinyTree: should we return something anyway?
+            return null;
+        }
+    }
+
     public static InstanceData getInstanceDataUpdateInherited(Node node) {
         final InstanceData localInstanceData = getLocalInstanceData(node);
         if (localInstanceData == null)
@@ -114,8 +153,8 @@ public class XFormsUtils {
      * Recursively decorate all the elements and attributes with default <code>InstanceData</code>.
      */
     public static void setInitialDecoration(Document document) {
-        Element rootElement = document.getRootElement();
-        Map idToNodeMap = new HashMap();
+        final Element rootElement = document.getRootElement();
+        final Map idToNodeMap = new HashMap();
         setInitialDecorationWorker(rootElement, new int[]{-1}, idToNodeMap);
         ((InstanceData) rootElement.getData()).setIdToNodeMap(idToNodeMap);
     }
@@ -170,9 +209,9 @@ public class XFormsUtils {
     /**
      * Mark all value nodes of an instance document as having changed.
      */
-    public static void markAllValuesChanged(Document document) {
-        XFormsUtils.iterateInstanceData(document, new XFormsUtils.InstanceWalker() {
-            public void walk(Node node, InstanceData updatedInstanceData) {
+    public static void markAllValuesChanged(XFormsInstance instance) {
+        XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
+            public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
                 if (updatedInstanceData != null) {
                     updatedInstanceData.markValueChanged();
                 }
@@ -199,26 +238,30 @@ public class XFormsUtils {
     /**
      * Reconcile "DOM InstanceData annotations" with "attribute annotations"
      */
-    public static void addInstanceAttributes(Document instanceDocument) {
-        addInstanceAttributes(instanceDocument.getRootElement());
-    }
+    public static void addInstanceAttributes(final NodeInfo elementNodeInfo) {
 
-    private static void addInstanceAttributes(final Element element) {
+        // Don't do anything if we have a read-only document
+        if (!(elementNodeInfo instanceof NodeWrapper))
+            return;
 
-        final InstanceData instanceData = getInstanceDataUpdateInherited(element);
+        final InstanceData instanceData = getInstanceDataUpdateInherited(elementNodeInfo);
 
-        final String invldBnds = instanceData.getInvalidBindIds();
-        updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds, null);
+        if (instanceData != null) {
+            final Element element = (Element) getNodeFromNodeInfo(elementNodeInfo, "");
+            final String invalidBindIds = instanceData.getInvalidBindIds();
+            updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBindIds, null);
 
-        // Reconcile boolean model item properties
-        reconcileBoolean(instanceData.getInheritedReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
-        reconcileBoolean(instanceData.getInheritedRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
-        reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
-        reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
+            // Reconcile boolean model item properties
+            reconcileBoolean(instanceData.getInheritedReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
+            reconcileBoolean(instanceData.getInheritedRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
+            reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
+            reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
+        }
 
-        for (final Iterator i = element.elements().iterator(); i.hasNext();) {
-            final Object o = i.next();
-            addInstanceAttributes((Element) o);
+        final List elements = getChildrenElements(elementNodeInfo);
+        for (Iterator i = elements.iterator(); i.hasNext();) {
+            final NodeInfo currentElementNodeInfo = (NodeInfo) i.next();
+            addInstanceAttributes(currentElementNodeInfo);
         }
     }
 
@@ -246,8 +289,7 @@ public class XFormsUtils {
             if (ns == null) {
                 elt.addNamespace(pfx, qnURI);
             } else if (!nsURI.equals(qnURI)) {
-                final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
-                final LocationData locDat = instDat.getLocationData();
+                final LocationData locDat = getNodeLocationData(elt);
                 throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
                         + " as the prefix is already mapped to another URI", locDat);
             }
@@ -264,12 +306,18 @@ public class XFormsUtils {
         }
     }
 
-    public static void removeInstanceAttributes(Document instanceDocument) {
+    public static void removeInstanceAttributes(final NodeInfo elementNodeInfo) {
+        // Don't do anything if we have a read-only document
+        if (!(elementNodeInfo instanceof NodeWrapper))
+            return;
+
+        // Visit all elements in the document and remove @xxforms:*
+        final Node instanceNode = (Node) getNodeFromNodeInfo(elementNodeInfo, "");
         Visitor visitor = new VisitorSupport() {
             public void visit(Element node) {
-                List newAttributes = new ArrayList();
+                final List newAttributes = new ArrayList();
                 for (Iterator i = node.attributeIterator(); i.hasNext();) {
-                    Attribute attr = (Attribute) i.next();
+                    final Attribute attr = (Attribute) i.next();
                     if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
                         newAttributes.add(attr);
 
@@ -277,38 +325,38 @@ public class XFormsUtils {
                 node.setAttributes(newAttributes);
             }
         };
-        instanceDocument.accept(visitor);
+        instanceNode.accept(visitor);
     }
 
     /**
      * Iterate through nodes of the instance document and call the walker on each of them.
      *
-     * @param instanceDocument
+     * @param instance
      * @param instanceWalker
      * @param allNodes          all the nodes, otherwise only data nodes
      */
-    public static void iterateInstanceData(Document instanceDocument, InstanceWalker instanceWalker, boolean allNodes) {
-        iterateInstanceData(instanceDocument.getRootElement(), instanceWalker, allNodes);
+    public static void iterateInstanceData(XFormsInstance instance, InstanceWalker instanceWalker, boolean allNodes) {
+        iterateInstanceData(instance.getInstanceRootElementInfo(), instanceWalker, allNodes);
     }
 
-    private static void iterateInstanceData(Element element, InstanceWalker instanceWalker, boolean allNodes) {
+    private static void iterateInstanceData(NodeInfo elementNodeInfo, InstanceWalker instanceWalker, boolean allNodes) {
 
-        final List childrenElements = element.elements();
+        final List childrenElements = getChildrenElements(elementNodeInfo);
 
         // We "walk" an element which contains elements only if allNodes == true
         if (allNodes || childrenElements.size() == 0)
-            instanceWalker.walk(element, getInstanceDataUpdateInherited(element));
+            instanceWalker.walk(elementNodeInfo, getInstanceDataUpdateInherited(elementNodeInfo));
 
         // "walk" current element's attributes
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            final Attribute attribute = (Attribute) i.next();
-            instanceWalker.walk(attribute, getInstanceDataUpdateInherited(attribute));
+        for (Iterator i = getAttributes(elementNodeInfo).iterator(); i.hasNext();) {
+            final NodeInfo attributeNodeInfo = (NodeInfo) i.next();
+            instanceWalker.walk(attributeNodeInfo, getInstanceDataUpdateInherited(attributeNodeInfo));
         }
         // "walk" current element's children elements
         if (childrenElements.size() != 0) {
             for (Iterator i = childrenElements.iterator(); i.hasNext();) {
-                final Element child = (Element) i.next();
-                iterateInstanceData(child, instanceWalker, allNodes);
+                final NodeInfo childElement = (NodeInfo) i.next();
+                iterateInstanceData(childElement, instanceWalker, allNodes);
             }
         }
     }
@@ -800,7 +848,7 @@ public class XFormsUtils {
                 throw new OXFException("Missing closing '}' in attribute value: " + attributeValue);
             final String xpathExpression = attributeValue.substring(openingIndex + 1, closingIndex);
 
-            final String result = xformsControls.getCurrentInstance().evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
+            final String result = xformsControls.getCurrentInstance().getEvaluator().evaluateAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                     xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), null, xformsControls.getFunctionLibrary(), null);
 
             sb.append(result);
@@ -811,7 +859,7 @@ public class XFormsUtils {
     }
 
     public static interface InstanceWalker {
-        public void walk(Node node, InstanceData updatedInstanceData);
+        public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData);
     }
 
     /**
@@ -904,4 +952,72 @@ public class XFormsUtils {
         return null;
     }
 
+    /**
+     * Return the underlying Node from the given NodeInfo if possible. If not, throw an exception with the given error
+     * message.
+     */
+    public static Node getNodeFromNodeInfo(NodeInfo nodeInfo, String errorMessage) {
+        if (!(nodeInfo instanceof NodeWrapper))
+            throw new OXFException(errorMessage);
+
+        return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+    }
+
+    public static List getChildrenElements(NodeInfo nodeInfo) {
+        final List result = new ArrayList();
+        final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
+        i.next();
+        while (i.current() != null) {
+            final Item current = i.current();
+            if (current instanceof NodeInfo) {
+                final NodeInfo currentNodeInfo = (NodeInfo) current;
+                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+                    result.add(currentNodeInfo);
+                }
+            }
+            i.next();
+        }
+        return result;
+    }
+
+    public static List getAttributes(NodeInfo nodeInfo) {
+
+        if (nodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE)
+            throw new OXFException("Invalid node type passed to getAttributes(): " + nodeInfo.getNodeKind());
+
+        final List result = new ArrayList();
+        final AxisIterator i = nodeInfo.iterateAxis(Axis.ATTRIBUTE);
+        i.next();
+        while (i.current() != null) {
+            final Item current = i.current();
+            if (current instanceof NodeInfo) {
+                final NodeInfo currentNodeInfo = (NodeInfo) current;
+                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+                    result.add(currentNodeInfo);
+                }
+            }
+            i.next();
+        }
+        return result;
+    }
+
+    public static String getFirstTextNodeValue(NodeInfo nodeInfo) {
+        // NOTE: We could probably optimize this for dom4j
+        if (nodeInfo.hasChildNodes()) {
+            final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
+            i.next();
+            while (i.current() != null) {
+                final Item current = i.current();
+                if (current instanceof NodeInfo) {
+                    final NodeInfo currentNodeInfo = (NodeInfo) current;
+                    if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+                        return currentNodeInfo.getStringValue();
+                    }
+                }
+                i.next();
+            }
+        }
+        // TODO: Check: if we bind to an element that doesn't have a "first text node", do we return ""?
+        return "";
+    }
 }

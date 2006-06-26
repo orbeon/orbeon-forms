@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -87,10 +87,10 @@ public class XFormsElement {
         if (("if".equals(localname) || "when".equals(localname)) && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             String test = attributes.getValue("test");
             final FunctionLibrary fncLib = context.getFunctionLibrary();
-            final Node contextNode = context.getCurrentSingleNode();
+            final NodeInfo contextNode = context.getCurrentSingleNode();
             if (contextNode == null)
                 throw new ValidationException("null context node for boolean 'test' expression: " + test, new LocationData(context.getLocator())); 
-            final Boolean value = (Boolean) context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), contextNode,
+            final Boolean value = (Boolean) context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), contextNode,
                     "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), fncLib, null);
 
             addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
@@ -112,12 +112,12 @@ public class XFormsElement {
 
             if (refPresent || bindPresent || nodesetPresent || positionPresent) {
 
-                final Node contextNode = context.getCurrentSingleNode();
+                final NodeInfo contextNodeInfo = context.getCurrentSingleNode();
 //                if (contextNode == null)
 //                    throw new ValidationException("null context node", new LocationData(context.getLocator()));
 
                 {
-                    final InstanceData currentNodeInstanceData = XFormsUtils.getInstanceDataUpdateInherited(contextNode);
+                    final InstanceData currentNodeInstanceData = XFormsUtils.getInstanceDataUpdateInherited(contextNodeInfo);
                     if (currentNodeInstanceData != null) { // will be null for /
                         final String typeAsString = currentNodeInstanceData.getType().getAsString();
                         if (typeAsString != null)
@@ -134,7 +134,7 @@ public class XFormsElement {
                             addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, currentNodeInstanceData.getInvalidBindIds());
                         if (DATA_CONTROLS.containsKey(localname)) {
                             // Must use local instance data to perform modifications
-                            final InstanceData currentNodeLocalInstanceData = XFormsUtils.getLocalInstanceData(contextNode);
+                            final InstanceData currentNodeLocalInstanceData = XFormsUtils.getLocalInstanceData(contextNodeInfo);
                             currentNodeLocalInstanceData.setGenerated(true);
                             String id = Integer.toString(currentNodeLocalInstanceData.getId());
                             if (XFormsUtils.isNameEncryptionEnabled())
@@ -189,9 +189,9 @@ public class XFormsElement {
                     final List currentNodeSet = context.getCurrentNodeset();
                     if (currentNodeSet != null) {
                         for (Iterator i = currentNodeSet.iterator(); i.hasNext();) {
-                            final Node node = (Node) i.next();
+                            final NodeInfo nodeInfo = (NodeInfo) i.next();
                             if (!first) ids.append(' '); else first = false;
-                            final InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(node);
+                            final InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
                             if (currentNodeInstanceData != null) {
                                 String id = Integer.toString(currentNodeInstanceData.getId());
                                 if (XFormsUtils.isNameEncryptionEnabled())
@@ -208,11 +208,11 @@ public class XFormsElement {
                 // Evaluate "at" as a number
 
                 final String atExpression = attributes.getValue("at");
-                final Node contextNode = context.getCurrentSingleNode();
+                final NodeInfo contextNode = context.getCurrentSingleNode();
                 if (contextNode == null)
                     throw new ValidationException("null context node for number 'at' expression: " + atExpression, new LocationData(context.getLocator()));
 
-                final Object at = context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                final Object at = context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
                         "round(" + atExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
 
                 if (!(at instanceof Number))
@@ -228,11 +228,11 @@ public class XFormsElement {
                 // Evaluate "value" as a string
 
                 final String valueExpression = attributes.getValue("value");
-                final Node contextNode = context.getCurrentSingleNode();
+                final NodeInfo contextNode = context.getCurrentSingleNode();
                 if (contextNode == null)
                     throw new ValidationException("null context node for string 'value' expression: " + valueExpression, new LocationData(context.getLocator()));
 
-                Object value = context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                Object value = context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
                         "string(" + valueExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
 
                 if (!(value instanceof String))
@@ -247,7 +247,7 @@ public class XFormsElement {
                     final String val;
                     String src = attributes.getValue("src");
                     if ("orbeon:xforms:schema:errors".equals(src)) {
-                        final Node contextNode = context.getCurrentSingleNode();
+                        final NodeInfo contextNode = context.getCurrentSingleNode();
 //                        if (contextNode == null)
 //                            throw new ValidationException("null context node", new LocationData(context.getLocator()));
 

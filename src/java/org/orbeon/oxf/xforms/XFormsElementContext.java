@@ -13,9 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
 import org.orbeon.oxf.xml.NamespaceSupport3;
@@ -83,7 +80,7 @@ public class XFormsElementContext extends XFormsControls {
     public void setRepeatIdIndex(String repeatId, int index) {
         // Update current element of nodeset in stack
         popBinding();
-        List newNodeset = new ArrayList();
+        final List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
         contextStack.push(new BindingContext(getCurrentBindingContext().getModel(), newNodeset, 1, repeatId, true, null));//TODO: check this
 
@@ -122,9 +119,6 @@ public class XFormsElementContext extends XFormsControls {
      * Returns the text value of the currently referenced node in the instance.
      */
     public String getRefValue() {
-        Node node = getCurrentBindingContext().getSingleNode();
-        return node instanceof Element ? ((Element) node).getStringValue()
-                : node instanceof Attribute ? ((Attribute) node).getValue()
-                : null;
+        return XFormsInstance.getValueForNode(getCurrentBindingContext().getSingleNode());
     }
 }

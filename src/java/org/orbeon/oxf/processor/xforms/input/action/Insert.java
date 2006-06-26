@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.processor.xforms.input.action;
 
-import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.saxon.om.DocumentInfo;
 
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class Insert implements Action {
 
     private static final String POSITION_BEFORE = "before";
-    private static final String POSITION_AFTER = "after";
+//    private static final String POSITION_AFTER = "after";
 
     private String nodeset;
     private String at;
@@ -40,24 +41,23 @@ public class Insert implements Action {
         position = (String) parameters.get(POSITION_ATTRIBUTE_NAME);
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, DocumentInfo instanceDocumentInfo) {
 
-        String[] ids = nodeset.split(" ");
-        Map idToNodeMap = ((org.orbeon.oxf.xforms.InstanceData) instance.getRootElement().getData()).getIdToNodeMap();
+        final String[] ids = nodeset.split(" ");
 
         // Get element to duplicate (last one in the nodeset)
         final Element elementToDuplicate;
         {
             if (ids.length == 0)
                 throw new OXFException("nodeset attribute in insert action must return a non-empty nodeset");
-            String lastIndex = ids[ids.length - 1];
-            Integer lastIndexInt;
-            if(XFormsUtils.isNameEncryptionEnabled())
-                lastIndexInt = new Integer(SecureUtils.decryptAsString(context, encryptionPassword, lastIndex));
+            final String lastIndex = ids[ids.length - 1];
+            final Integer lastIndexInteger;
+            if (XFormsUtils.isNameEncryptionEnabled())
+                lastIndexInteger = new Integer(SecureUtils.decryptAsString(context, encryptionPassword, lastIndex));
             else
-                lastIndexInt = new Integer(lastIndex);
+                lastIndexInteger = new Integer(lastIndex);
 
-            Object lastNode = idToNodeMap.get(lastIndexInt);
+            final Node lastNode = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(lastIndexInteger);
             if (!(lastNode instanceof Element))
                 throw new OXFException("last node in nodeset attribute from insert action must must be an element");
             elementToDuplicate = (Element) lastNode;
@@ -76,13 +76,13 @@ public class Insert implements Action {
             String id = ids[atValue];
             if (XFormsUtils.isNameEncryptionEnabled())
                 id = SecureUtils.decryptAsString(context, encryptionPassword, id);
-            Object atNode = idToNodeMap.get(new Integer(id));
+
+            final Node atNode = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
             if (!(atNode instanceof Element))
                 throw new OXFException("node pointed by 'at' position in nodeset attribute from"
                         + " insert action must must be an element");
             atElement = (Element) atNode;
         }
-
 
         // Locate position of atElement (element pointed by "at") among his siblings
         int atElementIndex = 0;
@@ -102,6 +102,6 @@ public class Insert implements Action {
 
         // Actually do the insertion
         atElementSiblings.add(POSITION_BEFORE.equals(position) ? atElementIndex : atElementIndex + 1,
-                ( org.dom4j.Element )elementToDuplicate.clone() );
+                (Element) elementToDuplicate.clone());
     }
 }

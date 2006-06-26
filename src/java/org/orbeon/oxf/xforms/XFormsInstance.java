@@ -23,15 +23,16 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.*;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,24 +47,44 @@ public class XFormsInstance implements XFormsEventTarget {
     private String instanceSourceURI;
     private boolean hasUsername;
     private XFormsModel model;
-    private Document instanceDocument;
-
-    private DocumentXPathEvaluator documentXPathEvaluator;
+    private DocumentInfo instanceDocumentInfo;
 
     public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, boolean hasUsername, XFormsModel model) {
+        // NOTE: We normalize the Document before setting it, so that text nodes follow the XPath constraints
+        this(pipelineContext, id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, hasUsername, model);
+    }
+
+    public XFormsInstance(PipelineContext pipelineContext, String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, boolean hasUsername, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.id = id;
         this.instanceSourceURI = instanceSourceURI;
         this.hasUsername = hasUsername;
         this.model = model;
-        setInstanceDocument(instanceDocument, true);
+        setInstanceDocumentInfo(instanceDocumentInfo, true);
+    }
+
+    public DocumentXPathEvaluator getEvaluator() {
+        return model.getEvaluator();
     }
 
     /**
      * Return the instance document.
      */
     public Document getInstanceDocument() {
-        return instanceDocument;
+        if (instanceDocumentInfo instanceof DocumentWrapper) {
+            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
+            return (Document) documentWrapper.getUnderlyingNode();
+        } else {
+            return null;
+        }
+    }
+
+    public DocumentInfo getInstanceDocumentInfo() {
+        return instanceDocumentInfo;
+    }
+
+    public NodeInfo getInstanceRootElementInfo() {
+        return (NodeInfo) XFormsUtils.getChildrenElements(instanceDocumentInfo).get(0);
     }
 
     public String getInstanceSourceURI() {
@@ -81,10 +102,19 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param initialize        true if initial decoration (MIPs) has to be reset
      */
     public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        if(initialize)
-            XFormsUtils.setInitialDecoration(instanceDocument);
-        this.instanceDocument = instanceDocument;
-        this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
+        setInstanceDocumentInfo(new DocumentWrapper(instanceDocument, null, new Configuration()), initialize);
+    }
+
+    public void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
+        if (instanceDocumentInfo instanceof DocumentWrapper) {
+            // Only set annotations on Document
+            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
+
+            if (initialize)
+                XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
+        }
+
+        this.instanceDocumentInfo = instanceDocumentInfo;
     }
 
     /**
@@ -96,13 +126,21 @@ public class XFormsInstance implements XFormsEventTarget {
      * @deprecated legacy XForms engine
      */
     public void setValueForId(int id, String value, String type) {
-        InstanceData rootInstanceData = XFormsUtils.getLocalInstanceData(instanceDocument.getRootElement());
-        Node node = (Node) rootInstanceData.getIdToNodeMap().get(new Integer(id));
-        if (node instanceof Element) {
-            setElementValue((Element) node, value, type);
-        } else {
-            setAttributeValue((Attribute) node, value);
-        }
+        final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+        setValueForNode(pipelineContext, node, value, type, instanceData);
+    }
+
+    public static void setValueForNodeInfo(PipelineContext pipelineContext, NodeInfo nodeInfo, String newValue, String type) {
+        if (!(nodeInfo instanceof NodeWrapper))
+            throw new OXFException("Unable to set value of read-only instance.");
+
+        // Get local instance data as we are not using any inheritance here AND we are doing an update
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
+
+        final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+
+        setValueForNode(pipelineContext, node, newValue, type, instanceData);
     }
 
     /**
@@ -113,9 +151,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type) {
-        // Get local instance data as we are not using any inheritance here AND we are doing an update
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type, InstanceData instanceData) {
 
         // Convert value based on types if possible
         if (type != null) {
@@ -153,15 +189,17 @@ public class XFormsInstance implements XFormsEventTarget {
             instanceData.markValueChanged();
     }
 
-    public static String getValueForNode(Node currentNode) {
-        if (currentNode instanceof Element) {
-            Element elementnode = (Element) currentNode;
-            return elementnode.getStringValue();
-        } else if (currentNode instanceof Attribute) {
-            Attribute attributenode = (Attribute) currentNode;
-            return attributenode.getStringValue();
+    public static String getValueForNode(NodeInfo currentNode) {
+
+        if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+            // Return the value of the first text node if any
+            return XFormsUtils.getFirstTextNodeValue(currentNode);
+        } else if (currentNode.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+            return currentNode.getStringValue();
+        } else if (currentNode.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+            return currentNode.getStringValue();
         } else {
-            throw new OXFException("Invalid node type: " + currentNode.getNodeTypeName());
+            throw new OXFException("Invalid node type: " + currentNode.getNodeKind());
         }
     }
 
@@ -177,53 +215,27 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
 
-        Node node = (Node) evaluateXPathSingle(pipelineContext, instanceDocument, refXPath, prefixToURIMap, null, null, null);
-        if (node == null)
+        final Object o = getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
+        if (o == null || !(o instanceof NodeInfo))
             throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 
-        if (node instanceof Element) {
-            setElementValue((Element) node, value, null);
+        setNodeInfoValue((NodeInfo) o, value, null);
+    }
+
+    private void setNodeInfoValue(NodeInfo nodeInfo, String value, String type) {
+        if (!(nodeInfo instanceof NodeWrapper))
+            throw new OXFException("Cannot set node value on read-only DOM.");
+
+        final NodeWrapper nodeWrapper = (NodeWrapper) nodeInfo;
+        final Object o = nodeWrapper.getUnderlyingNode();
+
+         if (o instanceof Element) {
+            setElementValue((Element) o, value, type);
+        } else if (o instanceof Attribute) {
+            setAttributeValue((Attribute) o, value);
         } else {
-            setAttributeValue((Attribute) node, value);
-        }
-    }
-
-    /**
-     * Evaluate an XPath expression on the instance and return its string value.
-     */
-    public String evaluateXPathAsString(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        return documentXPathEvaluator.evaluateAsString(pipelineContext, contextNodeSet, contextPosition, xpathExpression, prefixToURIMap,
-                variableToValueMap, functionLibrary, baseURI);
-    }
-
-    /**
-     * Evaluate an XPath expression on the instance and return its string value.
-     */
-    public String evaluateXPathAsString(PipelineContext pipelineContext, Node contextNode, String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        return documentXPathEvaluator.evaluateAsString(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
-                variableToValueMap, functionLibrary, baseURI);
-    }
-
-    /**
-     * Evaluate an XPath expression on the instance.
-     */
-    public List evaluateXPath(PipelineContext pipelineContext, Node contextNode, String xpathExpression,
-                              Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        return documentXPathEvaluator.evaluate(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
-                variableToValueMap, functionLibrary, baseURI);
-    }
-
-    /**
-     * Evaluate an XPath expression on the instance.
-     */
-    public Object evaluateXPathSingle(PipelineContext pipelineContext, Node contextNode, String xpathExpression,
-                              Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        return documentXPathEvaluator.evaluateSingle(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
-                variableToValueMap, functionLibrary, baseURI);
+             throw new OXFException("Invalid node class: " + o.getClass().getName());
+         }
     }
 
     private void setAttributeValue(Attribute attribute, String value) {
@@ -273,13 +285,22 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public void read(ContentHandler contentHandler) {
         try {
-            XFormsUtils.addInstanceAttributes(getInstanceDocument());
-            LocationSAXWriter saxw = new LocationSAXWriter();
-            saxw.setContentHandler(contentHandler);
-            saxw.write(instanceDocument);
-            XFormsUtils.removeInstanceAttributes(getInstanceDocument());
+            if (instanceDocumentInfo instanceof DocumentWrapper) {
+                XFormsUtils.addInstanceAttributes(getInstanceRootElementInfo());
+            }
 
-        } catch (SAXException e) {
+            final Transformer identity = TransformerUtils.getIdentityTransformer();
+            identity.transform(instanceDocumentInfo, new SAXResult(contentHandler));
+
+//            LocationSAXWriter saxw = new LocationSAXWriter();
+//            saxw.setContentHandler(contentHandler);
+//            saxw.write(instanceDocument);
+
+            if (instanceDocumentInfo instanceof DocumentWrapper) {
+                XFormsUtils.removeInstanceAttributes(getInstanceRootElementInfo());
+            }
+
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }
@@ -343,7 +364,12 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public LocationData getLocationData() {
-        return XFormsUtils.getNodeLocationData(instanceDocument.getRootElement());
+        if (instanceDocumentInfo instanceof DocumentWrapper) {
+            final Document document = getInstanceDocument();
+            return XFormsUtils.getNodeLocationData(document.getRootElement());
+        } else {
+            return new LocationData(instanceDocumentInfo.getSystemId(), instanceDocumentInfo.getLineNumber(), -1);
+        }
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -358,7 +384,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * Return a dom4j node wrapped into a NodeInfo. The node must belong to this particular
      * instance.
      */
-    public NodeInfo wrapNode(Node node) {
-        return documentXPathEvaluator.wrapNode(node);
-    }
+//    public NodeInfo wrapNode(Node node) {
+//        return documentXPathEvaluator.wrapNode(node);
+//    }
 }

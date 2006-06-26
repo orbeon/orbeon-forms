@@ -443,7 +443,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="group111" readonly="false" required="false" relevant="false" valid="false" type=""/>
+                        <xxf:control id="group111" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="group112" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="group113" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id111" readonly="false" required="false" relevant="true" valid="true" type="">111</xxf:control>
@@ -456,7 +456,7 @@
                         <xxf:control id="id122" readonly="false" required="false" relevant="true" valid="true" type="">122</xxf:control>
                         <xxf:control id="id123" readonly="false" required="false" relevant="true" valid="true" type="">123</xxf:control>
                         <xxf:control id="id124" readonly="false" required="false" relevant="true" valid="true" type="">124</xxf:control>
-                        <xxf:control id="group211" readonly="false" required="false" relevant="false" valid="false" type=""/>
+                        <xxf:control id="group211" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="group212" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="group213" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id211" readonly="false" required="false" relevant="true" valid="true" type="">211</xxf:control>
@@ -603,7 +603,7 @@
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue ref="/*/first" value="'3.141592'"/>
                                         <xforms:setvalue ref="instance('instance2')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-                                        <xforms:setvalue ref="instance('instance2')/fourth" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /*/first, 'result')/*"/>
+                                        <xforms:setvalue ref="instance('instance2')/fourth" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1')/memory, 'result')"/>
                                     </xforms:action>
                                 </xforms:trigger>
                             </xforms:group>
@@ -631,9 +631,9 @@
                                     </other-instance>
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/first"
-                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/><!-- FIXME: The '/' should evaluate to the root of instance2 -->
+                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
                                 <xforms:bind nodeset="instance('instance2')/second"
-                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second"/><!-- FIXME: The '/' should evaluate to the root of instance2 -->
+                                    calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
                                 <xforms:bind nodeset="/*/screen"
                                     constraint="false()"/>
                             </xforms:model>
@@ -661,10 +661,10 @@
                                 <result/>
                             </equation>
                             <other-instance>
-                                <first>3.141592</first><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
-                                <second>456</second><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
-                                <third>123</third>
-                                <fourth>123</fourth>
+                                <first>2222</first>
+                                <second>456</second>
+                                <third>2222</third>
+                                <fourth>12</fourth>
                             </other-instance>
                         </instances>
                         <divs/>

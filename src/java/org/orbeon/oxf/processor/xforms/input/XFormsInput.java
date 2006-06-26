@@ -17,10 +17,9 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -154,7 +153,7 @@ public class XFormsInput extends ProcessorImpl {
                                 for (int i = 0; i < actions.length; i++) {
                                     Action action = actions[i];
                                     action.run(pipelineContext, new ActionFunctionContext(),
-                                            requestParameters.getEncryptionKey(), localInstance.getInstanceDocument());
+                                            requestParameters.getEncryptionKey(), localInstance.getInstanceDocumentInfo());
                                 }
                                 if (logger.isDebugEnabled())
                                     logger.debug("2) Instance with actions applied:\n"
@@ -185,16 +184,16 @@ public class XFormsInput extends ProcessorImpl {
         return output;
     }
 
-    private static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
-        ExternalContext.Request request = getRequest(pipelineContext);
-        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
-    }
+//    private static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
+//        ExternalContext.Request request = getRequest(pipelineContext);
+//        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
+//        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
+//    }
 
-    private static ExternalContext.Request getRequest(PipelineContext context) {
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        if (externalContext == null)
-            throw new OXFException("Missing external context");
-        return externalContext.getRequest();
-    }
+//    private static ExternalContext.Request getRequest(PipelineContext context) {
+//        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+//        if (externalContext == null)
+//            throw new OXFException("Missing external context");
+//        return externalContext.getRequest();
+//    }
 }

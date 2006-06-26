@@ -24,8 +24,9 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.IOException;
 import java.util.*;
@@ -36,6 +37,9 @@ import java.util.*;
  * TODO: Separate actions into different classes for more modularity.
  */
 public class XFormsActionInterpreter {
+
+    public static final String CANNOT_INSERT_READONLY_MESSAGE = "Cannot perform insertion into read-only instance.";
+    public static final String CANNOT_DELETE_READONLY_MESSAGE = "Cannot perform deletion in read-only instance.";
 
     private XFormsContainingDocument containingDocument;
     private XFormsControls xformsControls;
@@ -78,7 +82,7 @@ public class XFormsActionInterpreter {
         }
         if (conditionAttribute != null) {
             // Don't evaluate the condition if the context has gone missing
-            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
             if (currentSingleNode == null) {
                 if (XFormsServer.logger.isDebugEnabled())
                     XFormsServer.logger.debug("XForms - not executing conditional action (missing context): " + actionEventName);
@@ -88,7 +92,7 @@ public class XFormsActionInterpreter {
 
             final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
 
-            final List conditionResult = currentInstance.evaluateXPath(pipelineContext,
+            final List conditionResult = currentInstance.getEvaluator().evaluate(pipelineContext,
                 currentSingleNode, "boolean(" + conditionAttribute + ")",
                 Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
@@ -122,7 +126,7 @@ public class XFormsActionInterpreter {
                 {
                     final XFormsInstance currentInstance = xformsControls.getCurrentInstance();// TODO: we should not use this
                     currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0) ?
-                        xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocument());
+                        xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocumentInfo());
 
                     // NOTE: The above is actually not correct: the context should not become null or empty. This is
                     // therefore just a workaround for a bug we hit:
@@ -135,8 +139,8 @@ public class XFormsActionInterpreter {
                     // This would require an update to the way we impelement the processing model.
                 }
 
-                final XFormsInstance currentInstance = xformsControls.getInstanceForNode((Node) currentNodeset.get(0));
-                valueToSet = currentInstance.evaluateXPathAsString(pipelineContext,
+                final XFormsInstance currentInstance = xformsControls.getInstanceForNode((NodeInfo) currentNodeset.get(0));
+                valueToSet = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                         currentNodeset, xformsControls.getCurrentPosition(),
                         value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
             } else {
@@ -145,10 +149,10 @@ public class XFormsActionInterpreter {
             }
 
             // Set value on current node
-            final Node currentNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
             if (currentNode != null) {
-                // Node exists, we can set the value
-                XFormsInstance.setValueForNode(pipelineContext, currentNode, valueToSet, null);
+                // Node exists, we can try to set the value
+                XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, null);
 
                 if (actionContext != null) {
                     // "XForms Actions that change only the value of an instance node results in setting
@@ -292,7 +296,7 @@ public class XFormsActionInterpreter {
             // We are now in the insert context
 
             // "The insert action is terminated with no effect if the insert context is the empty node-set [...]."
-            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
             if (currentSingleNode == null)
                 return;
 
@@ -308,7 +312,7 @@ public class XFormsActionInterpreter {
 
                         // "if this attribute is not given, then the last node of the Node Set Binding node-set is
                         // cloned"
-                        sourceNode = (Node) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
+                        sourceNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
                         clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                     } else {
                         // "If the attribute is given, it is evaluated in the insert context using the first node rule.
@@ -318,7 +322,7 @@ public class XFormsActionInterpreter {
                         final Object originObject = xformsControls.getCurrentSingleNode();
                         if (!(originObject instanceof Node))
                             return;
-                        sourceNode = (Node) originObject;
+                        sourceNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
                         clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                         xformsControls.popBinding();
                     }
@@ -347,7 +351,7 @@ public class XFormsActionInterpreter {
                         // position is 1."
 
                         // "2. The return value is processed according to the rules of the XPath function round()"
-                        final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                        final String insertionIndexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                             collectionToBeUpdated, 1,
                             "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
@@ -376,10 +380,10 @@ public class XFormsActionInterpreter {
                     // "1. If the Node Set Binding node-set is empty, then the target location is before the first
                     // child or attribute of the insert context node, based on the node type of the cloned node."
 
-                    final Node insertContextNode = xformsControls.getCurrentSingleNode();
-                    doInsert(insertContextNode, clonedNode);
+                    final NodeInfo insertContextNode = xformsControls.getCurrentSingleNode();
+                    doInsert(XFormsUtils.getNodeFromNodeInfo(insertContextNode, CANNOT_INSERT_READONLY_MESSAGE), clonedNode);
                 } else {
-                    final Node insertLocationNode = (Node) collectionToBeUpdated.get(insertionIndex - 1);
+                    final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToBeUpdated.get(insertionIndex - 1), CANNOT_INSERT_READONLY_MESSAGE);
                     if (insertLocationNode.getClass() != clonedNode.getClass()) {
                         // "2. If the node type of the cloned node does not match the node type of the insert location
                         // node, then the target location is before the first child or attribute of the insert location
@@ -474,7 +478,7 @@ public class XFormsActionInterpreter {
             // We are now in the insert context
 
             // "The delete action is terminated with no effect if the insert context is the empty node-set [...]."
-            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
             if (currentSingleNode == null)
                 return;
 
@@ -498,7 +502,7 @@ public class XFormsActionInterpreter {
                             // position is 1."
 
                             // "2. The return value is processed according to the rules of the XPath function round()"
-                            final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                            final String insertionIndexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                                 collectionToUpdate, 1,
                                 "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
@@ -524,7 +528,7 @@ public class XFormsActionInterpreter {
                         return;
                     } else {
                         // Find actual deletion point
-                        nodeToRemove = (Node) collectionToUpdate.get(deleteIndex - 1);
+                        nodeToRemove = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToUpdate.get(deleteIndex - 1), CANNOT_DELETE_READONLY_MESSAGE);
 
                         final Element parentElement = nodeToRemove.getParent();
                         if (parentElement != null) {
@@ -608,12 +612,12 @@ public class XFormsActionInterpreter {
             final String repeatId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("repeat"));
             final String indexXPath = actionElement.attributeValue("index");
 
-            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
             if (currentSingleNode == null)
                 return;
 
             final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
-            final String indexString = currentInstance.evaluateXPathAsString(pipelineContext,
+            final String indexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                     xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
                     "string(number(" + indexXPath + "))", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
@@ -708,7 +712,7 @@ public class XFormsActionInterpreter {
 
             // Try to get message from single-node binding if any
             if (ref != null) {
-                final Node currentNode = xformsControls.getCurrentSingleNode();
+                final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null)
                     message = XFormsInstance.getValueForNode(currentNode);
             }
@@ -782,7 +786,7 @@ public class XFormsActionInterpreter {
 
             if (ref != null) {
                 // Use single-node binding
-                final Node currentNode = xformsControls.getCurrentSingleNode();
+                final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
                 if (currentNode != null) {
                     final String value = XFormsInstance.getValueForNode(currentNode);
                     resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType);
@@ -825,7 +829,7 @@ public class XFormsActionInterpreter {
 
             insertContextDocument.setRootElement((Element) clonedNode);
         } else {
-            throw new OXFException("Unsupported insertion node: " + insertionNode.getClass().getName());
+            throw new OXFException("Unsupported insertion node type: " + insertionNode.getClass().getName());
         }
     }
 

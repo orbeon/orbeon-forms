@@ -25,6 +25,8 @@ import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.tree.TreeBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -118,8 +120,10 @@ public class TransformerURIResolver implements URIResolver {
 
     public static Document readURLAsDocument(URIResolver uriResolver, String urlString) {
         try {
-            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
             // TODO: forward session and authorization?
+            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
+//            source.setSystemId(urlString);
+//            return TransformerUtils.readDom4j(source);
 
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -130,6 +134,28 @@ public class TransformerURIResolver implements URIResolver {
             xmlReader.parse(urlString);
 
             return documentResult.getDocument();
+
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static DocumentInfo readURLAsDocumentInfo(URIResolver uriResolver, String urlString) {
+        try {
+            // TODO: forward session and authorization?
+            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
+//            source.setSystemId(urlString);
+//            return TransformerUtils.readTinyTree(source);
+
+            final TreeBuilder treeBuilder = new TreeBuilder();
+            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.setResult(treeBuilder);
+
+            final XMLReader xmlReader = source.getXMLReader();
+            xmlReader.setContentHandler(identity);
+            xmlReader.parse(urlString);
+
+            return (DocumentInfo) treeBuilder.getCurrentRoot();
 
         } catch (Exception e) {
             throw new OXFException(e);

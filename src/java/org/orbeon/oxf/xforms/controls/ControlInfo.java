@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.*;
@@ -24,6 +23,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.*;
 
@@ -331,9 +331,9 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             }
 
             if (format != null) {
-                final Node currentSingleNode = currentBindingContext.getSingleNode();
+                final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
                 final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
-                result = currentInstance.evaluateXPathAsString(pipelineContext, currentSingleNode,
+                result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
                             format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
             } else {
                 result = null;
@@ -343,10 +343,10 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             // Format value according to format attribute
             final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
 
-            final Node currentSingleNode = currentBindingContext.getSingleNode();
+            final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
             final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
 
-            result = currentInstance.evaluateXPathAsString(pipelineContext, currentSingleNode,
+            result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
                         format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
         }
         setDisplayValue(result);

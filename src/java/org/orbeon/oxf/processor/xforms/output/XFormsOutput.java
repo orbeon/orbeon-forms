@@ -53,7 +53,7 @@ public class XFormsOutput extends ProcessorImpl {
                 });
                 try {
                     // Clone because we set the instance, and that must not be cached
-                    model = (org.orbeon.oxf.xforms.XFormsModel) model.clone();
+                    model = (XFormsModel) model.clone();
                 } catch (CloneNotSupportedException e) {
                     throw new OXFException(e);
                 }

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -29,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
@@ -254,7 +254,7 @@ public class XFormsControls {
 
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getInstanceDocument().getRootElement()});
+        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getInstanceRootElementInfo()});
         contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, null, true, null));
     }
 
@@ -426,7 +426,7 @@ public class XFormsControls {
         final List newNodeset;
         {
             if (bindId != null) {
-                // Resolve the bind id to a node
+                // Resolve the bind id to a nodeset
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bindId));
             } else if (ref != null || nodeset != null) {
 
@@ -439,7 +439,7 @@ public class XFormsControls {
                 if (isNewModel) {
                     // Model was switched
 
-                    final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
+                    final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
                     if (currentSingleNodeForModel != null) {
 
                         // Temporarily update the context so that the function library's instance() function works
@@ -450,7 +450,7 @@ public class XFormsControls {
                             contextStack.push(new BindingContext(newModel, getCurrentNodeset(newModel.getId()), 1, null, false, null));
 
                         // Evaluate new node-set
-                        newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
+                        newNodeset = newModel.getDefaultInstance().getEvaluator().evaluate(pipelineContext, currentSingleNodeForModel,
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
 
                         // Restore context
@@ -461,9 +461,9 @@ public class XFormsControls {
 
                 } else {
                     // Simply evaluate new node-set
-                    final Node currentSingleNode = currentBindingContext.getSingleNode();
+                    final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
                     if (currentSingleNode != null) {
-                        newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNode,
+                        newNodeset = newModel.getDefaultInstance().getEvaluator().evaluate(pipelineContext, currentSingleNode,
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
                     } else {
                         newNodeset = null;
@@ -535,26 +535,26 @@ public class XFormsControls {
             return bindingContext.getNodeset();
 
         // If not found, return the document element of the model's default instance
-        return Collections.singletonList(containingDocument.getModel(modelId).getDefaultInstance().getInstanceDocument().getRootElement());
+        return Collections.singletonList(containingDocument.getModel(modelId).getDefaultInstance().getInstanceRootElementInfo());
     }
 
     /**
      * Get the current single node binding for the given model id.
      */
-    public Node getCurrentSingleNode(String modelId) {
+    public NodeInfo getCurrentSingleNode(String modelId) {
         final List currentNodeset = getCurrentNodeset(modelId);
-        return (Node) ((currentNodeset == null || currentNodeset.size() == 0) ? null : currentNodeset.get(0));
+        return (NodeInfo) ((currentNodeset == null || currentNodeset.size() == 0) ? null : currentNodeset.get(0));
     }
 
     /**
      * Get the current single node binding, if any.
      */
-    public Node getCurrentSingleNode() {
+    public NodeInfo getCurrentSingleNode() {
         return getCurrentBindingContext().getSingleNode();
     }
 
     public String getCurrentSingleNodeValue() {
-        final Node currentSingleNode = getCurrentSingleNode();
+        final NodeInfo currentSingleNode = getCurrentSingleNode();
         if (currentSingleNode != null)
             return XFormsInstance.getValueForNode(currentSingleNode);
         else
@@ -583,7 +583,7 @@ public class XFormsControls {
      * @param repeatId  enclosing repeat id, or null
      * @return          the single node
      */
-    public Node getRepeatCurrentSingleNode(String repeatId) {
+    public NodeInfo getRepeatCurrentSingleNode(String repeatId) {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
@@ -659,7 +659,7 @@ public class XFormsControls {
     public XFormsInstance getCurrentInstance() {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
-            final Node currentSingleNode = currentBindingContext.getSingleNode();
+            final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
 
             if (currentSingleNode != null)
                 return currentBindingContext.getModel().getInstanceForNode(currentSingleNode);
@@ -670,13 +670,13 @@ public class XFormsControls {
     /**
      * Find the instance containing the specified node, in any model.
      *
-     * @param node  node contained in an instance
+     * @param nodeInfo  node contained in an instance
      * @return      instance containing the node
      */
-    public XFormsInstance getInstanceForNode(Node node) {
+    public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
-            final XFormsInstance currentInstance = currentModel.getInstanceForNode(node);
+            final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
             if (currentInstance != null)
                 return currentInstance;
         }
@@ -820,7 +820,7 @@ public class XFormsControls {
                 final List currentNodeSet = currentBindingContext.getNodeset();
 
                 if (!(controlInfo instanceof RepeatControlInfo && currentNodeSet != null && currentNodeSet.size() == 0)) {
-                    final Node currentNode = currentBindingContext.getSingleNode();
+                    final NodeInfo currentNode = currentBindingContext.getSingleNode();
                     if (currentNode != null) {
                         // Control is bound to a node - get model item properties
                         final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
@@ -903,7 +903,7 @@ public class XFormsControls {
                 currentControlsContainer = repeatIterationInfo;
 
                 // Set current binding for control element
-                final Node currentNode = getCurrentSingleNode();
+                final NodeInfo currentNode = getCurrentSingleNode();
 
                 // Get model item properties
                 final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
@@ -1220,7 +1220,7 @@ public class XFormsControls {
 
         // Try to get single node binding
         if (getCurrentBindingContext().isNewBind()) {
-            final Node currentNode = getCurrentSingleNode();
+            final NodeInfo currentNode = getCurrentSingleNode();
             if (currentNode != null)
                 result = XFormsInstance.getValueForNode(currentNode);
         }
@@ -1317,11 +1317,11 @@ public class XFormsControls {
         /**
          * Get the current single node binding, if any.
          */
-        public Node getSingleNode() {
+        public NodeInfo getSingleNode() {
             if (nodeset == null || nodeset.size() == 0)
                 return null;
 
-            return (Node) nodeset.get(position - 1);
+            return (NodeInfo) nodeset.get(position - 1);
         }
     }
 
@@ -1340,36 +1340,36 @@ public class XFormsControls {
     /**
      * Find the list of control ids bound to a particular node.
      */
-    public List findBoundControlIds(final PipelineContext pipelineContext, final Node node) {
-        final List[] result = new List[1];
-        visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                final List currentNodeset = getCurrentNodeset();
-                if (currentNodeset != null && currentNodeset.size() > 0) {
-                    final Node currentNode = getCurrentSingleNode();
-
-                    if (currentNode == node) {
-                        if (result[0] == null)
-                            result[0] = new ArrayList();
-                        result[0].add(effectiveControlId);
-                    }
-                }
-
-                return true;
-            }
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                return true;
-            }
-
-            public void startRepeatIteration(int iteration) {
-            }
-
-            public void endRepeatIteration(int iteration) {
-            }
-        });
-
-        return result[0];
-    }
+//    public List findBoundControlIds(final PipelineContext pipelineContext, final NodeInfo node) {
+//        final List[] result = new List[1];
+//        visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
+//            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+//                final List currentNodeset = getCurrentNodeset();
+//                if (currentNodeset != null && currentNodeset.size() > 0) {
+//                    final NodeInfo currentNode = getCurrentSingleNode();
+//
+//                    if (currentNode == node) {
+//                        if (result[0] == null)
+//                            result[0] = new ArrayList();
+//                        result[0].add(effectiveControlId);
+//                    }
+//                }
+//
+//                return true;
+//            }
+//            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+//                return true;
+//            }
+//
+//            public void startRepeatIteration(int iteration) {
+//            }
+//
+//            public void endRepeatIteration(int iteration) {
+//            }
+//        });
+//
+//        return result[0];
+//    }
 
     /**
      * Represents the state of a tree of XForms controls.
@@ -1655,13 +1655,13 @@ public class XFormsControls {
         private String label;
         private String value;
 
-        private Node node;
+        private NodeInfo nodeInfo;
 
-        public ItemsetInfo(String id, String label, String value, Node node) {
+        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
             this.id = id;
             this.label = label;
             this.value = value;
-            this.node = node;
+            this.nodeInfo = nodeInfo;
         }
 
         public String getId() {
@@ -1676,8 +1676,8 @@ public class XFormsControls {
             return value;
         }
 
-        public Node getNode() {
-            return node;
+        public NodeInfo getNodeInfo() {
+            return nodeInfo;
         }
 
         public boolean equals(Object obj) {

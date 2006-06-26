@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.processor.xforms.input.action;
 
-import org.dom4j.Document;
-import org.dom4j.Node;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.dom4j.Node;
 
 import java.util.Map;
 
@@ -37,18 +37,21 @@ public class SetValue implements Action {
         content = (String) parameters.get("content");
     }
 
-    public void run(PipelineContext pipelineContext, FunctionContext functionContext, String encryptionPassword, Document instance) {
+    public void run(PipelineContext pipelineContext, FunctionContext functionContext, String encryptionPassword, DocumentInfo instanceDocumentInfo) {
 
         // Fill the instance
-        String[] ids = nodeset.split(" ");
+        final String[] ids = nodeset.split(" ");
         try {
             String id = ids[0];
             if (XFormsUtils.isNameEncryptionEnabled())
                 id = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, id);
-            Integer idInteger = new Integer(Integer.parseInt(id));
-            Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
-            String newValue = value != null ? value : content == null ? "" : content;
-            XFormsInstance.setValueForNode(pipelineContext, node, newValue, null);
+            final Integer idInteger = new Integer(Integer.parseInt(id));
+
+            final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(idInteger);
+            final String newValue = value != null ? value : content == null ? "" : content;
+
+            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+            XFormsInstance.setValueForNode(pipelineContext, node, newValue, null, instanceData);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);
         }

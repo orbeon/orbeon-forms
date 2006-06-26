@@ -13,20 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
-import org.orbeon.oxf.xforms.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.dom4j.Node;
-import org.dom4j.Document;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Return the context node-set based on the enclosing xforms:repeat, xforms:group or xforms:switch,
@@ -55,14 +51,16 @@ public class XXFormsContext extends XFormsFunction {
         final XFormsControls xformsControls = getXFormsControls();
         final List currentNodeset = xformsControls.getContextForId(contextId);
 
+        return new ListIterator(currentNodeset);
+
         // Build results by wrapping each node
-        final List results = new ArrayList(currentNodeset.size());
-
-        for (Iterator k = currentNodeset.iterator(); k.hasNext();) {
-            final Node currentNode = (Node) k.next();
-            results.add(xformsControls.getInstanceForNode(currentNode).wrapNode(currentNode));
-        }
-
-        return new ListIterator(results);
+//        final List results = new ArrayList(currentNodeset.size());
+//
+//        for (Iterator k = currentNodeset.iterator(); k.hasNext();) {
+//            final Node currentNode = (Node) k.next();
+//            results.add(xformsControls.getInstanceForNode(currentNode).wrapNode(currentNode));
+//        }
+//
+//        return new ListIterator(results);
     }
 }

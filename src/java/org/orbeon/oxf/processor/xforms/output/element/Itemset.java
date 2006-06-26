@@ -8,10 +8,10 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.dom4j.Node;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -38,7 +38,7 @@ public class Itemset extends XFormsElement {
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
         context.endRepeatId(null);
         for (Iterator i = nodelist.iterator(); i.hasNext();) {
-            Node node = (Node) i.next();
+            NodeInfo node = (NodeInfo) i.next();
             context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, "item",
                     XFormsConstants.XFORMS_PREFIX + ":item", XMLUtils.EMPTY_ATTRIBUTES);
             sendElement(context, node, "label", labelRef, labelPrefixToURI);
@@ -49,10 +49,10 @@ public class Itemset extends XFormsElement {
         context.getContentHandler().endElement(uri, localname, qname);
     }
 
-    private void sendElement(XFormsElementContext context, Node node, String localname,
+    private void sendElement(XFormsElementContext context, NodeInfo node, String localname,
                              String ref, Map prefixToURI) throws SAXException {
 
-        String value = (String) context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), node,
+        final String value = context.getCurrentInstance().getEvaluator().evaluateAsString(context.getPipelineContext(), node,
                 "string(" + ref +  ")", prefixToURI, context.getRepeatIdToIndex(), null, null);
 
         context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,

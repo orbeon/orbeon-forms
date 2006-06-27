@@ -461,7 +461,7 @@ public class XFormsControls {
 
                 } else {
                     // Simply evaluate new node-set
-                    final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+                    final NodeInfo currentSingleNode = getCurrentSingleNode();
                     if (currentSingleNode != null) {
                         newNodeset = newModel.getDefaultInstance().getEvaluator().evaluate(pipelineContext, currentSingleNode,
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);

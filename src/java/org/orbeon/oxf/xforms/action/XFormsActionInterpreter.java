@@ -320,7 +320,7 @@ public class XFormsActionInterpreter {
                         // with no effect."
                         xformsControls.pushBinding(pipelineContext, null, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
                         final Object originObject = xformsControls.getCurrentSingleNode();
-                        if (!(originObject instanceof Node))
+                        if (!(originObject instanceof NodeInfo))
                             return;
                         sourceNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
                         clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();

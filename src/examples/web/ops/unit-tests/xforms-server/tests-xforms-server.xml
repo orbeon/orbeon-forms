@@ -1799,4 +1799,110 @@
         </output>
     </test>
 
+    <test description="Test for bind readonly and relevant inheritance" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server-init.xpl"/>
+                    <p:input name="controls">
+                        <controls xmlns:xforms="http://www.w3.org/2002/xforms"
+                                  xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:input id="id1" ref="@gege"/>
+                            <xforms:input id="id2" ref="e2/e3/gege"/>
+                            <xforms:input id="id3" ref="e4/e5/gege"/>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:model>
+                                <xforms:instance id="instance">
+                                    <e1 gege="gigi1">
+                                        <e2>
+                                            <e3>
+                                                <gege>gigi2</gege>
+                                            </e3>
+                                        </e2>
+                                        <e4>
+                                            <e5>
+                                                <gege>gigi3</gege>
+                                            </e5>
+                                        </e4>
+                                    </e1>
+                                </xforms:instance>
+                                <xforms:bind nodeset="e2" relevant="false()"/>
+                                <xforms:bind nodeset="e4" readonly="true()"/>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:static-state>
+                    <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <controls>
+                            <xforms:input id="id1" ref="@gege"/>
+                            <xforms:input id="id2" ref="e2/e3/gege"/>
+                            <xforms:input id="id3" ref="e4/e5/gege"/>
+                        </controls>
+                        <models>
+                            <xforms:model>
+                                <xforms:instance id="instance">
+                                    <e1 gege="gigi1">
+                                        <e2>
+                                            <e3>
+                                                <gege>gigi2</gege>
+                                            </e3>
+                                        </e2>
+                                        <e4>
+                                            <e5>
+                                                <gege>gigi3</gege>
+                                            </e5>
+                                        </e4>
+                                    </e1>
+                                </xforms:instance>
+                                <xforms:bind nodeset="e2" relevant="false()"/>
+                                <xforms:bind nodeset="e4" readonly="true()"/>
+                            </xforms:model>
+                        </models>
+                    </static-state>
+                </xxf:static-state>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <e1 gege="gigi1">
+                                <e2>
+                                    <e3>
+                                        <gege>gigi2</gege>
+                                    </e3>
+                                </e2>
+                                <e4>
+                                    <e5>
+                                        <gege>gigi3</gege>
+                                    </e5>
+                                </e4>
+                            </e1>
+                        </instances>
+                        <divs/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type="">gigi1</xxf:control>
+                        <xxf:control id="id2" readonly="false" required="false" relevant="false" valid="true" type="">gigi2</xxf:control>
+                        <xxf:control id="id3" readonly="true" required="false" relevant="true" valid="true" type="">gigi3</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

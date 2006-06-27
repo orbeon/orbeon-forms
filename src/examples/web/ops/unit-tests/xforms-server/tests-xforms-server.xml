@@ -1905,4 +1905,121 @@
         </output>
     </test>
 
+    <test description="xforms:insert with @context and @origin" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="action">
+                        <xxforms:action>
+                            <xxforms:event name="DOMActivate" source-control-id="test-trigger"/>
+                        </xxforms:action>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls>
+                            <xforms:trigger id="test-trigger">
+                                <xforms:label id="test-trigger-label">Add</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- For the first insert, there is no employee element yet -->
+                                    <xforms:setvalue ref="instance('template')/first-name">Joe</xforms:setvalue>
+                                    <xforms:insert context="employees" nodeset="employee"
+                                                   origin="instance('template')"/>
+                                    <!-- For the second insert, there is an employee element, and we insert after that element -->
+                                    <xforms:setvalue ref="instance('template')/first-name">Mary</xforms:setvalue>
+                                    <xforms:insert context="employees" nodeset="employee"
+                                                   origin="instance('template')"/>
+                                    <!-- This should insert between the two existing employees -->
+                                    <xforms:setvalue ref="instance('template')/first-name">Billy</xforms:setvalue>
+                                    <xforms:insert context="employees" nodeset="employee" at="index('employee-repeat')" position="before"
+                                                   origin="instance('template')"/>
+                                </xforms:action>
+
+                            </xforms:trigger>
+                            <xforms:repeat nodeset="employees/employee" id="employee-repeat">
+                                <xforms:input id="first-name-input" ref="first-name"/>
+                            </xforms:repeat>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="instance">
+                                    <form>
+                                        <employees/>
+                                    </form>
+                                </xforms:instance>
+                                <xforms:instance id="template">
+                                    <employee>
+                                        <first-name/>
+                                    </employee>
+                                </xforms:instance>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <instances>
+                            <form>
+                                <employees/>
+                            </form>
+                            <employee>
+                                <first-name/>
+                            </employee>
+                        </instances>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <form>
+                                <employees>
+                                    <employee>
+                                        <first-name>Joe</first-name>
+                                    </employee>
+                                    <employee>
+                                        <first-name>Billy</first-name>
+                                    </employee>
+                                    <employee>
+                                        <first-name>Mary</first-name>
+                                    </employee>
+                                </employees>
+                            </form>
+                            <employee>
+                                <first-name>Billy</first-name>
+                            </employee>
+                        </instances>
+                        <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="employee-repeat" index="2"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="1"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="2"/>
+                        <xxf:copy-repeat-template id="employee-repeat" parent-indexes="" id-suffix="3"/>
+                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
+                        <xxf:control id="first-name-input·1" readonly="false" required="false" relevant="true" valid="true" type="">Joe</xxf:control>
+                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="2"/>
+                        <xxf:control id="first-name-input·2" readonly="false" required="false" relevant="true" valid="true" type="">Billy</xxf:control>
+                        <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
+                        <xxf:control id="first-name-input·3" readonly="false" required="false" relevant="true" valid="true" type="">Mary</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="employee-repeat" old-index="0" new-index="2"/>
+                    </xxf:repeat-indexes>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

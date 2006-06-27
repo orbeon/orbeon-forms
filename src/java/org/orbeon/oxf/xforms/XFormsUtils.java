@@ -125,16 +125,16 @@ public class XFormsUtils {
 
                 // Handle readonly inheritance
                 if (handleReadonly && currentInstanceData.getReadonly().get()) {
-                    if (currentInstanceData.getInheritedReadonly() == null)
+                    if (localInstanceData.getInheritedReadonly() == null)
                         localInstanceData.setInheritedReadonly(new ReadonlyModelItemProperty());
-                    currentInstanceData.getInheritedReadonly().set(true);
+                    localInstanceData.getInheritedReadonly().set(true);
                     handleReadonly = false;
                 }
                 // Handle relevant inheritance
                 if (handleRelevant && !currentInstanceData.getRelevant().get()) {
-                    if (currentInstanceData.getInheritedRelevant() == null)
+                    if (localInstanceData.getInheritedRelevant() == null)
                         localInstanceData.setInheritedRelevant(new RelevantModelItemProperty());
-                    currentInstanceData.getInheritedRelevant().set(false);
+                    localInstanceData.getInheritedRelevant().set(false);
                     handleRelevant = false;
                 }
             }

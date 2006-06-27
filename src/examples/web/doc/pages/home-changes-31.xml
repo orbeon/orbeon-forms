@@ -66,72 +66,102 @@
                     </p>
                     <ul>
                         <li>
-                            Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
-                            <code>xforms:submission</code>.
+                            <p>
+                                Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
+                                <code>xforms:submission</code>.
+                            </p>
                         </li>
                         <li>
-                            Support for attribute value templates (AVT) on <code>xforms:submission</code>
-                            <code>action</code>, <code>xxforms:username</code> and <code>xxforms:password</code>
-                            attributes.
+                            <p>
+                                Support for attribute value templates (AVT) on <code>xforms:submission</code>
+                                <code>action</code>, <code>xxforms:username</code> and <code>xxforms:password</code>
+                                attributes.
+                            </p>
                         </li>
                         <li>
-                            Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
-                            Support for this method is not included in XForms 1.0, but will be added to XForms 1.1.
-                            [TODO: Elaborate on using REST APIs for eXist] [TODO: Elaborate on using REST APIs for
-                            eXist]
+                            <p>
+                                Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
+                                Support for this method is not included in XForms 1.0, but will be added to XForms 1.1.
+                                [TODO: Elaborate on using REST APIs for eXist] [TODO: Elaborate on using REST APIs
+                                for eXist]
+                            </p>
                         </li>
                         <li>
-                            Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
+                            <p>
+                                Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
+                            </p>
                         </li>
                         <li>
-                            Support for the XForms 1.1 <a
-                            href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
-                            <code>xforms:insert</code> and <code>xforms:delete</code>. Improvements to
-                            <code>xforms:insert</code> and <code>xforms:delete</code> as per the XForms 1.1 draft.
-                            [TODO: point to example, insertion into empty elements, attributes, etc.]
+                            <p>
+                                Support for the XForms 1.1 <a
+                                href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
+                                <code>xforms:insert</code> and <code>xforms:delete</code>. Improvements to
+                                <code>xforms:insert</code> and <code>xforms:delete</code> as per the XForms 1.1 draft.
+                                [TODO: point to example, insertion into empty elements, attributes, etc.]
+                            </p>
                         </li>
                         <li>
-                            Autocomplete control. [TODO] [kindly sponsored by...]
+                            <p>
+                                Autocomplete control. [TODO] [kindly sponsored by Mobydoc]
+                            </p>
                         </li>
                         <li>
-                            HTML editor control. [TODO] [kindly sponsored by...]
+                            <p>
+                                HTML editor control. [TODO] [kindly sponsored by Teleflex]
+                            </p>
                         </li>
                         <li>
-                            Tree control and menu control. [TODO] [kindly sponsored by...]
+                            <p>
+                                Tree control and menu control. [TODO] [kindly sponsored  by Teleflex]
+                            </p>
                         </li>
                         <li>
-                            Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                            <p>
+                                Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                            </p>
                         </li>
                         <li>
-                            Support for XForms 1.1 conditional actions with the <code>if</code> (and
-                            <code>exf:if</code>) attribute. [TODO]
+                            <p>
+                                Support for XForms 1.1 conditional actions with the <code>if</code> (and
+                                <code>exf:if</code>) attribute. [TODO]
+                            </p>
                         </li>
                         <li>
-                            New extension function <code>xxforms:context()</code> [TODO: details; already documented,
-                            just link]
+                            <p>
+                                New extension function <code>xxforms:context()</code> [TODO: details; already documented,
+                                just link]
+                            </p>
                         </li>
                         <li>
-                            Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
-                            <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
-                            <code>xxforms:cols</code>. [TODO]
+                            <p>
+                                Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
+                                <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
+                                <code>xxforms:cols</code>. [TODO]
+                            </p>
                         </li>
                         <li>
-                            Upgrade to latest version of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
-                            library</code>. We no longer use <a
-                            href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
-                        </li>
-                        <li>
-                            Improved support within Liferay portal. [TODO] [kindly sponsored by...] A new epilogue
-                            pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168
-                            portlets into liferay. In addition, some bugs have been fixed relative to conflicts between
-                            OPS JavaScript files and Liferay's, as well as ensuring that multiple OPS portlets do not
-                            conflict. Finally, support for multiple OPS portlets within the same portal page is
-                            available.
+                            <p>
+                                Upgrade to latest version of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
+                                library</code>. We no longer use <a
+                                href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
+                            </p>
                         </li>
                         <li>
                             [TODO]
                         </li>
                     </ul>
+                </li>
+                <li>
+                    <p>
+                        Support of OPS, including XForms, within Liferay portal. [TODO] [kindly sponsored by Atkins
+                        Transport Systems] A new epilogue pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now
+                        be used to deploy JSR-168 portlets into liferay.
+                    </p>
+                    <p>
+                        In addition, some bugs have been fixed relative to conflicts between OPS JavaScript
+                        files and Liferay's, as well as ensuring that multiple OPS portlets do not conflict
+                        within the same portal page.
+                    </p>
                 </li>
                 <li>
                     <p>

@@ -1136,6 +1136,8 @@ function xformsPageLoaded() {
         document.xformsExecuteNextRequestInQueue = 0;
         document.xformsChangedIdsRequest = new Array();
         document.xformsHTMLAreaNames = new Array();
+        document.xformsRepeatTreeChildToParent = new Array();
+        document.xformsRepeatIndexes = new Array();
 
         // Initialize summary section that displays alert messages
         var xformsMessages = document.getElementById("xforms-messages");
@@ -1204,7 +1206,6 @@ function xformsPageLoaded() {
                 }
 
                 // Parse and store initial repeat hierarchy
-                document.xformsRepeatTreeChildToParent = new Array();
                 var repeatTreeString = xformsRepeatTree.value;
                 var repeatTree = repeatTreeString.split(",");
                 for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
@@ -1225,7 +1226,6 @@ function xformsPageLoaded() {
                 }
 
                 // Parse and store initial repeat indexes
-                document.xformsRepeatIndexes = new Array();
                 var repeatIndexesString = xformsRepeatIndices.value;
                 var repeatIndexes = repeatIndexesString.split(",");
                 for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
@@ -2170,5 +2170,9 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page
-YAHOO.util.Event.addListener(window, "load", xformsPageLoaded);
+// In case this script is loaded twice, we still want to run the initialization only once
+if (typeof document.xformsPageLoadedListener == "undefined") {
+    document.xformsPageLoadedListener = true;
+    YAHOO.util.Event.addListener(window, "load", xformsPageLoaded);
+}
 document.xformsTime = new Date().getTime();

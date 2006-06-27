@@ -83,6 +83,10 @@ public class XFormsInstance implements XFormsEventTarget {
         return instanceDocumentInfo;
     }
 
+    public boolean isReadOnly() {
+        return !(instanceDocumentInfo instanceof VirtualNode);
+    }
+
     public NodeInfo getInstanceRootElementInfo() {
         return (NodeInfo) XFormsUtils.getChildrenElements(instanceDocumentInfo).get(0);
     }
@@ -379,12 +383,4 @@ public class XFormsInstance implements XFormsEventTarget {
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         // NOP
     }
-
-    /**
-     * Return a dom4j node wrapped into a NodeInfo. The node must belong to this particular
-     * instance.
-     */
-//    public NodeInfo wrapNode(Node node) {
-//        return documentXPathEvaluator.wrapNode(node);
-//    }
 }

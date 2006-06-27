@@ -253,7 +253,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each
      * instance document may have an associated id that identifies it.
      */
-    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument, String instanceSourceURI, boolean hasUsername) {
+    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Object instanceDocument, String instanceSourceURI, boolean hasUsername) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -261,7 +261,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
         // Prepare and set instance
         final String instanceId = (String) instanceIds.get(instancePosition);
-        final XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, instanceSourceURI, hasUsername, this);
+        final XFormsInstance newInstance;
+        {
+            if (instanceDocument instanceof Document)
+                newInstance = new XFormsInstance(pipelineContext, instanceId, (Document) instanceDocument, instanceSourceURI, hasUsername, this);
+            else if (instanceDocument instanceof DocumentInfo)
+                newInstance = new XFormsInstance(pipelineContext, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, hasUsername, this);
+            else
+                throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
+        }
         instances.set(instancePosition, newInstance);
 
         // Create mapping instance id -> instance
@@ -644,7 +652,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Apply schemas to all instances
             for (Iterator i = getInstances().iterator(); i.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                schemaValidator.applySchema(currentInstance);
+                // Currently we don't support validating read-only instances
+                if (!currentInstance.isReadOnly())
+                    schemaValidator.applySchema(currentInstance);
             }
         }
     }
@@ -716,8 +726,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
 
-                        final Document instanceDocument;
-                        final DocumentInfo instanceDocumentInfo;
+                        final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
                         final boolean hasUsername;
                         if (srcAttribute == null) {
@@ -726,7 +735,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             if (children == null || children.size() == 0)
                                 throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
-                            instanceDocumentInfo = null;// TODO
+                            // TODO: support DocumentInfo (easier once static state is done with TinyTree as well)
                             instanceSourceURI = null;
                             hasUsername = false;
                         } else {
@@ -762,10 +771,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     // Read result as XML
                                     if (!isReadonlyHint) {
                                         instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
-                                        instanceDocumentInfo = null;
                                     } else {
-                                        instanceDocumentInfo = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
-                                        instanceDocument = null;
+                                        instanceDocument = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
                                     }
                                 } catch (Exception e) {
                                     throw new OXFException(e);
@@ -804,10 +811,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         // Read result as XML
                                         if (!isReadonlyHint) {
                                             instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
-                                            instanceDocumentInfo = null;
                                         } else {
-                                            instanceDocumentInfo = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
-                                            instanceDocument = null;
+                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
                                         }
                                     } catch (Exception e) {
                                         if (connectionResult != null && connectionResult.resourceURI != null)
@@ -843,10 +848,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     try {
                                         if (!isReadonlyHint) {
                                             instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
-                                            instanceDocumentInfo = null;
                                         } else {
-                                            instanceDocument = null;
-                                            instanceDocumentInfo = TransformerURIResolver.readURLAsDocumentInfo(containingDocument.getURIResolver(), urlString);
+                                            instanceDocument = TransformerURIResolver.readURLAsDocumentInfo(containingDocument.getURIResolver(), urlString);
                                         }
                                         hasUsername = false;
                                         instanceSourceURI = urlString;

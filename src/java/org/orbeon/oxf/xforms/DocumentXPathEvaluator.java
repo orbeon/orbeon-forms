@@ -90,43 +90,6 @@ public class DocumentXPathEvaluator {
     }
 
     /**
-     * Evaluate an XPath expression on the document.
-     */
-//    public List evaluate(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpathExpression,
-//                         Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-//
-//        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, wrapNodeSet(contextNodeSet), contextPosition,
-//                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-//        try {
-//
-//            return expr.evaluate();
-//        } catch (XPathException e) {
-//            throw new OXFException(e);
-//        } finally {
-//            if (expr != null)
-//                expr.returnToPool();
-//        }
-//    }
-
-    /**
-     * Evaluate an XPath expression on the document.
-     */
-//    public Object evaluateSingle(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpathExpression,
-//                                 Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-//
-//        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, wrapNodeSet(contextNodeSet), contextPosition,
-//                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-//        try {
-//            return expr.evaluateSingle();
-//        } catch (XPathException e) {
-//            throw new OXFException(e);
-//        } finally {
-//            if (expr != null)
-//                expr.returnToPool();
-//        }
-//    }
-
-    /**
      * Evaluate an XPath expression on the document and return its string value.
      */
     public String evaluateAsString(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
@@ -141,21 +104,4 @@ public class DocumentXPathEvaluator {
             if (xpathExpression != null) xpathExpression.returnToPool();
         }
     }
-
-//    private List wrapNodeSet(List nodeSet) {
-//        final List result = new ArrayList(nodeSet.size());
-//        for (Iterator i = nodeSet.iterator(); i.hasNext();) {
-//            final Node currentNode = (Node) i.next();
-//            result.add(wrapNode(currentNode));
-//        }
-//        return result;
-//    }
-
-    /**
-     * Return a dom4j node wrapped into a NodeInfo. The node must belong to this particular
-     * document.
-     */
-//    public NodeInfo wrapNode(Node node) {
-//        return documentWrapper.wrap(node);
-//    }
 }

@@ -84,7 +84,7 @@ public class ProcessorUtils {
     }
 
     public static boolean selectBooleanValue(Node node, String expr, boolean defaultValue) {
-        String result = XPathUtils.selectStringValueNormalize(node, expr);
+        final String result = XPathUtils.selectStringValueNormalize(node, expr);
         return (result == null) ? defaultValue : "true".equals(result);
     }
 

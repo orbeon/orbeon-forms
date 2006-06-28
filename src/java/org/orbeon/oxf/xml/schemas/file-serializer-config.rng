@@ -23,6 +23,11 @@
             </element>
         </optional>
         <optional>
+            <element name="append">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
             <element name="content-type">
                 <data type="string"/>
             </element>

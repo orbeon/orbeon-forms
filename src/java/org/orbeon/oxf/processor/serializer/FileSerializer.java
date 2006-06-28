@@ -47,6 +47,8 @@ public class FileSerializer extends ProcessorImpl {
     private static final boolean DEFAULT_FORCE_ENCODING = false;
     private static final boolean DEFAULT_IGNORE_DOCUMENT_ENCODING = false;
 
+    private static final boolean DEFAULT_APPEND = false;
+
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
@@ -56,6 +58,8 @@ public class FileSerializer extends ProcessorImpl {
 
         private String directory;
         private String file;
+        private boolean append;
+
         private boolean cacheUseLocalCache;
 
         private boolean forceContentType;
@@ -73,11 +77,10 @@ public class FileSerializer extends ProcessorImpl {
             file = XPathUtils.selectStringValueNormalize(document, "/config/file");
 
             // Cache control
-            String cacheUseLocalCacheString = XPathUtils.selectStringValueNormalize(document, "/config/cache-control/use-local-cache");
-            if (cacheUseLocalCacheString == null)
-                cacheUseLocalCache = CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE;
-            else
-                cacheUseLocalCache = new Boolean(cacheUseLocalCacheString).booleanValue();
+            cacheUseLocalCache = ProcessorUtils.selectBooleanValue(document, "/config/cache-control/use-local-cache", CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE);
+
+            // Whether to append or not
+            append = ProcessorUtils.selectBooleanValue(document, "/config/append", DEFAULT_APPEND);
 
             // Content-type and Encoding
             requestedContentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
@@ -101,6 +104,10 @@ public class FileSerializer extends ProcessorImpl {
 
         public String getFile() {
             return file;
+        }
+
+        public boolean isAppend() {
+            return append;
         }
 
         public boolean isCacheUseLocalCache() {
@@ -170,19 +177,20 @@ public class FileSerializer extends ProcessorImpl {
 //                return;
 //            }
 
-            // Delete file if it exists
-            if (file.exists() && file.canWrite()) {
+            // Delete file if it exists, unless we append
+            if (!config.isAppend() && file.exists()) {
                 final boolean deleted = file.delete();
                 if (!deleted)
                     throw new OXFException("Can't delete file: " + file);
             }
 
-            // Create file
-            if (!file.createNewFile())
-                throw new OXFException("Can't create file: " + file);
+            // Create file if needed
+            file.createNewFile();
+//            if (!file.createNewFile())
+//                throw new OXFException("Can't create file: " + file);
 
             // Create Writer and make sure it is closed when the pipeline terminates
-            final OutputStream fileOutputStream = new FileOutputStream(file);
+            final OutputStream fileOutputStream = new FileOutputStream(file, config.isAppend());
             context.addContextListener(new PipelineContext.ContextListenerAdapter() {
                 public void contextDestroyed(boolean success) {
                     try {

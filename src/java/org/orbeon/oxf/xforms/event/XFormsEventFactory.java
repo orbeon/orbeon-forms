@@ -59,7 +59,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_SELECT)) {
             return new XFormsSelectEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT_ERROR)) {
-            return new XFormsSubmitErrorEvent(targetObject, contextString, contextThrowable);
+            return new XFormsSubmitErrorEvent(targetObject, contextString);
         } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT)) {
             return new XFormsSubmitEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT_SERIALIZE)) {

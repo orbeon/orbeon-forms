@@ -41,7 +41,6 @@ import org.orbeon.saxon.om.NodeInfo;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -58,6 +57,8 @@ import java.util.Map;
 public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHandlerContainer {
 
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
+
+    public static final String DEFAULT_TEXT_READING_ENCODING = "iso-8859-1";
 
     private final XFormsContainingDocument containingDocument;
     private final String id;
@@ -188,6 +189,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             containingDocument.setGotSubmission(true);
 
             boolean isDeferredSubmissionSecondPass = false;
+            XFormsSubmitErrorEvent submitErrorEvent = null;
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
@@ -472,22 +474,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Handle response
                         if (connectionResult.resultCode >= 200 && connectionResult.resultCode < 300) {// accept any success code (in particular "201 Resource Created")
                             // Sucessful response
-
-                            final boolean hasContent;
-                            {
-                                if (connectionResult.resultInputStream == null) {
-                                    hasContent = false;
-                                } else {
-                                    if (!connectionResult.resultInputStream.markSupported())
-                                        connectionResult.resultInputStream = new BufferedInputStream(connectionResult.resultInputStream);
-
-                                    connectionResult.resultInputStream.mark(1);
-                                    hasContent = connectionResult.resultInputStream.read() != -1;
-                                    connectionResult.resultInputStream.reset();
-                                }
-                            }
-
-                            if (hasContent) {
+                            if (connectionHasContent(connectionResult)) {
                                 // There is a body
 
                                 if (isReplaceAll) {
@@ -519,17 +506,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                 } else if (isReplaceInstance) {
 
-                                    final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
-                                    NetUtils.copyStream(connectionResult.resultInputStream, resultByteArrayOutputStream);
-                                    byte[] submissionResponse = resultByteArrayOutputStream.toByteArray();
-
                                     if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                                         // Handling of XML media type
                                         try {
-                                            final Transformer identity = TransformerUtils.getIdentityTransformer();
-                                            final LocationDocumentResult documentResult = new LocationDocumentResult();
-                                            identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
-                                            final Document resultingInstanceDocument = documentResult.getDocument();
+                                            // Read stream into Document
+                                            final Document resultingInstanceDocument = Dom4jUtils.read(connectionResult.resultInputStream);
 
                                             // Set new instance document to replace the one submitted
                                             final XFormsInstance replaceInstance = (replaceInstanceId == null) ? currentInstance : model.getInstance(replaceInstanceId);
@@ -593,6 +574,36 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         } else {
                             // Error code received
+                            if (connectionHasContent(connectionResult)) {
+                                if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
+                                    // XML content-type
+                                    // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
+                                    // Read stream into Document
+                                    final DocumentInfo responseBody
+                                            = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+
+                                    submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                                    submitErrorEvent.setBodyDocument(responseBody);
+                                } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
+                                    // Text content-type
+                                    // Read stream into String
+                                    final String charset;
+                                    {
+                                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
+                                        if (connectionCharset != null)
+                                            charset = connectionCharset;
+                                        else
+                                            charset = DEFAULT_TEXT_READING_ENCODING;
+                                    }
+                                    final Reader reader = new InputStreamReader(connectionResult.resultInputStream, charset);
+                                    final String responseBody = NetUtils.readStreamAsString(reader);
+                                    submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                                    submitErrorEvent.setBodyString(responseBody);
+                                } else {
+                                    // This is binary
+                                    // Don't store anything for now
+                                }
+                            }
                             throw new OXFException("Error code received when submitting instance: " + connectionResult.resultCode);
                         }
                     }
@@ -608,7 +619,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     throw new OXFException(e);
                 } else {
                     // Any exception will cause an error event to be dispatched
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction, e));
+                    if (submitErrorEvent == null)
+                        submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+
+                    submitErrorEvent.setThrowable(e);
+                    containingDocument.dispatchEvent(pipelineContext, submitErrorEvent);
                 }
             }
 
@@ -616,6 +631,33 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // The default action for this event results in the following: Fatal error.
             throw new OXFException("Binding exception.");
         }
+    }
+
+//    private Document readConnectionAsDocument(InputStream inputStream) throws TransformerException, IOException {
+//
+//        final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
+//        NetUtils.copyStream(inputStream, resultByteArrayOutputStream);
+//        byte[] submissionResponse = resultByteArrayOutputStream.toByteArray();
+//
+//        final Transformer identity = TransformerUtils.getIdentityTransformer();
+//        final LocationDocumentResult documentResult = new LocationDocumentResult();
+//        identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
+//        return documentResult.getDocument();
+//    }
+
+    private boolean connectionHasContent(ConnectionResult connectionResult) throws IOException {
+        boolean hasContent;
+        if (connectionResult.resultInputStream == null) {
+            hasContent = false;
+        } else {
+            if (!connectionResult.resultInputStream.markSupported())
+                connectionResult.resultInputStream = new BufferedInputStream(connectionResult.resultInputStream);
+
+            connectionResult.resultInputStream.mark(1);
+            hasContent = connectionResult.resultInputStream.read() != -1;
+            connectionResult.resultInputStream.reset();
+        }
+        return hasContent;
     }
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {

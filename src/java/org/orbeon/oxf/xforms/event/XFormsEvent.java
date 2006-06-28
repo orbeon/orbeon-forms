@@ -16,6 +16,10 @@ package org.orbeon.oxf.xforms.event;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ListIterator;
+
+import java.util.Collections;
 
 
 /**
@@ -36,7 +40,7 @@ public abstract class XFormsEvent {
         this.bubbles = bubbles;
         this.cancelable = cancelable;
 
-        // Get location information for debugging only (it's time consuming)
+        // Get Java location information for debugging only (getting Java location data is very inefficient)
         if (XFormsServer.logger.isDebugEnabled())
             this.locationData = Dom4jUtils.getLocationData(2, true);
     }
@@ -59,5 +63,11 @@ public abstract class XFormsEvent {
 
     public LocationData getLocationData() {
         return locationData;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        // "If the event context information does not contain the property indicated by the string argument, then an
+        // empty node-set is returned."
+        return new ListIterator(Collections.EMPTY_LIST);
     }
 }

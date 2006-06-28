@@ -18,9 +18,14 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.value.StringValue;
 
 import java.io.PrintWriter;
 import java.io.CharArrayWriter;
+import java.util.Collections;
 
 
 /**
@@ -30,27 +35,66 @@ import java.io.CharArrayWriter;
  * The default action for this event results in the following: None; notification event only.
  */
 public class XFormsSubmitErrorEvent extends XFormsEvent {
+
     private Throwable throwable;
     private String urlString;
+    private DocumentInfo bodyDocument;
+    private String bodyString;
 
-    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String urlString, Throwable throwable) {
+    public XFormsSubmitErrorEvent(XFormsEventTarget targetObject, String urlString) {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
         this.urlString = urlString;
-        this.throwable = throwable;
-
-        // Log exception
-        if (XFormsServer.logger.isDebugEnabled()) {
-            CharArrayWriter writer = new CharArrayWriter();
-            OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
-            XFormsServer.logger.debug("XForms - submit error exception: " + writer.toString());
-        }
     }
 
     public Throwable getThrowable() {
         return throwable;
     }
 
+    public void setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+
+        // Log exception
+        if (XFormsServer.logger.isDebugEnabled()) {
+            CharArrayWriter writer = new CharArrayWriter();
+            OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
+            XFormsServer.logger.debug("XForms - submit error throwable: " + writer.toString());
+        }
+    }
+
     public String getUrlString() {
         return urlString;
+    }
+
+    public DocumentInfo getBodyDocument() {
+        return bodyDocument;
+    }
+
+    public void setBodyDocument(DocumentInfo bodyDocument) {
+        this.bodyDocument = bodyDocument;
+    }
+
+    public String getBodyString() {
+        return bodyString;
+    }
+
+    public void setBodyString(String bodyString) {
+        this.bodyString = bodyString;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+
+        if ("body".equals(name)) {
+            // Return the body of the response if possible
+            if (getBodyDocument() != null)
+                return new ListIterator(Collections.singletonList(getBodyDocument()));
+            else if (getBodyString() != null)
+                return new ListIterator(Collections.singletonList(new StringValue(getBodyString())));
+            else
+                return super.getAttribute(name);
+        } else if ("resource-uri".equals(name)) {
+            return new ListIterator(Collections.singletonList(new StringValue(getUrlString())));
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

@@ -641,7 +641,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                             if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
                                 // Capture phase match
-                                startHandleEvent();
+                                startHandleEvent(event);
                                 try {
                                     eventHandlerImpl.handleEvent(pipelineContext, event);
                                 } finally {
@@ -673,7 +673,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                             if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
                                 // Bubbling phase match
-                                startHandleEvent();
+                                startHandleEvent(event);
                                 try {
                                     eventHandlerImpl.handleEvent(pipelineContext, event);
                                 } finally {
@@ -692,7 +692,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
             // Perform default action is allowed to
             if (performDefaultAction || !event.isCancelable()) {
-                startHandleEvent();
+                startHandleEvent(event);
                 try {
                     targetObject.performDefaultAction(pipelineContext, event);
                 } finally {
@@ -711,21 +711,28 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    private int eventLevel = 0;
+    private Stack eventStack = new Stack();
 
-    private void startHandleEvent() {
-        eventLevel++;
+    private void startHandleEvent(XFormsEvent event) {
+        eventStack.push(event);
     }
 
     private void endHandleEvent() {
-        eventLevel--;
+        eventStack.pop();
     }
 
     private String getEventLogSpaces() {
         final StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < eventLevel; i++)
+        for (int i = 0; i < eventStack.size(); i++)
             sb.append("  ");
         return sb.toString();
+    }
+
+    /**
+     * Return the event being processed by the current event handler, null if no event is being processed.
+     */
+    public XFormsEvent getCurrentEvent() {
+        return (eventStack.size() == 0) ? null : (XFormsEvent) eventStack.peek();
     }
 
     /**

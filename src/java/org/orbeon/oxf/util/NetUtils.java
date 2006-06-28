@@ -35,13 +35,11 @@ public class NetUtils {
     /**
      * <!-- PATTERN_NO_AMP -->
      * @see #decodeQueryString(CharSequence, boolean)
-     * @author d
      */
     private static final Pattern PATTERN_NO_AMP;
     /**
      * <!-- PATTERN_AMP -->
      * @see #decodeQueryString(CharSequence, boolean)
-     * @author d
      */
     private static final Pattern PATTERN_AMP;
 
@@ -133,14 +131,12 @@ public class NetUtils {
 
     public static long getLastModified(java.net.URL u) throws java.io.IOException {
         final java.net.URLConnection uc = u.openConnection();
-        final long ret = getLastModified(uc);
-        return ret;
+        return getLastModified(uc);
     }
 
     public static Long getLastModified(java.net.URL u, Long notUsed) throws java.io.IOException {
         final long modTim = getLastModified(u);
-        final Long ret = new Long(modTim);
-        return ret;
+        return new Long(modTim);
     }
 
     /**
@@ -181,6 +177,12 @@ public class NetUtils {
         char[] buffer = new char[1024];
         while ((count = reader.read(buffer)) > 0)
             writer.write(buffer, 0, count);
+    }
+
+    public static String readStreamAsString(Reader reader) throws IOException {
+        final StringWriter writer = new StringWriter();
+        copyStream(reader, writer);
+        return writer.toString();
     }
 
     public static String getContentTypeCharset(String contentType) {

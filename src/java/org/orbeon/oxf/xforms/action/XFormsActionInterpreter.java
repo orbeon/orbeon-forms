@@ -100,7 +100,7 @@ public class XFormsActionInterpreter {
                 // Don't execute action
 
                 if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing conditional action (condition evaluated to 'false'): " + actionEventName);
+                    XFormsServer.logger.debug("XForms - not executing conditional action (condition evaluated to 'false'). Action name: " + actionEventName + ", condition: " + conditionAttribute);
 
                 return;
             }

@@ -19,6 +19,7 @@
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:widget="http://orbeon.org/oxf/xml/widget"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>XForms Sandbox</title>
@@ -36,33 +37,69 @@
     <body>
         <xforms:group ref="/form">
             <p>
-                The XForms Sandbox allows you to easily try your own XForms examples. Just point to
-                an XHTML + XForms document below, press the "Upload" button, and check if it works
-                with OPS!
+                The XForms Sandbox allows you to easily try your own XForms examples. Just point to an XHTML + XForms
+                document below, press the "Run XForms" button, and check if it works with OPS!
             </p>
             <p style="color: red; font-size: smaller">
                 Your document has to be in the XHTML namespace. Plain HTML won't work.
             </p>
-            <table>
-                <tr>
-                    <td>
-                        <xforms:upload ref="file" xhtml:size="50">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </td>
-                    <td>
-                        <xforms:trigger>
-                            <xforms:label>Run XForms</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="action">upload</xforms:setvalue>
-                                <xforms:send submission="main"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </td>
-                </tr>
-            </table>
+            <widget:tabs>
+                <widget:tab id="upload-case" selected="true">
+                    <widget:label>Upload File</widget:label>
+                    <p>
+                        Please select the local XHTML + XForms file to run:
+                    </p>
+                    <table>
+                        <tr>
+                            <td>
+                                <xforms:upload ref="file" xhtml:size="50">
+                                    <xforms:label></xforms:label>
+                                    <xforms:filename ref="@filename"/>
+                                    <xforms:mediatype ref="@mediatype"/>
+                                    <xxforms:size ref="@size"/>
+                                </xforms:upload>
+                            </td>
+                            <td>
+                                <xforms:trigger>
+                                    <xforms:label>Run XForms</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="action">upload</xforms:setvalue>
+                                        <xforms:send submission="main"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </td>
+                        </tr>
+                    </table>
+                </widget:tab>
+                <widget:tab id="download-case">
+                    <widget:label>Download File</widget:label>
+                    <p>
+                        Please enter the URL of the XHTML + XForms to download and run:
+                    </p>
+                    <table>
+                        <tr>
+                            <td>
+                                <xforms:input ref="file" xxforms:size="50">
+                                    <xforms:label></xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="../action">upload</xforms:setvalue>
+                                        <xforms:send submission="main"/>
+                                    </xforms:action>
+                                </xforms:input>
+                            </td>
+                            <td>
+                                <xforms:trigger>
+                                    <xforms:label>Run XForms</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="action">upload</xforms:setvalue>
+                                        <xforms:send submission="main"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </td>
+                        </tr>
+                    </table>
+                </widget:tab>
+            </widget:tabs>
             <p style="font-style: italic">
                 Tip: With Firefox, once the file is uploaded and displaying, you can do a
                 "shift-reload" in your browser to update the page with modifications you have done

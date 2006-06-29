@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.URIResolver;
 import java.io.IOException;
@@ -455,14 +454,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 final ControlInfo valueControlInfo = (ControlInfo) concreteEvent.getTargetObject();
                 xformsControls.setBinding(pipelineContext, valueControlInfo);
 
-                // Set value into the instance
-                final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+                // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
-                XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, valueControlInfo.convertFromExternalValue(eventValue), null);
-
-                // Update this particular control's value
-                valueControlInfo.evaluateValue(pipelineContext);
-                valueControlInfo.evaluateDisplayValue(pipelineContext);
+                valueControlInfo.setExternalValue(pipelineContext, eventValue);
             }
 
             // Make sure controls are not in the initial state before sending events

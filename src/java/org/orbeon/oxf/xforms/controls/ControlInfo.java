@@ -290,16 +290,33 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
         this.currentBindingContext = currentBindingContext;
     }
 
+    /**
+     * Notify the control that its value has changed due to external user interaction.
+     *
+     * @param value the new value
+     */
+    public void setExternalValue(PipelineContext pipelineContext, String value) {
+        // Set value into the instance
+        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+        XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, null);
+
+        // Update this particular control's value
+        evaluateValue(pipelineContext);
+        evaluateDisplayValue(pipelineContext);
+    }
+
+    /**
+     *
+     *
+     * @param pipelineContext
+     */
     public void evaluateValue(PipelineContext pipelineContext) {
-        setValue(XFormsInstance.getValueForNode(currentBindingContext.getSingleNode()));
+        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+        setValue(XFormsInstance.getValueForNode(currentSingleNode));
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {
         // NOP for most controls
-    }
-
-    public String convertFromExternalValue(String externalValue) {
-        return externalValue;
     }
 
     public String convertToExternalValue(String internalValue) {

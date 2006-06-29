@@ -18,6 +18,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -88,5 +89,9 @@ public class Select1ControlInfo extends ControlInfo {
 
     public List getItemset() {
         return items;
+    }
+
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        super.performDefaultAction(pipelineContext, event);
     }
 }

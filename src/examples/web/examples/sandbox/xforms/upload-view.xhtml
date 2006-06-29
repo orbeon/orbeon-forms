@@ -33,6 +33,10 @@
             <xforms:bind nodeset="file" type="xs:anyURI"/>
             <xforms:submission id="main" method="post" replace="all" action="/xforms-sandbox"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .widget-tab-panel { padding-top: 1em; }
+            .widget-tabs { width: 48em; }
+        </xhtml:style>
     </head>
     <body>
         <xforms:group ref="/form">
@@ -45,14 +49,14 @@
             </p>
             <widget:tabs>
                 <widget:tab id="upload-case" selected="true">
-                    <widget:label>Upload File</widget:label>
+                    <widget:label>Upload Local File</widget:label>
                     <p>
                         Please select the local XHTML + XForms file to run:
                     </p>
-                    <table>
+                    <table style="width: 100%">
                         <tr>
-                            <td>
-                                <xforms:upload ref="file" xhtml:size="50">
+                            <td style="width: 100%">
+                                <xforms:upload ref="file" xhtml:size="57">
                                     <xforms:label></xforms:label>
                                     <xforms:filename ref="@filename"/>
                                     <xforms:mediatype ref="@mediatype"/>
@@ -76,10 +80,10 @@
                     <p>
                         Please enter the URL of the XHTML + XForms to download and run:
                     </p>
-                    <table>
+                    <table style="width: 100%">
                         <tr>
-                            <td>
-                                <xforms:input ref="file" xxforms:size="50">
+                            <td style="width: 100%">
+                                <xforms:input ref="file" xxforms:size="71">
                                     <xforms:label></xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue ref="../action">upload</xforms:setvalue>

@@ -13,93 +13,43 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
-
-import java.util.Map;
 
 /**
- * Handle xforms:switch and xforms:case.
+ * Handle xforms:switch.
  */
-public class XFormsSwitchHandler extends XFormsGroupHandler {
+public class XFormsSwitchHandler extends HandlerBase {
 
-    private DeferredContentHandler currentSavedOutput;
-    private OutputInterceptor currentOutputInterceptor;
-    private String currentCaseEffectiveId;
+    protected String effectiveSwitchId;
 
     public XFormsSwitchHandler() {
+        super(false, false);
     }
 
-    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        effectiveSwitchId = handlerContext.getEffectiveId(attributes);
 
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("case")) {
-            // xforms:case
-
-            currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
-
-            // Find classes to add
-            final StringBuffer classes = new StringBuffer("xforms-" + localname);
-
-            final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
-
-            final Map switchIdToSelectedCaseIdMap = containingDocument.getXFormsControls().getCurrentControlsState().getSwitchIdToSelectedCaseIdMap();
-
-            final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(effectiveGroupId);
-            final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId);
-            newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
-
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-
-            // Place interceptor
-            currentSavedOutput = handlerContext.getController().getOutput();
-            currentOutputInterceptor = new OutputInterceptor(currentSavedOutput, spanQName, new OutputInterceptor.Listener() {
-                public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
-                    // Output begin delimiter
-                    outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                            outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
-                }
-            });
-
-            currentOutputInterceptor.setAddedClasses(new StringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
-
-            handlerContext.getController().setOutput(new DeferredContentHandlerImpl(currentOutputInterceptor));
-            setContentHandler(handlerContext.getController().getOutput());
-
-        } else {
-            super.startElement(uri, localname, qName, attributes);
+        // Find classes to add
+        final StringBuffer classes = new StringBuffer("xforms-" + localname);
+        if (!handlerContext.isGenerateTemplate()) {
+            final ControlInfo switchControlInfo = ((ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
+            HandlerBase.handleMIPClasses(classes, switchControlInfo);
         }
+
+        // Start xhtml:span
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+        handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveSwitchId));
     }
 
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && localname.equals("case")) {
-            // xforms:case
-
-            currentOutputInterceptor.flushCharacters(true, true);
-
-            // Restore output
-            handlerContext.getController().setOutput(currentSavedOutput);
-            setContentHandler(currentSavedOutput);
-
-            if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
-                // Output end delimiter
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
-                    currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
-            } else {
-                // Output start and end delimiter using xhtml:span
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + currentCaseEffectiveId);
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                    xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + currentCaseEffectiveId);
-            }
-
-        } else {
-            super.endElement(uri, localname, qName);
-        }
+    public void end(String uri, String localname, String qName) throws SAXException {
+        // Close xhtml:span
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+        handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 }

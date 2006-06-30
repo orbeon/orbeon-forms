@@ -146,22 +146,18 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                 isInItem = false;
                 isInChoices = true;
-            } else if (isInItem) {
-                if ("label".equals(localname)) {
-                    // xforms:label
+            } else if ("label".equals(localname)) {
+                // xforms:label
+                if (isInItem || isInChoices)
                     isInLabel = true;
-                } else if ("value".equals(localname)) {
-                    // xforms:value
+            } else if ("value".equals(localname)) {
+                // xforms:value
+                if (isInItem)
                     isInValue = true;
-                }
-            } else if (isInChoices) {
-                if ("label".equals(localname)) {
-                    // xforms:label
-                    isInLabel = true;
-                }
             }
+        } else {
+            super.startElement(uri, localname, qName, attributes);
         }
-        super.startElement(uri, localname, qName, attributes);
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -169,8 +165,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             labelStringBuffer.append(chars, start, length);
         } else if (isInValue) {
             valueStringBuffer.append(chars, start, length);
+        } else {
+            super.characters(chars, start, length);
         }
-        super.characters(chars, start, length);
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
@@ -207,8 +204,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 if (choicesLabel != null)
                     hierarchyLevel--;
             }
+        } else {
+            super.endElement(uri, localname, qName);
         }
-        super.endElement(uri, localname, qName);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

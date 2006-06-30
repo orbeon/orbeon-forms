@@ -44,7 +44,7 @@ public class XFormsGroupHandler extends HandlerBase {
             HandlerBase.handleMIPClasses(classes, groupControlInfo);
         }
 
-        // Create xhtml:span
+        // Start xhtml:span
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveGroupId));

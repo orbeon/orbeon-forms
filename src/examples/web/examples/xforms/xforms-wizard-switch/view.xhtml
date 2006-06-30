@@ -28,16 +28,20 @@
                     <age/>
                 </user>
             </xforms:instance>
-            <xforms:instance id="buttons-state">
-                <buttons-state>
+            <xforms:instance id="control-instance">
+                <control-instance>
+                    <back/>
                     <finish readonly="false"/>
-                </buttons-state>
+                </control-instance>
             </xforms:instance>
             <xforms:instance id="formatted">
                 <formated-instance/>
             </xforms:instance>                
             <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
-            <xforms:bind nodeset="instance('buttons-state')/finish" readonly="@readonly = 'false'"/>
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="back" readonly="true()"/>
+                <xforms:bind nodeset="finish" readonly="@readonly = 'false'"/>
+            </xforms:bind>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl('oxf:/config/theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
@@ -53,7 +57,7 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input ref="firstname" tabindex="1">
+                                <xforms:input ref="firstname">
                                     <xforms:label class="fixed-width">First name:</xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                                 </xforms:input>
@@ -61,7 +65,10 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:trigger tabindex="2">
+                                <xforms:trigger ref="instance('control-instance')/back">
+                                    <xforms:label>&lt; Previous</xforms:label>
+                                </xforms:trigger>
+                                <xforms:trigger>
                                     <xforms:label>Next ></xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                                 </xforms:trigger>
@@ -77,7 +84,7 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input ref="lastname" tabindex="3">
+                                <xforms:input ref="lastname">
                                     <xforms:label class="fixed-width">Last name:</xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="age"/>
                                 </xforms:input>
@@ -85,7 +92,7 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:trigger tabindex="4">
+                                <xforms:trigger>
                                     <xforms:label>&lt; Previous</xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="firstname"/>
                                 </xforms:trigger>
@@ -108,10 +115,10 @@
                                 <xforms:input ref="age" incremental="true">
                                     <xforms:label class="fixed-width">Age:</xforms:label>
                                     <xforms:action ev:event="xforms-valid">
-                                        <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">true</xforms:setvalue>
+                                        <xforms:setvalue ref="instance('control-instance')/finish/@readonly">true</xforms:setvalue>
                                     </xforms:action>
                                     <xforms:action ev:event="xforms-invalid">
-                                        <xforms:setvalue ref="instance('buttons-state')/finish/@readonly">false</xforms:setvalue>
+                                        <xforms:setvalue ref="instance('control-instance')/finish/@readonly">false</xforms:setvalue>
                                     </xforms:action>
                                     <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
                                 </xforms:input>
@@ -123,7 +130,7 @@
                                     <xforms:label>&lt; Previous</xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                                 </xforms:trigger>
-                                <xforms:trigger ref="instance('buttons-state')/finish">
+                                <xforms:trigger ref="instance('control-instance')/finish">
                                     <xforms:label>Finish ></xforms:label>
                                     <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
                                 </xforms:trigger>

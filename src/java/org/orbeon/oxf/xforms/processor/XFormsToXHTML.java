@@ -43,6 +43,8 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a
@@ -433,70 +435,36 @@ public class XFormsToXHTML extends ProcessorImpl {
         controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");
         controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
 
-        // Set final output with output to filter remaining xforms:* elements
-        controller.setOutput(new DeferredContentHandlerImpl(new ForwardingContentHandler(contentHandler) {
-
-            private int level = 0;
-            private int xformsLevel = -1;
-
-            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
-                if (xformsLevel == -1) {
-                    if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-                        xformsLevel = level;
-                    } else {
-                        super.startElement(uri, localname, qName, attributes);
-                    }
-                }
-
-                level++;
+        // Set final output with output to filter remaining xforms:* elements if any
+        controller.setOutput(new DeferredContentHandlerImpl(new ElementFilterContentHandler(contentHandler) {
+            protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
+                final boolean filter = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+//                if (filter)
+//                    System.out.println("Filtering: " + uri + " | " + localname + " | " + qName);
+                return filter;
             }
-
-            public void endElement(String uri, String localname, String qName) throws SAXException {
-                level--;
-
-                if (xformsLevel == level) {
-                    xformsLevel = -1;
-                } else if (xformsLevel == -1) {
-                    super.endElement(uri, localname, qName);
-                }
-            }
-
-            public void startPrefixMapping(String s, String s1) throws SAXException {
-                if (xformsLevel == -1)
-                    super.startPrefixMapping(s, s1);
-            }
-
-            public void endPrefixMapping(String s) throws SAXException {
-                if (xformsLevel == -1)
-                    super.endPrefixMapping(s);
-            }
-
-            public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-                if (xformsLevel == -1)
-                    super.ignorableWhitespace(chars, start, length);
-            }
-
-            public void characters(char[] chars, int start, int length) throws SAXException {
-                if (xformsLevel == -1)
-                    super.characters(chars, start, length);
-            }
-
-            public void skippedEntity(String s) throws SAXException {
-                if (xformsLevel == -1)
-                    super.skippedEntity(s);
-            }
-
-            public void processingInstruction(String s, String s1) throws SAXException {
-                if (xformsLevel == -1)
-                    super.processingInstruction(s, s1);
-            }
-
         }));
 
         controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, staticStateUUID, dynamicStateUUID, externalContext));
 
         // Process everything
-        annotatedDocument.replay(controller);
+        annotatedDocument.replay(new ElementFilterContentHandler(controller) {
+            protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
+                // We filter everything that is not a control
+                // TODO: there are some temporary exceptions, but those should actually be handled by the ControlInfo in the first place
+                return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !localname.equals("img"))
+                        || (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
+                            && !(XFormsControls.isActualControl(localname) || exceptionXFormsElements.get(localname) != null));
+            }
+        });
+    }
+    private static final Map exceptionXFormsElements = new HashMap();
+
+    static {
+        exceptionXFormsElements.put("item", "");
+        exceptionXFormsElements.put("itemset", "");
+        exceptionXFormsElements.put("choice", "");
+        exceptionXFormsElements.put("value", "");
+        exceptionXFormsElements.put("label", "");
     }
 }

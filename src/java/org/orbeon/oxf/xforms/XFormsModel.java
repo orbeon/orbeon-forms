@@ -333,8 +333,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 public void handleNode(NodeInfo nodeInfo) {
                     // Compute calculated value
                     try {
-                        final String xpath = "string(" + modelBind.getCalculate() + ")";
-                        final String stringResult = getEvaluator().evaluateAsString(pipelineContext, nodeInfo, xpath, modelBind.getNamespaceMap(), null,
+                        final String stringResult = getEvaluator().evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
                             xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
 
                         XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);

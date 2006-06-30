@@ -106,7 +106,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param initialize        true if initial decoration (MIPs) has to be reset
      */
     public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        setInstanceDocumentInfo(new DocumentWrapper(instanceDocument, null, new Configuration()), initialize);
+        setInstanceDocumentInfo(new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize);
     }
 
     public void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {

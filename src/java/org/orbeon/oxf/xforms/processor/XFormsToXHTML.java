@@ -438,10 +438,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set final output with output to filter remaining xforms:* elements if any
         controller.setOutput(new DeferredContentHandlerImpl(new ElementFilterContentHandler(contentHandler) {
             protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
-                final boolean filter = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-//                if (filter)
-//                    System.out.println("Filtering: " + uri + " | " + localname + " | " + qName);
-                return filter;
+                // TODO: Remove this filter once the "exception elements" below are filtered at the source.
+                return XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
             }
         }));
 
@@ -451,7 +449,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         annotatedDocument.replay(new ElementFilterContentHandler(controller) {
             protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
                 // We filter everything that is not a control
-                // TODO: there are some temporary exceptions, but those should actually be handled by the ControlInfo in the first place
+                // TODO: There are some temporary exceptions, but those should actually be handled by the ControlInfo in the first place
                 return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !localname.equals("img"))
                         || (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
                             && !(XFormsControls.isActualControl(localname) || exceptionXFormsElements.get(localname) != null));
@@ -466,5 +464,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         exceptionXFormsElements.put("choice", "");
         exceptionXFormsElements.put("value", "");
         exceptionXFormsElements.put("label", "");
+        exceptionXFormsElements.put("hint", "");
+        exceptionXFormsElements.put("help", "");
+        exceptionXFormsElements.put("alert", "");
     }
 }

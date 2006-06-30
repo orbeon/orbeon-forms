@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
@@ -45,7 +46,7 @@ public class XXFormsContext extends XFormsFunction {
 
         // Get instance id
         final Expression contextIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String contextId = (contextIdExpression == null) ? null : contextIdExpression.evaluateAsString(xpathContext);
+        final String contextId = (contextIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(), contextIdExpression.evaluateAsString(xpathContext));
 
         // Get context for id
         final XFormsControls xformsControls = getXFormsControls();

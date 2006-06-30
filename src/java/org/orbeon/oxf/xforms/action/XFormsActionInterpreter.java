@@ -125,8 +125,9 @@ public class XFormsActionInterpreter {
                 final List currentNodeset;
                 {
                     final XFormsInstance currentInstance = xformsControls.getCurrentInstance();// TODO: we should not use this
-                    currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0) ?
-                        xformsControls.getCurrentNodeset() : Collections.singletonList(currentInstance.getInstanceDocumentInfo());
+                    currentNodeset = (xformsControls.getCurrentNodeset() != null && xformsControls.getCurrentNodeset().size() > 0)
+                            ? xformsControls.getCurrentNodeset()
+                            : Collections.singletonList(currentInstance.getInstanceDocumentInfo());
 
                     // NOTE: The above is actually not correct: the context should not become null or empty. This is
                     // therefore just a workaround for a bug we hit:

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
@@ -41,7 +42,7 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         // Get instance id
         final Expression repeatIdExpression = (argument == null || argument.length == 0) ? null : argument[0];
-        final String repeatId = (repeatIdExpression == null) ? null : repeatIdExpression.evaluateAsString(xpathContext);
+        final String repeatId = (repeatIdExpression == null) ? null : XFormsUtils.namespaceId(getXFormsContainingDocument(), repeatIdExpression.evaluateAsString(xpathContext));
 
         final XFormsControls xformsControls = getXFormsControls();
 

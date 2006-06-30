@@ -53,7 +53,7 @@ public class Itemset extends XFormsElement {
                              String ref, Map prefixToURI) throws SAXException {
 
         final String value = context.getCurrentInstance().getEvaluator().evaluateAsString(context.getPipelineContext(), node,
-                "string(" + ref +  ")", prefixToURI, context.getRepeatIdToIndex(), null, null);
+                ref, prefixToURI, context.getRepeatIdToIndex(), null, null);
 
         context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
                 XFormsConstants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);

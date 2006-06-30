@@ -57,7 +57,7 @@ public class OutputControlInfo extends ControlInfo {
             // Value comes from the XPath expression within the value attribute
             rawValue = currentBindingContext.getModel().getDefaultInstance().getEvaluator().evaluateAsString(pipelineContext,
                     currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
-                    "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                    valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
         }
 
         // Handle mediatype if necessary

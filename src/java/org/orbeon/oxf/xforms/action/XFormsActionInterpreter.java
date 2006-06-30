@@ -620,7 +620,7 @@ public class XFormsActionInterpreter {
             final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
             final String indexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                     xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
-                    "string(number(" + indexXPath + "))", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+                    "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
             executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
 

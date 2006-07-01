@@ -537,4 +537,25 @@ public class Dom4jUtils {
         final int line = stkTrc[dpthToUse].getLineNumber();
         return new LocationData(sysID, line, -1);
     }
+
+    /**
+     * Visit a subtree of a dom4j document.
+     *
+     * @param container         element containing the elements to visit
+     * @param visitorListener   listener to call back
+     */
+    public static void visitSubtree(Element container, VisitorListener visitorListener) {
+        for (Iterator i = container.elements().iterator(); i.hasNext();) {
+            final Element childElement = (Element) i.next();
+
+            visitorListener.startElement(childElement);
+            visitSubtree(childElement, visitorListener);
+            visitorListener.endElement(childElement);
+        }
+    }
+
+    public static interface VisitorListener {
+        public void startElement(Element element);
+        public void endElement(Element element);
+    }
 }

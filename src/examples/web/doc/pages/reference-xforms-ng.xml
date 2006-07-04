@@ -66,33 +66,34 @@
             <section>
                 <title>Origin, Today, and Tomorrow</title>
                 <p>
-                    XForms 1.0 has been designed by the W3C based on experience with HTML forms. It
-                    was promoted to the rank of W3C Recommendation in October 2003, and a <a
-                    href="http://www.w3.org/TR/2005/PER-xforms-20051006/">second edition</a> of the
-                    specification has been released in October 2005. As of December 2005, mainstream
-                    browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not support
-                    XForms natively, although XForms support in Mozilla is under way and plugins are
-                    available for Internet Explorer. However you can already leverage the benefits
-                    of XForms today by using a hybrid client-side / server-side XForms engine like
-                    the one provided in OPS. The OPS XForms engine transparently generates HTML
-                    forms and performs the work that would be done by an XForms-compliant browser.
-                    This way you can start leveraging XForms today, be ready for upcoming
-                    XForms-compliant browsers, and work smoothly with the mainstream browsers that
-                    are deployed in the marketplace.
+                    XForms 1.0 has been designed by the W3C based on experience with HTML forms. It was promoted to the
+                    rank of W3C Recommendation in October 2003, and a <a
+                    href="http://www.w3.org/TR/2005/PER-xforms-20051006/">second edition</a> of the specification was
+                    released in March 2006. The <a href="http://www.w3.org/MarkUp/Forms/">XForms Working Group at
+                    W3C</a>is as of July 2006 working on XForms 1.1, before embarking on XForms 1.2 or XForms 2.0. For
+                    more information about XForms, please refer to the <a href="home-faq#xforms">FAQ</a>.
                 </p>
                 <p>
-                    For more information about the whys and therefores of server-side XForms, please
-                    read our article, <i>Are Server-Side XForms Engines the Future of XForms?</i>
-                    (<a
-                    href="http://idealliance.org/proceedings/xtech05/papers/03-08-03/">pre-conference
-                    version</a> and <a href="http://www.orbeon.com/ops/xtech">updated version</a>).
+
+                </p>
+                <p>
+                    As of July 2006, mainstream browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not
+                    support XForms natively, although XForms support in Mozilla is under way and plugins are available
+                    for Internet Explorer. However you can leverage the benefits of XForms today by using an Ajax-based
+                    XForms engine like the one provided in OPS. The OPS XForms engine transparently generates HTML forms
+                    and performs the work that would be done by an XForms-compliant browser, and you can leverage XForms
+                    today within the mainstream browsers that are already deployed in the marketplace.
+                </p>
+                <p>
+                    For more information about the whys and therefores of server-side and Ajax-based XForms engines,
+                    please refer to the <a href="home-faq#xforms-server-side">FAQ</a>.
                 </p>
             </section>
             <section>
                 <title>Benefits</title>
                 <p>
-                    Compared to HTML forms, XForms offers a higher level approach to forms. The
-                    benefits are that less programming is needed (less JavaScript, and less
+                    Compared to HTML forms, XForms offers a higher level approach to forms. The benefits are that less
+                    programming is needed (less JavaScript, and less
                     server-side programming), so forms are easier to create and modify. As an
                     illustration, let's consider some facets of XForms:
                 </p>

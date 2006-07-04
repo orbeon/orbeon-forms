@@ -20,82 +20,69 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xu="http://www.xmldb.org/xupdate">
     <header>
-        <title>Orbeon PresentationServer and Orbeon Studio FAQ</title>
+        <title>Orbeon PresentationServer (OPS) and Orbeon Studio FAQ</title>
     </header>
     <body>
         <section>
             <title>Introduction</title>
             <p>
-                This FAQ answsers technical questions about Orbeon Presentation Server (OPS). See
-                also the <a href="http://www.orbeon.com/community/faq">Orbeon community FAQ</a>.
+                This FAQ answsers technical questions about Orbeon Presentation Server (OPS).
             </p>
         </section>
         <section>
             <title>General Orbeon PresentationServer FAQ</title>
             <a name="what-is"/>
             <section added="2006-01-10">
-                <title>What is Orbeon PresentationServer?</title>
+                <title>What is Orbeon PresentationServer (OPS)?</title>
                 <p>
-                    <!--Form-based web applications done the right way-->
-                    Orbeon PresentationServer is an <b>open source</b> platform that uses <b>standard
-                    XForms</b> to make your form-based web applications more <b>user-friendly</b> and
-                    <b>simpler to create</b>.
+                    <!--Form-based web applications done the right way--> Orbeon PresentationServer is an <b>open
+                    source</b> platform that uses <b>standard XForms</b> and <b>Ajax technology</b> to make your
+                    form-based web applications more <b>user-friendly</b> and <b>simpler to create</b>.
                 </p>
                 <p>
-                    Unlike other web application frameworks based on Java objects or scripting
-                    languages, OPS is based on XML documents and XForms. This leads to an architecture
-                    perfectly suited for the tasks of capturing, processing, and presenting XML data,
-                    and does not require writing any Java or scripting code at all to implement a
-                    dynamic presentation layer for your web application.
+                    Unlike other web application platforms based on Java objects or scripting languages, OPS is based
+                    on XML documents and XForms. This leads to an architecture perfectly suited for the tasks of
+                    capturing, processing, and presenting XML data (in particular form data), and does not require
+                    writing any Java or scripting code at all to implement a dynamic presentation layer for your web
+                    application.
                 </p>
                 <p>
-                    OPS is built around a user-friendly Ajax-based XForms engine, which brings standard
-                    W3C XForms to mainstream browsers, and the <a href="reference-xpl-pipelines">XPL
-                    engine</a>, a mature, high-performance XML pipeline engine for processing XML data.
+                    OPS is built around a user-friendly Ajax-based XForms engine, which brings standard W3C XForms to
+                    mainstream browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
+                    high-performance XML pipeline engine for processing XML data.
                 </p>
             </section>
             <section added="2006-02-04">
                 <title>Is Orbeon PresentationServer an XForms Engine?</title>
                 <p>
-                    Orbeon PresentationServer does contain an XForms engine, which we refer to as
-                    the OPS XForms engine. It also contains an XML pipeline engine, an
-                    application controller (the Page Flow Controller or PFC), and built-in
-                    components to perform XSLT transformations, database access, and more. Needless
-                    to say, OPS ships with examples and documentation.
+                    Orbeon PresentationServer does contain an XForms engine, which we refer to as the OPS XForms engine.
+                    It also contains an XML pipeline engine running the XPL pipeline language, an application
+                    controller (the Page Flow Controller or PFC), and built-in components to perform XSLT
+                    transformations, database access, and more. Needless to say, OPS ships with examples and
+                    documentation.
                 </p>
                 <p>
-                    You are free to limit your use of OPS to its XForms functionality. But you can
-                    also leverage more of OPS to build your application's presentation layer.
+                    You are free to use OPS only for its XForms functionality, but you can also leverage more of OPS to
+                    build your application's presentation layer.
                 </p>
             </section>
             <!--
-            <a name="compare-cocoon"/>
-            <section>
-                <title>How does Orbeon PresentationServer compare with Apache Cocoon?</title>
-                <p>
-                    OPS is similar to Cocoon in some respects but also presents many differences,
-                    in particular XForms support. For more information, see our <a
-                    href="http://www.orbeon.com/community/cocoon">OPS and Cocoon</a> comparison
-                    matrix.
-                </p>
-            </section>
-            -->
             <a name="compare-model2x"/>
             <section>
                 <title>How does OPS compare with Model 2X?</title>
                 <p>
-                    Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to
-                    Web applications. Model 2X builds on top of Model 2 and replaces the JSP layer
-                    with XML and XSLT. Model 2X was first described in an <a
-                    href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
-                    Orbeon published by JavaWorld in February 2002. A variant of the concept using
-                    JavaServer Faces was <a
-                    href="http://www.theserverside.com/articles/article.tss?l=BestBothWorlds">published</a>
-                    in TheServerSide in 2003. OPS can be used to implement Model 2X and much more,
-                    but the current focus of the platform remains XForms technology. For more
-                    information, please refer to the <a href=".">OPS User Guide</a>.
+                    Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to Web applications.
+                    Model 2X builds on top of Model 2 and replaces the JSP layer with XML and XSLT. Model 2X was first
+                    described in an <a
+                    href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a> Orbeon
+                    published by JavaWorld in February 2002. A variant of the concept using JavaServer Faces was <a
+                    href="http://www.theserverside.com/articles/article.tss?l=BestBothWorlds">published</a> in
+                    TheServerSide in 2003. OPS can be used to implement Model 2X and much more, but the current focus of
+                    the platform remains XForms technology. For more information, please refer to the <a href=".">OPS
+                    User Guide</a>.
                 </p>
             </section>
+            -->
         </section>
         <section>
             <title>XForms FAQ</title>
@@ -103,15 +90,20 @@
             <section>
                 <title>What is XForms?</title>
                 <p>
-                    XForms is W3C's next generation web forms. <a
-                    href="http://www.w3.org/TR/xforms/">XForms 1.0</a> is a W3C Recommendation
-                    since October 2003.
+                    W3C XForms is a standard, markup-based, declarative, XML- and HTML-friendly user interface
+                    technology. XForms makes it easy to build dynamic user interfaces able to talk to XML services.
                 </p>
                 <p>
-                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The
-                    main goal of XForms is to make web forms design easier, allowing the developer
-                    to write less client-side scripting (or none at all), and less server-side code
-                    thanks to a feature-rich declarative approach.
+                    XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
+                    March 2006. The XForms Working Group is, as of June 2006, working on XForms 1.1, due in late 2006 or
+                    2007, before embarking on XForms 1.2 or XForms 2.0! Please visit <a
+                    href="http://www.w3.org/TR/xforms/">XForms - The Next Generation of Web Forms</a> for more
+                    information about XForms direct from W3C.
+                </p>
+                <p>
+                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms
+                    is to make web forms design easier, allowing the developer to write less client-side scripting (or
+                    none at all), and less server-side code thanks to a feature-rich declarative approach.
                 </p>
                 <p>
                     Benefits of XForms include:
@@ -127,55 +119,60 @@
                     <li>Not tied to a particular platform or language such as Java or .NET</li>
                 </ul>
                 <p>
-                    See also the OPS <a href="reference-xforms-ng#introduction">XForms
-                    Introduction</a> section.
+                    See also the OPS <a href="reference-xforms-ng#introduction">XForms Introduction</a> section.
                 </p>
             </section>
             <a name="xforms-compliance"/>
             <section>
                 <title>How much of the XForms specification does OPS support?</title>
                 <p>
-                    The OPS implementation is based on the <a
-                    href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
-                    October 2003). OPS 3.0's XForms NG engine is close to supporting all of the
-                    XForms 1.0 specification. For more detailed information on what features are
-                    supported in the latest version of OPS, see the <a
-                    href="reference-xforms-compliance">XForms conformance matrix</a> section of the
-                    documentation.
+                    The OPS implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
+                    (Second Edition) Recommendation</a> (14 March 2006). OPS 3.0's XForms NG engine is close to
+                    supporting all of the XForms 1.0 specification. <!-- For more detailed information on what features are
+                    supported in the latest version of OPS, see the <a href="reference-xforms-compliance">XForms
+                    conformance matrix</a> section of the documentation. -->
+                </p>
+                <p>
+                    OPS also supports several features from XForms 1.1 (in draft as of July 2006), as well as extensions
+                    such as new widgets (autocomplete, tree, menu, etc.).
                 </p>
             </section>
             <a name="xforms-server-side"/>
             <section added="2006-01-10">
                 <title>What is a server-side XForms implementation?</title>
                 <p>
-                    The XForms specification assumes that XForms is implemented on the client-side,
-                    that is natively within a web browser. Until XForms becomes standard on
-                    mainstream browsers, XForms-based applications can use server-side
-                    implementations (that delegate a good part of the XForms processing to
-                    server-side code), or hybrid implementations, that share XForms processing
-                    between server-side code and client-side code and rely on Ajax technology.
-                    Orbeon PresentationServer features such a hybrid implementation. We believe that
-                    using hybrid implementation is the best possible migration path towards XForms.
+                    The XForms specification assumes that XForms is implemented on the client-side, that is natively
+                    within a web browser. Until XForms becomes standard on mainstream browsers, XForms-based
+                    applications can use server-side implementations (that delegate a good part of the XForms processing
+                    to server-side code), or hybrid implementations, that share XForms processing between server-side
+                    code and client-side code and rely on Ajax technology. Orbeon PresentationServer features such an
+                    Ajax-based implementation. We believe that Ajax-based implementations is the best possible migration
+                    path towards XForms.
                 </p>
                 <p>
-                    A server-side implementation of XForms translates your forms described in terms
-                    of the XForms specification into HTML, CSS and JavaScript code understood by
-                    your web browser. The following diagram shows a high-level overview of the
-                    architecture of a hybrid XForms implementation:
+                    A server-side implementation of XForms translates your forms described in terms of the XForms
+                    specification into HTML, CSS and JavaScript code understood by your web browser. The following
+                    diagram shows a high-level overview of the architecture of an Ajax-based  XForms implementation:
                 </p>
                 <div class="image">
                     <img width="620" height="454" src="pages/xforms-hybrid.png"/>
-                    <div class="legend">Hybrid XForms</div>
+                    <div class="legend">Ajax-Based XForms</div>
                 </div>
                 <p>
-                    For more information about server-side XForms, we refer you to this article we
-                    presented at the XTech 2005 conference:
+                    For more information about server-side XForms, we refer you to these articles we presented at the
+                    XTech 2005 and XTech 2006 conferences:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            <a href="http://www.orbeon.com/ops/xtech">Are Server-Side XForms
-                            Engines the Future of XForms?</a> (see also the <a
+                            <a href="http://xtech06.usefulinc.com/schedule/detail/133">XForms: an alternative to
+                            Ajax?</a> (XTech 2006)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="http://www.orbeon.com/ops/xtech">Are Server-Side XForms Engines the Future of
+                            XForms?</a> (XTech 2005) (see also the <a
                             href="http://www.idealliance.org/proceedings/xtech05/papers/03-08-03/">pre-conference
                             proceedings</a>, which contain an out of date version of the article)
                         </p>
@@ -186,57 +183,55 @@
             <section added="2006-01-10">
                 <title>What are the XForms Classic and XForms NG engnes?</title>
                 <p>
-                    Up to version 2.8, OPS featured a pure server-side XForms engine with limited
-                    XForms functionality. With version 3.0, OPS features a much enhanced XForms
-                    engine, with support for almost the entire XForms specification, with the intent
-                    to completely support XForms 1.0 and XForms 1.1 in the future. The older XForms
-                    engine has been informally dubbed "XForms Classic", and the new XForms engine
+                    Up to version 2.8, OPS featured a pure server-side XForms engine with limited XForms functionality.
+                    With version 3.0, OPS features a much enhanced XForms engine, with support for almost the entire
+                    XForms specification, with the intent to completely support XForms 1.0 and XForms 1.1 in the future.
+                    The older XForms engine has been informally dubbed "XForms Classic", and the new XForms engine
                     "XForms NG".
                 </p>
                 <p>
-                    For backward compatibility reasons, the XForms Classic engine is still present
-                    in OPS 3.0.
+                    For backward compatibility reasons, the XForms Classic engine is still present in OPS 3.0. We plan
+                    over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well, therefore making
+                    XForms Classic obsolete in OPS.
                 </p>
             </section>
             <a name="xforms-classic-or-ng"/>
             <section added="2006-01-10">
                 <title>How do I know which XForms engine I am using?</title>
                 <p>
-                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are
-                    using OPS 3.0 or later, then you may be using XForms Classic or XForms NG, but
-                    there is an easy way to tell: if a <code>&lt;page></code> entry in your page
-                    flow features an <code>xforms</code> attribute, then and only then that page is
-                    using XForms Classic. Otherwise, if the page view contains at least one XForms
-                    model under its <code>xhtml:head</code> element, then it is using XForms NG.
+                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
+                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
+                    later, then you may be using XForms Classic or XForms NG, but there is an easy way to tell: if a
+                    <code>&lt;page></code> entry in your page flow features an <code>xforms</code> attribute, then and
+                    only then that page is using XForms Classic. Otherwise, if the page view contains at least one
+                    XForms model under its <code>xhtml:head</code> element, then it is using XForms NG.
                 </p>
             </section>
             <a name="xforms-classic-deprecation"/>
             <section added="2006-01-10">
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
-                    The XForms Classic engine has been kept only for backward compatibility. It is
-                    currently deprecated, and may be removed in the future. If you are starting an
-                    application from scratch with OPS 3.0, we strongly advise against using XForms
-                    Classic. If you are migrating to OPS 3.0, we advise starting migrating XForms
-                    NG. You can keep your existing pages working with XForms Classic, and write new
-                    pages with XForms NG. Over time, you can migrate existing XForms Classic pages
-                    to XForms NG, making for a smooth transition.
+                    The XForms Classic engine is available only for backward compatibility. It is currently
+                    deprecated, and may be removed in the future. If you are starting an application from scratch with
+                    OPS 3.0, we strongly advise against using XForms Classic. If you are migrating to OPS 3.0, we
+                    advise starting migrating XForms NG. You can keep your existing pages working with XForms Classic,
+                    and write new pages with XForms NG. Over time, you can migrate existing XForms Classic pages to
+                    XForms NG, making for a smooth transition.
                 </p>
                 <p>
-                    As of OPS 3.0, some features of XForms Classic have not yet made it into XForms
-                    NG, in particular support for browsers with very limited Javascript
-                    functionality, and non-Ajax mode. In time, we hope to bring these features to
-                    XForms NG as well, therefore completely removing the need for XForms Classic.
+                    As of OPS 3.0, some features of XForms Classic have not yet made it into XForms NG, in particular
+                    support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we
+                    hope to bring these features to XForms NG as well, therefore completely removing the need for XForms
+                    Classic.
                 </p>
             </section>
             <a name="xforms-html"/>
             <section>
                 <title>Do I need to use XForms to create my HTML forms?</title>
                 <p>
-                    It is not a requirement to use XForms. It is possible to generate HTML form
-                    elements and to examine request parameters manually. We recommend however using
-                    XForms whenever possible, because it provides an elegant abstraction that
-                    simplifies form handling.
+                    It is not a requirement to use XForms. It is possible to generate HTML form elements and to examine
+                    request parameters manually. We recommend however using XForms whenever possible, because it
+                    provides an elegant abstraction that greatly simplifies form handling.
                 </p>
             </section>
             <a name="file-upload"/>
@@ -276,6 +271,54 @@
                     use the Servlet Include generator to include the content produced by a JSP.
                     Finally, you can use the Servlet Filter generator and implement JSP
                     post-processing with OPS.
+                </p>
+            </section>
+            <a name="jsr-168"/>
+            <section>
+                <title>Can I run XForms within JSR-168 portlets?</title>
+                <p>
+                    As of OPS 3.1 (scheduled for release in summer 2006), it is possible to use the OPS XForms engine
+                    within the Java Portlet (JSR-168) compliant Liferay portal, thanks to kind sponsoring by Atkins
+                    Transport Systems.
+                </p>
+                <p>
+                    To do this, use the provided <code>epilogue-portlet-liferay.xpl</code> epilogue instead of the
+                    default <code>epilogue-portlet.xpl</code>. It is expected that OPS will work within other JSR-168
+                    portals, or that only minor adjustments will be needed in such cases.
+                </p>
+                <p>
+                    The great thing about OPS and portlets is that there is very little difference if any between
+                    writing an application working in a portlet vs. a servlet. In fact, all the OPS XForms examples work
+                    unmodified as portlets. You can use some particularities of portlets, like preferences, and you have
+                    to be careful about paths to serve resources, but otherwise portlets are transparent to the
+                    developer. This contrasts with many other web platforms.
+                </p>
+                <p>
+                    In other words, OPS gives you the flexibility to write an application that works in standalone mode,
+                    and allows you to migrate to a portlet environment at minimal cost. This contrasts with many other
+                    web application technologies, which sometimes require you to rewrite your application entirely to
+                    fit within a portlet.
+                </p>
+                <p>
+                    <i>NOTE: Historically, there has been a lot of code in OPS to support JSR-168 since late 2003
+                    already. When this code was written, the JSR-168 specification was not final and no JSR-168
+                    container was available. So Orbeon developped a container based on draft specifications for testing.
+                    This code was used until recently to run the OPS examples portal: examples were actually using the
+                    portlet code and running as portlets, and the examples portal is an early JSR-168 portal.</i>
+                </p>
+            </section>
+            <a name="browser-support"/>
+            <section>
+                <title>What web browsers does the OPS XForms engine support?</title>
+                <p>
+                    As of OPS 3.0.1, the OPS XForms engine supports Firefox (1.0.7 and later) and IE 6.
+                </p>
+                <p>
+                    As of OPS 3.1 (scheduled for release in summer 2006), some of the functionality works with Opera 8.5
+                    and Safari. We plan over time to progressivly bring full support to these two browsers.
+                </p>
+                <p>
+                    Finally, we also plan to fit XForms NG with support for non-JavaScript, non-Ajax browsers.
                 </p>
             </section>
         </section>
@@ -652,9 +695,8 @@
             <section>
                 <title>What is the recommended XSLT transformer for OPS?</title>
                 <p>
-                    <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within
-                    OPS. It has proven reliable, and supports the latest <a
-                    href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> and <a
+                    <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within OPS. It has proven
+                    reliable, and supports the latest <a href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> and <a
                     href="http://www.w3.org/TR/xpath20/">XPath 2.0</a> drafts from the W3C.
                 </p>
                 <p>
@@ -917,45 +959,6 @@
                     XSLT 2.0 processor in OPS, and will get used when using <code>oxf:xslt</code>.
                     See the <a href="processors-xslt">XSLT documentation</a> for more information.
                 </p>
-            </section>
-            <a name="jsr-168"/>
-            <section>
-                <title>
-                    Are JSR-168 portlets supported in OPS
-                </title>
-
-                    <p>
-                        <i>The short answer:</i> portlets are not officially "supported" at this time.
-                    </p>
-                    <p>
-                        <i>The long answer:</i> there is a lot of code in OPS to support JSR-168. When
-                        this code was written back in 2003, the JSR-168 specification was not final and
-                        no JSR-168 container was available. So Orbeon developped a container based on
-                        draft specifications for testing. This code is now used to run the examples
-                        portal. Examples are actually using the portlet code and running as portlets,
-                        and the examples portal is an early JSR-168 portal.
-                    </p>
-                    <p>
-                        The current status is that there are some bugs in the implementation and that
-                        due to high workload at Orbeon and lack of demand so far nobody has spent the
-                        time to make this code work with actual JSR-168 container out there now that the
-                        specification has been final for a while and that containers are available.
-                    </p>
-                    <p>
-                        The great thing about OPS and portlets is that there is very little difference
-                        between writing an application working in a portlet vs. a servlet. You can use
-                        some particularities of portlets, like preferences, and you have to be careful
-                        about paths to serve resources, but otherwise portlets are transparent to the
-                        developer. This contrasts with many other web platforms. OPS example
-                        applications that run within the examples portal can be trivially made working
-                        outside of the portal (see the BizDoc example).
-                    </p>
-                    <p>
-                        The bottom line is that there is some cleanup work, compatibility testing and
-                        documentation work to do until support for JSR-168 works robustly and is
-                        considered "supported" in OPS. Orbeon is hoping to find a sponsor for this
-                        work.
-                    </p>
             </section>
             <a name="xml-base"/>
             <section>

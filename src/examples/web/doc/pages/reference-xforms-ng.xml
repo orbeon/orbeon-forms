@@ -74,9 +74,6 @@
                     more information about XForms, please refer to the <a href="home-faq#xforms">FAQ</a>.
                 </p>
                 <p>
-
-                </p>
-                <p>
                     As of July 2006, mainstream browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not
                     support XForms natively, although XForms support in Mozilla is under way and plugins are available
                     for Internet Explorer. However you can leverage the benefits of XForms today by using an Ajax-based

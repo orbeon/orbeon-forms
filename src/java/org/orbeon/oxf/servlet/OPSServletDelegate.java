@@ -34,14 +34,17 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 /**
- * OXFServlet is the Servlet entry point of OXF.
+ * OXFServlet and OPSServletDelegate are the Servlet entry point of OPS. OPSServlet simply delegates to
+ * OPSServletDelegate and provides an option of using the OPS Class Loader.
  *
- * Several OXFServlet and OXFPortlet instances can be used in the same Web or Portlet application.
- * They all share the same Servlet context initialization parameters, but each Servlet or Portlet
- * can be configured with its own main processor and inputs.
+ * Several OPSServlet and OPSPortlet instances can be used in the same Web or Portlet application.
+ * They all share the same Servlet context initialization parameters, but each Servlet can be
+ * configured with its own main processor and inputs.
  *
- * At the moment, all OXFServlet and OXFPortlet instances in a given Web application share the same
- * resource manager.
+ * All OPSServlet and OPSPortlet instances in a given Web application share the same resource
+ * manager.
+ *
+ * WARNING: OPSServlet must only depend on the Servlet API and the OPS Class Loader.
  */
 public class OPSServletDelegate extends HttpServlet {
 

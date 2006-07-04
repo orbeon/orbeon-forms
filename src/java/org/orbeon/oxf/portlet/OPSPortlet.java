@@ -20,16 +20,17 @@ import javax.portlet.*;
 import java.io.IOException;
 
 /**
- * OXFPortlet is the Portlet (JSR-168) entry point of OXF.
+ * OPSPortlet and OPSPortletDelegate are the Portlet (JSR-168) entry point of OPS. OPSPortlet simply delegates to
+ * OPSPortletDelegate and provides an option of using the OPS Class Loader.
  *
- * Several OXFServlet and OXFPortlet instances can be used in the same Web or Portlet application.
+ * Several OPSServlet and OPSPortlet instances can be used in the same Web or Portlet application.
  * They all share the same Servlet context initialization parameters, but each Portlet can be
  * configured with its own main processor and inputs.
  *
- * All OXFServlet and OXFPortlet instances in a given Web application share the same resource
+ * All OPSServlet and OPSPortlet instances in a given Web application share the same resource
  * manager.
  *
- * WARNING: This class must only depend on the Servlet API and the OXF Class Loader.
+ * WARNING: OPSPortlet must only depend on the Servlet API and the OPS Class Loader.
  */
 public class OPSPortlet extends GenericPortlet {
 

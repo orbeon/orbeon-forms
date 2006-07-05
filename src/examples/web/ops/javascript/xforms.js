@@ -2022,6 +2022,15 @@ function xformsHandleResponse(o) {
                             control.focus();
                             break;
                         }
+
+                        // Run JavaScript code
+                        case "script": {
+                            var scriptElement = actionElement.childNodes[actionIndex];
+                            var functionName = scriptElement.getAttribute("name");
+                            var theFunction = eval(functionName);
+                            theFunction.call();
+                            break;
+                        }
                     }
                 }
             }

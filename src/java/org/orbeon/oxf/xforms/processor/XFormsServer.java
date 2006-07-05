@@ -425,9 +425,10 @@ public class XFormsServer extends ProcessorImpl {
                         outputSubmissionInfo(externalContext, ch);
                 }
 
+                // TODO: the following should be correctly ordered in the order they were requested
                 // Output messages to display
                 {
-                    final List messages = containingDocument.getClientMessages();
+                    final List messages = containingDocument.getMessagesToRun();
                     if (messages != null) {
                         outputMessagesInfo(ch, messages);
                     }
@@ -435,9 +436,17 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output loads
                 {
-                    final List loads = containingDocument.getClientLoads();
+                    final List loads = containingDocument.getLoadsToRun();
                     if (loads != null) {
                         outputLoadsInfo(ch, loads);
+                    }
+                }
+
+                // Output scripts
+                {
+                    final List scripts = containingDocument.getScriptsToRun();
+                    if (scripts != null) {
+                        outputScriptsInfo(ch, scripts);
                     }
                 }
 
@@ -502,6 +511,10 @@ public class XFormsServer extends ProcessorImpl {
 
                 for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) j.next();
+//                    if (currentInstance.isReadOnly())
+//                        xxx;
+
+
                     instancesElement.add((currentInstance).getInstanceDocument().getRootElement().createCopy());
                     // Log instance if needed
                     if (logger.isDebugEnabled()) {
@@ -548,7 +561,7 @@ public class XFormsServer extends ProcessorImpl {
             }
             // Check for xxforms-load event
             {
-                final List loads = containingDocument.getClientLoads();
+                final List loads = containingDocument.getLoadsToRun();
                 if (loads != null) {
                     for (Iterator i = loads.iterator(); i.hasNext();) {
                         final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
@@ -857,6 +870,13 @@ public class XFormsServer extends ProcessorImpl {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
                         new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new" });
             }
+        }
+    }
+
+    public static void outputScriptsInfo(ContentHandlerHelper ch, List scripts) {
+        for (Iterator i = scripts.iterator(); i.hasNext();) {
+            final String scriptName = (String) i.next();
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script", new String[]{ "name", scriptName });
         }
     }
 

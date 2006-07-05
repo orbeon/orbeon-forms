@@ -1020,4 +1020,14 @@ public class XFormsUtils {
         // TODO: Check: if we bind to an element that doesn't have a "first text node", do we return ""?
         return "";
     }
+
+    /**
+     * Create a JavaScript function name based on a script id.
+     *
+     * @param scriptId  id of the script
+     * @return          JavaScript function name
+     */
+    public static String scriptIdToScriptName(String scriptId) {
+        return scriptId.replace('-', '_') + "_xforms_function";
+    }
 }

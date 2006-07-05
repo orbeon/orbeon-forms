@@ -41,6 +41,8 @@ import java.util.Map;
 /**
  * The XForms Server processor handles client requests, including events, and either returns an XML
  * response, or returns a response through the ExternalContext.
+ *
+ * TODO: Get rid of this. But this is still used in some unit tests.
  */
 public class OldXFormsServer extends ProcessorImpl {
 
@@ -272,7 +274,7 @@ public class OldXFormsServer extends ProcessorImpl {
                             }
                             // Check for xxforms-load event
                             {
-                                final List loads = containingDocument.getClientLoads();
+                                final List loads = containingDocument.getLoadsToRun();
                                 if (loads != null) {
                                     for (Iterator i = loads.iterator(); i.hasNext();) {
                                         final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
@@ -424,7 +426,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                         // Output messages to display
                         {
-                            final List messages = containingDocument.getClientMessages();
+                            final List messages = containingDocument.getMessagesToRun();
                             if (messages != null) {
                                 outputMessagesInfo(ch, messages);
                             }
@@ -432,7 +434,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                         // Output loads
                         {
-                            final List loads = containingDocument.getClientLoads();
+                            final List loads = containingDocument.getLoadsToRun();
                             if (loads != null) {
                                 org.orbeon.oxf.xforms.processor.XFormsServer.outputLoadsInfo(ch, loads);
                             }

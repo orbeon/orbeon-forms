@@ -12,8 +12,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Stack;
-import java.util.Enumeration;
+import java.util.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -49,6 +48,11 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private final ExternalContext externalContext;
     private Stack xmlBaseStack = new Stack();
+
+    private boolean inScript;
+    private String xxformsScriptId;
+    private Map xxformsScriptMap;
+    private StringBuffer xxformsScriptStringBuffer;
 
     public XFormsExtractorContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
         super(contentHandler);
@@ -104,6 +108,28 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             super.endElement("", "controls", "controls");
         }
 
+        if (xxformsScriptMap != null) {
+//            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+            super.startElement("", "scripts", "scripts", XMLUtils.EMPTY_ATTRIBUTES);
+
+            final AttributesImpl newAttributes = new AttributesImpl();
+            for (Iterator i = xxformsScriptMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+
+                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, (String) currentEntry.getKey());
+
+                super.startElement("", "script", "script", newAttributes);
+                final String content = (String) currentEntry.getValue();
+                super.characters(content.toCharArray(), 0, content.length());// TODO: this copies characters around, maybe we can avoid that
+                super.endElement("", "script", "script");
+
+                newAttributes.clear();
+            }
+
+            super.endElement("", "scripts", "scripts");
+//            super.endPrefixMapping("xxforms");
+        }
+
         super.endElement("", "static-state", "static-state");
         super.endDocument();
     }
@@ -155,7 +181,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     modelLevel = level;
 
                     if (gotControl)
-                        throw new ValidationException("/xhtml:html/xhtml:head//xforms:model occurred after /xhtml:html/xhtml:body//xforms:*", new LocationData(locator));
+                        throw new ValidationException("/xhtml:html/xhtml:head/xforms:model occurred after /xhtml:html/xhtml:body//xforms:*", new LocationData(locator));
 
                     if (!gotModel) {
                         outputFirstElementIfNeeded();
@@ -199,12 +225,26 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             } else if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
 
                 if (BODY_QNAME.equals(element1)) {// NOTE: This test is a little harsh, as the user may use xxforms:* elements for examples, etc.
-                    if (!("img".equals(localname) || "size".equals(localname)))
+                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname)))
                         throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
                 }
 
-                if (inControl) {
-                    super.startElement(uri, localname, qName, attributes);
+                if (inControl || inModel) {
+
+                    if ("script".equals(localname)) {
+                        if (xxformsScriptMap == null) {
+                            xxformsScriptMap = new HashMap();
+                            xxformsScriptStringBuffer = new StringBuffer();
+                        } else {
+                            xxformsScriptStringBuffer.setLength(0);
+                        }
+                        xxformsScriptId = attributes.getValue("id");
+                        inScript = true;
+                    }
+
+                    if (inControl) {
+                        super.startElement(uri, localname, qName, attributes);
+                    }
                 }
             }
 
@@ -258,6 +298,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             sendEndPrefixMappings();
         }
 
+        if (inScript && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && "script".equals(localname)) {
+            // Leaving script: remember script content by id
+            xxformsScriptMap.put(xxformsScriptId, xxformsScriptStringBuffer.toString());
+            inScript = false;
+        }
+
         if (!inModel && !inControl) {
             xmlBaseStack.pop();
         }
@@ -266,8 +312,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        if (inModel || inControl)
+        if (inScript) {
+            // Script content doesn't go through
+            xxformsScriptStringBuffer.append(chars, start, length);
+        } else  if (inModel || inControl) {
             super.characters(chars, start, length);
+        }
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {

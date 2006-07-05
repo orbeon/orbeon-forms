@@ -77,7 +77,7 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-                        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+                        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
                             // This is an XForms element
 
                             final int idIndex = attributes.getIndex("id");

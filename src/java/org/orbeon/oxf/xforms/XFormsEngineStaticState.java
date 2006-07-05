@@ -20,9 +20,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class encapsulates containing document static state information.
@@ -37,6 +35,7 @@ public class XFormsEngineStaticState {
 
     private Document controlsDocument;
     private List modelDocuments = new ArrayList();
+    private Map xxformsScripts;
 
     private String baseURI;
     private String stateHandling;
@@ -63,6 +62,16 @@ public class XFormsEngineStaticState {
             final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
 
             modelDocuments.add(modelDocument);
+        }
+
+        // Scripts
+        final Element scriptsElement = staticStateDocument.getRootElement().element("scripts");
+        if (scriptsElement != null) {
+            xxformsScripts = new HashMap();
+            for (Iterator i = scriptsElement.elements("script").iterator(); i.hasNext();) {
+                final Element scriptElement = (Element) i.next();
+                xxformsScripts.put(scriptElement.attributeValue("id"), scriptElement.getStringValue());
+            }
         }
 
         // Attributes
@@ -95,6 +104,10 @@ public class XFormsEngineStaticState {
 
     public List getModelDocuments() {
         return modelDocuments;
+    }
+
+    public Map getScripts() {
+        return xxformsScripts;
     }
 
     public String getBaseURI() {

@@ -70,7 +70,7 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
         List eventHandlers = null;
         for (Iterator i = children.iterator(); i.hasNext();) {
             final Element currentElement = (Element) i.next();
-            if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(currentElement.getNamespaceURI()) && XFormsActions.isActionName(currentElement.getName())
+            if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())
                     && currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME) != null) {
                 // Found an action
                 if (eventHandlers == null)

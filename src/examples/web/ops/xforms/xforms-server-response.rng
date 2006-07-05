@@ -188,6 +188,11 @@
                         </attribute>
                     </element>
                 </zeroOrMore>
+                <zeroOrMore>
+                    <element name="xxforms:script">
+                        <attribute name="name"/>
+                    </element>
+                </zeroOrMore>
                 <optional>
                     <element name="xxforms:setfocus">
                         <attribute name="control-id"/>

@@ -16,9 +16,13 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+
+import java.util.Map;
+import java.util.Iterator;
 
 /**
  * Handle xhtml:head.
@@ -90,6 +94,22 @@ public class XHTMLHeadHandler extends HandlerBase {
         for (int i = 0; i < scripts.length; i++) {
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript", "src", scripts[i]});
+        }
+
+        // User-defined scripts (with xxforms:script)
+        final Map scripts = containingDocument.getScripts();
+        if (scripts != null) {
+            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                "type", "text/javascript"});
+
+            for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "() {\n");
+                helper.text(currentEntry.getValue().toString());
+                helper.text("}\n");
+            }
+
+            helper.endElement();
         }
     }
 

@@ -63,8 +63,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     // Client state
     private XFormsModelSubmission activeSubmission;
     private boolean gotSubmission;
-    private List messages;
-    private List loads;
+    private List messagesToRun;
+    private List loadsToRun;
+    private List scriptsToRun;
     private String focusEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
@@ -155,6 +156,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Return a map of script id -> script text.
+     */
+    public Map getScripts() {
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getScripts();
+    }
+
+    /**
      * Return the document base URI.
      */
     public String getBaseURI() {
@@ -226,8 +234,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void clearClientState() {
         this.activeSubmission = null;
         this.gotSubmission = false;
-        this.messages = null;
-        this.loads = null;
+        this.messagesToRun = null;
+        this.loadsToRun = null;
+        this.scriptsToRun = null;
         this.focusEffectiveControlId = null;
     }
 
@@ -253,17 +262,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms message to send to the client.
      */
-    public void addClientMessage(String message, String level) {
-        if (messages == null)
-            messages = new ArrayList();
-        messages.add(new Message(message, level));
+    public void addMessageToRun(String message, String level) {
+        if (messagesToRun == null)
+            messagesToRun = new ArrayList();
+        messagesToRun.add(new Message(message, level));
     }
 
     /**
      * Return the list of messages to send to the client, null if none.
      */
-    public List getClientMessages() {
-        return messages;
+    public List getMessagesToRun() {
+        return messagesToRun;
     }
 
     public static class Message {
@@ -284,20 +293,30 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
+    public void addScriptToRun(String scriptId) {
+        if (scriptsToRun == null)
+            scriptsToRun = new ArrayList();
+        scriptsToRun.add(XFormsUtils.scriptIdToScriptName(scriptId));
+    }
+
+    public List getScriptsToRun() {
+        return scriptsToRun;
+    }
+
     /**
      * Add an XForms load to send to the client.
      */
-    public void addClientLoad(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad) {
-        if (loads == null)
-            loads = new ArrayList();
-        loads.add(new Load(resource, target, urlType, isReplace, isPortletLoad));
+    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad) {
+        if (loadsToRun == null)
+            loadsToRun = new ArrayList();
+        loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad));
     }
 
     /**
      * Return the list of messages to send to the client, null if none.
      */
-    public List getClientLoads() {
-        return loads;
+    public List getLoadsToRun() {
+        return loadsToRun;
     }
 
     public static class Load {

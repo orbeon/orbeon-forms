@@ -41,7 +41,7 @@
                <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
             </context-param>
             <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'flat file resource manager'"/>
+                <xsl:with-param name="caption" select="'filesystem resource manager'"/>
                 <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <context-param>
@@ -64,7 +64,7 @@
                <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
             </context-param>
 
-            <xsl:comment> OXF Class Loader </xsl:comment>
+            <xsl:comment> OPS Class Loader </xsl:comment>
             <context-param>
                 <param-name>oxf.classloader.enable</param-name>
                 <param-value>false</param-value>
@@ -174,7 +174,7 @@
             <xsl:comment> All JSP files under /xforms-jsp go through the OPS filter </xsl:comment>
             <filter>
                 <filter-name>ops-main-filter</filter-name>
-                <filter-class>org.orbeon.oxf.servlet.OXFServletFilter</filter-class>
+                <filter-class>org.orbeon.oxf.servlet.OPSServletFilter</filter-class>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -220,6 +220,35 @@
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>
+
+            <!--
+            <servlet>
+                <servlet-name>ops-xhtml-xforms-servlet</servlet-name>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <init-param>
+                    <param-name>oxf.main-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.main-processor.input.config</param-name>
+                    <param-value>oxf:/config/run-xforms.xpl</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.input.config</param-name>
+                    <param-value>oxf:/config/error.xpl</param-value>
+                </init-param>
+                <load-on-startup>1</load-on-startup>
+            </servlet>
+
+            <servlet-mapping>
+                <servlet-name>ops-xhtml-xforms-servlet</servlet-name>
+                <url-pattern>/test/*</url-pattern>
+            </servlet-mapping>
+            -->
 
             <servlet>
                 <servlet-name>ops-main-servlet</servlet-name>
@@ -300,7 +329,7 @@
                     <param-name>basedir</param-name>
                     <param-value>WEB-INF/</param-value>
                 </init-param>
-v                <init-param>
+                 <init-param>
                     <param-name>configuration</param-name>
                     <param-value>exist-conf.xml</param-value>
                 </init-param>

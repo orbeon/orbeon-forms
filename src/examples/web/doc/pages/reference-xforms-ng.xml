@@ -2700,6 +2700,7 @@
                     </p>
                     <ul>
                         <li>
+                            <a name="xxforms-call-xpl"/>
                             <p>
                                 <code>xxforms:call-xpl($xplURL as xs:string, $inputNames as xs:string*, $inputElements
                                 as element()*, $outputNames as xs:string+) as document-node()*</code>.
@@ -2745,6 +2746,7 @@
                             </xml-source>
                         </li>
                         <li>
+                            <a name="xxforms-evaluate"/>
                             <p>
                                 <code>xxforms:evaluate($xpath as xs:string) as item()*</code>.
                             </p>
@@ -2759,6 +2761,7 @@
                             </xml-source>
                         </li>
                         <li>
+                            <a name="xxforms-repeat-current"/>
                             <p>
                                 <code>xxforms:repeat-current($repeat-id as xs:string?) as xs:string</code>.
                             </p>
@@ -2790,6 +2793,7 @@
                             </p>
                         </li>
                         <li>
+                            <a name="xxforms-context"/>
                             <p>
                                 <code>xxforms:context($element-id as xs:string) as xs:string</code>.
                             </p>
@@ -2840,15 +2844,42 @@
             </section>
             <a name="other-extensions"/>
             <section>
-                <title>XForms Submission</title>
-                <p>
-                    The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
-                    <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials:
-                </p>
-                <xml-source show-namespaces="false">
-                    <xforms:submission id="save-submission" ref="instance('my-instance')"
-                               method="put" action="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
-                </xml-source>
+                <title>Other Extensions</title>
+                <a name="submission-auth-extension"/>
+                <section>
+                    <title>XForms Submission</title>
+                    <p>
+                        The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
+                        <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:submission id="save-submission" ref="instance('my-instance')"
+                                   method="put" action="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
+                    </xml-source>
+                </section>
+                <a name="xxforms-script-extension"/>
+                <section>
+                    <title><code>xxforms:script</code> Action</title>
+                    <p>
+                        The <code>xxforms:script</code> action allows you to call client-side JavaScript as a result of
+                        XForms events:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:action ev:event="xforms-value-changed">
+                            <xforms:setvalue ref=".">test</xforms:setvalue>
+                            <xxforms:script>
+                                var v = 2;
+                                myValueChanged(v);
+                            </xxforms:script>
+                        </xforms:action>
+                    </xml-source>
+                    <note>
+                        <p>
+                            <code>xxforms:script</code> actions are currently always executed <i>last</i> in a sequence
+                            of XForms actions, even if they appear before other XForms actions.
+                        </p>
+                    </note>
+                </section>
             </section>
         </section>
         <a name="xforms-state-handling"/>

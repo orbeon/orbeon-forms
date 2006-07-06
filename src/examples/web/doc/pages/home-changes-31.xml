@@ -128,8 +128,16 @@
                         </li>
                         <li>
                             <p>
-                                New extension function <code>xxforms:context()</code> [TODO: details; already documented,
-                                just link]
+                                The <a href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a>
+                                function allows you to obtain the evaluation context for an enclosing
+                                <code>xforms:group</code>, <code>xforms:repeat</code>, or <code>xforms:switch</code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                A new extension action <a
+                                href="reference-xforms-ng#xxforms-script-extension"><code>xxforms:script</code></a>
+                                allows you to call client-side JavaScript code as a result of XForms events.
                             </p>
                         </li>
                         <li>

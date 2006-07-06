@@ -39,6 +39,70 @@ var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 
 /* * * * * * Utility functions * * * * * */
 
+ORBEON = {};
+ORBEON.util = {};
+
+ORBEON.util.Dom = {
+
+    /**
+     * The hasClass, addClass and removeClass methods use a cache of the
+     * classes for a give element for quick lookup. After having parsed the
+     * className a first time we store that information in the orbeonClasses
+     * map on the given element.
+     */
+
+    /**
+     * Changes the className on the element based on the information stored in
+     * _elementToClasses.
+     *
+     * @private
+     */
+    _regenerateClassName: function(element) {
+        var newClassName = "";
+        for (var existingClassName in element.orbeonClasses) {
+            if (element.orbeonClasses[existingClassName]) {
+                if (newClassName.length > 0)
+                    newClassName += " ";
+                newClassName += existingClassName;
+            }
+        }
+        element.className = newClassName;
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.hasClass(element, className).
+     */
+    hasClass: function(element, className) {
+        if (!element.orbeonClasses) {
+            element.orbeonClasses = {};
+            var classes = element.className.split(" ");
+            for (var i = 0; i < classes.length; i++)
+                element.orbeonClasses[classes[i]] = true;
+        }
+        return element.orbeonClasses[className] == true;
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.addClass(element, className).
+     */
+    addClass: function(element, className) {
+        if (!this.hasClass(element, className)) {
+            element.orbeonClasses[className] = true;
+            this._regenerateClassName(element);
+        }
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.removeClass(element, className).
+     */
+    removeClass: function(element, className) {
+        if (this.hasClass(element, className)) {
+            element.orbeonClasses[className] = false;
+            this._regenerateClassName(element);
+        }
+    }
+}
+
 function xformsIsDefined(thing) {
     return typeof thing != "undefined";
 }
@@ -174,7 +238,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
-        while (cursor.nodeType != ELEMENT_TYPE || !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
+        while (cursor.nodeType != ELEMENT_TYPE || !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")) {
             cursor = cursor.nextSibling;
             if (!cursor) return null;
         }
@@ -333,14 +397,14 @@ function xformsStoreInClientState(form, key, value) {
 function xformsValueChanged(target, other) {
     var valueChanged = target.value != target.previousValue;
     // We don't send value change events for the XForms upload control
-    var isUploadControl = YAHOO.util.Dom.hasClass(target, "xforms-upload");
+    var isUploadControl = ORBEON.util.Dom.hasClass(target, "xforms-upload");
     if (valueChanged && !isUploadControl) {
         target.previousValue = target.value;
         document.xformsChangedIdsRequest.push(target.id);
         var events = new Array(xformsCreateEventArray
                 (target, "xxforms-value-change-with-focus-change", target.value, other));
         var incremental = other == null
-                && YAHOO.util.Dom.hasClass(target, "xforms-incremental");
+                && ORBEON.util.Dom.hasClass(target, "xforms-incremental");
         xformsFireEvents(events, incremental);
     }
     return valueChanged;
@@ -361,8 +425,8 @@ function xformsHandleValueChange(event) {
         return xformsPreventDefault(event);
     } else {
         // If this is an input field, set value on parent and send event on parent element
-        if (YAHOO.util.Dom.hasClass(target.parentNode, "xforms-input")
-                || YAHOO.util.Dom.hasClass(target.parentNode, "xforms-select1-open")) {
+        if (ORBEON.util.Dom.hasClass(target.parentNode, "xforms-input")
+                || ORBEON.util.Dom.hasClass(target.parentNode, "xforms-select1-open")) {
             target.parentNode.valueSetByXForms++;
             target.parentNode.value = target.value;
             target = target.parentNode;
@@ -377,7 +441,7 @@ function xformsHandleValueChange(event) {
 function xformsHandleClick(event) {
     var target = getEventTarget(event);
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-    if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") && !YAHOO.util.Dom.hasClass(target, "xforms-readonly"))
+    if (ORBEON.util.Dom.hasClass(target, "xforms-trigger") && !ORBEON.util.Dom.hasClass(target, "xforms-readonly"))
         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)), false);
     return false;
 }
@@ -415,7 +479,7 @@ function xformsHandleOutputClick(event) {
     // In the case of appearance="xxforms:html, target can be an element inside
     // the xforms-output, not the xforms-output itself. So we are here looking for the
     // xforms-parent when necessary.
-    while (!YAHOO.util.Dom.hasClass(target, "xforms-output"))
+    while (!ORBEON.util.Dom.hasClass(target, "xforms-output"))
         target = target.parentNode;
     events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
     xformsFireEvents(events, false);
@@ -476,7 +540,7 @@ function xformsHandleBlur(event) {
         while (true) {
             if (!target) break; // No more parent, stop search
             if (target.className != null) {
-                if (YAHOO.util.Dom.hasClass(target, "xforms-control")) {
+                if (ORBEON.util.Dom.hasClass(target, "xforms-control")) {
                     // We found our XForms element target
                     break;
                 }
@@ -489,8 +553,8 @@ function xformsHandleBlur(event) {
             // This is an event for an XForms control
             document.xformsPreviousDOMFocusOut = target;
             // HTML area does not throw value change event, so we throw it on blur
-            if (YAHOO.util.Dom.hasClass(target, "xforms-textarea")
-                    && YAHOO.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
+                    && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
                 var editorInstance = FCKeditorAPI.GetInstance(target.name);
                 target.value = editorInstance.GetXHTML();
                 xformsValueChanged(target, null);
@@ -502,7 +566,7 @@ function xformsHandleBlur(event) {
 function xformsHandleFocus(event) {
     if (!document.xformsMaskFocusEvents) {
         var target = getEventTarget(event);
-        while (target && (target.className == null || !YAHOO.util.Dom.hasClass(target, "xforms-control")))
+        while (target && (target.className == null || !ORBEON.util.Dom.hasClass(target, "xforms-control")))
             target = target.parentNode;
 
         // Send focus events
@@ -608,8 +672,8 @@ function xformsInitCheckesRadios(control) {
         var checkbox = getEventTarget(event);
         var span = checkbox;
         while (true) {
-            if (YAHOO.util.Dom.hasClass(span, "xforms-select-full")
-                    || YAHOO.util.Dom.hasClass(span, "xforms-select1-full"))
+            if (ORBEON.util.Dom.hasClass(span, "xforms-select-full")
+                    || ORBEON.util.Dom.hasClass(span, "xforms-select1-full"))
                 break;
             span = span.parentNode;
         }
@@ -630,7 +694,7 @@ function xformsInitCheckesRadios(control) {
 function xformsHtmlEditorChange(editorInstance) {
     editorInstance.LinkedField.value = editorInstance.GetXHTML();
     // Throw value change event if the field is in incremental mode
-    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
+    if (ORBEON.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
         xformsValueChanged(editorInstance.LinkedField, null);
 }
 
@@ -709,7 +773,7 @@ function FCKeditor_OnComplete(editorInstance) {
     // Save reference to XForms element (textarea) in document for event handlers that receive the document
     editorInstance.EditorDocument.xformsElement = editorInstance.LinkedField;
     // Register value change handler when in incremental mode
-    if (YAHOO.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
+    if (ORBEON.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
         editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
     // Register focus/blur events for Gecko
     YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
@@ -820,13 +884,13 @@ function xformsInitializeControlsUnder(root) {
             xformsElementCount++;
 
             // For elements that correspond to XForms controls
-            if (YAHOO.util.Dom.hasClass(control, "xforms-control")) {
+            if (ORBEON.util.Dom.hasClass(control, "xforms-control")) {
 
                 // Set initial values for disabled, readonly, required, and valid
-                control.isRelevant = !YAHOO.util.Dom.hasClass(control, "xforms-disabled");
-                control.isReadonly = YAHOO.util.Dom.hasClass(control, "xforms-readonly");
-                control.isRequired = YAHOO.util.Dom.hasClass(control, "xforms-required");
-                control.isValid = !YAHOO.util.Dom.hasClass(control, "xforms-invalid");
+                control.isRelevant = !ORBEON.util.Dom.hasClass(control, "xforms-disabled");
+                control.isReadonly = ORBEON.util.Dom.hasClass(control, "xforms-readonly");
+                control.isRequired = ORBEON.util.Dom.hasClass(control, "xforms-required");
+                control.isValid = !ORBEON.util.Dom.hasClass(control, "xforms-invalid");
 
                 // Initialize control.xformsForm
                 if (typeof control.form == "undefined") {
@@ -852,7 +916,7 @@ function xformsInitializeControlsUnder(root) {
                 for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
                     values.push(select.options[optionIndex].value);
                 // Initialize auto-complete input
-                var noFilter = YAHOO.util.Dom.hasClass(control, "xforms-select1-open-autocomplete-nofilter");
+                var noFilter = ORBEON.util.Dom.hasClass(control, "xforms-select1-open-autocomplete-nofilter");
                 actb(textfield, values, noFilter);
                 // Initialize span
                 control.value = textfield.value;
@@ -910,7 +974,7 @@ function xformsInitializeControlsUnder(root) {
                     }
                 }
                 // Save in the control if it allows multiple selection
-                control.xformsAllowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select-tree");
+                control.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(control, "xforms-select-tree");
                 // Parse data put by the server in the div
                 var treeArray = eval(xformsStringValue(control));
                 xformsReplaceNodeText(control, "");
@@ -981,9 +1045,9 @@ function xformsInitializeControlsUnder(root) {
                 for (var i = 0; i < control.childNodes.length; i++) {
                     var childNode =  control.childNodes[i];
                     if (childNode.nodeType == ELEMENT_TYPE) {
-                        if (YAHOO.util.Dom.hasClass(childNode, "yuimenubar")) {
+                        if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
                             treeDiv = childNode;
-                        } else if (YAHOO.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
+                        } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
                             valuesDiv = childNode;
                         }
                     }
@@ -1057,7 +1121,7 @@ function xformsInitializeControlsUnder(root) {
 
             // Alert label next to the control
             if (isXFormsAlert) {
-                var isActive = YAHOO.util.Dom.hasClass(control, "xforms-alert-active");
+                var isActive = ORBEON.util.Dom.hasClass(control, "xforms-alert-active");
 
                 // Store reference in control element to this alert element
                 var alertFor = document.getElementById(control.htmlFor);
@@ -1100,7 +1164,7 @@ function xformsPageLoaded() {
     var allForms = document.forms;
     var foundXFormsForm = false;
     for (var formIndex = 0; formIndex < allForms.length; formIndex++) {
-        if (YAHOO.util.Dom.hasClass(allForms[formIndex], "xforms-form")) {
+        if (ORBEON.util.Dom.hasClass(allForms[formIndex], "xforms-form")) {
             foundXFormsForm = true;
             break;
         }
@@ -1159,7 +1223,7 @@ function xformsPageLoaded() {
         for (var formIndex = 0; formIndex < forms.length; formIndex++) {
             var form = forms[formIndex];
             // Store in the form if this is an XForms form for faster lookup when iterating on form later on
-            form.xformsIsXFormsForm = YAHOO.util.Dom.hasClass(form, "xforms-form");
+            form.xformsIsXFormsForm = ORBEON.util.Dom.hasClass(form, "xforms-form");
             // If this is an XForms form, procede with initialization
             if (form.xformsIsXFormsForm) {
 
@@ -1360,19 +1424,19 @@ function xformsHandleResponse(o) {
                                             var templateNode = templateRepeatEnd.previousSibling;
                                             var nestedRepeatLevel = 0;
                                             while (!(nestedRepeatLevel == 0 && templateNode.nodeType == ELEMENT_TYPE
-                                                     && YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-delimiter"))) {
+                                                     && ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-delimiter"))) {
                                                 var nodeCopy = templateNode.cloneNode(true);
                                                 if (templateNode.nodeType == ELEMENT_TYPE) {
                                                     // Save tag name to be used for delimiter
                                                     delimiterTagName = templateNode.tagName;
                                                     // Decrement nestedRepeatLevel when we we exit a nested repeat
-                                                    if (YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                             templateNode.id.indexOf("repeat-begin-") == 0)
                                                         nestedRepeatLevel--;
                                                     // Add suffix to all the ids
                                                     xformsAddSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : parentIndexes + XFORMS_SEPARATOR_2 + idSuffix, nestedRepeatLevel);
                                                     // Increment nestedRepeatLevel when we enter a nested repeat
-                                                    if (YAHOO.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
+                                                    if (ORBEON.util.Dom.hasClass(templateNode, "xforms-repeat-begin-end") &&
                                                             templateNode.id.indexOf("repeat-end-") == 0)
                                                         nestedRepeatLevel++;
                                                     // Remove "xforms-repeat-template" from classes on copy of element
@@ -1403,8 +1467,8 @@ function xformsHandleResponse(o) {
                                                 var repeatEnd = document.getElementById("repeat-end-" + repeatId);
                                                 var cursor = repeatEnd.previousSibling;
                                                 while (!(cursor.nodeType == ELEMENT_TYPE
-                                                        && YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                        && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-template"))) {
+                                                        && ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                        && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-template"))) {
                                                     cursor = cursor.previousSibling;
                                                 }
                                                 afterInsertionPoint = cursor;
@@ -1446,7 +1510,7 @@ function xformsHandleResponse(o) {
                                             if (parentIndexes == "") {
                                                 // Top-level repeat: need to go over template
                                                 while (lastElementToDelete.nodeType != ELEMENT_TYPE
-                                                        || !YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter"))
+                                                        || !ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter"))
                                                     lastElementToDelete = lastElementToDelete.previousSibling;
                                                 lastElementToDelete = lastElementToDelete.previousSibling;
                                             }
@@ -1455,7 +1519,7 @@ function xformsHandleResponse(o) {
                                         for (var countIndex = 0; countIndex < count; countIndex++) {
                                             while (true) {
                                                 var wasDelimiter = lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                    && YAHOO.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
+                                                    && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
                                                 var previous = lastElementToDelete.previousSibling;
                                                 lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                 lastElementToDelete = previous;
@@ -1483,7 +1547,7 @@ function xformsHandleResponse(o) {
                                 var documentElement = document.getElementById(controlId);
                                 var documentElementClasses = documentElement.className.split(" ");
 
-                                if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
+                                if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                     // Build list with new values
                                     var newValues = new Array();
                                     for (var k = 0; k < itemsetElement.childNodes.length; k++) {
@@ -1640,14 +1704,14 @@ function xformsHandleResponse(o) {
                                         // and it is possible to receive a response from the server after the value is modified but
                                         // before the keyup event is dispatched.
                                         var foundControlModified = false;
-                                        if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             if (documentElement.childNodes[1].value != documentElement.previousValue)
                                                 foundControlModified = true;
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                             if (documentElement.childNodes[0].value != documentElement.previousValue)
                                                 foundControlModified = true;
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             // For HTML area, compare previous value to value of the HTML area widget
                                             var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                             if (documentElement.previousValue != htmlEditor.GetXHTML())
@@ -1670,9 +1734,9 @@ function xformsHandleResponse(o) {
                                         if (foundControlModified) {
                                             // User has modified the value of this control since we sent our request:
                                             // so don't try to update it
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-trigger")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")) {
                                             // Triggers don't have a value: don't update them
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                             // Auto-complete
                                             var textfield = documentElement.childNodes[0];
                                             var select = documentElement.childNodes[1];
@@ -1680,36 +1744,36 @@ function xformsHandleResponse(o) {
                                             // Populate values
                                             if (textfield.value != newControlValue)
                                                 textfield.value = newControlValue;
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-full")
-                                                || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-full")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-full")) {
                                             // Handle checkboxes and radio buttons
-                                            var selectedValues = YAHOO.util.Dom.hasClass(documentElement, "xforms-select-full")
+                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")
                                                 ? newControlValue.split(" ") : new Array(newControlValue);
                                             var checkboxInputs = documentElement.getElementsByTagName("input");
                                             for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
                                                 var checkboxInput = checkboxInputs[checkboxInputIndex];
                                                 checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
                                             }
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-compact")
-                                                || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-compact")
-                                                || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-minimal")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-minimal")) {
                                             // Handle lists and comboboxes
-                                            var selectedValues = YAHOO.util.Dom.hasClass(documentElement, "xforms-select-compact")
+                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-compact")
                                                 ? newControlValue.split(" ") : new Array(newControlValue);
                                             var options = documentElement.options;
                                             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                                                 var option = options[optionIndex];
                                                 option.selected = xformsArrayContains(selectedValues, option.value);
                                             }
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")) {
                                             // XForms output
                                             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
-                                            if (YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
                                                 documentElement.firstChild.src = newOutputControlValue;
                                             } else {
                                                 xformsReplaceNodeText(documentElement, newOutputControlValue);
                                             }
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             // XForms input
                                             var displayField = documentElement.childNodes[0];
                                             var inputField = documentElement.childNodes[1];
@@ -1719,19 +1783,19 @@ function xformsHandleResponse(o) {
                                             if (type == "{http://www.w3.org/2001/XMLSchema}date") {
                                                 for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
                                                     var child = documentElement.childNodes[childIndex];
-                                                    YAHOO.util.Dom.addClass(child, "xforms-type-date");
-                                                    YAHOO.util.Dom.removeClass(child, "xforms-type-string");
+                                                    ORBEON.util.Dom.addClass(child, "xforms-type-date");
+                                                    ORBEON.util.Dom.removeClass(child, "xforms-type-string");
                                                 }
                                             } else if (type != null && type != "{http://www.w3.org/2001/XMLSchema}date") {
                                                 for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
                                                     var child = documentElement.childNodes[childIndex];
-                                                    YAHOO.util.Dom.addClass(child, "xforms-type-string");
-                                                    YAHOO.util.Dom.removeClass(child, "xforms-type-date");
+                                                    ORBEON.util.Dom.addClass(child, "xforms-type-string");
+                                                    ORBEON.util.Dom.removeClass(child, "xforms-type-date");
                                                 }
                                             }
 
                                             // Populate values
-                                            if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date"))
+                                            if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date"))
                                                 xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                             if (documentElement.value != newControlValue) {
                                                 documentElement.previousValue = newControlValue;
@@ -1740,8 +1804,8 @@ function xformsHandleResponse(o) {
                                             }
                                             if (inputField.value != newControlValue)
                                                 inputField.value = newControlValue;
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                && YAHOO.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             // HTML area
                                             var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                             if (xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)) {
@@ -1749,7 +1813,7 @@ function xformsHandleResponse(o) {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             }
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-select-tree")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-tree")) {
                                             // Tree
                                             var values = newControlValue.split(" ");
                                             for (nodeIndex in documentElement.xformsTree._nodes) {
@@ -1761,7 +1825,7 @@ function xformsHandleResponse(o) {
                                             }
                                             documentElement.value = newControlValue;
                                             documentElement.previousValue = newControlValue;
-                                        } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-control")
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-control")
                                                 && typeof(documentElement.value) == "string") {
                                             // Textarea, password
                                             if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {
@@ -1841,12 +1905,12 @@ function xformsHandleResponse(o) {
                                         // Remove or add xforms-disabled on elements after this delimiter
                                         var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
                                         while (!(cursor.nodeType == ELEMENT_TYPE &&
-                                                 (YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                    || YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
+                                                 (ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                    || ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end")))) {
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 if (relevant) {
-                                                    if (relevant == "true") YAHOO.util.Dom.removeClass(cursor, "xforms-disabled");
-                                                    else YAHOO.util.Dom.addClass(cursor, "xforms-disabled");
+                                                    if (relevant == "true") ORBEON.util.Dom.removeClass(cursor, "xforms-disabled");
+                                                    else ORBEON.util.Dom.addClass(cursor, "xforms-disabled");
                                                 }
                                             }
                                             cursor = cursor.nextSibling;
@@ -1880,8 +1944,8 @@ function xformsHandleResponse(o) {
                                         }
                                         if (cursor.nodeType == ELEMENT_TYPE) {
                                             if (cursor.id == "xforms-case-end-" + controlId) break;
-                                            YAHOO.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
-                                            YAHOO.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
+                                            ORBEON.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
+                                            ORBEON.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
                                         }
                                     }
                                 }
@@ -1934,12 +1998,12 @@ function xformsHandleResponse(o) {
                                 if (oldIndex != 0) {
                                     var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
                                     if (oldItemDelimiter != null) {
-                                        cursor = oldItemDelimiter.nextSibling;
+                                        var cursor = oldItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
-                                               (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                               && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                               (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                               && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                             if (cursor.nodeType == ELEMENT_TYPE)
-                                                YAHOO.util.Dom.removeClass(cursor, xformsGetClassForReapeatId(repeatId));
+                                                ORBEON.util.Dom.removeClass(cursor, xformsGetClassForReapeatId(repeatId));
                                             cursor = cursor.nextSibling;
                                         }
                                     }
@@ -1957,15 +2021,12 @@ function xformsHandleResponse(o) {
                                     var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                     if (newItemDelimiter == null)
                                         throw "Can not find delimiter for repeatId '" + repeatId + "' index '" + newIndex + "'";
-                                    cursor = newItemDelimiter.nextSibling;
+                                    var cursor = newItemDelimiter.nextSibling;
                                     while (cursor.nodeType != ELEMENT_TYPE ||
-                                           (!YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                           && !YAHOO.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
-                                        if (cursor.nodeType == ELEMENT_TYPE) {
-                                            var classNameArray = cursor.className.split(" ");
-                                            classNameArray.push(xformsGetClassForReapeatId(repeatId));
-                                            cursor.className = classNameArray.join(" ");
-                                        }
+                                           (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                           && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                        if (cursor.nodeType == ELEMENT_TYPE)
+                                            ORBEON.util.Dom.addClass(cursor, xformsGetClassForReapeatId(repeatId));
                                         cursor = cursor.nextSibling;
                                     }
                                 }
@@ -2016,7 +2077,7 @@ function xformsHandleResponse(o) {
                             var setfocusElement = actionElement.childNodes[actionIndex];
                             var controlId = setfocusElement.getAttribute("control-id");
                             var control = document.getElementById(controlId);
-                            if (YAHOO.util.Dom.hasClass(control, "xforms-input"))
+                            if (ORBEON.util.Dom.hasClass(control, "xforms-input"))
                                 control = control.childNodes[1];
                             document.xformsMaskFocusEvents = true;
                             control.focus();

@@ -25,27 +25,27 @@ function xformsUpdateStyleLabel(label, message) {
 function xformsUpdateReadonlyFormElement(element, readonly) {
     if (readonly) {
         element.setAttribute("disabled", "disabled");
-        YAHOO.util.Dom.addClass(element, "xforms-readonly");
+        ORBEON.util.Dom.addClass(element, "xforms-readonly");
     } else {
         element.removeAttribute("disabled");
-        YAHOO.util.Dom.removeClass(element, "xforms-readonly");
+        ORBEON.util.Dom.removeClass(element, "xforms-readonly");
     }
 }
 
 function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required, valid) {
     if (xformsIsDefined(relevant)) {
-        if (relevant) YAHOO.util.Dom.removeClass(element, "xforms-disabled")
-        else YAHOO.util.Dom.addClass(element, "xforms-disabled");
+        if (relevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled")
+        else ORBEON.util.Dom.addClass(element, "xforms-disabled");
     }
     if (xformsIsDefined(readonly)) {
-        if (YAHOO.util.Dom.hasClass(element, "xforms-input")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-input")) {
             // XForms input
 
             // Display value
             var displayValue = element.firstChild;
             while (displayValue.nodeType != ELEMENT_TYPE) displayValue = displayValue.nextSibling;
-            if (readonly) YAHOO.util.Dom.addClass(displayValue, "xforms-readonly");
-            else YAHOO.util.Dom.removeClass(displayValue, "xforms-readonly");
+            if (readonly) ORBEON.util.Dom.addClass(displayValue, "xforms-readonly");
+            else ORBEON.util.Dom.removeClass(displayValue, "xforms-readonly");
 
             // Text field
             var textField = displayValue.nextSibling;
@@ -56,13 +56,13 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
             // Calendar picker
             var showCalendar = textField.nextSibling;
             while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
-            if (readonly) YAHOO.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
-            else YAHOO.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
-        } else if (YAHOO.util.Dom.hasClass(element, "xforms-output") || YAHOO.util.Dom.hasClass(element, "xforms-group")) {
+            if (readonly) ORBEON.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
+            else ORBEON.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
+        } else if (ORBEON.util.Dom.hasClass(element, "xforms-output") || ORBEON.util.Dom.hasClass(element, "xforms-group")) {
             // XForms output and group
-            if (readonly) YAHOO.util.Dom.addClass(element, "xforms-readonly");
-            else YAHOO.util.Dom.removeClass(element, "xforms-readonly");
-        } else if (YAHOO.util.Dom.hasClass(element, "xforms-select1-full") || YAHOO.util.Dom.hasClass(element, "xforms-select-full")) {
+            if (readonly) ORBEON.util.Dom.addClass(element, "xforms-readonly");
+            else ORBEON.util.Dom.removeClass(element, "xforms-readonly");
+        } else if (ORBEON.util.Dom.hasClass(element, "xforms-select1-full") || ORBEON.util.Dom.hasClass(element, "xforms-select-full")) {
             // XForms radio buttons
             for (var spanIndex = 0; spanIndex < element.childNodes.length; spanIndex++) {
                 var span = element.childNodes[spanIndex];
@@ -77,35 +77,35 @@ function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required
     if (xformsIsDefined(required)) {
         var classes = element.className.split(" ");
         if (required) {
-            YAHOO.util.Dom.addClass(element, "xforms-required");
+            ORBEON.util.Dom.addClass(element, "xforms-required");
             if (element.value == "") {
-                YAHOO.util.Dom.addClass(element, "xforms-required-empty");
-                YAHOO.util.Dom.removeClass(element, "xforms-required-filled");
+                ORBEON.util.Dom.addClass(element, "xforms-required-empty");
+                ORBEON.util.Dom.removeClass(element, "xforms-required-filled");
             } else {
-                YAHOO.util.Dom.addClass(element, "xforms-required-filled");
-                YAHOO.util.Dom.removeClass(element, "xforms-required-empty");
+                ORBEON.util.Dom.addClass(element, "xforms-required-filled");
+                ORBEON.util.Dom.removeClass(element, "xforms-required-empty");
             }
         } else {
-            YAHOO.util.Dom.removeClass(element, "xforms-required");
-            YAHOO.util.Dom.removeClass(element, "xforms-required-filled");
-            YAHOO.util.Dom.removeClass(element, "xforms-required-empty");
+            ORBEON.util.Dom.removeClass(element, "xforms-required");
+            ORBEON.util.Dom.removeClass(element, "xforms-required-filled");
+            ORBEON.util.Dom.removeClass(element, "xforms-required-empty");
         }
     }
     if (xformsIsDefined(valid)) {
-        if (valid) YAHOO.util.Dom.removeClass(element, "xforms-invalid")
-        else YAHOO.util.Dom.addClass(element, "xforms-invalid");
+        if (valid) ORBEON.util.Dom.removeClass(element, "xforms-invalid")
+        else ORBEON.util.Dom.addClass(element, "xforms-invalid");
     }
 }
 
 function xformsSytleGetFocus(event) {
     var target = getEventTarget(event);
-    if (!YAHOO.util.Dom.hasClass(target, "xforms-control"))
+    if (!ORBEON.util.Dom.hasClass(target, "xforms-control"))
         target = target.parentNode;
     var hintLabel = target;
     while (true) {
-        if (YAHOO.util.Dom.hasClass(hintLabel, "xforms-hint") && hintLabel.htmlFor == target.id) {
-            YAHOO.util.Dom.removeClass(hintLabel, "xforms-hint");
-            YAHOO.util.Dom.addClass(hintLabel, "xforms-hint-active");
+        if (ORBEON.util.Dom.hasClass(hintLabel, "xforms-hint") && hintLabel.htmlFor == target.id) {
+            ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint");
+            ORBEON.util.Dom.addClass(hintLabel, "xforms-hint-active");
             break;
         }
         hintLabel = hintLabel.nextSibling;
@@ -115,13 +115,13 @@ function xformsSytleGetFocus(event) {
 
 function xformsStyleLoosesFocus(event) {
     var target = getEventTarget(event);
-    if (!YAHOO.util.Dom.hasClass(target, "xforms-control"))
+    if (!ORBEON.util.Dom.hasClass(target, "xforms-control"))
         target = target.parentNode;
     var hintLabel = target;
     while (true) {
-        if (YAHOO.util.Dom.hasClass(hintLabel, "xforms-hint-active") && hintLabel.htmlFor == target.id) {
-            YAHOO.util.Dom.removeClass(hintLabel, "xforms-hint-active");
-            YAHOO.util.Dom.addClass(hintLabel, "xforms-hint");
+        if (ORBEON.util.Dom.hasClass(hintLabel, "xforms-hint-active") && hintLabel.htmlFor == target.id) {
+            ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint-active");
+            ORBEON.util.Dom.addClass(hintLabel, "xforms-hint");
             break;
         }
         hintLabel = hintLabel.nextSibling;
@@ -148,7 +148,7 @@ function xformsCalendarClick(event) {
     // Event can be received on calendar picker span, or on the containing span
     var span = target.childNodes.length != 3 ? target.parentNode : target
     var inputField = span.childNodes[1];
-    if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date")
+    if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")
             && !inputField.disabled)
         span.xformsJscalendarOnClick();
 }
@@ -170,18 +170,18 @@ function xformsUpdateStyle(element) {
     if (element.className) {
         var classes = element.className.split(" ");
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-mediatype-text-html")
-                && YAHOO.util.Dom.hasClass(element, "xforms-output")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-mediatype-text-html")
+                && ORBEON.util.Dom.hasClass(element, "xforms-output")) {
             if (element.firstChild != null)
                 element.innerHTML = xformsStringValue(element);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-initially-hidden")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-initially-hidden")) {
             // Make the content of the element visible
-            YAHOO.util.Dom.removeClass(element, "xforms-initially-hidden");
+            ORBEON.util.Dom.removeClass(element, "xforms-initially-hidden");
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-label")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-label")) {
 
             // Initialize hint message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -200,7 +200,7 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-hint")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-hint")) {
 
             // Initialize hint message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -219,7 +219,7 @@ function xformsUpdateStyle(element) {
             if (!element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
                 // Add listeners on control
-                var controlGeneratingEvent = YAHOO.util.Dom.hasClass(control, "xforms-input")
+                var controlGeneratingEvent = ORBEON.util.Dom.hasClass(control, "xforms-input")
                     ? control.childNodes[1] : control;
                 YAHOO.util.Event.addListener(controlGeneratingEvent, "focus", xformsSytleGetFocus);
                 YAHOO.util.Event.addListener(controlGeneratingEvent, "blur", xformsStyleLoosesFocus);
@@ -229,7 +229,7 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-help")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-help")) {
 
             // Initialize help message on control if not set already
             var control = document.getElementById(element.htmlFor);
@@ -275,7 +275,7 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-alert-inactive") || YAHOO.util.Dom.hasClass(element, "xforms-alert-active")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-alert-inactive") || ORBEON.util.Dom.hasClass(element, "xforms-alert-active")) {
 
             // Initialize alert control when necessary
             var control = document.getElementById(element.htmlFor);
@@ -284,8 +284,8 @@ function xformsUpdateStyle(element) {
 
             // Change alert status when necessary
             if (xformsIsDefined(control.isValid)) {
-                YAHOO.util.Dom.addClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
-                YAHOO.util.Dom.removeClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
+                ORBEON.util.Dom.addClass(element, control.isValid ? "xforms-alert-inactive" : "xforms-alert-active");
+                ORBEON.util.Dom.removeClass(element, control.isValid ? "xforms-alert-active" : "xforms-alert-inactive");
             }
 
             // Change message if necessary
@@ -299,12 +299,12 @@ function xformsUpdateStyle(element) {
             xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-input")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-input")) {
 
             var inputField = element.childNodes[1];
             var showCalendar = element.childNodes[2];
 
-            if (YAHOO.util.Dom.hasClass(inputField, "xforms-type-date")
+            if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")
                     && !element.styleListenerRegistered) {
                 element.styleListenerRegistered = true;
 
@@ -325,12 +325,12 @@ function xformsUpdateStyle(element) {
             }
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-select1-compact")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-select1-compact")) {
             // Prevent end-user from selecting multiple values
             YAHOO.util.Event.addListener(element, "change", xformsSelect1CompactChanged);
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "xforms-trigger")) {
+        if (ORBEON.util.Dom.hasClass(element, "xforms-trigger")) {
             // Update label on trigger
             if (typeof element.labelMessage != "undefined" && element.labelMessage != xformsStringValue(element)) {
                 if (element.tagName.toLowerCase() == "input")
@@ -340,7 +340,7 @@ function xformsUpdateStyle(element) {
             }
         }
 
-        if (YAHOO.util.Dom.hasClass(element, "wide-textarea")) {
+        if (ORBEON.util.Dom.hasClass(element, "wide-textarea")) {
             if (!element.changeHeightHandlerRegistered) {
                 element.changeHeightHandlerRegistered = true;
                 xformsChangeHeightHandler(element);

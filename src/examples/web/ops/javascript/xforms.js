@@ -903,6 +903,20 @@ function xformsInitializeControlsUnder(root) {
                     // We have directly a form control
                     control.xformsForm = control.form;
                 }
+
+                // Register focus/blur events
+                if (isXFormsCheckboxRadio) {
+                    var inputs = control.getElementsByTagName("input");
+                    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                        var input = inputs[inputIndex];
+                        xformsRegisterForFocusBlurEvents(input);
+                    }
+                } else if (isXFormsInput) {
+                    var textfield = control.childNodes[1];
+                    xformsRegisterForFocusBlurEvents(textfield);
+                } else if (control.form) {
+                    xformsRegisterForFocusBlurEvents(control);
+                }
             }
 
             if (isXFormsTrigger) {
@@ -1107,16 +1121,6 @@ function xformsInitializeControlsUnder(root) {
                 if (isIncremental) {
                     YAHOO.util.Event.addListener(control, "keyup", xformsHandleValueChange);
                 }
-            }
-
-            if (isXFormsCheckboxRadio) {
-                var inputs = control.getElementsByTagName("input");
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    var input = inputs[inputIndex];
-                    xformsRegisterForFocusBlurEvents(input);
-                }
-            } else {
-                xformsRegisterForFocusBlurEvents(control);
             }
 
             // Alert label next to the control

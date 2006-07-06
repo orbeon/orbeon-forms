@@ -1745,12 +1745,11 @@ function xformsHandleResponse(o) {
                                             // Triggers don't have a value: don't update them
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                             // Auto-complete
-                                            var textfield = documentElement.childNodes[0];
-                                            var select = documentElement.childNodes[1];
-
-                                            // Populate values
-                                            if (textfield.value != newControlValue)
-                                                textfield.value = newControlValue;
+                                            if (documentElement.value != newControlValue) {
+                                                documentElement.value = newControlValue;
+                                                documentElement.childNodes[0].value = newControlValue;
+                                                documentElement.previousValue = newControlValue;
+                                            }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")
                                                 || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-full")) {
                                             // Handle checkboxes and radio buttons

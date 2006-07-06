@@ -914,6 +914,9 @@ function xformsInitializeControlsUnder(root) {
                 } else if (isXFormsInput) {
                     var textfield = control.childNodes[1];
                     xformsRegisterForFocusBlurEvents(textfield);
+                } else if (isXFormsAutoComplete) {
+                    var textfield = control.childNodes[0];
+                    xformsRegisterForFocusBlurEvents(textfield);
                 } else if (control.form) {
                     xformsRegisterForFocusBlurEvents(control);
                 }

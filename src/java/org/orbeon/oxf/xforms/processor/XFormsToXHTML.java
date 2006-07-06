@@ -436,12 +436,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         controller.registerHandler(XHTMLBodyHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "body");
 
         // Set final output with output to filter remaining xforms:* elements if any
-        controller.setOutput(new DeferredContentHandlerImpl(new ElementFilterContentHandler(contentHandler) {
-            protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
-                // TODO: Remove this filter once the "exception elements" below are filtered at the source.
-                return XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-            }
-        }));
+        // TODO: Remove this filter once the "exception elements" below are filtered at the source.
+        controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(contentHandler)));
 
         controller.setElementHandlerContext(new HandlerContext(controller, pipelineContext, containingDocument, xformsState, staticStateUUID, dynamicStateUUID, externalContext));
 

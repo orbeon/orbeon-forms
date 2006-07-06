@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -66,7 +67,7 @@ public class XFormsCaseHandler extends HandlerBase {
 
         currentOutputInterceptor.setAddedClasses(new StringBuffer(isVisible ? "xforms-case-selected" : "xforms-case-deselected"));
 
-        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(currentOutputInterceptor));
+        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(currentOutputInterceptor)));
         setContentHandler(handlerContext.getController().getOutput());
     }
 

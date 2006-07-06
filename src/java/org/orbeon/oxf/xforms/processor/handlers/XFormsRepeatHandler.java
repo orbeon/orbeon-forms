@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
 import org.orbeon.oxf.xforms.controls.RepeatIterationInfo;
 import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
 import org.orbeon.oxf.xml.DeferredContentHandler;
@@ -65,7 +66,7 @@ public class XFormsRepeatHandler extends HandlerBase {
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-repeat-delimiter", null);
             }
         });
-        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(outputInterceptor));
+        handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
         setContentHandler(handlerContext.getController().getOutput());
 
         if (isTopLevelRepeat || !isGenerateTemplate) {

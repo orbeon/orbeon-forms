@@ -118,6 +118,14 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
                     classes.append(" xforms-alert-inactive");
             }
 
+            // If the value of a help, hint or label is empty, consider it as "non-relevant"
+            // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
+            if (!type.equals("alert")) {
+                if (value == null || value.equals("")) {
+                    classes.append(" xforms-disabled");
+                }
+            }
+
             outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, value);
         }
     }

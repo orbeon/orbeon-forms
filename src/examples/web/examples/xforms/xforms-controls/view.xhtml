@@ -16,6 +16,7 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
@@ -34,7 +35,7 @@
             </xforms:action>
             <xforms:instance id="instance">
                 <!-- Here we illustrate how an XForms instance can be included with XInclude -->
-                <xi:include href="main-xforms-instance.xml"/>
+                <xi:include href="main-xforms-instance.xml" xxi:omit-xml-base="true"/>
             </xforms:instance>
             <xforms:instance id="items">
                 <items>

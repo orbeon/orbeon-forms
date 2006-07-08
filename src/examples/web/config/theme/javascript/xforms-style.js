@@ -34,7 +34,7 @@ function xformsUpdateReadonlyFormElement(element, readonly) {
 
 function xformsUpdateStyleRelevantReadonly(element, relevant, readonly, required, valid) {
     if (xformsIsDefined(relevant)) {
-        if (relevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled")
+        if (relevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled");
         else ORBEON.util.Dom.addClass(element, "xforms-disabled");
     }
     if (xformsIsDefined(readonly)) {
@@ -271,8 +271,9 @@ function xformsUpdateStyle(element) {
                 YAHOO.util.Event.addListener(element, "mouseout", tt_Hide);
             }
 
-            // Disable or enable help depending if control is relevant
-            xformsUpdateStyleRelevantReadonly(element, control.isRelevant, control.isReadonly, control.isRequired, control.isValid);
+            // Help is relevant (== displayed) if the control is relevant and there is a help message provided
+            xformsUpdateStyleRelevantReadonly(element, control.isRelevant && element.childNodes.length > 0,
+                    control.isReadonly, control.isRequired, control.isValid);
         }
 
         if (ORBEON.util.Dom.hasClass(element, "xforms-alert-inactive") || ORBEON.util.Dom.hasClass(element, "xforms-alert-active")) {

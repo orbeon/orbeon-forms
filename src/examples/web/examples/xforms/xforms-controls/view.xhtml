@@ -155,7 +155,8 @@
                     <xhtml:p>
                         <xforms:input ref="date" navindex="4" class="datafield">
                             <xforms:label class="fixed-width">Date:</xforms:label>
-                            <xforms:help>At most one day in the future</xforms:help>
+                            <xforms:help ref="xxx"/>
+                            <!--<xforms:help>At most one day in the future</xforms:help>-->
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
@@ -281,12 +282,6 @@
                         </xhtml:p>
                     </xforms:group>
 
-                </widget:tab>
-                <widget:tab id="html-area">
-                    <widget:label>HTML Area</widget:label>
-                    <xhtml:p>
-                        <xforms:textarea mediatype="text/html" ref="html"/>
-                    </xhtml:p>
                 </widget:tab>
                 <widget:tab id="slider">
                     <widget:label>Range</widget:label>

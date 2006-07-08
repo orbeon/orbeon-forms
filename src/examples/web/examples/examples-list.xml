@@ -60,6 +60,7 @@
         <example id="xforms-dynamic-image" path="xforms/xforms-dynamic-image" label="Dynamic Image" xforms-ng="true"/>
         <example id="xforms-wizard-switch" path="xforms/xforms-wizard-switch" label="Wizard with Switch" xforms-ng="true"/>
         <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control" xforms-ng="true"/>
+        <example id="xforms-html-area" path="xforms/xforms-html-area" label="HTML Area" xforms-ng="true"/>
         <example id="xforms-wizard-pfc" path="xforms/xforms-wizard-pfc" label="Wizard with PFC" xforms-ng="true"/>
         <!--<example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier" xforms-ng="true"/>-->
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table" xforms-ng="true"/>

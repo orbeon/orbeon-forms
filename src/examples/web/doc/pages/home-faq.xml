@@ -128,9 +128,9 @@
                 <p>
                     The OPS implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
                     (Second Edition) Recommendation</a> (14 March 2006). OPS 3.0's XForms NG engine is close to
-                    supporting all of the XForms 1.0 specification. <!-- For more detailed information on what features are
+                    supporting all of the XForms 1.0 specification. For more detailed information on what features are
                     supported in the latest version of OPS, see the <a href="reference-xforms-compliance">XForms
-                    conformance matrix</a> section of the documentation. -->
+                    Compliance</a> section of the documentation.
                 </p>
                 <p>
                     OPS also supports several features from XForms 1.1 (in draft as of July 2006), as well as extensions

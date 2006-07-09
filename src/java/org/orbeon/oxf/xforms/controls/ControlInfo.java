@@ -216,17 +216,24 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     /**
-     * Return a formatted display value of the control value, null if there is no such value.
+     * Return a formatted display value of the control value, null if there is no such display value.
      */
     public String getDisplayValue() {
         return displayValue;
+    }
+
+    /**
+     * Return a formatted display value of the control value, or the raw control value if there is no such display value.
+     */
+    public String getDisplayValueOrValue() {
+        return displayValue != null ? displayValue : value;
     }
 
     protected void setValue(String value) {
         this.value = value;
     }
 
-    public void setDisplayValue(String displayValue) {
+    protected void setDisplayValue(String displayValue) {
         this.displayValue = displayValue;
     }
 
@@ -323,7 +330,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
         return internalValue;
     }
 
-    protected void evaluateDisplayValue(PipelineContext pipelineContext, String format) {
+    protected void evaluateDisplayValueUseFormat(PipelineContext pipelineContext, String format) {
         final String result;
         if (format == null) {
             // Try default format for known types

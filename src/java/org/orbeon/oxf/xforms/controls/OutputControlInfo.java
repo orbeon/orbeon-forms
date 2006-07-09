@@ -80,7 +80,7 @@ public class OutputControlInfo extends ControlInfo {
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {
-        evaluateDisplayValue(pipelineContext, format);
+        evaluateDisplayValueUseFormat(pipelineContext, format);
     }
 
     public String getMediaTypeAttribute() {

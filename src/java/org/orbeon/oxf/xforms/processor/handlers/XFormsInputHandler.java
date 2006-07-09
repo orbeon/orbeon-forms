@@ -83,8 +83,9 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                 if (!handlerContext.isGenerateTemplate() && isDate) {
-                    final String value = controlInfo.getDisplayValue();
-                    contentHandler.characters(value.toCharArray(), 0, value.length());
+                    final String displayValue = controlInfo.getDisplayValueOrValue();
+                    if (displayValue != null)
+                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }

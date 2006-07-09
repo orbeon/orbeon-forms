@@ -120,13 +120,14 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                     contentHandler.endPrefixMapping(formattingPrefix);
             } else if (isDateOrTime) {
                 // Display formatted value for dates
-                final String displayValue = controlInfo.getDisplayValue();
-                contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                final String displayValue = controlInfo.getDisplayValueOrValue();
+                if (displayValue != null)
+                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
             } else {
                 // Regular text case
-                final String value = controlInfo.getValue();
-                if (value != null)
-                    contentHandler.characters(value.toCharArray(), 0, value.length());
+                final String displayValue = controlInfo.getDisplayValueOrValue();
+                if (displayValue != null)
+                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);

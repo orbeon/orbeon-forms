@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
 
@@ -51,6 +51,10 @@
     </page>
 
     <!-- ========== Services ========== -->
+
+    <!-- Resources -->
+    <page id="resources" path-info="/forms/service/resources/(.+)" matcher="oxf:perl5-matcher"
+            view="detail/resources_${1}.xml"/>
 
     <!-- Read services -->
     <page id="list-documents" path-info="/forms/service/list-documents" view="services/list-documents.xpl"/>

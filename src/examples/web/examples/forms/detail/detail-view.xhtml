@@ -82,8 +82,13 @@
                 <xforms:bind nodeset="//@xml:base" relevant="false()"/>
             </xforms:bind>
 
+            <!-- XForms instance containing the current language -->
+            <xforms:instance id="language-instance">
+                <language xmlns="">en</language>
+            </xforms:instance>
+
             <!-- XForms instance containing text resources -->
-            <xforms:instance id="resources-instance" src="oxf:/examples/forms/detail/resources.xml"/>
+            <xforms:instance id="resources-instance" src="oxf:/examples/forms/detail/resources_en.xml"/>
 
             <!-- XForms instance containing template for mailing address -->
             <xforms:instance id="mailing-address-template-instance" src="oxf:/examples/forms/schema/template-mailing-address.xml"/>
@@ -147,7 +152,8 @@
 
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
-                               method="post" replace="none" action="/forms/service/save-document">
+                    action="/forms/service/save-document"
+                    method="post" replace="none">
                 <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">validated</xforms:setvalue>
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-success"/>
@@ -171,6 +177,11 @@
                 </xforms:action>
             </xforms:submission>
 
+            <!-- Update language submission -->
+            <xforms:submission id="update-language-submission" ref="instance('language-instance')"
+                    action="/forms/service/resources/{.}" validate="false"
+                    method="get" replace="instance" instance="resources-instance"/>
+
         </xforms:model>
     </head>
     <body>
@@ -192,7 +203,7 @@
             <table class="dmv-main-table">
                 <tr>
                     <td colspan="2">
-                        <table class="dmv-action-table">
+                        <table class="dmv-action-table" id="main-action-table">
                             <tr>
                                 <td>
                                     <xforms:group ref="instance('control-instance')/back-trigger">
@@ -242,6 +253,20 @@
                                         </xforms:case>
                                     </xforms:switch>
                                 </td>
+                                <td id="language-choice-td">
+                                    <xforms:select1 ref="instance('language-instance')">
+                                        <xforms:label ref="instance('resources-instance')/labels/language-choice"/>
+                                        <xforms:item>
+                                            <xforms:label>en</xforms:label>
+                                            <xforms:value>en</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>fr</xforms:label>
+                                            <xforms:value>fr</xforms:value>
+                                        </xforms:item>
+                                        <xforms:send ev:event="xforms-value-changed" submission="update-language-submission"/>
+                                    </xforms:select1>
+                                </td>
                             </tr>
                         </table>
                     </td>
@@ -254,13 +279,14 @@
                     <xforms:group ref="dmv:personal-information">
                         <tr>
                             <th>
-                                Personal<br/>
-                                Information<br/>
+                                <xforms:output value="instance('resources-instance')/titles/personal-information"/><br/>
+                                <!--Personal<br/>-->
+                                <!--Information<br/>-->
                                 <p>
                                     <img src="/examples/forms/images/personal-information.png" alt="Personal Information"/>
                                 </p>
                             </th>
-                            <td>
+                            <td class="dmv-data-column">
                                 <table>
                                     <tr>
                                         <td>
@@ -302,8 +328,9 @@
                         <xforms:group ref="dmv:voter-address-change">
                             <tr>
                                 <th>
-                                    Voter Change<br/>
-                                    of Address<br/>
+                                    <xforms:output value="instance('resources-instance')/titles/voter-address-change"/><br/>
+                                    <!--Voter Change<br/>-->
+                                    <!--of Address<br/>-->
                                 </th>
                                 <td>
                                     <xforms:select ref="dmv:change-address" appearance="full">
@@ -320,9 +347,10 @@
                         <xforms:group ref="dmv:address[@type = 'residence']">
                             <tr>
                                 <th>
-                                    New or Correct<br/>
-                                    Residence<br/>
-                                    Address<br/>
+                                    <xforms:output value="instance('resources-instance')/titles/new-residence-address"/><br/>
+                                    <!--New or Correct<br/>-->
+                                    <!--Residence<br/>-->
+                                    <!--Address<br/>-->
                                     <p>
                                         <img src="/examples/forms/images/residence-address.png" alt="New or Correct Residence Address"/>
                                     </p>
@@ -381,9 +409,10 @@
                         <tr><td colspan="2" class="dmv-hr"/></tr>
                         <tr>
                             <th>
-                                New or Correct<br/>
-                                Mailing<br/>
-                                Address<br/>
+                                <xforms:output value="instance('resources-instance')/titles/new-mailing-address"/><br/>
+                                <!--New or Correct<br/>-->
+                                <!--Mailing<br/>-->
+                                <!--Address<br/>-->
                                 <p>
                                     <img src="/examples/forms/images/mailing-address.png" alt="New or Correct Mailing Address"/>
                                 </p>
@@ -494,10 +523,11 @@
                         <xforms:group ref="dmv:vehicles">
                             <tr>
                                 <th>
-                                    Vehicles,<br/>
-                                    Vessels, or<br/>
-                                    Placards<br/>
-                                    Owned By You<br/>
+                                    <xforms:output value="instance('resources-instance')/titles/vehicles-owned"/><br/>
+                                    <!--Vehicles,<br/>-->
+                                    <!--Vessels, or<br/>-->
+                                    <!--Placards<br/>-->
+                                    <!--Owned By You<br/>-->
                                 </th>
                                 <td>
                                     <!-- Advanced version of the triggers -->
@@ -505,19 +535,19 @@
                                         <tr>
                                             <td>
                                                 <xforms:group ref="instance('control-instance')/vehicle-insert-trigger">
-<xforms:action ev:event="DOMActivate">
-    <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
-    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
-    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
-    <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
-</xforms:action>
-<xforms:trigger appearance="xxforms:image">
-    <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
-    <xxforms:img src="/images/add.gif"/>
-</xforms:trigger>
-<xforms:trigger appearance="xxforms:link">
-    <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
-</xforms:trigger>
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
+                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
+                                                        <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
+                                                        <xxforms:img src="/images/add.gif"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
+                                                    </xforms:trigger>
                                                 </xforms:group>
                                             </td>
                                             <td>
@@ -608,7 +638,7 @@
                         <xforms:group ref="dmv:leased-vehicles">
                             <tr>
                                 <th>
-                                    Leased Vehicles
+                                    <xforms:output value="instance('resources-instance')/titles/leased-vehicles"/>
                                 </th>
                                 <td>
                                     <xforms:input incremental="true" ref="dmv:company-name" class="dmv-company-name">
@@ -621,9 +651,10 @@
                         <tr><td colspan="2" class="dmv-hr"/></tr>
                         <tr>
                             <th>
-                                Location of<br/>
-                                Trailer Coach<br/>
-                                or Vessel<br/>
+                                <xforms:output value="instance('resources-instance')/titles/coach-vessel-location"/><br/>
+                                <!--Location of<br/>-->
+                                <!--Trailer Coach<br/>-->
+                                <!--or Vessel<br/>-->
                             </th>
                             <td>
 
@@ -722,7 +753,7 @@
                     <xforms:group ref="dmv:address-information/dmv:address[@type = 'old']">
                         <tr>
                             <th>
-                                Old Address
+                                <xforms:output value="instance('resources-instance')/titles/old-address"/><br/>
                             </th>
                             <td>
                                 <table>

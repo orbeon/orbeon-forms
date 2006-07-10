@@ -90,6 +90,9 @@
             <!-- XForms instance containing text resources -->
             <xforms:instance id="resources-instance" src="oxf:/examples/forms/detail/resources_en.xml"/>
 
+            <!-- XForms instance containing the XML schema -->
+            <xforms:instance id="schema-instance" src="oxf:/examples/forms/schema/dmv-schema.xsd"/>
+
             <!-- XForms instance containing template for mailing address -->
             <xforms:instance id="mailing-address-template-instance" src="oxf:/examples/forms/schema/template-mailing-address.xml"/>
 
@@ -336,7 +339,7 @@
                                     <xforms:select ref="dmv:change-address" appearance="full">
                                         <xforms:label ref="instance('resources-instance')/labels/change-voting-address"/>
                                         <xforms:item>
-                                            <xforms:label></xforms:label>
+                                            <xforms:label/>
                                             <xforms:value>N</xforms:value>
                                         </xforms:item>
                                     </xforms:select>
@@ -392,10 +395,21 @@
                                                     <xforms:alert ref="instance('resources-instance')/alerts/city"/>
                                                     <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                                 </xforms:input>
-                                                <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
+                                                <xforms:select1 ref="dmv:state">
                                                     <xforms:label ref="instance('resources-instance')/labels/state"/>
-                                                    <xforms:alert ref="instance('resources-instance')/alerts/state"/>
-                                                </xforms:input>
+                                                    <xforms:item>
+                                                        <xforms:label/>
+                                                        <xforms:value/>
+                                                    </xforms:item>
+                                                    <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                        <xforms:label ref="@value"/>
+                                                        <xforms:value ref="@value"/>
+                                                    </xforms:itemset>
+                                                </xforms:select1>
+                                                <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
+                                                    <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
+                                                    <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
+                                                <!--</xforms:input>-->
                                                 <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                     <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                     <xforms:alert ref="instance('resources-instance')/alerts/zip"/>
@@ -503,10 +517,21 @@
                                                     <xforms:alert ref="instance('resources-instance')/alerts/city"/>
                                                     <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                                 </xforms:input>
-                                                <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
+                                                <xforms:select1 ref="dmv:state">
                                                     <xforms:label ref="instance('resources-instance')/labels/state"/>
-                                                    <xforms:alert ref="instance('resources-instance')/alerts/state"/>
-                                                </xforms:input>
+                                                    <xforms:item>
+                                                        <xforms:label/>
+                                                        <xforms:value/>
+                                                    </xforms:item>
+                                                    <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                        <xforms:label ref="@value"/>
+                                                        <xforms:value ref="@value"/>
+                                                    </xforms:itemset>
+                                                </xforms:select1>
+                                                <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
+                                                    <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
+                                                    <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
+                                                <!--</xforms:input>-->
                                                 <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                     <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                     <xforms:alert ref="instance('resources-instance')/alerts/zip"/>
@@ -606,7 +631,7 @@
                                                     <xforms:select ref="dmv:leased" appearance="full">
                                                         <xforms:label ref="instance('resources-instance')/labels/leased"/>
                                                         <xforms:item>
-                                                            <xforms:label></xforms:label>
+                                                            <xforms:label/>
                                                             <xforms:value>Y</xforms:value>
                                                         </xforms:item>
                                                     </xforms:select>
@@ -792,10 +817,21 @@
                                                 <xforms:alert ref="instance('resources-instance')/alerts/city"/>
                                                 <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                             </xforms:input>
-                                            <xforms:input incremental="true" ref="dmv:state" class="dmv-state">
+                                            <xforms:select1 ref="dmv:state">
                                                 <xforms:label ref="instance('resources-instance')/labels/state"/>
-                                                <xforms:alert ref="instance('resources-instance')/alerts/state"/>
-                                            </xforms:input>
+                                                <xforms:item>
+                                                    <xforms:label></xforms:label>
+                                                    <xforms:value/>
+                                                </xforms:item>
+                                                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                    <xforms:label ref="@value"/>
+                                                    <xforms:value ref="@value"/>
+                                                </xforms:itemset>
+                                            </xforms:select1>
+                                            <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
+                                                <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
+                                                <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
+                                            <!--</xforms:input>-->
                                             <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                 <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                 <xforms:alert ref="instance('resources-instance')/alerts/zip"/>

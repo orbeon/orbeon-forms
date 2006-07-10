@@ -51,7 +51,7 @@
         <last-name>Nom</last-name>
         <birth-date>Date de naissance</birth-date>
         <driver-license-number>Permis de conduire / carte d'identité</driver-license-number>
-        <change-voting-address>éelectionnez cette option si vous ne voulez pas changer votre adresse de vote</change-voting-address>
+        <change-voting-address>Sélectionnez cette option si vous ne voulez pas changer votre adresse de vote</change-voting-address>
         <street-number>Numéro de rue seulement</street-number>
         <street-name-1>Nom de rue 1</street-name-1>
         <street-name-2>Nom de rue 2</street-name-2>

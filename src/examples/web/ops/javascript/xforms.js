@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ *  Copyright (C) 2006 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -39,69 +39,139 @@ var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 
 /* * * * * * Utility functions * * * * * */
 
-ORBEON = {};
+ORBEON = {};  
 ORBEON.util = {};
 
-ORBEON.util.Dom = {
+ORBEON.util.Dom = function () {
 
-    /**
-     * The hasClass, addClass and removeClass methods use a cache of the
-     * classes for a give element for quick lookup. After having parsed the
-     * className a first time we store that information in the orbeonClasses
-     * map on the given element.
-     */
+    var ua = navigator.userAgent.toLowerCase();
+    var isOpera = (ua.indexOf('opera') != -1);
+    var isIE = (ua.indexOf('msie') != -1 && !isOpera); // not opera spoof
 
-    /**
-     * Changes the className on the element based on the information stored in
-     * _elementToClasses.
-     *
-     * @private
-     */
-    _regenerateClassName: function(element) {
-        var newClassName = "";
-        for (var existingClassName in element.orbeonClasses) {
-            if (element.orbeonClasses[existingClassName]) {
-                if (newClassName.length > 0)
-                    newClassName += " ";
-                newClassName += existingClassName;
+    if (isIE) {
+
+        /**
+         * The IE version of those methods does not store anything in the
+         * elements as this has some negative side effects like IE reloading
+         * background images set with CSS on the element.
+         */
+        return {
+
+            /**
+             * Optimized version of YAHOO.util.Dom.hasClass(element, className).
+             */
+            hasClass: function(element, className) {
+                if (element.className == className) {
+                    // Trivial true case
+                    return true;
+                } else {
+                    var startPosition = element.className.indexOf(className);
+                    if (startPosition == -1) {
+                        // Trivial false case
+                        return false;
+                    } else {
+                        var endPosition = startPosition + className.length;
+                        // className is at the beginning
+                        if (startPosition == 0)
+                            return element.className.charAt(endPosition) == " ";
+                        // className is at the end
+                        if (endPosition == element.className.length)
+                            return element.className.charAt(startPosition - 1) == " ";
+                        // className is in the middle
+                        return element.className.charAt(startPosition - 1) == " "
+                                && element.className.charAt(endPosition) == " ";
+                    }
+                }
+            },
+
+            /**
+             * Optimized version of YAHOO.util.Dom.addClass(element, className).
+             */
+            addClass: function(element, className) {
+                if (!this.hasClass(element, className))
+                    element.className = element.className.length == 0 ? className
+                            : (element.className + " " + className);
+            },
+
+            /**
+             * Optimized version of YAHOO.util.Dom.removeClass(element, className).
+             */
+            removeClass: function(element, className) {
+                if (this.hasClass(element, className)) {
+                    var classes = element.className.split(" ");
+                    var newClassName = "";
+                    for (var i = 0; i < classes.length; i++) {
+                        if (classes[i] != className) {
+                            if (newClassName.length > 0) newClassName += " ";
+                            newClassName += classes[i];
+                        }
+                    }
+                }
             }
-        }
-        element.className = newClassName;
-    },
+        };
+    } else {
 
-    /**
-     * Optimized version of YAHOO.util.Dom.hasClass(element, className).
-     */
-    hasClass: function(element, className) {
-        if (!element.orbeonClasses) {
-            element.orbeonClasses = {};
-            var classes = element.className.split(" ");
-            for (var i = 0; i < classes.length; i++)
-                element.orbeonClasses[classes[i]] = true;
-        }
-        return element.orbeonClasses[className] == true;
-    },
+        /**
+         * The hasClass, addClass and removeClass methods use a cache of the
+         * classes for a give element for quick lookup. After having parsed the
+         * className a first time we store that information in the orbeonClasses
+         * map on the given element.
+         */
+        return {
 
-    /**
-     * Optimized version of YAHOO.util.Dom.addClass(element, className).
-     */
-    addClass: function(element, className) {
-        if (!this.hasClass(element, className)) {
-            element.orbeonClasses[className] = true;
-            this._regenerateClassName(element);
-        }
-    },
+            /**
+             * Changes the className on the element based on the information stored in
+             * _elementToClasses.
+             *
+             * @private
+             */
+            _regenerateClassName: function(element) {
+                var newClassName = "";
+                for (var existingClassName in element.orbeonClasses) {
+                    if (element.orbeonClasses[existingClassName]) {
+                        if (newClassName.length > 0)
+                            newClassName += " ";
+                        newClassName += existingClassName;
+                    }
+                }
+                element.className = newClassName;
+            },
 
-    /**
-     * Optimized version of YAHOO.util.Dom.removeClass(element, className).
-     */
-    removeClass: function(element, className) {
-        if (this.hasClass(element, className)) {
-            element.orbeonClasses[className] = false;
-            this._regenerateClassName(element);
-        }
+            /**
+             * Optimized version of YAHOO.util.Dom.hasClass(element, className).
+             */
+            hasClass: function(element, className) {
+                if (!element.orbeonClasses) {
+                    element.orbeonClasses = {};
+                    var classes = element.className.split(" ");
+                    for (var i = 0; i < classes.length; i++)
+                        element.orbeonClasses[classes[i]] = true;
+                }
+                return element.orbeonClasses[className] == true;
+            },
+
+            /**
+             * Optimized version of YAHOO.util.Dom.addClass(element, className).
+             */
+            addClass: function(element, className) {
+                if (!this.hasClass(element, className)) {
+                    element.orbeonClasses[className] = true;
+                    this._regenerateClassName(element);
+                }
+            },
+
+            /**
+             * Optimized version of YAHOO.util.Dom.removeClass(element, className).
+             */
+            removeClass: function(element, className) {
+                if (this.hasClass(element, className)) {
+                    element.orbeonClasses[className] = false;
+                    this._regenerateClassName(element);
+                }
+            }
+        };
     }
-}
+}();
 
 function xformsIsDefined(thing) {
     return typeof thing != "undefined";

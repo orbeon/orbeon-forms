@@ -54,7 +54,11 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
     }
 
     public String getParameter(String s) {
-        return (String) parameters.get(s);
+        final String[] parameterValues = getParameterValues(s);
+        if (parameterValues == null || parameterValues.length == 0)
+            return null;
+        else
+            return parameterValues[0];
     }
 
     public String getPathInfo() {

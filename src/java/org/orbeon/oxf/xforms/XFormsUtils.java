@@ -952,6 +952,16 @@ public class XFormsUtils {
         return null;
     }
 
+    public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo, String errorMessage) {
+        if (nodeInfo instanceof NodeWrapper)
+            return getNodeFromNodeInfo(nodeInfo, errorMessage);
+
+//        if (!(nodeInfo instanceof DocumentInfo))
+//            throw new OXFException(errorMessage);// TODO: cannot convert for now, but should!
+
+        return TransformerUtils.tinyTreeToDom4j(nodeInfo);
+    }
+
     /**
      * Return the underlying Node from the given NodeInfo if possible. If not, throw an exception with the given error
      * message.

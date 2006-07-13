@@ -19,21 +19,22 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.saxon.tree.TreeBuilder;
 import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.tree.TreeBuilder;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.*;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
-import java.util.*;
+import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
+import java.util.*;
 
 /**
  * Utility class for XSLT and other transformations.
@@ -347,6 +348,17 @@ public class TransformerUtils {
             throw new OXFException(e);
         }
         return (DocumentInfo) treeBuilder.getCurrentRoot();
+    }
+
+    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
+        try {
+            final Transformer identity = getIdentityTransformer();
+            final LocationDocumentResult documentResult = new LocationDocumentResult();
+            identity.transform(nodeInfo, documentResult);
+            return documentResult.getDocument();
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
     }
 }
 

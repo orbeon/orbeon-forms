@@ -572,6 +572,7 @@ public class XFormsActionInterpreter {
             final Node sourceNode;
             final Node clonedNode;
             {
+                final Node clonedNodeTemp;
                 if (originAttribute == null) {
                     // "If the attribute is not given and the Node Set Binding node-set is empty, then the insert
                     // action is terminated with no effect."
@@ -580,8 +581,8 @@ public class XFormsActionInterpreter {
 
                     // "if this attribute is not given, then the last node of the Node Set Binding node-set is
                     // cloned"
-                    sourceNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
-                    clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+                    sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1), CANNOT_INSERT_READONLY_MESSAGE);
+                    clonedNodeTemp = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                 } else {
                     // "If the attribute is given, it is evaluated in the insert context using the first node rule.
                     // If the result is a node, then it is cloned, and otherwise the insert action is terminated
@@ -590,14 +591,24 @@ public class XFormsActionInterpreter {
                     final Object originObject = xformsControls.getCurrentSingleNode();
                     if (!(originObject instanceof NodeInfo))
                         return;
-                    sourceNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
-                    clonedNode = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+
+                    sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
+                    clonedNodeTemp = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
                     xformsControls.popBinding();
                 }
+
+                // We can never really insert a document into anything, but we assume that this means the root element
+                if (clonedNodeTemp instanceof Document)
+                    clonedNode = clonedNodeTemp.getDocument().getRootElement().detach();
+                else
+                    clonedNode = clonedNodeTemp;
+
                 if (clonedNode instanceof Element)
                     XFormsUtils.setInitialDecoration((Element) clonedNode);
                 else if (clonedNode instanceof Attribute)
                     XFormsUtils.setInitialDecoration((Attribute) clonedNode);
+                else if (clonedNode instanceof Document)
+                    XFormsUtils.setInitialDecoration(clonedNode.getDocument().getRootElement());
                 // TODO: we incorrectly don't handle instance data on text nodes and other nodes
             }
 
@@ -652,7 +663,7 @@ public class XFormsActionInterpreter {
                 doInsert(XFormsUtils.getNodeFromNodeInfo(insertContextNode, CANNOT_INSERT_READONLY_MESSAGE), clonedNode);
             } else {
                 final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToBeUpdated.get(insertionIndex - 1), CANNOT_INSERT_READONLY_MESSAGE);
-                if (insertLocationNode.getClass() != clonedNode.getClass()) {
+                if (insertLocationNode.getNodeType() != clonedNode.getNodeType()) {
                     // "2. If the node type of the cloned node does not match the node type of the insert location
                     // node, then the target location is before the first child or attribute of the insert location
                     // node, based on the node type of the cloned node."

@@ -531,16 +531,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                             }
                                         } catch (Exception e) {
+                                            submitErrorEvent = createErrorEvent(connectionResult);
                                             throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
                                         }
                                     } else {
                                         // Other media type
+                                        submitErrorEvent = createErrorEvent(connectionResult);
                                         throw new OXFException("Body received with non-XML media type for replace=\"instance\": " + connectionResult.resultMediaType);
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
                                     containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                 } else {
+                                    submitErrorEvent = createErrorEvent(connectionResult);
                                     throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
                                 }
 
@@ -574,36 +577,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         } else {
                             // Error code received
-                            if (connectionHasContent(connectionResult)) {
-                                if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
-                                    // XML content-type
-                                    // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
-                                    // Read stream into Document
-                                    final DocumentInfo responseBody
-                                            = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
-
-                                    submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
-                                    submitErrorEvent.setBodyDocument(responseBody);
-                                } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
-                                    // Text content-type
-                                    // Read stream into String
-                                    final String charset;
-                                    {
-                                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
-                                        if (connectionCharset != null)
-                                            charset = connectionCharset;
-                                        else
-                                            charset = DEFAULT_TEXT_READING_ENCODING;
-                                    }
-                                    final Reader reader = new InputStreamReader(connectionResult.resultInputStream, charset);
-                                    final String responseBody = NetUtils.readStreamAsString(reader);
-                                    submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
-                                    submitErrorEvent.setBodyString(responseBody);
-                                } else {
-                                    // This is binary
-                                    // Don't store anything for now
-                                }
-                            }
+                            submitErrorEvent = createErrorEvent(connectionResult);
                             throw new OXFException("Error code received when submitting instance: " + connectionResult.resultCode);
                         }
                     }
@@ -631,6 +605,41 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // The default action for this event results in the following: Fatal error.
             throw new OXFException("Binding exception.");
         }
+    }
+
+    private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult) throws IOException {
+        XFormsSubmitErrorEvent submitErrorEvent = null;
+        if (connectionHasContent(connectionResult)) {
+            if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
+                // XML content-type
+                // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
+                // Read stream into Document
+                final DocumentInfo responseBody
+                        = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+
+                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                submitErrorEvent.setBodyDocument(responseBody);
+            } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
+                // Text content-type
+                // Read stream into String
+                final String charset;
+                {
+                    final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
+                    if (connectionCharset != null)
+                        charset = connectionCharset;
+                    else
+                        charset = DEFAULT_TEXT_READING_ENCODING;
+                }
+                final Reader reader = new InputStreamReader(connectionResult.resultInputStream, charset);
+                final String responseBody = NetUtils.readStreamAsString(reader);
+                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                submitErrorEvent.setBodyString(responseBody);
+            } else {
+                // This is binary
+                // Don't store anything for now
+            }
+        }
+        return submitErrorEvent;
     }
 
 //    private Document readConnectionAsDocument(InputStream inputStream) throws TransformerException, IOException {

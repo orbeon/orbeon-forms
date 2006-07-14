@@ -40,8 +40,8 @@ public class ContentHandlerHelper {
     /**
      * ContentHandler to write to. 
      *
-     * @param contentHandler
-     * @param validateStream
+     * @param contentHandler    ContentHandler to write to
+     * @param validateStream    true if the stream must be validated by InspectingContentHandler
      */
     public ContentHandlerHelper(ContentHandler contentHandler, boolean validateStream) {
         if (validateStream)

@@ -21,6 +21,8 @@ import java.util.Stack;
 /**
  * Just like ForwardingContentHandler (a SAX content handler that forwards SAX events to another content handler), but
  * checks the validity of the SAX stream.
+ *
+ * TODO: check for duplicate attributes.
  */
 public class InspectingContentHandler extends ForwardingContentHandler {
 

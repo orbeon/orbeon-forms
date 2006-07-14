@@ -61,12 +61,20 @@
                 <exist:result/><!-- hits="2628" start="1" count="10" -->
             </xforms:instance>
 
+            <xforms:instance id="delete-instance">
+                <dummy/>
+            </xforms:instance>
+
             <xforms:submission id="query-submission" ref="instance('query-instance')"
                                action="/exist/rest/{instance('control-instance')/resource}" method="post"
                                replace="instance" instance="response-instance"/>
 
             <xforms:submission id="insert-submission" ref="instance('insert-instance')"
                                action="/exist/rest/{instance('control-instance')/resource}" method="put"
+                               replace="none"/>
+
+            <xforms:submission id="delete-submission" ref="instance('delete-instance')"
+                               action="/exist/rest/{instance('control-instance')/resource}" method="delete"
                                replace="none"/>
 
             <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
@@ -99,10 +107,10 @@
                     <!--<xforms:label>Update</xforms:label>-->
                     <!--<xforms:value>update</xforms:value>-->
                 <!--</xforms:item>-->
-                <!--<xforms:item>-->
-                    <!--<xforms:label>Delete</xforms:label>-->
-                    <!--<xforms:value>delete</xforms:value>-->
-                <!--</xforms:item>-->
+                <xforms:item>
+                    <xforms:label>Delete</xforms:label>
+                    <xforms:value>delete</xforms:value>
+                </xforms:item>
             </xforms:select1>
 
             <xhtml:span>
@@ -119,6 +127,7 @@
                         <xforms:insert nodeset="instance('insert-instance')" origin="saxon:parse(instance('control-instance')/insert)/*"/>
                         <xforms:send submission="insert-submission"/>
                     </xforms:action>
+                    <xforms:send if="instance('control-instance')/operation = 'delete'" submission="delete-submission"/>
                 </xforms:action>
             </xforms:trigger>
 
@@ -141,7 +150,7 @@
             </xforms:group>
 
             <xhtml:fieldset>
-                <xhtml:legend>Query Result</xhtml:legend>
+                <xhtml:legend>Result</xhtml:legend>
                 <xforms:output ref="instance('control-instance')/formatted-result" mediatype="text/html"/>
             </xhtml:fieldset>
 

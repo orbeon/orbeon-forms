@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2006 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,48 +11,140 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xi="http://www.w3.org/2001/XInclude">
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:exist="http://exist.sourceforge.net/NS/exist">
     
     <xhtml:head>
-        <xhtml:title>Schema Sandbox</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance id="instance">
-                <sandbox-instance>
-                    <xi:include href="../input.xml"/>
-                    <xi:include href="initial-query.xml"/>
-                    <formatted-output/>
-                </sandbox-instance>
+        <xhtml:title>eXist Sandbox</xhtml:title>
+        <xforms:model>
+
+            <xforms:instance id="control-instance">
+                <control xmlns="">
+                    <operation>query</operation>
+                    <resource>/db/</resource>
+                    <query/>
+                    <insert/>
+                    <error/>
+                    <formatted-result/>
+                </control>
             </xforms:instance>
-            <xforms:bind nodeset="formatted-output"
-                calculate="xxforms:call-xpl
-                                ('oxf:/examples/sandbox/exist/run-query.xpl', ('input', 'query'),
-                                (instance('instance')/input, instance('instance')/query),
-                                'formatted-output')"/>
+
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="query" relevant="../operation = 'query'"/>
+                <xforms:bind nodeset="insert" relevant="../operation = 'insert'"/>
+                <xforms:bind nodeset="formatted-result"
+                        calculate="if (instance('response-instance')/*)
+                                   then saxon:serialize(xxforms:call-xpl('oxf:/config/theme/format.xpl', 'data', instance('response-instance')/*[1], 'data')/*, 'html')
+                                   else ''"/>
+            </xforms:bind>
+
+
+            <xforms:instance id="query-instance">
+                <exist:query><!-- start="first item to be returned"  max="max items to be returned" -->
+                    <exist:text/>
+                    <!--<exist:properties>-->
+                        <!--<exist:property name="name1" value="value1"/>-->
+                    <!--</exist:properties>-->
+                </exist:query>
+            </xforms:instance>
+
+            <xforms:instance id="insert-instance">
+                <exist:result/><!-- hits="2628" start="1" count="10" -->
+            </xforms:instance>
+
+            <xforms:instance id="response-instance">
+                <exist:result/><!-- hits="2628" start="1" count="10" -->
+            </xforms:instance>
+
+            <xforms:submission id="query-submission" ref="instance('query-instance')"
+                               action="/exist/rest/{instance('control-instance')/resource}" method="post"
+                               replace="instance" instance="response-instance"/>
+
+            <xforms:submission id="insert-submission" ref="instance('insert-instance')"
+                               action="/exist/rest/{instance('control-instance')/resource}" method="put"
+                               replace="none"/>
+
+            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .sandbox-url-input input { width: 30em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:p>
-            <xforms:group ref="/sandbox-instance">
-                <p>
-                    <xforms:textarea ref="input" class="wide-textarea" incremental="true">
-                        <xforms:label>Input document:</xforms:label>
+
+        <xhtml:div>
+            <xforms:output ref="instance('control-instance')/error" mediatype="text/html"/>
+        </xhtml:div>
+
+        <xforms:group>
+            <xforms:setvalue ev:event="DOMFocusIn" ref="instance('control-instance')/error"/>
+
+            <xforms:select1 ref="instance('control-instance')/operation">
+                <xforms:label>Operation</xforms:label>
+                <xforms:item>
+                    <xforms:label>Insert</xforms:label>
+                    <xforms:value>insert</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>Query</xforms:label>
+                    <xforms:value>query</xforms:value>
+                </xforms:item>
+                <!-- TODO -->
+                <!--<xforms:item>-->
+                    <!--<xforms:label>Update</xforms:label>-->
+                    <!--<xforms:value>update</xforms:value>-->
+                <!--</xforms:item>-->
+                <!--<xforms:item>-->
+                    <!--<xforms:label>Delete</xforms:label>-->
+                    <!--<xforms:value>delete</xforms:value>-->
+                <!--</xforms:item>-->
+            </xforms:select1>
+
+            <xhtml:span>
+                <xforms:input ref="instance('control-instance')/resource" class="sandbox-url-input">
+                    <xforms:label>Resource URL</xforms:label>
+                </xforms:input>
+            </xhtml:span>
+
+            <xforms:trigger class="sandbox-send-trigger">
+                <xforms:label>Send</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:send if="instance('control-instance')/operation = 'query'" submission="query-submission"/>
+                    <xforms:action if="instance('control-instance')/operation = 'insert'">
+                        <xforms:insert nodeset="instance('insert-instance')" origin="saxon:parse(instance('control-instance')/insert)/*"/>
+                        <xforms:send submission="insert-submission"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:trigger>
+
+            <xforms:group ref="instance('control-instance')/query">
+                <xhtml:fieldset>
+                    <xhtml:legend>XQuery to execute</xhtml:legend>
+                    <xforms:textarea ref="instance('query-instance')/exist:text" class="wide-textarea" incremental="true">
+                        <xforms:label></xforms:label>
                     </xforms:textarea>
-                </p>
-                <p>
-                    <xforms:textarea ref="query" class="wide-textarea" incremental="true">
-                        <xforms:label>XQuery:</xforms:label>
-                    </xforms:textarea>
-                </p>
-                <xforms:group>
-                    <xforms:label>Result</xforms:label>
-                    <xforms:output ref="formatted-output" mediatype="text/html"/>
-                </xforms:group>
+                </xhtml:fieldset>
             </xforms:group>
-        </xhtml:p>
+
+            <xforms:group ref="instance('control-instance')/insert">
+                <xhtml:fieldset>
+                    <xhtml:legend>Document to insert</xhtml:legend>
+                    <xforms:textarea ref="." class="wide-textarea" incremental="true">
+                        <xforms:label></xforms:label>
+                    </xforms:textarea>
+                </xhtml:fieldset>
+            </xforms:group>
+
+            <xhtml:fieldset>
+                <xhtml:legend>Query Result</xhtml:legend>
+                <xforms:output ref="instance('control-instance')/formatted-result" mediatype="text/html"/>
+            </xhtml:fieldset>
+
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

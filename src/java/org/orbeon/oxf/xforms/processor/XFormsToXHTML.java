@@ -457,7 +457,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     static {
         exceptionXFormsElements.put("item", "");
         exceptionXFormsElements.put("itemset", "");
-        exceptionXFormsElements.put("choice", "");
+        exceptionXFormsElements.put("choices", "");
         exceptionXFormsElements.put("value", "");
         exceptionXFormsElements.put("label", "");
         exceptionXFormsElements.put("hint", "");

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,6 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -738,6 +740,15 @@ public class XFormsControls {
 
     private ControlsState buildControlsState(final PipelineContext pipelineContext) {
 
+        final long startTime;
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - building controls state start.");
+            startTime = System.currentTimeMillis();
+        } else {
+            startTime = 0;
+        }
+
         final ControlsState result = new ControlsState();
 
         final ControlInfo rootControlInfo = new ControlInfo(containingDocument, null, null, "root", null);// this is temporary and won't be stored
@@ -933,6 +944,10 @@ public class XFormsControls {
         result.setIdsToControlInfo(idsToControlInfo);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
         result.setValueControls(valueControls);
+
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("XForms - building controls state end: " + (System.currentTimeMillis() - startTime) + " ms.");
+        }
 
         return result;
     }
@@ -1258,8 +1273,9 @@ public class XFormsControls {
                             outputControl.evaluateDisplayValue(pipelineContext);
                             sb.append(outputControl.getDisplayValueOrValue());
                         }
-                    } else if (currentObject instanceof String) {
-                        sb.append(currentObject);
+                    } else if (currentObject instanceof Text) {
+                        final Text currentText = (Text) currentObject;
+                        sb.append(currentText.getStringValue());
                     }
                 }
                 result = sb.toString();

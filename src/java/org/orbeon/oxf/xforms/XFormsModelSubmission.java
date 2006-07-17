@@ -204,27 +204,38 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName) && !isHandlingOptimizedGet;
                 isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass;
 
-                // Select node based on ref or bind
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
-                xformsControls.setBinding(pipelineContext, submissionElement, model.getId()); // TODO FIXME: the submission element is not a control...
 
-                // Check that we have a current node and that it is pointing to a document or an element
-                final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
+                // Get node to submit
+                final Node currentNode;
+                {
+                    // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
+                    // "The default value is '/'."
+                    final String refAttribute = (submissionElement.attributeValue("ref") != null)
+                            ? submissionElement.attributeValue("ref") : "/";
+                    xformsControls.resetBindingContext();
+                    xformsControls.pushBinding(pipelineContext, refAttribute, null, null, model.getId(), null, submissionElement,
+                            Dom4jUtils.getNamespaceContextNoDefault(submissionElement));
 
-                if (currentNodeInfo == null)
-                    throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
+                    // Check that we have a current node and that it is pointing to a document or an element
+                    final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
 
-                if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
-                    throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
+                    if (currentNodeInfo == null)
+                        throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
+
+                    if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+                        throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
+                    }
+
+                    // For now, we can't submit a read-only instance (but we could in the future)
+                    if (!(currentNodeInfo instanceof NodeWrapper))
+                        throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
+
+                    currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
                 }
 
-                // For now, we can't submit a read-only instance (but we could in the future)
-                if (!(currentNodeInfo instanceof NodeWrapper))
-                    throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
-
-                final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-
                 // Evaluate AVTs
+                // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
                 resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
                 resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsUsername);
                 resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsPassword);

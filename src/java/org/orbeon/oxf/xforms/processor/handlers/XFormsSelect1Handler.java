@@ -35,6 +35,7 @@ import java.util.*;
 public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
     private Attributes elementAttributes;
+    private String id;
     private String effectiveId;
 
     private List items;
@@ -59,6 +60,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         elementAttributes = new AttributesImpl(attributes);
+        id = handlerContext.getId(elementAttributes);
         effectiveId = handlerContext.getEffectiveId(elementAttributes);
 
         // Reset state, as this handler is reused
@@ -283,11 +285,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
-                boolean isFirst = true;
-                for (Iterator i = items.iterator(); i.hasNext();) {
+                int itemIndex = 0;
+                for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
                     final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, effectiveId, fullItemType, item, isFirst);
-                    isFirst = false;
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, id, effectiveId, fullItemType, item, itemIndex);
                 }
 
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -300,7 +301,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, effectiveId, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), false);
+                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                 // TODO: in the future we should be able to handle multiple itemsets
@@ -574,10 +575,12 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                ControlInfo controlInfo, String effectiveId, String type, Select1ControlInfo.Item item, boolean isFirst) throws SAXException {
+                                ControlInfo controlInfo, String id, String effectiveId, String type, Select1ControlInfo.Item item, int itemIndex) throws SAXException {
+
+        // Create an id for the item (trying to make this unique)
+        final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
 
         // xhtml:span
-
         final Attributes spanAttributes = getAttributes(item.getAttributes(), null, null);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
@@ -586,6 +589,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
             reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
@@ -610,7 +614,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     }
                 }
 
-                if (isFirst) {
+                if (itemIndex == 0) {
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(elementAttributes, reusableAttributes);
                 }
@@ -618,9 +622,21 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
             handleReadOnlyAttribute(reusableAttributes, controlInfo);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-            final String label = item.getLabel();
-            contentHandler.characters(label.toCharArray(), 0, label.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+
+            // We don't output the label within <input></input>, because XHTML won't display it.
+            final AttributesImpl itemAttributes;
+            {
+                if (item.getAttributes() != null) {
+                    itemAttributes = new AttributesImpl(item.getAttributes());
+                } else {
+                    reusableAttributes.clear();
+                    itemAttributes = reusableAttributes;
+                }
+            }
+
+            final String label = item.getLabel();
+            outputLabelHintHelpAlert(handlerContext, itemAttributes, itemEffectiveId, label);
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

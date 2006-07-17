@@ -112,6 +112,10 @@ public class HandlerContext {
         return "p" + i;
     }
 
+    public String getId(Attributes controlElementAttributes) {
+        return controlElementAttributes.getValue("id");
+    }
+
     public String getEffectiveId(Attributes controlElementAttributes) {
         return controlElementAttributes.getValue("id") + getIdPostfix();
     }

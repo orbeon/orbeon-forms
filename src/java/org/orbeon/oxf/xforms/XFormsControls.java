@@ -1240,29 +1240,30 @@ public class XFormsControls {
             }
         }
 
-        // Try to get static value
+        // Try to get inline value
         if (result == null) {
             if (childElement.element(XFormsConstants.XFORMS_OUTPUT_QNAME) != null) {
                 // There is at least one xforms:output element inside
+                final StringBuffer sb = new StringBuffer();
+                for (Iterator i = childElement.content().iterator(); i.hasNext();) {
+                    final Object currentObject = i.next();
+                    if (currentObject instanceof Element) {
+                        final Element currentElement = (Element) currentObject;
+                        if (currentElement.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                            // This is an xforms:output
 
-//                final StringBuffer sb = new StringBuffer();
-//                for (Iterator i = childElement.content().iterator(); i.hasNext();) {
-//                    final Object currentObject = i.next();
-//                    if (currentObject instanceof Element) {
-//                        final Element currentElement = (Element) currentObject;
-//                        if (currentElement.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-//                            // This is an xforms:output
-//
-//                            final OutputControlInfo outputControl = new OutputControlInfo(null, currentElement, currentElement.getName(), null);
-//                            outputControl.
-//                        }
-//                    } else if (currentObject instanceof String) {
-//                        sb.append(currentObject);
-//                    }
-//                }
-
-                // TEMP
-                result = childElement.getStringValue();
+                            final OutputControlInfo outputControl = new OutputControlInfo(containingDocument, null, currentElement, currentElement.getName(), null);
+                            outputControl.prepareValue(pipelineContext, getCurrentBindingContext());
+                            outputControl.evaluateValue(pipelineContext);
+                            outputControl.evaluateDisplayValue(pipelineContext);
+                            sb.append(outputControl.getDisplayValueOrValue());
+                            sb.append(outputControl.getDisplayValueOrValue());
+                        }
+                    } else if (currentObject instanceof String) {
+                        sb.append(currentObject);
+                    }
+                }
+                result = sb.toString();
             } else {
                 // Plain text
                 result = childElement.getStringValue();

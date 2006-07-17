@@ -376,7 +376,7 @@ public class XFormsControls {
         final String ref = bindingElement.attributeValue("ref");
         final String context = bindingElement.attributeValue("context");
         final String nodeset = bindingElement.attributeValue("nodeset");
-        if (model == null)
+        if (model != null)
             model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
@@ -1256,7 +1256,6 @@ public class XFormsControls {
                             outputControl.prepareValue(pipelineContext, getCurrentBindingContext());
                             outputControl.evaluateValue(pipelineContext);
                             outputControl.evaluateDisplayValue(pipelineContext);
-                            sb.append(outputControl.getDisplayValueOrValue());
                             sb.append(outputControl.getDisplayValueOrValue());
                         }
                     } else if (currentObject instanceof String) {

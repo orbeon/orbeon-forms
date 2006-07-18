@@ -205,23 +205,6 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
-function xformsGetElementPosition(element) {
-    var offsetTrail = element;
-    var offsetLeft = 0;
-    var offsetTop = 0;
-    while (offsetTrail) {
-        offsetLeft += offsetTrail.offsetLeft;
-        offsetTop += offsetTrail.offsetTop;
-        offsetTrail = offsetTrail.offsetParent;
-    }
-    if (navigator.userAgent.indexOf("Mac") != -1 && xformsIsDefined(document.body.leftMargin)) {
-        offsetLeft += document.body.leftMargin;
-        offsetTop += document.body.topMargin;
-    }
-    return {left:offsetLeft, top:offsetTop};
-}
-
-
 /**
  * Retuns a string with contains all the concatenation of the child text node under the element.
  */

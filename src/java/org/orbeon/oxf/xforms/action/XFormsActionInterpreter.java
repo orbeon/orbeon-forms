@@ -69,7 +69,8 @@ public class XFormsActionInterpreter {
         }
 
         // Set binding context
-        setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
+        final String eventHandlerContainerId = eventHandlerContainer.getId();
+        setBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
 
         // Handle conditional action (@if / @exf:if)
         final String conditionAttribute;
@@ -170,15 +171,15 @@ public class XFormsActionInterpreter {
             }
         } else {
             if (XFormsActions.XXFORMS_SCRIPT_ACTION.equals(actionName)) {
-                executeScript(pipelineContext, actionElement);
+                executeScript(pipelineContext, targetId, eventHandlerContainerId, actionElement);
             } else {
                 throw new OXFException("Invalid action requested: " + actionName);
             }
         }
     }
 
-    private void executeScript(PipelineContext pipelineContext, Element actionElement) {
-        containingDocument.addScriptToRun(actionElement.attributeValue("id"));
+    private void executeScript(PipelineContext pipelineContext, String targetId, String eventHandlerContainerId, Element actionElement) {
+        containingDocument.addScriptToRun(actionElement.attributeValue("id"), targetId, eventHandlerContainerId);
     }
 
     private void executeLoad(PipelineContext pipelineContext, Element actionElement) {

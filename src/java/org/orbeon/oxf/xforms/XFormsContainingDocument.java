@@ -231,7 +231,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Clear current client state.
      */
-    public void clearClientState() {
+    private void clearClientState() {
         this.activeSubmission = null;
         this.gotSubmission = false;
         this.messagesToRun = null;
@@ -293,10 +293,34 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    public void addScriptToRun(String scriptId) {
+    public void addScriptToRun(String scriptId, String eventTargetId, String eventHandlerContainerId) {
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList();
-        scriptsToRun.add(XFormsUtils.scriptIdToScriptName(scriptId));
+        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), eventTargetId, eventHandlerContainerId));
+    }
+
+    public static class Script {
+        private String functionName;
+        private String eventTargetId;
+        private String eventHandlerContainerId;
+
+        public Script(String functionName, String eventTargetId, String eventHandlerContainerId) {
+            this.functionName = functionName;
+            this.eventTargetId = eventTargetId;
+            this.eventHandlerContainerId = eventHandlerContainerId;
+        }
+
+        public String getFunctionName() {
+            return functionName;
+        }
+
+        public String getEventTargetId() {
+            return eventTargetId;
+        }
+
+        public String getEventHandlerContainerId() {
+            return eventHandlerContainerId;
+        }
     }
 
     public List getScriptsToRun() {
@@ -443,8 +467,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)
             || XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)
-            || XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)
-            || XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) { // TODO: check if xforms-value-changed is actually ever sent by client
+            || XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
 
             // These are events we allow directly from the client and actually handle
 
@@ -468,45 +491,43 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
             // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
 
+            final XFormsModel modelForValueChangedControl;
+            final String targetControlEffectiveId;
             {
                 // Set current context to control
                 final ControlInfo valueControlInfo = (ControlInfo) concreteEvent.getTargetObject();
+                targetControlEffectiveId = valueControlInfo.getId();
                 xformsControls.setBinding(pipelineContext, valueControlInfo);
+                modelForValueChangedControl = xformsControls.getCurrentModel();
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
                 valueControlInfo.setExternalValue(pipelineContext, eventValue);
             }
 
-            // Make sure controls are not in the initial state before sending events
-            xformsControls.rebuildCurrentControlsState(pipelineContext);
-
             {
-                // Reset current context to control (necessary after rebuild)
-                final ControlInfo valueControlInfo
-                        = (ControlInfo) getObjectById(pipelineContext,
-                                ((ControlInfo) concreteEvent.getTargetObject()).getId());
-                xformsControls.setBinding(pipelineContext, valueControlInfo);
-
                 // Recalculate and revalidate
-                final XFormsModel model = xformsControls.getCurrentModel();
-                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(modelForValueChangedControl, true));
+                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(modelForValueChangedControl, true));
 
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (concreteEvent.getOtherTargetObject() != null) {
+
+                    final ControlInfo sourceControlInfo = (ControlInfo) getObjectById(pipelineContext, targetControlEffectiveId);
 
                     final ControlInfo otherTargetControlInfo
                         = (ControlInfo) getObjectById(pipelineContext,
                                 ((ControlInfo) concreteEvent.getOtherTargetObject()).getId());
 
                     // We have a focus change (otherwise, the focus is assumed to remain the same)
-                    dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(valueControlInfo));
-                    dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetControlInfo));
+                    if (sourceControlInfo != null)
+                        dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceControlInfo));
+                    if (otherTargetControlInfo != null)
+                        dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetControlInfo));
                 }
 
                 // Refresh (this will send update events)
-                dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+                dispatchEvent(pipelineContext, new XFormsRefreshEvent(modelForValueChangedControl));
             }
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
@@ -536,7 +557,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
                 if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventsToDispatch[i])) {
-                    dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, null, null));
+                    xformsControls.initialize(pipelineContext, null, null);
                 }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     final XFormsModel currentModel = (XFormsModel) j.next();
@@ -546,27 +567,32 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             final XXFormsInitializeStateEvent initializeStateEvent = (XXFormsInitializeStateEvent) xformsEvent;
 
-            // This is called whenever the state of the XForms engine needs to be rebuilt
-
-            // Clear containing document state
-            clearClientState();
+            // This is called whenever the state of the XForms engine needs to be rebuilt, but without going through a
+            // full XForms initialization sequence
 
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
-                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement(), initializeStateEvent.isInitializeControls()));
+                currentModel.initializeState(pipelineContext);
             }
 
-            if (initializeStateEvent.isInitializeControls())
-                dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
+            // Restore controls
+            xformsControls.initialize(pipelineContext, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement());
 
-        } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
-            // Make sure controls are initialized
-            final XXFormsInitializeControlsEvent initializeControlsEvent = (XXFormsInitializeControlsEvent) xformsEvent;
-            xformsControls.initialize(pipelineContext, initializeControlsEvent.getDivsElement(), initializeControlsEvent.getRepeatIndexesElement());
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }
+    }
+
+    /**
+     * Prepare the ContainingDocumentg for a sequence of external events.
+     */
+    public void prepareForExternalEvents(PipelineContext pipelineContext) {
+        // Clear containing document state
+        clearClientState();
+
+        // Initialize controls
+        xformsControls.initialize(pipelineContext, null, null);
     }
 
     public XFormsEventHandlerContainer getParentContainer() {

@@ -104,7 +104,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
-                helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "() {\n");
+                helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
                 helper.text(currentEntry.getValue().toString());
                 helper.text("}\n");
             }

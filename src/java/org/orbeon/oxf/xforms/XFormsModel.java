@@ -677,17 +677,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         return eventHandlers;
     }
 
+    /**
+     * Initialize the state of the model when the model object was just recreated.
+     */
+    public void initializeState(PipelineContext pipelineContext ) {
+        loadSchemasIfNeeded(pipelineContext);
+        applyComputedExpressionBinds(pipelineContext);
+        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
+        clearInstanceDataEventState();// TODO: why do we do this here if we just created the model?
+    }
+
     public void performDefaultAction(final PipelineContext pipelineContext, XFormsEvent event) {
         final String eventName = event.getEventName();
-        if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
-            // Internal event to restore state
-
-            loadSchemasIfNeeded(pipelineContext);
-            applyComputedExpressionBinds(pipelineContext);
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
-            clearInstanceDataEventState();
-
-        } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
+        if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
@@ -1067,7 +1069,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (xformsControls != null) {
 
             // Rebuild controls
-//            xformsControls.rebuildCurrentControlsState(pipelineContext);
+            xformsControls.rebuildCurrentControlsState(pipelineContext);
 
             // Build list of events to send
             final List eventsToDispatch = new ArrayList();

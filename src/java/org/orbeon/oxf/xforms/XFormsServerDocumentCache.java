@@ -116,7 +116,7 @@ public class XFormsServerDocumentCache {
                 throw new OXFException(e);
             }
             // Initialize state
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, null, null, true));
+//            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, null, null, true));
         }
         containingDocument.setSourceObjectPool(pool);
 

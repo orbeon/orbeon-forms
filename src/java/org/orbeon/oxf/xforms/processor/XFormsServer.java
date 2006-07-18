@@ -275,9 +275,9 @@ public class XFormsServer extends ProcessorImpl {
      * was already executed.
      */
     private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, int[] sentEventCount, String eventName, String controlId, String otherControlId, String contextString) {
-        if (sentEventCount[0] > 0) {
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, null, null, false));
-            containingDocument.getXFormsControls().rebuildCurrentControlsState(pipelineContext);
+        if (sentEventCount[0] == 0) {
+            // Prepare ContainingDocument
+            containingDocument.prepareForExternalEvents(pipelineContext);
         }
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         sentEventCount[0]++;
@@ -875,8 +875,9 @@ public class XFormsServer extends ProcessorImpl {
 
     public static void outputScriptsInfo(ContentHandlerHelper ch, List scripts) {
         for (Iterator i = scripts.iterator(); i.hasNext();) {
-            final String scriptName = (String) i.next();
-            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script", new String[]{ "name", scriptName });
+            final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
+                    new String[]{ "name", script.getFunctionName(), "target-id", script.getEventTargetId(), "observer-id", script.getEventHandlerContainerId() });
         }
     }
 
@@ -1065,7 +1066,7 @@ public class XFormsServer extends ProcessorImpl {
         if (isInitializeEvent)
             containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement, true));
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement));
 
         // Run automatic event if present
         if (eventElement != null) {

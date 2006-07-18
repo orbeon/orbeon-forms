@@ -741,7 +741,6 @@ public class XFormsControls {
     private ControlsState buildControlsState(final PipelineContext pipelineContext) {
 
         final long startTime;
-
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsServer.logger.debug("XForms - building controls state start.");
             startTime = System.currentTimeMillis();

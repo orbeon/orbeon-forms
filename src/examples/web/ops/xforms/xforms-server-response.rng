@@ -191,6 +191,8 @@
                 <zeroOrMore>
                     <element name="xxforms:script">
                         <attribute name="name"/>
+                        <attribute name="target-id"/>
+                        <attribute name="observer-id"/>
                     </element>
                 </zeroOrMore>
                 <optional>

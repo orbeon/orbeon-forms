@@ -2166,8 +2166,13 @@ function xformsHandleResponse(o) {
                         case "script": {
                             var scriptElement = actionElement.childNodes[actionIndex];
                             var functionName = scriptElement.getAttribute("name");
+                            var targetId = scriptElement.getAttribute("target-id");
+                            var targetElement = document.getElementById(targetId);
+                            var observerId = scriptElement.getAttribute("observer-id");
+                            var observer = document.getElementById(observerId);
+                            var event = { "target" : targetElement };
                             var theFunction = eval(functionName);
-                            theFunction.call();
+                            theFunction.call(observer, event);
                             break;
                         }
                     }

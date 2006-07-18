@@ -1040,7 +1040,7 @@ function xformsInitializeControlsUnder(root) {
                 } else if (isXFormsAutoComplete) {
                     var textfield = control.childNodes[0];
                     xformsRegisterForFocusBlurEvents(textfield);
-                } else if (control.form) {
+                } else {
                     xformsRegisterForFocusBlurEvents(control);
                 }
             }

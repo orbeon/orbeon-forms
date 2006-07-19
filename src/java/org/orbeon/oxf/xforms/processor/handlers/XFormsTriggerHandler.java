@@ -82,8 +82,15 @@ public class XFormsTriggerHandler extends HandlerBase {
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname)) {
             // Link appearance (xxforms:link)
 
+            // Add title attribute if not yet present and there is a hint
+            if (newAttributes.getValue("title") == null) {
+                final String hintValue = (controlInfo != null) ? controlInfo.getHint() : null;
+                if (hintValue != null)
+                    newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
+            }
+
+            // TODO: probably needs f:url-norewrite="true"
             newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
-//                            newAttributes.addAttribute(XMLConstant., "href", "href", ContentHandlerHelper.CDATA, "");// TODO: probably needs f:url-norewrite="true"
 
             // xhtml:a
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

@@ -871,14 +871,9 @@ public class XFormsActionInterpreter {
      * What we do here is that we bring back the index within bounds. The spec does not cover this
      * scenario.
      */
-    public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls) {
-        adjustRepeatIndexes(pipelineContext, xformsControls, null);
-    }
-
     public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls, final Map forceUpdate) {
 
-        // Rebuild before iterating
-        xformsControls.rebuildCurrentControlsState(pipelineContext);
+        // We don't rebuild before iterating because the caller has already rebuilt
         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
         currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
@@ -951,6 +946,7 @@ public class XFormsActionInterpreter {
         }
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
         final int index = Integer.parseInt(indexString);
@@ -1004,7 +1000,6 @@ public class XFormsActionInterpreter {
         for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
             XFormsModel currentModel = (XFormsModel) i.next();
             currentModel.applyComputedExpressionBinds(pipelineContext);
-            //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
         }
 
         containingDocument.getXFormsControls().markDirty();

@@ -469,7 +469,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
                         }, firstAncestorRepeatControlInfo);
 
                         // Adjust controls ids that could have gone out of bounds
-                        XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, xformsControls);
+                        XFormsActionInterpreter.adjustRepeatIndexes(pipelineContext, xformsControls, null);
 
                         // After changing indexes, must recalculate
                         // NOTE: The <setindex> action is supposed to "The implementation data

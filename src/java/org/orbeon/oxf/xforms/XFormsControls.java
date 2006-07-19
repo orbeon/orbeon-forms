@@ -669,23 +669,6 @@ public class XFormsControls {
         return null;
     }
 
-    /**
-     * Find the instance containing the specified node, in any model.
-     *
-     * @param nodeInfo  node contained in an instance
-     * @return      instance containing the node
-     */
-    public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
-        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-            final XFormsModel currentModel = (XFormsModel) i.next();
-            final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
-            if (currentInstance != null)
-                return currentInstance;
-        }
-        // This should not happen if the node is currently in an instance!
-        return null;
-    }
-
     public FunctionLibrary getFunctionLibrary() {
         return functionLibrary;
     }

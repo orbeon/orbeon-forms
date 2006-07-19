@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * Implementation of all the XForms actions.
  *
- * TODO: Separate actions into different classes for more modularity.
+ * TODO: Separate actions into different classes for modularity.
  */
 public class XFormsActionInterpreter {
 
@@ -57,9 +57,8 @@ public class XFormsActionInterpreter {
      * @param targetId              id of the target control
      * @param eventHandlerContainer event handler containe this action is running in
      * @param actionElement         Element specifying the action to execute
-     * @param actionContext         ActionContext instance for deferred updates, or null
      */
-    public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement, ActionContext actionContext) {
+    public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
 
         // Check that we understand the action element
         final String actionNamespaceURI = actionElement.getNamespaceURI();
@@ -91,7 +90,7 @@ public class XFormsActionInterpreter {
                 return;
             }
 
-            final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
+            final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
 
             final List conditionResult = currentInstance.getEvaluator().evaluate(pipelineContext,
                 currentSingleNode, "boolean(" + conditionAttribute + ")",
@@ -113,47 +112,31 @@ public class XFormsActionInterpreter {
 
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
             if (XFormsActions.XFORMS_SETVALUE_ACTION.equals(actionName)) {
-                executeSetvalue(pipelineContext, actionElement, actionContext);
+                executeSetvalue(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_RESET_ACTION.equals(actionName)) {
-                executeReset(pipelineContext, actionElement, actionContext);
+                executeReset(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_ACTION_ACTION.equals(actionName)) {
                 // 10.1.1 The action Element
 
-                final ActionContext newActionContext = (actionContext == null) ? new ActionContext() : null;
                 for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
                     final Element embeddedActionElement = (Element) i.next();
-                    runAction(pipelineContext, targetId, eventHandlerContainer, embeddedActionElement, (newActionContext == null) ? actionContext : newActionContext );
-                }
-                if (newActionContext != null) {
-                    // Binding context has to be reset as it may have been modified by sub-actions
-                    setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
-                    final XFormsModel model = xformsControls.getCurrentModel();
-
-                    // Process deferred behavior
-                    if (newActionContext.rebuild)
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
-                    if (newActionContext.recalculate)
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-                    if (newActionContext.revalidate)
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-                    if (newActionContext.refresh)
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+                    runAction(pipelineContext, targetId, eventHandlerContainer, embeddedActionElement);
                 }
 
             } else if (XFormsActions.XFORMS_REBUILD_ACTION.equals(actionName)) {
-                executeRebuild(pipelineContext, actionElement, actionContext);
+                executeRebuild(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_RECALCULATE_ACTION.equals(actionName)) {
-                executeRecalculate(pipelineContext, actionElement, actionContext);
+                executeRecalculate(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_REVALIDATE_ACTION.equals(actionName)) {
-                executeRevalidate(pipelineContext, actionElement, actionContext);
+                executeRevalidate(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_REFRESH_ACTION.equals(actionName)) {
-                executeRefresh(pipelineContext, actionElement, actionContext);
+                executeRefresh(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionName)) {
                 executeToggle(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_INSERT_ACTION.equals(actionName)) {
-                executeInsert(pipelineContext, actionElement, actionContext, eventHandlerContainer);
+                executeInsert(pipelineContext, actionElement, eventHandlerContainer);
             } else if (XFormsActions.XFORMS_DELETE_ACTION.equals(actionName)) {
-                executeDelete(pipelineContext, actionElement, actionContext, eventHandlerContainer);
+                executeDelete(pipelineContext, actionElement, eventHandlerContainer);
             } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionName)) {
                 executeSetindex(pipelineContext, actionElement);
             } else if (XFormsActions.XFORMS_SEND_ACTION.equals(actionName)) {
@@ -379,7 +362,7 @@ public class XFormsActionInterpreter {
         if (currentSingleNode == null)
             return;
 
-        final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
+        final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
         final String indexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                 xformsControls.getCurrentNodeset(), xformsControls.getCurrentPosition(),
                 "number(" + indexXPath + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
@@ -387,7 +370,7 @@ public class XFormsActionInterpreter {
         executeSetindexAction(pipelineContext, containingDocument, repeatId, indexString);
     }
 
-    private void executeDelete(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext, XFormsEventHandlerContainer eventHandlerContainer) {
+    private void executeDelete(PipelineContext pipelineContext, Element actionElement, XFormsEventHandlerContainer eventHandlerContainer) {
         // 9.3.6 The delete Element
 
         final String atAttribute = actionElement.attributeValue("at");
@@ -416,7 +399,7 @@ public class XFormsActionInterpreter {
             return;
 
         {
-            final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
+            final NodeInfo nodeInfoToRemove;
             final Node nodeToRemove;
             final List parentContent;
             final int actualIndexInParentContentCollection;
@@ -435,6 +418,7 @@ public class XFormsActionInterpreter {
                         // position is 1."
 
                         // "2. The return value is processed according to the rules of the XPath function round()"
+                        final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
                         final String insertionIndexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                             collectionToUpdate, 1,
                             "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
@@ -461,7 +445,8 @@ public class XFormsActionInterpreter {
                     return;
                 } else {
                     // Find actual deletion point
-                    nodeToRemove = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToUpdate.get(deleteIndex - 1), CANNOT_DELETE_READONLY_MESSAGE);
+                    nodeInfoToRemove = (NodeInfo) collectionToUpdate.get(deleteIndex - 1);
+                    nodeToRemove = XFormsUtils.getNodeFromNodeInfo(nodeInfoToRemove, CANNOT_DELETE_READONLY_MESSAGE);
 
                     final Element parentElement = nodeToRemove.getParent();
                     if (parentElement != null) {
@@ -487,6 +472,9 @@ public class XFormsActionInterpreter {
                     }
                 }
             }
+
+            // Identify the instance that actually changes
+            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(nodeInfoToRemove);
 
             // Get current repeat indexes
             final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
@@ -522,25 +510,14 @@ public class XFormsActionInterpreter {
             adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIndexUpdates);
 
             // "4. If the delete is successful, the event xforms-delete is dispatched."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(currentInstance, atAttribute));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, atAttribute));
 
-            if (actionContext != null) {
-                // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-                actionContext.setAll(true);
-            } else {
-                // Binding context has to be reset as the controls have been updated
-                setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
-                final XFormsModel model = xformsControls.getCurrentModel();
-                // Send events directly
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
-            }
+            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+            modifiedInstance.getModel().getDeferredActionContext().setAllDeferredFlags(true);
         }
     }
 
-    private void executeInsert(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext, XFormsEventHandlerContainer eventHandlerContainer) {
+    private void executeInsert(PipelineContext pipelineContext, Element actionElement, XFormsEventHandlerContainer eventHandlerContainer) {
         // 9.3.5 The insert Element
         final String atAttribute = actionElement.attributeValue("at");
         final String positionAttribute = actionElement.attributeValue("position");
@@ -615,8 +592,6 @@ public class XFormsActionInterpreter {
 
             // "Finally, this newly created node is inserted into the instance data at the location
             // specified by attributes position and at."
-
-            final XFormsInstance currentInstance = xformsControls.getInstanceForNode(currentSingleNode);
             int insertionIndex;
             {
                 if (isEmptyNodesetBinding) {
@@ -631,6 +606,7 @@ public class XFormsActionInterpreter {
                     // position is 1."
 
                     // "2. The return value is processed according to the rules of the XPath function round()"
+                    final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
                     final String insertionIndexString = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                         collectionToBeUpdated, 1,
                         "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
@@ -655,15 +631,21 @@ public class XFormsActionInterpreter {
             // Prepare switches
             XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls, sourceNode, clonedNode);
 
+            // Identify the instance that actually changes
+            final XFormsInstance modifiedInstance;
+
             // Find actual insertion point and insert
             if (isEmptyNodesetBinding) {
                 // "1. If the Node Set Binding node-set is empty, then the target location is before the first
                 // child or attribute of the insert context node, based on the node type of the cloned node."
 
                 final NodeInfo insertContextNode = xformsControls.getCurrentSingleNode();
+                modifiedInstance = containingDocument.getInstanceForNode(insertContextNode);
                 doInsert(XFormsUtils.getNodeFromNodeInfo(insertContextNode, CANNOT_INSERT_READONLY_MESSAGE), clonedNode);
             } else {
-                final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo((NodeInfo) collectionToBeUpdated.get(insertionIndex - 1), CANNOT_INSERT_READONLY_MESSAGE);
+                final NodeInfo insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
+                final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
+                modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
                 if (insertLocationNode.getNodeType() != clonedNode.getNodeType()) {
                     // "2. If the node type of the cloned node does not match the node type of the insert location
                     // node, then the target location is before the first child or attribute of the insert location
@@ -717,21 +699,10 @@ public class XFormsActionInterpreter {
             XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
 
             // "4. If the insert is successful, the event xforms-insert is dispatched."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(modifiedInstance, atAttribute));
 
-            if (actionContext != null) {
-                // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-                actionContext.setAll(true);
-            } else {
-                // Binding context has to be reset as the controls have been updated
-                setBindingContext(pipelineContext, containingDocument, eventHandlerContainer.getId(), actionElement);
-                final XFormsModel model = xformsControls.getCurrentModel();
-                // Send events directly
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
-            }
+            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+            modifiedInstance.getModel().getDeferredActionContext().setAllDeferredFlags(true);
         }
     }
 
@@ -745,59 +716,39 @@ public class XFormsActionInterpreter {
         xformsControls.updateSwitchInfo(pipelineContext, effectiveCaseId);
     }
 
-    private void executeRefresh(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeRefresh(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.6 The refresh Element
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
         containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        if (actionContext != null)
-            actionContext.refresh = false;
     }
 
-    private void executeRevalidate(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeRevalidate(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.5 The revalidate Element
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
-        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        if (actionContext != null)
-            actionContext.revalidate = false;
+        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
     }
 
-    private void executeRecalculate(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeRecalculate(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.4 The recalculate Element
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
-        containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        if (actionContext != null)
-            actionContext.recalculate = false;
+        containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
     }
 
-    private void executeRebuild(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeRebuild(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.3 The rebuild Element
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
         containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        if (actionContext != null)
-            actionContext.rebuild = false;
     }
 
-    private void executeReset(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeReset(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.11 The reset Element
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
@@ -806,16 +757,15 @@ public class XFormsActionInterpreter {
         if (modelObject instanceof XFormsModel) {
             final XFormsModel model = (XFormsModel) modelObject;
             containingDocument.dispatchEvent(pipelineContext, new XFormsResetEvent(model));
+
+            // "the reset action takes effect immediately and clears all of the flags."
+            model.getDeferredActionContext().setAllDeferredFlags(false);
         } else {
             throw new OXFException("xforms:reset model attribute must point to an xforms:model element.");
         }
-
-        // "the reset action takes effect immediately and clears all of the flags."
-        if (actionContext != null)
-            actionContext.setAll(false);
     }
 
-    private void executeSetvalue(PipelineContext pipelineContext, Element actionElement, ActionContext actionContext) {
+    private void executeSetvalue(PipelineContext pipelineContext, Element actionElement) {
         // 10.1.9 The setvalue Element
         // xforms:setvalue
 
@@ -845,7 +795,7 @@ public class XFormsActionInterpreter {
                 // This would require an update to the way we impelement the processing model.
             }
 
-            final XFormsInstance currentInstance = xformsControls.getInstanceForNode((NodeInfo) currentNodeset.get(0));
+            final XFormsInstance currentInstance = containingDocument.getInstanceForNode((NodeInfo) currentNodeset.get(0));
             valueToSet = currentInstance.getEvaluator().evaluateAsString(pipelineContext,
                     currentNodeset, xformsControls.getCurrentPosition(),
                     value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
@@ -858,25 +808,30 @@ public class XFormsActionInterpreter {
         final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
         if (currentNode != null) {
             // Node exists, we can try to set the value
-            XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, null);
-
-            if (actionContext != null) {
-                // "XForms Actions that change only the value of an instance node results in setting
-                // the flags for recalculate, revalidate, and refresh to true and making no change to
-                // the flag for rebuild".
-                actionContext.recalculate = true;
-                actionContext.revalidate = true;
-                actionContext.refresh = true;
-            } else {
-                // Send events directly
-                final XFormsModel model = xformsControls.getCurrentModel();
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-                containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
-            }
+            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
+        }
+    }
+
+    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet) {
+        final String currentValue = XFormsInstance.getValueForNode(currentNode);
+        if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
+            XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, null);
+
+            final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
+            final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel().getDeferredActionContext();
+
+            // "XForms Actions that change only the value of an instance node results in setting the flags for
+            // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
+            deferredActionContext.recalculate = true;
+            deferredActionContext.revalidate = true;
+            deferredActionContext.refresh = true;
+
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -1063,19 +1018,5 @@ public class XFormsActionInterpreter {
             xformsControls.resetBindingContext();
         }
         xformsControls.pushBinding(pipelineContext, actionElement);
-    }
-
-    private static class ActionContext {
-        public boolean rebuild;
-        public boolean recalculate;
-        public boolean revalidate;
-        public boolean refresh;
-
-        public void setAll(boolean value) {
-            rebuild = value;
-            recalculate = value;
-            revalidate = value;
-            refresh = value;
-        }
     }
 }

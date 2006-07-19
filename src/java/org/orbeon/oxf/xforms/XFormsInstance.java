@@ -68,6 +68,13 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
+     * Return the model that contains this instance.
+     */
+    public XFormsModel getModel() {
+        return model;
+    }
+
+    /**
      * Return the instance document.
      */
     public Document getInstanceDocument() {

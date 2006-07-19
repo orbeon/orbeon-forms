@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.URIResolver;
 import java.io.IOException;
@@ -218,6 +219,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (id.equals(getId()))
             return this;
 
+        return null;
+    }
+
+    /**
+     * Find the instance containing the specified node, in any model.
+     *
+     * @param nodeInfo  node contained in an instance
+     * @return      instance containing the node
+     */
+    public XFormsInstance getInstanceForNode(NodeInfo nodeInfo) {
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            final XFormsInstance currentInstance = currentModel.getInstanceForNode(nodeInfo);
+            if (currentInstance != null)
+                return currentInstance;
+        }
+        // This should not happen if the node is currently in an instance!
         return null;
     }
 
@@ -506,9 +524,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
 
             {
-                // Recalculate and revalidate
-                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(modelForValueChangedControl, true));
-                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(modelForValueChangedControl, true));
+                // Recalculate and revalidate are done with the automatic deferred updates
+//                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(modelForValueChangedControl, true));
+//                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(modelForValueChangedControl, true));
 
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (concreteEvent.getOtherTargetObject() != null) {
@@ -526,8 +544,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetControlInfo));
                 }
 
+                // Refresh is done with the automatic deferred updates
                 // Refresh (this will send update events)
-                dispatchEvent(pipelineContext, new XFormsRefreshEvent(modelForValueChangedControl));
+//                dispatchEvent(pipelineContext, new XFormsRefreshEvent(modelForValueChangedControl));
             }
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
@@ -593,6 +612,20 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Initialize controls
         xformsControls.initialize(pipelineContext, null, null);
+    }
+
+    public void startOutmostActionHandler() {
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.startOutmostActionHandler();
+        }
+    }
+
+    public void endOutmostActionHandler(PipelineContext pipelineContext) {
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            currentModel.endOutmostActionHandler(pipelineContext);
+        }
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -785,6 +818,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
         if (actionInterpreter == null)
             actionInterpreter = new XFormsActionInterpreter(this);
-        actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, actionElement, null);
+        actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, actionElement);
     }
 }

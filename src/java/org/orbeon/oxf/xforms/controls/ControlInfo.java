@@ -304,12 +304,15 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
      */
     public void setExternalValue(PipelineContext pipelineContext, String value) {
         // Set value into the instance
-        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
-        XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, null);
 
-        // Update this particular control's value
-        evaluateValue(pipelineContext);
-        evaluateDisplayValue(pipelineContext);
+        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+        final boolean changed = XFormsActionInterpreter.doSetValue(pipelineContext, containingDocument, currentSingleNode, value);
+
+        if (changed) {
+            // Update this particular control's value
+            evaluateValue(pipelineContext);
+            evaluateDisplayValue(pipelineContext);
+        }
     }
 
     /**
@@ -356,7 +359,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
 
             if (format != null) {
                 final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
-                final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
+                final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
                 result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
                             format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
             } else {
@@ -368,7 +371,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
 
             final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
-            final XFormsInstance currentInstance = containingDocument.getXFormsControls().getInstanceForNode(currentSingleNode);
+            final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
 
             result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
                         format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);

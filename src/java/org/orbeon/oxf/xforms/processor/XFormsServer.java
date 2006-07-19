@@ -279,7 +279,9 @@ public class XFormsServer extends ProcessorImpl {
             // Prepare ContainingDocument
             containingDocument.prepareForExternalEventsSequence(pipelineContext);
         }
+        containingDocument.startOutmostActionHandler();
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
+        containingDocument.endOutmostActionHandler(pipelineContext);
         sentEventCount[0]++;
     }
 

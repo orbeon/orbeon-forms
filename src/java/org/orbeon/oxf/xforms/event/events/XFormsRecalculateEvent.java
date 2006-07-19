@@ -25,14 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XFormsRecalculateEvent extends XFormsEvent {
 
-    private boolean sendEvents;
-
-    public XFormsRecalculateEvent(XFormsEventTarget targetObject, boolean sendEvents) {
+    public XFormsRecalculateEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_RECALCULATE, targetObject, true, true);
-        this.sendEvents = sendEvents;
-    }
-
-    public boolean isSendEvents() {
-        return sendEvents;
     }
 }

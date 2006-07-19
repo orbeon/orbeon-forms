@@ -25,14 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XFormsRevalidateEvent extends XFormsEvent {
 
-    private boolean sendEvents;
-
-    public XFormsRevalidateEvent(XFormsEventTarget targetObject, boolean sendEvents) {
+    public XFormsRevalidateEvent(XFormsEventTarget targetObject) {
         super(XFormsEvents.XFORMS_REVALIDATE, targetObject, true, true);
-        this.sendEvents = sendEvents;
-    }
-
-    public boolean isSendEvents() {
-        return sendEvents;
     }
 }

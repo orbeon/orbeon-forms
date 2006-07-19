@@ -885,9 +885,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
+            doRebuild(pipelineContext);
+            doRecalculate(pipelineContext);
+            doRevalidate(pipelineContext);
 
             synchronizeInstanceDataEventState();
 
@@ -933,8 +933,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
             // xforms-refresh are dispatched to the model element in sequence."
             containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this, true));
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 
         } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName)) {
@@ -991,6 +991,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public void doRebuild(PipelineContext pipelineContext) {
         // TODO: rebuild computational dependency data structures
+
+        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+        // have an immediate effect, and clear the corresponding flag."
+        getDeferredActionContext().rebuild = false;
     }
 
     public void doRecalculate(PipelineContext pipelineContext) {
@@ -1015,6 +1019,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // Update computed expression binds
             applyComputedExpressionBinds(pipelineContext);
         }
+
+        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+        // have an immediate effect, and clear the corresponding flag."
+        getDeferredActionContext().recalculate = false;
     }
 
 
@@ -1040,6 +1048,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 }
             });
         }
+
+        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+        // have an immediate effect, and clear the corresponding flag."
+        getDeferredActionContext().revalidate = false;
     }
 
     public void doRefresh(final PipelineContext pipelineContext) {
@@ -1168,6 +1180,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 continue;
             }
 
+            // "The XForms processor is not considered to be executing an outermost action handler at the time that it
+            // performs deferred update behavior for XForms models. Therefore, event handlers for events dispatched to
+            // the user interface during the deferred refresh behavior are considered to be new outermost action
+            // handler."
+            // TODO: It doesn't really look like we are allowed to do a single start/end around multiple events below. Check that.
+            containingDocument.startOutmostActionHandler();
+
             // Re-obtain node to which control is bound, in case things have shifted
             xformsControls.setBinding(pipelineContext, controlInfo);
             final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
@@ -1217,6 +1236,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     }
                 }
             }
+
+            containingDocument.endOutmostActionHandler(pipelineContext);
         }
 
         // "5. The user interface reflects the state of the model, which means that all forms
@@ -1224,6 +1245,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (xformsControls != null) {
             containingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
         }
+
+        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+        // have an immediate effect, and clear the corresponding flag."
+        getDeferredActionContext().refresh = false;
     }
 
     /**
@@ -1237,12 +1262,46 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         doRebuild(pipelineContext);
         doRecalculate(pipelineContext);
         doRevalidate(pipelineContext);
-
-        // Rebuild ControlsState
-//        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-//        xformsControls.rebuildCurrentControlsState(pipelineContext);
-
         doRefresh(pipelineContext);
+    }
+
+    private DeferredActionContext deferredActionContext;
+
+    public static class DeferredActionContext {
+        public boolean rebuild;
+        public boolean recalculate;
+        public boolean revalidate;
+        public boolean refresh;
+
+        public void setAllDeferredFlags(boolean value) {
+            rebuild = value;
+            recalculate = value;
+            revalidate = value;
+            refresh = value;
+        }
+    }
+
+    public DeferredActionContext getDeferredActionContext() {
+        if (deferredActionContext == null)
+            deferredActionContext = new DeferredActionContext();
+        return deferredActionContext;
+    }
+
+    public void startOutmostActionHandler() {
+        getDeferredActionContext().setAllDeferredFlags(false);
+    }
+
+    public void endOutmostActionHandler(PipelineContext pipelineContext) {
+        // Process deferred behavior
+        final DeferredActionContext deferredActionContext = getDeferredActionContext();
+        if (deferredActionContext.rebuild)
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+        if (deferredActionContext.recalculate)
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
+        if (deferredActionContext.revalidate)
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
+        if (deferredActionContext.refresh)
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
     }
 
     /**

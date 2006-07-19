@@ -155,6 +155,16 @@
                             </p>
                         </li>
                         <li>
+                            <p>
+                                Support for xforms:output in xxx
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                New deferred update behavior as per 1.0 errata xxx 
+                            </p>
+                        </li>
+                        <li>
                             [TODO]
                         </li>
                     </ul>

@@ -251,10 +251,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         currentInstance.setInstanceDocument(initialDocumentToSubmit, false);
 
                         // Revalidate instance
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
-                        // TODO: The "false" attribute is no longer used. The above will cause events to be
-                        // sent out. Check if the validation state can really change. If so, find a
-                        // solution.
+                        model.doRevalidate(pipelineContext);
+                        // TODO: Check if the validation state can really change. If so, find a solution.
                         // "no notification events are marked for dispatching due to this operation"
 
                         // Check that there are no validation errors
@@ -358,8 +356,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         currentInstance.setInstanceDocument(documentToSubmit, false);
 
                         // Revalidate instance
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, false));
-                        // TODO: The "false" attribute is no longer used. The above will cause events to be
+                        model.doRevalidate(pipelineContext);
                         // sent out. Check if the validation state can really change. If so, find a
                         // solution.
                         // "no notification events are marked for dispatching due to this operation"

@@ -1050,7 +1050,7 @@ public class XFormsActionInterpreter {
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
         // Rebuild controls state before using setBinding()
-        xformsControls.rebuildCurrentControlsState(pipelineContext);// TODO: why do we need to do this here?
+//        xformsControls.rebuildCurrentControlsState(pipelineContext);// TODO: why do we need to do this here?
 
         // Get "fresh" event handler containier
         final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);

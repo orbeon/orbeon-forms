@@ -277,7 +277,7 @@ public class XFormsServer extends ProcessorImpl {
     private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, int[] sentEventCount, String eventName, String controlId, String otherControlId, String contextString) {
         if (sentEventCount[0] == 0) {
             // Prepare ContainingDocument
-            containingDocument.prepareForExternalEvents(pipelineContext);
+            containingDocument.prepareForExternalEventsSequence(pipelineContext);
         }
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         sentEventCount[0]++;

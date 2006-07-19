@@ -540,7 +540,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         } else {
             throw new OXFException("Invalid event dispatched by client: " + eventName);
         }
-    }
+        }
 
     public void dispatchExternalEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
@@ -587,7 +587,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Prepare the ContainingDocumentg for a sequence of external events.
      */
-    public void prepareForExternalEvents(PipelineContext pipelineContext) {
+    public void prepareForExternalEventsSequence(PipelineContext pipelineContext) {
         // Clear containing document state
         clearClientState();
 

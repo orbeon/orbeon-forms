@@ -110,15 +110,24 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
-        if (instanceDocumentInfo instanceof DocumentWrapper) {
-            // Only set annotations on Document
-            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
-
-            if (initialize)
-                XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
-        }
 
         this.instanceDocumentInfo = instanceDocumentInfo;
+
+        if (initialize && instanceDocumentInfo instanceof DocumentWrapper) {
+            // Only set annotations on Document
+            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
+            XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
+        }
+    }
+
+    public void synchronizeInstanceDataEventState() {
+        XFormsUtils.iterateInstanceData(this, new XFormsUtils.InstanceWalker() {
+            public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
+                if (updatedInstanceData != null) {
+                    updatedInstanceData.clearInstanceDataEventState();
+                }
+            }
+        }, true);
     }
 
     /**

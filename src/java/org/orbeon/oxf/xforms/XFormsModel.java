@@ -683,8 +683,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     public void initializeState(PipelineContext pipelineContext ) {
         loadSchemasIfNeeded(pipelineContext);
         applyComputedExpressionBinds(pipelineContext);
-        containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
-        clearInstanceDataEventState();// TODO: why do we do this here if we just created the model?
+        doRevalidate(pipelineContext);
+        synchronizeInstanceDataEventState();
     }
 
     public void performDefaultAction(final PipelineContext pipelineContext, XFormsEvent event) {
@@ -888,7 +888,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
-//            clearInstanceDataEventState();
+
+            synchronizeInstanceDataEventState();
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -979,16 +980,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private void clearInstanceDataEventState() {
+    private void synchronizeInstanceDataEventState() {
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()), new XFormsUtils.InstanceWalker() {
-                    public void walk(NodeInfo nodeInfo, InstanceData updatedInstanceData) {
-                        if (updatedInstanceData != null) {
-                            updatedInstanceData.clearInstanceDataEventState();
-                        }
-                    }
-                }, false);
+                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                currentInstance.synchronizeInstanceDataEventState();
             }
         }
     }
@@ -1020,6 +1016,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             applyComputedExpressionBinds(pipelineContext);
         }
     }
+
 
     public void doRevalidate(final PipelineContext pipelineContext) {
         if (instances != null) {
@@ -1066,161 +1063,166 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // specify an ordering for the events."
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        if (xformsControls != null) {
+        if (xformsControls == null)
+            return;
 
-            // Rebuild controls
-            xformsControls.rebuildCurrentControlsState(pipelineContext);
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - performing refresh");
 
-            // Build list of events to send
-            final List eventsToDispatch = new ArrayList();
+        // Rebuild controls
+        xformsControls.rebuildCurrentControlsState(pipelineContext);
 
-            // Iterate through controls and check the nodes they are bound to
-            xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
-                public void startVisitControl(ControlInfo controlInfo) {
-                    xformsControls.setBinding(pipelineContext, controlInfo);
-                    final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
+        // Build list of events to send
+        final List eventsToDispatch = new ArrayList();
 
-                    // This can happen if control is not bound to anything
-                    if (currentNodeInfo == null)
-                        return;
 
-                    // We only dispatch value-changed events for controls bound to a mutable document
-                    if (!(currentNodeInfo instanceof NodeWrapper))
-                        return;
-
-                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();// NOTE: we don't actually use the node later below
-
-                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
-
-                    // Check if value has changed
-                    final boolean valueChanged = updatedInstanceData.isValueChanged();
-
-                    // TODO: should check whether value of control has changed, not node.
-                    // However, is this compatible with with the way we rebuild the controls?
-
-                    if (valueChanged) {
-                        // Value change takes care of everything
-                        eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.ALL));
-                    } else {
-                        // Dispatch xforms-optional/xforms-required if needed
-                        {
-                            final boolean previousRequiredState = updatedInstanceData.getPreviousRequiredState();
-                            final boolean newRequiredState = updatedInstanceData.getRequired().get();
-
-                            if ((previousRequiredState && !newRequiredState) || (!previousRequiredState && newRequiredState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.REQUIRED));
-                        }
-                        // Dispatch xforms-enabled/xforms-disabled if needed
-                        {
-                            final boolean previousRelevantState = updatedInstanceData.getPreviousInheritedRelevantState();
-                            final boolean newRelevantState = updatedInstanceData.getInheritedRelevant().get();
-
-                            if ((previousRelevantState && !newRelevantState) || (!previousRelevantState && newRelevantState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.RELEVANT));
-                        }
-                        // Dispatch xforms-readonly/xforms-readwrite if needed
-                        {
-                            final boolean previousReadonlyState = updatedInstanceData.getPreviousInheritedReadonlyState();
-                            final boolean newReadonlyState = updatedInstanceData.getInheritedReadonly().get();
-
-                            if ((previousReadonlyState && !newReadonlyState) || (!previousReadonlyState && newReadonlyState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.READONLY));
-                        }
-
-                        // Dispatch xforms-valid/xforms-invalid if needed
-
-                        // NOTE: There is no mention in the spec that these events should be
-                        // displatched automatically when the value has changed, contrary to the
-                        // other events above.
-                        {
-                            final boolean previousValidState = updatedInstanceData.getPreviousValidState();
-                            final boolean newValidState = updatedInstanceData.getValid().get();
-
-                            if ((previousValidState && !newValidState) || (!previousValidState && newValidState))
-                                eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.VALID));
-                        }
-                    }
-                }
-
-                public void endVisitControl(ControlInfo controlInfo) {
-                }
-            });
-
-            // Clear InstanceData event state
-            clearInstanceDataEventState();
-
-            // Send events and (try to) make sure the event corresponds to the current instance data
-            // NOTE: deferred behavior is broken in XForms 1.0; 1.1 should introduce better
-            // behavior. Also, event order and the exact steps to take are under-specified in 1.0.
-            for (Iterator i = eventsToDispatch.iterator(); i.hasNext();) {
-                final EventSchedule eventSchedule = (XFormsModel.EventSchedule) i.next();
-
-                final String controlInfoId = eventSchedule.getControlInfoId();
-                final ControlInfo controlInfo = (ControlInfo) xformsControls.getObjectById(controlInfoId);
-
-                if (controlInfo == null) {
-                    // In this case, the algorithm in the spec is not clear. Many thing can have happened between the
-                    // initial determination of a control bound to a changing node, and now, including many events and
-                    // actions.
-                    continue;
-                }
-
-                // Re-obtain node to which control is bound, in case things have shifted
+        // Iterate through controls and check the nodes they are bound to
+        xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
+            public void startVisitControl(ControlInfo controlInfo) {
                 xformsControls.setBinding(pipelineContext, controlInfo);
                 final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
 
-                final int type = eventSchedule.getType();
-                if ((type & EventSchedule.VALUE) != 0) {
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(controlInfo));
+                // This can happen if control is not bound to anything
+                if (currentNodeInfo == null)
+                    return;
+
+                // We only dispatch value-changed events for controls bound to a mutable document
+                if (!(currentNodeInfo instanceof NodeWrapper))
+                    return;
+
+                final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();// NOTE: we don't actually use the node later below!
+
+                final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
+
+                // Check if value has changed
+                final boolean valueChanged = updatedInstanceData.isValueChanged();
+
+                // TODO: should check whether value of control has changed, not node.
+                // However, is this compatible with with the way we rebuild the controls?
+
+                if (valueChanged) {
+                    // Value change takes care of everything
+                    eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.ALL));
+                } else {
+                    // Dispatch xforms-optional/xforms-required if needed
+                    {
+                        final boolean previousRequiredState = updatedInstanceData.getPreviousRequiredState();
+                        final boolean newRequiredState = updatedInstanceData.getRequired().get();
+
+                        if ((previousRequiredState && !newRequiredState) || (!previousRequiredState && newRequiredState))
+                            eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.REQUIRED));
+                    }
+                    // Dispatch xforms-enabled/xforms-disabled if needed
+                    {
+                        final boolean previousRelevantState = updatedInstanceData.getPreviousInheritedRelevantState();
+                        final boolean newRelevantState = updatedInstanceData.getInheritedRelevant().get();
+
+                        if ((previousRelevantState && !newRelevantState) || (!previousRelevantState && newRelevantState))
+                            eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.RELEVANT));
+                    }
+                    // Dispatch xforms-readonly/xforms-readwrite if needed
+                    {
+                        final boolean previousReadonlyState = updatedInstanceData.getPreviousInheritedReadonlyState();
+                        final boolean newReadonlyState = updatedInstanceData.getInheritedReadonly().get();
+
+                        if ((previousReadonlyState && !newReadonlyState) || (!previousReadonlyState && newReadonlyState))
+                            eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.READONLY));
+                    }
+
+                    // Dispatch xforms-valid/xforms-invalid if needed
+
+                    // NOTE: There is no mention in the spec that these events should be
+                    // displatched automatically when the value has changed, contrary to the
+                    // other events above.
+                    {
+                        final boolean previousValidState = updatedInstanceData.getPreviousValidState();
+                        final boolean newValidState = updatedInstanceData.getValid().get();
+
+                        if ((previousValidState && !newValidState) || (!previousValidState && newValidState))
+                            eventsToDispatch.add(new EventSchedule(controlInfo.getId(), currentNode, EventSchedule.VALID));
+                    }
                 }
-                if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
+            }
+
+            public void endVisitControl(ControlInfo controlInfo) {
+            }
+        });
+        
+
+        // Clear InstanceData event state
+        synchronizeInstanceDataEventState();
+
+        // Send events and (try to) make sure the event corresponds to the current instance data
+        // NOTE: deferred behavior is broken in XForms 1.0; 1.1 should introduce better
+        // behavior. Also, event order and the exact steps to take are under-specified in 1.0.
+        for (Iterator i = eventsToDispatch.iterator(); i.hasNext();) {
+            final EventSchedule eventSchedule = (XFormsModel.EventSchedule) i.next();
+
+            final String controlInfoId = eventSchedule.getControlInfoId();
+            final ControlInfo controlInfo = (ControlInfo) xformsControls.getObjectById(controlInfoId);
+
+            if (controlInfo == null) {
+                // In this case, the algorithm in the spec is not clear. Many thing can have happened between the
+                // initial determination of a control bound to a changing node, and now, including many events and
+                // actions.
+                continue;
+            }
+
+            // Re-obtain node to which control is bound, in case things have shifted
+            xformsControls.setBinding(pipelineContext, controlInfo);
+            final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
+
+            final int type = eventSchedule.getType();
+            if ((type & EventSchedule.VALUE) != 0) {
+                containingDocument.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(controlInfo));
+            }
+            if (currentNodeInfo != null && currentNodeInfo instanceof NodeWrapper) {
 
 //                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                    if ((type & EventSchedule.REQUIRED) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
-                        final boolean currentRequiredState = updatedInstanceData.getRequired().get();
-                        if (currentRequiredState) {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent(controlInfo));
-                        } else {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsOptionalEvent(controlInfo));
-                        }
+                if ((type & EventSchedule.REQUIRED) != 0) {
+                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
+                    final boolean currentRequiredState = updatedInstanceData.getRequired().get();
+                    if (currentRequiredState) {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent(controlInfo));
+                    } else {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsOptionalEvent(controlInfo));
                     }
-                    if ((type & EventSchedule.RELEVANT) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
-                        final boolean currentRelevantState = updatedInstanceData.getInheritedRelevant().get();
-                        if (currentRelevantState) {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent(controlInfo));
-                        } else {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsDisabledEvent(controlInfo));
-                        }
+                }
+                if ((type & EventSchedule.RELEVANT) != 0) {
+                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
+                    final boolean currentRelevantState = updatedInstanceData.getInheritedRelevant().get();
+                    if (currentRelevantState) {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent(controlInfo));
+                    } else {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsDisabledEvent(controlInfo));
                     }
-                    if ((type & EventSchedule.READONLY) != 0) {
-                        final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
-                        final boolean currentReadonlyState = updatedInstanceData.getInheritedReadonly().get();
-                        if (currentReadonlyState) {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(controlInfo));
-                        } else {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(controlInfo));
-                        }
+                }
+                if ((type & EventSchedule.READONLY) != 0) {
+                    final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
+                    final boolean currentReadonlyState = updatedInstanceData.getInheritedReadonly().get();
+                    if (currentReadonlyState) {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(controlInfo));
+                    } else {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(controlInfo));
                     }
-                    if ((type & EventSchedule.VALID) != 0) {
-                        final InstanceData inheritedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
-                        final boolean currentValidState = inheritedInstanceData.getValid().get();
-                        if (currentValidState) {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent(controlInfo));
-                        } else {
-                            containingDocument.dispatchEvent(pipelineContext, new XFormsInvalidEvent(controlInfo));
-                        }
+                }
+                if ((type & EventSchedule.VALID) != 0) {
+                    final InstanceData inheritedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
+                    final boolean currentValidState = inheritedInstanceData.getValid().get();
+                    if (currentValidState) {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent(controlInfo));
+                    } else {
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsInvalidEvent(controlInfo));
                     }
                 }
             }
+        }
 
-            // "5. The user interface reflects the state of the model, which means that all forms
-            // controls reflect for their corresponding bound instance data:"
-            if (xformsControls != null) {
-                containingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
-            }
+        // "5. The user interface reflects the state of the model, which means that all forms
+        // controls reflect for their corresponding bound instance data:"
+        if (xformsControls != null) {
+            containingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
         }
     }
 
@@ -1237,8 +1239,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         doRevalidate(pipelineContext);
 
         // Rebuild ControlsState
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-        xformsControls.rebuildCurrentControlsState(pipelineContext);
+//        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+//        xformsControls.rebuildCurrentControlsState(pipelineContext);
 
         doRefresh(pipelineContext);
     }

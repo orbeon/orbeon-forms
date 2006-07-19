@@ -333,7 +333,7 @@ public class XFormsUtils {
      *
      * @param instance
      * @param instanceWalker
-     * @param allNodes          all the nodes, otherwise only data nodes
+     * @param allNodes          all the nodes, otherwise only leaf data nodes
      */
     public static void iterateInstanceData(XFormsInstance instance, InstanceWalker instanceWalker, boolean allNodes) {
         iterateInstanceData(instance.getInstanceRootElementInfo(), instanceWalker, allNodes);

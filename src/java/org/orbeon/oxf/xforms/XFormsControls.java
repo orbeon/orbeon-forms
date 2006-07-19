@@ -47,6 +47,8 @@ public class XFormsControls {
     private ControlsState initialControlsState;
     private ControlsState currentControlsState;
 
+    private boolean dirty;
+
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
 
@@ -145,6 +147,16 @@ public class XFormsControls {
         setRepeatIndexState(repeatIndexesElement);
     }
 
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    
+    public void markDirty() {
+        this.dirty = true;
+        this.currentControlsState.markDirty();
+    }
+
     /**
      * Iterate statically through controls and set the default repeat index for xforms:repeat.
      *
@@ -193,7 +205,7 @@ public class XFormsControls {
                 // Use existing controls state
                 initialControlsState = currentControlsState;
             } else {
-                // Rebuild controls state
+                // Build controls state
 
                 // Get initial controls state information
                 initialControlsState = buildControlsState(pipelineContext);
@@ -226,6 +238,10 @@ public class XFormsControls {
                 // Evaluate values after index state has been computed
                 initialControlsState.evaluateValueControls(pipelineContext);
             }
+
+            // We are now clean
+            dirty = false;
+            initialControlsState.dirty = false;
         }
 
         resetBindingContext();
@@ -302,7 +318,7 @@ public class XFormsControls {
 
     private void pushBinding(PipelineContext pipelineContext, ControlInfo controlInfo) {
 
-        final Element bindingElement = controlInfo.getElement();
+        final Element bindingElement = controlInfo.getControlElement();
         if (!(controlInfo instanceof RepeatIterationInfo)) {
             // Regular ControlInfo backed by an element
 
@@ -798,6 +814,7 @@ public class XFormsControls {
                 }
 
                 // Handle xforms:itemset
+                // TODO: We don't need to do this every time, only when we need to produce output, right?
                 if (controlInfo instanceof SelectControlInfo || controlInfo instanceof Select1ControlInfo) {
                     ((Select1ControlInfo) controlInfo).evaluateItemsets(pipelineContext);
                 }
@@ -812,6 +829,11 @@ public class XFormsControls {
                 final BindingContext currentBindingContext = getCurrentBindingContext();
                 final List currentNodeSet = currentBindingContext.getNodeset();
 
+                // Bind the control to the binding context
+                controlInfo.setBindingContext(currentBindingContext);
+
+                // Update MIPs on control
+                // TODO: we don't need to set these values until we produce output, right?
                 if (!(controlInfo instanceof RepeatControlInfo && currentNodeSet != null && currentNodeSet.size() == 0)) {
                     final NodeInfo currentNode = currentBindingContext.getSingleNode();
                     if (currentNode != null) {
@@ -830,7 +852,6 @@ public class XFormsControls {
                         // If control can have a value, prepare it
                         // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
                         if (controlInfo.isValueControl()) {
-                            controlInfo.prepareValue(pipelineContext, currentBindingContext);
                             valueControls.add(controlInfo);
                         }
                     } else {
@@ -896,7 +917,13 @@ public class XFormsControls {
                 currentControlsContainer = repeatIterationInfo;
 
                 // Set current binding for control element
-                final NodeInfo currentNode = getCurrentSingleNode();
+                final BindingContext currentBindingContext = getCurrentBindingContext();
+
+                // Bind the control to the binding context
+                repeatIterationInfo.setBindingContext(currentBindingContext);
+
+                // Set current binding for control element
+                final NodeInfo currentNode = currentBindingContext.getSingleNode();
 
                 // Get model item properties
                 final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
@@ -946,6 +973,23 @@ public class XFormsControls {
      */
     public ControlsState getCurrentControlsState() {
         return currentControlsState;
+    }
+
+    /**
+     * Rebuild the current ControlInfo and other controls state information.
+     */
+    public void rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
+
+        // Don't do anything if we are clean
+        if (!currentControlsState.isDirty())
+            return;
+
+        // Rebuild
+        rebuildCurrentControlsState(pipelineContext);
+
+        // Everything is clean
+        initialControlsState.dirty = false;
+        currentControlsState.dirty = false;
     }
 
     /**
@@ -1250,7 +1294,7 @@ public class XFormsControls {
                             // This is an xforms:output
 
                             final OutputControlInfo outputControl = new OutputControlInfo(containingDocument, null, currentElement, currentElement.getName(), null);
-                            outputControl.prepareValue(pipelineContext, getCurrentBindingContext());
+                            outputControl.setBindingContext(getCurrentBindingContext());
                             outputControl.evaluateValue(pipelineContext);
                             outputControl.evaluateDisplayValue(pipelineContext);
                             sb.append(outputControl.getDisplayValueOrValue());
@@ -1336,6 +1380,16 @@ public class XFormsControls {
     }
 
     /**
+     * Represents the state of repeat indexes.
+     */
+//    public static class RepeatIndexesState {
+//        public RepeatIndexesState() {
+//        }
+//
+//
+//    }
+
+    /**
      * Represents the state of a tree of XForms controls.
      */
     public static class ControlsState {
@@ -1350,7 +1404,17 @@ public class XFormsControls {
         private boolean hasRepeat;
         private boolean hasUpload;
 
+        private boolean dirty;
+
         public ControlsState() {
+        }
+
+        public boolean isDirty() {
+            return dirty;
+        }
+
+        public void markDirty() {
+            this.dirty = true;
         }
 
         public void setChildren(List children) {

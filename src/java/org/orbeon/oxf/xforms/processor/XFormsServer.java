@@ -289,9 +289,8 @@ public class XFormsServer extends ProcessorImpl {
                                 PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
                                 ExternalContext externalContext, XFormsState xformsState) {
 
-        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
-        xFormsControls.rebuildCurrentControlsState(pipelineContext);
-        final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
         try {
             final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
             ch.startDocument();
@@ -361,9 +360,20 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (!allEvents) {
                         // Common case
-                        diffControlsState(ch, xFormsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+
+                        if (xformsControls.isDirty()) {
+                            // Only output changes if needed
+                            xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                            final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
+                            diffControlsState(ch, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        }
                     } else {
                         // Reload / back case
+
+                        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
                         final XFormsContainingDocument initialContainingDocument
                                     = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
 
@@ -376,15 +386,16 @@ public class XFormsServer extends ProcessorImpl {
                 // Output divs information
                 {
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                    outputSwitchDivs(ch, currentControlsState);
+                    outputSwitchDivs(ch, xformsControls.getCurrentControlsState());// TODO: move switch state out of ControlsState + handle diffs
                     ch.endElement();
                 }
 
                 // Output repeats information
                 {
                     // Output index updates
-                    final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
-                    final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                    // TODO: move index state out of ControlsState + handle diffs
+                    final Map initialRepeatIdToIndex = xformsControls.getInitialControlsState().getRepeatIdToIndex();
+                    final Map currentRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
                     if (currentRepeatIdToIndex.size() != 0) {
                         boolean found = false;
                         for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {

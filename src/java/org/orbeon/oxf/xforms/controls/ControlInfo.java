@@ -37,7 +37,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
     private ControlInfo parent;
     private String name;
 
-    private Element element;
+    private Element controlElement;
 
     private String originalId;
 
@@ -63,12 +63,12 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
     private List children;
     private List eventHandlers;
 
-    protected XFormsControls.BindingContext currentBindingContext;
+    protected XFormsControls.BindingContext bindingContext;
 
     public ControlInfo(XFormsContainingDocument containingDocument, ControlInfo parent, Element element, String name, String id) {
         this.containingDocument = containingDocument;
         this.parent = parent;
-        this.element = element;
+        this.controlElement = element;
         this.name = name;
         this.id = id;
 
@@ -108,7 +108,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public LocationData getLocationData() {
-        return (LocationData) element.getData();
+        return (LocationData) controlElement.getData();
     }
 
     public List getChildren() {
@@ -245,8 +245,8 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
         this.parent = null;
     }
 
-    public Element getElement() {
-        return element;
+    public Element getControlElement() {
+        return controlElement;
     }
 
     public boolean equals(Object obj) {
@@ -293,8 +293,11 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
         return XFormsControls.isValueControl(getName());
     }
 
-    public void prepareValue(PipelineContext pipelineContext, XFormsControls.BindingContext currentBindingContext) {
-        this.currentBindingContext = currentBindingContext;
+    /**
+     * Set this control's binding context.
+     */
+    public void setBindingContext(XFormsControls.BindingContext bindingContext) {
+        this.bindingContext = bindingContext;
     }
 
     /**
@@ -305,7 +308,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
     public void setExternalValue(PipelineContext pipelineContext, String value) {
         // Set value into the instance
 
-        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+        final NodeInfo currentSingleNode = bindingContext.getSingleNode();
         final boolean changed = XFormsActionInterpreter.doSetValue(pipelineContext, containingDocument, currentSingleNode, value);
 
         if (changed) {
@@ -321,7 +324,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
      * @param pipelineContext
      */
     public void evaluateValue(PipelineContext pipelineContext) {
-        final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+        final NodeInfo currentSingleNode = bindingContext.getSingleNode();
         setValue(XFormsInstance.getValueForNode(currentSingleNode));
     }
 
@@ -358,7 +361,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
             }
 
             if (format != null) {
-                final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+                final NodeInfo currentSingleNode = bindingContext.getSingleNode();
                 final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
                 result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
                             format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
@@ -368,9 +371,9 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
 
         } else {
             // Format value according to format attribute
-            final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
+            final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getControlElement());
 
-            final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
+            final NodeInfo currentSingleNode = bindingContext.getSingleNode();
             final XFormsInstance currentInstance = containingDocument.getInstanceForNode(currentSingleNode);
 
             result = currentInstance.getEvaluator().evaluateAsString(pipelineContext, currentSingleNode,
@@ -440,8 +443,7 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
                     if (doUpdate) {
 
                         // Update ControlsState if needed as we are going to make some changes
-                        if (xformsControls.getInitialControlsState() == xformsControls.getCurrentControlsState())
-                            xformsControls.rebuildCurrentControlsState(pipelineContext);
+                        xformsControls.rebuildCurrentControlsState(pipelineContext);
 
                         // Iterate from root to leaf
                         Collections.reverse(ancestorRepeatsIds);
@@ -481,6 +483,8 @@ public class ControlInfo implements XFormsEventTarget, XFormsEventHandlerContain
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }
                         // TODO: Should try to use the code of the <setindex> action
+
+                        containingDocument.getXFormsControls().markDirty();
                     }
                 }
 

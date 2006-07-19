@@ -432,7 +432,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         final ElementHandlerController controller = new ElementHandlerController();
 
         // Make sure we have up to date controls
-        containingDocument.getXFormsControls().rebuildCurrentControlsState(pipelineContext); // TODO: 
+        containingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
 
         // Register handlers on controller (the other handlers are registered by the body handler)
         controller.registerHandler(XHTMLHeadHandler.class.getName(), XMLConstants.XHTML_NAMESPACE_URI, "head");

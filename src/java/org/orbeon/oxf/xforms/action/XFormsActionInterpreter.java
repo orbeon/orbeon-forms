@@ -514,6 +514,7 @@ public class XFormsActionInterpreter {
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
             modifiedInstance.getModel().getDeferredActionContext().setAllDeferredFlags(true);
+            containingDocument.getXFormsControls().markDirty();
         }
     }
 
@@ -703,6 +704,7 @@ public class XFormsActionInterpreter {
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
             modifiedInstance.getModel().getDeferredActionContext().setAllDeferredFlags(true);
+            containingDocument.getXFormsControls().markDirty();
         }
     }
 
@@ -760,6 +762,7 @@ public class XFormsActionInterpreter {
 
             // "the reset action takes effect immediately and clears all of the flags."
             model.getDeferredActionContext().setAllDeferredFlags(false);
+            containingDocument.getXFormsControls().markDirty();
         } else {
             throw new OXFException("xforms:reset model attribute must point to an xforms:model element.");
         }
@@ -815,6 +818,7 @@ public class XFormsActionInterpreter {
         }
     }
 
+
     public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet) {
         final String currentValue = XFormsInstance.getValueForNode(currentNode);
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
@@ -828,6 +832,8 @@ public class XFormsActionInterpreter {
             deferredActionContext.recalculate = true;
             deferredActionContext.revalidate = true;
             deferredActionContext.refresh = true;
+
+            containingDocument.getXFormsControls().markDirty();
 
             return true;
         } else {
@@ -873,7 +879,8 @@ public class XFormsActionInterpreter {
 
         // Rebuild before iterating
         xformsControls.rebuildCurrentControlsState(pipelineContext);
-        xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+        currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
             public void startVisitControl(ControlInfo controlInfo) {
                 if (controlInfo instanceof RepeatControlInfo) {
@@ -898,10 +905,11 @@ public class XFormsActionInterpreter {
                                 // otherwise 1." However, for, xforms:insert, we are supposed to
                                 // update to startindex. Here, for now, we decide to use
                                 // startindex for consistency.
+                                // TODO: check latest errata
 
                             } else {
                                 // Just use current index
-                                newIndex = ((Integer) xformsControls.getCurrentControlsState().getRepeatIdToIndex().get(repeatId)).intValue();
+                                newIndex = ((Integer) currentControlsState.getRepeatIdToIndex().get(repeatId)).intValue();
                             }
 
                             // Adjust bounds if necessary
@@ -914,11 +922,11 @@ public class XFormsActionInterpreter {
                         }
 
                         // Set index
-                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, adjustedNewIndex);
+                        currentControlsState.updateRepeatIndex(repeatId, adjustedNewIndex);
 
                     } else {
                         // Node-set is empty, make sure index is set to 0
-                        xformsControls.getCurrentControlsState().updateRepeatIndex(repeatId, 0);
+                        currentControlsState.updateRepeatIndex(repeatId, 0);
                     }
                 }
             }
@@ -939,56 +947,56 @@ public class XFormsActionInterpreter {
     public static void executeSetindexAction(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final String repeatId, final String indexString) {
         if ("NaN".equals(indexString)) {
             // "If the index evaluates to NaN the action has no effect."
+            return;
+        }
+
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
+        final int index = Integer.parseInt(indexString);
+
+        final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
+        final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
+
+        if (repeatControlInfo == null)
+            throw new OXFException("Invalid repeat id: " + repeatId);
+
+        if (index <= 0) {
+            // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
+            // and the index is set to 1."
+            containingDocument.dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControlInfo));
+            currentControlsState.updateRepeatIndex(repeatId, 1);
         } else {
+            final List children = repeatControlInfo.getChildren();
 
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+            if (children != null && index > children.size()) {
+                // "If the selected index is greater than the index of the last repeat
+                // item, an xforms-scroll-last event is dispatched and the index is set to
+                // that of the last item."
 
-            final int index = Integer.parseInt(indexString);
-
-            final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
-            final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
-
-            if (repeatControlInfo == null)
-                throw new OXFException("Invalid repeat id: " + repeatId);
-
-            if (index <= 0) {
-                // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
-                // and the index is set to 1."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControlInfo));
-                currentControlsState.updateRepeatIndex(repeatId, 1);
+                containingDocument.dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControlInfo));
+                currentControlsState.updateRepeatIndex(repeatId, children.size());
             } else {
-                final List children = repeatControlInfo.getChildren();
+                // Otherwise just set the index
+                currentControlsState.updateRepeatIndex(repeatId, index);
+            }
+        }
 
-                if (children != null && index > children.size()) {
-                    // "If the selected index is greater than the index of the last repeat
-                    // item, an xforms-scroll-last event is dispatched and the index is set to
-                    // that of the last item."
-
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControlInfo));
-                    currentControlsState.updateRepeatIndex(repeatId, children.size());
-                } else {
-                    // Otherwise just set the index
-                    currentControlsState.updateRepeatIndex(repeatId, index);
+        // "The indexes for inner nested repeat collections are re-initialized to startindex."
+        {
+            // First step: set all children indexes to 0
+            final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
+            final Map nestedRepeatIdsMap = new HashMap();
+            if (nestedRepeatIds != null) {
+                for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
+                    final String currentRepeatId = (String) i.next();
+                    nestedRepeatIdsMap.put(currentRepeatId, "");
+                    currentControlsState.updateRepeatIndex(currentRepeatId, 0);
                 }
             }
 
-            // "The indexes for inner nested repeat collections are re-initialized to startindex."
-            {
-                // First step: set all children indexes to 0
-                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
-                final Map nestedRepeatIdsMap = new HashMap();
-                if (nestedRepeatIds != null) {
-                    for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
-                        final String currentRepeatId = (String) i.next();
-                        nestedRepeatIdsMap.put(currentRepeatId, "");
-                        currentControlsState.updateRepeatIndex(currentRepeatId, 0);
-                    }
-                }
-
-                // Adjust controls ids that could have gone out of bounds
-                adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
-            }
+            // Adjust controls ids that could have gone out of bounds
+            adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIdsMap);
         }
 
         // TODO: "The implementation data structures for tracking computational dependencies are
@@ -998,6 +1006,8 @@ public class XFormsActionInterpreter {
             currentModel.applyComputedExpressionBinds(pipelineContext);
             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
         }
+
+        containingDocument.getXFormsControls().markDirty();
     }
 
     private static void setBindingContext(final PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {

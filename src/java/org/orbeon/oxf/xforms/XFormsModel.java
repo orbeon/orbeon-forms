@@ -1081,12 +1081,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (XFormsServer.logger.isDebugEnabled())
             XFormsServer.logger.debug("XForms - performing refresh");
 
-        // Rebuild controls
-        xformsControls.rebuildCurrentControlsState(pipelineContext);
+        // Rebuild controls if needed
+        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
 
         // Build list of events to send
         final List eventsToDispatch = new ArrayList();
-
 
         // Iterate through controls and check the nodes they are bound to
         xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
@@ -1255,6 +1254,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Handle events related to externally updating one or more instance documents.
      */
     public void handleNewInstanceDocuments(PipelineContext pipelineContext ) {
+
+        containingDocument.getXFormsControls().markDirty();
 
         // "Once the XML instance data has been replaced, the rebuild, recalculate, revalidate and refresh operations
         // are performed on the model, without dispatching events to invoke those four operations."

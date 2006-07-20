@@ -333,15 +333,17 @@ function xformsUpdateStyle(element) {
 
         if (ORBEON.util.Dom.hasClass(element, "xforms-trigger")) {
             // Update label on trigger
-            // TODO: Check this, I am not sure if this is all correct (handle <a> and <button> as well)
-            if (typeof element.labelMessage != "undefined" && element.labelMessage != xformsStringValue(element)) {
-                if (element.tagName.toLowerCase() == "input")
+            if (xformsIsDefined(element.labelMessage) && element.labelMessage != xformsStringValue(element)) {
+                if (element.tagName.toLowerCase() == "input") {
                     element.alt = element.labelMessage;
-                else if (element.tagName.toLowerCase() != "a")
+                    element.value = element.labelMessage;
+                } else {
+                    // Case of <button> and <a>
                     xformsReplaceNodeText(element, element.labelMessage);
+                }
             }
             // Update hint on trigger
-            if (typeof element.hintMessage != "undefined"
+            if (xformsIsDefined(element.hintMessage)
                     && element.tagName.toLowerCase() == "a"
                     && element.hintMessage != element.title) {
                 element.title = element.hintMessage;

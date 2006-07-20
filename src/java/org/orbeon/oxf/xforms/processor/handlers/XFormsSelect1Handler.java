@@ -515,8 +515,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
             if (!handlerContext.isGenerateTemplate()) {
-                final String value = controlInfo.getValue();
-
+                final String value = (controlInfo.getValue() == null) ? "" : controlInfo.getValue();
                 final StringBuffer sb = new StringBuffer();
                 int selectedFound = 0;
                 for (Iterator i = items.iterator(); i.hasNext();) {

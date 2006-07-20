@@ -49,6 +49,7 @@ public class XMLConstants {
     public final static QName NULL_PROCESSOR_QNAME = new QName("null", OXF_PROCESSORS_NAMESPACE);
     public final static QName NULL_SERIALIZER_PROCESSOR_QNAME = new QName("null-serializer", OXF_PROCESSORS_NAMESPACE);
     public final static QName PIPELINE_PROCESSOR_QNAME = new QName("pipeline", OXF_PROCESSORS_NAMESPACE);
+    public final static QName PAGE_FLOW_PROCESSOR_QNAME = new QName("page-flow", OXF_PROCESSORS_NAMESPACE);
     public final static QName REDIRECT_PROCESSOR_QNAME = new QName("redirect", OXF_PROCESSORS_NAMESPACE);
     public final static QName HTML_SERIALIZER_PROCESSOR_QNAME = new QName("html-serializer", OXF_PROCESSORS_NAMESPACE);
     public final static QName XFORMS_INPUT_PROCESSOR_QNAME = new QName("xforms-input", OXF_PROCESSORS_NAMESPACE);

@@ -98,15 +98,22 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // User-defined scripts (with xxforms:script)
         final Map scripts = containingDocument.getScripts();
-        if (scripts != null) {
+        final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
+        if (scripts != null || focusElementId != null) {
             helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 
-            for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
-                helper.text(currentEntry.getValue().toString());
-                helper.text("}\n");
+            if (scripts != null) {
+                for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
+                    helper.text(currentEntry.getValue().toString());
+                    helper.text("}\n");
+                }
+            }
+
+            if (focusElementId != null) {
+                helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.setfocus(\"" + focusElementId + "\") }\n");
             }
 
             helper.endElement();

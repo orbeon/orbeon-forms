@@ -51,35 +51,41 @@ public class AggregatorProcessor extends ProcessorImpl {
 
                 try {
                     // Read config
-                    Element config = readCacheInputAsDOM4J(context, INPUT_CONFIG).getRootElement();
-                    String qname = config.element("root").getText();
-                    String namespaceURI;
-                    String localName;
+                    final Element config = readCacheInputAsDOM4J(context, INPUT_CONFIG).getRootElement();
+                    final String rootQName = config.element("root").getText();
+                    final String rootPrefix;
+                    final String rootLocalName;
+                    final String rootNamespaceURI;
 
                     // Get declared namespaces
-                    int columnPosition = qname.indexOf(':');
+                    int columnPosition = rootQName.indexOf(':');
                     if (columnPosition == -1) {
-                        namespaceURI = "";
-                        localName = qname;
+                        rootPrefix = "";
+                        rootLocalName = rootQName;
+                        rootNamespaceURI = "";
                     } else {
-                        String prefix = qname.substring(0, columnPosition);
-                        localName = qname.substring(columnPosition + 1);
-                        namespaceURI = null;
+                        rootPrefix = rootQName.substring(0, columnPosition);
+                        rootLocalName = rootQName.substring(columnPosition + 1);
+                        String tempNamespaceURI = null;
                         for (Iterator i = config.elements("namespace").iterator(); i.hasNext();) {
                             Element namespaceElement = (Element) i.next();
-                            if (namespaceElement.attributeValue("prefix").equals(prefix)) {
-                                namespaceURI = namespaceElement.attributeValue("uri");
+                            if (namespaceElement.attributeValue("prefix").equals(rootPrefix)) {
+                                tempNamespaceURI = namespaceElement.attributeValue("uri");
                                 break;
                             }
                         }
-                        if (namespaceURI == null)
-                            throw new ValidationException("Undeclared namespace prefix '" + prefix + "'",
+                        if (tempNamespaceURI == null)
+                            throw new ValidationException("Undeclared namespace prefix '" + rootPrefix + "'",
                                     (LocationData) config.getData());
+
+                        rootNamespaceURI = tempNamespaceURI;
                     }
 
                     // Start document
                     contentHandler.startDocument();
-                    contentHandler.startElement(namespaceURI, localName, qname, XMLUtils.EMPTY_ATTRIBUTES);
+                    if (!rootNamespaceURI.equals(""))
+                        contentHandler.startPrefixMapping(rootPrefix, rootNamespaceURI);
+                    contentHandler.startElement(rootNamespaceURI, rootLocalName, rootQName, XMLUtils.EMPTY_ATTRIBUTES);
 
                     // Processor input processors
                     for (Iterator i = getInputsByName(INPUT_DATA).iterator(); i.hasNext();) {
@@ -88,7 +94,9 @@ public class AggregatorProcessor extends ProcessorImpl {
                     }
 
                     // End document
-                    contentHandler.endElement(namespaceURI, localName, qname);
+                    contentHandler.endElement(rootNamespaceURI, rootLocalName, rootQName);
+                    if (!rootNamespaceURI.equals(""))
+                        contentHandler.endPrefixMapping(rootPrefix);
                     contentHandler.endDocument();
                 } catch (SAXException e) {
                     throw new OXFException(e);

@@ -288,7 +288,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 int itemIndex = 0;
                 for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
                     final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, id, effectiveId, fullItemType, item, itemIndex);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, id, effectiveId, isMany, fullItemType, item, itemIndex);
                 }
 
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -301,7 +301,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
+                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                 // TODO: in the future we should be able to handle multiple itemsets
@@ -575,7 +575,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                ControlInfo controlInfo, String id, String effectiveId, String type, Select1ControlInfo.Item item, int itemIndex) throws SAXException {
+                                ControlInfo controlInfo, String id, String effectiveId, boolean isMany, String type, Select1ControlInfo.Item item, int itemIndex) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
@@ -598,20 +598,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
                 final String controlValue = ((controlInfo.getValue() == null) ? "" : controlInfo.getValue()).trim();
 
-                if ("".equals(controlValue)) {
-                    // Special case of empty string: check the item that has empty string if any
-                    if ("".equals(itemValue)) {
-                        reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
-                    }
-                } else {
-                    // Case of multiple tokens
-                    for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
-                        final String token = st.nextToken();
-                        if (token.equals(itemValue)) {
-                            reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
-                            break;
-                        }
-                    }
+
+                if (isSelected(isMany, controlValue, itemValue)) {
+                    reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
                 }
 
                 if (itemIndex == 0) {
@@ -669,11 +658,19 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private boolean isSelected(boolean isMany, String controlValue, String itemValue) {
         boolean selected = false;
         if (isMany) {
-            for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
-                final String token = st.nextToken();
-                if (token.equals(itemValue)) {
+            if ("".equals(controlValue)) {
+                // Special case of empty string: check the item that has empty string if any
+                if ("".equals(itemValue)) {
                     selected = true;
-                    break;
+                }
+            } else {
+                // Case of multiple tokens
+                for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                    final String token = st.nextToken();
+                    if (token.equals(itemValue)) {
+                        selected = true;
+                        break;
+                    }
                 }
             }
         } else {

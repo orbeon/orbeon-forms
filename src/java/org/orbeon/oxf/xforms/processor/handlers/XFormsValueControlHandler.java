@@ -71,8 +71,12 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
     }
 
     protected void handleLabelHintHelpAlert(String parentId, String type, ControlInfo controlInfo) throws SAXException {
-        final String value;
 
+        // Don't handle alerts and help in read-only mode
+        if (isStaticReadonly(controlInfo) && (type.equals("alert") || type.equals("help")))
+            return;
+
+        final String value;
         if (controlInfo != null) {
             // Get actual value from control
             if (type.equals("label")) {

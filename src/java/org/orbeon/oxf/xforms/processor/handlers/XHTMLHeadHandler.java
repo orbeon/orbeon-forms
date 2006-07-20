@@ -91,32 +91,34 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Scripts
-        for (int i = 0; i < scripts.length; i++) {
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                "type", "text/javascript", "src", scripts[i]});
-        }
+        if (!containingDocument.isReadonly()) {
+            for (int i = 0; i < scripts.length; i++) {
+                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                    "type", "text/javascript", "src", scripts[i]});
+            }
 
-        // User-defined scripts (with xxforms:script)
-        final Map scripts = containingDocument.getScripts();
-        final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
-        if (scripts != null || focusElementId != null) {
-            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                "type", "text/javascript"});
+            // User-defined scripts (with xxforms:script)
+            final Map scripts = containingDocument.getScripts();
+            final String focusElementId = containingDocument.getClientFocusEffectiveControlId();
+            if (scripts != null || focusElementId != null) {
+                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                    "type", "text/javascript"});
 
-            if (scripts != null) {
-                for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
-                    helper.text(currentEntry.getValue().toString());
-                    helper.text("}\n");
+                if (scripts != null) {
+                    for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
+                        helper.text(currentEntry.getValue().toString());
+                        helper.text("}\n");
+                    }
                 }
-            }
 
-            if (focusElementId != null) {
-                helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.setfocus(\"" + focusElementId + "\") }\n");
-            }
+                if (focusElementId != null) {
+                    helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.setfocus(\"" + focusElementId + "\") }\n");
+                }
 
-            helper.endElement();
+                helper.endElement();
+            }
         }
     }
 

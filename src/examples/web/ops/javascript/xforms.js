@@ -1008,6 +1008,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsMediatypeTextHTML = true;
             if (className == "xforms-textarea")
                 isXFormsTextarea = true;
+            if (className == "xforms-static")
+                isXFormsNoInitElement = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }

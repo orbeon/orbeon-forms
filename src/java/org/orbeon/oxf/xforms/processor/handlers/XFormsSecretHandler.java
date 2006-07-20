@@ -25,6 +25,8 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsSecretHandler extends XFormsValueControlHandler {
 
+    private static final String HIDDEN_PASSWORD = "********";
+
     private Attributes elementAttributes;
 
     public XFormsSecretHandler() {
@@ -48,7 +50,7 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = new StringBuffer("xforms-control xforms-secret");
+            final StringBuffer classes = getInitialClasses(localname, controlInfo);
             if (!handlerContext.isGenerateTemplate()) {
 
                 handleMIPClasses(classes, controlInfo);
@@ -61,19 +63,28 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
         }
 
         // Create xhtml:input
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
         {
-            newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
-            newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-            newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                    handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            if (!isStaticReadonly(controlInfo)) {
+                final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
+                newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
+                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
+                        handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
 
-            // Handle accessibility attributes
-            handleAccessibilityAttributes(elementAttributes, newAttributes);
+                // Handle accessibility attributes
+                handleAccessibilityAttributes(elementAttributes, newAttributes);
 
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+            } else {
+                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                final String value = controlInfo.getValue();
+                if (value != null && value.length() > 0)
+                    contentHandler.characters(HIDDEN_PASSWORD.toCharArray(), 0, HIDDEN_PASSWORD.length());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+            }
         }
 
         // xforms:help

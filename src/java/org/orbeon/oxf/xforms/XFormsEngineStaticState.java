@@ -39,6 +39,8 @@ public class XFormsEngineStaticState {
 
     private String baseURI;
     private String stateHandling;
+    private boolean readonly;
+    private String readonlyAppearance;
     private String containerType;
     private String containerNamespace;
 
@@ -80,6 +82,14 @@ public class XFormsEngineStaticState {
                 ? stateHandlingAttribute
                 : XFormsUtils.isCacheSession() ? XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE : XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE;
 
+        final String readonlyAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
+        readonly = (readonlyAttribute != null) && new Boolean(readonlyAttribute).booleanValue() ;
+
+        final String readonlyAppearanceAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
+        readonlyAppearance = (readonlyAppearanceAttribute != null)
+                ? readonlyAppearanceAttribute
+                : XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE;
+
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
         containerNamespace = staticStateDocument.getRootElement().attributeValue("container-namespace");
@@ -116,6 +126,14 @@ public class XFormsEngineStaticState {
 
     public String getStateHandling() {
         return stateHandling;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public String getReadonlyAppearance() {
+        return readonlyAppearance;
     }
 
     public String getContainerType() {

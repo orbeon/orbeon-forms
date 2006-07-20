@@ -42,6 +42,7 @@ public class XFormsTriggerHandler extends HandlerBase {
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
         if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             if (localname.equals("img")) {
                 // xxforms:img
@@ -58,8 +59,10 @@ public class XFormsTriggerHandler extends HandlerBase {
         // xforms:trigger and xforms:submit
 
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-
         final ControlInfo controlInfo = handlerContext.isGenerateTemplate() ? null : ((ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
+
+        if (isStaticReadonly(controlInfo))
+            return;
 
         if (!handlerContext.isGenerateTemplate() && controlInfo.getLabel() == null)
             throw new OXFException("Missing label on xforms:trigger element.");// TODO: location data
@@ -70,7 +73,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
         final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
 
-        final StringBuffer classes = new StringBuffer("xforms-control xforms-trigger");
+        final StringBuffer classes = getInitialClasses(localname, controlInfo);
         if (!handlerContext.isGenerateTemplate())
             handleMIPClasses(classes, controlInfo);
         final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);

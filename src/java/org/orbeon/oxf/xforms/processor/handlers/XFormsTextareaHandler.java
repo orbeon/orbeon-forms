@@ -53,7 +53,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = new StringBuffer("xforms-control xforms-textarea");
+            final StringBuffer classes = getInitialClasses(localname, controlInfo);
             if (isHTMLMediaType)
                 classes.append(" xforms-mediatype-text-html");
 
@@ -71,22 +71,34 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
-            newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+            if (!isStaticReadonly(controlInfo)) {
+                final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
+                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
-            // Copy special attributes in xxforms namespace
-            copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
+                // Copy special attributes in xxforms namespace
+                copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, newAttributes);
 
-            // Handle accessibility attributes
-            handleAccessibilityAttributes(elementAttributes, newAttributes);
+                // Handle accessibility attributes
+                handleAccessibilityAttributes(elementAttributes, newAttributes);
 
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
-            if (!handlerContext.isGenerateTemplate()) {
-                final String value = controlInfo.getValue();
-                if (value != null)
-                    contentHandler.characters(value.toCharArray(), 0, value.length());
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
+                if (!handlerContext.isGenerateTemplate()) {
+                    final String value = controlInfo.getValue();
+                    if (value != null)
+                        contentHandler.characters(value.toCharArray(), 0, value.length());
+                }
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
+            } else {
+                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+                if (!handlerContext.isGenerateTemplate()) {
+                    final String value = controlInfo.getValue();
+                    if (value != null)
+                        contentHandler.characters(value.toCharArray(), 0, value.length());
+                }
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName);
         }
 
         // xforms:help

@@ -255,7 +255,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = new StringBuffer("xforms-control");
+            final StringBuffer classes = getInitialClasses(localname, controlInfo);
             if (isMany) {
                 classes.append(" xforms-select-");
             } else {
@@ -279,234 +279,262 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         }
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        if (isFull) {
-            final String fullItemType = isMany ? "checkbox" : "radio";
-            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-            {
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-
-                int itemIndex = 0;
-                for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
-                    final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, id, effectiveId, isMany, fullItemType, item, itemIndex);
-                }
-
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-            }
-
-            if (hasItemset) {
-                // Produce template
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
-
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-                // TODO: in the future we should be able to handle multiple itemsets
-            }
-        } else {
-
-            if (isOpenSelection) {
-
-                if (isAutocomplete) {
-
-                    // Create xhtml:span
-                    final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+        if (!isStaticReadonly(controlInfo)) {
+            if (isFull) {
+                final String fullItemType = isMany ? "checkbox" : "radio";
+                final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+                {
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
-                    {
-                        {
-                            // Create xhtml:input
-                            final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-
-                            reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                            reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "xforms-select1-open-input-" + effectiveId);
-                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-input");
-                            reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, "off");
-
-                            final String value = (controlInfo == null) ? null : controlInfo.getValue();
-                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
-                        }
-                        {
-                            // Create xhtml:select
-                            final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
-
-                            reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-select");
-
-                            if ("compact".equals(appearanceLocalname))
-                                reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
-
-                            // Handle accessibility attributes
-                            handleAccessibilityAttributes(elementAttributes, reusableAttributes);
-
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
-
-                            final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                            handleItemCompact(contentHandler, optionQName, controlInfo, isMany, new Select1ControlInfo.Item(false, new AttributesImpl(), "", "", 1));
-                            for (Iterator i = items.iterator(); i.hasNext();) {
-                                final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
-                                if (item.getValue() != null)
-                                    handleItemCompact(contentHandler, optionQName, controlInfo, isMany, item);
-                            }
-
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
-                        }
+                    int itemIndex = 0;
+                    for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
+                        final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
+                        handleItemFull(contentHandler, xhtmlPrefix, spanQName, controlInfo, id, effectiveId, isMany, fullItemType, item, itemIndex);
                     }
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-                } else {
-                    // We do not support other appearances or regular open selection for now
-                    throw new OXFException("Open selection currently only supports the xxforms:autocomplete appearance.");
-                    // TODO: Use ValidationException.
                 }
 
-            } else if (isTree) {
-                // xxforms:tree appearance
-
-                // Create xhtml:div with tree info
-                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
-
-                handleReadOnlyAttribute(newAttributes, controlInfo);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
-
-                outputJSONTreeInfo(controlInfo, isMany, contentHandler);
-
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-
-            } else if (isMenu) {
-                // xxforms:menu appearance
-
-                // Create enclosing xhtml:div
-                final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
-                final String ulQName = XMLUtils.buildQName(xhtmlPrefix, "ul");
-                final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
-                final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-
-                handleReadOnlyAttribute(newAttributes, controlInfo);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
-
-                // Create xhtml:div with initial menu entries
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "yuimenubar");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                {
+                if (hasItemset) {
+                    // Produce template
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
+
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new Select1ControlInfo.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+
+                    // TODO: in the future we should be able to handle multiple itemsets
+                }
+            } else {
+
+                if (isOpenSelection) {
+
+                    if (isAutocomplete) {
+
+                        // Create xhtml:span
+                        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+
+                        {
+                            {
+                                // Create xhtml:input
+                                final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, "xforms-select1-open-input-" + effectiveId);
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-input");
+                                reusableAttributes.addAttribute("", "autocomplete", "autocomplete", ContentHandlerHelper.CDATA, "off");
+
+                                final String value = (controlInfo == null) ? null : controlInfo.getValue();
+                                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
+                            }
+                            {
+                                // Create xhtml:select
+                                final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-select");
+
+                                if ("compact".equals(appearanceLocalname))
+                                    reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
+
+                                // Handle accessibility attributes
+                                handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
+
+                                final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
+                                handleItemCompact(contentHandler, optionQName, controlInfo, isMany, new Select1ControlInfo.Item(false, new AttributesImpl(), "", "", 1));
+                                for (Iterator i = items.iterator(); i.hasNext();) {
+                                    final Select1ControlInfo.Item item = (Select1ControlInfo.Item) i.next();
+                                    if (item.getValue() != null)
+                                        handleItemCompact(contentHandler, optionQName, controlInfo, isMany, item);
+                                }
+
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
+                            }
+                        }
+
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                    } else {
+                        // We do not support other appearances or regular open selection for now
+                        throw new OXFException("Open selection currently only supports the xxforms:autocomplete appearance.");
+                        // TODO: Use ValidationException.
+                    }
+
+                } else if (isTree) {
+                    // xxforms:tree appearance
+
+                    // Create xhtml:div with tree info
+                    final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+
+                    handleReadOnlyAttribute(newAttributes, controlInfo);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
+
+                    outputJSONTreeInfo(controlInfo, isMany, contentHandler);
+
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
+                } else if (isMenu) {
+                    // xxforms:menu appearance
+
+                    // Create enclosing xhtml:div
+                    final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
+                    final String ulQName = XMLUtils.buildQName(xhtmlPrefix, "ul");
+                    final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
+                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
+
+                    handleReadOnlyAttribute(newAttributes, controlInfo);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
+
+                    // Create xhtml:div with initial menu entries
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "yuimenubar");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                     {
                         reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first");
-
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
+                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                         {
                             reusableAttributes.clear();
+                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first");
 
-                            int index = 0;
-                            for (Iterator j = items.iterator(); j.hasNext(); index++) {
-                                final Select1ControlInfo.Item currentItem = (Select1ControlInfo.Item) j.next();
-
-                                // Only care about item at level 1
-                                if (currentItem.getLevel() != 1)
-                                    continue;
-
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
+                            {
                                 reusableAttributes.clear();
-                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
-                                        (index == 0) ? "yuimenubaritem first" : "yuimenubaritem");
 
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
+                                int index = 0;
+                                for (Iterator j = items.iterator(); j.hasNext(); index++) {
+                                    final Select1ControlInfo.Item currentItem = (Select1ControlInfo.Item) j.next();
 
-                                {
+                                    // Only care about item at level 1
+                                    if (currentItem.getLevel() != 1)
+                                        continue;
+
                                     reusableAttributes.clear();
-                                    reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
-                                    final String text = currentItem.getLabel();
-                                    contentHandler.characters(text.toCharArray(), 0, text.length());
-                                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
-                                }
+                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
+                                            (index == 0) ? "yuimenubaritem first" : "yuimenubaritem");
 
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
+                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
+
+                                    {
+                                        reusableAttributes.clear();
+                                        reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
+                                        final String text = currentItem.getLabel();
+                                        contentHandler.characters(text.toCharArray(), 0, text.length());
+                                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+                                    }
+
+                                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
+                                }
                             }
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
                         }
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
                     }
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
-                }
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
-                // Create xhtml:div with tree info
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
+                    // Create xhtml:div with tree info
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
 
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                outputJSONTreeInfo(controlInfo, isMany, contentHandler);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+                    outputJSONTreeInfo(controlInfo, isMany, contentHandler);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
-            } else {
-                // Create xhtml:select
-                final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
+                } else {
+                    // Create xhtml:select
+                    final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
 
-                if ("compact".equals(appearanceLocalname))
-                    newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
+                    if ("compact".equals(appearanceLocalname))
+                        newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
-                // Handle accessibility attributes
-                handleAccessibilityAttributes(elementAttributes, newAttributes);
+                    // Handle accessibility attributes
+                    handleAccessibilityAttributes(elementAttributes, newAttributes);
 
-                handleReadOnlyAttribute(newAttributes, controlInfo);
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
+                    handleReadOnlyAttribute(newAttributes, controlInfo);
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
 
-                final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
+                    final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
+                    final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
-                int level = 0;
-                for (Iterator j = items.iterator(); j.hasNext();) {
-                    final Select1ControlInfo.Item currentItem = (Select1ControlInfo.Item) j.next();
-                    final String value = currentItem.getValue();
+                    int level = 0;
+                    for (Iterator j = items.iterator(); j.hasNext();) {
+                        final Select1ControlInfo.Item currentItem = (Select1ControlInfo.Item) j.next();
+                        final String value = currentItem.getValue();
 
-                    final int newLevel = currentItem.getLevel();
+                        final int newLevel = currentItem.getLevel();
 
-                    if (level - newLevel > 0) {
-                        //  We are going down one or more levels
-                        for (int i = newLevel; i < level; i++) {
-                            // End xhtml:optgroup
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                        if (level - newLevel > 0) {
+                            //  We are going down one or more levels
+                            for (int i = newLevel; i < level; i++) {
+                                // End xhtml:optgroup
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                            }
                         }
+
+                        if (value == null) {
+                            // Starting a new group
+
+                            final String label = currentItem.getLabel();
+                            final AttributesImpl optGroupAttributes = getAttributes(currentItem.getAttributes(), null, null);
+                            if (label != null)
+                                optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+
+                            // Start xhtml:optgroup
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
+                        } else {
+                            // Adding a new item
+                            handleItemCompact(contentHandler, optionQName, controlInfo, isMany, currentItem);
+                        }
+
+                        level = newLevel;
                     }
 
-                    if (value == null) {
-                        // Starting a new group
-
-                        final String label = currentItem.getLabel();
-                        final AttributesImpl optGroupAttributes = getAttributes(currentItem.getAttributes(), null, null);
-                        if (label != null)
-                            optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
-
-                        // Start xhtml:optgroup
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
-                    } else {
-                        // Adding a new item
-                        handleItemCompact(contentHandler, optionQName, controlInfo, isMany, currentItem);
+                    // Close brackets
+                    for (int i = level; i > 1; i--) {
+                        // End xhtml:optgroup
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                     }
 
-                    level = newLevel;
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
                 }
-
-                // Close brackets
-                for (int i = level; i > 1; i--) {
-                    // End xhtml:optgroup
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
-                }
-
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
             }
+        } else {
+            // Read-only mode
+
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
+            if (!handlerContext.isGenerateTemplate()) {
+                final String value = controlInfo.getValue();
+
+                final StringBuffer sb = new StringBuffer();
+                int selectedFound = 0;
+                for (Iterator i = items.iterator(); i.hasNext();) {
+                    final Select1ControlInfo.Item currentItem = (Select1ControlInfo.Item) i.next();
+                    if (isSelected(isMany, value, currentItem.getValue())) {
+                        if (selectedFound > 0)
+                            sb.append(" - ");
+                        sb.append(currentItem.getLabel());
+                        selectedFound++;
+                    }
+                }
+
+                if (sb.length() > 0) {
+                    final String result = sb.toString();
+                    contentHandler.characters(result.toCharArray(), 0, result.length());
+                }
+            }
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
         }
 
         // xforms:help

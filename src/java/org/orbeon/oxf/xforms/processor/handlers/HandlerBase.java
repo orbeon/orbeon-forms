@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
@@ -194,7 +196,27 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return reusableAttributes;
     }
 
+    protected StringBuffer getInitialClasses(String controlName, ControlInfo controlInfo) {
+        final StringBuffer sb;
+        if (!XFormsControls.isGroupingControl(controlName))
+            sb = new StringBuffer("xforms-control xforms-" + controlName);
+        else
+            sb = new StringBuffer("xforms-" + controlName);// not sure why those wouldn't have xforms-control as well
+
+        if (isStaticReadonly(controlInfo))
+            sb.append(" xforms-static");
+
+        return sb;
+    }
+
     protected String uriFromQName(String qName) {
         return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
+    }
+
+    protected boolean isStaticReadonly(ControlInfo controlInfo) {
+        return containingDocument.isReadonly()
+                || (controlInfo != null
+                    && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
+                    && controlInfo.isReadonly());
     }
 }

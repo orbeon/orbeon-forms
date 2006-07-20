@@ -38,7 +38,7 @@ public class XFormsCaseHandler extends HandlerBase {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = new StringBuffer("xforms-" + localname);
+        final StringBuffer classes = getInitialClasses(localname, null);
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 
@@ -48,7 +48,7 @@ public class XFormsCaseHandler extends HandlerBase {
 //        final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId);
 
         // TODO: This is probably not efficient, but we don't have the switch id right here
-        final boolean isVisible = switchIdToSelectedCaseIdMap.containsValue(currentCaseEffectiveId);
+        final boolean isVisible = switchIdToSelectedCaseIdMap.containsValue(currentCaseEffectiveId) || containingDocument.isReadonly();
 
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 

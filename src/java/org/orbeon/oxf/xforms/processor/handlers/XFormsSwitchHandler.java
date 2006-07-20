@@ -34,7 +34,7 @@ public class XFormsSwitchHandler extends HandlerBase {
         effectiveSwitchId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = new StringBuffer("xforms-" + localname);
+        final StringBuffer classes = getInitialClasses(localname, null);
         if (!handlerContext.isGenerateTemplate()) {
             final ControlInfo switchControlInfo = ((ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
             HandlerBase.handleMIPClasses(classes, switchControlInfo);

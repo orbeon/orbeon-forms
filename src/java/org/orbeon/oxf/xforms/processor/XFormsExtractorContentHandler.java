@@ -29,6 +29,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private Locator locator;
 
     private String stateHandling;
+    private String readonly;
+    private String readonlyAppearance;
 
     private int level;
     private String element0;
@@ -74,18 +76,24 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
     private void outputFirstElementIfNeeded() throws SAXException {
         if (mustOutputFirstElement) {
-            final AttributesImpl attributesImp = new AttributesImpl();
+            final AttributesImpl attributesImpl = new AttributesImpl();
             // Add xml:base attribute
-            attributesImp.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
+            attributesImpl.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteRenderURL(((URI) xmlBaseStack.get(0)).toString()));
             // Add container-type attribute
-            attributesImp.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
+            attributesImpl.addAttribute("", "container-type", "container-type", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerType());
             // Add container-namespace attribute
-            attributesImp.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
+            attributesImpl.addAttribute("", "container-namespace", "container-namespace", ContentHandlerHelper.CDATA, externalContext.getRequest().getContainerNamespace());
             // Add state-handling attribute
             if (stateHandling != null)
-                attributesImp.addAttribute("", "state-handling", "state-handling", ContentHandlerHelper.CDATA, stateHandling);
+                attributesImpl.addAttribute("", "state-handling", "state-handling", ContentHandlerHelper.CDATA, stateHandling);
+            // Add read-only attribute
+            if (readonly != null)
+                attributesImpl.addAttribute("", "readonly", "readonly", ContentHandlerHelper.CDATA, readonly);
+            // Add read-only appearance
+            if (readonlyAppearance != null)
+                attributesImpl.addAttribute("", "readonly-appearance", "readonly-appearance", ContentHandlerHelper.CDATA, readonlyAppearance);
 
-            super.startElement("", "static-state", "static-state", attributesImp);
+            super.startElement("", "static-state", "static-state", attributesImpl);
             mustOutputFirstElement = false;
         }
     }
@@ -158,9 +166,28 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 final String xxformsStateHandling = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME);
                 if (xxformsStateHandling != null) {
                     if (!(xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_CLIENT_VALUE) || xxformsStateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE)))
-                        throw new ValidationException("Invalid " + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
+                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME + " attribute value: " + xxformsStateHandling, new LocationData(locator));
 
                     stateHandling = xxformsStateHandling;
+                }
+            }
+            if (readonly == null) {
+                final String xxformsReadonly = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
+                if (xxformsReadonly != null) {
+                    if (!(xxformsReadonly.equals("true") || xxformsReadonly.equals("false")))
+                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME + " attribute value: " + xxformsReadonly, new LocationData(locator));
+
+                    readonly = xxformsReadonly;
+                }
+            }
+            if (readonlyAppearance == null) {
+                final String xxformsReadonlyAppearance = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME);
+                if (xxformsReadonlyAppearance != null) {
+                    if (!(xxformsReadonlyAppearance.equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE)
+                            || xxformsReadonlyAppearance.equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE)))
+                        throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME + " attribute value: " + xxformsReadonlyAppearance, new LocationData(locator));
+
+                    readonlyAppearance = xxformsReadonlyAppearance;
                 }
             }
         }

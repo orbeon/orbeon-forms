@@ -196,6 +196,20 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Return whether this form is read-only or not.
+     */
+    public boolean isReadonly() {
+        return (xformsEngineStaticState != null) && xformsEngineStaticState.isReadonly();
+    }
+
+    /**
+     * Return read-only appearance configuration attribute.
+     */
+    public String getReadonlyAppearance() {
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getReadonlyAppearance();
+    }
+
+    /**
      * Get object with the id specified.
      */
     public Object getObjectById(PipelineContext pipelineContext, String id) {

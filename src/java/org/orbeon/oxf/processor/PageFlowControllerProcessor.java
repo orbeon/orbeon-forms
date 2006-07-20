@@ -1297,6 +1297,25 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
                         }});
+                        // Simply bypass data and instance channels
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                            addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+                            final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+                            addOutput( resDatOut );
+                        }});
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                            addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
+                            final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
+                            addOutput( resInstOut );
+                        }});
+                    }});
+
+                    // PFC file (should only work as model)
+                    addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/controller'") {{
+                        addStatement(new ASTProcessorCall(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME) {{
+                            addInput(new ASTInput("controller", new ASTHrefId(contentXIncluded)));
+                        }});
+                        // Simply bypass data and instance channels
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );

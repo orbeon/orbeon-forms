@@ -1876,13 +1876,14 @@ function xformsHandleResponse(o) {
                                             // Populate values
                                             if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date"))
                                                 xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
-                                            if (documentElement.value != newControlValue) {
-                                                documentElement.previousValue = newControlValue;
-                                                documentElement.valueSetByXForms++;
-                                                documentElement.value = newControlValue;
-                                            }
                                             if (inputField.value != newControlValue)
                                                 inputField.value = newControlValue;
+                                            // NOTE: We use inputField.value instead of newControlValue, because the control may normalize the value
+                                            if (documentElement.value != inputField.value) {
+                                                documentElement.previousValue = inputField.value;
+                                                documentElement.valueSetByXForms++;
+                                                documentElement.value = inputField.value;
+                                            }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             // HTML area

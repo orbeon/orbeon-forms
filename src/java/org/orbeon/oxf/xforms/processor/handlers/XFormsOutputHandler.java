@@ -49,7 +49,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         // The "control" is allowed to be null when xforms:output is in
         // xforms:label|xforms:hint|xforms:alert|xforms:help, because in that case currently we don't put the control in
         // the regular hierarchy of controls
-        if (controlInfo == null)
+        if (controlInfo == null && !handlerContext.isGenerateTemplate())
             return;
 
         // xforms:label

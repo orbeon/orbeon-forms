@@ -17,4 +17,5 @@ public class CacheEntry {
     public CacheKey key;
     public Object object;
     public Object validity;
+    public CacheLinkedList.ListEntry listEntry;
 }

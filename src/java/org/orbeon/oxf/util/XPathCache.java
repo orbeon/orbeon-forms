@@ -17,14 +17,13 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.apache.log4j.Logger;
-import org.dom4j.XPath;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.expr.ExpressionTool;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.NodeInfo;
@@ -32,7 +31,6 @@ import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
-import org.orbeon.saxon.expr.ExpressionTool;
 
 import java.util.*;
 
@@ -44,23 +42,6 @@ import java.util.*;
  */
 public class XPathCache {
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
-    private static final boolean doCache = true;
-
-    public static XPath createCacheXPath(PipelineContext context, String xpathExpression) {
-        if (doCache) {
-            Long validity = new Long(0);
-            Cache cache = ObjectCache.instance();
-            InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression", xpathExpression);
-            XPath xpath = (XPath) cache.findValid(context, cacheKey, validity);
-            if (xpath == null) {
-                xpath = Dom4jUtils.createXPath(xpathExpression);
-                cache.add(context, cacheKey, validity, xpath);
-            }
-            return xpath;
-        } else {
-            return Dom4jUtils.createXPath(xpathExpression);
-        }
-    }
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
                                                            NodeInfo contextNode,
@@ -105,7 +86,7 @@ public class XPathCache {
         try {
             // Find pool from cache
             final Long validity = new Long(0);
-            final Cache cache = ObjectCache.instance();
+            final Cache cache = ObjectCache.instance("xpath");
             String cacheKeyString = xpathExpressionString;
             {
                 if (functionLibrary != null)// This is ok

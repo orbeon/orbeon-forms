@@ -13,16 +13,40 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.resources.OXFProperties;
+
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Factory for the cache object
  */
 public class ObjectCache {
 
-    private static Cache impl = new MemoryCacheImpl(200);
+    private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.cache.";
+    private static final String CACHE_PROPERTY_NAME_SIZE_SUFFIX = ".size";
+
+    private static final int DEFAULT_SIZE = 200;
+
+    private static Cache impl = new MemoryCacheImpl(DEFAULT_SIZE);
+    private static Map impls;
 
     private ObjectCache() {}
 
-    public synchronized static Cache instance() {
+    public static Cache instance() {
         return impl;
+    }
+
+    public synchronized static Cache instance(String type) {
+        if (impls == null)
+            impls = new HashMap();
+        Cache cache = (Cache) impls.get(type);
+        if (cache == null) {
+            final String propertyName = CACHE_PROPERTY_NAME_PREFIX + type + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
+            final Integer size = OXFProperties.instance().getPropertySet().getInteger(propertyName, DEFAULT_SIZE);
+            cache = new MemoryCacheImpl(size.intValue());
+            impls.put(type, cache);
+        }
+        return cache;
     }
 }

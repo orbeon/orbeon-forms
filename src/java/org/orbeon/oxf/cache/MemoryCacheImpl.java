@@ -29,7 +29,7 @@ public class MemoryCacheImpl implements Cache {
     }
 
     private Map keyToEntryMap = new HashMap();
-    private LinkedList linkedList = new LinkedList();
+    private CacheLinkedList linkedList = new CacheLinkedList();
     private int maxSize;
     private int currentSize;
 
@@ -69,20 +69,20 @@ public class MemoryCacheImpl implements Cache {
             entry.validity = validity;
             entry.object = object;
             keyToEntryMap.put(key, entry);
-            linkedList.addFirst(entry);
+            entry.listEntry = linkedList.addFirst(entry);
         } else {
             // Update validity and move to the front
             entry.validity = validity;
             entry.object = object;
-            linkedList.remove(entry);
-            linkedList.addFirst(entry);
+            linkedList.remove(entry.listEntry);
+            entry.listEntry = linkedList.addFirst(entry);
         }
     }
 
     public synchronized void remove(PipelineContext context, CacheKey key) {
         CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
         keyToEntryMap.remove(key);
-        linkedList.remove(entry);
+        linkedList.remove(entry.listEntry);
         currentSize--;
     }
 
@@ -94,8 +94,8 @@ public class MemoryCacheImpl implements Cache {
             if (context != null)
                 ((Statistics) getStatistics(context)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
-                linkedList.remove(entry);
-                linkedList.addFirst(entry);
+                linkedList.remove(entry.listEntry);
+                entry.listEntry = linkedList.addFirst(entry);
             }
             return entry.object;
         } else {
@@ -127,8 +127,8 @@ public class MemoryCacheImpl implements Cache {
             if (context != null)
                 ((Statistics) getStatistics(context)).incrementHitsCount();
             if (linkedList.getFirst() != entry) {
-                linkedList.remove(entry);
-                linkedList.addFirst(entry);
+                linkedList.remove(entry.listEntry);
+                entry.listEntry = linkedList.addFirst(entry);
             }
         } else {
             // Cache miss

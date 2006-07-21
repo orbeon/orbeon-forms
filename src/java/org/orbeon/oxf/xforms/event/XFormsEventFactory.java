@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.event;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
 
 /**
  * Factory for XForms events
@@ -35,7 +36,7 @@ public class XFormsEventFactory {
     }
 
     private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
-                                          String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                                           String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
 
         // TODO: more efficient way to switch!
         if (eventName.equals(XFormsEvents.XFORMS_DOM_ACTIVATE)) {
@@ -95,9 +96,9 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN)) {
             return new XFormsDOMFocusInEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_VALID)) {
-            return new XFormsValidEvent(targetObject);
+            return new XFormsValidEvent((ControlInfo) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
-            return new XFormsInvalidEvent(targetObject);
+            return new XFormsInvalidEvent((ControlInfo) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
             return new XFormsRequiredEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {

@@ -14,8 +14,13 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.value.StringValue;
+
+import java.util.Collections;
 
 /**
  * 4.4.6 The xforms-valid Event
@@ -23,7 +28,22 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
 public class XFormsValidEvent extends XFormsEvent {
-    public XFormsValidEvent(XFormsEventTarget targetObject) {
+
+    private ControlInfo targetControl;
+
+    public XFormsValidEvent(ControlInfo targetObject) {
         super(XFormsEvents.XFORMS_VALID, targetObject, true, false);
+        this.targetControl = targetObject;
+    }
+
+     public SequenceIterator getAttribute(String name) {
+        if ("target-ref".equals(name)) {
+            // Return the node to which the control is bound
+            return new ListIterator(Collections.singletonList(targetControl.getBindingContext().getSingleNode()));
+        } else if ("target-id".equals(name)) {
+            return new ListIterator(Collections.singletonList(new StringValue(targetControl.getOriginalId())));
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

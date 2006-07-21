@@ -849,6 +849,9 @@ public class XFormsControls {
                                 controlInfo.setType(typeAsString);
                             }
                         }
+                        // Handle global read-only setting
+                        if (containingDocument.isReadonly())
+                            controlInfo.setReadonly(true);
                         // If control can have a value, prepare it
                         // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
                         if (controlInfo.isValueControl()) {
@@ -933,6 +936,9 @@ public class XFormsControls {
                     repeatIterationInfo.setRelevant(instanceData.getInheritedRelevant().get());
                     repeatIterationInfo.setValid(instanceData.getValid().get());
                 }
+                // Handle global read-only setting
+                if (containingDocument.isReadonly())
+                    repeatIterationInfo.setReadonly(true);
             }
 
             public void endRepeatIteration(int iteration) {

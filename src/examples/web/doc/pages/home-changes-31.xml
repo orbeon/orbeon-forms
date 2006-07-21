@@ -149,19 +149,41 @@
                         </li>
                         <li>
                             <p>
-                                Upgrade to latest version of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
+                                Upgrade of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
                                 library</code>. We no longer use <a
                                 href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for xforms:output in xxx
+                                Support for <code>xforms:output</code> in <code>xforms:label</code>,
+                                <code>xforms:hint</code>, <code>xforms:help</code>, and <code>xforms:alert</code>. This
+                                allow you to dynamically build the value of labels, etc. For example:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:trigger>
+                                    <xforms:label>Dynamic label with a number (<xforms:output value="count(/*/*)"/>) in it!</xforms:label>
+                                </xforms:trigger>
+                            </xml-source>
+                            <p>
+                                This feature was kindly sponsored by Esprit. [TODO: doc]
                             </p>
                         </li>
                         <li>
                             <p>
-                                New deferred update behavior as per 1.0 errata xxx 
+                                Support for read-only modes with <code>xxforms:readonly</code> and
+                                <code>xxforms:readonly-appearance</code> (kindly sponsored by Esprit). By using
+                                <code>xxforms:readonly="true"</code> on the first XForms model, all the controls in your
+                                form become read-only. With <code>xxforms:readonly-appearance="static"</code>, read-only
+                                controls (whether set with <code>xxforms:readonly="true"</code> or with regular readonly
+                                binds) take a static appearance appropriate for read-only rendition of forms in HTML.
+                                [TODO: doc]
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                New deferred update behavior as per 1.0 errata.
+                                xxx
                             </p>
                         </li>
                         <li>

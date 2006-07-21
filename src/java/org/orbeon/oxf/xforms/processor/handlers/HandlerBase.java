@@ -214,9 +214,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     protected boolean isStaticReadonly(ControlInfo controlInfo) {
-        return containingDocument.isReadonly()
-                || (controlInfo != null
-                    && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
-                    && controlInfo.isReadonly());
+        return (controlInfo != null && controlInfo.isReadonly())
+                && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
     }
 }

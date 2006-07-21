@@ -509,7 +509,8 @@ function xformsHandleValueChange(event) {
 function xformsHandleClick(event) {
     var target = getEventTarget(event);
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-    if (ORBEON.util.Dom.hasClass(target, "xforms-trigger") && !ORBEON.util.Dom.hasClass(target, "xforms-readonly"))
+    if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))
+            && !ORBEON.util.Dom.hasClass(target, "xforms-readonly"))
         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)), false);
     return false;
 }
@@ -963,7 +964,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
         var isXFormsAutoComplete = false;
-        var isXFormsTrigger = false;
+        var isXFormsTriggerOrSubmit = false;
         var isXFormsOutput = false;
         var isXFormsInput = false;
         var isXFormsDate = false;
@@ -992,8 +993,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal" || className == "xforms-select1-compact")
                 isXFormsComboboxList = true;
-            if (className == "xforms-trigger")
-                isXFormsTrigger = true;
+            if (className == "xforms-trigger" || className == "xforms-submit")
+                isXFormsTriggerOrSubmit = true;
             if (className == "xforms-output")
                 isXFormsOutput = true;
             if (className == "xforms-input")
@@ -1061,7 +1062,7 @@ function xformsInitializeControlsUnder(root) {
                 }
             }
 
-            if (isXFormsTrigger) {
+            if (isXFormsTriggerOrSubmit) {
                 // Handle click on trigger
                 control.onclick = xformsHandleClick;
             } else if (isXFormsAutoComplete) {
@@ -1812,7 +1813,8 @@ function xformsHandleResponse(o) {
                                         if (foundControlModified) {
                                             // User has modified the value of this control since we sent our request:
                                             // so don't try to update it
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-submit")) {
                                             // Triggers don't have a value: don't update them
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                             // Auto-complete

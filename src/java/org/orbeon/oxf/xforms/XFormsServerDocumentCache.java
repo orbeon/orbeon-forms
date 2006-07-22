@@ -15,14 +15,13 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
+import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 /**
@@ -30,6 +29,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
  */
 public class XFormsServerDocumentCache {
 
+    private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms-sessions";
     private static final String CONTAINING_DOCUMENT_KEY_TYPE = "oxf.xforms.cache.context.containing-document";
 
     private static XFormsServerDocumentCache instance = null;
@@ -48,7 +48,7 @@ public class XFormsServerDocumentCache {
     public synchronized void add(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
         final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance();
+        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);
         final String cacheKeyString = xformsState.toString();
         //logger.info("xxx KEY used when returning: " + cacheKeyString);
 
@@ -94,7 +94,7 @@ public class XFormsServerDocumentCache {
     public synchronized XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
 
         final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance();
+        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);
         final String cacheKeyString = xformsState.toString();
         //logger.info("xxx KEY used when returning: " + cacheKeyString);
 

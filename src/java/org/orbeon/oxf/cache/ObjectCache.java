@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Factory for the cache object
+ * Factory for ObjectCache instances.
  */
 public class ObjectCache {
 
@@ -33,10 +33,16 @@ public class ObjectCache {
 
     private ObjectCache() {}
 
+    /**
+     * Get the intance of the main object cache.
+     */
     public static Cache instance() {
         return impl;
     }
 
+    /**
+     * Get the instance of the object cache specified.
+     */
     public synchronized static Cache instance(String type) {
         if (impls == null)
             impls = new HashMap();

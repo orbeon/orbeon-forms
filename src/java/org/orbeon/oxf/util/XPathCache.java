@@ -15,7 +15,6 @@ package org.orbeon.oxf.util;
 
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
@@ -41,6 +40,9 @@ import java.util.*;
  * good to do this within a finally() block enclosing the use of the expression.
  */
 public class XPathCache {
+
+    private static final String XFORMS_XFORMS_CACHE_NAME = "xforms";
+
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
@@ -86,7 +88,7 @@ public class XPathCache {
         try {
             // Find pool from cache
             final Long validity = new Long(0);
-            final Cache cache = ObjectCache.instance("xpath");
+            final Cache cache = ObjectCache.instance(XFORMS_XFORMS_CACHE_NAME);
             String cacheKeyString = xpathExpressionString;
             {
                 if (functionLibrary != null)// This is ok

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
+import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;

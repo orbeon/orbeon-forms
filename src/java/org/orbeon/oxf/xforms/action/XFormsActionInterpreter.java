@@ -75,53 +75,54 @@ public class XFormsActionInterpreter {
             else
                 conditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
         }
-        if (conditionAttribute != null) {
 
-            // Set binding context to action element (including @context/@nodeset, @ref, or @bind)
-            final String eventHandlerContainerId = eventHandlerContainer.getId();
-            setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
-
-            // Get into context set by the parent of the action
-            // "It contains an XPath 1.0 expression that is evaluated using the in-scope evaluation context before
-            // the action is executed"
-            xformsControls.popBinding();
-            // But the @context attribute actually _replaces_ that context
-            pushContextAttributeIfNeeded(pipelineContext, actionElement);
-            // We are now in the right context to evaluate
-
-            // Don't evaluate the condition if the context has gone missing
-            final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-            if (currentSingleNode == null) {
-                if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing conditional action (missing context): " + actionName);
-                return;
-            }
-
-            final List conditionResult = containingDocument.getEvaluator().evaluate(pipelineContext,
-                currentSingleNode, "boolean(" + conditionAttribute + ")",
-                Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
-
-            if (!((Boolean) conditionResult.get(0)).booleanValue()) {
-                // Don't execute action
-
-                if (XFormsServer.logger.isDebugEnabled())
-                    XFormsServer.logger.debug("XForms - not executing conditional action (condition evaluated to 'false'). Action name: " + actionName + ", condition: " + conditionAttribute);
-
-                return;
-            }
+        // Handle iterated action (@while / @exf:while)
+        final String iterationAttribute;
+        {
+            final String whileAttribute = actionElement.attributeValue("while");
+            if (whileAttribute != null)
+                iterationAttribute = whileAttribute;
+            else
+                iterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
         }
 
-        // Set binding context to action element
         final String eventHandlerContainerId = eventHandlerContainer.getId();
-        setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
+        int iteration = 1;
+        while (true) {
+            // Check if the conditionAttribute attribute exists and stop if false
+            if (conditionAttribute != null) {
+                boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, conditionAttribute, "if");
+                if (!result)
+                    break;
+            }
+            // Check if the iterationAttribute attribute exists and stop if false
+            if (iterationAttribute != null) {
+                boolean result = evaluateCondition(pipelineContext, eventHandlerContainerId, actionElement, actionName, iterationAttribute, "while");
+                if (!result)
+                    break;
+            }
 
-        // We are executing the action
-        if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - executing action: " + actionName);
+            // Set binding context to action element
+            setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
 
-        // Get action and execute it
-        final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
-        xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement);
+            // We are executing the action
+            if (XFormsServer.logger.isDebugEnabled()) {
+                if (iterationAttribute == null)
+                    XFormsServer.logger.debug("XForms - executing action: " + actionName);
+                else
+                    XFormsServer.logger.debug("XForms - executing action (iteration " + iteration  +"): " + actionName);
+            }
+
+            // Get action and execute it
+            final XFormsAction xformsAction = XFormsActions.getAction(actionNamespaceURI, actionName);
+            xformsAction.execute(this, pipelineContext, targetId, eventHandlerContainer, actionElement);
+
+            // Stop if there is no iteration
+            if (iterationAttribute == null)
+                break;
+
+            iteration++;
+        }
     }
 
     private static void setActionBindingContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventHandlerContainerId, Element actionElement) {
@@ -146,5 +147,43 @@ public class XFormsActionInterpreter {
         if (contextAttribute != null) {
             xformsControls.pushBinding(pipelineContext, null, null, contextAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
         }
+    }
+
+    private boolean evaluateCondition(PipelineContext pipelineContext, String eventHandlerContainerId, Element actionElement,
+                                      String actionName, String conditionAttribute, String conditionType) {
+        // Set binding context to action element (including @context/@nodeset, @ref, or @bind)
+        setActionBindingContext(pipelineContext, containingDocument, eventHandlerContainerId, actionElement);
+
+        // Get into context set by the parent of the action
+        // "It contains an XPath 1.0 expression that is evaluated using the in-scope evaluation context before
+        // the action is executed"
+        xformsControls.popBinding();
+        // But the @context attribute actually _replaces_ that context
+        pushContextAttributeIfNeeded(pipelineContext, actionElement);
+        // We are now in the right context to evaluate
+
+        // Don't evaluate the condition if the context has gone missing
+        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        if (currentSingleNode == null) {
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
+            return false;
+        }
+
+        final List conditionResult = containingDocument.getEvaluator().evaluate(pipelineContext,
+            currentSingleNode, "boolean(" + conditionAttribute + ")",
+            Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
+
+        if (!((Boolean) conditionResult.get(0)).booleanValue()) {
+            // Don't execute action
+
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (condition evaluated to 'false'). Action name: " + actionName + ", condition: " + conditionAttribute);
+
+            return false;
+        }
+
+        // Condition is true
+        return true;
     }
 }

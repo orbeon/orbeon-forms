@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ElementFilterContentHandler;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 
 /**
  * This filters out all elements in the XForms or "xxforms" namespace.

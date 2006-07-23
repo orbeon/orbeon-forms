@@ -1,20 +1,20 @@
 package org.orbeon.oxf.xforms.processor;
 
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.xml.sax.Locator;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * This ContentHandler extracts XForms models and controls from an XHTML document and creates a static state document

@@ -90,7 +90,7 @@ public class XFormsElement {
             final NodeInfo contextNode = context.getCurrentSingleNode();
             if (contextNode == null)
                 throw new ValidationException("null context node for boolean 'test' expression: " + test, new LocationData(context.getLocator())); 
-            final Boolean value = (Boolean) context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), contextNode,
+            final Boolean value = (Boolean) context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), contextNode,
                     "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), fncLib, null);
 
             addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
@@ -212,7 +212,7 @@ public class XFormsElement {
                 if (contextNode == null)
                     throw new ValidationException("null context node for number 'at' expression: " + atExpression, new LocationData(context.getLocator()));
 
-                final Object at = context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                final Object at = context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
                         "round(" + atExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
 
                 if (!(at instanceof Number))
@@ -232,7 +232,7 @@ public class XFormsElement {
                 if (contextNode == null)
                     throw new ValidationException("null context node for string 'value' expression: " + valueExpression, new LocationData(context.getLocator()));
 
-                Object value = context.getCurrentInstance().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                Object value = context.getContainingDocument().getEvaluator().evaluateSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
                         "string(" + valueExpression + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
 
                 if (!(value instanceof String))

@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -59,23 +61,23 @@ public class XFormsTriggerHandler extends HandlerBase {
         // xforms:trigger and xforms:submit
 
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final ControlInfo controlInfo = handlerContext.isGenerateTemplate() ? null : ((ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId));
+        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
 
-        if (isStaticReadonly(controlInfo))
+        if (isStaticReadonly(XFormsControl))
             return;
 
-        if (!handlerContext.isGenerateTemplate() && controlInfo.getLabel() == null)
+        if (!handlerContext.isGenerateTemplate() && XFormsControl.getLabel() == null)
             throw new OXFException("Missing label on xforms:trigger element.");// TODO: location data
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : controlInfo.getLabel();
+        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : XFormsControl.getLabel();
 
         final String appearanceValue = elementAttributes.getValue("appearance");
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
         final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
 
-        final StringBuffer classes = getInitialClasses(localname, controlInfo);
+        final StringBuffer classes = getInitialClasses(localname, XFormsControl);
         if (!handlerContext.isGenerateTemplate())
-            handleMIPClasses(classes, controlInfo);
+            handleMIPClasses(classes, XFormsControl);
         final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes
@@ -87,7 +89,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
             // Add title attribute if not yet present and there is a hint
             if (newAttributes.getValue("title") == null) {
-                final String hintValue = (controlInfo != null) ? controlInfo.getHint() : null;
+                final String hintValue = (XFormsControl != null) ? XFormsControl.getHint() : null;
                 if (hintValue != null)
                     newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
             }
@@ -132,7 +134,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:input
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-            handleReadOnlyAttribute(newAttributes, controlInfo);
+            handleReadOnlyAttribute(newAttributes, XFormsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName);
 
@@ -144,7 +146,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:button
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
-            handleReadOnlyAttribute(newAttributes, controlInfo);
+            handleReadOnlyAttribute(newAttributes, XFormsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);

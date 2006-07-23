@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.event;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 
 /**
  * Factory for XForms events
@@ -96,9 +96,9 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN)) {
             return new XFormsDOMFocusInEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_VALID)) {
-            return new XFormsValidEvent((ControlInfo) targetObject);
+            return new XFormsValidEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
-            return new XFormsInvalidEvent((ControlInfo) targetObject);
+            return new XFormsInvalidEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
             return new XFormsRequiredEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {

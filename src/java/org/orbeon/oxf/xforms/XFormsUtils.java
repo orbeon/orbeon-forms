@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -27,6 +26,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
 import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
@@ -37,8 +37,11 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.om.Axis;
+import org.orbeon.saxon.om.AxisIterator;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -848,7 +851,7 @@ public class XFormsUtils {
                 throw new OXFException("Missing closing '}' in attribute value: " + attributeValue);
             final String xpathExpression = attributeValue.substring(openingIndex + 1, closingIndex);
 
-            final String result = xformsControls.getCurrentInstance().getEvaluator().evaluateAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
+            final String result = xformsControls.getContainingDocument().getEvaluator().evaluateAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                     xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), null, xformsControls.getFunctionLibrary(), null);
 
             sb.append(result);

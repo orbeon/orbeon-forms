@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Handle xhtml:head.

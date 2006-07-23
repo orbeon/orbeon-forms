@@ -15,8 +15,11 @@ package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.CalendarValue;
+import org.orbeon.saxon.value.DateTimeValue;
+import org.orbeon.saxon.value.DateValue;
+import org.orbeon.saxon.value.IntegerValue;
 
 public class DaysFromDate extends XFormsFunction {
 

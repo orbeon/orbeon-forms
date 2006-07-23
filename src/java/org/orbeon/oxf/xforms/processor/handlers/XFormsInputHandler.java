@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -42,22 +44,22 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
 
         final AttributesImpl newAttributes;
         final boolean isDate;
         final String typeClass;
         {
-            final StringBuffer classes = getInitialClasses(localname, controlInfo);
+            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
             if (!handlerContext.isGenerateTemplate()) {
-                isDate = isDate(controlInfo.getType());
+                isDate = isDate(XFormsControl.getType());
                 typeClass = isDate ? "xforms-type-date" : "xforms-type-string";
 
-                handleMIPClasses(classes, controlInfo);
+                handleMIPClasses(classes, XFormsControl);
             } else {
                 isDate = false;
                 typeClass = null;
@@ -66,14 +68,14 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         }
 
         // Create xhtml:span
-        final boolean isReadOnly = !handlerContext.isGenerateTemplate() && controlInfo.isReadonly();
+        final boolean isReadOnly = !handlerContext.isGenerateTemplate() && XFormsControl.isReadonly();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
         {
             // Create xhtml:span for date display
-            if (!isStaticReadonly(controlInfo)) {
+            if (!isStaticReadonly(XFormsControl)) {
                 final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
                 if (isReadOnly)
                     spanClasses.append(" xforms-readonly");
@@ -81,7 +83,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                 if (!handlerContext.isGenerateTemplate() && isDate) {
-                    final String displayValue = controlInfo.getDisplayValueOrValue();
+                    final String displayValue = XFormsControl.getDisplayValueOrValue();
                     if (displayValue != null)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
                 }
@@ -91,7 +93,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             // Create xhtml:input
             {
                 reusableAttributes.clear();
-                if (!isStaticReadonly(controlInfo)) {
+                if (!isStaticReadonly(XFormsControl)) {
                     // Regular mode
 
                     final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
@@ -106,7 +108,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
 
                     if (!handlerContext.isGenerateTemplate()) {
-                        final String value = controlInfo.getValue();
+                        final String value = XFormsControl.getValue();
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
                     } else {
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
@@ -129,7 +131,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 } else {
                     // Read-only mode
                     if (!handlerContext.isGenerateTemplate()) {
-                        final String value = controlInfo.getDisplayValueOrValue();
+                        final String value = XFormsControl.getDisplayValueOrValue();
                         if (value != null)
                             contentHandler.characters(value.toCharArray(), 0, value.length());
                     }
@@ -137,7 +139,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             }
  
             // Create xhtml:span for date picker
-            if (!isStaticReadonly(controlInfo)) {
+            if (!isStaticReadonly(XFormsControl)) {
                 final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
                 if (isReadOnly)
                     spanClasses.append(" xforms-showcalendar-readonly");
@@ -157,12 +159,12 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
     }
 }

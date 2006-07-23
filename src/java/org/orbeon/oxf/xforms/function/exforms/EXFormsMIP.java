@@ -22,8 +22,8 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.BooleanValue;
 
 /**
  * Base class for eXForms MIP functions.

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -26,7 +26,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsGroupHandler extends HandlerBase {
 
     protected String effectiveGroupId;
-    private ControlInfo groupControlInfo;
+    private XFormsControl groupXFormsControl;
 
     public XFormsGroupHandler() {
         super(false, true);
@@ -39,9 +39,9 @@ public class XFormsGroupHandler extends HandlerBase {
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, null);
         if (!handlerContext.isGenerateTemplate()) {
-            groupControlInfo = ((ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
+            groupXFormsControl = ((XFormsControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
 
-            HandlerBase.handleMIPClasses(classes, groupControlInfo);
+            HandlerBase.handleMIPClasses(classes, groupXFormsControl);
         }
 
         // Start xhtml:span
@@ -49,7 +49,7 @@ public class XFormsGroupHandler extends HandlerBase {
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? null : groupControlInfo.getLabel();
+        final String labelValue = handlerContext.isGenerateTemplate() ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
             XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);

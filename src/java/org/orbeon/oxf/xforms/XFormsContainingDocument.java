@@ -22,8 +22,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.oxf.xforms.controls.OutputControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -54,6 +54,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     // URI resolver
     private URIResolver uriResolver;
+
+    // XPath evaluator
+    private DocumentXPathEvaluator documentXPathEvaluator = new DocumentXPathEvaluator();
 
     // A document contains models and controls
     private XFormsEngineStaticState xformsEngineStaticState;
@@ -124,6 +127,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public ObjectPool getSourceObjectPool() {
         return sourceObjectPool;
+    }
+
+    public DocumentXPathEvaluator getEvaluator() {
+        return documentXPathEvaluator;
     }
 
     public URIResolver getURIResolver() {
@@ -455,14 +462,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // xforms:output though).
         // This is also a security measures that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
-        if (eventTarget instanceof ControlInfo) {
-            final ControlInfo controlInfo = (ControlInfo) eventTarget;
-            if (controlInfo instanceof OutputControlInfo) {
+        if (eventTarget instanceof XFormsControl) {
+            final XFormsControl XFormsControl = (XFormsControl) eventTarget;
+            if (XFormsControl instanceof XFormsOutputControl) {
                 if (!(eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN) || eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT))) {
                     // Event on xforms:output which is not a focus event
                     return;
                 }
-            } else if (!controlInfo.isRelevant() || controlInfo.isReadonly()) {
+            } else if (!XFormsControl.isRelevant() || XFormsControl.isReadonly()) {
                 // Other controls accept event only if they are relevant and not readonly
                 return;
             }
@@ -523,44 +530,37 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
             // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
 
-            final XFormsModel modelForValueChangedControl;
             final String targetControlEffectiveId;
             {
                 // Set current context to control
-                final ControlInfo valueControlInfo = (ControlInfo) concreteEvent.getTargetObject();
-                targetControlEffectiveId = valueControlInfo.getId();
-                xformsControls.setBinding(pipelineContext, valueControlInfo);
-                modelForValueChangedControl = xformsControls.getCurrentModel();
+                final XFormsControl valueXFormsControl = (XFormsControl) concreteEvent.getTargetObject();
+                targetControlEffectiveId = valueXFormsControl.getId();
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
-                valueControlInfo.setExternalValue(pipelineContext, eventValue);
+                valueXFormsControl.setExternalValue(pipelineContext, eventValue);
             }
 
             {
-                // Recalculate and revalidate are done with the automatic deferred updates
-//                dispatchEvent(pipelineContext, new XFormsRecalculateEvent(modelForValueChangedControl, true));
-//                dispatchEvent(pipelineContext, new XFormsRevalidateEvent(modelForValueChangedControl, true));
+                // NOTE: Recalculate and revalidate are done with the automatic deferred updates
 
                 // Handle focus change DOMFocusOut / DOMFocusIn
                 if (concreteEvent.getOtherTargetObject() != null) {
 
-                    final ControlInfo sourceControlInfo = (ControlInfo) getObjectById(pipelineContext, targetControlEffectiveId);
+                    final XFormsControl sourceXFormsControl = (XFormsControl) getObjectById(pipelineContext, targetControlEffectiveId);
 
-                    final ControlInfo otherTargetControlInfo
-                        = (ControlInfo) getObjectById(pipelineContext,
-                                ((ControlInfo) concreteEvent.getOtherTargetObject()).getId());
+                    final XFormsControl otherTargetXFormsControl
+                        = (XFormsControl) getObjectById(pipelineContext,
+                                ((XFormsControl) concreteEvent.getOtherTargetObject()).getId());
 
                     // We have a focus change (otherwise, the focus is assumed to remain the same)
-                    if (sourceControlInfo != null)
-                        dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceControlInfo));
-                    if (otherTargetControlInfo != null)
-                        dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetControlInfo));
+                    if (sourceXFormsControl != null)
+                        dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(sourceXFormsControl));
+                    if (otherTargetXFormsControl != null)
+                        dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(otherTargetXFormsControl));
                 }
 
-                // Refresh is done with the automatic deferred updates
-                // Refresh (this will send update events)
-//                dispatchEvent(pipelineContext, new XFormsRefreshEvent(modelForValueChangedControl));
+                // NOTE: Refresh is done with the automatic deferred updates
             }
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {

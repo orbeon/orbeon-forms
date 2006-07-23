@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.event;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 
 import java.util.Collections;
 

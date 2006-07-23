@@ -26,7 +26,9 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.om.*;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.Transformer;
@@ -61,10 +63,6 @@ public class XFormsInstance implements XFormsEventTarget {
         this.hasUsername = hasUsername;
         this.model = model;
         setInstanceDocumentInfo(instanceDocumentInfo, true);
-    }
-
-    public DocumentXPathEvaluator getEvaluator() {
-        return model.getEvaluator();
     }
 
     /**
@@ -235,7 +233,7 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
 
-        final Object o = getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
+        final Object o = getModel().getContainingDocument().getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
         if (o == null || !(o instanceof NodeInfo))
             throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 

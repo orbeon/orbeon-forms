@@ -18,9 +18,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.ContentHandler;
 
 /**

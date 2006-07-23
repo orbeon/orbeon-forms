@@ -15,23 +15,23 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.function.*;
-import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.Current;
+import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRequired;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsCallXPL;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsValid;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsContext;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsRepeatCurrent;
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsValid;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.om.NamespaceConstant;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.SequenceType;
-import org.orbeon.saxon.trans.XPathException;
 
 import java.util.HashMap;
 import java.util.Map;

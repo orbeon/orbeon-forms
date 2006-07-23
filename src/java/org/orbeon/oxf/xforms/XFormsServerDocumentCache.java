@@ -15,13 +15,13 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
-import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 /**

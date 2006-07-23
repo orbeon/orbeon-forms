@@ -52,7 +52,7 @@ public class Itemset extends XFormsElement {
     private void sendElement(XFormsElementContext context, NodeInfo node, String localname,
                              String ref, Map prefixToURI) throws SAXException {
 
-        final String value = context.getCurrentInstance().getEvaluator().evaluateAsString(context.getPipelineContext(), node,
+        final String value =  context.getContainingDocument().getEvaluator().evaluateAsString(context.getPipelineContext(), node,
                 ref, prefixToURI, context.getRepeatIdToIndex(), null, null);
 
         context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,

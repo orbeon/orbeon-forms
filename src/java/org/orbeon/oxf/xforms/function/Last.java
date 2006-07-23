@@ -19,8 +19,8 @@ import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SingletonIterator;
-import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.IntegerValue;
 
 public class Last extends XFormsFunction {
 

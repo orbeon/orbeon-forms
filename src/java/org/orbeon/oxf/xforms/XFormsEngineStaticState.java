@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.UUIDUtils;
 
 import java.util.*;
 

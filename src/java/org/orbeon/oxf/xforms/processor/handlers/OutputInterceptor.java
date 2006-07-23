@@ -1,11 +1,11 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 

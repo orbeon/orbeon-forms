@@ -13,12 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -42,27 +44,27 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
 
         final String mediatypeValue = elementAttributes.getValue("mediatype");
         final boolean isHTMLMediaType = mediatypeValue != null && mediatypeValue.equals("text/html");
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, controlInfo);
+            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
             if (isHTMLMediaType)
                 classes.append(" xforms-mediatype-text-html");
 
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleMIPClasses(classes, controlInfo);
+                handleMIPClasses(classes, XFormsControl);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, controlInfo);
+                handleReadOnlyAttribute(newAttributes, XFormsControl);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
@@ -71,7 +73,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(controlInfo)) {
+            if (!isStaticReadonly(XFormsControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
@@ -83,7 +85,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = controlInfo.getValue();
+                    final String value = XFormsControl.getValue();
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -93,7 +95,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = controlInfo.getValue();
+                    final String value = XFormsControl.getValue();
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -102,12 +104,12 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
     }
 }

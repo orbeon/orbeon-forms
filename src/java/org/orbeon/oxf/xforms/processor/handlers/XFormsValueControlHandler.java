@@ -14,13 +14,13 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -70,24 +70,24 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
         level--;
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, ControlInfo controlInfo) throws SAXException {
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl XFormsControl) throws SAXException {
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
-        if (isStaticReadonly(controlInfo) && (type.equals("alert") || type.equals("hint")))
+        if (isStaticReadonly(XFormsControl) && (type.equals("alert") || type.equals("hint")))
             return;
 
         final String value;
-        if (controlInfo != null) {
+        if (XFormsControl != null) {
             // Get actual value from control
             if (type.equals("label")) {
-                value = controlInfo.getLabel();
+                value = XFormsControl.getLabel();
             } else if (type.equals("help")) {
-                value = controlInfo.getHelp();
+                value = XFormsControl.getHelp();
             } else if (type.equals("hint")) {
-                value = controlInfo.getHint();
+                value = XFormsControl.getHint();
             } else if (type.equals("alert")) {
-                value = controlInfo.getAlert();
+                value = XFormsControl.getAlert();
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
@@ -117,7 +117,7 @@ public abstract class XFormsValueControlHandler extends HandlerBase {
             final StringBuffer classes = new StringBuffer("xforms-");
             classes.append(type);
             if (type.equals("alert")) {
-                if (!handlerContext.isGenerateTemplate() && !controlInfo.isValid())
+                if (!handlerContext.isGenerateTemplate() && !XFormsControl.isValid())
                     classes.append(" xforms-alert-active");
                 else
                     classes.append(" xforms-alert-inactive");

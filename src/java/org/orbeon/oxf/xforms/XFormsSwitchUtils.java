@@ -13,17 +13,17 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.oxf.xforms.controls.RepeatIterationInfo;
-import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
-import org.dom4j.Node;
-import org.dom4j.Element;
 import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utilities related to xforms:switch.
@@ -44,24 +44,23 @@ public class XFormsSwitchUtils {
 
 //                System.out.println("xxx 1: has separator");
 
-                final ControlInfo switchControlInfo = (ControlInfo) xformsControls.getObjectById(switchId);
-                ControlInfo parent = switchControlInfo;
+                final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                XFormsControl parent = switchXFormsControl;
                 while ((parent = parent.getParent()) != null) {
-                    if (parent instanceof RepeatIterationInfo) {
+                    if (parent instanceof RepeatIterationControl) {
                         // Found closest enclosing repeat iteration
 
-                        final RepeatIterationInfo repeatIterationInfo = (RepeatIterationInfo) parent;
-                        final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIterationInfo.getParent();
+                        final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
 
-                        xformsControls.setBinding(pipelineContext, repeatControlInfo);
-                        final List currentNodeset = xformsControls.getCurrentNodeset();
+                        final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
                         final Node node = (Node) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
                         // Store an original case id instead of an effective case id
                         final String caseId = (String) entry.getValue();
-                        instanceData.addSwitchIdToCaseId(switchControlInfo.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
+                        instanceData.addSwitchIdToCaseId(switchXFormsControl.getOriginalId(), caseId.substring(0, caseId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)));
 
 //                        System.out.println("xxx 1: adding case id " + switchControlInfo.getOriginalId() + " " + entry.getValue());
 
@@ -129,22 +128,21 @@ public class XFormsSwitchUtils {
 
 //                System.out.println("xxx 2: has separator");
 
-                final ControlInfo switchControlInfo = (ControlInfo) xformsControls.getObjectById(switchId);
-                ControlInfo parent = switchControlInfo;
+                final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                XFormsControl parent = switchXFormsControl;
                 while ((parent = parent.getParent()) != null) {
-                    if (parent instanceof RepeatIterationInfo) {
+                    if (parent instanceof RepeatIterationControl) {
                         // Found closest enclosing repeat iteration
 
-                        final RepeatIterationInfo repeatIterationInfo = (RepeatIterationInfo) parent;
-                        final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIterationInfo.getParent();
+                        final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) parent;
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIterationInfo.getParent();
 
-                        xformsControls.setBinding(pipelineContext, repeatControlInfo);
-                        final List currentNodeset = xformsControls.getCurrentNodeset();
+                        final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
                         final Node node = (Node) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
-                        final String caseId = instanceData.getCasedIdForSwitchId(switchControlInfo.getOriginalId());
+                        final String caseId = instanceData.getCasedIdForSwitchId(switchXFormsControl.getOriginalId());
 
 //                        System.out.println("xxx 2: found case id " + caseId);
 

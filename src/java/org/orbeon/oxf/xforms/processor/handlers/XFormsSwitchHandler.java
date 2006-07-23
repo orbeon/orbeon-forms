@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -36,8 +36,8 @@ public class XFormsSwitchHandler extends HandlerBase {
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, null);
         if (!handlerContext.isGenerateTemplate()) {
-            final ControlInfo switchControlInfo = ((ControlInfo) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
-            HandlerBase.handleMIPClasses(classes, switchControlInfo);
+            final XFormsControl switchXFormsControl = ((XFormsControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
+            HandlerBase.handleMIPClasses(classes, switchXFormsControl);
         }
 
         // Start xhtml:span

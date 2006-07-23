@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.processor;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -25,8 +25,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
@@ -42,9 +42,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * This processor handles XForms initialization and produces an XHTML document which is a

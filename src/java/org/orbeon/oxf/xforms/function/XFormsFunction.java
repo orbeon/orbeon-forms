@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.functions.SystemFunction;
 
 /**

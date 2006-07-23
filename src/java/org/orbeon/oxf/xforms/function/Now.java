@@ -17,11 +17,11 @@ import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.DateTimeValue;
 import org.orbeon.saxon.value.DateValue;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.TimeValue;
-import org.orbeon.saxon.trans.XPathException;
 
 import java.util.GregorianCalendar;
 import java.util.TimeZone;

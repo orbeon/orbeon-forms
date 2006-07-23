@@ -32,6 +32,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
@@ -40,7 +41,6 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
 
 import java.net.URL;
 import java.util.ArrayList;

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.controls.OutputControlInfo;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -43,21 +43,21 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final OutputControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (OutputControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsOutputControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // The "control" is allowed to be null when xforms:output is in
         // xforms:label|xforms:hint|xforms:alert|xforms:help, because in that case currently we don't put the control in
         // the regular hierarchy of controls
-        if (controlInfo == null && !handlerContext.isGenerateTemplate())
+        if (xformsOutputControl == null && !handlerContext.isGenerateTemplate())
             return;
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "label", xformsOutputControl);
 
         final AttributesImpl newAttributes;
         final boolean isDateOrTime;
-        final StringBuffer classes = getInitialClasses(localname, controlInfo);
+        final StringBuffer classes = getInitialClasses(localname, xformsOutputControl);
 
         final String appearanceValue = elementAttributes.getValue("appearance");
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
@@ -78,8 +78,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         if (!handlerContext.isGenerateTemplate()) {
 
             // Find classes to add
-            isDateOrTime = isDateOrTime(controlInfo.getType());
-            handleMIPClasses(classes, controlInfo);
+            isDateOrTime = isDateOrTime(xformsOutputControl.getType());
+            handleMIPClasses(classes, xformsOutputControl);
 
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         } else {
@@ -102,7 +102,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, controlInfo.getValue());
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, xformsOutputControl.getValue());
                 // @f:url-norewrite="true"
                 final String formattingPrefix;
                 final boolean isNewPrefix;
@@ -126,12 +126,12 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                     contentHandler.endPrefixMapping(formattingPrefix);
             } else if (isDateOrTime) {
                 // Display formatted value for dates
-                final String displayValue = controlInfo.getDisplayValueOrValue();
+                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                 if (displayValue != null)
                     contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
             } else {
                 // Regular text case
-                final String displayValue = controlInfo.getDisplayValueOrValue();
+                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                 if (displayValue != null)
                     contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
             }
@@ -139,13 +139,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsOutputControl);
 
         // xforms:alert
         if (elementAttributes.getValue("value") == null)
-            handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
+            handleLabelHintHelpAlert(effectiveId, "alert", xformsOutputControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "hint", xformsOutputControl);
     }
 }

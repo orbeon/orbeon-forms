@@ -25,9 +25,9 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -536,15 +536,15 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
-                final List children = switchControlInfo.getChildren();
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
+                        final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseControlInfo.getId().equals(selectedCaseId)) {
+                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
                             final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                            divElement.addAttribute("id", caseControlInfo.getId());
+                            divElement.addAttribute("id", caseXFormsControl.getId());
                             divElement.addAttribute("visibility", "hidden");
                         }
                     }
@@ -569,14 +569,14 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final ControlInfo switchControlInfo = (ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
-                final List children = switchControlInfo.getChildren();
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
-                        final ControlInfo caseControlInfo = (ControlInfo) j.next();
+                        final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseControlInfo.getId().equals(selectedCaseId)) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseControlInfo.getId(), "visibility", "hidden"});
+                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getId(), "visibility", "hidden"});
                         }
                     }
                 }

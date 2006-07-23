@@ -15,11 +15,14 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerNew;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -65,35 +68,35 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return forwarding;
     }
 
-    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, ControlInfo controlInfo) {
-        if (controlInfo != null && controlInfo.isReadonly()) {
+    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControl XFormsControl) {
+        if (XFormsControl != null && XFormsControl.isReadonly()) {
             // @disabled="disabled"
             newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
         }
     }
 
-    public static void handleMIPClasses(StringBuffer sb, ControlInfo controlInfo) {
-        if (controlInfo != null) {// TEMP, controlInfo should not be null
-            if (!controlInfo.isRelevant()) {
+    public static void handleMIPClasses(StringBuffer sb, XFormsControl XFormsControl) {
+        if (XFormsControl != null) {// TEMP, controlInfo should not be null
+            if (!XFormsControl.isRelevant()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-disabled");
             }
-            if (!controlInfo.isValid()) {
+            if (!XFormsControl.isValid()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-invalid");
             }
-            if (controlInfo != null && controlInfo.isReadonly()) {
+            if (XFormsControl != null && XFormsControl.isReadonly()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-readonly");
             }
-            if (controlInfo != null && controlInfo.isRequired()) {
+            if (XFormsControl != null && XFormsControl.isRequired()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
-                if ("".equals(controlInfo.getValue()))
+                if ("".equals(XFormsControl.getValue()))
                     sb.append(" xforms-required-empty");
                 else
                     sb.append(" xforms-required-filled");
@@ -196,14 +199,14 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return reusableAttributes;
     }
 
-    protected StringBuffer getInitialClasses(String controlName, ControlInfo controlInfo) {
+    protected StringBuffer getInitialClasses(String controlName, XFormsControl XFormsControl) {
         final StringBuffer sb;
         if (!XFormsControls.isGroupingControl(controlName))
             sb = new StringBuffer("xforms-control xforms-" + controlName);
         else
             sb = new StringBuffer("xforms-" + controlName);// not sure why those wouldn't have xforms-control as well
 
-        if (isStaticReadonly(controlInfo))
+        if (isStaticReadonly(XFormsControl))
             sb.append(" xforms-static");
 
         return sb;
@@ -213,8 +216,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
     }
 
-    protected boolean isStaticReadonly(ControlInfo controlInfo) {
-        return (controlInfo != null && controlInfo.isReadonly())
+    protected boolean isStaticReadonly(XFormsControl XFormsControl) {
+        return (XFormsControl != null && XFormsControl.isReadonly())
                 && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
     }
 }

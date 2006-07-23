@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -42,21 +44,21 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final ControlInfo controlInfo = handlerContext.isGenerateTemplate()
-                ? null : (ControlInfo) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, controlInfo);
+            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleMIPClasses(classes, controlInfo);
+                handleMIPClasses(classes, XFormsControl);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, controlInfo);
+                handleReadOnlyAttribute(newAttributes, XFormsControl);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
@@ -65,12 +67,12 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
         // Create xhtml:input
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(controlInfo)) {
+            if (!isStaticReadonly(XFormsControl)) {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
                 newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() ? "" : controlInfo.getValue());
+                        handlerContext.isGenerateTemplate() ? "" : XFormsControl.getValue());
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(elementAttributes, newAttributes);
@@ -80,7 +82,7 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
             } else {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-                final String value = controlInfo.getValue();
+                final String value = XFormsControl.getValue();
                 if (value != null && value.length() > 0)
                     contentHandler.characters(HIDDEN_PASSWORD.toCharArray(), 0, HIDDEN_PASSWORD.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -88,12 +90,12 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", controlInfo);
+        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
     }
 }

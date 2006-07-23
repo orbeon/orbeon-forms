@@ -13,18 +13,18 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.io.PrintWriter;
 import java.io.CharArrayWriter;
+import java.io.PrintWriter;
 import java.util.Collections;
 
 

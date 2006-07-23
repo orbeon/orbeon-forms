@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.oxf.xforms.controls.RepeatControlInfo;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
@@ -52,14 +52,14 @@ public class XFormsIndexUtils {
 
         // TODO: detect use of index() function
         final Map updatedIndexesIds = new HashMap();
-        currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
             private int level = 0;
 
-            public void startVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
+            public void startVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
-                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
                     final List repeatNodeSet = xformsControls.getCurrentNodeset();
 
@@ -89,8 +89,8 @@ public class XFormsIndexUtils {
                 }
             }
 
-            public void endVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
+            public void endVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
                     level--;
                 }
             }
@@ -119,18 +119,18 @@ public class XFormsIndexUtils {
                                                final XFormsControls.ControlsState currentControlsState, final Node clonedNode) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
-        currentControlsState.visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
-            private ControlInfo foundControl;
+            private XFormsControl foundXFormsControl;
 
-            public void startVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
+            public void startVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
-                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
                     final List repeatNodeSet = xformsControls.getCurrentNodeset();
 
-                    if (foundControl == null) {
+                    if (foundXFormsControl == null) {
                         // We are not yet inside a matching xforms:repeat
 
                         if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
@@ -155,12 +155,12 @@ public class XFormsIndexUtils {
                                         }
                                     }
 
-                                    foundControl = controlInfo;
+                                    foundXFormsControl = XFormsControl;
                                     break;
                                 }
                             }
 
-                            if (foundControl == null) {
+                            if (foundXFormsControl == null) {
                                 // Still not found a control. Make sure the bounds of this
                                 // xforms:repeat are correct for the rest of the visit.
 
@@ -216,10 +216,10 @@ public class XFormsIndexUtils {
                 }
             }
 
-            public void endVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
-                    if (foundControl == controlInfo)
-                        foundControl = null;
+            public void endVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
+                    if (foundXFormsControl == XFormsControl)
+                        foundXFormsControl = null;
                 }
             }
         });
@@ -240,19 +240,19 @@ public class XFormsIndexUtils {
                                               final Map nestedRepeatIndexUpdates, final Node nodeToRemove) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
-        xformsControls.getCurrentControlsState().visitControlInfoFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+        xformsControls.getCurrentControlsState().visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
 
-            private ControlInfo foundControl;
+            private XFormsControl foundXFormsControl;
             private boolean reinitializeInner;
 
-            public void startVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
+            public void startVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
                     // Found an xforms:repeat
-                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) controlInfo;
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
                     final String repeatId = repeatControlInfo.getOriginalId();
 
                     final List repeatNodeSet = xformsControls.getCurrentNodeset();
-                    if (foundControl == null) {
+                    if (foundXFormsControl == null) {
                         // We are not yet inside a matching xforms:repeat
 
                         if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
@@ -323,7 +323,7 @@ public class XFormsIndexUtils {
                                         }
                                     }
 
-                                    foundControl = controlInfo;
+                                    foundXFormsControl = XFormsControl;
                                     break;
                                 }
                             }
@@ -332,11 +332,77 @@ public class XFormsIndexUtils {
                 }
             }
 
-            public void endVisitControl(ControlInfo controlInfo) {
-                if (controlInfo instanceof RepeatControlInfo) {
-                    if (foundControl == controlInfo)
-                        foundControl = null;
+            public void endVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
+                    if (foundXFormsControl == XFormsControl)
+                        foundXFormsControl = null;
                 }
+            }
+        });
+    }
+
+    /**
+     * Adjust controls ids that could have gone out of bounds.
+     *
+     * What we do here is that we bring back the index within bounds. The spec does not cover this
+     * scenario.
+     */
+    public static void adjustRepeatIndexes(PipelineContext pipelineContext, final XFormsControls xformsControls, final Map forceUpdate) {
+
+        // We don't rebuild before iterating because the caller has already rebuilt
+        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.ControlInfoVisitorListener() {
+
+            public void startVisitControl(XFormsControl XFormsControl) {
+                if (XFormsControl instanceof XFormsRepeatControl) {
+                    // Found an xforms:repeat
+                    final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) XFormsControl;
+                    final String repeatId = repeatControlInfo.getOriginalId();
+
+                    final List repeatNodeSet = xformsControls.getCurrentNodeset();
+
+                    if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
+                        // Node-set is non-empty
+
+                        final int adjustedNewIndex;
+                        {
+                            final int newIndex;
+                            if (forceUpdate != null && forceUpdate.get(repeatId) != null) {
+                                // Force update of index to start index
+                                newIndex = repeatControlInfo.getStartIndex();
+
+                                // NOTE: XForms 1.0 2nd edition actually says "To re-initialize
+                                // a repeat means to change the index to 0 if it is empty,
+                                // otherwise 1." However, for, xforms:insert, we are supposed to
+                                // update to startindex. Here, for now, we decide to use
+                                // startindex for consistency.
+                                // TODO: check latest errata
+
+                            } else {
+                                // Just use current index
+                                newIndex = ((Integer) currentControlsState.getRepeatIdToIndex().get(repeatId)).intValue();
+                            }
+
+                            // Adjust bounds if necessary
+                            if (newIndex < 1)
+                                adjustedNewIndex = 1;
+                            else if (newIndex > repeatNodeSet.size())
+                                adjustedNewIndex = repeatNodeSet.size();
+                            else
+                                adjustedNewIndex = newIndex;
+                        }
+
+                        // Set index
+                        currentControlsState.updateRepeatIndex(repeatId, adjustedNewIndex);
+
+                    } else {
+                        // Node-set is empty, make sure index is set to 0
+                        currentControlsState.updateRepeatIndex(repeatId, 0);
+                    }
+                }
+            }
+
+            public void endVisitControl(XFormsControl XFormsControl) {
             }
         });
     }

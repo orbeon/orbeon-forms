@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.IntegerValue;
 
 public class CountNonEmpty extends XFormsFunction {
 

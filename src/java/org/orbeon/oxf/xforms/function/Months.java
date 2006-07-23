@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.Component;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.DurationValue;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.trans.XPathException;
 
 public class Months extends XFormsFunction {
 

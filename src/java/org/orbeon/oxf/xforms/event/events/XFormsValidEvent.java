@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.controls.ControlInfo;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
@@ -29,19 +29,19 @@ import java.util.Collections;
  */
 public class XFormsValidEvent extends XFormsEvent {
 
-    private ControlInfo targetControl;
+    private XFormsControl targetXFormsControl;
 
-    public XFormsValidEvent(ControlInfo targetObject) {
+    public XFormsValidEvent(XFormsControl targetObject) {
         super(XFormsEvents.XFORMS_VALID, targetObject, true, false);
-        this.targetControl = targetObject;
+        this.targetXFormsControl = targetObject;
     }
 
      public SequenceIterator getAttribute(String name) {
         if ("target-ref".equals(name)) {
             // Return the node to which the control is bound
-            return new ListIterator(Collections.singletonList(targetControl.getBindingContext().getSingleNode()));
+            return new ListIterator(Collections.singletonList(targetXFormsControl.getBoundNode()));
         } else if ("target-id".equals(name)) {
-            return new ListIterator(Collections.singletonList(new StringValue(targetControl.getOriginalId())));
+            return new ListIterator(Collections.singletonList(new StringValue(targetXFormsControl.getOriginalId())));
         } else {
             return super.getAttribute(name);
         }

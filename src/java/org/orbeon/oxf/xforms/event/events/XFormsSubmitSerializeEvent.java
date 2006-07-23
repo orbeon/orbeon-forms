@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
  * 4.1.1 The xforms-submit-serialize Event

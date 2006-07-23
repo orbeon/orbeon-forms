@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
+import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -49,6 +49,7 @@ public class XFormsCaseHandler extends HandlerBase {
 
         // TODO: This is probably not efficient, but we don't have the switch id right here
         final boolean isVisible = switchIdToSelectedCaseIdMap.containsValue(currentCaseEffectiveId) || containingDocument.isReadonly();
+        // TODO FIXME: must not use containingDocument.isReadonly() here, but use readonly of switch
 
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 

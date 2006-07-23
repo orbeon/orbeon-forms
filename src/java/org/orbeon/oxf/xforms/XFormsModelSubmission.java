@@ -22,10 +22,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.controls.UploadControlInfo;
+import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSubmissionEvent;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -310,8 +313,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String mediatype = parameterElement.element("content-type").getTextTrim();
                             final String size = parameterElement.element("content-length").getTextTrim();
 
-                            final UploadControlInfo uploadControl
-                                    = (UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
+                            final XFormsUploadControl uploadControl
+                                    = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
 
                             if (uploadControl != null)
                             { // in case of xforms:repeat, the name of the template will not match an existing control
@@ -684,7 +687,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {
         final String actionString = resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
-        final String resultURL = XFormsActionInterpreter.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null);
+        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;
         return connectionResult;

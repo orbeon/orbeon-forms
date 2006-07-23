@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.function;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.functions.Component;
 import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.saxon.value.*;
 
 public class Seconds extends XFormsFunction {
 

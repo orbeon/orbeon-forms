@@ -46,7 +46,7 @@
         <include name="commons-cli-1_0.jar"/>
         <include name="commons-fileupload-1.0.jar"/>
         <include name="commons-beanutils-1_5.jar"/>
-        <include name="commons-pool-1.2.jar"/>
+        <include name="commons-pool-1.3.jar"/>
         <include name="commons-discovery-0_2.jar"/>
         <include name="commons-httpclient-3_0_1.jar"/>
         <include name="commons-codec-1_3.jar"/>
@@ -171,7 +171,8 @@
         </copy>
         <javac destdir="${build.classes.dir}"
             classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.3" source="1.3">
+            debug="${build.debug}" optimize="off" target="1.3" source="1.3"
+            fork="true" memoryInitialSize="128m" memoryMaximumSize="256m">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>

@@ -165,8 +165,9 @@ public class XFormsSubmissionUtils {
                                httpURLConnection.setPassword(password);
                         }
                     }
-                    if (hasRequestBody)
+                    if (hasRequestBody) {
                         urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
+                    }
 
                     // Forward cookies for session handling
                     // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
@@ -185,8 +186,11 @@ public class XFormsSubmissionUtils {
                         urlConnection.setRequestProperty("authorization", authorizationHeader);
 
                     // Write request body if needed
-                    if (hasRequestBody)
+                    if (hasRequestBody) {
+                        if (XFormsServer.logger.isDebugEnabled())
+                            XFormsServer.logger.debug("XForms - setting request body: " + new String(serializedInstance, "UTF-8"));
                         httpURLConnection.setRequestBody(serializedInstance);
+                    }
 
                     urlConnection.connect();
 

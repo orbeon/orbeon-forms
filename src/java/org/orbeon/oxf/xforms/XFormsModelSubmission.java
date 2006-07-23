@@ -499,13 +499,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         for (Iterator i = connectionResult.resultHeaders.entrySet().iterator(); i.hasNext();) {
                                             final Map.Entry currentEntry = (Map.Entry) i.next();
                                             final String headerName = (String) currentEntry.getKey();
-                                            final List headerValues = (List) currentEntry.getValue();
+                                            final String headerValue = (String) currentEntry.getValue();
 
-                                            if (headerName != null && headerValues != null) {
-                                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                                    response.addHeader(headerName, (String) j.next());
-                                                }
+                                            // NOTE: We only get one header value per name
+                                            if (headerName != null && headerValue != null) {
+                                                response.addHeader(headerName, headerValue);
                                             }
+
+//                                            if (headerName != null && headerValues != null) {
+//                                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
+//                                                    response.addHeader(headerName, (String) j.next());
+//                                                }
+//                                            }
                                         }
                                     }
 

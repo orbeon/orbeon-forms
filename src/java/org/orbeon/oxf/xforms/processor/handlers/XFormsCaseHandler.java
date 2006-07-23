@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.processor.XFormsElementFilterContentHandler;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -42,14 +44,16 @@ public class XFormsCaseHandler extends HandlerBase {
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 
-        final Map switchIdToSelectedCaseIdMap = containingDocument.getXFormsControls().getCurrentControlsState().getSwitchIdToSelectedCaseIdMap();
+        final XFormsControls.ControlsState controlsState = containingDocument.getXFormsControls().getCurrentControlsState();
 
-//        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(effectiveGroupId);
-//        final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId);
+        final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(currentCaseEffectiveId);
+        final XFormsControl switchControl = caseControl.getParent();
 
-        // TODO: This is probably not efficient, but we don't have the switch id right here
-        final boolean isVisible = switchIdToSelectedCaseIdMap.containsValue(currentCaseEffectiveId) || containingDocument.isReadonly();
-        // TODO FIXME: must not use containingDocument.isReadonly() here, but use readonly of switch
+        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
+        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getId());
+
+        // This case is visible if it is selected or if the switch is read-only and we display read-only as static
+        final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId) || isStaticReadonly(switchControl);
 
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 

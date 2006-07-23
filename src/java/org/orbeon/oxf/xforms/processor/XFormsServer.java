@@ -911,7 +911,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
                 for (Iterator j = items.iterator(); j.hasNext();) {
-                    final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                    final XFormsSelect1Control.ItemsetInfo itemsetInfo = (XFormsSelect1Control.ItemsetInfo) j.next();
 
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "item",
                             new String[]{"label", itemsetInfo.getLabel(), "value", itemsetInfo.getValue()});
@@ -940,7 +940,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
                 final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
@@ -973,7 +973,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
                 final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {

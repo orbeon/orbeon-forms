@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -113,7 +112,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                         final Stack nodeStack = new Stack();
                         int level = 0;
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
-                            final XFormsControls.ItemsetInfo currentItemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                            final XFormsSelect1Control.ItemsetInfo currentItemsetInfo = (XFormsSelect1Control.ItemsetInfo) j.next();
                             final NodeInfo currentNodeInfo = currentItemsetInfo.getNodeInfo();
 
                             final int newLevel = XFormsSelect1Control.getNodeLevel(currentNodeInfo, nodeStack);

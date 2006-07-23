@@ -123,7 +123,13 @@
                         <li>
                             <p>
                                 Support for XForms 1.1 conditional actions with the <code>if</code> (and
-                                <code>exf:if</code>) attribute. [TODO]
+                                <code>exf:if</code>) attributes. [TODO]
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Support for XForms 1.1 actions iterations with the <code>while</code> (and
+                                <code>exf:while</code>) attributes. [TODO]
                             </p>
                         </li>
                         <li>
@@ -171,12 +177,9 @@
                         </li>
                         <li>
                             <p>
-                                Support for read-only modes with <code>xxforms:readonly</code> and
-                                <code>xxforms:readonly-appearance</code> (kindly sponsored by Esprit). By using
-                                <code>xxforms:readonly="true"</code> on the first XForms model, all the controls in your
-                                form become read-only. With <code>xxforms:readonly-appearance="static"</code>, read-only
-                                controls (whether set with <code>xxforms:readonly="true"</code> or with regular readonly
-                                binds) take a static appearance appropriate for read-only rendition of forms in HTML.
+                                Support for read-only modes with <code>xxforms:readonly-appearance</code> (kindly
+                                sponsored by Esprit). With <code>xxforms:readonly-appearance="static"</code>, read-only
+                                controls take a static appearance appropriate for read-only rendition of forms in HTML.
                                 [TODO: doc]
                             </p>
                         </li>

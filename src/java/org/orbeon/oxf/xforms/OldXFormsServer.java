@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -507,7 +508,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
                 for (Iterator j = items.iterator(); j.hasNext();) {
-                    final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                    final XFormsSelect1Control.ItemsetInfo itemsetInfo = (XFormsSelect1Control.ItemsetInfo) j.next();
 
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "item",
                             new String[]{"label", itemsetInfo.getLabel(), "value", itemsetInfo.getValue()});
@@ -536,7 +537,7 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
                 final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
@@ -569,7 +570,7 @@ public class OldXFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdsToControlInfo().get(switchId);
+                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
                 final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {

@@ -80,7 +80,7 @@ public class XFormsSelect1Control extends XFormsControl {
                                 final String value = xformsControls.getCurrentSingleNodeValue();
                                 // TODO: handle xforms:copy
                                 if (value != null)
-                                    itemsetInfos.add(new XFormsControls.ItemsetInfo(getId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
+                                    itemsetInfos.add(new ItemsetInfo(getId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
                             }
                             xformsControls.popBinding();
                         }
@@ -121,7 +121,7 @@ public class XFormsSelect1Control extends XFormsControl {
                         final Stack nodeStack = new Stack();
                         int level = 0;
                         for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
-                            final XFormsControls.ItemsetInfo currentItemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+                            final ItemsetInfo currentItemsetInfo = (ItemsetInfo) j.next();
                             final NodeInfo currentNodeInfo = currentItemsetInfo.getNodeInfo();
 
                             final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
@@ -237,5 +237,47 @@ public class XFormsSelect1Control extends XFormsControl {
         }
 
         return false;
+    }
+
+    /**
+     * Represents xforms:itemset information.
+     */
+    public static class ItemsetInfo {
+        private String id;
+        private String label;
+        private String value;
+
+        private NodeInfo nodeInfo;
+
+        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
+            this.id = id;
+            this.label = label;
+            this.value = value;
+            this.nodeInfo = nodeInfo;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public NodeInfo getNodeInfo() {
+            return nodeInfo;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj == null || !(obj instanceof ItemsetInfo))
+                return false;
+
+            final ItemsetInfo other = (ItemsetInfo) obj;
+            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
+        }
     }
 }

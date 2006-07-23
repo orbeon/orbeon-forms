@@ -216,8 +216,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return XMLUtils.uriFromQName(qName, handlerContext.getController().getNamespaceSupport());
     }
 
-    protected boolean isStaticReadonly(XFormsControl XFormsControl) {
-        return (XFormsControl != null && XFormsControl.isReadonly())
+    protected boolean isStaticReadonly(XFormsControl xformsControl) {
+        return (xformsControl != null && xformsControl.isReadonly())
                 && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
     }
 }

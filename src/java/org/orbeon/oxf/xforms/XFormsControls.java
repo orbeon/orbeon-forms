@@ -689,7 +689,7 @@ public class XFormsControls {
     public void updateSwitchInfo(final PipelineContext pipelineContext, final String selectedCaseId) {
 
         // Find SwitchControlInfo
-        final XFormsControl caseXFormsControl = (XFormsControl) currentControlsState.getIdsToControlInfo().get(selectedCaseId);
+        final XFormsControl caseXFormsControl = (XFormsControl) currentControlsState.getIdToControl().get(selectedCaseId);
         if (caseXFormsControl == null)
             throw new OXFException("No ControlInfo found for case id '" + selectedCaseId + "'.");
         final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
@@ -705,10 +705,10 @@ public class XFormsControls {
             currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getId(), selectedCaseId);
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) currentControlsState.getIdsToControlInfo().get(currentSelectedCaseId)));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) currentControlsState.getIdToControl().get(currentSelectedCaseId)));
 
             // "2. Dispatching an xform-select event to the case to be selected."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) currentControlsState.getIdsToControlInfo().get(selectedCaseId)));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) currentControlsState.getIdToControl().get(selectedCaseId)));
         }
     }
 
@@ -718,16 +718,16 @@ public class XFormsControls {
     public void updateSwitchInfo(String caseId, boolean visible) {
 
         // Find SwitchControlInfo
-        final XFormsControl caseXFormsControl = (XFormsControl) currentControlsState.getIdsToControlInfo().get(caseId);
-        if (caseXFormsControl == null)
-            throw new OXFException("No ControlInfo found for case id '" + caseId + "'.");
-        final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
-        if (switchXFormsControl == null)
-            throw new OXFException("No SwitchControlInfo found for case id '" + caseId + "'.");
+        final XFormsControl caseControl = (XFormsControl) currentControlsState.getIdToControl().get(caseId);
+        if (caseControl == null)
+            throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
+        final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
+        if (switchControl == null)
+            throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
 
         // Update currently selected case id
         if (visible) {
-            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getId(), caseId);
+            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControl.getId(), caseId);
         }
     }
 
@@ -1042,7 +1042,7 @@ public class XFormsControls {
      * Get the object with the id specified, null if not found.
      */
     public Object getObjectById(String controlId) {
-        return currentControlsState.getIdsToControlInfo().get(controlId);
+        return currentControlsState.getIdToControl().get(controlId);
     }
 
     /**
@@ -1444,7 +1444,7 @@ public class XFormsControls {
             return children;
         }
 
-        public Map getIdsToControlInfo() {
+        public Map getIdToControl() {
             return idsToControlInfo;
         }
 
@@ -1659,48 +1659,6 @@ public class XFormsControls {
             }
             // Not found
             return null;
-        }
-    }
-
-    /**
-     * Represents xforms:itemset information.
-     */
-    public static class ItemsetInfo {
-        private String id;
-        private String label;
-        private String value;
-
-        private NodeInfo nodeInfo;
-
-        public ItemsetInfo(String id, String label, String value, NodeInfo nodeInfo) {
-            this.id = id;
-            this.label = label;
-            this.value = value;
-            this.nodeInfo = nodeInfo;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public NodeInfo getNodeInfo() {
-            return nodeInfo;
-        }
-
-        public boolean equals(Object obj) {
-            if (obj == null || !(obj instanceof ItemsetInfo))
-                return false;
-
-            final ItemsetInfo other = (ItemsetInfo) obj;
-            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
         }
     }
 }

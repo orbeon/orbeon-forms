@@ -27,6 +27,7 @@
     </xsl:template>
 
     <xsl:template match="widget:tabs">
+        <xsl:variable name="tabs-element" select="."/><!-- as="element()"  -->
         <xsl:variable name="tabs" select="widget:tab"/><!-- as="element()*"  -->
         <xhtml:table class="widget-tabs" cellpadding="0" cellspacing="0" border="0">
             <xsl:copy-of select="@*"/>
@@ -41,6 +42,9 @@
                     </xsl:if>
                     <xhtml:td class="widget-tab">
                         <xforms:switch>
+                            <xsl:if test="$tabs-element/@ref">
+                                <xsl:attribute name="ref" select="$tabs-element/@ref"/>
+                            </xsl:if>
                             <!-- Case where this tab is inactive -->
                             <xforms:case id="{$tab-id}-inactive">
                                 <xhtml:div class="widget-tab-inactive">
@@ -88,6 +92,9 @@
             <xhtml:tr>
                 <xhtml:td class="widget-tabs-panel" colspan="{count(widget:tab) * 4 + 1}">
                     <xforms:switch>
+                        <xsl:if test="$tabs-element/@ref">
+                            <xsl:attribute name="ref" select="$tabs-element/@ref"/>
+                        </xsl:if>
                         <xsl:for-each select="widget:tab">
                             <xforms:case>
                                 <xsl:copy-of select="@*"/>

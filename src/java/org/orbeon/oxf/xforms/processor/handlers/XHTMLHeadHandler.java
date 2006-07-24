@@ -114,7 +114,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                 }
 
                 if (focusElementId != null) {
-                    helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.setfocus(\"" + focusElementId + "\") }\n");
+                    helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.Controls.setFocus(\"" + focusElementId + "\") }\n");
                 }
 
                 helper.endElement();

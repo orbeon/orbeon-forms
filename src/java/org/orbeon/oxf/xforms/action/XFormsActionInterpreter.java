@@ -164,7 +164,7 @@ public class XFormsActionInterpreter {
 
         // Don't evaluate the condition if the context has gone missing
         final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-        if (currentSingleNode == null) {
+        if (currentSingleNode == null || containingDocument.getInstanceForNode(currentSingleNode) == null) {
             if (XFormsServer.logger.isDebugEnabled())
                 XFormsServer.logger.debug("XForms - not executing \"" + conditionType + "\" conditional action (missing context): " + actionName);
             return false;

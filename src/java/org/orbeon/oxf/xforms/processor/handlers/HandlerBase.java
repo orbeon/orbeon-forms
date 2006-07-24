@@ -24,6 +24,8 @@ import org.orbeon.oxf.xml.ElementHandlerNew;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -31,9 +33,16 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public abstract class HandlerBase extends ElementHandlerNew {
 
+    private int level = 0;
+
+    private Attributes labelAttributes;
+    private Attributes helpAttributes;
+    private Attributes hintAttributes;
+    private Attributes alertAttributes;
+
     // NOTE: the XForms schema seems to indicates that "style", "onchange", and others
     // cannot be used; those should probably be in the XHTML namespace
-    private static final String[] XHTML_ATTRIBUTES_TO_COPY = { "style", "onchange" };
+    private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange"};
 
     private boolean repeating;
     private boolean forwarding;
@@ -66,6 +75,37 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
     public boolean isForwarding() {
         return forwarding;
+    }
+
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        // Reset state, as this handler may be reused
+        level = 0;
+        labelAttributes = null;
+        helpAttributes = null;
+        hintAttributes = null;
+        alertAttributes = null;
+    }
+
+    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        level++;
+        if (level == 1 && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+            // Handle direct children only
+            if ("label".equals(localname)) {
+                labelAttributes = new AttributesImpl(attributes);
+            } else if ("hint".equals(localname)) {
+                hintAttributes = new AttributesImpl(attributes);
+            } else if ("help".equals(localname)) {
+                helpAttributes = new AttributesImpl(attributes);
+            } else if ("alert".equals(localname)) {
+                alertAttributes = new AttributesImpl(attributes);
+            }
+        }
+        super.startElement(uri, localname, qName, attributes);
+    }
+
+    public void endElement(String uri, String localname, String qName) throws SAXException {
+        super.endElement(uri, localname, qName);
+        level--;
     }
 
     public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControl XFormsControl) {
@@ -219,5 +259,92 @@ public abstract class HandlerBase extends ElementHandlerNew {
     protected boolean isStaticReadonly(XFormsControl xformsControl) {
         return (xformsControl != null && xformsControl.isReadonly())
                 && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
+    }
+
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl XFormsControl) throws SAXException {
+
+        // Don't handle alerts and help in read-only mode
+        // TODO: Removing hints and help could be optional depending on appearance
+        if (isStaticReadonly(XFormsControl) && (type.equals("alert") || type.equals("hint")))
+            return;
+
+        final String value;
+        if (XFormsControl != null) {
+            // Get actual value from control
+            if (type.equals("label")) {
+                value = XFormsControl.getLabel();
+            } else if (type.equals("help")) {
+                value = XFormsControl.getHelp();
+            } else if (type.equals("hint")) {
+                value = XFormsControl.getHint();
+            } else if (type.equals("alert")) {
+                value = XFormsControl.getAlert();
+            } else {
+                throw new IllegalStateException("Illegal type requested");
+            }
+        } else {
+            // Placeholder
+            value = null;
+        }
+
+        // Find id
+        final Attributes labelHintHelpAlertAttributes;
+        if (type.equals("label")) {
+            labelHintHelpAlertAttributes = labelAttributes;
+        } else if (type.equals("help")) {
+            labelHintHelpAlertAttributes = helpAttributes;
+        } else if (type.equals("hint")) {
+            labelHintHelpAlertAttributes = hintAttributes;
+        } else if (type.equals("alert")) {
+            labelHintHelpAlertAttributes = alertAttributes;
+        } else {
+            throw new IllegalStateException("Illegal type requested");
+        }
+
+        // If no attributes were found, there is no such label / help / hint
+        if (labelHintHelpAlertAttributes != null) {
+            //final String id = labelHintHelpId +  handlerContext.getIdPostfix();
+
+            final StringBuffer classes = new StringBuffer("xforms-");
+            classes.append(type);
+            if (type.equals("alert")) {
+                if (!handlerContext.isGenerateTemplate() && !XFormsControl.isValid())
+                    classes.append(" xforms-alert-active");
+                else
+                    classes.append(" xforms-alert-inactive");
+            }
+
+            // If the value of a help, hint or label is empty, consider it as "non-relevant"
+            // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
+            if (!type.equals("alert")) {
+                if (value == null || value.equals("")) {
+                    classes.append(" xforms-disabled");
+                }
+            }
+
+            outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, value);
+        }
+    }
+
+    public static void outputLabelHintHelpAlert(HandlerContext handlerContext, AttributesImpl labelHintHelpAlertAttributes, String parentId, String value) throws SAXException {
+        labelHintHelpAlertAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, parentId);
+
+        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+        final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelHintHelpAlertAttributes);
+        if (!handlerContext.isGenerateTemplate() && value != null) {
+            contentHandler.characters(value.toCharArray(), 0, value.length());
+        }
+        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);
+    }
+
+    protected static void copyAttributes(Attributes sourceAttributes, String sourceNamespaceURI, String[] sourceAttributeLocalNames, AttributesImpl destAttributes) {
+        for (int i = 0; i < sourceAttributeLocalNames.length; i++) {
+            final String attributeName = sourceAttributeLocalNames[i];
+            final String attributeValue = sourceAttributes.getValue(sourceNamespaceURI, attributeName);
+            if (attributeValue != null)
+                destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
+        }
     }
 }

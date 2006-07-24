@@ -288,7 +288,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     int itemIndex = 0;
                     for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
                         final XFormsSelect1Control.Item item = (XFormsSelect1Control.Item) i.next();
-                        handleItemFull(contentHandler, xhtmlPrefix, spanQName, xformsSelect1Control, id, effectiveId, isMany, fullItemType, item, itemIndex);
+                        handleItemFull(contentHandler, xhtmlPrefix, spanQName, xformsSelect1Control, id, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
                     }
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -301,7 +301,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new XFormsSelect1Control.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), 0);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new XFormsSelect1Control.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                     // TODO: in the future we should be able to handle multiple itemsets
@@ -601,7 +601,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                XFormsControl XFormsControl, String id, String effectiveId, boolean isMany, String type, XFormsSelect1Control.Item item, int itemIndex) throws SAXException {
+                                XFormsControl XFormsControl, String id, String effectiveId, boolean isMany, String type, XFormsSelect1Control.Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
@@ -629,7 +629,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
                 }
 
-                if (itemIndex == 0) {
+                if (isFirst) {
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(elementAttributes, reusableAttributes);
                 }

@@ -83,16 +83,16 @@ public class XFormsTriggerHandler extends HandlerBase {
         // Handle accessibility attributes
         handleAccessibilityAttributes(elementAttributes, newAttributes);
 
+        // Add title attribute if not yet present and there is a hint
+        if (newAttributes.getValue("title") == null) {
+            final String hintValue = (XFormsControl != null) ? XFormsControl.getHint() : null;
+            if (hintValue != null)
+                newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
+        }
+
         if (appearanceValue != null
                 && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname)) {
             // Link appearance (xxforms:link)
-
-            // Add title attribute if not yet present and there is a hint
-            if (newAttributes.getValue("title") == null) {
-                final String hintValue = (XFormsControl != null) ? XFormsControl.getHint() : null;
-                if (hintValue != null)
-                    newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
-            }
 
             // TODO: probably needs f:url-norewrite="true"
             newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");
@@ -151,5 +151,8 @@ public class XFormsTriggerHandler extends HandlerBase {
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);
         }
+
+        // xforms:help
+        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
     }
 }

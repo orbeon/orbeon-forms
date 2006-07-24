@@ -1805,14 +1805,15 @@ function xformsHandleResponse(o) {
                                     // Case of checkboxes / radio bottons
 
                                     // Actual values:
-                                    //     <span id="id" class="xforms-control xforms-select[1]-full">
-                                    //         <span><input type="checkbox" checked="..." value="v"/> Vanilla</span>
-                                    //         ... other checkboxes / radio buttons
+                                    //     <span>
+                                    //         <input type="checkbox" checked="" value="v" name="xforms-element-97" id="element-97-opsitem0"/>
+                                    //         <label for="xforms-element-97-opsitem0" id="xforms-element-99">Vanilla</label>
                                     //     </span>
                                     //
                                     // Template follows:
-                                    //     <span id="xforms-select-template-id" class="xforms-select-template">
-                                    //         <span><input type="checkbox" checked="..." value="$xforms-template-value$"/> $xforms-template-label$</span>
+                                    //     <span>
+                                    //         <input type="checkbox" value="$xforms-template-value$" name="xforms-element-97" id="xforms-element-97-opsitem0"/>
+                                    //         <label for="xforms-element-97-opsitem0" id="xforms-element-99">$xforms-template-label$</label>
                                     //     </span>
 
                                     // Get element following control
@@ -1834,6 +1835,7 @@ function xformsHandleResponse(o) {
                                     }
 
                                     // Recreate content based on template
+                                    var itemIndex = 0;
                                     for (var k = 0; k < itemsetElement.childNodes.length; k++) {
                                         var itemElement = itemsetElement.childNodes[k];
                                         if (itemElement.nodeType == ELEMENT_TYPE) {
@@ -1846,6 +1848,7 @@ function xformsHandleResponse(o) {
                                             // Restore checked state after copy
                                             if (valueToChecked[ORBEON.util.Dom.getAttribute(itemElement, "value")] == true)
                                                 xformsGetInputUnderNode(templateClone).checked = true;
+                                            itemIndex++;
                                         }
                                     }
                                 }

@@ -41,7 +41,7 @@ import java.util.*;
  */
 public class XPathCache {
 
-    private static final String XFORMS_XFORMS_CACHE_NAME = "xforms";
+    private static final String XPATH_CACHE_NAME = "xpath";
 
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
 
@@ -88,7 +88,7 @@ public class XPathCache {
         try {
             // Find pool from cache
             final Long validity = new Long(0);
-            final Cache cache = ObjectCache.instance(XFORMS_XFORMS_CACHE_NAME);
+            final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME);
             String cacheKeyString = xpathExpressionString;
             {
                 if (functionLibrary != null)// This is ok

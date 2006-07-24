@@ -226,7 +226,7 @@ ORBEON.xforms.Globals = {
     serverValue: {}                   // Values on controls known to the server
 };
 
-ORBEON.xforms.Utils = {
+ORBEON.xforms.Controls = {
 
     // Returns MIP for a given control
     isRelevant: function (control) { return !ORBEON.util.Dom.hasClass(control, "xforms-disabled"); },
@@ -292,7 +292,7 @@ ORBEON.xforms.Utils = {
     },
 
     _setMessage: function(control, className, message) {
-        var label = ORBEON.xforms.Utils._getControlLabel(control, className);
+        var label = ORBEON.xforms.Controls._getControlLabel(control, className);
         if (label != null) {
             if (message == "") {
                 ORBEON.util.Dom.addClass(label, "xforms-disabled");
@@ -314,21 +314,21 @@ ORBEON.xforms.Utils = {
                 ORBEON.util.Dom.setStringValue(control, message);
             }
         } else {
-            ORBEON.xforms.Utils._setMessage(control, "xforms-label", message);
+            ORBEON.xforms.Controls._setMessage(control, "xforms-label", message);
         }
     },
 
     getHelpMessage: function(control) {
-        var helpElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-help");
+        var helpElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help");
         return ORBEON.util.Dom.getStringValue(helpElement);
     },
 
     setHelpMessage: function(control, message) {
-        ORBEON.xforms.Utils._setMessage(control, "xforms-help", message);
+        ORBEON.xforms.Controls._setMessage(control, "xforms-help", message);
     },
 
     setValid: function(control, isValid) {
-        var alertElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-alert");
+        var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
         if (alertElement != null) { // Some controls don't have validity indicator
             if (isValid) {
                 ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
@@ -341,12 +341,12 @@ ORBEON.xforms.Utils = {
     },
 
     getAlertMessage: function(control) {
-        var alertElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-alert");
+        var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
         return ORBEON.util.Dom.getStringValue(alertElement);
     },
 
     setAlertMessage: function(control, message) {
-        ORBEON.xforms.Utils._setMessage(control, "xforms-alert", message);
+        ORBEON.xforms.Controls._setMessage(control, "xforms-alert", message);
     },
 
     setHintMessage: function(control, message) {
@@ -354,12 +354,9 @@ ORBEON.xforms.Utils = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
             control.title = message;
         } else {
-            ORBEON.xforms.Utils._setMessage(control, "xforms-hint", message);
+            ORBEON.xforms.Controls._setMessage(control, "xforms-hint", message);
         }
-    }
-};
-
-ORBEON.xforms.Controls = {
+    },
 
     getInputTextfield: function(inputControl) {
         return inputControl.childNodes[1];
@@ -375,6 +372,18 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Controls.getInputTextfield(control).focus();
         } else if (typeof control.focus != "undefined") {
             control.focus();
+        }
+    },
+
+    /**
+     * Update the xforms-required-empty class as necessary.
+     */
+    updateRequiredEmpty: function(control) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-required")) {
+            if (ORBEON.xforms.Controls.getCurrentValue(control) == "")
+                ORBEON.util.Dom.addClass(control, "xforms-required-empty");
+            else
+                ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
         }
     }
 };
@@ -482,8 +491,9 @@ ORBEON.xforms.Events = {
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+            // Fire change event
             xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
-                ORBEON.xforms.Utils.getCurrentValue(target))], false);
+                ORBEON.xforms.Controls.getCurrentValue(target))], false);
         }
     },
 
@@ -499,7 +509,7 @@ ORBEON.xforms.Events = {
                     // Send a value change and DOM activate
                     var events = [
                         xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
-                            ORBEON.xforms.Utils.getCurrentValue(target)),
+                            ORBEON.xforms.Controls.getCurrentValue(target)),
                         xformsCreateEventArray(target, "DOMActivate", null)
                     ];
                     xformsFireEvents(events, false);
@@ -522,8 +532,11 @@ ORBEON.xforms.Events = {
             // Incremental control: treat keypress as a value change event
             if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
                 xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
-                    ORBEON.xforms.Utils.getCurrentValue(target))], true);
+                    ORBEON.xforms.Controls.getCurrentValue(target))], true);
             }
+
+            // If value is required, add/remove xforms-required-empty appropriately
+            ORBEON.xforms.Controls.updateRequiredEmpty(target);
 
             // Resize wide text area
             if (ORBEON.util.Dom.hasClass(target, "wide-textarea")) {
@@ -586,13 +599,13 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-help")) {
                 // Show help tool-tip
                 var control = document.getElementById(target.htmlFor);
-                ORBEON.xforms.Events._showToolTip(event, target, "xforms-help", ORBEON.xforms.Utils.getHelpMessage(control));
+                ORBEON.xforms.Events._showToolTip(event, target, "xforms-help", ORBEON.xforms.Controls.getHelpMessage(control));
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
                 var control = document.getElementById(target.htmlFor);
-                var message = ORBEON.xforms.Utils.getAlertMessage(control);
+                var message = ORBEON.xforms.Controls.getAlertMessage(control);
                 if (message != "") {
                     // Show alert tool-tip
-                    ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", ORBEON.xforms.Utils.getAlertMessage(control));
+                    ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", ORBEON.xforms.Controls.getAlertMessage(control));
                 }
             }
         }
@@ -634,7 +647,7 @@ ORBEON.xforms.Events = {
                     || ORBEON.util.Dom.hasClass(target, "xforms-select-full")) {
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",
-                                ORBEON.xforms.Utils.getCurrentValue(target), null)), false);
+                                ORBEON.xforms.Controls.getCurrentValue(target), null)), false);
             }
 
             // Click on calendar inside input field
@@ -1998,24 +2011,24 @@ function xformsHandleResponse(o) {
                                         // Store new label message in control attribute
                                         var newLabel = ORBEON.util.Dom.getAttribute(controlElement, "label");
                                         if (newLabel != null)
-                                            ORBEON.xforms.Utils.setLabelMessage(documentElement, newLabel);
+                                            ORBEON.xforms.Controls.setLabelMessage(documentElement, newLabel);
                                         // Store new hint message in control attribute
                                         var newHint = ORBEON.util.Dom.getAttribute(controlElement, "hint");
                                         if (newHint != null)
-                                            ORBEON.xforms.Utils.setHintMessage(documentElement, newHint);
+                                            ORBEON.xforms.Controls.setHintMessage(documentElement, newHint);
                                         // Store new help message in control attribute
                                         var newHelp = ORBEON.util.Dom.getAttribute(controlElement, "help");
                                         if (newHelp != null)
-                                            ORBEON.xforms.Utils.setHelpMessage(documentElement, newHelp);
+                                            ORBEON.xforms.Controls.setHelpMessage(documentElement, newHelp);
                                         // Store new alert message in control attribute
                                         var newAlert = ORBEON.util.Dom.getAttribute(controlElement, "alert");
                                         if (newAlert != null)
-                                            ORBEON.xforms.Utils.setAlertMessage(documentElement, newAlert);
+                                            ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                         // Store validity, label, hint, help in element
                                         var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
                                         if (newValid != null) {
                                             var newIsValid = newValid != "false";
-                                            ORBEON.xforms.Utils.setValid(documentElement, newIsValid);
+                                            ORBEON.xforms.Controls.setValid(documentElement, newIsValid);
                                         }
 
                                         // Handle relevance
@@ -2042,6 +2055,7 @@ function xformsHandleResponse(o) {
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-required-filled");
                                                 ORBEON.util.Dom.removeClass(documentElement, "xforms-required-empty");
                                             }
+                                            ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
                                         }
 
                                         // Handle readonly
@@ -2394,7 +2408,7 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
         if (document.xformsEvents.length > 0) {
 
             // Save the form for this request
-            document.xformsRequestForm = ORBEON.xforms.Utils.getForm(document.xformsEvents[0][0]);
+            document.xformsRequestForm = ORBEON.xforms.Controls.getForm(document.xformsEvents[0][0]);
 
             // Mark this as loading
             document.xformsRequestInProgress = true;
@@ -2435,7 +2449,7 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
                     var other = event[3];
 
                     // Only handle this event if it is for the form we chose
-                    if (ORBEON.xforms.Utils.getForm(target) == document.xformsRequestForm) {
+                    if (ORBEON.xforms.Controls.getForm(target) == document.xformsRequestForm) {
                         // Create <xxforms:event> element
                         requestDocumentString += indent + indent;
                         requestDocumentString += '<xxforms:event';

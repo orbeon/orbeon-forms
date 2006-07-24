@@ -219,11 +219,11 @@ ORBEON.util.Dom = {
 ORBEON.xforms.Globals = {
 
     overlayManager: null,
-    inputCalendarCreated: {}, // Maps input id to true when the calendar has been created for that input
-    inputCalendarOnclick: {}, // Maps input id to the JSCalendar function that displays the calendar
+    inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
+    inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
-    changedIdsRequest: {},
-    serverValue: {}
+    changedIdsRequest: {},            // Id of controls that have been touched by user since the last request was sent
+    serverValue: {}                   // Values on controls known to the server
 };
 
 ORBEON.xforms.Utils = {
@@ -423,6 +423,9 @@ ORBEON.xforms.Events = {
         if (!document.xformsMaskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
+                // Store initial value of control
+                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
+                    ORBEON.xforms.Globals.serverValue[target.id] = target.value;
                 // Send focus events
                 if (document.xformsPreviousDOMFocusOut) {
                     if (document.xformsPreviousDOMFocusOut != target) {
@@ -510,9 +513,6 @@ ORBEON.xforms.Events = {
         if (target != null) {
             // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
             ORBEON.xforms.Globals.changedIdsRequest[target.id] = true;
-            // Store initial value of control
-            if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
-                ORBEON.xforms.Globals.serverValue[target.id] = target.value;
         }
     },
 

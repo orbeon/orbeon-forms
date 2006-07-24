@@ -41,152 +41,973 @@ var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 
 ORBEON = {};
 ORBEON.util = {};
+ORBEON.xforms = {};
 
-ORBEON.util.Dom = function () {
+/**
+ * The IE version of those methods does not store anything in the
+ * elements as this has some negative side effects like IE reloading
+ * background images set with CSS on the element.
+ */
+ORBEON.util.IEDom = {
+    /**
+     * Optimized version of YAHOO.util.Dom.hasClass(element, className).
+     */
+    hasClass: function(element, className) {
+        if (element.className == className) {
+            // Trivial true case
+            return true;
+        } else {
+            var startPosition = element.className.indexOf(className);
+            if (startPosition == -1) {
+                // Trivial false case
+                return false;
+            } else {
+                var endPosition = startPosition + className.length;
+                // className is at the beginning
+                if (startPosition == 0)
+                    return element.className.charAt(endPosition) == " ";
+                // className is at the end
+                if (endPosition == element.className.length)
+                    return element.className.charAt(startPosition - 1) == " ";
+                // className is in the middle
+                return element.className.charAt(startPosition - 1) == " "
+                        && element.className.charAt(endPosition) == " ";
+            }
+        }
+    },
 
+    /**
+     * Optimized version of YAHOO.util.Dom.addClass(element, className).
+     */
+    addClass: function(element, className) {
+        if (!this.hasClass(element, className))
+            element.className = element.className.length == 0 ? className
+                    : (element.className + " " + className);
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.removeClass(element, className).
+     */
+    removeClass: function(element, className) {
+        if (this.hasClass(element, className)) {
+            var classes = element.className.split(" ");
+            var newClassName = "";
+            for (var i = 0; i < classes.length; i++) {
+                if (classes[i] != className) {
+                    if (newClassName.length > 0) newClassName += " ";
+                    newClassName += classes[i];
+                }
+            }
+            element.className = newClassName;
+        }
+    },
+
+    /**
+     * IE doesn't support hasAttribute().
+     */
+    getAttribute: function(element, name) {
+        return element.getAttribute(name);
+    }
+};
+
+/**
+ * The hasClass, addClass and removeClass methods use a cache of the
+ * classes for a give element for quick lookup. After having parsed the
+ * className a first time we store that information in the orbeonClasses
+ * map on the given element.
+ */
+ORBEON.util.MozDom = {
+    /**
+     * Changes the className on the element based on the information stored in
+     * _elementToClasses.
+     *
+     * @private
+     */
+    _regenerateClassName: function(element) {
+        var newClassName = "";
+        for (var existingClassName in element.orbeonClasses) {
+            if (element.orbeonClasses[existingClassName]) {
+                if (newClassName.length > 0)
+                    newClassName += " ";
+                newClassName += existingClassName;
+            }
+        }
+        element.className = newClassName;
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.hasClass(element, className).
+     */
+    hasClass: function(element, className) {
+        if (!element.orbeonClasses) {
+            element.orbeonClasses = {};
+            var classes = element.className.split(" ");
+            for (var i = 0; i < classes.length; i++)
+                element.orbeonClasses[classes[i]] = true;
+        }
+        return element.orbeonClasses[className] == true;
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.addClass(element, className).
+     */
+    addClass: function(element, className) {
+        if (!this.hasClass(element, className)) {
+            element.orbeonClasses[className] = true;
+            this._regenerateClassName(element);
+        }
+    },
+
+    /**
+     * Optimized version of YAHOO.util.Dom.removeClass(element, className).
+     */
+    removeClass: function(element, className) {
+        if (this.hasClass(element, className)) {
+            element.orbeonClasses[className] = false;
+            this._regenerateClassName(element);
+        }
+    }
+};
+
+ORBEON.util.Dom = {
+
+    ELEMENT_TYPE: 1,
+
+    isElement: function(node) {
+        return node.nodeType == this.ELEMENT_TYPE;
+    },
+
+    getStringValue: function(element) {
+        var result = "";
+        for (var i = 0; i < element.childNodes.length; i++) {
+            var child = element.childNodes[i];
+            if (child.nodeType == TEXT_TYPE)
+                result += child.nodeValue;
+        }
+        return result;
+    },
+
+    setStringValue: function(element, text) {
+        // Remove content
+        while (element.childNodes.length > 0)
+            element.removeChild(element.firstChild);
+        // Add specified text
+        var textNode = element.ownerDocument.createTextNode(text);
+        element.appendChild(textNode);
+    },
+
+    /**
+     * Other browsers support hasAttribute().
+     */
+    getAttribute: function(element, name) {
+        return element.hasAttribute(name) ? element.getAttribute(name) : null;
+    }
+};
+
+(function () {
     var ua = navigator.userAgent.toLowerCase();
     var isOpera = (ua.indexOf('opera') != -1);
-    var isIE = (ua.indexOf('msie') != -1 && !isOpera); // not opera spoof
+    var isIE = (ua.indexOf('msie') != -1 && !isOpera);
+    var methodsFrom = isIE ? ORBEON.util.IEDom : ORBEON.util.MozDom;
+    for (var method in methodsFrom)
+        ORBEON.util.Dom[method] = methodsFrom[method];
+}());
 
-    if (isIE) {
+/**
+ * Global constants and variable
+ */
+ORBEON.xforms.Globals = {
 
-        /**
-         * The IE version of those methods does not store anything in the
-         * elements as this has some negative side effects like IE reloading
-         * background images set with CSS on the element.
-         */
-        return {
+    overlayManager: null,
+    inputCalendarCreated: {}, // Maps input id to true when the calendar has been created for that input
+    inputCalendarOnclick: {}, // Maps input id to the JSCalendar function that displays the calendar
+    tooltipLibraryInitialized: false,
+    changedIdsRequest: {},
+    serverValue: {}
+};
 
-            /**
-             * Optimized version of YAHOO.util.Dom.hasClass(element, className).
-             */
-            hasClass: function(element, className) {
-                if (element.className == className) {
-                    // Trivial true case
-                    return true;
-                } else {
-                    var startPosition = element.className.indexOf(className);
-                    if (startPosition == -1) {
-                        // Trivial false case
-                        return false;
-                    } else {
-                        var endPosition = startPosition + className.length;
-                        // className is at the beginning
-                        if (startPosition == 0)
-                            return element.className.charAt(endPosition) == " ";
-                        // className is at the end
-                        if (endPosition == element.className.length)
-                            return element.className.charAt(startPosition - 1) == " ";
-                        // className is in the middle
-                        return element.className.charAt(startPosition - 1) == " "
-                                && element.className.charAt(endPosition) == " ";
-                    }
+ORBEON.xforms.Utils = {
+
+    // Returns MIP for a given control
+    isRelevant: function (control) { return !ORBEON.util.Dom.hasClass(control, "xforms-disabled"); },
+    isReadonly: function (control) { return  ORBEON.util.Dom.hasClass(control, "xforms-readonly"); },
+    isRequired: function (control) { return  ORBEON.util.Dom.hasClass(control, "xforms-required"); },
+    isValid:    function (control) { return !ORBEON.util.Dom.hasClass(control, "xforms-invalid"); },
+
+    getForm: function(control) {
+        if (typeof control.form == "undefined") {
+            // There is a span around the control go through parents until we find the form element
+            var candidateForm = control;
+            while (candidateForm.tagName.toLowerCase() != "form")
+                candidateForm = candidateForm.parentNode;
+            return candidateForm;
+        } else {
+            // We have directly a form control
+            return control.form;
+        }
+    },
+
+    getCurrentValue: function(control) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
+            return control.childNodes[1].value;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-full")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-full")) {
+            var inputs = control.getElementsByTagName("input");
+            var spanValue = "";
+            for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                var input = inputs[inputIndex];
+                if (input.checked) {
+                    if (spanValue != "") spanValue += " ";
+                    spanValue += input.value;
                 }
-            },
-
-            /**
-             * Optimized version of YAHOO.util.Dom.addClass(element, className).
-             */
-            addClass: function(element, className) {
-                if (!this.hasClass(element, className))
-                    element.className = element.className.length == 0 ? className
-                            : (element.className + " " + className);
-            },
-
-            /**
-             * Optimized version of YAHOO.util.Dom.removeClass(element, className).
-             */
-            removeClass: function(element, className) {
-                if (this.hasClass(element, className)) {
-                    var classes = element.className.split(" ");
-                    var newClassName = "";
-                    for (var i = 0; i < classes.length; i++) {
-                        if (classes[i] != className) {
-                            if (newClassName.length > 0) newClassName += " ";
-                            newClassName += classes[i];
-                        }
-                    }
-                    element.className = newClassName;
-                }
-            },
-
-            /**
-             * IE doesn't support hasAttribute().
-             */
-            getAttribute: function(element, name) {
-                return element.getAttribute(name);
             }
-        };
-    } else {
-
-        /**
-         * The hasClass, addClass and removeClass methods use a cache of the
-         * classes for a give element for quick lookup. After having parsed the
-         * className a first time we store that information in the orbeonClasses
-         * map on the given element.
-         */
-        return {
-
-            /**
-             * Changes the className on the element based on the information stored in
-             * _elementToClasses.
-             *
-             * @private
-             */
-            _regenerateClassName: function(element) {
-                var newClassName = "";
-                for (var existingClassName in element.orbeonClasses) {
-                    if (element.orbeonClasses[existingClassName]) {
-                        if (newClassName.length > 0)
-                            newClassName += " ";
-                        newClassName += existingClassName;
-                    }
+            return spanValue;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-compact")) {
+            var options = control.options;
+            var selectValue = "";
+            for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                var option = options[optionIndex];
+                if (option.selected) {
+                    if (selectValue != "") selectValue += " ";
+                    selectValue += option.value;
                 }
-                element.className = newClassName;
-            },
-
-            /**
-             * Optimized version of YAHOO.util.Dom.hasClass(element, className).
-             */
-            hasClass: function(element, className) {
-                if (!element.orbeonClasses) {
-                    element.orbeonClasses = {};
-                    var classes = element.className.split(" ");
-                    for (var i = 0; i < classes.length; i++)
-                        element.orbeonClasses[classes[i]] = true;
-                }
-                return element.orbeonClasses[className] == true;
-            },
-
-            /**
-             * Optimized version of YAHOO.util.Dom.addClass(element, className).
-             */
-            addClass: function(element, className) {
-                if (!this.hasClass(element, className)) {
-                    element.orbeonClasses[className] = true;
-                    this._regenerateClassName(element);
-                }
-            },
-
-            /**
-             * Optimized version of YAHOO.util.Dom.removeClass(element, className).
-             */
-            removeClass: function(element, className) {
-                if (this.hasClass(element, className)) {
-                    element.orbeonClasses[className] = false;
-                    this._regenerateClassName(element);
-                }
-            },
-
-            /**
-             * Other browsers support hasAttribute().
-             */
-            getAttribute: function(element, name) {
-                return element.hasAttribute(name) ? element.getAttribute(name) : null;
             }
-        };
+            return selectValue;
+        } else {
+            return control.value;
+        }
+    },
+
+    _getControlLabel: function(control, className) {
+        var candidate = control;
+        while (true) {
+            if (candidate == null) break;
+            if (ORBEON.util.Dom.isElement(candidate)
+                    && ORBEON.util.Dom.hasClass(candidate, className)) break;
+            candidate = className == "xforms-label" ? candidate.previousSibling : candidate.nextSibling;
+        }
+        return candidate;
+    },
+
+    _setMessage: function(control, className, message) {
+        var label = ORBEON.xforms.Utils._getControlLabel(control, className);
+        if (label != null) {
+            if (message == "") {
+                ORBEON.util.Dom.addClass(label, "xforms-disabled");
+            } else {
+                ORBEON.util.Dom.removeClass(label, "xforms-disabled");
+                ORBEON.util.Dom.setStringValue(label, message);
+            }
+        }
+    },
+
+    setLabelMessage: function(control, message) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
+            if (control.tagName.toLowerCase() == "input") {
+                // Image
+                control.title = message;
+            } else {
+                // Button and link
+                ORBEON.util.Dom.setStringValue(control, message);
+            }
+        } else {
+            ORBEON.xforms.Utils._setMessage(control, "xforms-label", message);
+        }
+    },
+
+    getHelpMessage: function(control) {
+        var helpElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-help");
+        return ORBEON.util.Dom.getStringValue(helpElement);
+    },
+
+    setHelpMessage: function(control, message) {
+        ORBEON.xforms.Utils._setMessage(control, "xforms-help", message);
+    },
+
+    setValid: function(control, isValid) {
+        var alertElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-alert");
+        if (alertElement != null) { // Some controls don't have validity indicator
+            if (isValid) {
+                ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-active");
+                ORBEON.util.Dom.addClass(alertElement, "xforms-alert-inactive");
+            } else {
+                ORBEON.util.Dom.removeClass(alertElement, "xforms-alert-inactive");
+                ORBEON.util.Dom.addClass(alertElement, "xforms-alert-active");
+            }
+        }
+    },
+
+    getAlertMessage: function(control) {
+        var alertElement = ORBEON.xforms.Utils._getControlLabel(control, "xforms-alert");
+        return ORBEON.util.Dom.getStringValue(alertElement);
+    },
+
+    setAlertMessage: function(control, message) {
+        ORBEON.xforms.Utils._setMessage(control, "xforms-alert", message);
+    },
+
+    setHintMessage: function(control, message) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
+                || ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+            control.title = message;
+        } else {
+            ORBEON.xforms.Utils._setMessage(control, "xforms-hint", message);
+        }
     }
-}();
+};
+
+ORBEON.xforms.Events = {
+
+    /**
+     * Look for a hint label that follows the control
+     */
+    _findHint: function(control) {
+        var hintLabel = control;
+        while (true) {
+            hintLabel = hintLabel.nextSibling;
+            // No, we can't found a hint label
+            if (hintLabel == null) return null;
+            // Yes, we found the hint label
+            if (ORBEON.util.Dom.isElement(hintLabel)
+                    && (ORBEON.util.Dom.hasClass(hintLabel, "xforms-hint")
+                        || ORBEON.util.Dom.hasClass(hintLabel, "xforms-hint-active"))
+                    && hintLabel.htmlFor == control.id)
+                return hintLabel;
+        }
+    },
+
+    /**
+     * Look for the first parent control which is an XForms control
+     */
+    _findParentXFormsControl: function(element) {
+        while (true) {
+            if (!element) return null; // No more parent, stop search
+            if (element.className != null) {
+                if (ORBEON.util.Dom.hasClass(element, "xforms-control")
+                        || ORBEON.util.Dom.hasClass(element, "xforms-help")
+                        || ORBEON.util.Dom.hasClass(element, "xforms-alert")) {
+                    // We found our XForms element
+                    return element;
+                }
+            }
+            // Go to parent and continue search
+            element = element.parentNode;
+        }
+    },
+
+    focus: function(event) {
+        if (!document.xformsMaskFocusEvents) {
+            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            if (target != null) {
+                // Send focus events
+                if (document.xformsPreviousDOMFocusOut) {
+                    if (document.xformsPreviousDOMFocusOut != target) {
+                        var events = new Array();
+                        events.push(xformsCreateEventArray
+                            (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
+                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                        xformsFireEvents(events, true);
+                    }
+                    document.xformsPreviousDOMFocusOut = null;
+                } else {
+                    if (document.xformsPreviousDOMFocusIn != target) {
+                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
+                    }
+                }
+
+                // Activate hint if we found one
+                var hintLabel = ORBEON.xforms.Events._findHint(target);
+                if (hintLabel != null) {
+                    ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint");
+                    ORBEON.util.Dom.addClass(hintLabel, "xforms-hint-active");
+                }
+            }
+            document.xformsPreviousDOMFocusIn = target;
+        } else {
+            document.xformsMaskFocusEvents = false;
+        }
+    },
+
+    blur: function(event) {
+        if (!document.xformsMaskFocusEvents) {
+            var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+            if (target != null) {
+                // This is an event for an XForms control
+                document.xformsPreviousDOMFocusOut = target;
+                // HTML area does not throw value change event, so we throw it on blur
+                if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
+                        && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
+                    var editorInstance = FCKeditorAPI.GetInstance(target.name);
+                    target.value = editorInstance.GetXHTML();
+                    xformsValueChanged(target, null);
+                }
+
+                // De-activate hint if we found one
+                var hintLabel = ORBEON.xforms.Events._findHint(target);
+                if (hintLabel != null) {
+                    ORBEON.util.Dom.addClass(hintLabel, "xforms-hint");
+                    ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint-active");
+                }
+            }
+        }
+    },
+
+    change: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+            xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
+                ORBEON.xforms.Utils.getCurrentValue(target))], false);
+        }
+    },
+
+    keypress: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+            // Input field and auto-complete: trigger DOMActive when when enter is pressed
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-open")
+                    || ORBEON.util.Dom.hasClass(target, "xforms-input")) {
+                if (event.keyCode == 10 || event.keyCode == 13) {
+                    // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
+                    YAHOO.util.Event.preventDefault(event);
+                    // Send a value change and DOM activate
+                    var events = [
+                        xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
+                            ORBEON.xforms.Utils.getCurrentValue(target)),
+                        xformsCreateEventArray(target, "DOMActivate", null)
+                    ];
+                    xformsFireEvents(events, false);
+                }
+            }
+        }
+    },
+
+    keydown: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+            // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
+            ORBEON.xforms.Globals.changedIdsRequest[target.id] = true;
+            // Store initial value of control
+            if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
+                ORBEON.xforms.Globals.serverValue[target.id] = target.value;
+        }
+    },
+
+    keyup: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+            // Incremental control: treat keypress as a value change event
+            if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
+                xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
+                    ORBEON.xforms.Utils.getCurrentValue(target))], true);
+            }
+
+            // Resize wide text area
+            if (ORBEON.util.Dom.hasClass(target, "wide-textarea")) {
+                var lineNumber = target.value.split("\n").length;
+                if (lineNumber < 5) lineNumber = 5;
+                target.style.height = 3 + lineNumber * 1.1 + "em";
+            }
+        }
+    },
+
+    mousedown: function(event) {
+        // Close open menus of there are any
+        if (ORBEON.xforms.Globals.overlayManager != null)
+            ORBEON.xforms.Globals.overlayManager.hideAll();
+    },
+
+
+    _showToolTip: function(event, label, type, message) {
+        // Initialize tooltip library
+        if (!ORBEON.xforms.Globals.tooltipLibraryInitialized) {
+            ORBEON.xforms.Globals.tooltipLibraryInitialized = true;
+            tt_init();
+        }
+
+        // Figure out if we need to create a div
+        // When there is an existing div, check if it has the same message
+        var needToCreateDiv;
+        var tooltipDivId = label.htmlFor + "-" + type;
+        var existingDiv = document.getElementById(tooltipDivId);
+        if (existingDiv != null) {
+            if (existingDiv.message == message) {
+                needToCreateDiv = false;
+            } else {
+                needToCreateDiv = true;
+                existingDiv.parentNode.removeChild(existingDiv);
+            }
+        } else {
+            needToCreateDiv = true;
+        }
+
+        // Create new div when necessary
+        if (needToCreateDiv) {
+            var divHTML = tt_Htm(this, tooltipDivId, message);
+            var container = document.createElement("DIV");
+            container.innerHTML = divHTML;
+            var newDiv = container.firstChild;
+            newDiv.message = message;
+            document.body.appendChild(newDiv);
+        }
+
+        // Show the help div
+        tt_Show(event, tooltipDivId, false, 0, false, false,
+            ttOffsetX, ttOffsetY, false, false, ttTemp);
+    },
+
+    mouseover: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+
+            if (ORBEON.util.Dom.hasClass(target, "xforms-help")) {
+                // Show help tool-tip
+                var control = document.getElementById(target.htmlFor);
+                ORBEON.xforms.Events._showToolTip(event, target, "xforms-help", ORBEON.xforms.Utils.getHelpMessage(control));
+            } else if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
+                var control = document.getElementById(target.htmlFor);
+                var message = ORBEON.xforms.Utils.getAlertMessage(control);
+                if (message != "") {
+                    // Show alert tool-tip
+                    ORBEON.xforms.Events._showToolTip(event, target, "xforms-alert", ORBEON.xforms.Utils.getAlertMessage(control));
+                }
+            }
+        }
+    },
+
+    mouseout: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+
+            // Hide help
+            if (ORBEON.util.Dom.hasClass(target, "xforms-help")
+                    || ORBEON.util.Dom.hasClass(target, "xforms-alert-active"))
+                tt_Hide();
+        }
+    },
+
+    click: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+
+            // Click on output
+            if (ORBEON.util.Dom.hasClass(target, "xforms-output")) {
+                xformsFireEvents([xformsCreateEventArray(target, "DOMFocusIn", null)], false);
+            }
+
+            // Click on trigger
+            if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))
+                    && !ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
+                YAHOO.util.Event.preventDefault(event);
+                if (!window.addEventListener && target.tagName.toLowerCase() == "a") {
+                    // If this is an anchor and we didn't get a chance to register the focus event, send the focus event here
+                    ORBEON.xforms.Events.focus(event);
+                }
+                xformsFireEvents([xformsCreateEventArray(target, "DOMActivate", null)], false);
+            }
+
+            // Click on checkbox or radio button
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-full")
+                    || ORBEON.util.Dom.hasClass(target, "xforms-select-full")) {
+                xformsFireEvents(new Array(xformsCreateEventArray
+                        (target, "xxforms-value-change-with-focus-change",
+                                ORBEON.xforms.Utils.getCurrentValue(target), null)), false);
+            }
+
+            // Click on calendar inside input field
+            if (ORBEON.util.Dom.hasClass(target, "xforms-input")) {
+
+                // Initialize calendar when needed
+                var inputField = target.childNodes[1];
+                var showCalendar = target.childNodes[2];
+                if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")) {
+
+                    // Setup calendar library if not done already
+                    if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {
+                        Calendar.setup({
+                            inputField     :    inputField.id,
+                            ifFormat       :    "%Y-%m-%d",
+                            showsTime      :    false,
+                            button         :    target.id,
+                            singleClick    :    true,
+                            step           :    1,
+                            onUpdate       :    xformsCalendarUpdate,
+                            electric       :    true
+                        });
+                        // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
+                        ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
+                        target.onclick = null;
+                        ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
+                    }
+
+                    // Event can be received on calendar picker span, or on the containing span
+                    ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
+                }
+            }
+        }
+    },
+
+    sliderValueChange: function (offset) {
+        // Notify server that value changed
+        var rangeControl = document.getElementById(this.id);
+        rangeControl.value = offset / 200;
+        xformsValueChanged(rangeControl, null);
+    }
+};
+
+ORBEON.xforms.Init = {
+
+    _addToTree: function (tree, nameValueArray, treeNode, firstPosition) {
+        for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
+            // Extract information from the first 3 position in the array
+            var childArray = nameValueArray[arrayIndex];
+            var name = childArray[0];
+            var value = childArray[1];
+            var selected = childArray[2];
+            // Create node and add to tree
+            var nodeInformation = { label: name, value: value };
+            var childNode;
+            if (tree.xformsAllowMultipleSelection) {
+                childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
+                childNode.onCheckClick = xformsSelectTreeSelect;
+                if (selected) childNode.check();
+            } else {
+                nodeInformation.href = "javascript:xformsSelect1TreeSelect('"
+                        + tree.id + "', '"
+                        + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
+                        + "')";
+                childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
+            }
+            ORBEON.xforms.Init._addToTree(tree, childArray, childNode, 3);
+            // Add this value to the list if selected
+            if (selected) {
+                if (tree.value != "") tree.value += " ";
+                tree.value += value;
+            }
+        }
+    },
+
+    /**
+     * Create a sub-menu attached to the given menu item. In the nameValueArray we
+     * ignore the first 3 items that correspond to the menuItem.
+     */
+    _addToMenuItem: function (menu, nameValueArray, menuItem) {
+        // Assign id to menu item
+        if (menuItem.element.id == "")
+            YAHOO.util.Dom.generateId(menuItem.element);
+        // Handle click on menu item
+        menuItem.clickEvent.subscribe(xformsOnMenuBarItemClick,
+            {"menu": menu, "value": nameValueArray[1]});
+
+        // Create sub-menu if necessary
+        if (nameValueArray.length > 3) {
+            // Show submenu when mouse over menu item
+            menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver);
+            menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut);
+            // Create submenu
+            var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
+            //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
+            //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
+            // Add menu items to submenu
+            for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
+                // Extract information from the first 3 position in the array
+                var childArray = nameValueArray[arrayIndex];
+                var name = childArray[0];
+                var value = childArray[1];
+                var selected = childArray[2];
+                // Create menu item and add to menu
+                var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
+                subMenu.addItem(subMenuItem);
+                // Add sub-sub menu
+                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem)
+            }
+            menuItem.cfg.setProperty("submenu", subMenu);
+            ORBEON.xforms.Globals.overlayManager.register(subMenu);
+        }
+    },
+
+    document: function() {
+
+        // Register events in capture phase for W3C-compliant browsers
+        if (window.addEventListener) {
+            window.addEventListener("focus", ORBEON.xforms.Events.focus, true);
+            window.addEventListener("blur", ORBEON.xforms.Events.blur, true);
+            window.addEventListener("change", ORBEON.xforms.Events.change, true);
+        } else {
+            // Register event handlers on form elements
+            for (var i = 0; i < document.forms.length; i++) {
+                var form = document.forms[i];
+                if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
+                    for (var j = 0; j < form.elements.length; j++) {
+                        var element = form.elements[j];
+                        YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
+                        YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
+                        YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
+                    }
+                }
+            }
+        }
+
+        // Register events that bubble on document for all browsers
+        YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
+        YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
+        YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
+        YAHOO.util.Event.addListener(document, "mousedown", ORBEON.xforms.Events.mousedown);
+        YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
+        YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
+        YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
+
+        // Initialize logging
+        if (typeof window.console == "undefined") {
+            window.console = { log: xformsLog }
+        }
+
+        // Initialize XForms server URL
+        var scripts = document.getElementsByTagName("script");
+        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+            var script = scripts[scriptIndex];
+            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
+            if (scriptSrc != null) {
+                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT);
+                if (startPathToJavaScript != -1) {
+                    BASE_URL = ORBEON.util.Dom.getAttribute(script, "src").substr(0, startPathToJavaScript);
+                    XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+                    break;
+                }
+            }
+        }
+
+        // Initialize attributes on document
+        document.xformsRequestInProgress = false;
+        document.xformsEvents = new Array();
+        document.xformsExecuteNextRequestInQueue = 0;
+        document.xformsHTMLAreaNames = new Array();
+        document.xformsRepeatTreeChildToParent = new Array();
+        document.xformsRepeatIndexes = new Array();
+
+        // Initialize attributes on form
+        for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
+            var form = document.forms[formIndex];
+            // Store in the form if this is an XForms form for faster lookup when iterating on form later on
+            form.xformsIsXFormsForm = ORBEON.util.Dom.hasClass(form, "xforms-form");
+            // If this is an XForms form, procede with initialization
+            if (form.xformsIsXFormsForm) {
+
+                // Initialize elements as necessary
+                ORBEON.xforms.Init.elementsUnder(form);
+
+                // Initialize loading and error indicator
+                form.xformsLoadingLoading = null;
+                form.xformsLoadingError = null;
+                form.xformsLoadingNone = null;
+
+                var xformsLoadingCount = 0;
+                for (var formChildIndex = 0; formChildIndex < form.childNodes.length; formChildIndex++) {
+                    if (xformsLoadingCount == 3) break;
+                    var formChild = form.childNodes[formChildIndex];
+                    if (formChild.className == "xforms-loading-loading") {
+                        form.xformsLoadingLoading = formChild;
+                        xformsLoadingCount++;
+                        continue;
+                    }
+                    if (formChild.className == "xforms-loading-error") {
+                        form.xformsLoadingError = formChild;
+                        xformsLoadingCount++;
+                        continue;
+                    }
+                    if (formChild.className == "xforms-loading-none") {
+                        form.xformsLoadingNone = formChild;
+                        xformsLoadingCount++;
+                        continue;
+                    }
+                }
+
+                var elements = form.elements;
+                var xformsRepeatTree;
+                var xformsRepeatIndices;
+                for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+                    var element = elements[elementIndex];
+                    if (element.name.indexOf("$static-state") != -1) {
+                        form.xformsStaticState = element;
+                    } else if (element.name.indexOf("$dynamic-state") != -1) {
+                        form.xformsDynamicState = element;
+                    } else if (element.name.indexOf("$client-state") != -1) {
+                        form.xformsClientState = element;
+                        if (element.value == "")
+                            xformsStoreInClientState(form, "ajax-dynamic-state", form.xformsDynamicState.value);
+                    } else if (element.name.indexOf("$repeat-tree") != -1) {
+                        xformsRepeatTree = element;
+                    } else if (element.name.indexOf("$repeat-indexes") != -1) {
+                        xformsRepeatIndices = element;
+                        // This is the last input field we are interested in
+                        break;
+                    }
+                }
+
+                // Parse and store initial repeat hierarchy
+                var repeatTreeString = xformsRepeatTree.value;
+                var repeatTree = repeatTreeString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
+                    var repeatInfo = repeatTree[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
+                    document.xformsRepeatTreeChildToParent[id] = parent;
+                }
+                document.xformsRepeatTreeParentToAllChildren = new Array();
+                for (var child in document.xformsRepeatTreeChildToParent) {
+                    var parent = document.xformsRepeatTreeChildToParent[child];
+                    while (parent != null) {
+                        if (!document.xformsRepeatTreeParentToAllChildren[parent])
+                            document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
+                        document.xformsRepeatTreeParentToAllChildren[parent].push(child);
+                        parent = document.xformsRepeatTreeChildToParent[parent];
+                    }
+                }
+
+                // Parse and store initial repeat indexes
+                var repeatIndexesString = xformsRepeatIndices.value;
+                var repeatIndexes = repeatIndexesString.split(",");
+                for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
+                    var repeatInfo = repeatIndexes[repeatIndex].split(" ");
+                    var id = repeatInfo[0];
+                    var index = repeatInfo[repeatInfo.length - 1];
+                    document.xformsRepeatIndexes[id] = index;
+                }
+
+                // Ask server to resend events if this is not the first time load is called
+                if (xformsGetFromClientState(form, "load-did-run") == null) {
+                    xformsStoreInClientState(form, "load-did-run", "true");
+                } else {
+                    xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
+                }
+            }
+        }
+    },
+
+    elementsUnder: function(root) {
+
+        var textareas = YAHOO.util.Dom.getElementsByClassName("wide-textarea", "textarea", root);
+        for (var i = 0; i < textareas.length; i++) {
+            var textarea = textareas[i];
+            var lineNumber = textarea.value.split("\n").length;
+            if (lineNumber < 5) lineNumber = 5;
+            textarea.style.height = 3 + lineNumber * 1.1 + "em";
+        }
+
+        var autoCompletes = YAHOO.util.Dom.getElementsByClassName("xforms-select1-open", "span", root);
+        for (var i = 0; i < autoCompletes.length; i++) {
+            var autoComplete = autoCompletes[i];
+            var textfield = autoComplete.childNodes[0];
+            var select = autoComplete.childNodes[1];
+            // Get list of possible values from the select
+            var values = new Array();
+            for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
+                values.push(select.options[optionIndex].value);
+            // Initialize auto-complete input
+            var noFilter = ORBEON.util.Dom.hasClass(autoComplete, "xforms-select1-open-autocomplete-nofilter");
+            actb(textfield, values, noFilter);
+        }
+
+        var ranges = YAHOO.util.Dom.getElementsByClassName("controls-range", "div", root);
+        for (var i = 0; i < ranges.length; i++) {
+            var range = ranges[i];
+            var background = range.childNodes[0];
+            if (!ORBEON.util.Dom.isElement(background))
+                background = range.childNodes[1];
+            background.tabIndex = 0;
+            background.previousValue = 0; // Will be modified once the initial value can be set
+            var thumbDiv = background.firstChild;
+            if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
+            thumbDiv.id = background.id + XFORMS_SEPARATOR_1 + "thumb";
+            var slider = YAHOO.widget.Slider.getHorizSlider(background.id, thumbDiv.id, 0, 200);
+            slider.onChange = ORBEON.xforms.Events.sliderValueChange;
+        }
+
+        var treesSelect1 = YAHOO.util.Dom.getElementsByClassName("xforms-select1-tree", "div", root);
+        var treesSelect = YAHOO.util.Dom.getElementsByClassName("xforms-select-tree", "div", root);
+        var trees = treesSelect1;
+        for (var i = 0; i < treesSelect.length; i++)
+            trees.push(treesSelect[i]);
+        for (var i = 0; i < trees.length; i++) {
+            var tree = trees[i];
+
+            // Save in the control if it allows multiple selection
+            tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select-tree");
+            // Parse data put by the server in the div
+            var treeArray = eval(ORBEON.util.Dom.getStringValue(tree));
+            ORBEON.util.Dom.setStringValue(tree, "");
+            tree.value = "";
+            // Create, populate, and show the tree
+            tree.xformsTree = new YAHOO.widget.TreeView(tree.id);
+            var treeRoot = tree.xformsTree.getRoot();
+            ORBEON.xforms.Init._addToTree(tree, treeArray, treeRoot, 0);
+            // Make selected nodes visible'
+            var values = tree.xformsAllowMultipleSelection ? tree.value.split(" ") : [ tree.value ];
+            for (nodeIndex in tree.xformsTree._nodes) {
+                var node = tree.xformsTree._nodes[nodeIndex];
+                if (xformsArrayContains(values, node.data.value)) {
+                    var nodeParent = node.parent;
+                    while (nodeParent != null) {
+                        nodeParent.expand();
+                        nodeParent = nodeParent.parent;
+                    }
+                }
+            }
+            // Save value in tree
+            tree.previousValue = tree.value;
+            tree.xformsTree.draw();
+        }
+
+        var menus = YAHOO.util.Dom.getElementsByClassName("xforms-select1-menu", "div", root);
+        for (var i = 0; i < menus.length; i++) {
+            var menu = menus[i];
+            // Find the divs for the tree and for the values inside the control
+            var treeDiv;
+            var valuesDiv;
+            for (var j = 0; j < menu.childNodes.length; j++) {
+                var childNode =  menu.childNodes[j];
+                if (childNode.nodeType == ELEMENT_TYPE) {
+                    if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
+                        treeDiv = childNode;
+                    } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
+                        valuesDiv = childNode;
+                    }
+                }
+            }
+
+            // Create overlay manager, if we don't have one already
+            if (ORBEON.xforms.Globals.overlayManager == null)
+                ORBEON.xforms.Globals.overlayManager = new YAHOO.widget.OverlayManager();
+            // Extract menu hierarchy from HTML
+            var menuArray = eval(ORBEON.util.Dom.getStringValue(valuesDiv));
+            ORBEON.util.Dom.setStringValue(valuesDiv, "");
+            // Initialize tree
+            YAHOO.util.Dom.generateId(treeDiv);
+            menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
+            for (var topLevelIndex = 0; topLevelIndex < menu.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
+                var topLevelArray = menuArray[topLevelIndex];
+                var menuItem = menu.xformsMenu.getItem(topLevelIndex);
+                ORBEON.xforms.Init._addToMenuItem(menu, topLevelArray, menuItem);
+            }
+            menu.xformsMenu.render();
+            menu.xformsMenu.show();
+        }
+
+        var htmlAreas = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", "textarea", root);
+        for (var i = 0; i < htmlAreas.length; i++) {
+            var htmlArea = htmlAreas[i];
+            document.xformsHTMLAreaNames = new Array();
+            var fckEditor = new FCKeditor(htmlArea.name);
+            if (!xformsArrayContains(document.xformsHTMLAreaNames, htmlArea.name))
+                document.xformsHTMLAreaNames.push(htmlArea.name);
+            fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
+            fckEditor.ToolbarSet = "OPS";
+            fckEditor.ReplaceTextarea() ;
+        }
+    }
+};
 
 function xformsIsDefined(thing) {
     return typeof thing != "undefined";
@@ -217,28 +1038,6 @@ function xformsArrayContains(array, element) {
         if (array[i] == element)
             return true;
     return false;
-}
-
-/**
- * Retuns a string with contains all the concatenation of the child text node under the element.
- */
-function xformsStringValue(element) {
-    var result = "";
-    for (var i = 0; i < element.childNodes.length; i++) {
-        var child = element.childNodes[i];
-        if (child.nodeType == TEXT_TYPE)
-            result += child.nodeValue;
-    }
-    return result;
-}
-
-function xformsReplaceNodeText(node, text) {
-    // Remove content
-    while (node.childNodes.length > 0)
-        node.removeChild(node.firstChild);
-    // Add specified text
-    var textNode = node.ownerDocument.createTextNode(text);
-    node.appendChild(textNode);
 }
 
 function xformsStringReplaceWorker(node, placeholderRegExp, replacement) {
@@ -468,7 +1267,6 @@ function xformsValueChanged(target, other) {
     var isUploadControl = ORBEON.util.Dom.hasClass(target, "xforms-upload");
     if (valueChanged && !isUploadControl) {
         target.previousValue = target.value;
-        document.xformsChangedIdsRequest.push(target.id);
         var events = new Array(xformsCreateEventArray
                 (target, "xxforms-value-change-with-focus-change", target.value, other));
         var incremental = other == null
@@ -478,80 +1276,14 @@ function xformsValueChanged(target, other) {
     return valueChanged;
 }
 
-/**
- * Function called by browser when value changes (either after changing focus or keyboard input).
- * This is an event handler we register with the browser on "change" and "keyup" (for incremental)
- * events.
- *
- * Here we intercept the user pressing cancel, we handle the case of the input which is in a span
- * and call xformsValueChanged().
- */
-function xformsHandleValueChange(event) {
-    var target = getEventTarget(event);
-    if (event.keyCode == 27) {
-        // We don't want to propagate the event and maybe cancel a request
-        return xformsPreventDefault(event);
-    } else {
-        // If this is an input field, set value on parent and send event on parent element
-        if (ORBEON.util.Dom.hasClass(target.parentNode, "xforms-input")
-                || ORBEON.util.Dom.hasClass(target.parentNode, "xforms-select1-open")) {
-            target.parentNode.valueSetByXForms++;
-            target.parentNode.value = target.value;
-            target = target.parentNode;
-            target.lastKeyCode = event.keyCode;
-        }
-        xformsValueChanged(target, null);
-        return true;
-    }
-}
-
 // Handle click on trigger
 function xformsHandleClick(event) {
     var target = getEventTarget(event);
     // Make sure the user really clicked on the trigger, instead of pressing enter in a nearby control
-    if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))
+    if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-trigger"))
             && !ORBEON.util.Dom.hasClass(target, "xforms-readonly"))
         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMActivate", null)), false);
     return false;
-}
-
-function xformsComputeSelectValue(select) {
-    var options = select.options;
-    var selectValue = "";
-    for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-        var option = options[optionIndex];
-        if (option.selected) {
-            if (selectValue != "") selectValue += " ";
-            selectValue += option.value;
-        }
-    }
-    select.selectValue = selectValue;
-}
-
-function xformsHandleSelectChanged(event) {
-    var select = getEventTarget(event);
-    xformsComputeSelectValue(select);
-    xformsFireEvents(new Array(xformsCreateEventArray(select, "xxforms-value-change-with-focus-change",
-        select.selectValue)), false);
-}
-
-function xformsSliderValueChange(offset) {
-    // Notify server that value changed
-    var rangeControl = document.getElementById(this.id);
-    rangeControl.value = offset / 200;
-    xformsValueChanged(rangeControl, null);
-}
-
-function xformsHandleOutputClick(event) {
-    var events = new Array();
-    var target = getEventTarget(event);
-    // In the case of appearance="xxforms:html, target can be an element inside
-    // the xforms-output, not the xforms-output itself. So we are here looking for the
-    // xforms-parent when necessary.
-    while (!ORBEON.util.Dom.hasClass(target, "xforms-output"))
-        target = target.parentNode;
-    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-    xformsFireEvents(events, false);
 }
 
 function xformsHandleFirefoxValueChange(property, oldvalue, newvalue) {
@@ -580,96 +1312,10 @@ function xformsHandleIEValueChange(event) {
     }
 }
 
-function xformsHandleInputKeyPress(event) {
-    if (event.keyCode == 10 || event.keyCode == 13) {
-        var span = getEventTarget(event).parentNode;
-        xformsHandleValueChange(event);
-        xformsFireEvents(new Array(xformsCreateEventArray(span, "DOMActivate", null)), false);
-        // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
-        return xformsPreventDefault(event);
-    }
-}
-
 function xformsHandleAutoCompleteMouseChange(input) {
     input.parentNode.lastKeyCode = -1;
     input.parentNode.value = input.value;
     xformsValueChanged(input.parentNode, null);
-}
-
-/**
- * Focus out events are only handled when we have receive a focus in event.
- * Here we just save the event which will be handled when we receive a focus
- * in from the browser.
- */
-function xformsHandleBlur(event) {
-    if (!document.xformsMaskFocusEvents) {
-        var target = getEventTarget(event);
-
-        // Look for first parent-or-self that is an XForms control
-        while (true) {
-            if (!target) break; // No more parent, stop search
-            if (target.className != null) {
-                if (ORBEON.util.Dom.hasClass(target, "xforms-control")) {
-                    // We found our XForms element target
-                    break;
-                }
-            }
-            // Go to parent and continue search
-            target = target.parentNode;
-        }
-
-        if (target != null) {
-            // This is an event for an XForms control
-            document.xformsPreviousDOMFocusOut = target;
-            // HTML area does not throw value change event, so we throw it on blur
-            if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
-                    && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
-                var editorInstance = FCKeditorAPI.GetInstance(target.name);
-                target.value = editorInstance.GetXHTML();
-                xformsValueChanged(target, null);
-            }
-        }
-    }
-}
-
-function xformsHandleFocus(event) {
-    if (!document.xformsMaskFocusEvents) {
-        var target = getEventTarget(event);
-        while (target && (target.className == null || !ORBEON.util.Dom.hasClass(target, "xforms-control")))
-            target = target.parentNode;
-
-        // Send focus events
-        if (target != null) {
-            if (document.xformsPreviousDOMFocusOut) {
-                if (document.xformsPreviousDOMFocusOut != target) {
-                    var events = new Array();
-                    events.push(xformsCreateEventArray
-                        (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
-                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                    xformsFireEvents(events, false);
-                }
-                document.xformsPreviousDOMFocusOut = null;
-            } else {
-                if (document.xformsPreviousDOMFocusIn != target) {
-                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), false);
-                }
-            }
-        }
-        document.xformsPreviousDOMFocusIn = target;
-    } else {
-        document.xformsMaskFocusEvents = false;
-    }
-}
-
-/**
- * Register listener on focus in and out events
- */
-function xformsRegisterForFocusBlurEvents(control) {
-    if (!control.focusBlurEventListenerRegistered) {
-        control.focusBlurEventListenerRegistered = true;
-        YAHOO.util.Event.addListener(control, "blur", xformsHandleBlur);
-        YAHOO.util.Event.addListener(control, "focus", xformsHandleFocus);
-    }
 }
 
 /**
@@ -710,7 +1356,7 @@ function getEventTarget(event) {
     } else {
         // Case of normal HTML DOM events
         event = event ? event : window.event;
-        var target = event.srcElement ? event.srcElement : event.currentTarget;
+        var target = event.srcElement ? event.srcElement : event.target;
         if (target.xformsElement) {
             // HTML area on Gecko: event target is the document, return the textarea
             return target.xformsElement;
@@ -721,43 +1367,6 @@ function getEventTarget(event) {
             return target;
         }
     }
-}
-
-function xformsInitCheckesRadiosComputeSpanValue(span) {
-    var inputs = span.getElementsByTagName("input");
-    var spanValue = "";
-    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-        var input = inputs[inputIndex];
-        if (input.checked) {
-            if (spanValue != "") spanValue += " ";
-            spanValue += input.value;
-        }
-    }
-    span.value = spanValue;
-}
-
-function xformsInitCheckesRadios(control) {
-    function inputSelected(event) {
-        var checkbox = getEventTarget(event);
-        var span = checkbox;
-        while (true) {
-            if (ORBEON.util.Dom.hasClass(span, "xforms-select-full")
-                    || ORBEON.util.Dom.hasClass(span, "xforms-select1-full"))
-                break;
-            span = span.parentNode;
-        }
-        xformsInitCheckesRadiosComputeSpanValue(span);
-        xformsFireEvents(new Array(xformsCreateEventArray
-                (span, "xxforms-value-change-with-focus-change", span.value, null)), false);
-    }
-
-    // Register event listener on every checkbox
-    var inputs = control.getElementsByTagName("input");
-    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
-        YAHOO.util.Event.addListener(inputs[inputIndex], "click", inputSelected);
-
-    // Compute the checkes value for the first time
-    xformsInitCheckesRadiosComputeSpanValue(control);
 }
 
 function xformsHtmlEditorChange(editorInstance) {
@@ -822,16 +1431,16 @@ function xformsOnMenuBarItemMouseOut(eventType, arguments) {
     }
 }
 
-function xformsOnMenuBarItemClick(eventTyoe, arguments, userObject) {
-    var control = userObject["control"];
+function xformsOnMenuBarItemClick(eventType, arguments, userObject) {
+    var menu = userObject["menu"];
     var value = userObject["value"];
-    control.value = value;
-    document.xformsOverlayManager.hideAll();
-    xformsValueChanged(control);
+    menu.value = value;
+    ORBEON.xforms.Globals.overlayManager.hideAll();
+    xformsValueChanged(menu);
 }
 
 function xformsOnDocumentMouseDown(p_oEvent) {
-    document.xformsOverlayManager.hideAll();
+    ORBEON.xforms.Globals.overlayManager.hideAll();
 }
 
 /**
@@ -845,550 +1454,11 @@ function FCKeditor_OnComplete(editorInstance) {
     if (ORBEON.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
         editorInstance.Events.AttachEvent("OnSelectionChange", xformsHtmlEditorChange);
     // Register focus/blur events for Gecko
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", xformsHandleFocus);
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "blur", xformsHandleBlur);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focus", ORBEON.xforms.Events.focus);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "blur", ORBEON.xforms.Events.blur);
     // Register focus/blur events for IE
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusin", xformsHandleFocus);
-    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusout", xformsHandleBlur);
-}
-
-function xformsAddToTree(nameValueArray, treeNode, firstPosition) {
-    for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
-        // Extract information from the first 3 position in the array
-        var childArray = nameValueArray[arrayIndex];
-        var name = childArray[0];
-        var value = childArray[1];
-        var selected = childArray[2];
-        // Create node and add to tree
-        var nodeInformation = { label: name, value: value };
-        var childNode;
-        if (control.xformsAllowMultipleSelection) {
-            childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
-            childNode.onCheckClick = xformsSelectTreeSelect;
-            if (selected) childNode.check();
-        } else {
-            nodeInformation.href = "javascript:xformsSelect1TreeSelect('"
-                    + control.id + "', '"
-                    + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
-                    + "')";
-            childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
-        }
-        xformsAddToTree(childArray, childNode, 3);
-        // Add this value to the list if selected
-        if (selected) {
-            if (control.value != "") control.value += " ";
-            control.value += value;
-        }
-    }
-}
-
-/**
- * Create a sub-menu attached to the given menu item. In the nameValueArray we
- * ignore the first 3 items that correspond to the menuItem.
- */
-function xformsAddToMenuItem(nameValueArray, menuItem) {
-    // Assign id to menu item
-    if (menuItem.element.id == "")
-        YAHOO.util.Dom.generateId(menuItem.element);
-    // Handle click on menu item
-    menuItem.clickEvent.subscribe(xformsOnMenuBarItemClick,
-        {"control": control, "value": nameValueArray[1]});
-
-    // Create sub-menu if necessary
-    if (nameValueArray.length > 3) {
-        // Show submenu when mouse over menu item
-        menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver);
-        menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut);
-        // Create submenu
-        var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
-        //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
-        //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
-        // Add menu items to submenu
-        for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
-            // Extract information from the first 3 position in the array
-            var childArray = nameValueArray[arrayIndex];
-            var name = childArray[0];
-            var value = childArray[1];
-            var selected = childArray[2];
-            // Create menu item and add to menu
-            var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
-            subMenu.addItem(subMenuItem);
-            // Add sub-sub menu
-            xformsAddToMenuItem(childArray, subMenuItem)
-        }
-        menuItem.cfg.setProperty("submenu", subMenu);
-        document.xformsOverlayManager.register(subMenu);
-    }
-}
-
-/**
- * Initializes attributes on the document object:
- *
- *     Array[]         xformsEvents
- *     Div             xformsLoadingLoading
- *     Div             xformsLoadingError
- *     Div             xformsLoadingNone
- *     Input           xformsStaticState
- *     Input           xformsDynamicState
- *     Form            xformsRequestForm
- *     boolean         xformsRequestInProgress
- *     XMLHttpRequest  xformsXMLHttpRequest
- *     Array           xformsChangedIdsRequest        Ids of controls changed while request is processed by server
- *     Array[id]->id   xformsRepeatTreeChildToParent  Returns the direct parent for each repeat id (or null if no parent)
- *     Array[id]->#    xformsRepeatIndexes            Current index for each repeat id
- */
-function xformsInitializeControlsUnder(root) {
-
-    // Gather all potential form controls
-    var interestingTagNames = new Array("span", "button", "textarea", "input", "label", "a", "select", "td", "table", "div");
-    var formsControls = new Array();
-    for (var tagIndex = 0; tagIndex < interestingTagNames.length; tagIndex++) {
-        var elements = root.getElementsByTagName(interestingTagNames[tagIndex]);
-        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++)
-            formsControls.push(elements[elementIndex]);
-        if (root.tagName.toLowerCase() == interestingTagNames[tagIndex])
-            formsControls.push(root);
-    }
-
-    var xformsElementCount = 0;
-    // Go through potential form controls, add style, and register listeners
-    for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
-
-        var control = formsControls[controlIndex];
-
-        // Check that this is an XForms control. Otherwise continue.
-        var classes = control.className.split(" ");
-        var isXFormsElement = false;
-        var isXFormsAlert = false;
-        var isIncremental = false;
-        var isXFormsCheckboxRadio = false;
-        var isXFormsComboboxList = false;
-        var isXFormsAutoComplete = false;
-        var isXFormsTriggerOrSubmit = false;
-        var isXFormsOutput = false;
-        var isXFormsInput = false;
-        var isXFormsDate = false;
-        var isWidget = false;
-        var isXFormsRange = false;
-        var isXFormsTree = false;
-        var isXFormsMenu = false;
-        var isXFormsMediatypeTextHTML = false;
-        var isXFormsTextarea = false;
-        var isXFormsNoInitElement = false;
-        for (var classIndex = 0; classIndex < classes.length; classIndex++) {
-            var className = classes[classIndex];
-            if (className.indexOf("xforms-") == 0)
-                isXFormsElement = true;
-            if (className.indexOf("xforms-alert") == 0)
-                isXFormsAlert = true;
-            if (className == "xforms-incremental")
-                isIncremental = true;
-            if (className == "xforms-range-background")
-                isXFormsRange = true;
-            if (className == "xforms-select1-tree" || className == "xforms-select-tree")
-                isXFormsTree = true;
-            if (className == "xforms-select1-menu")
-                isXFormsMenu = true;
-            if (className == "xforms-select-full" || className == "xforms-select1-full")
-                isXFormsCheckboxRadio = true;
-            if (className == "xforms-select-compact" || className == "xforms-select1-minimal" || className == "xforms-select1-compact")
-                isXFormsComboboxList = true;
-            if (className == "xforms-trigger" || className == "xforms-submit")
-                isXFormsTriggerOrSubmit = true;
-            if (className == "xforms-output")
-                isXFormsOutput = true;
-            if (className == "xforms-input")
-                isXFormsInput = true;
-            if (className == "xforms-select1-open")
-                isXFormsAutoComplete = true;
-            if (className == "xforms-select1-open-input")
-                isXFormsNoInitElement = true;
-            if (className == "xforms-select1-open-select")
-                isXFormsNoInitElement = true;
-            if (className == "xforms-mediatype-text-html")
-                isXFormsMediatypeTextHTML = true;
-            if (className == "xforms-textarea")
-                isXFormsTextarea = true;
-            if (className == "xforms-static")
-                isXFormsNoInitElement = true;
-            if (className.indexOf("widget-") != -1)
-                isWidget = true;
-        }
-
-        if (isWidget && !isXFormsElement) {
-            // For widget: just add style
-            xformsUpdateStyle(control);
-        }
-
-        if (isXFormsElement && !isXFormsNoInitElement) {
-            xformsElementCount++;
-
-            // For elements that correspond to XForms controls
-            if (ORBEON.util.Dom.hasClass(control, "xforms-control")) {
-
-                // Set initial values for disabled, readonly, required, and valid
-                control.isRelevant = !ORBEON.util.Dom.hasClass(control, "xforms-disabled");
-                control.isReadonly = ORBEON.util.Dom.hasClass(control, "xforms-readonly");
-                control.isRequired = ORBEON.util.Dom.hasClass(control, "xforms-required");
-                control.isValid = !ORBEON.util.Dom.hasClass(control, "xforms-invalid");
-
-                // Initialize control.xformsForm
-                if (typeof control.form == "undefined") {
-                    // There is a span around the control go through parents until we find the form element
-                    var candidateForm = control.parentNode;
-                    while (candidateForm.tagName.toLowerCase() != "form")
-                        candidateForm = candidateForm.parentNode;
-                    control.xformsForm = candidateForm;
-                } else {
-                    // We have directly a form control
-                    control.xformsForm = control.form;
-                }
-
-                // Register focus/blur events
-                if (isXFormsCheckboxRadio) {
-                    var inputs = control.getElementsByTagName("input");
-                    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                        var input = inputs[inputIndex];
-                        xformsRegisterForFocusBlurEvents(input);
-                    }
-                } else if (isXFormsInput) {
-                    var textfield = control.childNodes[1];
-                    xformsRegisterForFocusBlurEvents(textfield);
-                } else if (isXFormsAutoComplete) {
-                    var textfield = control.childNodes[0];
-                    xformsRegisterForFocusBlurEvents(textfield);
-                } else {
-                    xformsRegisterForFocusBlurEvents(control);
-                }
-            }
-
-            if (isXFormsTriggerOrSubmit) {
-                // Handle click on trigger
-                control.onclick = xformsHandleClick;
-            } else if (isXFormsAutoComplete) {
-                var textfield = control.childNodes[0];
-                var select = control.childNodes[1];
-                // Get list of possible values from the select
-                var values = new Array();
-                for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
-                    values.push(select.options[optionIndex].value);
-                // Initialize auto-complete input
-                var noFilter = ORBEON.util.Dom.hasClass(control, "xforms-select1-open-autocomplete-nofilter");
-                actb(textfield, values, noFilter);
-                // Initialize span
-                control.value = textfield.value;
-                control.previousValue = textfield.value;
-                control.valueSetByXForms = 0;
-                // Intercept end-user pressing enter in text field
-                YAHOO.util.Event.addListener(textfield, "keypress", xformsHandleInputKeyPress);
-                // Intercept incremental modifications
-                if (isIncremental)
-                    YAHOO.util.Event.addListener(textfield, "keyup", xformsHandleValueChange);
-            } else if (isXFormsCheckboxRadio) {
-                xformsInitCheckesRadios(control);
-            } else if (isXFormsComboboxList) {
-                // Register event listener on select
-                YAHOO.util.Event.addListener(control, "change", xformsHandleSelectChanged);
-                // Compute the checkes value for the first time
-                xformsComputeSelectValue(control);
-            } else if (isXFormsRange) {
-                control.tabIndex = 0;
-                control.previousValue = 0; // Will be modified once the initial value can be set
-                var thumbDiv = control.firstChild;
-                if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
-                thumbDiv.id = control.id + XFORMS_SEPARATOR_1 + "thumb";
-                var slider = YAHOO.widget.Slider.getHorizSlider(control.id, thumbDiv.id, 0, 200);
-                slider.onChange = xformsSliderValueChange;
-            } else if (isXFormsTree) {
-
-                // Save in the control if it allows multiple selection
-                control.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(control, "xforms-select-tree");
-                // Parse data put by the server in the div
-                var treeArray = eval(xformsStringValue(control));
-                xformsReplaceNodeText(control, "");
-                control.value = "";
-                // Create, populate, and show the tree
-                control.xformsTree = new YAHOO.widget.TreeView(control.id);
-                var treeRoot = control.xformsTree.getRoot();
-                xformsAddToTree(treeArray, treeRoot, 0);
-                // Make selected nodes visible'
-                var values = control.xformsAllowMultipleSelection ? control.value.split(" ") : [ control.value ];
-                for (nodeIndex in control.xformsTree._nodes) {
-                    var node = control.xformsTree._nodes[nodeIndex];
-                    if (xformsArrayContains(values, node.data.value)) {
-                        var nodeParent = node.parent;
-                        while (nodeParent != null) {
-                            nodeParent.expand();
-                            nodeParent = nodeParent.parent;
-                        }
-                    }
-                }
-                // Save value in control
-                control.previousValue = control.value;
-                control.xformsTree.draw();
-            } else if (isXFormsMenu) {
-
-                // Find the divs for the tree and for the values inside the control
-                var treeDiv;
-                var valuesDiv;
-                for (var i = 0; i < control.childNodes.length; i++) {
-                    var childNode =  control.childNodes[i];
-                    if (childNode.nodeType == ELEMENT_TYPE) {
-                        if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
-                            treeDiv = childNode;
-                        } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
-                            valuesDiv = childNode;
-                        }
-                    }
-                }
-
-                // Create overlay manager, if we don't have one already
-                if (typeof document.xformsOverlayManager == "undefined")
-                    document.xformsOverlayManager = new YAHOO.widget.OverlayManager();
-                // Extract menu hierarchy from HTML
-                var menuArray = eval(xformsStringValue(valuesDiv));
-                xformsReplaceNodeText(valuesDiv, "");
-                // Initialize tree
-                YAHOO.util.Dom.generateId(treeDiv);
-                control.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
-                for (var topLevelIndex = 0; topLevelIndex < control.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
-                    var topLevelArray = menuArray[topLevelIndex];
-                    var menuItem = control.xformsMenu.getItem(topLevelIndex);
-                    xformsAddToMenuItem(topLevelArray, menuItem);
-                }
-                // Hide menu when user click on document
-                if (!document.xformsMenuDocumentMouseOutInitialized) {
-                    document.xformsMenuDocumentMouseOutInitialized = true;
-                    YAHOO.util.Event.addListener(document, "mousedown", xformsOnDocumentMouseDown);
-                }
-
-                control.xformsMenu.render();
-                control.xformsMenu.show();
-
-            } else if (isXFormsOutput) {
-                YAHOO.util.Event.addListener(control, "click", xformsHandleOutputClick);
-            } else if (isXFormsInput) {
-                control.value = control.childNodes[1].value;
-                var textfield = control.childNodes[1];
-                control.previousValue = textfield.value;
-                control.valueSetByXForms = 0;
-                // Intercept custom JavaScript code changing control value
-                if (control.watch) {
-                    // Firefox implements a watch() method
-                    control.watch("value", xformsHandleFirefoxValueChange);
-                } else {
-                    // IE throws a propertychange event
-                    YAHOO.util.Event.addListener(control, "propertychange", xformsHandleIEValueChange);
-                }
-                // Intercept end-user pressing enter in text field
-                YAHOO.util.Event.addListener(textfield, "keypress", xformsHandleInputKeyPress);
-                // Intercept incremental modifications
-                if (isIncremental)
-                    YAHOO.util.Event.addListener(textfield, "keyup", xformsHandleValueChange);
-            } else if (control.tagName == "SPAN" || control.tagName == "DIV" || control.tagName == "LABEL") {
-                // Don't add listeners on spans
-            } else {
-                // Handle value change and incremental modification
-                control.previousValue = control.value;
-                control.userModications = false;
-                // Register listeners
-                YAHOO.util.Event.addListener(control, "change", xformsHandleValueChange);
-                if (isIncremental) {
-                    YAHOO.util.Event.addListener(control, "keyup", xformsHandleValueChange);
-                }
-            }
-
-            // Alert label next to the control
-            if (isXFormsAlert) {
-                var isActive = ORBEON.util.Dom.hasClass(control, "xforms-alert-active");
-
-                // Store reference in control element to this alert element
-                var alertFor = document.getElementById(control.htmlFor);
-                alertFor.alertElement = control;
-                alertFor.isValid = !isActive;
-                alertFor.alertMessage = xformsStringValue(control);
-
-                // If active error, display messages and increment error counter
-                if (isActive) {
-                    var xformsMessages = document.getElementById("xforms-messages");
-                    if (xformsMessages != null)
-                        xformsMessages.invalidCount++;
-                }
-            }
-
-            // Initialize HTML area
-            if (isXFormsMediatypeTextHTML && isXFormsTextarea) {
-                // We dont' register a listener here but our FCKeditor_OnComplete() will be called automatically
-                // when an FCK editor is initialized
-                document.xformsHTMLAreaNames = new Array();
-                var fckEditor = new FCKeditor(control.name);
-                if (!xformsArrayContains(document.xformsHTMLAreaNames, control.name))
-                    document.xformsHTMLAreaNames.push(control.name);
-                fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
-                fckEditor.ToolbarSet = "OPS";
-                fckEditor.ReplaceTextarea() ;
-            }
-
-            // Add style to element
-            xformsUpdateStyle(control);
-        }
-    }
-}
-
-function xformsPageLoaded() {
-
-    xformsLogTime("Start xformsPageLoaded");
-
-    // See if there is an XForms form
-    var allForms = document.forms;
-    var foundXFormsForm = false;
-    for (var formIndex = 0; formIndex < allForms.length; formIndex++) {
-        if (ORBEON.util.Dom.hasClass(allForms[formIndex], "xforms-form")) {
-            foundXFormsForm = true;
-            break;
-        }
-    }
-    if (foundXFormsForm) {
-
-        // Initialize logging
-        if (typeof window.console == "undefined") {
-            window.console = { log: xformsLog }
-        }
-
-        // Initialize tooltip library
-        tt_init();
-
-        // Initialize XForms server URL
-        var scripts = document.getElementsByTagName("script");
-        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-            var script = scripts[scriptIndex];
-            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-            if (scriptSrc != null) {
-                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT);
-                if (startPathToJavaScript != -1) {
-                    BASE_URL = ORBEON.util.Dom.getAttribute(script, "src").substr(0, startPathToJavaScript);
-                    XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-                    break;
-                }
-            }
-        }
-
-        // Initialize attributes on document
-        document.xformsRequestInProgress = false;
-        document.xformsEvents = new Array();
-        document.xformsExecuteNextRequestInQueue = 0;
-        document.xformsChangedIdsRequest = new Array();
-        document.xformsHTMLAreaNames = new Array();
-        document.xformsRepeatTreeChildToParent = new Array();
-        document.xformsRepeatIndexes = new Array();
-
-        // Initialize summary section that displays alert messages
-        var xformsMessages = document.getElementById("xforms-messages");
-        if (xformsMessages) {
-            xformsMessages.invalidCount = 0;
-            var labels = xformsMessages.getElementsByTagName("LABEL");
-            for (var labelIndex = 0; labelIndex < labels.length; labelIndex++) {
-                var label = labels[labelIndex];
-                var xformsControl = document.getElementById(label.htmlFor);
-                xformsControl.xformsMessageLabel = label;
-            }
-        }
-
-        // Initialize controls
-        xformsInitializeControlsUnder(document.body);
-
-        // Initialize attributes on form
-        var forms = document.getElementsByTagName("form");
-        for (var formIndex = 0; formIndex < forms.length; formIndex++) {
-            var form = forms[formIndex];
-            // Store in the form if this is an XForms form for faster lookup when iterating on form later on
-            form.xformsIsXFormsForm = ORBEON.util.Dom.hasClass(form, "xforms-form");
-            // If this is an XForms form, procede with initialization
-            if (form.xformsIsXFormsForm) {
-
-                // Used when the form is the target event
-                form.xformsForm = form;
-
-                // Initialize loading and error indicator
-                form.xformsLoadingLoading = null;
-                form.xformsLoadingError = null;
-                form.xformsLoadingNone = null;
-                var spans = form.getElementsByTagName("span");
-                for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
-                    if (spans[spanIndex].className == "xforms-loading-loading")
-                        form.xformsLoadingLoading = spans[spanIndex];
-                    if (spans[spanIndex].className == "xforms-loading-error")
-                        form.xformsLoadingError = spans[spanIndex];
-                    if (spans[spanIndex].className == "xforms-loading-none")
-                        form.xformsLoadingNone = spans[spanIndex];
-                }
-
-                var elements = form.elements;
-                var xformsRepeatTree;
-                var xformsRepeatIndices;
-                for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-                    var element = elements[elementIndex];
-                    if (element.name) {
-                        // Store pointer to elements with state
-                        if (element.name.indexOf("$static-state") != -1) {
-                            form.xformsStaticState = element;
-                        } else if (element.name.indexOf("$dynamic-state") != -1) {
-                            form.xformsDynamicState = element;
-                        } else if (element.name.indexOf("$client-state") != -1) {
-                            form.xformsClientState = element;
-                            if (element.value == "")
-                                xformsStoreInClientState(form, "ajax-dynamic-state", form.xformsDynamicState.value);
-                        }
-                        // Store points to elements with repeat hierarchy
-                        else if (element.name.indexOf("$repeat-tree") != -1) {
-                            xformsRepeatTree = element;
-                        } else if (element.name.indexOf("$repeat-indexes") != -1) {
-                            xformsRepeatIndices = element;
-                        }
-                    }
-                }
-
-                // Parse and store initial repeat hierarchy
-                var repeatTreeString = xformsRepeatTree.value;
-                var repeatTree = repeatTreeString.split(",");
-                for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
-                    var repeatInfo = repeatTree[repeatIndex].split(" ");
-                    var id = repeatInfo[0];
-                    var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
-                    document.xformsRepeatTreeChildToParent[id] = parent;
-                }
-                document.xformsRepeatTreeParentToAllChildren = new Array();
-                for (var child in document.xformsRepeatTreeChildToParent) {
-                    var parent = document.xformsRepeatTreeChildToParent[child];
-                    while (parent != null) {
-                        if (!document.xformsRepeatTreeParentToAllChildren[parent])
-                            document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
-                        document.xformsRepeatTreeParentToAllChildren[parent].push(child);
-                        parent = document.xformsRepeatTreeChildToParent[parent];
-                    }
-                }
-
-                // Parse and store initial repeat indexes
-                var repeatIndexesString = xformsRepeatIndices.value;
-                var repeatIndexes = repeatIndexesString.split(",");
-                for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
-                    var repeatInfo = repeatIndexes[repeatIndex].split(" ");
-                    var id = repeatInfo[0];
-                    var index = repeatInfo[repeatInfo.length - 1];
-                    document.xformsRepeatIndexes[id] = index;
-                }
-
-                // Ask server to resend events if this is not the first time load is called
-                if (xformsGetFromClientState(form, "load-did-run") == null) {
-                    xformsStoreInClientState(form, "load-did-run", "true");
-                } else {
-                    xformsFireEvents(new Array(xformsCreateEventArray(form, "xxforms-all-events-required", null, null)), false);
-                }
-            }
-        }
-    }
-
-    xformsLogTime("End xformsPageLoaded");
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusin", ORBEON.xforms.Events.focus);
+    YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusout", ORBEON.xforms.Events.blur);
 }
 
 function xformsGetLocalName(element) {
@@ -1472,7 +1542,7 @@ function xformsHandleResponse(o) {
 
             // Update instances
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state")
-                newDynamicState = xformsStringValue(responseRoot.childNodes[i]);
+                newDynamicState = ORBEON.util.Dom.getStringValue(responseRoot.childNodes[i]);
 
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
                 var actionElement = responseRoot.childNodes[i];
@@ -1565,8 +1635,7 @@ function xformsHandleResponse(o) {
                                         // Initialize style on copied node
                                         for (var templateNodeIndex in templateNodes) {
                                             templateNode = templateNodes[templateNodeIndex];
-                                            if (templateNode.nodeType == ELEMENT_TYPE)
-                                                xformsInitializeControlsUnder(templateNode);
+                                            // Maybe we need to do some initialization for advanced controls here
                                         }
 
                                         break;
@@ -1741,9 +1810,6 @@ function xformsHandleResponse(o) {
                                                 xformsGetInputUnderNode(templateClone).checked = true;
                                         }
                                     }
-
-                                    // Compute value, of checkboxes/radio buttons and register listeners
-                                    xformsInitCheckesRadios(documentElement);
                                 }
                             }
                         }
@@ -1766,7 +1832,7 @@ function xformsHandleResponse(o) {
                                     // Update control value
                                     case "control": {
                                         var controlElement = controlValuesElement.childNodes[j];
-                                        var newControlValue = xformsStringValue(controlElement);
+                                        var newControlValue = ORBEON.util.Dom.getStringValue(controlElement);
                                         var controlId = ORBEON.util.Dom.getAttribute(controlElement, "id");
                                         var relevant = ORBEON.util.Dom.getAttribute(controlElement, "relevant");
                                         var readonly = ORBEON.util.Dom.getAttribute(controlElement, "readonly");
@@ -1774,14 +1840,13 @@ function xformsHandleResponse(o) {
                                         var displayValue = ORBEON.util.Dom.getAttribute(controlElement, "display-value");
                                         var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                         var documentElement = document.getElementById(controlId);
-                                        if (documentElement == null)
-                                            throw "Can not find element with id '" + controlId + "' received in <control>";
                                         var documentElementClasses = documentElement.className.split(" ");
 
                                         // Check if this control was modified and we haven't even received the key event yet
                                         // This can happen as the the keyup event is dispatched after the control.value is modified,
                                         // and it is possible to receive a response from the server after the value is modified but
                                         // before the keyup event is dispatched.
+                                        /*
                                         var foundControlModified = false;
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             if (documentElement.childNodes[1].value != documentElement.previousValue)
@@ -1799,18 +1864,10 @@ function xformsHandleResponse(o) {
                                                 && documentElement.previousValue != documentElement.value) {
                                             foundControlModified = true;
                                         }
-                                        // Check if this control has been modified while the event was processed
-                                        if (!foundControlModified) {
-                                            for (var indexId = 0; indexId < document.xformsChangedIdsRequest.length; indexId++) {
-                                                if (document.xformsChangedIdsRequest[indexId] == controlId) {
-                                                    foundControlModified = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                        */
 
                                         // Update value
-                                        if (foundControlModified) {
+                                        if (ORBEON.xforms.Globals.changedIdsRequest[controlId] == true) {
                                             // User has modified the value of this control since we sent our request:
                                             // so don't try to update it
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")
@@ -1850,7 +1907,7 @@ function xformsHandleResponse(o) {
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
                                                 documentElement.firstChild.src = newOutputControlValue;
                                             } else {
-                                                xformsReplaceNodeText(documentElement, newOutputControlValue);
+                                                ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                             }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             // XForms input
@@ -1875,15 +1932,14 @@ function xformsHandleResponse(o) {
 
                                             // Populate values
                                             if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date"))
-                                                xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
+                                                ORBEON.util.Dom.setStringValue(displayField, displayValue == null ? "" : displayValue);
+                                            if (documentElement.value != newControlValue) {
+                                                documentElement.previousValue = newControlValue;
+                                                documentElement.valueSetByXForms++;
+                                                documentElement.value = newControlValue;
+                                            }
                                             if (inputField.value != newControlValue)
                                                 inputField.value = newControlValue;
-                                            // NOTE: We use inputField.value instead of newControlValue, because the control may normalize the value
-                                            if (documentElement.value != inputField.value) {
-                                                documentElement.previousValue = inputField.value;
-                                                documentElement.valueSetByXForms++;
-                                                documentElement.value = inputField.value;
-                                            }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             // HTML area
@@ -1916,62 +1972,104 @@ function xformsHandleResponse(o) {
 
                                         // Store new label message in control attribute
                                         var newLabel = ORBEON.util.Dom.getAttribute(controlElement, "label");
-                                        if (newLabel != null && newLabel != documentElement.labelMessage) {
-                                            documentElement.labelMessage = newLabel;
-                                        }
+                                        if (newLabel != null)
+                                            ORBEON.xforms.Utils.setLabelMessage(documentElement, newLabel);
                                         // Store new hint message in control attribute
                                         var newHint = ORBEON.util.Dom.getAttribute(controlElement, "hint");
-                                        if (newHint != null && newHint != documentElement.hintMessage)
-                                            documentElement.hintMessage = newHint;
+                                        if (newHint != null)
+                                            ORBEON.xforms.Utils.setHintMessage(documentElement, newHint);
                                         // Store new help message in control attribute
                                         var newHelp = ORBEON.util.Dom.getAttribute(controlElement, "help");
-                                        if (newHelp != null && newHelp != documentElement.helpMessage)
-                                            documentElement.helpMessage = newHelp;
+                                        if (newHelp != null)
+                                            ORBEON.xforms.Utils.setHelpMessage(documentElement, newHelp);
                                         // Store new alert message in control attribute
                                         var newAlert = ORBEON.util.Dom.getAttribute(controlElement, "alert");
-                                        if (newAlert != null && newAlert != documentElement.alertMessage)
-                                            documentElement.alertMessage = newAlert;
-                                        // Store validity in element
+                                        if (newAlert != null)
+                                            ORBEON.xforms.Utils.setAlertMessage(documentElement, newAlert);
+                                        // Store validity, label, hint, help in element
                                         var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
                                         if (newValid != null) {
                                             var newIsValid = newValid != "false";
-                                            if (newIsValid != documentElement.isValid) {
-                                                // Show or hide messages section
-                                                var xformsMessages = document.getElementById("xforms-messages");
-                                                if (xformsMessages) {
-                                                    xformsMessages.invalidCount += (newIsValid ? -1 : +1);
-                                                    xformsMessages.style.display = xformsMessages.invalidCount == 0 ? "none" : "";
+                                            ORBEON.xforms.Utils.setValid(documentElement, newIsValid);
+                                        }
+
+                                        // Handle relevance
+                                        if (relevant != null) {
+                                            var isRelevant = relevant == "true";
+                                            if (isRelevant) ORBEON.util.Dom.removeClass(documentElement, "xforms-disabled");
+                                            else ORBEON.util.Dom.addClass(documentElement, "xforms-disabled");
+                                        }
+
+                                        // Handle required
+                                        if (required != null) {
+                                            var isRequired = required == "true";
+                                            if (isRequired) {
+                                                ORBEON.util.Dom.addClass(documentElement, "xforms-required");
+                                                if (documentElement.value == "") {
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-required-empty");
+                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-required-filled");
+                                                } else {
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-required-filled");
+                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-required-empty");
                                                 }
-                                                // Show or hide specific message for this control
-                                                if (documentElement.xformsMessageLabel) {
-                                                    if (newIsValid) {
-                                                        documentElement.xformsMessageLabel.style.display = "none";
-                                                    } else {
-                                                        if (documentElement.alertMessage != "")
-                                                            documentElement.xformsMessageLabel.style.display = "";
-                                                    }
+                                            } else {
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required-filled");
+                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required-empty");
+                                            }
+                                        }
+
+                                        // Handle readonly
+                                        if (readonly != null) {
+                                            function setReadonlyOnFormElement(element, isReadonly) {
+                                                if (isReadonly) {
+                                                    element.setAttribute("disabled", "disabled");
+                                                    ORBEON.util.Dom.addClass(element, "xforms-readonly");
+                                                } else {
+                                                    element.removeAttribute("disabled");
+                                                    ORBEON.util.Dom.removeClass(element, "xforms-readonly");
                                                 }
                                             }
-                                            documentElement.isValid = newIsValid;
-                                        }
-                                        // Update relevant and readonly
-                                        if (relevant)
-                                            documentElement.isRelevant = relevant == "true";
-                                        if (readonly)
-                                            documentElement.isReadonly = readonly == "true";
-                                        if (required)
-                                            documentElement.isRequired = required == "true";
 
-                                        // Update style
-                                        xformsUpdateStyle(documentElement);
-                                        if (documentElement.labelElement)
-                                            xformsUpdateStyle(documentElement.labelElement);
-                                        if (documentElement.hintElement)
-                                            xformsUpdateStyle(documentElement.hintElement);
-                                        if (documentElement.helpElement)
-                                            xformsUpdateStyle(documentElement.helpElement);
-                                        if (documentElement.alertElement)
-                                            xformsUpdateStyle(documentElement.alertElement);
+                                            var isReadonly = readonly == "true";
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                                // XForms input
+
+                                                // Display value
+                                                var displaySpan = documentElement.firstChild;
+                                                while (displaySpan.nodeType != ELEMENT_TYPE) displaySpan = displaySpan.nextSibling;
+                                                if (isReadonly) ORBEON.util.Dom.addClass(displaySpan, "xforms-readonly");
+                                                else ORBEON.util.Dom.removeClass(displaySpan, "xforms-readonly");
+
+                                                // Text field
+                                                var textField = displaySpan.nextSibling;
+                                                while (textField.nodeType != ELEMENT_TYPE) textField = textField.nextSibling;
+                                                if (isReadonly) textField.setAttribute("disabled", "disabled");
+                                                else textField.removeAttribute("disabled");
+
+                                                // Calendar picker
+                                                var showCalendar = textField.nextSibling;
+                                                while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
+                                                if (isReadonly) ORBEON.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
+                                                else ORBEON.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")
+                                                    || ORBEON.util.Dom.hasClass(documentElement, "xforms-group")) {
+                                                // XForms output and group
+                                                if (isReadonly) ORBEON.util.Dom.addClass(documentElement, "xforms-readonly");
+                                                else ORBEON.util.Dom.removeClass(documentElement, "xforms-readonly");
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-full")
+                                                    || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")) {
+                                                // XForms radio buttons
+                                                for (var spanIndex = 0; spanIndex < documentElement.childNodes.length; spanIndex++) {
+                                                    var span = documentElement.childNodes[spanIndex];
+                                                    var input = span.firstChild;
+                                                    setReadonlyOnFormElement(input, isReadonly);
+                                                }
+                                            } else {
+                                                // Other controls
+                                                setReadonlyOnFormElement(documentElement, isReadonly);
+                                            }
+                                        }
 
                                         break;
                                     }
@@ -2014,7 +2112,6 @@ function xformsHandleResponse(o) {
 
                                     var caseBeginId = "xforms-case-begin-" + controlId;
                                     var caseBegin = document.getElementById(caseBeginId);
-                                    if (caseBegin == null) throw "Can not find element with id '" + caseBeginId + "'";
                                     var caseBeginParent = caseBegin.parentNode;
                                     var foundCaseBegin = false;
                                     for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
@@ -2100,8 +2197,6 @@ function xformsHandleResponse(o) {
                                 var newIndex = newRepeatIndexes[repeatId];
                                 if (newIndex != 0) {
                                     var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
-                                    if (newItemDelimiter == null)
-                                        throw "Can not find delimiter for repeatId '" + repeatId + "' index '" + newIndex + "'";
                                     var cursor = newItemDelimiter.nextSibling;
                                     while (cursor.nodeType != ELEMENT_TYPE ||
                                            (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
@@ -2128,7 +2223,7 @@ function xformsHandleResponse(o) {
                         // Display modal message
                         case "message": {
                             var messageElement = actionElement.childNodes[actionIndex];
-                            var message = xformsStringValue(messageElement);
+                            var message = ORBEON.util.Dom.getStringValue(messageElement);
                             if (ORBEON.util.Dom.getAttribute(messageElement, "level") == "modal")
                                 alert(message);
                             break;
@@ -2206,13 +2301,13 @@ function xformsHandleResponse(o) {
         var messageElements = responseXML.getElementsByTagName("message");
         for (var messageIndex = messageElements.length - 1; messageIndex >= 0; messageIndex--) {
             if (messageElements[messageIndex].firstChild != null) {
-                errorMessage += ": " + xformsStringValue(messageElements[messageIndex]);
+                errorMessage += ": " + ORBEON.util.Dom.getStringValue(messageElements[messageIndex]);
                 break;
             }
         }
         // Display error
         var errorContainer = document.xformsRequestForm.xformsLoadingError;
-        xformsReplaceNodeText(errorContainer, errorMessage);
+        ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
         xformsDisplayIndicator("error");
     } else {
         // The server didn't send valid XML
@@ -2220,6 +2315,9 @@ function xformsHandleResponse(o) {
         xformsDisplayIndicator("error");
 
     }
+
+    // Reset changes, as changes are included in this bach of events
+    ORBEON.xforms.Globals.changedIdsRequest = {};
 
     // Go ahead with next request, if any
     document.xformsRequestInProgress = false;
@@ -2239,89 +2337,118 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
             && document.xformsEvents.length > 0
             && (bypassRequestQueue || document.xformsExecuteNextRequestInQueue == 0)) {
 
-        // Save the form for this request
-        document.xformsRequestForm = document.xformsEvents[0][0].xformsForm;
-
-        // Mark this as loading
-        document.xformsRequestInProgress = true;
-        if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
-        else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
-
-        // Build request
-        var requestDocumentString = "";
-        var indent = "    ";
+        // Collapse value change for the same control
         {
-            // Start request
-            requestDocumentString += '<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">\n';
-
-            // Add static state
-            requestDocumentString += indent;
-            requestDocumentString += '<xxforms:static-state>';
-            requestDocumentString += document.xformsRequestForm.xformsStaticState.value;
-            requestDocumentString += '</xxforms:static-state>\n';
-
-            // Add dynamic state (element is just created and will be filled just before we send the request)
-            requestDocumentString += indent;
-            requestDocumentString += '<xxforms:dynamic-state>';
-            requestDocumentString += xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state");
-            requestDocumentString += '</xxforms:dynamic-state>\n';
-
-            // Start action
-            requestDocumentString += indent;
-            requestDocumentString += '<xxforms:action>\n';
-
-            // Add events
-            var handledEvents = [];
-            for (var i = 0; i < document.xformsEvents.length; i++) {
+            var seenControlValue = {};
+            var newEvents = [];
+            for (var eventIndex = document.xformsEvents.length - 1; eventIndex >= 0; eventIndex--) {
                 // Extract information from event array
-                var event = document.xformsEvents[i];
+                var event = document.xformsEvents[eventIndex];
                 var target = event[0];
                 var eventName = event[1];
                 var value = event[2];
-                var other = event[3];
-
-                // Only handle this event if it is for the form we chose
-                if (target.xformsForm == document.xformsRequestForm) {
-                    // Create <xxforms:event> element
-                    requestDocumentString += indent + indent;
-                    requestDocumentString += '<xxforms:event';
-                    requestDocumentString += ' name="' + eventName + '"';
-                    if (target != null)
-                        requestDocumentString += ' source-control-id="' + target.id + '"';
-                    if (other != null)
-                        requestDocumentString += ' other-control-id="' + other.id + '"';
-                    requestDocumentString += '>';
-                    if (value != null) {
-                        // When the range is used we get an int here when the page is first loaded
-                        if (typeof value == "string")
-                            value = value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
-                        requestDocumentString += value;
+                if (eventName == "xxforms-value-change-with-focus-change") {
+                    // Don't send change value if there is already a change value for the same control
+                    if (!seenControlValue[target.id] == true) {
+                        seenControlValue[target.id] = true;
+                        // Don't send change value if the server already knows about the value of this control
+                        if (ORBEON.xforms.Globals.serverValue[target.id] != "undefined"
+                                && ORBEON.xforms.Globals.serverValue[target.id] != value) {
+                            ORBEON.xforms.Globals.serverValue[target.id] = value;
+                            newEvents.unshift(event);
+                        }
                     }
-                    requestDocumentString += '</xxforms:event>\n';
-                    handledEvents.unshift(i);
+                } else {
+                    newEvents.unshift(event);
                 }
             }
-
-            // End action
-            requestDocumentString += indent;
-            requestDocumentString += '</xxforms:action>\n';
-
-            // End request
-            requestDocumentString += '</xxforms:event-request>';
-
-            // Remove events we have handled from event queue
-            for (var i = 0; i < handledEvents.length; i++)
-                document.xformsEvents.splice(handledEvents[i], 1);
-
-            // Reset changes, as changes are included in this bach of events
-            document.xformsChangedIdsRequest = new Array();
+            document.xformsEvents = newEvents;
         }
 
-        var aysncRequestCallback = { success: xformsHandleResponse };
+        // Check again that we have events to send after collapsing
+        if (document.xformsEvents.length > 0) {
 
-        // Send request
-        YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-        YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, aysncRequestCallback, requestDocumentString);
+            // Save the form for this request
+            document.xformsRequestForm = ORBEON.xforms.Utils.getForm(document.xformsEvents[0][0]);
+
+            // Mark this as loading
+            document.xformsRequestInProgress = true;
+            if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
+            else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
+
+            // Build request
+            var requestDocumentString = "";
+            var indent = "    ";
+            {
+                // Start request
+                requestDocumentString += '<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">\n';
+
+                // Add static state
+                requestDocumentString += indent;
+                requestDocumentString += '<xxforms:static-state>';
+                requestDocumentString += document.xformsRequestForm.xformsStaticState.value;
+                requestDocumentString += '</xxforms:static-state>\n';
+
+                // Add dynamic state (element is just created and will be filled just before we send the request)
+                requestDocumentString += indent;
+                requestDocumentString += '<xxforms:dynamic-state>';
+                requestDocumentString += xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state");
+                requestDocumentString += '</xxforms:dynamic-state>\n';
+
+                // Start action
+                requestDocumentString += indent;
+                requestDocumentString += '<xxforms:action>\n';
+
+                // Add events
+                var handledEvents = [];
+                for (var i = 0; i < document.xformsEvents.length; i++) {
+                    // Extract information from event array
+                    var event = document.xformsEvents[i];
+                    var target = event[0];
+                    var eventName = event[1];
+                    var value = event[2];
+                    var other = event[3];
+
+                    // Only handle this event if it is for the form we chose
+                    if (ORBEON.xforms.Utils.getForm(target) == document.xformsRequestForm) {
+                        // Create <xxforms:event> element
+                        requestDocumentString += indent + indent;
+                        requestDocumentString += '<xxforms:event';
+                        requestDocumentString += ' name="' + eventName + '"';
+                        if (target != null)
+                            requestDocumentString += ' source-control-id="' + target.id + '"';
+                        if (other != null)
+                            requestDocumentString += ' other-control-id="' + other.id + '"';
+                        requestDocumentString += '>';
+                        if (value != null) {
+                            // When the range is used we get an int here when the page is first loaded
+                            if (typeof value == "string")
+                                value = value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
+                            requestDocumentString += value;
+                        }
+                        requestDocumentString += '</xxforms:event>\n';
+                        handledEvents.unshift(i);
+                    }
+                }
+
+                // End action
+                requestDocumentString += indent;
+                requestDocumentString += '</xxforms:action>\n';
+
+                // End request
+                requestDocumentString += '</xxforms:event-request>';
+
+                // Remove events we have handled from event queue
+                for (var i = 0; i < handledEvents.length; i++)
+                    document.xformsEvents.splice(handledEvents[i], 1);
+            }
+
+            var aysncRequestCallback = { success: xformsHandleResponse };
+
+            // Send request
+            YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
+            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, aysncRequestCallback, requestDocumentString);
+        }
     }
 }
 
@@ -2329,6 +2456,6 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
 // In case this script is loaded twice, we still want to run the initialization only once
 if (typeof document.xformsPageLoadedListener == "undefined") {
     document.xformsPageLoadedListener = true;
-    YAHOO.util.Event.addListener(window, "load", xformsPageLoaded);
+    YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
 }
 document.xformsTime = new Date().getTime();

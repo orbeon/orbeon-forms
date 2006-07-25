@@ -1844,6 +1844,7 @@ function xformsHandleResponse(o) {
                                                 ORBEON.util.Dom.getAttribute(itemElement, "label"));
                                             xformsStringReplace(templateClone, "$xforms-template-value$",
                                                 ORBEON.util.Dom.getAttribute(itemElement, "value"));
+                                            xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
                                             documentElement.appendChild(templateClone);
                                             // Restore checked state after copy
                                             if (valueToChecked[ORBEON.util.Dom.getAttribute(itemElement, "value")] == true)

@@ -491,6 +491,19 @@ ORBEON.xforms.Events = {
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+
+            // For select1 list, make sure we have exactly one value selected
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-compact")) {
+                if (target.value == "") {
+                    // Stop end-user from deselecting last selected value
+                    target.value = target.options[0].value;
+                } else {
+                    // target.value returns the value of the first selected option
+                    // This unselects other options that might be selected as well
+                    target.value = target.value;
+                }
+            }
+
             // Fire change event
             xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
                 ORBEON.xforms.Controls.getCurrentValue(target))], false);

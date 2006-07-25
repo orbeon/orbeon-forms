@@ -70,35 +70,6 @@
     </xsl:template>
 
     <!-- - - - - - - Form controls - - - - - - -->
-
-    <xsl:template match="xhtml:form[@class = 'xforms-form']">
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-        <!-- Summary section for errors -->
-        <xhtml:table id="xforms-messages">
-            <!-- This section starts hidden if there are not errors the first time the page is displayed -->
-            <xsl:if test="count(.//xhtml:label[starts-with(@class, 'xforms-alert-active')]) = 0">
-                <xsl:attribute name="style">display: none</xsl:attribute>
-            </xsl:if>
-            <xhtml:tr>
-                <xhtml:td style="padding-left: 1em">
-                    <xhtml:img src="/images/error-large.gif" alt="Error"/>
-                </xhtml:td>
-                <xhtml:td style="padding-right: 1em">
-                    <xhtml:p>Please check form for invalid values</xhtml:p>
-                    <xsl:for-each select=".//xhtml:label[starts-with(@class, 'xforms-alert-')]">
-                        <xhtml:label for="{@for}" class="xforms-message">
-                            <xsl:if test="@class = 'xforms-alert-inactive'">
-                                <xsl:attribute name="style">display: none</xsl:attribute>
-                            </xsl:if>
-                            <xsl:value-of select="."/>
-                        </xhtml:label>
-                    </xsl:for-each>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-    </xsl:template>
     
     <xsl:template match="xhtml:textarea">
         <xhtml:textarea wrap="soft">
@@ -139,7 +110,7 @@
     <!-- Legacy XForms error cell styling -->
     <xsl:template match="xhtml:td[@xxforms:error-cell = 'true']" >
         <xhtml:td>
-            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
+            <xhtml:img alt="Error" src="/images/error.gif" style="margin: 5px"/>
         </xhtml:td>
     </xsl:template>
 

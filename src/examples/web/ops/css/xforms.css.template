@@ -233,11 +233,6 @@ a.xforms-readonly {
     color: grey; cursor: default;
 }
 
-#xforms-messages {
-    display: none;
-    background: #fcc;
-}
-
 .xforms-message {
     list-style: disc;
     display: list-item;

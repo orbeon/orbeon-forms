@@ -86,7 +86,7 @@ public class XFormsActionInterpreter {
                 iterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
         }
 
-        final String eventHandlerContainerId = eventHandlerContainer.getId();
+        final String eventHandlerContainerId = eventHandlerContainer.getEffectiveId();
         int iteration = 1;
         while (true) {
             // Check if the conditionAttribute attribute exists and stop if false

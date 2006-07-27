@@ -166,7 +166,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 && (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method));
     }
 
-    public String getId() {
+    public String getEffectiveId() {
         return id;
     }
 
@@ -217,7 +217,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     final String refAttribute = (submissionElement.attributeValue("ref") != null)
                             ? submissionElement.attributeValue("ref") : "/";
                     xformsControls.resetBindingContext();
-                    xformsControls.pushBinding(pipelineContext, refAttribute, null, null, model.getId(), null, submissionElement,
+                    xformsControls.pushBinding(pipelineContext, refAttribute, null, null, model.getEffectiveId(), null, submissionElement,
                             Dom4jUtils.getNamespaceContextNoDefault(submissionElement));
 
                     // Check that we have a current node and that it is pointing to a document or an element

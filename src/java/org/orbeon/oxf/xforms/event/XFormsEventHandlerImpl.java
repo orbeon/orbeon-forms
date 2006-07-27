@@ -82,7 +82,7 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
     }
 
     public void handleEvent(PipelineContext pipelineContext, XFormsEvent event) {
-        containingDocument.runAction(pipelineContext, event.getTargetObject().getId(), eventHandlerContainer, eventHandlerElement);
+        containingDocument.runAction(pipelineContext, event.getTargetObject().getEffectiveId(), eventHandlerContainer, eventHandlerElement);
     }
 
     public String getEventName() {

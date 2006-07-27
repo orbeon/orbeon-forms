@@ -101,8 +101,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             model.setContainingDocument(this);
 
             this.models.add(model);
-            if (model.getId() != null)
-                this.modelsMap.put(model.getId(), model);
+            if (model.getEffectiveId() != null)
+                this.modelsMap.put(model.getEffectiveId(), model);
         }
     }
 
@@ -113,8 +113,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         this.models = Collections.singletonList(xformsModel);
         this.xformsControls = new XFormsControls(this, null, null);
 
-        if (xformsModel.getId() != null)
-            modelsMap.put(xformsModel.getId(), xformsModel);
+        if (xformsModel.getEffectiveId() != null)
+            modelsMap.put(xformsModel.getEffectiveId(), xformsModel);
         xformsModel.setContainingDocument(this);
 
         this.legacyContainerType = externalContext.getRequest().getContainerType();
@@ -237,7 +237,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Check containing document
-        if (id.equals(getId()))
+        if (id.equals(getEffectiveId()))
             return this;
 
         return null;
@@ -534,7 +534,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             {
                 // Set current context to control
                 final XFormsControl valueXFormsControl = (XFormsControl) concreteEvent.getTargetObject();
-                targetControlEffectiveId = valueXFormsControl.getId();
+                targetControlEffectiveId = valueXFormsControl.getEffectiveId();
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
@@ -551,7 +551,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     final XFormsControl otherTargetXFormsControl
                         = (XFormsControl) getObjectById(pipelineContext,
-                                ((XFormsControl) concreteEvent.getOtherTargetObject()).getId());
+                                ((XFormsControl) concreteEvent.getOtherTargetObject()).getEffectiveId());
 
                     // We have a focus change (otherwise, the focus is assumed to remain the same)
                     if (sourceXFormsControl != null)
@@ -650,7 +650,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return null;
     }
 
-    public String getId() {
+    public String getEffectiveId() {
         return CONTAINING_DOCUMENT_PSEUDO_ID;
     }
 
@@ -691,7 +691,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("XForms - dispatching event: " + getEventLogSpaces() + event.getEventName() + " - " + event.getTargetObject().getId() + " - at " + event.getLocationData());
+            XFormsServer.logger.debug("XForms - dispatching event: " + getEventLogSpaces() + event.getEventName() + " - " + event.getTargetObject().getEffectiveId() + " - at " + event.getLocationData());
         }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();

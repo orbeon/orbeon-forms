@@ -50,7 +50,7 @@ public class XFormsCaseHandler extends HandlerBase {
         final XFormsControl switchControl = caseControl.getParent();
 
         final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
-        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getId());
+        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getEffectiveId());
 
         // This case is visible if it is selected or if the switch is read-only and we display read-only as static
         final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId) || isStaticReadonly(switchControl);

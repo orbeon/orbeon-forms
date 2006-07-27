@@ -40,6 +40,8 @@ import java.util.*;
 
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
+ *
+ * TODO: It would be nice to separate the context stack code from here.
  */
 public class XFormsControls {
 
@@ -451,15 +453,15 @@ public class XFormsControls {
                 if (isNewModel) {
                     // Model was switched
 
-                    final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
+                    final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
                     if (currentSingleNodeForModel != null) {
 
                         // Temporarily update the context so that the function library's instance() function works
-                        final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getId());
+                        final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel.getEffectiveId());
                         if (modelBindingContext != null)
                             contextStack.push(new BindingContext(currentBindingContext, newModel, modelBindingContext.getNodeset(), modelBindingContext.getPosition(), null, false, null));
                         else
-                            contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getId()), 1, null, false, null));
+                            contextStack.push(new BindingContext(currentBindingContext, newModel, getCurrentNodeset(newModel.getEffectiveId()), 1, null, false, null));
 
                         // Evaluate new node-set
                         newNodeset = containingDocument.getEvaluator().evaluate(pipelineContext, currentSingleNodeForModel,
@@ -527,7 +529,7 @@ public class XFormsControls {
         for (int i = contextStack.size() - 1; i >= 0; i--) {
             final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
 
-            final String currentModelId = currentBindingContext.getModel().getId();
+            final String currentModelId = currentBindingContext.getModel().getEffectiveId();
             if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
                 return currentBindingContext;
         }
@@ -696,13 +698,13 @@ public class XFormsControls {
         if (switchXFormsControl == null)
             throw new OXFException("No SwitchControlInfo found for case id '" + selectedCaseId + "'.");
 
-        final String currentSelectedCaseId = (String) currentControlsState.getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getId());
+        final String currentSelectedCaseId = (String) currentControlsState.getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getEffectiveId());
         if (!selectedCaseId.equals(currentSelectedCaseId)) {
             // A new selection occurred on this switch
 
             // "This action adjusts all selected attributes on the affected cases to reflect the
             // new state, and then performs the following:"
-            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getId(), selectedCaseId);
+            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
             containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) currentControlsState.getIdToControl().get(currentSelectedCaseId)));
@@ -727,7 +729,7 @@ public class XFormsControls {
 
         // Update currently selected case id
         if (visible) {
-            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControl.getId(), caseId);
+            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControl.getEffectiveId(), caseId);
         }
     }
 
@@ -778,7 +780,7 @@ public class XFormsControls {
                 if (controlName.equals("case")) {
                     if (!(currentControlsContainer.getName().equals("switch")))
                         throw new OXFException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.");
-                    final String switchId = currentControlsContainer.getId();
+                    final String switchId = currentControlsContainer.getEffectiveId();
 
                     if (switchIdToSelectedCaseIdMap.get(switchId) == null) {
                         // If case is not already selected for this switch and there is a select attribute, set it
@@ -863,7 +865,7 @@ public class XFormsControls {
                         // No case was selected, select first case id
                         final List children = currentControlsContainer.getChildren();
                         if (children != null && children.size() > 0)
-                            switchIdToSelectedCaseIdMap.put(effectiveControlId, ((XFormsControl) children.get(0)).getId());
+                            switchIdToSelectedCaseIdMap.put(effectiveControlId, ((XFormsControl) children.get(0)).getEffectiveId());
                     }
                 }
 
@@ -1164,24 +1166,24 @@ public class XFormsControls {
     /**
      * Visit all the current ControlInfo.
      */
-    public void visitAllControlInfo(ControlInfoVisitorListener controlInfoVisitorListener) {
-        handleControlInfo(controlInfoVisitorListener, currentControlsState.getChildren());
+    public void visitAllControlInfo(XFormsControlVisitorListener xformsControlVisitorListener) {
+        handleControlInfo(xformsControlVisitorListener, currentControlsState.getChildren());
     }
 
     /**
      * Visit all the children of the given ControlInfo.
      */
-    public void visitAllControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, XFormsControl currentXFormsControl) {
-        handleControlInfo(controlInfoVisitorListener, currentXFormsControl.getChildren());
+    public void visitAllControlInfo(XFormsControlVisitorListener xformsControlVisitorListener, XFormsControl currentXFormsControl) {
+        handleControlInfo(xformsControlVisitorListener, currentXFormsControl.getChildren());
     }
 
-    private void handleControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, List children) {
+    private void handleControlInfo(XFormsControlVisitorListener xformsControlVisitorListener, List children) {
         if (children != null && children.size() > 0) {
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl XFormsControl = (XFormsControl) i.next();
-                controlInfoVisitorListener.startVisitControl(XFormsControl);
-                handleControlInfo(controlInfoVisitorListener, XFormsControl.getChildren());
-                controlInfoVisitorListener.endVisitControl(XFormsControl);
+                xformsControlVisitorListener.startVisitControl(XFormsControl);
+                handleControlInfo(xformsControlVisitorListener, XFormsControl.getChildren());
+                xformsControlVisitorListener.endVisitControl(XFormsControl);
             }
         }
     }
@@ -1361,9 +1363,9 @@ public class XFormsControls {
         public void endRepeatIteration(int iteration);
     }
 
-    public static interface ControlInfoVisitorListener {
-        public void startVisitControl(XFormsControl XFormsControl);
-        public void endVisitControl(XFormsControl XFormsControl);
+    public static interface XFormsControlVisitorListener {
+        public void startVisitControl(XFormsControl xformsControl);
+        public void endVisitControl(XFormsControl xformsControl);
     }
 
     /**
@@ -1585,17 +1587,17 @@ public class XFormsControls {
          * Visit all the ControlInfo elements by following the current repeat indexes and setting
          * current bindings.
          */
-        public void visitXFormsControlFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, ControlInfoVisitorListener controlInfoVisitorListener) {
+        public void visitXFormsControlFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, XFormsControlVisitorListener xformsControlVisitorListener) {
             xformsControls.resetBindingContext();
-            visitControlInfoFollowRepeats(pipelineContext, xformsControls, this.children, controlInfoVisitorListener);
+            visitControlInfoFollowRepeats(pipelineContext, xformsControls, this.children, xformsControlVisitorListener);
         }
 
-        private void visitControlInfoFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, List children, ControlInfoVisitorListener controlInfoVisitorListener) {
+        private void visitControlInfoFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, List children, XFormsControlVisitorListener xformsControlVisitorListener) {
             for (Iterator i = children.iterator(); i.hasNext();) {
                 final XFormsControl currentXFormsControl = (XFormsControl) i.next();
 
                 xformsControls.pushBinding(pipelineContext, currentXFormsControl);
-                controlInfoVisitorListener.startVisitControl(currentXFormsControl);
+                xformsControlVisitorListener.startVisitControl(currentXFormsControl);
                 {
                     if (currentXFormsControl instanceof XFormsRepeatControl) {
                         final XFormsRepeatControl currentRepeatControlInfo = (XFormsRepeatControl) currentXFormsControl;
@@ -1605,16 +1607,16 @@ public class XFormsControls {
                         if (index > 0) {
                             final List newChildren = currentXFormsControl.getChildren();
                             if (newChildren != null && newChildren.size() > 0)
-                                visitControlInfoFollowRepeats(pipelineContext, xformsControls, Collections.singletonList(newChildren.get(index - 1)), controlInfoVisitorListener);
+                                visitControlInfoFollowRepeats(pipelineContext, xformsControls, Collections.singletonList(newChildren.get(index - 1)), xformsControlVisitorListener);
                         }
 
                     } else {
                         final List newChildren = currentXFormsControl.getChildren();
                         if (newChildren != null)
-                            visitControlInfoFollowRepeats(pipelineContext, xformsControls, newChildren, controlInfoVisitorListener);
+                            visitControlInfoFollowRepeats(pipelineContext, xformsControls, newChildren, xformsControlVisitorListener);
                     }
                 }
-                controlInfoVisitorListener.endVisitControl(currentXFormsControl);
+                xformsControlVisitorListener.endVisitControl(currentXFormsControl);
                 xformsControls.popBinding();
             }
         }
@@ -1633,7 +1635,7 @@ public class XFormsControls {
                 final String originalControlId = currentXFormsControl.getOriginalId();
 
                 if (controlId.equals(originalControlId)) {
-                    return currentXFormsControl.getId();
+                    return currentXFormsControl.getEffectiveId();
                 } else if (currentXFormsControl instanceof XFormsRepeatControl) {
                     final XFormsRepeatControl currentRepeatControlInfo = (XFormsRepeatControl) currentXFormsControl;
                     final String repeatId = currentRepeatControlInfo.getRepeatId();

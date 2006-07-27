@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 public class RepeatIterationControl extends XFormsControl {
     private int iteration;
     public RepeatIterationControl(XFormsContainingDocument containingDocument, XFormsControl parent, int iteration) {
-        super(containingDocument, parent, null, "xxforms-repeat-iteration", parent.getId());
+        super(containingDocument, parent, null, "xxforms-repeat-iteration", parent.getEffectiveId());
         this.iteration = iteration;
     }
 

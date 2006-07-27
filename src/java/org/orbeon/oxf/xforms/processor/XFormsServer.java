@@ -532,7 +532,7 @@ public class XFormsServer extends ProcessorImpl {
                     instancesElement.add((currentInstance).getInstanceDocument().getRootElement().createCopy());
                     // Log instance if needed
                     if (logger.isDebugEnabled()) {
-                        logger.debug("XForms - resulting instance: model id='" + currentModel.getId() +  "', instance id= '" + currentInstance.getId() + "'\n"
+                        logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
                                 + Dom4jUtils.domToString(currentInstance.getInstanceDocument()));
                     }
                 }
@@ -568,7 +568,7 @@ public class XFormsServer extends ProcessorImpl {
                 final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
                 if (activeSubmission != null) {
                     final Element eventElement = dynamicStateElement.addElement("event");
-                    eventElement.addAttribute("source-control-id", activeSubmission.getId());
+                    eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
                     eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
                     requireClientSubmission[0] = true;
                 }
@@ -620,13 +620,13 @@ public class XFormsServer extends ProcessorImpl {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
                 // Output diffs between controlInfo1 and controlInfo2
-                final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(XFormsControlInfo2.getId()) != null;
+                final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(XFormsControlInfo2.getEffectiveId()) != null;
                 if (!XFormsControlInfo2.equals(XFormsControlInfo1) || isValueChangeControl) { // don't send anything if nothing has changed; but we force a change for controls whose values changed in the request
 
                     attributesImpl.clear();
 
                     // Control id
-                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsControlInfo2.getId());
+                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsControlInfo2.getEffectiveId());
 
                     // Control children values
                     if (!(XFormsControlInfo2 instanceof RepeatIterationControl)) {
@@ -754,13 +754,13 @@ public class XFormsServer extends ProcessorImpl {
                     if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
                         final Object items = xformsSelect1Control1.getItemset();
                         if (items != null)
-                            itemsetsFull1.put(xformsSelect1Control1.getId(), items);
+                            itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                     }
 
                     if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
                         final Object items = xformsSelect1Control2.getItemset();
                         if (items != null)
-                            itemsetsFull2.put(xformsSelect1Control2.getId(), items);
+                            itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
                     }
                 }
             }
@@ -800,7 +800,7 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (size2 < size1) {
                         // Size has shrunk
 
-                        final String repeatControlId = XFormsControlInfo2.getId();
+                        final String repeatControlId = XFormsControlInfo2.getEffectiveId();
                         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
                         final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
                         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
@@ -851,7 +851,7 @@ public class XFormsServer extends ProcessorImpl {
 
     private static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int idSuffix) {
 
-        final String repeatControlId = repeatControlInfo.getId();
+        final String repeatControlId = repeatControlInfo.getEffectiveId();
         final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
         final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
@@ -946,9 +946,9 @@ public class XFormsServer extends ProcessorImpl {
                     for (Iterator j = children.iterator(); j.hasNext();) {
                         final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
+                        if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
                             final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                            divElement.addAttribute("id", caseXFormsControl.getId());
+                            divElement.addAttribute("id", caseXFormsControl.getEffectiveId());
                             divElement.addAttribute("visibility", "hidden");
                         }
                     }
@@ -979,8 +979,8 @@ public class XFormsServer extends ProcessorImpl {
                     for (Iterator j = children.iterator(); j.hasNext();) {
                         final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getId(), "visibility", "hidden"});
+                        if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
                         }
                     }
                 }

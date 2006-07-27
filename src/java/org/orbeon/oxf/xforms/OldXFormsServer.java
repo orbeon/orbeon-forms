@@ -232,7 +232,7 @@ public class OldXFormsServer extends ProcessorImpl {
                                     instancesElement.add((currentInstance).getInstanceDocument().getRootElement().createCopy());
                                     // Log instance if needed
                                     if (logger.isDebugEnabled()) {
-                                        logger.debug("XForms - resulting instance: model id='" + currentModel.getId() +  "', instance id= '" + currentInstance.getId() + "'\n"
+                                        logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
                                                 + Dom4jUtils.domToString(currentInstance.getInstanceDocument()));
                                     }
                                 }
@@ -268,7 +268,7 @@ public class OldXFormsServer extends ProcessorImpl {
                                 final XFormsModelSubmission activeSubmission = containingDocument.getActiveSubmission();
                                 if (activeSubmission != null) {
                                     final Element eventElement = dynamicStateElement.addElement("event");
-                                    eventElement.addAttribute("source-control-id", activeSubmission.getId());
+                                    eventElement.addAttribute("source-control-id", activeSubmission.getEffectiveId());
                                     eventElement.addAttribute("name", XFormsEvents.XXFORMS_SUBMIT);
                                     requireClientSubmission = true;
                                 }
@@ -543,9 +543,9 @@ public class OldXFormsServer extends ProcessorImpl {
                     for (Iterator j = children.iterator(); j.hasNext();) {
                         final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
+                        if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
                             final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                            divElement.addAttribute("id", caseXFormsControl.getId());
+                            divElement.addAttribute("id", caseXFormsControl.getEffectiveId());
                             divElement.addAttribute("visibility", "hidden");
                         }
                     }
@@ -576,8 +576,8 @@ public class OldXFormsServer extends ProcessorImpl {
                     for (Iterator j = children.iterator(); j.hasNext();) {
                         final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseXFormsControl.getId().equals(selectedCaseId)) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getId(), "visibility", "hidden"});
+                        if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
                         }
                     }
                 }

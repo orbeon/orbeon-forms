@@ -43,8 +43,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private Element controlElement;
 
     private String originalId;
+    private String appearance;
 
-    private String id;
+    private String effectiveId;
     private String label;
     private String help;
     private String hint;
@@ -73,7 +74,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.parent = parent;
         this.controlElement = element;
         this.name = name;
-        this.id = id;
+        this.effectiveId = id;
 
         // Extract event handlers
         if (element != null) {
@@ -106,8 +107,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return originalId;
     }
 
-    public String getId() {
-        return id;
+    public String getEffectiveId() {
+        return effectiveId;
     }
 
     public LocationData getLocationData() {
@@ -252,6 +253,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return controlElement;
     }
 
+    /**
+     * Return the control's appearance as an exploded QName.
+     */
+    public String getAppearance() {
+        if (appearance == null)
+            appearance = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(controlElement, "appearance"));
+        return appearance;
+    }
+
     public boolean equals(Object obj) {
 
         if (obj == null || !(obj instanceof XFormsControl))
@@ -264,7 +274,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
         if (!((name == null && other.name == null) || (name != null && other.name != null && name.equals(other.name))))
             return false;
-        if (!((id == null && other.id == null) || (id != null && other.id != null && id.equals(other.id))))
+        if (!((effectiveId == null && other.effectiveId == null) || (effectiveId != null && other.effectiveId != null && effectiveId.equals(other.effectiveId))))
             return false;
         if (!((label == null && other.label == null) || (label != null && other.label != null && label.equals(other.label))))
             return false;
@@ -488,7 +498,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         }
 
                         // Update children xforms:repeat indexes if any
-                        xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
+                        xformsControls.visitAllControlInfo(new XFormsControls.XFormsControlVisitorListener() {
                             public void startVisitControl(XFormsControl XFormsControl) {
                                 if (XFormsControl instanceof XFormsRepeatControl) {
                                     // Found child repeat
@@ -522,7 +532,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
                 // Store new focus information for client
                 if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
-                    containingDocument.setClientFocusEffectiveControlId(getId());
+                    containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
                 }
             }
         }

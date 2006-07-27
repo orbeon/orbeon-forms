@@ -561,7 +561,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         void handleNode(NodeInfo node);
     }
 
-    public String getId() {
+    public String getEffectiveId() {
         return modelId;
     }
 
@@ -1082,7 +1082,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final List eventsToDispatch = new ArrayList();
 
         // Iterate through controls and check the nodes they are bound to
-        xformsControls.visitAllControlInfo(new XFormsControls.ControlInfoVisitorListener() {
+        xformsControls.visitAllControlInfo(new XFormsControls.XFormsControlVisitorListener() {
             public void startVisitControl(XFormsControl XFormsControl) {
                 final NodeInfo currentNodeInfo = XFormsControl.getBoundNode();
 
@@ -1106,7 +1106,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                 if (valueChanged) {
                     // Value change takes care of everything
-                    eventsToDispatch.add(new EventSchedule(XFormsControl.getId(), currentNode, EventSchedule.ALL));
+                    eventsToDispatch.add(new EventSchedule(XFormsControl.getEffectiveId(), currentNode, EventSchedule.ALL));
                 } else {
                     // Dispatch xforms-optional/xforms-required if needed
                     {
@@ -1114,7 +1114,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final boolean newRequiredState = updatedInstanceData.getRequired().get();
 
                         if ((previousRequiredState && !newRequiredState) || (!previousRequiredState && newRequiredState))
-                            eventsToDispatch.add(new EventSchedule(XFormsControl.getId(), currentNode, EventSchedule.REQUIRED));
+                            eventsToDispatch.add(new EventSchedule(XFormsControl.getEffectiveId(), currentNode, EventSchedule.REQUIRED));
                     }
                     // Dispatch xforms-enabled/xforms-disabled if needed
                     {
@@ -1122,7 +1122,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final boolean newRelevantState = updatedInstanceData.getInheritedRelevant().get();
 
                         if ((previousRelevantState && !newRelevantState) || (!previousRelevantState && newRelevantState))
-                            eventsToDispatch.add(new EventSchedule(XFormsControl.getId(), currentNode, EventSchedule.RELEVANT));
+                            eventsToDispatch.add(new EventSchedule(XFormsControl.getEffectiveId(), currentNode, EventSchedule.RELEVANT));
                     }
                     // Dispatch xforms-readonly/xforms-readwrite if needed
                     {
@@ -1130,7 +1130,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final boolean newReadonlyState = updatedInstanceData.getInheritedReadonly().get();
 
                         if ((previousReadonlyState && !newReadonlyState) || (!previousReadonlyState && newReadonlyState))
-                            eventsToDispatch.add(new EventSchedule(XFormsControl.getId(), currentNode, EventSchedule.READONLY));
+                            eventsToDispatch.add(new EventSchedule(XFormsControl.getEffectiveId(), currentNode, EventSchedule.READONLY));
                     }
 
                     // Dispatch xforms-valid/xforms-invalid if needed
@@ -1143,7 +1143,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final boolean newValidState = updatedInstanceData.getValid().get();
 
                         if ((previousValidState && !newValidState) || (!previousValidState && newValidState))
-                            eventsToDispatch.add(new EventSchedule(XFormsControl.getId(), currentNode, EventSchedule.VALID));
+                            eventsToDispatch.add(new EventSchedule(XFormsControl.getEffectiveId(), currentNode, EventSchedule.VALID));
                     }
                 }
             }

@@ -80,7 +80,7 @@ public class XFormsSelect1Control extends XFormsControl {
                                 final String value = xformsControls.getCurrentSingleNodeValue();
                                 // TODO: handle xforms:copy
                                 if (value != null)
-                                    itemsetInfos.add(new ItemsetInfo(getId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
+                                    itemsetInfos.add(new ItemsetInfo(getEffectiveId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
                             }
                             xformsControls.popBinding();
                         }

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 public class XXFormsScriptAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
 
-        final String eventHandlerContainerId = eventHandlerContainer.getId();
+        final String eventHandlerContainerId = eventHandlerContainer.getEffectiveId();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         containingDocument.addScriptToRun(actionElement.attributeValue("id"), targetId, eventHandlerContainerId);

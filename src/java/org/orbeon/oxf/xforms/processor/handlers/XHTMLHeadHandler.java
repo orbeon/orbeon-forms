@@ -14,6 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -21,8 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Handle xhtml:head.
@@ -118,6 +119,91 @@ public class XHTMLHeadHandler extends HandlerBase {
                 }
 
                 helper.endElement();
+            }
+        }
+
+        // Store information about "special" controls that need JavaScript initialization
+        {
+            final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
+            final String serverBase = externalContext.getResponse().rewriteResourceURL("/", true);
+            // TODO: store server base
+            // TODO: produce JSON
+
+            // Gather information about controls appearances
+            final Map appearancesMap = new HashMap();
+            xformsControls.getCurrentControlsState().visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+                public void startVisitControl(XFormsControl xformsControl) {
+                    final String controlName = xformsControl.getName();
+                    final String controlAppearance = xformsControl.getAppearance();
+                    if (controlAppearance != null) {
+                        Map listForControlNameMap = (Map) appearancesMap.get(controlName);
+                        if (listForControlNameMap == null) {
+                            listForControlNameMap = new HashMap();
+                            appearancesMap.put(xformsControl.getName(), listForControlNameMap);
+                        }
+                        List idsForAppearanceList = (List) listForControlNameMap.get(controlAppearance);
+                        if (idsForAppearanceList == null) {
+                            idsForAppearanceList = new ArrayList();
+                            listForControlNameMap.put(controlAppearance , idsForAppearanceList);
+                        }
+                        idsForAppearanceList.add(xformsControl.getEffectiveId());
+                    }
+                }
+
+                public void endVisitControl(XFormsControl xformsControl) {}
+            });
+
+            // Procuce JSON output
+            if (appearancesMap.size() > 0) {
+                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":[");
+
+                for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry1 = (Map.Entry) i.next();
+                    final String controlName = (String) currentEntry1.getKey();
+                    final Map controlMap = (Map) currentEntry1.getValue();
+
+                    sb.append("{\"");
+                    sb.append(controlName);
+                    sb.append("\":[");
+
+                    for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
+                        final Map.Entry currentEntry2 = (Map.Entry) j.next();
+                        final String controlAppearance = (String) currentEntry2.getKey();
+                        final List idsForAppearanceList = (List) currentEntry2.getValue();
+
+                        sb.append("{\"");
+                        sb.append(controlAppearance);
+                        sb.append("\":[");
+
+                        for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
+                            final String controlId = (String) k.next();
+                            sb.append('"');
+                            sb.append(controlId);
+                            sb.append('"');
+                            if (k.hasNext())
+                                sb.append(',');
+                        }
+
+                        sb.append("]}");
+                        if (j.hasNext())
+                            sb.append(',');
+                    }
+
+                    sb.append("]}");
+                    if (i.hasNext())
+                        sb.append(',');
+                }
+
+                sb.append("]};");
+
+                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                    "type", "text/javascript"});
+
+                helper.text(sb.toString());
+
+                helper.endElement();
+
             }
         }
     }

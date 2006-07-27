@@ -377,7 +377,7 @@ public class XFormsInstance implements XFormsEventTarget {
     /**
      * Return the id of this instance.
      */
-    public String getId() {
+    public String getEffectiveId() {
         return id;
     }
 

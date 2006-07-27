@@ -223,7 +223,9 @@ ORBEON.xforms.Globals = {
     inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
     changedIdsRequest: {},            // Id of controls that have been touched by user since the last request was sent
-    serverValue: {}                   // Values on controls known to the server
+    serverValue: {},                  // Values on controls known to the server
+    autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
+    autoCompleteOpen: {}
 };
 
 ORBEON.xforms.Controls = {
@@ -250,6 +252,8 @@ ORBEON.xforms.Controls = {
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
             return control.childNodes[1].value;
+        } if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
+            return control.childNodes[0].value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-full")) {
             var inputs = control.getElementsByTagName("input");
@@ -542,6 +546,9 @@ ORBEON.xforms.Events = {
     keyup: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
+            // Save keycode
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-open"))
+                ORBEON.xforms.Globals.autoCompleteLastKeyCode[target.id] = event.keyCode;
             // Incremental control: treat keypress as a value change event
             if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
                 xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
@@ -706,6 +713,19 @@ ORBEON.xforms.Events = {
 
 ORBEON.xforms.Init = {
 
+    /**
+     * Functions used to initialize special controls
+     */
+    _specialControlsInitFunctions: null,
+    _getSpecialControlsInitFunctions: function () {
+        ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
+            "select1" : {
+                "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete
+            }
+        };
+        return ORBEON.xforms.Init._specialControlsInitFunctions;
+    },
+
     _addToTree: function (tree, nameValueArray, treeNode, firstPosition) {
         for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
             // Extract information from the first 3 position in the array
@@ -830,6 +850,29 @@ ORBEON.xforms.Init = {
             }
         }
 
+        // Initialize special controls
+        if (typeof opsXFormsControls != "undefined") {
+            var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
+            // Iterate over controls
+            for (var controlType in opsXFormsControls["controls"][0]) {
+                if (initFunctions[controlType]) {
+                    var controlAppearances = opsXFormsControls["controls"][0][controlType][0];
+                    // Iterate over appearance for current control
+                    for (var controlAppearance in controlAppearances) {
+                        var initFunction = initFunctions[controlType][controlAppearance];
+                        if (initFunction) {
+                            var controlIds = controlAppearances[controlAppearance];
+                            // Iterate over controls
+                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
+                                var control = document.getElementById(controlIds[controlIndex]);
+                                initFunction(control);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Initialize attributes on document
         document.xformsRequestInProgress = false;
         document.xformsEvents = new Array();
@@ -937,126 +980,135 @@ ORBEON.xforms.Init = {
         }
     },
 
+    _autoComplete: function(autoComplete) {
+        console.log(autoComplete);
+        var textfield = autoComplete.childNodes[0];
+        var select = autoComplete.childNodes[1];
+        // Get list of possible values from the select
+        var values = new Array();
+        for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
+            values.push(select.options[optionIndex].value);
+        // Initialize auto-complete input
+        var noFilter = ORBEON.util.Dom.hasClass(autoComplete, "xforms-select1-open-autocomplete-nofilter");
+        ORBEON.xforms.Globals.autoCompleteLastKeyCode[autoComplete.id] = -1;
+        ORBEON.xforms.Globals.autoCompleteOpen[autoComplete.id] = actb(textfield, values, noFilter);
+    },
+
+    _widetextArea: function(textarea) {
+        var lineNumber = textarea.value.split("\n").length;
+        if (lineNumber < 5) lineNumber = 5;
+        textarea.style.height = 3 + lineNumber * 1.1 + "em";
+    },
+
+    _range: function(range) {
+        var background = range.childNodes[0];
+        if (!ORBEON.util.Dom.isElement(background))
+            background = range.childNodes[1];
+        background.tabIndex = 0;
+        background.previousValue = 0; // Will be modified once the initial value can be set
+        var thumbDiv = background.firstChild;
+        if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
+        thumbDiv.id = background.id + XFORMS_SEPARATOR_1 + "thumb";
+        var slider = YAHOO.widget.Slider.getHorizSlider(background.id, thumbDiv.id, 0, 200);
+        slider.onChange = ORBEON.xforms.Events.sliderValueChange;
+    },
+
+    _tree: function(tree) {
+        // Save in the control if it allows multiple selection
+        tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select-tree");
+        // Parse data put by the server in the div
+        var treeArray = eval(ORBEON.util.Dom.getStringValue(tree));
+        ORBEON.util.Dom.setStringValue(tree, "");
+        tree.value = "";
+        // Create, populate, and show the tree
+        tree.xformsTree = new YAHOO.widget.TreeView(tree.id);
+        var treeRoot = tree.xformsTree.getRoot();
+        ORBEON.xforms.Init._addToTree(tree, treeArray, treeRoot, 0);
+        // Make selected nodes visible'
+        var values = tree.xformsAllowMultipleSelection ? tree.value.split(" ") : [ tree.value ];
+        for (nodeIndex in tree.xformsTree._nodes) {
+            var node = tree.xformsTree._nodes[nodeIndex];
+            if (xformsArrayContains(values, node.data.value)) {
+                var nodeParent = node.parent;
+                while (nodeParent != null) {
+                    nodeParent.expand();
+                    nodeParent = nodeParent.parent;
+                }
+            }
+        }
+        // Save value in tree
+        tree.previousValue = tree.value;
+        tree.xformsTree.draw();
+    },
+
+    _menu: function (menu) {
+        // Find the divs for the tree and for the values inside the control
+        var treeDiv;
+        var valuesDiv;
+        for (var j = 0; j < menu.childNodes.length; j++) {
+            var childNode =  menu.childNodes[j];
+            if (childNode.nodeType == ELEMENT_TYPE) {
+                if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
+                    treeDiv = childNode;
+                } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
+                    valuesDiv = childNode;
+                }
+            }
+        }
+
+        // Create overlay manager, if we don't have one already
+        if (ORBEON.xforms.Globals.overlayManager == null)
+            ORBEON.xforms.Globals.overlayManager = new YAHOO.widget.OverlayManager();
+        // Extract menu hierarchy from HTML
+        var menuArray = eval(ORBEON.util.Dom.getStringValue(valuesDiv));
+        ORBEON.util.Dom.setStringValue(valuesDiv, "");
+        // Initialize tree
+        YAHOO.util.Dom.generateId(treeDiv);
+        menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
+        for (var topLevelIndex = 0; topLevelIndex < menu.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
+            var topLevelArray = menuArray[topLevelIndex];
+            var menuItem = menu.xformsMenu.getItem(topLevelIndex);
+            ORBEON.xforms.Init._addToMenuItem(menu, topLevelArray, menuItem);
+        }
+        menu.xformsMenu.render();
+        menu.xformsMenu.show();
+    },
+
+    htmlArea: function (htmlArea) {
+        document.xformsHTMLAreaNames = new Array();
+        var fckEditor = new FCKeditor(htmlArea.name);
+        if (!xformsArrayContains(document.xformsHTMLAreaNames, htmlArea.name))
+            document.xformsHTMLAreaNames.push(htmlArea.name);
+        fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
+        fckEditor.ToolbarSet = "OPS";
+        fckEditor.ReplaceTextarea() ;
+    },
+
     elementsUnder: function(root) {
 
         var textareas = YAHOO.util.Dom.getElementsByClassName("wide-textarea", "textarea", root);
-        for (var i = 0; i < textareas.length; i++) {
-            var textarea = textareas[i];
-            var lineNumber = textarea.value.split("\n").length;
-            if (lineNumber < 5) lineNumber = 5;
-            textarea.style.height = 3 + lineNumber * 1.1 + "em";
-        }
-
-        var autoCompletes = YAHOO.util.Dom.getElementsByClassName("xforms-select1-open", "span", root);
-        for (var i = 0; i < autoCompletes.length; i++) {
-            var autoComplete = autoCompletes[i];
-            var textfield = autoComplete.childNodes[0];
-            var select = autoComplete.childNodes[1];
-            // Get list of possible values from the select
-            var values = new Array();
-            for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
-                values.push(select.options[optionIndex].value);
-            // Initialize auto-complete input
-            var noFilter = ORBEON.util.Dom.hasClass(autoComplete, "xforms-select1-open-autocomplete-nofilter");
-            actb(textfield, values, noFilter);
-        }
+        for (var i = 0; i < textareas.length; i++)
+            ORBEON.xforms.Init._widetextArea(textareas[i]);
 
         var ranges = YAHOO.util.Dom.getElementsByClassName("controls-range", "div", root);
-        for (var i = 0; i < ranges.length; i++) {
-            var range = ranges[i];
-            var background = range.childNodes[0];
-            if (!ORBEON.util.Dom.isElement(background))
-                background = range.childNodes[1];
-            background.tabIndex = 0;
-            background.previousValue = 0; // Will be modified once the initial value can be set
-            var thumbDiv = background.firstChild;
-            if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
-            thumbDiv.id = background.id + XFORMS_SEPARATOR_1 + "thumb";
-            var slider = YAHOO.widget.Slider.getHorizSlider(background.id, thumbDiv.id, 0, 200);
-            slider.onChange = ORBEON.xforms.Events.sliderValueChange;
-        }
+        for (var i = 0; i < ranges.length; i++)
+            ORBEON.xforms.Init._range(ranges[i]);
 
         var treesSelect1 = YAHOO.util.Dom.getElementsByClassName("xforms-select1-tree", "div", root);
         var treesSelect = YAHOO.util.Dom.getElementsByClassName("xforms-select-tree", "div", root);
         var trees = treesSelect1;
         for (var i = 0; i < treesSelect.length; i++)
             trees.push(treesSelect[i]);
-        for (var i = 0; i < trees.length; i++) {
-            var tree = trees[i];
-
-            // Save in the control if it allows multiple selection
-            tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select-tree");
-            // Parse data put by the server in the div
-            var treeArray = eval(ORBEON.util.Dom.getStringValue(tree));
-            ORBEON.util.Dom.setStringValue(tree, "");
-            tree.value = "";
-            // Create, populate, and show the tree
-            tree.xformsTree = new YAHOO.widget.TreeView(tree.id);
-            var treeRoot = tree.xformsTree.getRoot();
-            ORBEON.xforms.Init._addToTree(tree, treeArray, treeRoot, 0);
-            // Make selected nodes visible'
-            var values = tree.xformsAllowMultipleSelection ? tree.value.split(" ") : [ tree.value ];
-            for (nodeIndex in tree.xformsTree._nodes) {
-                var node = tree.xformsTree._nodes[nodeIndex];
-                if (xformsArrayContains(values, node.data.value)) {
-                    var nodeParent = node.parent;
-                    while (nodeParent != null) {
-                        nodeParent.expand();
-                        nodeParent = nodeParent.parent;
-                    }
-                }
-            }
-            // Save value in tree
-            tree.previousValue = tree.value;
-            tree.xformsTree.draw();
-        }
+        for (var i = 0; i < trees.length; i++)
+            ORBEON.xforms.Init._tree(trees[i]);
 
         var menus = YAHOO.util.Dom.getElementsByClassName("xforms-select1-menu", "div", root);
-        for (var i = 0; i < menus.length; i++) {
-            var menu = menus[i];
-            // Find the divs for the tree and for the values inside the control
-            var treeDiv;
-            var valuesDiv;
-            for (var j = 0; j < menu.childNodes.length; j++) {
-                var childNode =  menu.childNodes[j];
-                if (childNode.nodeType == ELEMENT_TYPE) {
-                    if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
-                        treeDiv = childNode;
-                    } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
-                        valuesDiv = childNode;
-                    }
-                }
-            }
-
-            // Create overlay manager, if we don't have one already
-            if (ORBEON.xforms.Globals.overlayManager == null)
-                ORBEON.xforms.Globals.overlayManager = new YAHOO.widget.OverlayManager();
-            // Extract menu hierarchy from HTML
-            var menuArray = eval(ORBEON.util.Dom.getStringValue(valuesDiv));
-            ORBEON.util.Dom.setStringValue(valuesDiv, "");
-            // Initialize tree
-            YAHOO.util.Dom.generateId(treeDiv);
-            menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
-            for (var topLevelIndex = 0; topLevelIndex < menu.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
-                var topLevelArray = menuArray[topLevelIndex];
-                var menuItem = menu.xformsMenu.getItem(topLevelIndex);
-                ORBEON.xforms.Init._addToMenuItem(menu, topLevelArray, menuItem);
-            }
-            menu.xformsMenu.render();
-            menu.xformsMenu.show();
-        }
+        for (var i = 0; i < menus.length; i++)
+            ORBEON.xforms.Init._menu(menus[i]);
 
         var htmlAreas = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", "textarea", root);
-        for (var i = 0; i < htmlAreas.length; i++) {
-            var htmlArea = htmlAreas[i];
-            document.xformsHTMLAreaNames = new Array();
-            var fckEditor = new FCKeditor(htmlArea.name);
-            if (!xformsArrayContains(document.xformsHTMLAreaNames, htmlArea.name))
-                document.xformsHTMLAreaNames.push(htmlArea.name);
-            fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
-            fckEditor.ToolbarSet = "OPS";
-            fckEditor.ReplaceTextarea() ;
-        }
+        for (var i = 0; i < htmlAreas.length; i++)
+            ORBEON.xforms.Init._htmlArea(htmlAreas[i]);
     }
 };
 
@@ -1758,8 +1810,10 @@ function xformsHandleResponse(o) {
                                     // Case of the auto-complete control
                                     var textfield = documentElement.childNodes[0];
                                     textfield.actb_keywords = newValues;
-                                    if (xformsIsDefined(documentElement.lastKeyCode) && documentElement.lastKeyCode != -1)
-                                        textfield.actb_tocomplete(documentElement.lastKeyCode);
+                                    // Reopen auto-complete if necessary
+                                    var lastKeyCode = ORBEON.xforms.Globals.autoCompleteLastKeyCode[documentElement.id];
+                                    if (lastKeyCode != -1)
+                                        ORBEON.xforms.Globals.autoCompleteOpen[documentElement.id](lastKeyCode);
                                 } else if (documentElement.tagName == "SELECT") {
 
                                     // Case of list / combobox

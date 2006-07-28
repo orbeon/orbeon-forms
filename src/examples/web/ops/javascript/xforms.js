@@ -982,7 +982,6 @@ ORBEON.xforms.Init = {
     },
 
     _autoComplete: function(autoComplete) {
-        console.log(autoComplete);
         var textfield = autoComplete.childNodes[0];
         var select = autoComplete.childNodes[1];
         // Get list of possible values from the select
@@ -1432,7 +1431,6 @@ function xformsHandleAutoCompleteMouseChange(input) {
  * @param incremental  Are these incremental events
  */
 function xformsFireEvents(events, incremental) {
-    console.trace();
     // Store the time of the first event to be sent in the queue
     var currentTime = new Date().getTime();
     if (document.xformsEvents.length == 0)
@@ -2397,7 +2395,6 @@ function xformsHandleResponse(o) {
             xformsStoreInClientState(document.xformsRequestForm, "ajax-dynamic-state", newDynamicState);
         }
 
-        console.log(document.xformsEvents);
         if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
             // Display loading indicator when we go to another page.
             // Display it even if it was not displayed before as loading the page could take time.

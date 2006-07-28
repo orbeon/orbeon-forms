@@ -225,7 +225,8 @@ ORBEON.xforms.Globals = {
     changedIdsRequest: {},            // Id of controls that have been touched by user since the last request was sent
     serverValue: {},                  // Values on controls known to the server
     autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
-    autoCompleteOpen: {}
+    autoCompleteOpen: {},
+    loadingOtherPage: false           // Flag set when loading other page that revents the loading indicator to disappear
 };
 
 ORBEON.xforms.Controls = {
@@ -1317,12 +1318,14 @@ function xformsDisplayIndicator(state) {
                 form.xformsLoadingNone.style.display = "none";
             break;
         case "none":
-            if (form.xformsLoadingLoading != null)
-                form.xformsLoadingLoading.style.display = "none";
-            if (form.xformsLoadingError != null)
-                form.xformsLoadingError.style.display = "none";
-            if (form.xformsLoadingNone != null)
-                form.xformsLoadingNone.style.display = "block";
+            if (!ORBEON.xforms.Globals.loadingOtherPage) {
+                if (form.xformsLoadingLoading != null)
+                    form.xformsLoadingLoading.style.display = "none";
+                if (form.xformsLoadingError != null)
+                    form.xformsLoadingError.style.display = "none";
+                if (form.xformsLoadingNone != null)
+                    form.xformsLoadingNone.style.display = "block";
+            }
             break;
     }
 }
@@ -1429,6 +1432,7 @@ function xformsHandleAutoCompleteMouseChange(input) {
  * @param incremental  Are these incremental events
  */
 function xformsFireEvents(events, incremental) {
+    console.trace();
     // Store the time of the first event to be sent in the queue
     var currentTime = new Date().getTime();
     if (document.xformsEvents.length == 0)
@@ -2393,13 +2397,12 @@ function xformsHandleResponse(o) {
             xformsStoreInClientState(document.xformsRequestForm, "ajax-dynamic-state", newDynamicState);
         }
 
+        console.log(document.xformsEvents);
         if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
             // Display loading indicator when we go to another page.
             // Display it even if it was not displayed before as loading the page could take time.
             xformsDisplayIndicator("loading");
-        } else if (document.xformsEvents.length == 0) {
-            // Hide loading indicator if there are no other request in the queue
-            xformsDisplayIndicator("none");
+            ORBEON.xforms.Globals.loadingOtherPage = true;
         }
 
     } else if (responseXML && responseXML.documentElement
@@ -2423,7 +2426,6 @@ function xformsHandleResponse(o) {
         // The server didn't send valid XML
         document.xformsRequestForm.xformsLoadingError.innerHTML = "Unexpected response received from server";
         xformsDisplayIndicator("error");
-
     }
 
     // Reset changes, as changes are included in this bach of events
@@ -2443,6 +2445,7 @@ function xformsDisplayLoading() {
 function xformsExecuteNextRequest(bypassRequestQueue) {
     bypassRequestQueue = typeof(bypassRequestQueue) == "boolean"  && bypassRequestQueue == true;
     document.xformsExecuteNextRequestInQueue--;
+    var executedRequest = false;
     if (!document.xformsRequestInProgress
             && document.xformsEvents.length > 0
             && (bypassRequestQueue || document.xformsExecuteNextRequestInQueue == 0)) {
@@ -2553,13 +2556,16 @@ function xformsExecuteNextRequest(bypassRequestQueue) {
                     document.xformsEvents.splice(handledEvents[i], 1);
             }
 
-            var aysncRequestCallback = { success: xformsHandleResponse };
-
             // Send request
+            executedRequest = true;
             YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, aysncRequestCallback, requestDocumentString);
+            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: xformsHandleResponse }, requestDocumentString);
         }
     }
+
+    // Hide loading indicator if we have started a new request and there are not events in the queue
+    if (!executedRequest && document.xformsEvents.length == 0)
+        xformsDisplayIndicator("none");
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page

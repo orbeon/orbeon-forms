@@ -1001,15 +1001,12 @@ ORBEON.xforms.Init = {
     },
 
     _range: function(range) {
-        var background = range.childNodes[0];
-        if (!ORBEON.util.Dom.isElement(background))
-            background = range.childNodes[1];
-        background.tabIndex = 0;
-        background.previousValue = 0; // Will be modified once the initial value can be set
-        var thumbDiv = background.firstChild;
+        range.tabIndex = 0;
+        range.previousValue = 0; // Will be modified once the initial value can be set
+        var thumbDiv = range.firstChild;
         if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
-        thumbDiv.id = background.id + XFORMS_SEPARATOR_1 + "thumb";
-        var slider = YAHOO.widget.Slider.getHorizSlider(background.id, thumbDiv.id, 0, 200);
+        thumbDiv.id = range.id + XFORMS_SEPARATOR_1 + "thumb";
+        var slider = YAHOO.widget.Slider.getHorizSlider(range.id, thumbDiv.id, 0, 200);
         slider.onChange = ORBEON.xforms.Events.sliderValueChange;
     },
 
@@ -1090,7 +1087,7 @@ ORBEON.xforms.Init = {
         for (var i = 0; i < textareas.length; i++)
             ORBEON.xforms.Init._widetextArea(textareas[i]);
 
-        var ranges = YAHOO.util.Dom.getElementsByClassName("controls-range", "div", root);
+        var ranges = YAHOO.util.Dom.getElementsByClassName("xforms-range", "div", root);
         for (var i = 0; i < ranges.length; i++)
             ORBEON.xforms.Init._range(ranges[i]);
 

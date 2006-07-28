@@ -730,7 +730,12 @@ ORBEON.xforms.Init = {
     _getSpecialControlsInitFunctions: function () {
         ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
             "select1" : {
-                "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete
+                "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete,
+                "{http://orbeon.org/oxf/xml/xforms}menu": ORBEON.xforms.Init._menu,
+                "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
+            },
+            "select" : {
+                "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
             }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
@@ -864,18 +869,20 @@ ORBEON.xforms.Init = {
         if (typeof opsXFormsControls != "undefined") {
             var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
             // Iterate over controls
-            for (var controlType in opsXFormsControls["controls"][0]) {
-                if (initFunctions[controlType]) {
-                    var controlAppearances = opsXFormsControls["controls"][0][controlType][0];
-                    // Iterate over appearance for current control
-                    for (var controlAppearance in controlAppearances) {
-                        var initFunction = initFunctions[controlType][controlAppearance];
-                        if (initFunction) {
-                            var controlIds = controlAppearances[controlAppearance];
-                            // Iterate over controls
-                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
-                                var control = document.getElementById(controlIds[controlIndex]);
-                                initFunction(control);
+            for (var strangeIterator = 0; strangeIterator < opsXFormsControls["controls"].length; strangeIterator++) {
+                for (var controlType in opsXFormsControls["controls"][strangeIterator]) {
+                    if (initFunctions[controlType]) {
+                        var controlAppearances = opsXFormsControls["controls"][strangeIterator][controlType][0];
+                        // Iterate over appearance for current control
+                        for (var controlAppearance in controlAppearances) {
+                            var initFunction = initFunctions[controlType][controlAppearance];
+                            if (initFunction) {
+                                var controlIds = controlAppearances[controlAppearance];
+                                // Iterate over controls
+                                for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
+                                    var control = document.getElementById(controlIds[controlIndex]);
+                                    initFunction(control);
+                                }
                             }
                         }
                     }
@@ -1101,18 +1108,6 @@ ORBEON.xforms.Init = {
         var ranges = YAHOO.util.Dom.getElementsByClassName("xforms-range", "div", root);
         for (var i = 0; i < ranges.length; i++)
             ORBEON.xforms.Init._range(ranges[i]);
-
-        var treesSelect1 = YAHOO.util.Dom.getElementsByClassName("xforms-select1-tree", "div", root);
-        var treesSelect = YAHOO.util.Dom.getElementsByClassName("xforms-select-tree", "div", root);
-        var trees = treesSelect1;
-        for (var i = 0; i < treesSelect.length; i++)
-            trees.push(treesSelect[i]);
-        for (var i = 0; i < trees.length; i++)
-            ORBEON.xforms.Init._tree(trees[i]);
-
-        var menus = YAHOO.util.Dom.getElementsByClassName("xforms-select1-menu", "div", root);
-        for (var i = 0; i < menus.length; i++)
-            ORBEON.xforms.Init._menu(menus[i]);
 
         var htmlAreas = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", "textarea", root);
         for (var i = 0; i < htmlAreas.length; i++)

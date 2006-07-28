@@ -48,6 +48,7 @@ ORBEON.xforms = {};
  * elements as this has some negative side effects like IE reloading
  * background images set with CSS on the element.
  */
+// @class
 ORBEON.util.IEDom = {
     /**
      * Optimized version of YAHOO.util.Dom.hasClass(element, className).
@@ -111,7 +112,7 @@ ORBEON.util.IEDom = {
 };
 
 /**
- * The hasClass, addClass and removeClass methods use a cache of the
+ * @class The hasClass, addClass and removeClass methods use a cache of the
  * classes for a give element for quick lookup. After having parsed the
  * className a first time we store that information in the orbeonClasses
  * map on the given element.
@@ -169,6 +170,10 @@ ORBEON.util.MozDom = {
     }
 };
 
+/**
+ * @class Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
+ TODO dslfdklf
+ */
 ORBEON.util.Dom = {
 
     ELEMENT_TYPE: 1,
@@ -216,6 +221,7 @@ ORBEON.util.Dom = {
 /**
  * Global constants and variable
  */
+// @class
 ORBEON.xforms.Globals = {
 
     overlayManager: null,
@@ -229,6 +235,7 @@ ORBEON.xforms.Globals = {
     loadingOtherPage: false           // Flag set when loading other page that revents the loading indicator to disappear
 };
 
+// @class
 ORBEON.xforms.Controls = {
 
     // Returns MIP for a given control
@@ -394,6 +401,7 @@ ORBEON.xforms.Controls = {
 };
 
 
+// @class
 ORBEON.xforms.Events = {
 
     /**
@@ -712,6 +720,7 @@ ORBEON.xforms.Events = {
     }
 };
 
+// @class
 ORBEON.xforms.Init = {
 
     /**
@@ -1036,6 +1045,7 @@ ORBEON.xforms.Init = {
         // Save value in tree
         tree.previousValue = tree.value;
         tree.xformsTree.draw();
+        ORBEON.util.Dom.removeClass(tree, "xforms-initially-hidden");
     },
 
     _menu: function (menu) {
@@ -1069,9 +1079,10 @@ ORBEON.xforms.Init = {
         }
         menu.xformsMenu.render();
         menu.xformsMenu.show();
+        ORBEON.util.Dom.removeClass(menu, "xforms-initially-hidden");
     },
 
-    htmlArea: function (htmlArea) {
+    _htmlArea: function (htmlArea) {
         document.xformsHTMLAreaNames = new Array();
         var fckEditor = new FCKeditor(htmlArea.name);
         if (!xformsArrayContains(document.xformsHTMLAreaNames, htmlArea.name))

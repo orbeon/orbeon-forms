@@ -147,7 +147,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                         List idsForAppearanceList = (List) listForControlNameMap.get(controlAppearance);
                         if (idsForAppearanceList == null) {
                             idsForAppearanceList = new ArrayList();
-                            listForControlNameMap.put(controlAppearance != null ? controlAppearance : "", idsForAppearanceList);
+                            listForControlNameMap.put(controlAppearance, idsForAppearanceList);
                         }
                         idsForAppearanceList.add(xformsControl.getEffectiveId());
                     }
@@ -158,14 +158,14 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             // Produce JSON output
             if (appearancesMap.size() > 0) {
-                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":");
+                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":{");
 
                 for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry1 = (Map.Entry) i.next();
                     final String controlName = (String) currentEntry1.getKey();
                     final Map controlMap = (Map) currentEntry1.getValue();
 
-                    sb.append("{\"");
+                    sb.append("\"");
                     sb.append(controlName);
                     sb.append("\":");
 
@@ -175,7 +175,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                         final List idsForAppearanceList = (List) currentEntry2.getValue();
 
                         sb.append("{\"");
-                        sb.append(controlAppearance);
+                        sb.append(controlAppearance != null ? controlAppearance : "");
                         sb.append("\":[");
 
                         for (Iterator k = idsForAppearanceList.iterator(); k.hasNext();) {
@@ -192,12 +192,12 @@ public class XHTMLHeadHandler extends HandlerBase {
                             sb.append(',');
                     }
 
-                    sb.append("}");
+                    sb.append("");
                     if (i.hasNext())
                         sb.append(',');
                 }
 
-                sb.append("};");
+                sb.append("}};");
 
                 helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});

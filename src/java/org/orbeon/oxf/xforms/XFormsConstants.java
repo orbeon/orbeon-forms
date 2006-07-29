@@ -126,6 +126,10 @@ public class XFormsConstants {
     public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
 
+    public static final QName XXFORMS_TREE_APPEARANCE_QNAME = new QName("tree", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = new QName("autocomplete", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);
 

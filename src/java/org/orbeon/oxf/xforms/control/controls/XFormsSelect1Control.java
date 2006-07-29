@@ -32,10 +32,21 @@ import java.util.*;
  */
 public class XFormsSelect1Control extends XFormsControl {
 
+    private static final String TREE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME);
+    private static final String MENU_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
+    private static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
+
+
     private List itemsetInfos;
 
     public XFormsSelect1Control(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
+    }
+
+    public boolean hasJavaScriptInitialization() {
+        final String appearance = getAppearance();
+        return appearance != null
+                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance));
     }
 
     public void evaluateItemsets(PipelineContext pipelineContext) {

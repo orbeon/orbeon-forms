@@ -36,6 +36,10 @@ public class XFormsRangeControl extends XFormsControl {
         this.step = element.attributeValue("step");
     }
 
+    public boolean hasJavaScriptInitialization() {
+        return true;
+    }
+
     public String getStart() {
         return start;
     }

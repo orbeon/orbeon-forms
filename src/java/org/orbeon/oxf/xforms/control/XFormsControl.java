@@ -44,6 +44,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     private String originalId;
     private String appearance;
+    private String mediatype;
 
     private String effectiveId;
     private String label;
@@ -260,6 +261,22 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         if (appearance == null)
             appearance = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(controlElement, "appearance"));
         return appearance;
+    }
+
+    /**
+     * Return the control's mediatype.
+     */
+    public String getMediatype() {
+        if (mediatype == null)
+            mediatype = controlElement.attributeValue("mediatype");
+        return mediatype;
+    }
+
+    /**
+     * Return true if the control, with its current appearance, requires JavaScript initialization.
+     */
+    public boolean hasJavaScriptInitialization() {
+        return false;
     }
 
     public boolean equals(Object obj) {

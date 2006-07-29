@@ -135,17 +135,19 @@ public class XHTMLHeadHandler extends HandlerBase {
             xformsControls.getCurrentControlsState().visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl xformsControl) {
                     final String controlName = xformsControl.getName();
-                    final String controlAppearance = xformsControl.getAppearance();
-                    if (controlAppearance != null) {
+
+                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization();
+                    if (hasJavaScriptInitialization) {
                         Map listForControlNameMap = (Map) appearancesMap.get(controlName);
                         if (listForControlNameMap == null) {
                             listForControlNameMap = new HashMap();
                             appearancesMap.put(xformsControl.getName(), listForControlNameMap);
                         }
+                        final String controlAppearance = xformsControl.getAppearance();
                         List idsForAppearanceList = (List) listForControlNameMap.get(controlAppearance);
                         if (idsForAppearanceList == null) {
                             idsForAppearanceList = new ArrayList();
-                            listForControlNameMap.put(controlAppearance , idsForAppearanceList);
+                            listForControlNameMap.put(controlAppearance != null ? controlAppearance : "", idsForAppearanceList);
                         }
                         idsForAppearanceList.add(xformsControl.getEffectiveId());
                     }
@@ -154,9 +156,9 @@ public class XHTMLHeadHandler extends HandlerBase {
                 public void endVisitControl(XFormsControl xformsControl) {}
             });
 
-            // Procuce JSON output
+            // Produce JSON output
             if (appearancesMap.size() > 0) {
-                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":[");
+                final StringBuffer sb = new StringBuffer("var opsXFormsControls = {\"controls\":");
 
                 for (Iterator i = appearancesMap.entrySet().iterator(); i.hasNext();) {
                     final Map.Entry currentEntry1 = (Map.Entry) i.next();
@@ -165,7 +167,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                     sb.append("{\"");
                     sb.append(controlName);
-                    sb.append("\":[");
+                    sb.append("\":");
 
                     for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
                         final Map.Entry currentEntry2 = (Map.Entry) j.next();
@@ -190,12 +192,12 @@ public class XHTMLHeadHandler extends HandlerBase {
                             sb.append(',');
                     }
 
-                    sb.append("]}");
+                    sb.append("}");
                     if (i.hasNext())
                         sb.append(',');
                 }
 
-                sb.append("]};");
+                sb.append("};");
 
                 helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});

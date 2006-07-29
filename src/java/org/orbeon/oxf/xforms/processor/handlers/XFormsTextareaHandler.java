@@ -51,7 +51,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
 
         final String mediatypeValue = elementAttributes.getValue("mediatype");
-        final boolean isHTMLMediaType = mediatypeValue != null && mediatypeValue.equals("text/html");
+        final boolean isHTMLMediaType = "text/html".equals(mediatypeValue);
 
         final AttributesImpl newAttributes;
         {

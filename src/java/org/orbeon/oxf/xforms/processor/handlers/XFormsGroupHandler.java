@@ -37,7 +37,7 @@ public class XFormsGroupHandler extends HandlerBase {
         effectiveGroupId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, null);
+        final StringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
             groupXFormsControl = ((XFormsControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveGroupId));
 

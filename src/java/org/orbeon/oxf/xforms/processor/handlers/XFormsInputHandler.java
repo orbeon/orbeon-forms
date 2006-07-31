@@ -54,7 +54,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         final boolean isDate;
         final String typeClass;
         {
-            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
             if (!handlerContext.isGenerateTemplate()) {
                 isDate = isDate(XFormsControl.getType());
                 typeClass = isDate ? "xforms-type-date" : "xforms-type-string";

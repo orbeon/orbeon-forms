@@ -55,7 +55,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
             if (isHTMLMediaType)
                 classes.append(" xforms-mediatype-text-html");
 

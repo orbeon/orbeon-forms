@@ -75,7 +75,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
         final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
 
-        final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+        final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
         if (!handlerContext.isGenerateTemplate())
             handleMIPClasses(classes, XFormsControl);
         final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);

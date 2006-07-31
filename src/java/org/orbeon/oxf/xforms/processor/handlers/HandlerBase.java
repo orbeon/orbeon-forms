@@ -23,10 +23,13 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerNew;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.QName;
+import org.dom4j.Namespace;
 
 /**
  *
@@ -214,14 +217,6 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     sb.append(classes);
                 }
             }
-            {
-                final String value = elementAttributes.getValue("incremental");
-                if ("true".equals(value)) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-incremental");
-                }
-            }
             if (sb.length() > 0) {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, sb.toString());
             }
@@ -239,13 +234,46 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return reusableAttributes;
     }
 
-    protected StringBuffer getInitialClasses(String controlName, XFormsControl XFormsControl) {
-        final StringBuffer sb;
-        if (!XFormsControls.isGroupingControl(controlName))
-            sb = new StringBuffer("xforms-control xforms-" + controlName);
-        else
-            sb = new StringBuffer("xforms-" + controlName);// not sure why those wouldn't have xforms-control as well
+    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl XFormsControl) {
 
+        // Control name
+        final StringBuffer sb;
+        {
+            // We only call xforms-control the actual controls as per the spec
+            if (!XFormsControls.isGroupingControl(controlName))
+                sb = new StringBuffer("xforms-control xforms-");
+            else
+                sb = new StringBuffer("xforms-");
+            sb.append(controlName);
+        }
+        {
+            // Class for incremental mode
+            final String value = controlAttributes.getValue("incremental");
+            if ("true".equals(value)) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-incremental");
+            }
+        }
+        {
+            // Class for appearance
+            final QName appearance = getAppearance(controlAttributes);
+            if (appearance != null) {
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-");
+                sb.append(controlName);
+                sb.append("-appearance-");
+                // Allow xxforms:* and *
+                if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearance.getNamespace().getURI()))
+                    sb.append("xxforms-");
+                else if (!"".equals(appearance.getNamespace().getURI()))
+                    throw new OXFException("Invalid appearance namespace URI: " + appearance.getNamespace().getURI());
+                sb.append(appearance.getName());
+            }
+        }
+
+        // Static read-only
         if (isStaticReadonly(XFormsControl))
             sb.append(" xforms-static");
 
@@ -346,5 +374,17 @@ public abstract class HandlerBase extends ElementHandlerNew {
             if (attributeValue != null)
                 destAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
         }
+    }
+
+    protected QName getAppearance(Attributes controlAttributes) {
+        final String appearanceValue = controlAttributes.getValue("appearance");
+        if (appearanceValue == null)
+            return null;
+
+        final String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
+        final String appearancePrefix = XMLUtils.prefixFromQName(appearanceValue);
+        final String appearanceURI = uriFromQName(appearanceValue);
+
+        return new QName(appearanceLocalname, new Namespace(appearancePrefix, appearanceURI));
     }
 }

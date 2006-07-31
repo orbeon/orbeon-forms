@@ -57,7 +57,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         final boolean isDateOrTime;
-        final StringBuffer classes = getInitialClasses(localname, xformsOutputControl);
+        final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsOutputControl);
 
         final String appearanceValue = elementAttributes.getValue("appearance");
         final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);

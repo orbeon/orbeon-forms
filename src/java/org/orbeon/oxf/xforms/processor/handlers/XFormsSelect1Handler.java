@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -216,6 +217,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final boolean isMany = localname.equals("select");
 
+        final QName appearance = getAppearance(elementAttributes);
+
         String appearanceValue;
         {
             final String appearanceAttribute = elementAttributes.getValue("appearance");
@@ -254,13 +257,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, xformsSelect1Control);
-            if (isMany) {
-                classes.append(" xforms-select-");
-            } else {
-                classes.append(" xforms-select1-");
-            }
-            classes.append(appearanceLocalname);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsSelect1Control);
+
             if (isOpenSelection)
                 classes.append(" xforms-select1-open");
             if (isAutocompleteNoFilter)

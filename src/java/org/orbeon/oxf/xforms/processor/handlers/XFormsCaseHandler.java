@@ -40,7 +40,7 @@ public class XFormsCaseHandler extends HandlerBase {
         currentCaseEffectiveId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = getInitialClasses(localname, null);
+        final StringBuffer classes = getInitialClasses(localname, attributes, null);
 
         final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), currentCaseEffectiveId);
 

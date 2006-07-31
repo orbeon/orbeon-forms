@@ -50,7 +50,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
             if (!handlerContext.isGenerateTemplate()) {
                 handleMIPClasses(classes, XFormsControl);
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);

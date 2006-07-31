@@ -52,7 +52,7 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
             if (!handlerContext.isGenerateTemplate()) {
 
                 handleMIPClasses(classes, XFormsControl);

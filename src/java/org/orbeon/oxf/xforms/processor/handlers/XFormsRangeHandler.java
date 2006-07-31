@@ -50,7 +50,7 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
             classes.append(" xforms-range-background");
             if (!handlerContext.isGenerateTemplate()) {
 

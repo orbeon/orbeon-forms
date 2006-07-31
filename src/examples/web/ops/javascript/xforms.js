@@ -729,14 +729,14 @@ ORBEON.xforms.Init = {
     _specialControlsInitFunctions: null,
     _getSpecialControlsInitFunctions: function () {
         ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
-            "select1" : {
+            "select1": {
                 "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete,
                 "{http://orbeon.org/oxf/xml/xforms}menu": ORBEON.xforms.Init._menu,
                 "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
             },
-            "select" : {
-                "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
-            }
+            "select": { "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree },
+            "range": { "": ORBEON.xforms.Init._range },
+            "textarea": { "": ORBEON.xforms.Init._htmlArea }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
@@ -866,23 +866,21 @@ ORBEON.xforms.Init = {
         }
 
         // Initialize special controls
-        if (typeof opsXFormsControls != "undefined") {
+        if (!(window.opsXFormsControls === undefined)) {
             var initFunctions = ORBEON.xforms.Init._getSpecialControlsInitFunctions();
             // Iterate over controls
-            for (var strangeIterator = 0; strangeIterator < opsXFormsControls["controls"].length; strangeIterator++) {
-                for (var controlType in opsXFormsControls["controls"][strangeIterator]) {
-                    if (initFunctions[controlType]) {
-                        var controlAppearances = opsXFormsControls["controls"][strangeIterator][controlType][0];
-                        // Iterate over appearance for current control
-                        for (var controlAppearance in controlAppearances) {
-                            var initFunction = initFunctions[controlType][controlAppearance];
-                            if (initFunction) {
-                                var controlIds = controlAppearances[controlAppearance];
-                                // Iterate over controls
-                                for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
-                                    var control = document.getElementById(controlIds[controlIndex]);
-                                    initFunction(control);
-                                }
+            for (var controlType in window.opsXFormsControls["controls"]) {
+                if (initFunctions[controlType]) {
+                    var controlAppearances = window.opsXFormsControls["controls"][controlType];
+                    // Iterate over appearance for current control
+                    for (var controlAppearance in controlAppearances) {
+                        var initFunction = initFunctions[controlType][controlAppearance];
+                        if (initFunction) {
+                            var controlIds = controlAppearances[controlAppearance];
+                            // Iterate over controls
+                            for (var controlIndex = 0; controlIndex < controlIds.length; controlIndex++) {
+                                var control = document.getElementById(controlIds[controlIndex]);
+                                initFunction(control);
                             }
                         }
                     }
@@ -1100,18 +1098,9 @@ ORBEON.xforms.Init = {
     },
 
     elementsUnder: function(root) {
-
         var textareas = YAHOO.util.Dom.getElementsByClassName("wide-textarea", "textarea", root);
         for (var i = 0; i < textareas.length; i++)
             ORBEON.xforms.Init._widetextArea(textareas[i]);
-
-        var ranges = YAHOO.util.Dom.getElementsByClassName("xforms-range", "div", root);
-        for (var i = 0; i < ranges.length; i++)
-            ORBEON.xforms.Init._range(ranges[i]);
-
-        var htmlAreas = YAHOO.util.Dom.getElementsByClassName("xforms-mediatype-text-html", "textarea", root);
-        for (var i = 0; i < htmlAreas.length; i++)
-            ORBEON.xforms.Init._htmlArea(htmlAreas[i]);
     }
 };
 

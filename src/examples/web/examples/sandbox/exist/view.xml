@@ -134,7 +134,7 @@
             <xforms:group ref="instance('control-instance')/query">
                 <xhtml:fieldset>
                     <xhtml:legend>XQuery to execute</xhtml:legend>
-                    <xforms:textarea ref="instance('query-instance')/exist:text" class="wide-textarea" incremental="true">
+                    <xforms:textarea ref="instance('query-instance')/exist:text" appearance="xxforms:autosize" incremental="true">
                         <xforms:label></xforms:label>
                     </xforms:textarea>
                 </xhtml:fieldset>
@@ -143,7 +143,7 @@
             <xforms:group ref="instance('control-instance')/insert">
                 <xhtml:fieldset>
                     <xhtml:legend>Document to insert</xhtml:legend>
-                    <xforms:textarea ref="." class="wide-textarea" incremental="true">
+                    <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
                         <xforms:label></xforms:label>
                     </xforms:textarea>
                 </xhtml:fieldset>

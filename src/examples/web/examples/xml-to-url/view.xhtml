@@ -14,6 +14,7 @@
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -45,7 +46,7 @@
         </xhtml:ul>
         <xforms:group>
             <xhtml:p>
-                <xforms:textarea ref="instance('xml')" class="wide-textarea">
+                <xforms:textarea ref="instance('xml')" appearance="xxforms:autosize">
                     <xforms:label>XML:</xforms:label>
                 </xforms:textarea>
             </xhtml:p>

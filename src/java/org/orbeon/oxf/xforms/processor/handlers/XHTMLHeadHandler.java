@@ -132,7 +132,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             // Gather information about controls appearances
             final Map appearancesMap = new HashMap();
-            xformsControls.getCurrentControlsState().visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+            xformsControls.getCurrentControlsState().visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl xformsControl) {
                     final String controlName = xformsControl.getName();
 

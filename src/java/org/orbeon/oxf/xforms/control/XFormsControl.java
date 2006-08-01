@@ -70,12 +70,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
     protected XFormsControls.BindingContext bindingContext;
 
-    public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
+    public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         this.containingDocument = containingDocument;
         this.parent = parent;
         this.controlElement = element;
         this.name = name;
-        this.effectiveId = id;
+        this.effectiveId = effectiveId;
 
         // Extract event handlers
         if (element != null) {
@@ -515,7 +515,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                         }
 
                         // Update children xforms:repeat indexes if any
-                        xformsControls.visitAllControlInfo(new XFormsControls.XFormsControlVisitorListener() {
+                        xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
                             public void startVisitControl(XFormsControl XFormsControl) {
                                 if (XFormsControl instanceof XFormsRepeatControl) {
                                     // Found child repeat

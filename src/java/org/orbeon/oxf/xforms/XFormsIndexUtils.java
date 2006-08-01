@@ -52,7 +52,7 @@ public class XFormsIndexUtils {
 
         // TODO: detect use of index() function
         final Map updatedIndexesIds = new HashMap();
-        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+        currentControlsState.visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             private int level = 0;
 
@@ -119,7 +119,7 @@ public class XFormsIndexUtils {
                                                final XFormsControls.ControlsState currentControlsState, final Node clonedNode) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
-        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+        currentControlsState.visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             private XFormsControl foundXFormsControl;
 
@@ -240,7 +240,7 @@ public class XFormsIndexUtils {
                                               final Map nestedRepeatIndexUpdates, final Node nodeToRemove) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
-        xformsControls.getCurrentControlsState().visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+        xformsControls.getCurrentControlsState().visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             private XFormsControl foundXFormsControl;
             private boolean reinitializeInner;
@@ -351,7 +351,7 @@ public class XFormsIndexUtils {
 
         // We don't rebuild before iterating because the caller has already rebuilt
         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
-        currentControlsState.visitXFormsControlFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+        currentControlsState.visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
 
             public void startVisitControl(XFormsControl XFormsControl) {
                 if (XFormsControl instanceof XFormsRepeatControl) {

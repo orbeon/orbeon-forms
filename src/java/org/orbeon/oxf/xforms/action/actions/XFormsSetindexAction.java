@@ -66,7 +66,7 @@ public class XFormsSetindexAction extends XFormsAction {
 
         final int index = Integer.parseInt(indexString);
 
-        final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
+        final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatXFormsControl();
         final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) repeatIdToRepeatControlInfo.get(repeatId);
 
         if (repeatControlInfo == null)

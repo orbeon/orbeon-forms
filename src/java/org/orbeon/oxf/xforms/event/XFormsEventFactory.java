@@ -100,17 +100,17 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
             return new XFormsInvalidEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
-            return new XFormsRequiredEvent(targetObject);
+            return new XFormsRequiredEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {
-            return new XFormsOptionalEvent(targetObject);
+            return new XFormsOptionalEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_READWRITE)) {
-            return new XFormsReadwriteEvent(targetObject);
+            return new XFormsReadwriteEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_READONLY)) {
-            return new XFormsReadonlyEvent(targetObject);
+            return new XFormsReadonlyEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_ENABLED)) {
-            return new XFormsEnabledEvent(targetObject);
+            return new XFormsEnabledEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DISABLED)) {
-            return new XFormsDisabledEvent(targetObject);
+            return new XFormsDisabledEvent((XFormsControl) targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_FOCUS)) {
             return new XFormsFocusEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SCROLL_FIRST)) {

@@ -212,18 +212,15 @@
 
         <xforms:group ref="instance('errors-instance')/error">
             <table class="dmv-errors-table">
-                <!--<tr>-->
-                    <!--<th>Field</th>-->
-                    <!--<th>Row</th>-->
-                    <!--<th>Message</th>-->
-                <!--</tr>-->
                 <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
                     <tr>
                         <th>
                             <xforms:output value="@label"/>
                         </th>
                         <td>
-                            <xforms:output value="@indexes"/>
+                            <i>
+                                <xforms:output value="if (string-length(@indexes) > 0) then concat('(Row ', @indexes, ')') else ''"/>
+                            </i>
                         </td>
                         <td>
                             <xforms:output value="@alert"/>

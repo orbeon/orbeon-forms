@@ -60,13 +60,9 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsOutputControl);
 
         final String mediatypeValue = elementAttributes.getValue("mediatype");
-        final boolean isImage = mediatypeValue != null && mediatypeValue.startsWith("image/");
-        final boolean isHTML = (mediatypeValue != null && mediatypeValue.equals("text/html"))
+        final boolean isImageMediatype = mediatypeValue != null && mediatypeValue.startsWith("image/");
+        final boolean isHTMLMediaType = (mediatypeValue != null && mediatypeValue.equals("text/html"))
                 || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(elementAttributes));
-
-        if (isHTML) {
-            classes.append(" xforms-initially-hidden");
-        }
 
         if (!handlerContext.isGenerateTemplate()) {
 
@@ -85,12 +81,12 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         // Create xhtml:span or xhtml:div
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         // For IE we need to generate a div here for IE, which doesn't support working with innterHTML on spans.
-        final String enclosingElementLocalname = isHTML ? "div" : "span";
+        final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         if (!handlerContext.isGenerateTemplate()) {
-            if (isImage) {
+            if (isImageMediatype) {
                 // Case of image media type with URI
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
@@ -122,6 +118,14 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                 if (displayValue != null)
                     contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+            } else if (isHTMLMediaType) {
+                // HTML case
+
+                // TODO: use JTidy
+                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                if (displayValue != null)
+                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+
             } else {
                 // Regular text case
                 final String displayValue = xformsOutputControl.getDisplayValueOrValue();

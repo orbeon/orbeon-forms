@@ -50,9 +50,6 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
 
-        final String mediatypeValue = elementAttributes.getValue("mediatype");
-        final boolean isHTMLMediaType = "text/html".equals(mediatypeValue);
-
         final AttributesImpl newAttributes;
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
@@ -83,7 +80,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = getValue(xformsControl.getValue(), isHTMLMediaType);
+                    final String value = xformsControl.getValue();
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -93,7 +90,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = getValue(xformsControl.getValue(), isHTMLMediaType);
+                    final String value = xformsControl.getValue();
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -109,10 +106,5 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         // xforms:hint
         handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
-    }
-
-    private String getValue(String valueFromControl, boolean isHTMLMediaType) {
-        // TODO: use isHTMLMediaType and tidy-up!
-        return valueFromControl;
     }
 }

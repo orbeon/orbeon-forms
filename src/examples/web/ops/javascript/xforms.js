@@ -392,10 +392,16 @@ ORBEON.xforms.Controls = {
      */
     updateRequiredEmpty: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-required")) {
-            if (ORBEON.xforms.Controls.getCurrentValue(control) == "")
+            if (ORBEON.xforms.Controls.getCurrentValue(control) == "") {
                 ORBEON.util.Dom.addClass(control, "xforms-required-empty");
-            else
+                ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
+            } else {
+                ORBEON.util.Dom.addClass(control, "xforms-required-filled");
                 ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
+            }
+        } else {
+            ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
+            ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
         }
     }
 };
@@ -661,14 +667,15 @@ ORBEON.xforms.Events = {
             }
 
             // Click on trigger
-            if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))
-                    && !ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
+            if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
                 YAHOO.util.Event.preventDefault(event);
-                if (!window.addEventListener && target.tagName.toLowerCase() == "a") {
-                    // If this is an anchor and we didn't get a chance to register the focus event, send the focus event here
-                    ORBEON.xforms.Events.focus(event);
+                if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
+                    if (!window.addEventListener && target.tagName.toLowerCase() == "a") {
+                        // If this is an anchor and we didn't get a chance to register the focus event, send the focus event here
+                        ORBEON.xforms.Events.focus(event);
+                    }
+                    xformsFireEvents([xformsCreateEventArray(target, "DOMActivate", null)], false);
                 }
-                xformsFireEvents([xformsCreateEventArray(target, "DOMActivate", null)], false);
             }
 
             // Click on checkbox or radio button
@@ -2102,22 +2109,12 @@ function xformsHandleResponse(o) {
                                         // Handle required
                                         if (required != null) {
                                             var isRequired = required == "true";
-                                            if (isRequired) {
-                                                ORBEON.util.Dom.addClass(documentElement, "xforms-required");
-                                                if (documentElement.value == "") {
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-required-empty");
-                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-required-filled");
-                                                } else {
-                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-required-filled");
-                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-required-empty");
-                                                }
-                                            } else {
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required-filled");
-                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-required-empty");
-                                            }
-                                            ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                            if (isRequired) ORBEON.util.Dom.addClass(documentElement, "xforms-required");
+                                            else ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
                                         }
+                                        // Update the required-empty/required-full even if the required has not changed or
+                                        // is not specified as the value may have changed
+                                        ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
 
                                         // Handle readonly
                                         if (readonly != null) {

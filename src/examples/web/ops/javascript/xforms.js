@@ -736,7 +736,10 @@ ORBEON.xforms.Init = {
             },
             "select": { "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree },
             "range": { "": ORBEON.xforms.Init._range },
-            "textarea": { "": ORBEON.xforms.Init._htmlArea }
+            "textarea": {
+                "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
+                "": ORBEON.xforms.Init._htmlArea
+            }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
@@ -903,9 +906,6 @@ ORBEON.xforms.Init = {
             form.xformsIsXFormsForm = ORBEON.util.Dom.hasClass(form, "xforms-form");
             // If this is an XForms form, procede with initialization
             if (form.xformsIsXFormsForm) {
-
-                // Initialize elements as necessary
-                ORBEON.xforms.Init.elementsUnder(form);
 
                 // Initialize loading and error indicator
                 form.xformsLoadingLoading = null;
@@ -1095,12 +1095,6 @@ ORBEON.xforms.Init = {
         fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
         fckEditor.ToolbarSet = "OPS";
         fckEditor.ReplaceTextarea() ;
-    },
-
-    elementsUnder: function(root) {
-        var textareas = YAHOO.util.Dom.getElementsByClassName("xforms-textarea-appearance-xxforms-autosize", "textarea", root);
-        for (var i = 0; i < textareas.length; i++)
-            ORBEON.xforms.Init._widetextArea(textareas[i]);
     }
 };
 

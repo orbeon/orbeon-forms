@@ -59,9 +59,9 @@
         <city>Ville</city>
         <state>Etat</state>
         <zip>Numéro postal</zip>
-        <plate-number></plate-number>
-        <vin></vin>
-        <leased></leased>
+        <plate-number>Numéro de plaque</plate-number>
+        <vin>Id du vehicule ou vaisseau</vin>
+        <leased>Lease</leased>
         <company-name>Compagnie de leasing</company-name>
         <county>Comté</county>
     </labels>

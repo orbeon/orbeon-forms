@@ -25,7 +25,7 @@
         <title>OPS DMV Forms Example - Notice of Change of Address</title>
         <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
-        <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd">
+        <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd" xxforms:readonly-appearance="dynamic">
 
             <!-- This action clears all the fields of the mailing address -->
             <xforms:action ev:event="dmv-clear-mailing-address">
@@ -53,6 +53,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('main-instance')">
+
                 <!-- Metadata -->
                 <xforms:bind nodeset="document-date" calculate="current-dateTime()" type="xs:dateTime"/>
                 <!-- Business data -->
@@ -131,6 +132,16 @@
                 <xforms:bind nodeset="clear-vehicle-address" relevant="normalize-space(instance('main-instance')//dmv:vehicle-address) != ''"/>
             </xforms:bind>
 
+            <!-- XForms instance for error information -->
+            <xforms:instance id="errors-instance">
+                <errors xmlns="">
+                </errors>
+            </xforms:instance>
+
+            <xforms:instance id="error-template">
+                <error xmlns="" id="" indexes="" label="" alert=""/>
+            </xforms:instance>
+
             <!-- XForms instance for license plate information -->
             <!--<xforms:instance id="plate-instance">-->
                 <!--<control xmlns="">-->
@@ -198,6 +209,35 @@
                 </td>
             </tr>
         </table>
+
+        <xforms:group ref="instance('errors-instance')/error">
+            <table class="dmv-errors-table">
+                <!--<tr>-->
+                    <!--<th>Field</th>-->
+                    <!--<th>Row</th>-->
+                    <!--<th>Message</th>-->
+                <!--</tr>-->
+                <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
+                    <tr>
+                        <th>
+                            <xforms:output value="@label"/>
+                        </th>
+                        <td>
+                            <xforms:output value="@indexes"/>
+                        </td>
+                        <td>
+                            <xforms:output value="@alert"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </table>
+        </xforms:group>
+
+        <!--<ul id="dmv-errors">-->
+            <!--<xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">-->
+                <!--<li><xforms:output value="concat(@label, if (string-length(@indexes) > 0) then concat(' (row ', @indexes, ')')  else '', ': ', @alert)"/></li>-->
+            <!--</xforms:repeat>-->
+        <!--</ul>-->
 
         <xforms:group ref="instance('main-instance')/document/*">
             <!-- Clear messages upon user moving around in the form -->
@@ -279,6 +319,23 @@
                     <xforms:action ev:event="xforms-value-changed">
                         <xforms:setvalue ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
                     </xforms:action>
+                    <!-- Handle invalid and valid events -->
+                    <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
+                        <xforms:action if="not(instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')])">
+                            <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target-id')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                        </xforms:action>
+                        <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
+                        <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
+                    </xforms:action>
+                    <xforms:action ev:event="xforms-valid">
+                        <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+                    </xforms:action>
+                    <xforms:action ev:event="xforms-disabled">
+                        <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+                    </xforms:action>
+
                     <xforms:group ref="dmv:personal-information">
                         <tr>
                             <th>
@@ -592,21 +649,7 @@
                                         </tr>
                                     </table>
 
-                                    <!-- Simple version of the triggers -->
-                                    <!--<xforms:trigger ref="instance('control-instance')/vehicle-insert-trigger">-->
-                                        <!--<xforms:label>Add</xforms:label>-->
-                                        <!--<xforms:action ev:event="DOMActivate">-->
-                                            <!--<xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>-->
-                                        <!--</xforms:action>-->
-                                    <!--</xforms:trigger>-->
-                                    <!--<xforms:trigger ref="instance('control-instance')/vehicle-delete-trigger">-->
-                                        <!--<xforms:label>Remove</xforms:label>-->
-                                        <!--<xforms:action ev:event="DOMActivate">-->
-                                            <!--<xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>-->
-                                        <!--</xforms:action>-->
-                                    <!--</xforms:trigger>-->
-
-                                    <table class="dmv-gridtable">
+                                    <table class="dmv-gridtable" id="dmv-vehicles">
                                         <tr>
                                             <th><xforms:output value="instance('resources-instance')/titles/plate-number"/></th>
                                             <th><xforms:output value="instance('resources-instance')/titles/vin"/></th>

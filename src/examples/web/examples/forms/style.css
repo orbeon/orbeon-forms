@@ -16,8 +16,12 @@ td { vertical-align: top }
 .dmv-main-table { border: solid 2px #ffcc66; width: 64em }
 #main-action-table { width: 100% }
 #language-choice-td { width: 100%; text-align: right }
+#dmv-vehicles .xforms-label { display: none }
+.dmv-errors-table .xforms-repeat-selected-item-1 { background: none }
+.dmv-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 62em; background: #fcc}
+.dmv-errors-table th { padding: 0em; color: red  }
 /*.dmv-main-table { border: solid 2px #ffcc66 }*/
-.dmv-main-table th p { text-align: center }
+.dmv-main-table th p { text-align: center; vertical-align: top }
 /*.dmv-main-table th .xforms-output { white-space: pre; }*/
 .dmv-data-column { width: 100% }
 .dmv-action-table td { white-space: nowrap; vertical-align: middle; }

@@ -118,32 +118,31 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
     }
 
-    public static void handleMIPClasses(StringBuffer sb, XFormsControl XFormsControl) {
-        if (XFormsControl != null) {// TEMP, controlInfo should not be null
-            if (!XFormsControl.isRelevant()) {
+    public static void handleMIPClasses(StringBuffer sb, XFormsControl xformsControl) {
+        if (xformsControl != null) {// TEMP, controlInfo should not be null
+            if (!xformsControl.isRelevant()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-disabled");
             }
-            if (!XFormsControl.isValid()) {
+            if (!xformsControl.isValid()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-invalid");
             }
-            if (XFormsControl != null && XFormsControl.isReadonly()) {
+            if (xformsControl != null && xformsControl.isReadonly()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-readonly");
             }
-            if (XFormsControl != null && XFormsControl.isRequired()) {
+            if (xformsControl != null && xformsControl.isRequired()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
-                if ("".equals(XFormsControl.getValue()))
+                if ("".equals(xformsControl.getValue()))
                     sb.append(" xforms-required-empty");
                 else
                     sb.append(" xforms-required-filled");
-
             }
         }
     }

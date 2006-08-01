@@ -58,9 +58,9 @@
         <city>City</city>
         <state>State</state>
         <zip>Zip Code</zip>
-        <plate-number></plate-number>
-        <vin></vin>
-        <leased></leased>
+        <plate-number>California Plate / CF / Placard No.</plate-number>
+        <vin>Vehicle Id or Vessel Hull Id Number</vin>
+        <leased>Leased</leased>
         <company-name>Leasing Company's Name</company-name>
         <county>County</county>
     </labels>
@@ -76,7 +76,7 @@
         <apt>Must contain letters and digits only and be 4 characters long at most.</apt>
         <city>Must contain letters, '-' or space only, start with a letter, and be 22 characters long at most.</city>
         <state>Must contain two capital letters that match a valid US state.</state>
-        <zip>Must contain 5 digts.</zip>
+        <zip>Must contain 5 digits.</zip>
         <plate-number>Must contain letters and numbers only and be 8 characters long at most.</plate-number>
         <vin>Must contain letters and numbers only and be 17 characters long at most.</vin>
         <leased></leased>

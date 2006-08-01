@@ -700,7 +700,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Find all event handler containers
             final List containers = new ArrayList();
             {
-                XFormsEventHandlerContainer container = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
+                XFormsEventHandlerContainer container
+                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
                 while (container != null) {
                     containers.add(container);
                     container = container.getParentContainer();

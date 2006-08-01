@@ -16,12 +16,16 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.EmptyIterator;
 import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
+import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Base class for events related to MIP changes.
@@ -52,8 +56,22 @@ public abstract class XFormsMIPEvent extends XFormsEvent {
                 return new ListIterator(Collections.singletonList(new StringValue(label)));
             else
                 return new EmptyIterator();
-        } else if ("target-effective-id".equals(name)) {
-            return new ListIterator(Collections.singletonList(new StringValue(targetXFormsControl.getEffectiveId())));
+        } else if ("repeat-indexes".equals(name)) {
+            final String effectiveTargetId = targetXFormsControl.getEffectiveId();
+            final int index = (effectiveTargetId == null) ? - 1 : effectiveTargetId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+
+            if (index != -1) {
+                final String repeatIndexesString = effectiveTargetId.substring(index + 1);
+                StringTokenizer st = new StringTokenizer(repeatIndexesString, "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+                final List tokens = new ArrayList();
+                while (st.hasMoreTokens()) {
+                    final String currentToken = st.nextToken();
+                    tokens.add(new StringValue(currentToken));
+                }
+                return new ListIterator(tokens);
+            } else {
+                return new EmptyIterator();
+            }
         } else {
             return super.getAttribute(name);
         }

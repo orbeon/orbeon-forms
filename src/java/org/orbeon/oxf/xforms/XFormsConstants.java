@@ -126,10 +126,17 @@ public class XFormsConstants {
     public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
 
+    public static final QName XFORMS_FULL_APPEARANCE_QNAME = new QName("full");
+    public static final QName XFORMS_COMPACT_APPEARANCE_QNAME = new QName("compact");
+    public static final QName XFORMS_MINIMAL_APPEARANCE_QNAME = new QName("minimal");
+
     public static final QName XXFORMS_TREE_APPEARANCE_QNAME = new QName("tree", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = new QName("autocomplete", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOSIZE_APPEARANCE_QNAME = new QName("autosize", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_LINK_APPEARANCE_QNAME = new QName("link", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_IMAGE_APPEARANCE_QNAME = new QName("image", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_HTML_APPEARANCE_QNAME = new QName("html", XFormsConstants.XXFORMS_NAMESPACE);// legacy
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);

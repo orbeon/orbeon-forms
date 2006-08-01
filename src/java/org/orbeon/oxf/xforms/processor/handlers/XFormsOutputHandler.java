@@ -59,20 +59,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final boolean isDateOrTime;
         final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsOutputControl);
 
-        final String appearanceValue = elementAttributes.getValue("appearance");
-        final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
-        final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
-
         final String mediatypeValue = elementAttributes.getValue("mediatype");
         final boolean isImage = mediatypeValue != null && mediatypeValue.startsWith("image/");
         final boolean isHTML = (mediatypeValue != null && mediatypeValue.equals("text/html"))
-                || (appearanceValue != null && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "html".equals(appearanceLocalname));
+                || XFormsConstants.XXFORMS_HTML_APPEARANCE_QNAME.equals(getAppearance(elementAttributes));
 
         if (isHTML) {
             classes.append(" xforms-initially-hidden");
-            classes.append(" xforms-mediatype-text-html");
-        } else if (isImage) {
-            classes.append(" xforms-mediatype-image");
         }
 
         if (!handlerContext.isGenerateTemplate()) {

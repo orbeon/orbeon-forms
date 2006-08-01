@@ -217,38 +217,32 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final boolean isMany = localname.equals("select");
 
-        final QName appearance = getAppearance(elementAttributes);
-
-        String appearanceValue;
+        QName appearance;
         {
-            final String appearanceAttribute = elementAttributes.getValue("appearance");
-            if (appearanceAttribute != null)
-                appearanceValue = appearanceAttribute;
+            final QName tempAppearance = getAppearance(elementAttributes);
+            if (tempAppearance != null)
+                appearance = tempAppearance;
             else if (isMany)
-                appearanceValue = "compact";// default for xforms:select
+                appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;// default for xforms:select
             else
-                appearanceValue = "minimal";// default for xforms:select1
+                appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
         }
-        String appearanceLocalname = XMLUtils.localNameFromQName(appearanceValue);
-        String appearanceURI = uriFromQName(appearanceValue);
 
         boolean isOpenSelection = "open".equals(elementAttributes.getValue("selection"));
         boolean isAutocomplete = isOpenSelection
-                && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI)
-                && "autocomplete".equals(appearanceLocalname);
+                && XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME.equals(appearance);
 
         // NOTE: We don't support autocompletion with xforms:select for now, only with xforms:select1
         if (isAutocomplete && isMany) {
-            appearanceValue = "compact";
-            appearanceLocalname = appearanceValue;
-            appearanceURI = "";
+            appearance = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME;
             isOpenSelection = false;
             isAutocomplete = false;
         }
 
-        final boolean isFull = "full".equals(appearanceLocalname);
-        final boolean isTree = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("tree".equals(appearanceLocalname));
-        final boolean isMenu = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && ("menu".equals(appearanceLocalname));
+        final boolean isFull = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME.equals(appearance);
+        final boolean isCompact = XFormsConstants.XFORMS_COMPACT_APPEARANCE_QNAME.equals(appearance);
+        final boolean isTree = XFormsConstants.XXFORMS_TREE_APPEARANCE_QNAME.equals(appearance);
+        final boolean isMenu = XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME.equals(appearance);
 
         final boolean isAutocompleteNoFilter = isAutocomplete && "false".equals(elementAttributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "filter"));
 
@@ -338,7 +332,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 reusableAttributes.clear();
                                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select1-open-select");
 
-                                if ("compact".equals(appearanceLocalname))
+                                if (isCompact)
                                     reusableAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
                                 // Handle accessibility attributes
@@ -452,7 +446,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // Create xhtml:select
                     final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
 
-                    if ("compact".equals(appearanceLocalname))
+                    if (isCompact)
                         newAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
 
                     // Handle accessibility attributes

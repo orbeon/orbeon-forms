@@ -44,27 +44,25 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
+        final XFormsControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
 
         final String mediatypeValue = elementAttributes.getValue("mediatype");
         final boolean isHTMLMediaType = "text/html".equals(mediatypeValue);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
-            if (isHTMLMediaType)
-                classes.append(" xforms-mediatype-text-html");
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
 
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleMIPClasses(classes, XFormsControl);
+                handleMIPClasses(classes, xformsControl);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, XFormsControl);
+                handleReadOnlyAttribute(newAttributes, xformsControl);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }
@@ -73,7 +71,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         // Create xhtml:textarea
         {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-            if (!isStaticReadonly(XFormsControl)) {
+            if (!isStaticReadonly(xformsControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
                 newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
@@ -85,7 +83,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = XFormsControl.getValue();
+                    final String value = getValue(xformsControl.getValue(), isHTMLMediaType);
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -95,7 +93,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
-                    final String value = XFormsControl.getValue();
+                    final String value = getValue(xformsControl.getValue(), isHTMLMediaType);
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
                 }
@@ -104,12 +102,17 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
+    }
+
+    private String getValue(String valueFromControl, boolean isHTMLMediaType) {
+        // TODO: use isHTMLMediaType and tidy-up!
+        return valueFromControl;
     }
 }

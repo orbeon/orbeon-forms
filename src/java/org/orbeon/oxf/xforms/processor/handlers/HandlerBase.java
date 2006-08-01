@@ -272,6 +272,31 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 sb.append(appearance.getName());
             }
         }
+        {
+            // Class for mediatype
+            final String mediatypeValue = controlAttributes.getValue("mediatype");
+            if (mediatypeValue != null) {
+
+                // NOTE: We could certainly do a better check than this to make sure we have a valid mediatype
+                final int slashIndex = mediatypeValue.indexOf('/');
+                if (slashIndex == -1)
+                    throw new OXFException("Invalid mediatype attribute value: " + mediatypeValue);
+
+                if (sb.length() > 0)
+                    sb.append(' ');
+                sb.append("xforms-mediatype-");
+                if (mediatypeValue.endsWith("/*")) {
+                    // Add class with just type: "image/*" -> "xforms-mediatype-image"
+                    sb.append(mediatypeValue.substring(0, mediatypeValue.length() - 2));
+                } else {
+                    // Add class with type and subtype: "text/html" -> "xforms-mediatype-text-html"
+                    sb.append(mediatypeValue.replace('/', '-'));
+                    // Also add class with just type: "image/jpeg" -> "xforms-mediatype-image"
+                    sb.append(" xforms-mediatype-");
+                    sb.append(mediatypeValue.substring(0, slashIndex));
+                }
+            }
+        }
 
         // Static read-only
         if (isStaticReadonly(XFormsControl))

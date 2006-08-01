@@ -23,6 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.QName;
 
 /**
  * Handle xforms:trigger.
@@ -71,9 +72,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : XFormsControl.getLabel();
 
-        final String appearanceValue = elementAttributes.getValue("appearance");
-        final String appearanceLocalname = (appearanceValue == null) ? null : XMLUtils.localNameFromQName(appearanceValue);
-        final String appearanceURI = (appearanceValue == null) ? null : uriFromQName(appearanceValue);
+        final QName appearance = getAppearance(elementAttributes);
 
         final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
         if (!handlerContext.isGenerateTemplate())
@@ -90,8 +89,7 @@ public class XFormsTriggerHandler extends HandlerBase {
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }
 
-        if (appearanceValue != null
-                && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "link".equals(appearanceLocalname)) {
+        if (appearance != null && XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)) {
             // Link appearance (xxforms:link)
 
             // TODO: probably needs f:url-norewrite="true"
@@ -104,8 +102,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName);
 
-        } else if (appearanceValue != null
-                && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearanceURI) && "image".equals(appearanceLocalname)) {
+        } else if (appearance != null && XFormsConstants.XXFORMS_IMAGE_APPEARANCE_QNAME.equals(appearance)) {
             // Image appearance
 
             newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "image");

@@ -132,6 +132,11 @@
     display: none;
 }
 
+.xforms-textarea-appearance-xxforms-autosize {
+    font-size: 11px;
+    width: 100%;
+}
+
 .xforms-range-background {
     position: relative;
     width: 218px;

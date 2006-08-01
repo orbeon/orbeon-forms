@@ -262,8 +262,8 @@ ORBEON.xforms.Controls = {
             return control.childNodes[1].value;
         } if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
             return control.childNodes[0].value;
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-full")
-                || ORBEON.util.Dom.hasClass(control, "xforms-select1-full")) {
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")) {
             var inputs = control.getElementsByTagName("input");
             var spanValue = "";
             for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -274,9 +274,9 @@ ORBEON.xforms.Controls = {
                 }
             }
             return spanValue;
-        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-compact")
-                || ORBEON.util.Dom.hasClass(control, "xforms-select1-minimal")
-                || ORBEON.util.Dom.hasClass(control, "xforms-select1-compact")) {
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-compact")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-minimal")
+                || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-compact")) {
             var options = control.options;
             var selectValue = "";
             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -506,7 +506,7 @@ ORBEON.xforms.Events = {
         if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
 
             // For select1 list, make sure we have exactly one value selected
-            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-compact")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                 if (target.value == "") {
                     // Stop end-user from deselecting last selected value
                     target.value = target.options[0].value;
@@ -568,7 +568,7 @@ ORBEON.xforms.Events = {
             ORBEON.xforms.Controls.updateRequiredEmpty(target);
 
             // Resize wide text area
-            if (ORBEON.util.Dom.hasClass(target, "wide-textarea")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-textarea-appearance-xxforms-autosize")) {
                 var lineNumber = target.value.split("\n").length;
                 if (lineNumber < 5) lineNumber = 5;
                 target.style.height = 3 + lineNumber * 1.1 + "em";
@@ -672,8 +672,8 @@ ORBEON.xforms.Events = {
             }
 
             // Click on checkbox or radio button
-            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-full")
-                    || ORBEON.util.Dom.hasClass(target, "xforms-select-full")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-full")
+                    || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-full")) {
                 xformsFireEvents(new Array(xformsCreateEventArray
                         (target, "xxforms-value-change-with-focus-change",
                                 ORBEON.xforms.Controls.getCurrentValue(target), null)), false);
@@ -1098,7 +1098,7 @@ ORBEON.xforms.Init = {
     },
 
     elementsUnder: function(root) {
-        var textareas = YAHOO.util.Dom.getElementsByClassName("wide-textarea", "textarea", root);
+        var textareas = YAHOO.util.Dom.getElementsByClassName("xforms-textarea-appearance-xxforms-autosize", "textarea", root);
         for (var i = 0; i < textareas.length; i++)
             ORBEON.xforms.Init._widetextArea(textareas[i]);
     }
@@ -1983,21 +1983,21 @@ function xformsHandleResponse(o) {
                                                 documentElement.childNodes[0].value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             }
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")
-                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-full")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-full")) {
                                             // Handle checkboxes and radio buttons
-                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")
+                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")
                                                 ? newControlValue.split(" ") : new Array(newControlValue);
                                             var checkboxInputs = documentElement.getElementsByTagName("input");
                                             for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
                                                 var checkboxInput = checkboxInputs[checkboxInputIndex];
                                                 checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
                                             }
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-compact")
-                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-compact")
-                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-minimal")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-compact")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
                                             // Handle lists and comboboxes
-                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-compact")
+                                            var selectedValues = ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-compact")
                                                 ? newControlValue.split(" ") : new Array(newControlValue);
                                             var options = documentElement.options;
                                             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -2009,6 +2009,8 @@ function xformsHandleResponse(o) {
                                             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
                                                 documentElement.firstChild.src = newOutputControlValue;
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                documentElement.innerHTML = newOutputControlValue;
                                             } else {
                                                 ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                             }
@@ -2161,8 +2163,8 @@ function xformsHandleResponse(o) {
                                                 // XForms output and group
                                                 if (isReadonly) ORBEON.util.Dom.addClass(documentElement, "xforms-readonly");
                                                 else ORBEON.util.Dom.removeClass(documentElement, "xforms-readonly");
-                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-full")
-                                                    || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-full")) {
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-full")
+                                                    || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")) {
                                                 // XForms radio buttons
                                                 for (var spanIndex = 0; spanIndex < documentElement.childNodes.length; spanIndex++) {
                                                     var span = documentElement.childNodes[spanIndex];

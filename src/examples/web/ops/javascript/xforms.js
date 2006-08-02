@@ -341,6 +341,11 @@ ORBEON.xforms.Controls = {
     },
 
     setValid: function(control, isValid) {
+        // Update class xforms-invalid on the control
+        if (isValid) ORBEON.util.Dom.removeClass(control, "xforms-invalid");
+        else ORBEON.util.Dom.addClass(control, "xforms-invalid");
+
+        // Update class on alert label
         var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
         if (alertElement != null) { // Some controls don't have validity indicator
             if (isValid) {

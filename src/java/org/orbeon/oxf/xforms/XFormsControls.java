@@ -837,7 +837,7 @@ public class XFormsControls {
                         xformsControl.setReadonly(false);
                         xformsControl.setRequired(false);
                         xformsControl.setRelevant(false);
-                        xformsControl.setValid(false);
+                        xformsControl.setValid(true);// by default, a control is not invalid
                         xformsControl.setType(null);
                     }
                 }
@@ -1709,9 +1709,10 @@ public class XFormsControls {
             if (!(leadingControl instanceof XFormsRepeatControl)) {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
-                if (!leadingControl.equals(otherControl)) {
+//                if (!leadingControl.equals(otherControl)) {
                     String foundControlId = null;
                     XFormsControl targetControl = null;
+                    int eventType = 0;
                     if (xformsControl1 != null && xformsControl2 != null) {
                         final NodeInfo boundNode1 = xformsControl1.getBoundNode();
                         final NodeInfo boundNode2 = xformsControl2.getBoundNode();
@@ -1719,15 +1720,27 @@ public class XFormsControls {
                         if (boundNode1 != null && xformsControl1.isRelevant() && boundNode2 == null) {
                             // A control was bound to a node and relevant, but has become no longer bound to a node
                             foundControlId = xformsControl2.getEffectiveId();
+                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                         } else if (boundNode1 == null && boundNode2 != null && xformsControl2.isRelevant()) {
                             // A control was not bound to a node, but has now become bound and relevant
                             foundControlId = xformsControl2.getEffectiveId();
+                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                         }
+
+                        // TODO
+//                        if (boundNode2 != null && boundNode1 != boundNode2) {
+//                            // The control is now bound to a different node
+//                            // In this case, we schedule the control to dispatch all the events
+//                            foundControlId = xformsControl2.getEffectiveId();
+//                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;// TODO: or use other event type?
+//                            xxx
+//                        }
                     } else if (xformsControl2 != null) {
                         final NodeInfo boundNode2 = xformsControl2.getBoundNode();
                         if (boundNode2 != null && xformsControl2.isRelevant()) {
                             // A control was not bound to a node, but has now become bound and relevant
                             foundControlId = xformsControl2.getEffectiveId();
+                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                         }
                     } else if (xformsControl1 != null) {
                         final NodeInfo boundNode1 = xformsControl1.getBoundNode();
@@ -1735,6 +1748,7 @@ public class XFormsControls {
                             // A control was bound to a node and relevant, but has become no longer bound to a node
                             foundControlId = xformsControl1.getEffectiveId();
                             targetControl = xformsControl1;
+                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                         }
                     }
 
@@ -1743,9 +1757,9 @@ public class XFormsControls {
                         if (eventsToDispatch[0] == null)
                             eventsToDispatch[0] = new HashMap();
                         eventsToDispatch[0].put(foundControlId,
-                                new XFormsModel.EventSchedule(foundControlId, XFormsModel.EventSchedule.RELEVANT_BINDING, targetControl));
+                                new XFormsModel.EventSchedule(foundControlId, eventType, targetControl));
                     }
-                }
+//                }
             }
 
             // 2: Check children if any

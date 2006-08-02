@@ -49,17 +49,31 @@ public class XFormsGroupHandler extends HandlerBase {
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
+        // xforms:label
         final String labelValue = handlerContext.isGenerateTemplate() ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
             XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
         }
+
+        // NOTE: This doesn't work because attributes for the label are only gathered after start()
+//        handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
+
         // Close xhtml:span
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+
+        // xforms:help
+        handleLabelHintHelpAlert(effectiveGroupId, "help", groupXFormsControl);
+
+        // xforms:alert
+        handleLabelHintHelpAlert(effectiveGroupId, "alert", groupXFormsControl);
+
+        // xforms:hint
+        handleLabelHintHelpAlert(effectiveGroupId, "hint", groupXFormsControl);
     }
 }

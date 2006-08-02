@@ -313,24 +313,24 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
     }
 
-    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl XFormsControl) throws SAXException {
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl) throws SAXException {
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
-        if (isStaticReadonly(XFormsControl) && (type.equals("alert") || type.equals("hint")))
+        if (isStaticReadonly(xformsControl) && (type.equals("alert") || type.equals("hint")))
             return;
 
         final String value;
-        if (XFormsControl != null) {
+        if (xformsControl != null) {
             // Get actual value from control
             if (type.equals("label")) {
-                value = XFormsControl.getLabel();
+                value = xformsControl.getLabel();
             } else if (type.equals("help")) {
-                value = XFormsControl.getHelp();
+                value = xformsControl.getHelp();
             } else if (type.equals("hint")) {
-                value = XFormsControl.getHint();
+                value = xformsControl.getHint();
             } else if (type.equals("alert")) {
-                value = XFormsControl.getAlert();
+                value = xformsControl.getAlert();
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
@@ -360,7 +360,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
             final StringBuffer classes = new StringBuffer("xforms-");
             classes.append(type);
             if (type.equals("alert")) {
-                if (!handlerContext.isGenerateTemplate() && !XFormsControl.isValid())
+                if (!handlerContext.isGenerateTemplate() && !xformsControl.isValid())
                     classes.append(" xforms-alert-active");
                 else
                     classes.append(" xforms-alert-inactive");

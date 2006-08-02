@@ -690,9 +690,11 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-input")) {
 
                 // Initialize calendar when needed
+                var displayField = target.childNodes[0];
                 var inputField = target.childNodes[1];
                 var showCalendar = target.childNodes[2];
-                if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")) {
+                if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")
+                        && !ORBEON.util.Dom.hasClass(displayField, "xforms-readonly")) {
 
                     // Setup calendar library if not done already
                     if (!ORBEON.xforms.Globals.inputCalendarCreated[target.id]) {

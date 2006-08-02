@@ -21,13 +21,13 @@ public class Numberer_fr extends Numberer_en {
 
 	private static String[] frenchTens = { "", "Dix", "Vingt", "Trente", "Quarante", "Cinquante", "Soixante", "Soixante", "Quatre-vingt", "Quatre-vingt" };
 
-	private static String[] frenchOrdinalUnits = { "", "Premier", "Deuxième", "Troisième", "Quatrième", "Cinquième", "Sixième", "Septième", "Huitième", "Neuvième", "Dixième", "Onzième", "Douzième", "Treizième", "Quatorzième", "Quinzième", "Seizième", "Dix-septième", "Dix-huitième", "Dix-neuvième" };
+	private static String[] frenchOrdinalUnits = { "", "Premier", "Deuxi\u00e8me", "Troisi\u00e8me", "Quatri\u00e8me", "Cinqui\u00e8me", "Sixi\u00e8me", "Septi\u00e8me", "Huiti\u00e8me", "Neuvi\u00e8me", "Dixi\u00e8me", "Onzi\u00e8me", "Douzi\u00e8me", "Treizi\u00e8me", "Quatorzi\u00e8me", "Quinzi\u00e8me", "Seizi\u00e8me", "Dix-septi\u00e8me", "Dix-huiti\u00e8me", "Dix-neuvi\u00e8me" };
 
-	private static String[] frenchOrdinalTens = { "", "Dixième", "Vingtième", "Trentième", "Quarantième", "Cinquantième", "Soixantième", "Soixante", "Quatre-vingtième", "Quatre-vingt" };
+	private static String[] frenchOrdinalTens = { "", "Dixi\u00e8me", "Vingti\u00e8me", "Trenti\u00e8me", "Quaranti\u00e8me", "Cinquanti\u00e8me", "Soixanti\u00e8me", "Soixante", "Quatre-vingti\u00e8me", "Quatre-vingt" };
 
 	private static String[] frenchDays = { "Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi" };
 
-	private static String[] frenchMonths = { "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre" };
+	private static String[] frenchMonths = { "Janvier", "F\u00e9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\u00fbt", "Septembre", "Octobre", "Novembre", "D\u00e9cembre" };
 
 	/*
 	 * (non-Javadoc)
@@ -70,7 +70,7 @@ public class Numberer_fr extends Numberer_en {
 
 	private String toWords(long number, boolean terminal) {
 		if (number == 0) {
-			return "Zéro";
+			return "Z\u00e9ro";
 		} else if (number >= 1000000000000000000l) {
 			long rem = number % 1000000000000000000l;
 			long n = number / 1000000000000000000l;
@@ -141,7 +141,7 @@ public class Numberer_fr extends Numberer_en {
 		String ord;
 		if (number < 20) {
 			if (number == 0) {
-				ord = "Zéroième";
+				ord = "Z\u00e9roi\u00e8me";
 			} else {
 				ord = frenchOrdinalUnits[(int) number];
 			}
@@ -161,10 +161,10 @@ public class Numberer_fr extends Numberer_en {
 					prefix = prefix.substring(0, prefix.length() - 1);
 				}
 				String result = prefix + link;
-				ord = result + ((mod10 == 1) ? "unième" : toOrdinalWords("", mod10, LOWER_CASE));
+				ord = result + ((mod10 == 1) ? "uni\u00e8me" : toOrdinalWords("", mod10, LOWER_CASE));
 			}
 		} else {
-			String suffix = "ième";
+			String suffix = "i\u00e8me";
 			long mod100 = number % 100;
 			long int100 = number / 100;
 			if (int100 == 70 || int100 == 90) {
@@ -184,7 +184,7 @@ public class Numberer_fr extends Numberer_en {
 				prefix = prefix.substring(0, prefix.length() - 1);
 			}
 
-			ord = prefix + ((mod100 == 0) ? suffix : " " + ((mod100 == 1) ? "unième" : toOrdinalWords("", mod100, LOWER_CASE)));
+			ord = prefix + ((mod100 == 0) ? suffix : " " + ((mod100 == 1) ? "uni\u00e8me" : toOrdinalWords("", mod100, LOWER_CASE)));
 		}
 		if (wordCase == UPPER_CASE) {
 			return ord.toUpperCase();
@@ -258,5 +258,5 @@ public class Numberer_fr extends Numberer_en {
 // Rights Reserved.
 //
 // Contributor(s): 	Laurent Bourbeau, for the elaboration of JUnit tests
-//					and Jean-Grégoire Djénandji, for acceptance testing.
+//					and Jean-Gr\u00e9goire Dj\u00e9nandji, for acceptance testing.
 //

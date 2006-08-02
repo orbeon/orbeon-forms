@@ -232,7 +232,8 @@ ORBEON.xforms.Globals = {
     serverValue: {},                  // Values on controls known to the server
     autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
     autoCompleteOpen: {},
-    loadingOtherPage: false           // Flag set when loading other page that revents the loading indicator to disappear
+    loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
+    activeControl: null               // The currently active control, used to disable hint
 };
 
 // @class
@@ -403,6 +404,24 @@ ORBEON.xforms.Controls = {
             ORBEON.util.Dom.removeClass(control, "xforms-required-filled");
             ORBEON.util.Dom.removeClass(control, "xforms-required-empty");
         }
+    },
+
+    hintActive: function(control, active) {
+        var hintLabel = ORBEON.xforms.Events._findHint(control);
+        if (hintLabel != null) {
+            if (active) {
+                // Disable previously active control
+                if (ORBEON.xforms.Globals.activeControl != null)
+                    ORBEON.xforms.Controls.hintActive(ORBEON.xforms.Globals.activeControl, false);
+                ORBEON.xforms.Globals.activeControl = control;
+                ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint");
+                ORBEON.util.Dom.addClass(hintLabel, "xforms-hint-active");
+            } else {
+                ORBEON.xforms.Globals.activeControl = null;
+                ORBEON.util.Dom.addClass(hintLabel, "xforms-hint");
+                ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint-active");
+            }
+        }
     }
 };
 
@@ -451,6 +470,8 @@ ORBEON.xforms.Events = {
         if (!document.xformsMaskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
+                // Activate hint if we found one
+                ORBEON.xforms.Controls.hintActive(target, true);
                 // Store initial value of control
                 if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
                     ORBEON.xforms.Globals.serverValue[target.id] = target.value;
@@ -469,13 +490,6 @@ ORBEON.xforms.Events = {
                         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
                     }
                 }
-
-                // Activate hint if we found one
-                var hintLabel = ORBEON.xforms.Events._findHint(target);
-                if (hintLabel != null) {
-                    ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint");
-                    ORBEON.util.Dom.addClass(hintLabel, "xforms-hint-active");
-                }
             }
             document.xformsPreviousDOMFocusIn = target;
         } else {
@@ -487,6 +501,8 @@ ORBEON.xforms.Events = {
         if (!document.xformsMaskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
+                // De-activate hint if we found one
+                ORBEON.xforms.Controls.hintActive(target, false);
                 // This is an event for an XForms control
                 document.xformsPreviousDOMFocusOut = target;
                 // HTML area does not throw value change event, so we throw it on blur
@@ -495,13 +511,6 @@ ORBEON.xforms.Events = {
                     var editorInstance = FCKeditorAPI.GetInstance(target.name);
                     target.value = editorInstance.GetXHTML();
                     xformsValueChanged(target, null);
-                }
-
-                // De-activate hint if we found one
-                var hintLabel = ORBEON.xforms.Events._findHint(target);
-                if (hintLabel != null) {
-                    ORBEON.util.Dom.addClass(hintLabel, "xforms-hint");
-                    ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint-active");
                 }
             }
         }
@@ -660,6 +669,8 @@ ORBEON.xforms.Events = {
     click: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
+            // Activate hint
+            ORBEON.xforms.Controls.hintActive(target, true);
 
             // Click on output
             if (ORBEON.util.Dom.hasClass(target, "xforms-output")) {

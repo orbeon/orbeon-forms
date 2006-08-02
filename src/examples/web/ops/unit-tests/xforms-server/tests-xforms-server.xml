@@ -1423,7 +1423,7 @@
                     <xxf:control-values>
                         <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type=""/>
                         <xxf:control id="id2" readonly="false" required="false" relevant="true" valid="true" type=""/>
-                        <xxf:control id="id3" readonly="false" required="false" relevant="false" valid="false" type=""/>
+                        <xxf:control id="id3" readonly="false" required="false" relevant="false" valid="true" type=""/>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:itemsets/>

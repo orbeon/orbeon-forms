@@ -124,7 +124,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 }
                             }
 
-                            items.add(new XFormsSelect1Control.Item(true, itemsetAttributes, currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));
+                            items.add(new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null), currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));
                             nodeStack.push(currentNodeInfo);
                             level = newLevel;
                         }
@@ -174,7 +174,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
             if ("item".equals(localname)) {
                 // xforms:item
-                items.add(new XFormsSelect1Control.Item(false, itemChoicesAttributes, labelStringBuffer.toString(), valueStringBuffer.toString(), hierarchyLevel));
+                items.add(new XFormsSelect1Control.Item(false, getAttributes(itemChoicesAttributes, null, null), labelStringBuffer.toString(), valueStringBuffer.toString(), hierarchyLevel));
                 isInItem = false;
                 hierarchyLevel--;
             } else if ("label".equals(localname)) {
@@ -189,7 +189,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     choicesStack.push(choicesLabel);
                     hierarchyLevel++;
 
-                    items.add(new XFormsSelect1Control.Item(false, itemChoicesAttributes, choicesLabel, null, hierarchyLevel));
+                    items.add(new XFormsSelect1Control.Item(false, getAttributes(itemChoicesAttributes, null, null), choicesLabel, null, hierarchyLevel));
                 }
 
                 isInLabel = false;
@@ -293,7 +293,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new XFormsSelect1Control.Item(true, itemsetAttributes, "$xforms-template-label$", "$xforms-template-value$", 1), "$xforms-item-index$", true);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null), "$xforms-template-label$", "$xforms-template-value$", 1), "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                     // TODO: in the future we should be able to handle multiple itemsets

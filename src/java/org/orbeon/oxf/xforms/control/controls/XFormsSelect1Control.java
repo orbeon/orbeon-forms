@@ -121,7 +121,7 @@ public class XFormsSelect1Control extends XFormsControl {
                     final String label = element.element(XFormsConstants.XFORMS_LABEL_QNAME).getStringValue();
                     final String value = element.element(XFormsConstants.XFORMS_VALUE_QNAME).getStringValue();
 
-                    items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, value, hierarchyLevel + 1));
+                    items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
@@ -143,7 +143,7 @@ public class XFormsSelect1Control extends XFormsControl {
                                 }
                             }
 
-                            items.add(new XFormsSelect1Control.Item(true, element.attributes(), currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));
+                            items.add(new XFormsSelect1Control.Item(true, element.attributes(), currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));// TODO: must filter attributes on element.attributes()
                             nodeStack.push(currentNodeInfo);
                             level = newLevel;
                         }
@@ -157,7 +157,7 @@ public class XFormsSelect1Control extends XFormsControl {
                         // TODO: support @ref
                         final String label = labelElement.getStringValue();
                         hierarchyLevel++;
-                        items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, null, hierarchyLevel));
+                        items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }

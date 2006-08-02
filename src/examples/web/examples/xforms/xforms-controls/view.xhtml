@@ -27,11 +27,11 @@
             .controls-range { margin-top: 1em; margin-bottom: 2em; }
             .xforms-textarea { font-family: sans-serif; }
         </xhtml:style>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema" id="main-model">
+        <xforms:model id="main-model">
             <xforms:action ev:event="xforms-ready">
                 <xforms:send submission="countries-submission"/>
                 <xforms:refresh model="main-model"/>
+                <xforms:setfocus control="age-input-control"/>
             </xforms:action>
             <xforms:instance id="instance">
                 <!-- Here we illustrate how an XForms instance can be included with XInclude -->
@@ -129,11 +129,11 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('instance')">
-            <widget:tabs>
-                <widget:tab id="text-controls" selected="true">
+            <widget:tabs ref=".">
+                <widget:tab id="text-controls">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
-                        <xforms:input ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
+                        <xforms:input id="age-input-control" ref="age" incremental="true" class="input" xxforms:maxlength="3" navindex="1">
                             <xforms:label class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                         </xforms:input>

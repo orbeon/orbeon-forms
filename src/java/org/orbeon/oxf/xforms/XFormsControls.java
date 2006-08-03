@@ -439,7 +439,10 @@ public class XFormsControls {
         {
             if (bindId != null) {
                 // Resolve the bind id to a nodeset
-                newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bindId));
+                final ModelBind modelBind = newModel.getModelBindById(bindId);
+                if (modelBind == null)
+                    throw new OXFException("Cannot find bind for id: " + bindId);
+                newNodeset = newModel.getBindNodeset(pipelineContext, modelBind);
             } else if (ref != null || nodeset != null) {
 
                 // Check whether there is an optional context

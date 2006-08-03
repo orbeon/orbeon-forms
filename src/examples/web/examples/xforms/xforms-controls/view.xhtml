@@ -87,7 +87,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('instance')">
-                <xforms:bind nodeset="age" type="xs:positiveInteger" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
+                <xforms:bind id="age-bind" nodeset="age" type="xs:positiveInteger" constraint="number(.) >= 0 and number(.) &lt;= 150"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
                 <xforms:bind nodeset="date" type="xs:date" constraint="if (. castable as xs:date)

@@ -34,23 +34,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This processor adds ids on all the XForms elements which don't have any, and adds xforms:alert
- * elements within relevant XForms element which don't have any.
- *
- * TODO: We shouldn't have to add those xforms:alert elements. Is this a legacy from the XSLT version of XFormsToXHTML?
+ * This processor adds ids on all the XForms elements which don't have any.
  */
 public class XFormsDocumentAnnotator extends ProcessorImpl {
-
-    private static final Map alertElements = new HashMap();
-
-    static {
-        alertElements.put("input", "");
-        alertElements.put("secret", "");
-        alertElements.put("textarea", "");
-        alertElements.put("select", "");
-        alertElements.put("select1", "");
-        alertElements.put("output", "");
-    }
 
     public XFormsDocumentAnnotator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
@@ -71,8 +57,6 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
                     private int currentId = 1;
-                    private String alertParentIdAttribute;
-                    private boolean hasAlert;
                     private Locator documentLocator;
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -110,14 +94,6 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                             // Remember that this id was used
                             ids.put(newIdAttribute, "");
 
-                            if (alertElements.get(localname) != null) {
-                                // Control may have an alert
-                                hasAlert = false;
-                                alertParentIdAttribute = newIdAttribute;
-                            } else if (localname.equals("alert")) {
-                                hasAlert = true;
-                            }
-
                             currentId++;
                         }
 
@@ -125,30 +101,6 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                     }
 
                     public void endElement(String uri, String localname, String qName) throws SAXException {
-
-                        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-                            // This is an XForms element
-
-                            if (alertElements.get(localname) != null) {
-                                // Control may have an alert
-
-                                if (!hasAlert) {
-                                    // Create an alert element
-
-                                    final int colonIndex = qName.indexOf(':');
-                                    final String prefix = (colonIndex == -1) ? null : qName.substring(0, colonIndex);
-                                    final String newLocalname = "alert";
-                                    final String newQName = (prefix == null) ? newLocalname : prefix + ":" + newLocalname; // if parent doesn't have a prefix, then we can also not use a prefix
-
-                                    final AttributesImpl newAttributes = new AttributesImpl();
-                                    newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, alertParentIdAttribute + "-alert");
-
-                                    super.startElement(XFormsConstants.XFORMS_NAMESPACE_URI, newLocalname, newQName, newAttributes);
-                                    super.endElement(XFormsConstants.XFORMS_NAMESPACE_URI, newLocalname, newQName);
-                                }
-                            }
-                        }
-
                         super.endElement(uri, localname, qName);
                     }
 

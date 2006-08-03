@@ -394,7 +394,7 @@ ORBEON.xforms.Controls = {
     setFocus: function(controlId) {
         var control = document.getElementById(controlId);
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
-            ORBEON.xforms.Dom.getChildElement(control, 1).focus();
+            ORBEON.util.Dom.getChildElement(control, 1).focus();
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }

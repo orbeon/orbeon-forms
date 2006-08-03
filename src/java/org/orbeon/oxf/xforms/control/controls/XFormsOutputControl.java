@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
+import java.util.List;
 
 /**
  * Represents an xforms:output control.
@@ -56,9 +57,14 @@ public class XFormsOutputControl extends XFormsControl {
             rawValue = XFormsInstance.getValueForNode(bindingContext.getSingleNode());
         } else {
             // Value comes from the XPath expression within the value attribute
-            rawValue = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
-                    bindingContext.getNodeset(), bindingContext.getPosition(),
-                    valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+            final List currentNodeset = bindingContext.getNodeset();
+            if (currentNodeset != null && currentNodeset.size() > 0) {
+                rawValue = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                        bindingContext.getNodeset(), bindingContext.getPosition(),
+                        valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+            } else {
+                rawValue = "";
+            }
         }
 
         // Handle mediatype if necessary

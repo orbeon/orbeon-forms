@@ -79,20 +79,20 @@
     
     <!-- Generate fieldset for groups that contain a label -->
     <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' 
-            and xhtml:label[@class = 'xforms-label' and @for = ../@id]]">
+            and xhtml:label[tokenize(@class, ' ') = 'xforms-label' and @for = ../@id]]">
         <xhtml:fieldset>
             <xsl:apply-templates select="@*"/>
             <xhtml:legend>
-                <xsl:variable name="label" as="element()" select="xhtml:label[@class = 'xforms-label'][1]"/>
+                <xsl:variable name="label" as="element()" select="xhtml:label[tokenize(@class, ' ') = 'xforms-label'][1]"/>
                 <xsl:apply-templates select="$label/@*"/>
                 <xsl:value-of select="$label"/>
             </xhtml:legend>
-            <xsl:apply-templates select="node() except xhtml:label[@class = 'xforms-label' and @for = ../@id]"/>
+            <xsl:apply-templates select="node() except xhtml:label[tokenize(@class, ' ') = 'xforms-label' and @for = ../@id]"/>
         </xhtml:fieldset>
     </xsl:template>
     
     <!-- Populate content of loading indicator -->
-    <xsl:template match="xhtml:span[@class = 'xforms-loading-loading']">
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-loading-loading']">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             Loading...

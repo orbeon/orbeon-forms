@@ -93,9 +93,11 @@ public class XFormsSetvalueAction extends XFormsAction {
 
             // "XForms Actions that change only the value of an instance node results in setting the flags for
             // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".
-            deferredActionContext.recalculate = true;
-            deferredActionContext.revalidate = true;
-            deferredActionContext.refresh = true;
+            if (deferredActionContext != null) {
+                deferredActionContext.recalculate = true;
+                deferredActionContext.revalidate = true;
+                deferredActionContext.refresh = true;
+            }
 
             containingDocument.getXFormsControls().markDirty();
 

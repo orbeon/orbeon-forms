@@ -628,17 +628,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         xformsControls.initialize(pipelineContext, null, null);
     }
 
-    public void startOutmostActionHandler() {
+    public void startOutermostActionHandler() {
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.startOutmostActionHandler();
+            currentModel.startOutermostActionHandler();
         }
     }
 
-    public void endOutmostActionHandler(PipelineContext pipelineContext) {
+    public void endOutermostActionHandler(PipelineContext pipelineContext) {
         for (Iterator i = getModels().iterator(); i.hasNext();) {
             final XFormsModel currentModel = (XFormsModel) i.next();
-            currentModel.endOutmostActionHandler(pipelineContext);
+            currentModel.endOutermostActionHandler(pipelineContext);
         }
     }
 

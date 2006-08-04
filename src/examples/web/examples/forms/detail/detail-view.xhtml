@@ -320,7 +320,7 @@
                     <xforms:action ev:event="xforms-value-changed">
                         <xforms:setvalue ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
                     </xforms:action>
-                    <!-- Handle invalid and valid events -->
+                    <!-- Handle invalid and valid events in order to update error summary -->
                     <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
                         <xforms:action if="not(instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')])">
                             <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
@@ -330,10 +330,7 @@
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
                     </xforms:action>
-                    <xforms:action ev:event="xforms-valid">
-                        <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
-                    </xforms:action>
-                    <xforms:action ev:event="xforms-disabled">
+                    <xforms:action ev:event="xforms-valid" if="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]">
                         <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
                     </xforms:action>
 

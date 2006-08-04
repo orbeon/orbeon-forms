@@ -1022,7 +1022,7 @@ public class XFormsControls {
 
         // Handle relevance of controls that are no longer bound to instance data nodes
         final Map[] eventsToDispatch = new Map[] { currentControlsState.getEventsToDispatch() } ;
-        findSpecialRelevanceChanges(pipelineContext, currentControlsState.getChildren(), result.getChildren(), eventsToDispatch);
+        findSpecialRelevanceChanges(currentControlsState.getChildren(), result.getChildren(), eventsToDispatch);
         this.currentControlsState.setEventsToDispatch(eventsToDispatch[0]);
     }
 
@@ -1687,7 +1687,7 @@ public class XFormsControls {
     /**
      * Analyze differences of relevance for controls getting bound and unbound to nodes.
      */
-    private void findSpecialRelevanceChanges(PipelineContext pipelineContext, List state1, List state2, Map[] eventsToDispatch) {
+    private void findSpecialRelevanceChanges(List state1, List state2, Map[] eventsToDispatch) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -1706,63 +1706,60 @@ public class XFormsControls {
             final XFormsControl xformsControl2 = (state2 == null) ? null : (XFormsControl) i.next();
 
             final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1; // never null
-            final XFormsControl otherControl = (xformsControl2 != null) ? xformsControl1 : xformsControl2;   // possibly null
 
             // 1: Check current control
             if (!(leadingControl instanceof XFormsRepeatControl)) {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
-//                if (!leadingControl.equals(otherControl)) {
-                    String foundControlId = null;
-                    XFormsControl targetControl = null;
-                    int eventType = 0;
-                    if (xformsControl1 != null && xformsControl2 != null) {
-                        final NodeInfo boundNode1 = xformsControl1.getBoundNode();
-                        final NodeInfo boundNode2 = xformsControl2.getBoundNode();
+                String foundControlId = null;
+                XFormsControl targetControl = null;
+                int eventType = 0;
+                if (xformsControl1 != null && xformsControl2 != null) {
+                    final NodeInfo boundNode1 = xformsControl1.getBoundNode();
+                    final NodeInfo boundNode2 = xformsControl2.getBoundNode();
 
-                        if (boundNode1 != null && xformsControl1.isRelevant() && boundNode2 == null) {
-                            // A control was bound to a node and relevant, but has become no longer bound to a node
-                            foundControlId = xformsControl2.getEffectiveId();
-                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                        } else if (boundNode1 == null && boundNode2 != null && xformsControl2.isRelevant()) {
-                            // A control was not bound to a node, but has now become bound and relevant
-                            foundControlId = xformsControl2.getEffectiveId();
-                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                        }
+                    if (boundNode1 != null && xformsControl1.isRelevant() && boundNode2 == null) {
+                        // A control was bound to a node and relevant, but has become no longer bound to a node
+                        foundControlId = xformsControl2.getEffectiveId();
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                    } else if (boundNode1 == null && boundNode2 != null && xformsControl2.isRelevant()) {
+                        // A control was not bound to a node, but has now become bound and relevant
+                        foundControlId = xformsControl2.getEffectiveId();
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                    } else if (boundNode1 != null && boundNode2 != null && !boundNode1.isSameNodeInfo(boundNode2)) {
+                        // The control is now bound to a different node
+                        // In this case, we schedule the control to dispatch all the events
 
-                        // TODO
-//                        if (boundNode2 != null && boundNode1 != boundNode2) {
-//                            // The control is now bound to a different node
-//                            // In this case, we schedule the control to dispatch all the events
-//                            foundControlId = xformsControl2.getEffectiveId();
-//                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;// TODO: or use other event type?
-//                            xxx
-//                        }
-                    } else if (xformsControl2 != null) {
-                        final NodeInfo boundNode2 = xformsControl2.getBoundNode();
-                        if (boundNode2 != null && xformsControl2.isRelevant()) {
-                            // A control was not bound to a node, but has now become bound and relevant
-                            foundControlId = xformsControl2.getEffectiveId();
-                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                        }
-                    } else if (xformsControl1 != null) {
-                        final NodeInfo boundNode1 = xformsControl1.getBoundNode();
-                        if (boundNode1 != null && xformsControl1.isRelevant()) {
-                            // A control was bound to a node and relevant, but has become no longer bound to a node
-                            foundControlId = xformsControl1.getEffectiveId();
-                            targetControl = xformsControl1;
-                            eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
-                        }
+                        // NOTE: This is not really proper according to the spec, but it does help applications to
+                        // force dispatching in such cases
+                        foundControlId = xformsControl2.getEffectiveId();
+                        eventType = XFormsModel.EventSchedule.ALL;
                     }
-
-                    // Remember that we need to dispatch information about this control
-                    if (foundControlId != null) {
-                        if (eventsToDispatch[0] == null)
-                            eventsToDispatch[0] = new HashMap();
-                        eventsToDispatch[0].put(foundControlId,
-                                new XFormsModel.EventSchedule(foundControlId, eventType, targetControl));
+                } else if (xformsControl2 != null) {
+                    final NodeInfo boundNode2 = xformsControl2.getBoundNode();
+                    if (boundNode2 != null && xformsControl2.isRelevant()) {
+                        // A control was not bound to a node, but has now become bound and relevant
+                        foundControlId = xformsControl2.getEffectiveId();
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
                     }
-//                }
+                } else if (xformsControl1 != null) {
+                    final NodeInfo boundNode1 = xformsControl1.getBoundNode();
+                    if (boundNode1 != null && xformsControl1.isRelevant()) {
+                        // A control was bound to a node and relevant, but has become no longer bound to a node
+                        foundControlId = xformsControl1.getEffectiveId();
+                        // NOTE: This is the only case where we must dispatch the event to an obsolete control
+                        targetControl = xformsControl1;
+                        eventType = XFormsModel.EventSchedule.RELEVANT_BINDING;
+                    }
+                }
+
+                // Remember that we need to dispatch information about this control
+                if (foundControlId != null) {
+                    if (eventsToDispatch[0] == null)
+                        eventsToDispatch[0] = new HashMap();
+                    eventsToDispatch[0].put(foundControlId,
+                            new XFormsModel.EventSchedule(foundControlId, eventType, targetControl));
+                }
             }
 
             // 2: Check children if any
@@ -1779,28 +1776,28 @@ public class XFormsControls {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        findSpecialRelevanceChanges(pipelineContext, children1, children2, eventsToDispatch);
+                        findSpecialRelevanceChanges(children1, children2, eventsToDispatch);
                     } else if (size2 > size1) {
                         // Size has grown
 
                         // Diff the common subset
-                        findSpecialRelevanceChanges(pipelineContext, children1, children2.subList(0, size1), eventsToDispatch);
+                        findSpecialRelevanceChanges(children1, children2.subList(0, size1), eventsToDispatch);
 
                         // Issue new values for new iterations
-                        findSpecialRelevanceChanges(pipelineContext, null, children2.subList(size1, size2), eventsToDispatch);
+                        findSpecialRelevanceChanges(null, children2.subList(size1, size2), eventsToDispatch);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
 
                         // Diff the common subset
-                        findSpecialRelevanceChanges(pipelineContext, children1.subList(0, size2), children2, eventsToDispatch);
+                        findSpecialRelevanceChanges(children1.subList(0, size2), children2, eventsToDispatch);
 
                         // Issue new values for new iterations
-                        findSpecialRelevanceChanges(pipelineContext, children1.subList(size2, size1), null, eventsToDispatch);
+                        findSpecialRelevanceChanges(children1.subList(size2, size1), null, eventsToDispatch);
                     }
                 } else {
                     // Other grouping controls
-                    findSpecialRelevanceChanges(pipelineContext, size1 == 0 ? null : children1, size2 == 0 ? null : children2, eventsToDispatch);
+                    findSpecialRelevanceChanges(size1 == 0 ? null : children1, size2 == 0 ? null : children2, eventsToDispatch);
                 }
             }
         }

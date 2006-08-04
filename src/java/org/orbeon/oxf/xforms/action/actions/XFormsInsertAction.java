@@ -222,7 +222,7 @@ public class XFormsInsertAction extends XFormsAction {
             containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(modifiedInstance, atAttribute));
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            modifiedInstance.getModel().getDeferredActionContext().setAllDeferredFlags(true);
+            modifiedInstance.getModel().setAllDeferredFlags(true);
             containingDocument.getXFormsControls().markDirty();
         }
     }

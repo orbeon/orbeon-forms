@@ -18,13 +18,13 @@
         <plate-number>Numéro de plaque</plate-number>
         <vin>Id du vehicule ou vaisseau</vin>
         <leased>Sélectionnez si lease</leased>
-        <personal-information>Informations&#xa;Personelles</personal-information>
-        <voter-address-change>Changement&#xa;Adresse de Vote</voter-address-change>
-        <new-residence-address>Nouvelle&#xa;Adresse de&#xa;Résidence</new-residence-address>
-        <new-mailing-address>Nouvelle&#xa;Addresse de&#xa;Correspondance</new-mailing-address>
-        <vehicles-owned>Véhicules et&#xa;Vaisseaux en&#xa;Votre Possession</vehicles-owned>
+        <personal-information>Informations&lt;br/>Personelles</personal-information>
+        <voter-address-change>Changement&lt;br/>Adresse de Vote</voter-address-change>
+        <new-residence-address>Nouvelle&lt;br/>Adresse de&lt;br/>Résidence</new-residence-address>
+        <new-mailing-address>Nouvelle&lt;br/>Addresse de&lt;br/>Correspondance</new-mailing-address>
+        <vehicles-owned>Véhicules et&lt;br/>Vaisseaux en&lt;br/>Votre Possession</vehicles-owned>
         <leased-vehicles>Véhicules en Lease</leased-vehicles>
-        <coach-vessel-location>Adresse de&#xa;Remorque&#xa;ou Vaisseau</coach-vessel-location>
+        <coach-vessel-location>Adresse de&lt;br/>Remorque&lt;br/>ou Vaisseau</coach-vessel-location>
         <old-address>Ancienne Adresse</old-address>
     </titles>
     <messages>

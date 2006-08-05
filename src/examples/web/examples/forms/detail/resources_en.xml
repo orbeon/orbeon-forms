@@ -17,13 +17,13 @@
         <plate-number>California Plate / CF / Placard No.</plate-number>
         <vin>Vehicle Id or Vessel Hull Id Number</vin>
         <leased>Check If Leased</leased>
-        <personal-information>Personal&#xa;Information</personal-information>
-        <voter-address-change>Voter Change&#xa;of Address</voter-address-change>
-        <new-residence-address>New or Correct&#xa;Residence&#xa;Address</new-residence-address>
-        <new-mailing-address>New or Correct&#xa;Mailing&#xa;Address</new-mailing-address>
-        <vehicles-owned>Vehicles,&#xa;Vessels, or&#xa;Placards&#xa;Owned By You</vehicles-owned>
+        <personal-information>Personal&lt;br/>Information</personal-information>
+        <voter-address-change>Voter Change&lt;br/>of Address</voter-address-change>
+        <new-residence-address>New or Correct&lt;br/>Residence&lt;br/>Address</new-residence-address>
+        <new-mailing-address>New or Correct&lt;br/>Mailing&lt;br/>Address</new-mailing-address>
+        <vehicles-owned>Vehicles,&lt;br/>Vessels, or&lt;br/>Placards&lt;br/>Owned By You</vehicles-owned>
         <leased-vehicles>Leased Vehicles</leased-vehicles>
-        <coach-vessel-location>Location of&#xa;Trailer Coach&#xa;or Vessel</coach-vessel-location>
+        <coach-vessel-location>Location of&lt;br/>Trailer Coach&lt;br/>or Vessel</coach-vessel-location>
         <old-address>Old Address</old-address>
     </titles>
     <messages>

@@ -21,7 +21,6 @@ td { vertical-align: top }
 .dmv-errors-table .xforms-repeat-selected-item-1 { background: none }
 .dmv-errors-table th { padding: 0em; color: red }
 .dmv-main-table th p { text-align: center; vertical-align: top }
-.dmv-data-column { width: 100% }
 .dmv-action-table td { white-space: nowrap; vertical-align: middle; }
 .dmv-action-table input { vertical-align: middle;}
 .dmv-hr { height: 3px; border: 0px; background-color: #ffcc66; color: #ffcc66 }

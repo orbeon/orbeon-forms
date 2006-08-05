@@ -62,6 +62,8 @@
                 <xforms:bind nodeset="document-date" calculate="current-dateTime()" type="xs:dateTime"/>
                 <!-- Business data -->
                 <xforms:bind nodeset="//dmv:form">
+                    <!-- Uncomment this line to test read-only version -->
+                    <!--<xforms:bind nodeset="." readonly="true()"/>-->
                     <xforms:bind nodeset="dmv:personal-information">
                         <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
                         <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
@@ -124,7 +126,7 @@
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty')"/>
+                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0)"/>
                 <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty'"/>
                 <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
                 <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
@@ -138,8 +140,7 @@
 
             <!-- XForms instance for error information -->
             <xforms:instance id="errors-instance">
-                <errors xmlns="">
-                </errors>
+                <errors xmlns=""/>
             </xforms:instance>
 
             <xforms:instance id="error-template">
@@ -233,12 +234,6 @@
                 </xforms:repeat>
             </table>
         </xforms:group>
-
-        <!--<ul id="dmv-errors">-->
-            <!--<xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">-->
-                <!--<li><xforms:output value="concat(@label, if (string-length(@indexes) > 0) then concat(' (row ', @indexes, ')')  else '', ': ', @alert)"/></li>-->
-            <!--</xforms:repeat>-->
-        <!--</ul>-->
 
         <xforms:group ref="instance('main-instance')/document/*">
             <!-- Clear messages upon user moving around in the form -->
@@ -336,10 +331,8 @@
 
                     <xforms:group ref="dmv:personal-information">
                         <tr>
-                            <th>
-                                <xforms:output value="instance('resources-instance')/titles/personal-information"/><br/>
-                                <!--Personal<br/>-->
-                                <!--Information<br/>-->
+                            <th class="dmv-heading-column">
+                                <xforms:output value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
                                 <p>
                                     <img src="/examples/forms/images/personal-information.png" alt="Personal Information"/>
                                 </p>
@@ -385,9 +378,7 @@
                         <xforms:group ref="dmv:voter-address-change">
                             <tr>
                                 <th>
-                                    <xforms:output value="instance('resources-instance')/titles/voter-address-change"/><br/>
-                                    <!--Voter Change<br/>-->
-                                    <!--of Address<br/>-->
+                                    <xforms:output value="instance('resources-instance')/titles/voter-address-change" mediatype="text/html"/><br/>
                                 </th>
                                 <td>
                                     <xforms:select ref="dmv:change-address" appearance="full">
@@ -404,10 +395,7 @@
                         <xforms:group ref="dmv:address[@type = 'residence']">
                             <tr>
                                 <th>
-                                    <xforms:output value="instance('resources-instance')/titles/new-residence-address"/><br/>
-                                    <!--New or Correct<br/>-->
-                                    <!--Residence<br/>-->
-                                    <!--Address<br/>-->
+                                    <xforms:output value="instance('resources-instance')/titles/new-residence-address" mediatype="text/html"/><br/>
                                     <p>
                                         <img src="/examples/forms/images/residence-address.png" alt="New or Correct Residence Address"/>
                                     </p>
@@ -477,10 +465,7 @@
                         <tr><td colspan="2" class="dmv-hr"/></tr>
                         <tr>
                             <th>
-                                <xforms:output value="instance('resources-instance')/titles/new-mailing-address"/><br/>
-                                <!--New or Correct<br/>-->
-                                <!--Mailing<br/>-->
-                                <!--Address<br/>-->
+                                <xforms:output value="instance('resources-instance')/titles/new-mailing-address" mediatype="text/html"/><br/>
                                 <p>
                                     <img src="/examples/forms/images/mailing-address.png" alt="New or Correct Mailing Address"/>
                                 </p>
@@ -602,11 +587,7 @@
                         <xforms:group ref="dmv:vehicles">
                             <tr>
                                 <th>
-                                    <xforms:output value="instance('resources-instance')/titles/vehicles-owned"/><br/>
-                                    <!--Vehicles,<br/>-->
-                                    <!--Vessels, or<br/>-->
-                                    <!--Placards<br/>-->
-                                    <!--Owned By You<br/>-->
+                                    <xforms:output value="instance('resources-instance')/titles/vehicles-owned" mediatype="text/html"/><br/>
                                 </th>
                                 <td>
                                     <!-- Advanced version of the triggers -->
@@ -648,9 +629,9 @@
 
                                     <table class="dmv-gridtable" id="dmv-vehicles">
                                         <tr>
-                                            <th><xforms:output value="instance('resources-instance')/titles/plate-number"/></th>
-                                            <th><xforms:output value="instance('resources-instance')/titles/vin"/></th>
-                                            <th><xforms:output value="instance('resources-instance')/titles/leased"/></th>
+                                            <th><xforms:output value="instance('resources-instance')/titles/plate-number" mediatype="text/html"/></th>
+                                            <th><xforms:output value="instance('resources-instance')/titles/vin" mediatype="text/html"/></th>
+                                            <th><xforms:output value="instance('resources-instance')/titles/leased" mediatype="text/html"/></th>
                                         </tr>
                                         <xforms:repeat nodeset="dmv:vehicle" id="vehicles-repeat">
                                             <tr>
@@ -671,7 +652,7 @@
                                                     <xforms:select ref="dmv:leased" appearance="full">
                                                         <xforms:label ref="instance('resources-instance')/labels/leased"/>
                                                         <xforms:item>
-                                                            <xforms:label/>
+                                                            <xforms:label ref="instance('resources-instance')/labels/leased"/>
                                                             <xforms:value>Y</xforms:value>
                                                         </xforms:item>
                                                     </xforms:select>
@@ -703,7 +684,7 @@
                         <xforms:group ref="dmv:leased-vehicles">
                             <tr>
                                 <th>
-                                    <xforms:output value="instance('resources-instance')/titles/leased-vehicles"/>
+                                    <xforms:output value="instance('resources-instance')/titles/leased-vehicles" mediatype="text/html"/>
                                 </th>
                                 <td>
                                     <xforms:input incremental="true" ref="dmv:company-name" class="dmv-company-name">
@@ -716,10 +697,7 @@
                         <tr><td colspan="2" class="dmv-hr"/></tr>
                         <tr>
                             <th>
-                                <xforms:output value="instance('resources-instance')/titles/coach-vessel-location"/><br/>
-                                <!--Location of<br/>-->
-                                <!--Trailer Coach<br/>-->
-                                <!--or Vessel<br/>-->
+                                <xforms:output value="instance('resources-instance')/titles/coach-vessel-location" mediatype="text/html"/><br/>
                             </th>
                             <td>
 
@@ -818,7 +796,7 @@
                     <xforms:group ref="dmv:address-information/dmv:address[@type = 'old']">
                         <tr>
                             <th>
-                                <xforms:output value="instance('resources-instance')/titles/old-address"/><br/>
+                                <xforms:output value="instance('resources-instance')/titles/old-address" mediatype="text/html"/><br/>
                             </th>
                             <td>
                                 <table>

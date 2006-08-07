@@ -34,7 +34,6 @@ public class XFormsLoadAction extends XFormsAction {
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String ref = actionElement.attributeValue("ref");
         final String resource = actionElement.attributeValue("resource");
         final String showAttribute;
         {
@@ -48,10 +47,11 @@ public class XFormsLoadAction extends XFormsAction {
         final String urlType = actionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
 
         // "If both are present, the action has no effect."
-        if (ref != null && resource != null)
+        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        if (bindingContext.isNewBind() && resource != null)
             return;
 
-        if (ref != null) {
+        if (bindingContext.isNewBind()) {
             // Use single-node binding
             final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
             if (currentNode != null) {

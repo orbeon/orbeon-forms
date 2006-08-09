@@ -603,8 +603,11 @@ ${files}
                 <include name="pages/*.pdf"/>
             </fileset>
         </copy>
-        <copy file="${war.dir}/WEB-INF/resources/config/theme/orbeon.css" toDir="${build.doc.dir}/reference/theme"/>
-        <copy file="${war.dir}/WEB-INF/resources/config/theme/xforms.css" toDir="${build.doc.dir}/reference/theme"/>
+        <copy toDir="${build.doc.dir}/reference/theme">
+            <fileset dir="${build.temp.dir}/theme">
+                <include name="*.css"/>
+            </fileset>
+        </copy>
         <copy todir="${build.doc.dir}" file="doc/OPS Tutorial.pdf"/>
         <copy todir="${build.doc.dir}" file="doc/OPS User Guide.pdf"/>
     </target>

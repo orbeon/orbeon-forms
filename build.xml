@@ -125,6 +125,8 @@
         <property name="build.doc.dir" value="${build.dir}/doc"/>
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
         <property name="cli.jar.file" value="${build.lib.dir}/cli-${project.name}.jar"/>
+        <property name="resources-private.jar.file" value="${build.lib.dir}/${project.name}-resources-private.jar"/>
+        <property name="resources-public.jar.file" value="${build.lib.dir}/${project.name}-resources-public.jar"/>
 
         <property name="build.portlet-classes.dir" value="${build.dir}/portlet-classes"/>
 
@@ -203,8 +205,8 @@
       />
     </target>
 
-    <!-- JAR -->
-    <target name="jars" depends="classes,transform">
+    <!-- JARs -->
+    <target name="jars" depends="classes,transform,orbeon-css-templates">
       <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
         <map from='${lib.dir}' to='private' />
       </pathconvert>
@@ -229,9 +231,6 @@
           <zipfileset dir="descriptors/jar" prefix="META-INF" >
             <exclude name='*.MF' />
           </zipfileset>
-          <zipfileset dir="${java-src.dir}/org/orbeon/oxf/portlet/taglib" prefix="META-INF">
-              <include name="*.tld"/>
-          </zipfileset>
         </jar>
 
         <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
@@ -246,57 +245,27 @@
             <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
           </manifest>
         </jar>
-    </target>
 
-    <target name="sql-patch-28-jar" depends="prepare">
-      <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
-        <map from='${lib.dir}' to='private' />
-      </pathconvert>
-
-      <jar destfile='${build.lib.dir}/ops-2.8-sql_patch.jar' compress='false' >
-          <fileset dir="${build.classes.dir}">
-              <include name="org/orbeon/oxf/processor/sql/**/*.*"/>
-              <include name="org/orbeon/oxf/xml/XMLConstants.class"/>
-              <include name="org/orbeon/oxf/xml/DeferredContentHandler*.class"/>
-              <include name="org/orbeon/oxf/xml/dom4j/NonLazy*.class"/>
-          </fileset>
-          <fileset dir="${java-src.dir}">
-              <include name="org/orbeon/oxf/processor/sql/*.rng"/>
-          </fileset>
+        <!-- Build resources JAR -->
+        <jar destfile="${resources-private.jar.file}" compress="false">
+            <fileset dir="${web-examples-src.dir}">
+                <include name="ops/**"/>
+                <exclude name="ops/unit-tests/**"/>
+                <exclude name="ops/css/**"/>
+                <include name="config/theme/**"/>
+            </fileset>
+            <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
+                <include name="*.css"/>
+            </zipfileset>
         </jar>
-    </target>
 
-    <target name="file-serializer-patch-28-jar" depends="prepare">
-      <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
-        <map from='${lib.dir}' to='private' />
-      </pathconvert>
-
-      <jar destfile='${build.lib.dir}/ops-2.8-file_serializer_patch.jar' compress='false' >
-          <fileset dir="${build.classes.dir}">
-              <include name="org/orbeon/oxf/processor/serializer/FileSerializer*.class"/>
-              <include name="org/orbeon/oxf/xml/XMLConstants.class"/>
-              <include name="org/orbeon/oxf/processor/serializer/legacy/FileSerializer*.class"/>
-              <include name="org/orbeon/oxf/processor/serializer/BinaryTextContentHandler.class"/>
-          </fileset>
-          <fileset dir="${java-src.dir}">
-              <include name="org/orbeon/oxf/schemas/file-serializer-config.rng"/>
-          </fileset>
-          <fileset dir="${resources.dir}">
-              <include name="oxf/processors.xml"/>
-          </fileset>
-        </jar>
     </target>
 
     <!-- WAR -->
-	
-    <target name="war" depends="jars,orbeon-source-files-lists,orbeon-css-templates">
-    <!--<target name="war" depends="jars,orbeon-css-templates">-->
+    <target name="war" depends="jars,orbeon-source-files-lists">
         <echo message="war.dir: ${war.dir}"/>
         <mkdir dir="${war.classes}"/>
-        <!--<javac destdir="${war.dir}/WEB-INF/classes"-->
-            <!--classpathref="class.path" debug="${build.debug}" optimize="off" target="1.3" source="1.3" srcdir="${web-examples-src.dir}/examples-standalone/struts-view/src"/>-->
         <copy todir="${war.classes}">
-            <!--<fileset dir="${web-examples-src.dir}/examples-standalone/struts-view/src/" includes="**/*.properties"/>-->
             <fileset dir="descriptors/examples/web/jboss-security" includes="*.properties"/>
         </copy>
 
@@ -304,7 +273,8 @@
           <fileset refid='war.libs' />
         </copy>
 
-        <copy file='${jar.file}' todir='${war.lib}' />
+        <copy file="${jar.file}" todir="${war.lib}"/>
+        <copy file="${resources-private.jar.file}" todir="${war.lib}"/>
 
         <copy todir='${war.lib}/private' >
           <fileset refid='war.libs.private' />
@@ -330,7 +300,10 @@
         <!-- eXist database -->
         <mkdir dir="${war.inf}/exist-data"/>
         <copy todir="${war.inf}/exist-data">
-            <fileset dir="${descriptors.dir}/exist-data" includes="README.txt"/>
+            <fileset dir="${descriptors.dir}/exist-data">
+                <include name="README.txt"/>
+                <exclude name="*.dbx"/>
+            </fileset>
         </copy>
         <echo message="Target: ${target}"/>
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl" out="${war.inf}/web.xml" force="true">
@@ -382,11 +355,11 @@
         <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
             <filtersfile file="${web-examples-src.dir}/ops/css/css-constants.properties"/>
         </filterset>
-        <mkdir dir="${war.dir}/WEB-INF/resources/config/theme"/>
-        <copy file="${web-examples-src.dir}/ops/css/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
+        <mkdir dir="${build.temp.dir}/theme"/>
+        <copy file="${web-examples-src.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${web-examples-src.dir}/ops/css/xforms.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms.css">
+        <copy file="${web-examples-src.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>
@@ -596,7 +569,6 @@ ${files}
            </fileset>
         </delete>
 
-
     </target>
 
     <target name="clean" depends="init" description="Remove all generated files">
@@ -665,61 +637,13 @@ ${files}
                 <exclude name="**/*.cdr"/>
                 <exclude name="**/*.cpl"/>
                 <exclude name="doc/xtech-2005/**"/>
-                <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/css/**"/>
                 <exclude name="oxfmark/**"/>
                 <exclude name="struts-view/**"/>
+                <exclude name="ops/**"/>
+                <exclude name="config/theme/**"/>
             </zipfileset>
         </zip>
     </target>
-
-    <target name="bizdoc-example" depends="prepare">
-        <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/bizdoc-example-${version.number}.zip">
-            <zipfileset dir="doc/example-applications"/>
-            <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF"/>
-            <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
-                <include name="config/**/*"/>
-                <include name="images/**/*"/>
-            </zipfileset>
-            <zipfileset dir="${web-examples-src.dir}/examples/bizdoc" prefix="WEB-INF/resources/bizdoc">
-                <include name="**/*"/>
-                <exclude name="example-descriptor.xml"/>
-                <exclude name="page-flow.xpl"/>
-            </zipfileset>
-        </zip>
-    </target>
-
-    <target name="employees-example" depends="prepare">
-        <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/employees-example-${version.number}.zip">
-            <zipfileset dir="doc/example-applications"/>
-            <zipfileset dir="descriptors/examples/web/employees" prefix="WEB-INF"/>
-            <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
-                <include name="config/**/*"/>
-                <include name="examples/datasource-sql.xml"/>
-                <include name="examples/employees/export-excel/employees.xls"/>
-                <include name="images/**/*"/>
-                <include name="init-database/**/*"/>
-            </zipfileset>
-            <zipfileset dir="${web-examples-src.dir}/examples/employees" prefix="WEB-INF/resources/employees">
-                <include name="**/*"/>
-                <exclude name="example-descriptor.xml"/>
-                <exclude name="page-flow.xpl"/>
-            </zipfileset>
-        </zip>
-    </target>
-
-    <target name="orbeon-com-example" depends="prepare">
-        <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/orbeon-com-example-1.2.zip">
-            <zipfileset dir="doc/example-applications"/>
-            <zipfileset dir="descriptors/examples/web/orbeon-com" prefix="WEB-INF"/>
-            <zipfileset dir="C:/Documents and Settings/Alessandro Vernet/My Documents/orbeon/cvs-public/oss-site/resources" prefix="WEB-INF/resources"/>
-        </zip>
-    </target>
-
-    <target name="example-applications" depends="bizdoc-example, orbeon-com-example"/>
 
     <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc">
         <property name="prefix" value="ops-${release.number}"/>

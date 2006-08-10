@@ -802,7 +802,7 @@ ORBEON.xforms.Init = {
             "range": { "": ORBEON.xforms.Init._range },
             "textarea": {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
-                "": ORBEON.xforms.Init._htmlArea
+                "text/html": ORBEON.xforms.Init._htmlArea
             }
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;

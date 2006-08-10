@@ -43,32 +43,32 @@ public class XHTMLHeadHandler extends HandlerBase {
 
     private static final String[] scripts = {
             // Calendar scripts
-            "/config/theme/jscalendar/calendar.js",
-            "/config/theme/jscalendar/lang/calendar-en.js",
-            "/config/theme/jscalendar/calendar-setup.js",
+            "/config/theme/jscalendar/calendar.js", null,
+            "/config/theme/jscalendar/lang/calendar-en.js", null,
+            "/config/theme/jscalendar/calendar-setup.js", null,
             // Yahoo UI Library
-            "/ops/javascript/yahoo.js",
-            "/ops/javascript/event.js",
-            "/ops/javascript/dom.js",
-            "/ops/javascript/connection.js",
-            "/ops/javascript/animation.js",
-            "/ops/javascript/dragdrop.js",
-            "/ops/javascript/slider.js",
-            "/ops/javascript/treeview.js",
-            "/ops/javascript/treeview-tasknode.js",
-            "/ops/javascript/treeview-checkonclicknode.js",
-            "/ops/javascript/container_core.js",
-            "/ops/javascript/menu.js",
+            "/ops/javascript/yahoo.js", "/ops/javascript/yahoo-min.js",
+            "/ops/javascript/event.js", "/ops/javascript/event-min.js",
+            "/ops/javascript/dom.js", "/ops/javascript/dom-min.js",
+            "/ops/javascript/connection.js", "/ops/javascript/connection-min.js",
+            "/ops/javascript/animation.js", "/ops/javascript/animation-min.js",
+            "/ops/javascript/dragdrop.js", "/ops/javascript/dragdrop-min.js",
+            "/ops/javascript/slider.js", "/ops/javascript/slider-min.js",
+            "/ops/javascript/treeview.js", "/ops/javascript/treeview-min.js",
+            "/ops/javascript/treeview-tasknode.js", null,
+            "/ops/javascript/treeview-checkonclicknode.js", null,
+            "/ops/javascript/container_core.js", "/ops/javascript/container_core-min.js",
+            "/ops/javascript/menu.js", "/ops/javascript/menu-min.js",
             // HTML area
-            "/ops/fckeditor/fckeditor.js",
+            "/ops/fckeditor/fckeditor.js", null,
             // Other standard scripts
-            "/config/theme/javascript/xforms-style.js",
-            "/ops/javascript/wz_tooltip.js",
-            "/ops/javascript/overlib_mini.js",
-            "/ops/javascript/time-utils.js",
-            "/ops/javascript/xforms.js",
-            "/ops/javascript/suggest-common.js",
-            "/ops/javascript/suggest-actb.js"
+            "/config/theme/javascript/xforms-style.js", null,
+            "/ops/javascript/wz_tooltip.js", null,
+            "/ops/javascript/overlib_mini.js", null,
+            "/ops/javascript/time-utils.js", null,
+            "/ops/javascript/xforms.js", null,
+            "/ops/javascript/suggest-common.js", null,
+            "/ops/javascript/suggest-actb.js", null
     };
 
     public XHTMLHeadHandler() {
@@ -93,9 +93,18 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Scripts
         if (!containingDocument.isReadonly()) {
-            for (int i = 0; i < scripts.length; i++) {
+            final boolean isMinimalJS = XFormsUtils.isMinimalJS();
+            for (int i = 0; i < scripts.length; i += 2) {
+                // Load minimal script if requested and there exists a minimal script
+                final String script;
+                {
+                    if (isMinimalJS && scripts[i + 1] != null)
+                        script = scripts[i + 1];
+                    else
+                        script = scripts[i];
+                }
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                    "type", "text/javascript", "src", scripts[i]});
+                    "type", "text/javascript", "src", script});
             }
 
             // User-defined scripts (with xxforms:script)
@@ -128,7 +137,6 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             final String serverBase = externalContext.getResponse().rewriteResourceURL("/", true);
             // TODO: store server base
-            // TODO: produce JSON
 
             // Gather information about controls appearances
             final Map appearancesMap = new HashMap();

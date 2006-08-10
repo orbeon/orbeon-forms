@@ -794,6 +794,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_HOST_LANGUAGE_AVTS_PROPERTY, XFormsConstants.DEFAULT_HOST_LANGUAGE_AVTS).booleanValue();
     }
 
+    public static boolean isMinimalJS() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_MINIMAL_JAVASCRIPT_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_JAVASCRIPT).booleanValue();
+    }
+
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 

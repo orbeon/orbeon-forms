@@ -19,6 +19,7 @@
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
@@ -53,7 +54,7 @@
 
             <!-- Main XForms instance provided by the page model -->
             <xforms:instance id="main-instance">
-                <xi:include href="input:data"/>
+                <xi:include href="input:data"  xxi:omit-xml-base="true"/>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('main-instance')">
@@ -449,10 +450,6 @@
                                                         <xforms:value ref="@value"/>
                                                     </xforms:itemset>
                                                 </xforms:select1>
-                                                <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
-                                                    <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
-                                                    <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
-                                                <!--</xforms:input>-->
                                                 <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                     <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                     <xforms:alert ref="instance('resources-instance')/alerts/zip"/>
@@ -569,10 +566,6 @@
                                                         <xforms:value ref="@value"/>
                                                     </xforms:itemset>
                                                 </xforms:select1>
-                                                <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
-                                                    <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
-                                                    <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
-                                                <!--</xforms:input>-->
                                                 <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                     <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                     <xforms:alert ref="instance('resources-instance')/alerts/zip"/>
@@ -849,10 +842,6 @@
                                                     <xforms:value ref="@value"/>
                                                 </xforms:itemset>
                                             </xforms:select1>
-                                            <!--<xforms:input incremental="true" ref="dmv:state" class="dmv-state">-->
-                                                <!--<xforms:label ref="instance('resources-instance')/labels/state"/>-->
-                                                <!--<xforms:alert ref="instance('resources-instance')/alerts/state"/>-->
-                                            <!--</xforms:input>-->
                                             <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
                                                 <xforms:label ref="instance('resources-instance')/labels/zip"/>
                                                 <xforms:alert ref="instance('resources-instance')/alerts/zip"/>

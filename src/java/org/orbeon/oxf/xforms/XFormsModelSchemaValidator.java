@@ -226,9 +226,6 @@ public class XFormsModelSchemaValidator {
         // data.
         final InstanceData instDat = XFormsUtils.getLocalInstanceData(attribute);
         instDat.addSchemaError(errMsg, attribute.getStringValue());
-        // FIXME: The code below does nothing. Why is it here at all?
-//        final Element elt = att.getParent();
-//        final InstanceData eltInstDat = XFormsUtils.getLocalInstanceData(elt);
     }
 
     private Acceptor getChildAcceptor
@@ -253,8 +250,7 @@ public class XFormsModelSchemaValidator {
         final String qnam = elt.getQualifiedName();
         final List attLst = elt.attributes();
         final AttributesImpl atts = new AttributesImpl();
-        // Note that we don't strip xxform:* atts here as doing so would cause confustion in
-        // validateChildren
+
         for (final Iterator itr = attLst.iterator(); itr.hasNext();) {
             final Attribute att = (Attribute) itr.next();
             final String auri = att.getNamespaceURI();
@@ -422,14 +418,14 @@ public class XFormsModelSchemaValidator {
      */
     public void applySchema(XFormsInstance instance) {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
-            final REDocumentDeclaration rdd = new REDocumentDeclaration(schemaGrammar);
-            final Acceptor acc = rdd.createAcceptor();
-            final Element relt = instance.getInstanceDocument().getRootElement();
-            final IDConstraintChecker icc = new IDConstraintChecker();
+            final REDocumentDeclaration documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+            final Acceptor acceptor = documentDeclaration.createAcceptor();
+            final Element instanceRootElement = instance.getInstanceDocument().getRootElement();
+            final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
 
-            validateElement(relt, acc, icc);
-            icc.endDocument();
-            handleIDErrors(icc);
+            validateElement(instanceRootElement, acceptor, idConstraintChecker);
+            idConstraintChecker.endDocument();
+            handleIDErrors(idConstraintChecker);
         }
     }
 

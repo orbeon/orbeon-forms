@@ -33,7 +33,6 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
-            <!--<xs:attribute name="xml:base" type="xs:anyURI" use="optional"/>-->
         </xs:complexType>
     </xs:element>
 
@@ -45,6 +44,9 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <!-- Define type for language-instance -->
+    <xs:element name="language" type="xs:string"/>
 
 </xs:schema>
 

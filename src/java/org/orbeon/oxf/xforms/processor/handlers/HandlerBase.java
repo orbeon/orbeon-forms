@@ -352,10 +352,9 @@ public abstract class HandlerBase extends ElementHandlerNew {
         } else {
             throw new IllegalStateException("Illegal type requested");
         }
-
-        // If no attributes were found, there is no such label / help / hint
-        if (labelHintHelpAlertAttributes != null) {
-            //final String id = labelHintHelpId +  handlerContext.getIdPostfix();
+        
+        if (labelHintHelpAlertAttributes != null || type.equals("alert")) {
+            // If no attributes were found, there is no such label / help / hint / alert
 
             final StringBuffer classes = new StringBuffer("xforms-");
             classes.append(type);
@@ -384,7 +383,9 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 }
             }
 
-            outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
+            // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
+            final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
+            outputLabelHintHelpAlert(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
         }
     }
 

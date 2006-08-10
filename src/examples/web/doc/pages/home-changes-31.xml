@@ -191,7 +191,10 @@
                         </li>
                         <li>
                             <p>
-                                JavaScript and CSS files are not loaded xxx
+                                Improvement to JavaScript and CSS loading. JavaScript and CSS files related to
+                                particular XForms controls are loaded only when necessary. In addition, the property
+                                <code>oxf.xforms.minimal-resources</code> allows specifying whether "minimal" versions
+                                of those resources should be used when possible. xxx
                             </p>
                         </li>
                         <li>

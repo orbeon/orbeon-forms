@@ -794,9 +794,9 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_HOST_LANGUAGE_AVTS_PROPERTY, XFormsConstants.DEFAULT_HOST_LANGUAGE_AVTS).booleanValue();
     }
 
-    public static boolean isMinimalJS() {
+    public static boolean isMinimalResources() {
         return OXFProperties.instance().getPropertySet().getBoolean
-                (XFormsConstants.XFORMS_MINIMAL_JAVASCRIPT_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_JAVASCRIPT).booleanValue();
+                (XFormsConstants.XFORMS_MINIMAL_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_RESOURCES).booleanValue();
     }
 
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {

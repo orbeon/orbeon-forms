@@ -54,7 +54,7 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
     <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
-    <property as="xs:boolean" name="oxf.xforms.minimal-javascript"                   value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="false"/>
 
     <!-- Rarely used global properties -->
     <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>

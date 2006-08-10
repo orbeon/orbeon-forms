@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -302,7 +302,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         public String getResource() {
             // Load minimal resource if requested and there exists a minimal resource
-            final boolean isMinimal = XFormsUtils.isMinimalJS();
+            final boolean isMinimal = XFormsUtils.isMinimalResources();
             return (isMinimal && minResource != null) ? minResource : fullResource;
         }
 

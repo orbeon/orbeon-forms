@@ -1212,8 +1212,10 @@ function xformsFindRepeatDelimiter(repeatId, index) {
         var currentId = repeatId;
         while (true) {
             var parent = document.xformsRepeatTreeChildToParent[currentId];
+//            if (typeof parent != "string") parent = null;// hack to work around Prototype's broken Object.extend
             if (parent == null) break;
             var grandParent = document.xformsRepeatTreeChildToParent[parent];
+//            if (typeof grandParent != "string") grandParent = null;// hack to work around Prototype's broken Object.extend
             parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
                     + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
             currentId = parent;
@@ -1726,11 +1728,13 @@ function xformsHandleResponse(o) {
                                         }
                                         // Insert copy of template nodes
                                         for (var templateNodeIndex in templateNodes) {
+//                                            if (typeof templateNodes[templateNodeIndex] != "string") continue;// hack to work around Prototype's broken Object.extend
                                             templateNode = templateNodes[templateNodeIndex];
                                             afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
                                         }
                                         // Initialize style on copied node
                                         for (var templateNodeIndex in templateNodes) {
+//                                            if (typeof templateNodes[templateNodeIndex] != "string") continue;// hack to work around Prototype's broken Object.extend
                                             templateNode = templateNodes[templateNodeIndex];
                                             // Maybe we need to do some initialization for advanced controls here
                                         }
@@ -2259,6 +2263,7 @@ function xformsHandleResponse(o) {
                             // For each repeat id that changes, see if all the children are also included in
                             // newRepeatIndexes. If they are not, add an entry with the index unchanged.
                             for (var repeatId in newRepeatIndexes) {
+//                                if (typeof newRepeatIndexes[repeatId] != "string") continue;// hack to work around Prototype's broken Object.extend
                                 var children = document.xformsRepeatTreeParentToAllChildren[repeatId];
                                 for (var childIndex in children) {
                                     var child = children[childIndex];
@@ -2268,6 +2273,7 @@ function xformsHandleResponse(o) {
                             }
                             // Unhighlight items at old indexes
                             for (var repeatId in newRepeatIndexes) {
+//                                if (typeof newRepeatIndexes[repeatId] != "string") continue;// hack to work around Prototype's broken Object.extend
                                 var oldIndex = document.xformsRepeatIndexes[repeatId];
                                 if (oldIndex != 0) {
                                     var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
@@ -2285,11 +2291,13 @@ function xformsHandleResponse(o) {
                             }
                             // Store new indexes
                             for (var repeatId in newRepeatIndexes) {
+//                                if (typeof newRepeatIndexes[repeatId] != "string") continue;// hack to work around Prototype's broken Object.extend
                                 var newIndex = newRepeatIndexes[repeatId];
                                 document.xformsRepeatIndexes[repeatId] = newIndex;
                             }
                             // Highlight item a new index
                             for (var repeatId in newRepeatIndexes) {
+//                                if (typeof newRepeatIndexes[repeatId] != "string") continue;// hack to work around Prototype's broken Object.extend
                                 var newIndex = newRepeatIndexes[repeatId];
                                 if (newIndex != 0) {
                                     var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);

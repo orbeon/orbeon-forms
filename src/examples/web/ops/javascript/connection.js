@@ -437,8 +437,10 @@ YAHOO.util.Connect =
 	setHeader:function(o)
 	{
 		for(var prop in this._http_header){
-			o.conn.setRequestHeader(prop, this._http_header[prop]);
-		}
+//            if (typeof this._http_header[prop] == "string") { // hack to work around Prototype's broken Object.extend
+                o.conn.setRequestHeader(prop, this._http_header[prop]);
+//            }
+        }
 		delete this._http_header;
 
 		this._http_header = {};

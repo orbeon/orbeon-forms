@@ -36,6 +36,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
 var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
+var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 
 /* * * * * * Utility functions * * * * * */
 
@@ -244,7 +245,8 @@ ORBEON.xforms.Globals = {
     autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
     autoCompleteOpen: {},
     loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
-    activeControl: null               // The currently active control, used to disable hint
+    activeControl: null,              // The currently active control, used to disable hint
+    autosizeTextareas: []             // Ids of the autosize textareas on the page
 };
 
 // @class
@@ -434,6 +436,31 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.removeClass(hintLabel, "xforms-hint-active");
             }
         }
+    },
+
+    autosizeTextarea: function(textarea) {
+        var scrollHeight = textarea.scrollHeight;
+        var clientHeight = textarea.clientHeight;
+        var rowHeight = clientHeight / textarea.rows;
+        var linesAdded = 0;
+        console.log(scrollHeight);
+
+        if (scrollHeight > clientHeight) {
+            // Grow
+            while (scrollHeight > clientHeight) {
+                textarea.rows = textarea.rows + 1;
+                clientHeight = textarea.clientHeight;
+                linesAdded++;
+
+            }
+        } else if (scrollHeight < clientHeight) {
+            // Shrink
+            while (textarea.rows > XFORMS_WIDE_TEXTAREA_MIN_ROWS && scrollHeight < clientHeight - rowHeight) {
+                textarea.rows = textarea.rows - 1;
+                clientHeight = textarea.clientHeight;
+                linesAdded--;
+            }
+        }
     }
 };
 
@@ -596,9 +623,7 @@ ORBEON.xforms.Events = {
 
             // Resize wide text area
             if (ORBEON.util.Dom.hasClass(target, "xforms-textarea-appearance-xxforms-autosize")) {
-                var lineNumber = target.value.split("\n").length;
-                if (lineNumber < 5) lineNumber = 5;
-                target.style.height = 3 + lineNumber * 1.1 + "em";
+                ORBEON.xforms.Controls.autosizeTextarea(target);
             }
         }
     },
@@ -607,6 +632,13 @@ ORBEON.xforms.Events = {
         // Close open menus of there are any
         if (ORBEON.xforms.Globals.overlayManager != null)
             ORBEON.xforms.Globals.overlayManager.hideAll();
+    },
+
+    resize: function(event) {
+        for (var i = 0; i < ORBEON.xforms.Globals.autosizeTextareas.length; i++) {
+            var textarea = ORBEON.xforms.Globals.autosizeTextareas[i];
+            ORBEON.xforms.Controls.autosizeTextarea(textarea);
+        }
     },
 
 
@@ -879,6 +911,7 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
         YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
+        YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
 
         // Initialize logging
         if (typeof window.console == "undefined") {
@@ -1041,9 +1074,8 @@ ORBEON.xforms.Init = {
     },
 
     _widetextArea: function(textarea) {
-        var lineNumber = textarea.value.split("\n").length;
-        if (lineNumber < 5) lineNumber = 5;
-        textarea.style.height = 3 + lineNumber * 1.1 + "em";
+        ORBEON.xforms.Globals.autosizeTextareas.push(textarea);
+        ORBEON.xforms.Controls.autosizeTextarea(textarea);
     },
 
     _range: function(range) {

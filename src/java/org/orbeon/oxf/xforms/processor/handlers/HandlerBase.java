@@ -320,23 +320,23 @@ public abstract class HandlerBase extends ElementHandlerNew {
         if (isStaticReadonly(xformsControl) && (type.equals("alert") || type.equals("hint")))
             return;
 
-        final String value;
+        final String labelHintHelpAlertValue;
         if (xformsControl != null) {
             // Get actual value from control
             if (type.equals("label")) {
-                value = xformsControl.getLabel();
+                labelHintHelpAlertValue = xformsControl.getLabel();
             } else if (type.equals("help")) {
-                value = xformsControl.getHelp();
+                labelHintHelpAlertValue = xformsControl.getHelp();
             } else if (type.equals("hint")) {
-                value = xformsControl.getHint();
+                labelHintHelpAlertValue = xformsControl.getHint();
             } else if (type.equals("alert")) {
-                value = xformsControl.getAlert();
+                labelHintHelpAlertValue = xformsControl.getAlert();
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
         } else {
             // Placeholder
-            value = null;
+            labelHintHelpAlertValue = null;
         }
 
         // Find id
@@ -359,6 +359,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
             final StringBuffer classes = new StringBuffer("xforms-");
             classes.append(type);
+
+            // Handle alert state
             if (type.equals("alert")) {
                 if (!handlerContext.isGenerateTemplate() && !xformsControl.isValid())
                     classes.append(" xforms-alert-active");
@@ -366,15 +368,23 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     classes.append(" xforms-alert-inactive");
             }
 
-            // If the value of a help, hint or label is empty, consider it as "non-relevant"
+            // Handle visibility
             // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-            if (!type.equals("alert")) {
-                if (value == null || value.equals("")) {
-                    classes.append(" xforms-disabled");
+            if (!handlerContext.isGenerateTemplate()) {
+                if (type.equals("alert") || type.equals("label")) {
+                    // Allow empty labels and alerts
+                    if (!xformsControl.isRelevant())
+                        classes.append(" xforms-disabled");
+                } else {
+                    // For help and hint, consider "non-relevant" if empty
+                    final boolean isHintHelpRelevant = xformsControl.isRelevant() && !(labelHintHelpAlertValue == null || labelHintHelpAlertValue.equals(""));
+                    if (!isHintHelpRelevant) {
+                        classes.append(" xforms-disabled");
+                    }
                 }
             }
 
-            outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, value);
+            outputLabelHintHelpAlert(handlerContext, getAttributes(labelHintHelpAlertAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
         }
     }
 

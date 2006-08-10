@@ -204,9 +204,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 if (choicesLabel != null)
                     hierarchyLevel--;
             }
-        } else {
-            super.endElement(uri, localname, qName);
         }
+        super.endElement(uri, localname, qName);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

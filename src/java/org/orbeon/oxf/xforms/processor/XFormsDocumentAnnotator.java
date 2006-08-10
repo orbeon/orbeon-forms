@@ -20,8 +20,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -50,9 +52,11 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
 
                 final ExternalContext externalContext = ((ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT));
                 final boolean isPortlet = "portlet".equals(externalContext.getRequest().getContainerType());
+                final boolean isHostLanguageAVTs = XFormsUtils.isHostLanguageAVTs();
                 final String containerNamespace = externalContext.getRequest().getContainerNamespace();
 
                 final Map ids = new HashMap();
+                final AttributesImpl reusableAttributes = new AttributesImpl();
 
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ForwardingContentHandler(contentHandler) {
 
@@ -95,9 +99,39 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                             ids.put(newIdAttribute, "");
 
                             currentId++;
-                        }
 
-                        super.startElement(uri, localname, qName, attributes);
+                            super.startElement(uri, localname, qName, attributes);
+                        } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && isHostLanguageAVTs) {
+                            // This is an XHTML element
+
+                            final int attributesCount = attributes.getLength();
+                            if (attributesCount > 0) {
+                                for (int i = 0; i <attributesCount; i++) {
+                                    final String attributeValue = attributes.getValue(i);
+                                    if (attributeValue.indexOf('{') != -1) {
+                                        // This is an AVT
+                                        final String attributeName = attributes.getLocalName(i);
+
+                                        final String id = attributes.getValue("id");// TODO: create / update id if needed
+
+                                        reusableAttributes.clear();
+                                        reusableAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, id);
+                                        reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
+
+                                        super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                                        super.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", reusableAttributes);
+                                        super.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
+                                        super.endPrefixMapping("xxforms");
+                                    }
+                                }
+                                // TODO: create / update id if needed
+                                super.startElement(uri, localname, qName, attributes);
+                            } else {
+                                super.startElement(uri, localname, qName, attributes);
+                            }
+                        } else {
+                            super.startElement(uri, localname, qName, attributes);
+                        }
                     }
 
                     public void endElement(String uri, String localname, String qName) throws SAXException {

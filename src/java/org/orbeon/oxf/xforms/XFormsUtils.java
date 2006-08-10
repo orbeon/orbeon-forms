@@ -789,6 +789,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_GZIP_STATE_PROPERTY, XFormsConstants.DEFAULT_GZIP_STATE).booleanValue();
     }
 
+    public static boolean isHostLanguageAVTs() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_HOST_LANGUAGE_AVTS_PROPERTY, XFormsConstants.DEFAULT_HOST_LANGUAGE_AVTS).booleanValue();
+    }
+
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 

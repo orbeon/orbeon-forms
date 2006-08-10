@@ -49,7 +49,6 @@ ORBEON.xforms = {};
  * elements as this has some negative side effects like IE reloading
  * background images set with CSS on the element.
  */
-// @class
 ORBEON.util.IEDom = {
     /**
      * Optimized version of YAHOO.util.Dom.hasClass(element, className).
@@ -113,7 +112,7 @@ ORBEON.util.IEDom = {
 };
 
 /**
- * @class The hasClass, addClass and removeClass methods use a cache of the
+ * The hasClass, addClass and removeClass methods use a cache of the
  * classes for a give element for quick lookup. After having parsed the
  * className a first time we store that information in the orbeonClasses
  * map on the given element.
@@ -172,8 +171,7 @@ ORBEON.util.MozDom = {
 };
 
 /**
- * @class Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
- TODO dslfdklf
+ *  Utilities to deal with the DOM that supplement what is provided by YAHOO.util.Dom.
  */
 ORBEON.util.Dom = {
 
@@ -233,7 +231,6 @@ ORBEON.util.Dom = {
 /**
  * Global constants and variable
  */
-// @class
 ORBEON.xforms.Globals = {
 
     overlayManager: null,
@@ -249,7 +246,6 @@ ORBEON.xforms.Globals = {
     autosizeTextareas: []             // Ids of the autosize textareas on the page
 };
 
-// @class
 ORBEON.xforms.Controls = {
 
     // Returns MIP for a given control
@@ -465,7 +461,6 @@ ORBEON.xforms.Controls = {
 };
 
 
-// @class
 ORBEON.xforms.Events = {
 
     /**
@@ -760,7 +755,7 @@ ORBEON.xforms.Events = {
                             button         :    target.id,
                             singleClick    :    true,
                             step           :    1,
-                            onUpdate       :    xformsCalendarUpdate,
+                            onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
                             electric       :    true
                         });
                         // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
@@ -776,6 +771,19 @@ ORBEON.xforms.Events = {
         }
     },
 
+    /**
+     * Send notification to XForms engine end-user clicked on day.
+     * We don't notify the server the user is just navigating through the calendar.
+     */
+    calendarUpdate: function(calendar) {
+        if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
+            var inputField = calendar.params.inputField;
+            var element = inputField.parentNode;
+            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change",
+                ORBEON.xforms.Controls.getCurrentValue(element))], false);
+        }
+    },
+
     sliderValueChange: function (offset) {
         // Notify server that value changed
         var rangeControl = document.getElementById(this.id);
@@ -784,7 +792,6 @@ ORBEON.xforms.Events = {
     }
 };
 
-// @class
 ORBEON.xforms.Init = {
 
     /**

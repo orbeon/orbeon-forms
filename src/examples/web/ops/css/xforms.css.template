@@ -135,6 +135,7 @@
 .xforms-textarea-appearance-xxforms-autosize {
     font-size: 11px;
     width: 100%;
+    overflow: hidden;
 }
 
 .xforms-range-background {

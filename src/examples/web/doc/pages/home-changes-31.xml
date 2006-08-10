@@ -45,12 +45,6 @@
             <ul>
                 <li>
                     <p>
-                        Performance improvements, including in the following scenarios: [TODO: explain caching, serving
-                        static XForms, etc.]
-                    </p>
-                </li>
-                <li>
-                    <p>
                         The embedded eXist database has been upgraded to the 20060316 snapshot.
                     </p>
                 </li>
@@ -65,6 +59,18 @@
                         XForms improvements, including [TODO: link, elaborate]:
                     </p>
                     <ul>
+                        <li>
+                            <p>
+                                Entirely reworked client-side event handling. Client-side JavaScript performance is
+                                now greatly improved with very large forms.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Performance improvements, including in the following scenarios: [TODO: explain caching,
+                                serving static XForms, XPath cache, document cache, etc.]
+                            </p>
+                        </li>
                         <li>
                             <p>
                                 Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
@@ -204,9 +210,10 @@
                 </li>
                 <li>
                     <p>
-                        Support of OPS, including XForms, within Liferay portal. [TODO] [kindly sponsored by Atkins
-                        Transport Systems] A new epilogue pipeline, <code>epilogue-portlet-liferay.xpl</code>, can now
-                        be used to deploy JSR-168 portlets into liferay.
+                        Support of OPS, including XForms, within Liferay portal 3.6.1 and 4.1.0. [TODO] [kindly
+                        sponsored by Atkins Transport Systems] A new epilogue pipeline,
+                        <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168 portlets into
+                        liferay.
                     </p>
                     <p>
                         In addition, some bugs have been fixed relative to conflicts between OPS JavaScript

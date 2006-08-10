@@ -432,8 +432,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the effective control id of the control to set the focus to, or null.
      */
-    public String getClientFocusEffectiveControlId() {
-        return focusEffectiveControlId;
+    public String getClientFocusEffectiveControlId(PipelineContext pipelineContext) {
+
+        if (focusEffectiveControlId == null)
+            return null;
+
+        final XFormsControl xformsControl = (XFormsControl) getObjectById(pipelineContext, focusEffectiveControlId);
+        // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly  
+        if (xformsControl != null && xformsControl.isRelevant() && !xformsControl.isReadonly())
+            return focusEffectiveControlId;
+        else
+            return null;
     }
 
     /**

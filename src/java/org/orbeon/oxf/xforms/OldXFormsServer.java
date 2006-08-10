@@ -360,7 +360,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                            XFormsServer.diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                            XFormsServer.diffControlsState(ch, containingDocument, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
                                     currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
 
                             ch.endElement();
@@ -443,7 +443,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                         // Output focus instructions
                         {
-                            final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
+                            final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
                             if (focusEffectiveControlId != null) {
                                 outputFocusInfo(ch, focusEffectiveControlId);
                             }

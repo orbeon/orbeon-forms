@@ -48,6 +48,8 @@ td { vertical-align: top }
 .dmv-message-negative { color: orange }
 .dmv-message-fatal { color: red }
 .dmv-main-table td { white-space: nowrap }
-.xforms-label { margin-right: 1em }
+.xforms-label { margin-right: 1em; font-style: italic }
 .xforms-repeat-selected-item-1 td { cursor: default }
 .xforms-repeat-selected-item-2 td { cursor: default }
+.xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
+

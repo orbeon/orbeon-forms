@@ -64,6 +64,7 @@
                 <!-- Business data -->
                 <xforms:bind nodeset="//dmv:form">
                     <!-- Uncomment this line to test read-only version -->
+                    <!-- TODO: Control this from the outside -->
                     <!--<xforms:bind nodeset="." readonly="true()"/>-->
                     <xforms:bind nodeset="dmv:personal-information">
                         <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
@@ -86,8 +87,7 @@
                         </xforms:bind>
                     </xforms:bind>
                 </xforms:bind>
-                <!-- Don't care about xml:base -->
-                <xforms:bind nodeset="//@xml:base" relevant="false()"/>
+
             </xforms:bind>
 
             <!-- XForms instance containing the current language -->
@@ -113,30 +113,36 @@
                     <message/>
                     <data-status/>
                     <save-status/>
-                    <vehicle-insert-trigger/>
-                    <vehicle-delete-trigger/>
+
                     <save-trigger/>
                     <back-trigger/>
-                    <add-mailing-address/>
-                    <remove-mailing-address/>
-                    <clear-mailing-address/>
-                    <add-vehicle-address/>
-                    <remove-vehicle-address/>
-                    <clear-vehicle-address/>
+
+                    <add-vehicle-trigger/>
+                    <remove-vehicle-trigger/>
+                    <add-mailing-address-trigger/>
+                    <remove-mailing-address-trigger/>
+                    <clear-mailing-address-trigger/>
+                    <add-vehicle-address-trigger/>
+                    <remove-vehicle-address-trigger/>
+                    <clear-vehicle-address-trigger/>
                 </control>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0)"/>
                 <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty'"/>
-                <xforms:bind nodeset="vehicle-insert-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
-                <xforms:bind nodeset="vehicle-delete-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
-                <xforms:bind nodeset="add-mailing-address" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
-                <xforms:bind nodeset="remove-mailing-address" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
-                <xforms:bind nodeset="clear-mailing-address" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
-                <xforms:bind nodeset="add-vehicle-address" relevant="not(instance('main-instance')//dmv:vehicle-address)"/>
-                <xforms:bind nodeset="remove-vehicle-address" relevant="instance('main-instance')//dmv:vehicle-address"/>
-                <xforms:bind nodeset="clear-vehicle-address" relevant="normalize-space(instance('main-instance')//dmv:vehicle-address) != ''"/>
+                <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
+                <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
+                <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
+                <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
+                <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
+                <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('main-instance')//dmv:vehicle-address)"/>
+                <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('main-instance')//dmv:vehicle-address"/>
+                <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('main-instance')//dmv:vehicle-address) != ''"/>
+
+                <!-- Uncomment this line to test read-only version -->
+                <!-- TODO: Control this from the outside -->
+                <!--<xforms:bind nodeset="*[contains(name(), 'add') or contains(name(), 'remove')]" readonly="true()"/>-->
             </xforms:bind>
 
             <!-- XForms instance for error information -->
@@ -473,7 +479,7 @@
                                 <table class="dmv-action-table">
                                     <tr>
                                         <td>
-                                            <xforms:group ref="instance('control-instance')/remove-mailing-address">
+                                            <xforms:group ref="instance('control-instance')/remove-mailing-address-trigger">
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:delete nodeset="instance('main-instance')//dmv:address[@type = 'mailing']" at="last()"/>
                                                 </xforms:action>
@@ -486,7 +492,7 @@
                                                 </xforms:trigger>
                                             </xforms:group>
 
-                                            <xforms:group ref="instance('control-instance')/clear-mailing-address">
+                                            <xforms:group ref="instance('control-instance')/clear-mailing-address-trigger">
                                                 <xforms:action ev:event="DOMActivate" >
                                                     <xforms:dispatch name="dmv-clear-mailing-address" target="main-model"/>
                                                 </xforms:action>
@@ -500,7 +506,7 @@
                                             </xforms:group>
                                         </td>
                                         <td>
-                                            <xforms:group ref="instance('control-instance')/add-mailing-address" >
+                                            <xforms:group ref="instance('control-instance')/add-mailing-address-trigger" >
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="instance('main-instance')//dmv:address-information/dmv:address" at="last()" position="after"
                                                             origin="instance('mailing-address-template-instance')"/>
@@ -589,7 +595,7 @@
                                     <table class="dmv-action-table">
                                         <tr>
                                             <td>
-                                                <xforms:group ref="instance('control-instance')/vehicle-insert-trigger">
+                                                <xforms:group ref="instance('control-instance')/add-vehicle-trigger">
                                                     <xforms:action ev:event="DOMActivate">
                                                         <xforms:insert nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
                                                         <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
@@ -606,7 +612,7 @@
                                                 </xforms:group>
                                             </td>
                                             <td>
-                                                <xforms:group ref="instance('control-instance')/vehicle-delete-trigger">
+                                                <xforms:group ref="instance('control-instance')/remove-vehicle-trigger">
                                                     <xforms:action ev:event="DOMActivate">
                                                         <xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
                                                     </xforms:action>
@@ -699,7 +705,7 @@
                                 <table class="dmv-action-table">
                                     <tr>
                                         <td>
-                                            <xforms:group ref="instance('control-instance')/remove-vehicle-address">
+                                            <xforms:group ref="instance('control-instance')/remove-vehicle-address-trigger">
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:delete nodeset="instance('main-instance')//dmv:vehicle-address" at="last()"/>
                                                 </xforms:action>
@@ -712,7 +718,7 @@
                                                 </xforms:trigger>
                                             </xforms:group>
 
-                                            <xforms:group ref="instance('control-instance')/clear-vehicle-address">
+                                            <xforms:group ref="instance('control-instance')/clear-vehicle-address-trigger">
                                                 <xforms:action ev:event="DOMActivate" >
                                                     <xforms:dispatch name="dmv-clear-vehicle-address" target="main-model"/>
                                                 </xforms:action>
@@ -726,7 +732,7 @@
                                             </xforms:group>
                                         </td>
                                         <td>
-                                            <xforms:group ref="instance('control-instance')/add-vehicle-address">
+                                            <xforms:group ref="instance('control-instance')/add-vehicle-address-trigger">
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="instance('main-instance')//dmv:vehicle-information/dmv:leased-vehicles" at="last()" position="after"
                                                             origin="instance('vehicle-address-template-instance')"/>

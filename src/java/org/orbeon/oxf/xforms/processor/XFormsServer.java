@@ -367,7 +367,7 @@ public class XFormsServer extends ProcessorImpl {
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(ch, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
@@ -378,7 +378,7 @@ public class XFormsServer extends ProcessorImpl {
                         final XFormsContainingDocument initialContainingDocument
                                     = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
 
-                        diffControlsState(ch, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControlsState(ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -466,7 +466,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output focus instructions
                 {
-                    final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId();
+                    final String focusEffectiveControlId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
                     if (focusEffectiveControlId != null) {
                         outputFocusInfo(ch, focusEffectiveControlId);
                     }
@@ -598,7 +598,7 @@ public class XFormsServer extends ProcessorImpl {
         return dynamicStateDocument;
     }
 
-    public static void diffControlsState(ContentHandlerHelper ch, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -609,6 +609,7 @@ public class XFormsServer extends ProcessorImpl {
             throw new IllegalStateException("Illegal state when comparing controls.");
         }
 
+        final boolean isStaticReadonly = containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE);
         final AttributesImpl attributesImpl = new AttributesImpl();
         final Iterator j = (state1 == null) ? null : state1.iterator();
         for (Iterator i = state2.iterator(); i.hasNext();) {
@@ -621,7 +622,10 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output diffs between controlInfo1 and controlInfo2
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsControl2.getEffectiveId()) != null;
-                if (!xformsControl2.equals(xformsControl1) || isValueChangeControl) { // don't send anything if nothing has changed; but we force a change for controls whose values changed in the request
+                if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
+                    // Don't send anything if nothing has changed
+                    // But we force a change for controls whose values changed in the request
+                    // Also, we don't output anything for triggers in static readonly mode
 
                     attributesImpl.clear();
 
@@ -783,7 +787,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(ch, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -793,10 +797,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(ch, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         // Issue new values for new iterations
-                        diffControlsState(ch, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -810,7 +814,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(ch, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
@@ -825,7 +829,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                 } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
 
@@ -840,10 +844,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 } else {
                     // Other grouping controls
-                    diffControlsState(ch, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 }
             }
         }

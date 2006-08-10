@@ -2009,7 +2009,18 @@ function xformsHandleResponse(o) {
                                         */
 
                                         // Update value
-                                        if (ORBEON.xforms.Globals.changedIdsRequest[controlId] == true) {
+                                        var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
+                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") || isStaticReadonly) {
+                                            // XForms output or "static readonly" mode
+                                            var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
+                                                documentElement.firstChild.src = newOutputControlValue;
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                documentElement.innerHTML = newOutputControlValue;
+                                            } else {
+                                                ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
+                                            }
+                                        } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] == true) {
                                             // User has modified the value of this control since we sent our request:
                                             // so don't try to update it
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")
@@ -2042,16 +2053,6 @@ function xformsHandleResponse(o) {
                                             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                                                 var option = options[optionIndex];
                                                 option.selected = xformsArrayContains(selectedValues, option.value);
-                                            }
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")) {
-                                            // XForms output
-                                            var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
-                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
-                                                documentElement.firstChild.src = newOutputControlValue;
-                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                documentElement.innerHTML = newOutputControlValue;
-                                            } else {
-                                                ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                             }
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                             // XForms input
@@ -2152,10 +2153,12 @@ function xformsHandleResponse(o) {
                                         }
                                         // Update the required-empty/required-full even if the required has not changed or
                                         // is not specified as the value may have changed
-                                        ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                        if (!isStaticReadonly) {
+                                            ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                        }
 
                                         // Handle readonly
-                                        if (readonly != null) {
+                                        if (readonly != null && !isStaticReadonly) {
                                             function setReadonlyOnFormElement(element, isReadonly) {
                                                 if (isReadonly) {
                                                     element.setAttribute("disabled", "disabled");

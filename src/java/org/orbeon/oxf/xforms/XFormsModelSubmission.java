@@ -203,9 +203,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
 
                 //noinspection UnnecessaryLocalVariable
-                final boolean isDeferredSubmission = isReplaceAll;
-                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName) && !isHandlingOptimizedGet;
-                isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass;
+                final boolean isDeferredSubmission = isReplaceAll && !isHandlingOptimizedGet;
+                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+                isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
 

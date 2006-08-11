@@ -292,7 +292,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-select-template");
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType, new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null), "$xforms-template-label$", "$xforms-template-value$", 1), "$xforms-item-index$", true);
+                    handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
+                            new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null),
+                                    "$xforms-template-label$", "$xforms-template-value$", 1),
+                            "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
                     // TODO: in the future we should be able to handle multiple itemsets

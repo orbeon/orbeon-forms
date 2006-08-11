@@ -98,13 +98,14 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
-        if (!handlerContext.isGenerateTemplate()) {
+        {
             if (isImageMediatype) {
                 // Case of image media type with URI
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, xformsOutputControl.getValue());
+                final String srcValue = (xformsOutputControl != null) ? xformsOutputControl.getValue() : "";// $xforms-template-value$
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
                 // @f:url-norewrite="true"
                 final String formattingPrefix;
                 final boolean isNewPrefix;
@@ -128,94 +129,99 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                     contentHandler.endPrefixMapping(formattingPrefix);
             } else if (isDateOrTime) {
                 // Display formatted value for dates
-                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
-                if (displayValue != null)
-                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                if (xformsOutputControl != null) {
+                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    if (displayValue != null)
+                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                }
             } else if (isHTMLMediaType) {
                 // HTML case
 
-                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
-                if (displayValue != null && displayValue.length() > 0) {
-                    // Create and configure Tidy instance
-                    final Tidy tidy = new Tidy();
-                    tidy.setShowWarnings(false);
-                    tidy.setQuiet(true);
-                    tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
+                if (xformsOutputControl != null) {
+                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    if (displayValue != null && displayValue.length() > 0) {
+                        // Create and configure Tidy instance
+                        final Tidy tidy = new Tidy();
+                        tidy.setShowWarnings(false);
+                        tidy.setQuiet(true);
+                        tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
 
-                    // Parse and output to SAXResult
-                    final byte[] valueBytes;
-                    try {
-                        valueBytes = displayValue.getBytes("utf-8");
-                    } catch (UnsupportedEncodingException e) {
-                        throw new OXFException(e); // will not happen
-                    }
-                    // TODO: optimize and skip creation of Dom4j document
-                    final Document dom4jResult;
-                    try {
-                        final InputStream is = new ByteArrayInputStream(valueBytes);
-                        final org.w3c.dom.Document result = tidy.parseDOM(is, null);
-                        dom4jResult = TransformerUtils.domToDom4jDocument(result);
-                    } catch (TransformerException e) {
-                        throw new OXFException(e);
-                    }
+                        // Parse and output to SAXResult
+                        final byte[] valueBytes;
+                        try {
+                            valueBytes = displayValue.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException e) {
+                            throw new OXFException(e); // will not happen
+                        }
+                        // TODO: optimize and skip creation of Dom4j document
+                        final Document dom4jResult;
+                        try {
+                            final InputStream is = new ByteArrayInputStream(valueBytes);
+                            final org.w3c.dom.Document result = tidy.parseDOM(is, null);
+                            dom4jResult = TransformerUtils.domToDom4jDocument(result);
+                        } catch (TransformerException e) {
+                            throw new OXFException(e);
+                        }
 
-                    // Create content document
-                    final Element htmlElement = dom4jResult.getRootElement();
-                    final Element bodyElement = htmlElement.element("body");
-                    final Document bodyDocument =  Dom4jUtils.createDocument();
-                    bodyDocument.setRootElement((Element) bodyElement.detach());
+                        // Create content document
+                        final Element htmlElement = dom4jResult.getRootElement();
+                        final Element bodyElement = htmlElement.element("body");
+                        final Document bodyDocument =  Dom4jUtils.createDocument();
+                        bodyDocument.setRootElement((Element) bodyElement.detach());
 
-                    // Stream fragment to the output
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
+                        // Stream fragment to the output
+                        try {
+                            final Transformer identity = TransformerUtils.getIdentityTransformer();
+                            identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
 
-                            private int level = 0;
+                                private int level = 0;
 
-                            public void startDocument() {
-                            }
-
-                            public void endDocument() {
-                            }
-
-                            public void startPrefixMapping(String s, String s1) {
-                            }
-
-                            public void endPrefixMapping(String s) {
-                            }
-
-                            public void setDocumentLocator(Locator locator) {
-                            }
-
-                            public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                                if (level > 0) {
-                                    final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                    super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
+                                public void startDocument() {
                                 }
 
-                                level++;
-                            }
-
-                            public void endElement(String uri, String localname, String qName) throws SAXException {
-                                level--;
-
-                                if (level > 0) {
-                                    final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                    super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
+                                public void endDocument() {
                                 }
-                            }
 
-                        }));
-                    } catch (TransformerException e) {
-                        throw new OXFException(e);
+                                public void startPrefixMapping(String s, String s1) {
+                                }
+
+                                public void endPrefixMapping(String s) {
+                                }
+
+                                public void setDocumentLocator(Locator locator) {
+                                }
+
+                                public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                                    if (level > 0) {
+                                        final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
+                                        super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
+                                    }
+
+                                    level++;
+                                }
+
+                                public void endElement(String uri, String localname, String qName) throws SAXException {
+                                    level--;
+
+                                    if (level > 0) {
+                                        final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
+                                        super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
+                                    }
+                                }
+
+                            }));
+                        } catch (TransformerException e) {
+                            throw new OXFException(e);
+                        }
                     }
                 }
-
             } else {
                 // Regular text case
-                final String displayValue = xformsOutputControl.getDisplayValueOrValue();
-                if (displayValue != null && displayValue.length() > 0)
-                    contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                if (xformsOutputControl != null) {
+                    final String displayValue = xformsOutputControl.getDisplayValueOrValue();
+                    if (displayValue != null && displayValue.length() > 0)
+                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                }
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);

@@ -42,7 +42,6 @@ td { vertical-align: top }
 .dmv-gridtable { border-collapse: collapse; width: 95%; margin-left: 1em; margin-right: 1em }
 .dmv-gridtable th { background-color: #ffcc66; text-align: center; padding: .3em; border: 1px solid #f93 }
 .dmv-gridtable td { padding: .3em; border: 1px solid #f93; margin: 0px; cursor: pointer }
-.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; text-align: center }
 .dmv-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana }
 .dmv-message-positive { color: green }
 .dmv-message-negative { color: orange }
@@ -50,6 +49,7 @@ td { vertical-align: top }
 .dmv-main-table td { white-space: nowrap }
 .xforms-label { margin-right: 1em; font-style: italic }
 .xforms-repeat-selected-item-1 td { cursor: default }
-.xforms-repeat-selected-item-2 td { cursor: default }
+.xforms-repeat-selected-item-2 td { cursor: default;  }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
-
+.dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
+.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0px; border: none; text-align: center }

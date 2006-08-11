@@ -77,7 +77,7 @@
         <city>Must contain letters, '-' or space only, start with a letter, and be 22 characters long at most.</city>
         <state>Must contain two capital letters that match a valid US state.</state>
         <zip>Must contain 5 digits.</zip>
-        <plate-number>Must contain letters and numbers only and be 8 characters long at most.</plate-number>
+        <plate-number>Must contain letters and numbers only and be 7 characters long at most.</plate-number>
         <vin>Must contain letters and numbers only and be 17 characters long at most.</vin>
         <leased></leased>
         <company-name>Must contain letters, '-', '.', '/', or space only, and be 22 characters long at most.</company-name>

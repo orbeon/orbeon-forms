@@ -78,7 +78,7 @@
         <city>Doit contenir seulement des lettres , '-' ou espaces, commencer avec une lettre, et avoir 22 caractères au plus.</city>
         <state>Doit contenir deux lettres majuscules correspondant à un état des Etats-Unis.</state>
         <zip>Doit contenir 5 chiffres.</zip>
-        <plate-number>Doit contenir seulement des lettres et chiffres et avoir 8 caractères au plus.</plate-number>
+        <plate-number>Doit contenir seulement des lettres et chiffres et avoir 7 caractères au plus.</plate-number>
         <vin>Doit contenir seulement des lettres et chiffres et avoir 17 caractères au plus.</vin>
         <leased></leased>
         <company-name>Doit contenir seulement des lettres, '-', '.', '/', ou espaces, et avoir 22 caractères au plus.</company-name>

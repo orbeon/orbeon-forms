@@ -28,7 +28,13 @@
         <!-- Main XForms model -->
         <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd" xxforms:readonly-appearance="dynamic">
 
+            <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">
+                <!-- Build plates instance -->
+                <xforms:insert while="count(plate) lt count(instance('main-instance')//dmv:plate-number)"
+                               context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
+                <xforms:recalculate/>
+                <!-- Set initial focus -->
                 <xforms:setfocus control="dmv-last-name-control"/>
             </xforms:action>
 
@@ -155,26 +161,26 @@
             </xforms:instance>
 
             <!-- XForms instance for license plate information -->
-            <!--<xforms:instance id="plate-instance">-->
-                <!--<control xmlns="">-->
-                    <!--<plate>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                        <!--<character/>-->
-                    <!--</plate>-->
-                <!--</control>-->
-            <!--</xforms:instance>-->
+            <xforms:instance id="plates-instance">
+                <plates xmlns=""/>
+            </xforms:instance>
 
-            <!--<xforms:bind nodeset="instance('plate-instance')">-->
-                <!--<xforms:bind nodeset="plate[1]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[1], count(preceding-sibling::character) + 1, 1)"/>-->
-                <!--<xforms:bind nodeset="plate[2]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[2], count(preceding-sibling::character) + 1, 1)"/>-->
-                <!--<xforms:bind nodeset="plate[3]/character" calculate="substring((instance('main-instance')//dmv:plate-number)[3], count(preceding-sibling::character) + 1, 1)"/>-->
-            <!--</xforms:bind>-->
+            <xforms:instance id="plate-template">
+                <plate xmlns="">
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                </plate>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('plates-instance')">
+                <xforms:bind nodeset="plate/character"
+                             calculate="for $i in . return substring((instance('main-instance')//dmv:plate-number)[count($i/../preceding-sibling::plate) + 1], count($i/preceding-sibling::character) + 1, 1)"/>
+            </xforms:bind>
 
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
@@ -591,7 +597,6 @@
                                     <xforms:output value="instance('resources-instance')/titles/vehicles-owned" mediatype="text/html"/><br/>
                                 </th>
                                 <td>
-                                    <!-- Advanced version of the triggers -->
                                     <table class="dmv-action-table">
                                         <tr>
                                             <td>
@@ -601,6 +606,7 @@
                                                         <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
                                                         <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
                                                         <xforms:setvalue ref="instance('main-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
+                                                        <xforms:insert context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
                                                     </xforms:action>
                                                     <xforms:trigger appearance="xxforms:image">
                                                         <xforms:label ref="instance('resources-instance')/labels/add-vehicle"/>
@@ -615,6 +621,7 @@
                                                 <xforms:group ref="instance('control-instance')/remove-vehicle-trigger">
                                                     <xforms:action ev:event="DOMActivate">
                                                         <xforms:delete nodeset="instance('main-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
+                                                        <xforms:delete context="instance('plates-instance')" nodeset="plate"/>
                                                     </xforms:action>
                                                     <xforms:trigger appearance="xxforms:image">
                                                         <xforms:label ref="instance('resources-instance')/labels/remove-vehicle"/>
@@ -630,7 +637,7 @@
 
                                     <table class="dmv-gridtable" id="dmv-vehicles">
                                         <tr>
-                                            <th><xforms:output value="instance('resources-instance')/titles/plate-number" mediatype="text/html"/></th>
+                                            <th colspan="2"><xforms:output value="instance('resources-instance')/titles/plate-number" mediatype="text/html"/></th>
                                             <th><xforms:output value="instance('resources-instance')/titles/vin" mediatype="text/html"/></th>
                                             <th><xforms:output value="instance('resources-instance')/titles/leased" mediatype="text/html"/></th>
                                         </tr>
@@ -641,6 +648,19 @@
                                                         <xforms:label ref="instance('resources-instance')/labels/plate-number"/>
                                                         <xforms:alert ref="instance('resources-instance')/alerts/plate-number"/>
                                                     </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <table class="dmv-plate-table">
+                                                        <tr>
+                                                            <td>
+                                                                <span style="position: relative; top: 15px; background: none">
+                                                                    <xforms:repeat nodeset="instance('plates-instance')/plate[count(xxforms:repeat-current('vehicles-repeat')/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
+                                                                        <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_', '_small.gif')"/>
+                                                                    </xforms:repeat>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
                                                 </td>
                                                 <td>
                                                     <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
@@ -662,22 +682,6 @@
                                         </xforms:repeat>
                                         <tr/><!-- This is to work around a bug in IE -->
                                     </table>
-
-                                    <!-- TODO: Fix bug in xforms:repeat to enable this
-                                    <xforms:repeat nodeset="instance('plate-instance')/plate[1]">
-                                        <table class="dmv-plate-table">
-                                            <tr>
-                                                <td>
-                                                    <span style="position: relative; top: 15px">
-                                                        <xforms:repeat nodeset="character[. != '']">
-                                                            <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', ., '_small.gif')"/>
-                                                        </xforms:repeat>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </xforms:repeat>
-                                    -->
                                 </td>
                             </tr>
                         </xforms:group>

@@ -53,7 +53,7 @@ public class XFormsGroupHandler extends HandlerBase {
         final String labelValue = handlerContext.isGenerateTemplate() ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
-            XFormsValueControlHandler.outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
+            outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
         }
 
         // NOTE: This doesn't work because attributes for the label are only gathered after start()
@@ -68,12 +68,12 @@ public class XFormsGroupHandler extends HandlerBase {
         handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveGroupId, "help", groupXFormsControl);
+        handleLabelHintHelpAlert(effectiveGroupId, "help", groupXFormsControl, false);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveGroupId, "alert", groupXFormsControl);
+        handleLabelHintHelpAlert(effectiveGroupId, "alert", groupXFormsControl, false);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveGroupId, "hint", groupXFormsControl);
+        handleLabelHintHelpAlert(effectiveGroupId, "hint", groupXFormsControl, false);
     }
 }

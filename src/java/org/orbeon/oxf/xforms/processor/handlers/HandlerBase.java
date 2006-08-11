@@ -314,6 +314,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl) throws SAXException {
+        handleLabelHintHelpAlert(parentId, type, xformsControl, true);
+    }
+
+    protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl, boolean placeholder) throws SAXException {
 
         // Don't handle alerts and help in read-only mode
         // TODO: Removing hints and help could be optional depending on appearance
@@ -352,7 +356,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         } else {
             throw new IllegalStateException("Illegal type requested");
         }
-        
+
         if (labelHintHelpAlertAttributes != null || type.equals("alert")) {
             // If no attributes were found, there is no such label / help / hint / alert
 
@@ -384,8 +388,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
             }
 
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
-            final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
-            outputLabelHintHelpAlert(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
+            final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
+            if (newAttributes != null) {
+                outputLabelHintHelpAlert(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
+            }
         }
     }
 
@@ -396,7 +402,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelHintHelpAlertAttributes);
-        if (!handlerContext.isGenerateTemplate() && value != null) {
+        if (value != null) {
             contentHandler.characters(value.toCharArray(), 0, value.length());
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName);

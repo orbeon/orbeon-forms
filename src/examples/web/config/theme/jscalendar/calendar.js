@@ -12,7 +12,7 @@
  * Read the entire license text here: http://www.gnu.org/licenses/lgpl.html
  */
 
-// $Id: calendar.js,v 1.4 2006/05/06 01:51:18 avernet Exp $
+// $Id: calendar.js,v 1.5 2006/08/11 01:46:16 ebruchez Exp $
 
 /** The Calendar object constructor. */
 Calendar = function (firstDayOfWeek, dateStr, onSelected, onClose) {
@@ -837,7 +837,7 @@ Calendar.prototype.create = function (_par) {
 		cell = Calendar.createElement("td", row);
 		cell.className = "time";
 		cell.colSpan = 2;
-		cell.innerHTML = Calendar._TT["TIME"] || "&nbsp;";
+		cell.innerHTML = Calendar._TT["TIME"] || "&#160;";
 
 		cell = Calendar.createElement("td", row);
 		cell.className = "time";
@@ -882,7 +882,7 @@ Calendar.prototype.create = function (_par) {
 			if (t12)
 				AP = makeTimePart("ampm", pm ? "pm" : "am", ["am", "pm"]);
 			else
-				cell.innerHTML = "&nbsp;";
+				cell.innerHTML = "&#160;";
 
 			cal.onSetTime = function() {
 				var pm, hrs = this.date.getHours(),
@@ -1135,7 +1135,7 @@ Calendar.prototype._init = function (firstDayOfWeek, date) {
 					cell.otherMonth = true;
 				} else {
 					cell.className = "emptycell";
-					cell.innerHTML = "&nbsp;";
+					cell.innerHTML = "&#160;";
 					cell.disabled = true;
 					continue;
 				}

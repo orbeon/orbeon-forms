@@ -1984,30 +1984,6 @@ function xformsHandleResponse(o) {
                                         var documentElement = document.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");
 
-                                        // Check if this control was modified and we haven't even received the key event yet
-                                        // This can happen as the the keyup event is dispatched after the control.value is modified,
-                                        // and it is possible to receive a response from the server after the value is modified but
-                                        // before the keyup event is dispatched.
-                                        /*
-                                        var foundControlModified = false;
-                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                            if (documentElement.childNodes[1].value != documentElement.previousValue)
-                                                foundControlModified = true;
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
-                                            if (documentElement.childNodes[0].value != documentElement.previousValue)
-                                                foundControlModified = true;
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
-                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                            // For HTML area, compare previous value to value of the HTML area widget
-                                            var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
-                                            if (documentElement.previousValue != htmlEditor.GetXHTML())
-                                                foundControlModified = true;
-                                        } else if (xformsIsDefined(documentElement.previousValue)
-                                                && documentElement.previousValue != documentElement.value) {
-                                            foundControlModified = true;
-                                        }
-                                        */
-
                                         // Update value
                                         var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") || isStaticReadonly) {

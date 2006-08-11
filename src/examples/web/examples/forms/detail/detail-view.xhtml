@@ -376,7 +376,8 @@
                                                     <xforms:alert ref="instance('resources-instance')/alerts/initial"/>
                                                 </xforms:input>
                                             </xforms:group>
-                                            <xforms:input incremental="true" ref="dmv:birth-date">
+                                            <xforms:input incremental="true" ref="dmv:birth-date"
+                                                          xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), instance('resources-instance')/formats/birth-date, instance('language-instance'), (), ()) else ''">
                                                 <xforms:label ref="instance('resources-instance')/labels/birth-date"/>
                                                 <xforms:alert ref="instance('resources-instance')/alerts/birth-date"/>
                                             </xforms:input>
@@ -647,6 +648,7 @@
                                                     <xforms:input incremental="true" ref="dmv:plate-number" class="dmv-plate-number">
                                                         <xforms:label ref="instance('resources-instance')/labels/plate-number"/>
                                                         <xforms:alert ref="instance('resources-instance')/alerts/plate-number"/>
+                                                        <xforms:setvalue ev:event="DOMFocusOut" ref="." value="upper-case(.)"/>
                                                     </xforms:input>
                                                 </td>
                                                 <td>

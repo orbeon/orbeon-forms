@@ -83,4 +83,7 @@
         <company-name>Must contain letters, '-', '.', '/', or space only, and be 22 characters long at most.</company-name>
         <county>Must contain letters, '-' or space only, start with a letter, and be 14 characters long at most.</county>
     </alerts>
+    <formats>
+        <birth-date>[FNn] [MNn] [D], [Y]</birth-date>
+    </formats>
 </resources>

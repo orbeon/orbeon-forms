@@ -60,7 +60,7 @@
         <state>Etat</state>
         <zip>Numéro postal</zip>
         <plate-number>Numéro de plaque</plate-number>
-        <vin>Id du vehicule ou vaisseau</vin>
+        <vin>Id du véhicule ou vaisseau</vin>
         <leased>Lease</leased>
         <company-name>Compagnie de leasing</company-name>
         <county>Comté</county>
@@ -84,4 +84,7 @@
         <company-name>Doit contenir seulement des lettres, '-', '.', '/', ou espaces, et avoir 22 caractères au plus.</company-name>
         <county>Doit contenir seulement des lettres, '-' ou espaces, commencer avec une lettre, et avoir 14 caractères au plus.</county>
     </alerts>
+    <formats>
+        <birth-date>[FNn], le [D] [MNn] [Y]</birth-date>
+    </formats>
 </resources>

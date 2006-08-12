@@ -58,22 +58,20 @@ ORBEON.util.IEDom = {
             // Trivial true case
             return true;
         } else {
-            var startPosition = element.className.indexOf(className);
-            if (startPosition == -1) {
-                // Trivial false case
-                return false;
-            } else {
-                var endPosition = startPosition + className.length;
-                // className is at the beginning
-                if (startPosition == 0)
-                    return element.className.charAt(endPosition) == " ";
-                // className is at the end
-                if (endPosition == element.className.length)
-                    return element.className.charAt(startPosition - 1) == " ";
-                // className is in the middle
-                return element.className.charAt(startPosition - 1) == " "
-                        && element.className.charAt(endPosition) == " ";
+            var classes = element.className + XFORMS_SEPARATOR_1;
+            if (classes.indexOf(className + " ") == 0) {
+                // Starts with the class we look for
+                return true;
             }
+            if (classes.indexOf(" " + className + " ") != -1) {
+                // The class we look for is in the middle
+                return true;
+            }
+            if (classes.indexOf(" " + className + XFORMS_SEPARATOR_1) != -1) {
+                // The class we look for is in the end
+                return true;
+            }
+            return false;
         }
     },
 
@@ -1990,7 +1988,8 @@ function xformsHandleResponse(o) {
                                             // XForms output or "static readonly" mode
                                             var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
                                             if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
-                                                documentElement.firstChild.src = newOutputControlValue;
+                                                var image = ORBEON.util.Dom.getChildElement(documentElement, 0);
+                                                image.src = newOutputControlValue;
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                 documentElement.innerHTML = newOutputControlValue;
                                             } else {

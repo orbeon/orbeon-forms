@@ -48,6 +48,7 @@
             <xforms:instance id="control-instance">
                 <control xmlns="">
                     <detail-uri/>
+                    <readonly-uri/>
                     <xml-detail-uri/>
                     <pdf-detail-uri/>
                     <non-empty-triggers/>
@@ -65,6 +66,8 @@
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="detail-uri"
                              calculate="concat('/forms/detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                <xforms:bind nodeset="readonly-uri"
+                             calculate="concat('/forms/detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id, '&amp;readonly=true')"/>
                 <xforms:bind nodeset="xml-detail-uri"
                              calculate="concat('/direct/forms/xml-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="pdf-detail-uri"
@@ -168,14 +171,29 @@
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
+                                        <xforms:load ref="instance('control-instance')/readonly-uri" f:url-type="resource"/>
+                                    </xforms:action>
+                                    <xforms:trigger appearance="xxforms:image">
+                                        <xforms:label>View Read-Only</xforms:label>
+                                        <xxforms:img src="/images/lockedstate.gif"/>
+                                    </xforms:trigger>
+                                    <xforms:trigger appearance="xxforms:link">
+                                        <xforms:label>View Read-Only</xforms:label>
+                                    </xforms:trigger>
+                                </xforms:group>
+                            </td>
+                            <td>
+                                <xforms:group ref="instance('control-instance')/non-empty-triggers">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:recalculate/>
                                         <xforms:load ref="instance('control-instance')/xml-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>View Selected As XML</xforms:label>
+                                        <xforms:label>View As XML</xforms:label>
                                         <xxforms:img src="/images/view-xml.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>View Selected As XML</xforms:label>
+                                        <xforms:label>View As XML</xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -186,11 +204,11 @@
                                         <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>View Selected As PDF</xforms:label>
+                                        <xforms:label>View As PDF</xforms:label>
                                         <xxforms:img src="/images/pdf.png"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>View Selected As PDF</xforms:label>
+                                        <xforms:label>View As PDF</xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>

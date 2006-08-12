@@ -20,13 +20,17 @@
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns="http://www.w3.org/1999/xhtml">
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xsl:version="2.0">
 
     <head>
         <title>OPS DMV Forms Example - Notice of Change of Address</title>
         <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
-        <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd" xxforms:readonly-appearance="dynamic">
+        <!-- NOTE: We only use XSLT here to set the value of xxforms:readonly-appearance. It would be nice to be able to forgo XSLT entirely -->
+        <xforms:model id="main-model" schema="oxf:/examples/forms/detail/form-schema.xsd"
+                      xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
 
             <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">
@@ -40,13 +44,16 @@
 
             <!-- This action clears all the fields of the mailing address -->
             <xforms:action ev:event="dmv-clear-mailing-address">
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>
+                <!--<xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>-->
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-1"/>
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-2"/>
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:apt"/>
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:city"/>
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:state"/>
                 <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:zip"/>
+
+                <!--<xforms:setvalue while="instance('main-instance')//dmv:address[@type = 'mailing']//*[. != '']"-->
+                                 <!--ref="instance('main-instance')//dmv:address[@type = 'mailing']//*[. != '']"/>-->
             </xforms:action>
 
             <!-- This action clears all the fields of the vehicle address -->
@@ -71,7 +78,7 @@
                 <xforms:bind nodeset="//dmv:form">
                     <!-- Uncomment this line to test read-only version -->
                     <!-- TODO: Control this from the outside -->
-                    <!--<xforms:bind nodeset="." readonly="true()"/>-->
+                    <xforms:bind nodeset="." readonly="instance('parameters-instance')/readonly = 'true'"/>
                     <xforms:bind nodeset="dmv:personal-information">
                         <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
                         <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
@@ -95,6 +102,9 @@
                 </xforms:bind>
 
             </xforms:bind>
+
+            <!-- Instance containing the page parameters -->
+            <xforms:instance id="parameters-instance" src="input:instance"/>
 
             <!-- XForms instance containing the current language -->
             <xforms:instance id="language-instance">
@@ -148,7 +158,7 @@
 
                 <!-- Uncomment this line to test read-only version -->
                 <!-- TODO: Control this from the outside -->
-                <!--<xforms:bind nodeset="*[contains(name(), 'add') or contains(name(), 'remove')]" readonly="true()"/>-->
+                <xforms:bind nodeset="*[contains(name(), 'add') or contains(name(), 'remove')]" readonly="instance('parameters-instance')/readonly = 'true'"/>
             </xforms:bind>
 
             <!-- XForms instance for error information -->
@@ -211,7 +221,7 @@
 
             <!-- Update language submission -->
             <xforms:submission id="update-language-submission" ref="instance('language-instance')"
-                    action="/forms/service/resources/{.}" validate="false"
+                    action="/forms/service/resources/{{.}}" validate="false"
                     method="get" replace="instance" instance="resources-instance"/>
 
         </xforms:model>
@@ -655,7 +665,7 @@
                                                     <table class="dmv-plate-table">
                                                         <tr>
                                                             <td>
-                                                                <span style="position: relative; top: 15px; background: none">
+                                                                <span class="dmv-plate-span">
                                                                     <xforms:repeat nodeset="instance('plates-instance')/plate[count(xxforms:repeat-current('vehicles-repeat')/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
                                                                         <xforms:output mediatype="image/gif" value="concat('/examples/forms/images/_', if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_', '_small.gif')"/>
                                                                     </xforms:repeat>

@@ -36,6 +36,7 @@
           model="detail/detail-model.xpl"
           view="detail/detail-view.xhtml">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
+        <setvalue ref="/parameters/readonly" parameter="readonly"/>
     </page>
 
     <page id="xml-detail" path-info="/direct/forms/xml-detail"

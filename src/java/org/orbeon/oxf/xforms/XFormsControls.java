@@ -1325,6 +1325,14 @@ public class XFormsControls {
             this.idForContext = idForContext;
             this.newBind = newBind;
             this.controlElement = controlElement;
+
+            if (nodeset != null && nodeset.size() > 0) {
+                for (Iterator i = nodeset.iterator(); i.hasNext();) {
+                    final Object currentItem = i.next();
+                    if (!(currentItem instanceof NodeInfo))
+                        throw new OXFException("A reference to a node (such as text, element, or attribute) is required in a binding. Attempted to bind to the invalid item type: " + currentItem.getClass());
+                }
+            }
         }
 
         public BindingContext getParent() {

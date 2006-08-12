@@ -156,6 +156,8 @@ public class XFormsConstants {
     public static final boolean DEFAULT_HOST_LANGUAGE_AVTS = false;
     public static final boolean DEFAULT_MINIMAL_RESOURCES = false;
 
+    public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
+
     private XFormsConstants() {
         // Disallow contruction
     }

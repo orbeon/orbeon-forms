@@ -28,7 +28,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsInputHandler extends XFormsValueControlHandler {
 
-    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength" };
+    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength", "autocomplete" };
     private Attributes elementAttributes;
 
     public XFormsInputHandler() {

@@ -14,6 +14,7 @@
 -->
 <resources>
     <titles>
+        <!-- NOTE: All the titles can contain (escaped) HTML -->
         <main-title>Changement d'adresse</main-title>
         <plate-number>Numéro de plaque</plate-number>
         <vin>Id du vehicule ou vaisseau</vin>

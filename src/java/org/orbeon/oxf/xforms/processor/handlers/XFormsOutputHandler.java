@@ -104,22 +104,29 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
-                final String srcValue = (xformsOutputControl != null) ? xformsOutputControl.getValue() : "";// $xforms-template-value$
+                // NOTE: If producing a template, we must point to an existing image
+                final String srcValue = (xformsOutputControl != null) ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
                 // @f:url-norewrite="true"
                 final String formattingPrefix;
                 final boolean isNewPrefix;
                 {
-                    final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
-                    if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
-                        // No prefix is currently mapped
-                        formattingPrefix = handlerContext.findNewPrefix();
-                        isNewPrefix = true;
+                    if (xformsOutputControl != null) {
+                        final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
+                        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
+                            // No prefix is currently mapped
+                            formattingPrefix = handlerContext.findNewPrefix();
+                            isNewPrefix = true;
+                        } else {
+                            formattingPrefix = existingFormattingPrefix;
+                            isNewPrefix = false;
+                        }
+                        imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                     } else {
-                        formattingPrefix = existingFormattingPrefix;
+                        // In the case of a template, allow for rewriting
+                        formattingPrefix = null;
                         isNewPrefix = false;
                     }
-                    imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                 }
                 if (isNewPrefix)
                     contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);

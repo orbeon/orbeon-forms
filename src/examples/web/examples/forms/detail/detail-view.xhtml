@@ -668,6 +668,7 @@
                                                     <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
                                                         <xforms:label ref="instance('resources-instance')/labels/vin"/>
                                                         <xforms:alert ref="instance('resources-instance')/alerts/vin"/>
+                                                        <xforms:setvalue ev:event="DOMFocusOut" ref="." value="upper-case(.)"/>
                                                         <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
                                                     </xforms:input>
                                                 </td>

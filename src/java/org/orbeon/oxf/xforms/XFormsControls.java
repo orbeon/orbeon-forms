@@ -1608,6 +1608,10 @@ public class XFormsControls {
          * current bindings.
          */
         public void visitControlsFollowRepeats(PipelineContext pipelineContext, XFormsControls xformsControls, XFormsControlVisitorListener xformsControlVisitorListener) {
+            // Don't iterate if we don't have controls
+            if (this.children == null)
+                return;
+
             xformsControls.resetBindingContext();
             visitControlsFollowRepeats(pipelineContext, xformsControls, this.children, xformsControlVisitorListener);
         }
@@ -1646,6 +1650,10 @@ public class XFormsControls {
          * current indexes of the repeat elements.
          */
         public String findEffectiveControlId(String controlId) {
+            // Don't iterate if we don't have controls
+            if (this.children == null)
+                return null;
+
             return findEffectiveControlId(controlId, this.children);
         }
 

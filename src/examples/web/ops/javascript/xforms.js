@@ -790,6 +790,16 @@ ORBEON.xforms.Events = {
         var rangeControl = document.getElementById(this.id);
         rangeControl.value = offset / 200;
         xformsValueChanged(rangeControl, null);
+    },
+
+    /**
+     * Called by the YUI menu library when a click happens a menu entry.
+     */
+    menuClick: function(eventType, arguments, userObject) {
+        var menu = userObject["menu"];
+        var value = userObject["value"];
+        ORBEON.xforms.Globals.overlayManager.hideAll();
+        xformsFireEvents([xformsCreateEventArray(menu, "xxforms-value-change-with-focus-change", value)], false);
     }
 };
 
@@ -855,7 +865,7 @@ ORBEON.xforms.Init = {
         if (menuItem.element.id == "")
             YAHOO.util.Dom.generateId(menuItem.element);
         // Handle click on menu item
-        menuItem.clickEvent.subscribe(xformsOnMenuBarItemClick,
+        menuItem.clickEvent.subscribe(ORBEON.xforms.Events.menuClick,
             {"menu": menu, "value": nameValueArray[1]});
 
         // Create sub-menu if necessary
@@ -1566,14 +1576,6 @@ function xformsOnMenuBarItemMouseOut(eventType, arguments) {
             oSubmenu.hide();
         }
     }
-}
-
-function xformsOnMenuBarItemClick(eventType, arguments, userObject) {
-    var menu = userObject["menu"];
-    var value = userObject["value"];
-    menu.value = value;
-    ORBEON.xforms.Globals.overlayManager.hideAll();
-    xformsValueChanged(menu);
 }
 
 function xformsOnDocumentMouseDown(p_oEvent) {

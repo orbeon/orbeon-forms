@@ -195,6 +195,8 @@ public class XFormsServer extends ProcessorImpl {
                     String lastValueChangeEventValue = null;
                     int[] sentEventCount = { 0 } ;
 
+                    containingDocument.prepareForExternalEventsSequence(pipelineContext);
+
                     for (Iterator i = eventElements.iterator(); i.hasNext();) {
                         final Element eventElement = (Element) i.next();
                         final String sourceControlId = eventElement.attributeValue("source-control-id");
@@ -276,10 +278,6 @@ public class XFormsServer extends ProcessorImpl {
      * was already executed.
      */
     private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, int[] sentEventCount, String eventName, String controlId, String otherControlId, String contextString) {
-        if (sentEventCount[0] == 0) {
-            // Prepare ContainingDocument
-            containingDocument.prepareForExternalEventsSequence(pipelineContext);
-        }
         containingDocument.startOutermostActionHandler();
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         containingDocument.endOutermostActionHandler(pipelineContext);
@@ -371,7 +369,6 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     } else {
                         // Reload / back case
-
                         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 

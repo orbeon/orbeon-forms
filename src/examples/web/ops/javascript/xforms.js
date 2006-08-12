@@ -235,7 +235,7 @@ ORBEON.xforms.Globals = {
     inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
-    changedIdsRequest: {},            // Id of controls that have been touched by user since the last request was sent
+    changedIdsRequest: {},            // Id of controls that have been touched by user since the last response was received
     serverValue: {},                  // Values on controls known to the server
     autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
     autoCompleteOpen: {},
@@ -595,7 +595,10 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
             // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
-            ORBEON.xforms.Globals.changedIdsRequest[target.id] = true;
+            var c = event.keyCode;
+            // Ignore some key codes that won't modify the value of the field
+            if (c != 9 && c != 13 && c != 16 && c != 17 && c != 18)
+                ORBEON.xforms.Globals.changedIdsRequest[target.id] = true;
         }
     },
 

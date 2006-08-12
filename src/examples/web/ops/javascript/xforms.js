@@ -437,7 +437,6 @@ ORBEON.xforms.Controls = {
         var clientHeight = textarea.clientHeight;
         var rowHeight = clientHeight / textarea.rows;
         var linesAdded = 0;
-        console.log(scrollHeight);
 
         if (scrollHeight > clientHeight) {
             // Grow
@@ -812,11 +811,15 @@ ORBEON.xforms.Init = {
     _getSpecialControlsInitFunctions: function () {
         ORBEON.xforms.Init._specialControlsInitFunctions = ORBEON.xforms.Init._specialControlsInitFunctions || {
             "select1": {
+                "compact" : ORBEON.xforms.Init._list,
                 "{http://orbeon.org/oxf/xml/xforms}autocomplete": ORBEON.xforms.Init._autoComplete,
                 "{http://orbeon.org/oxf/xml/xforms}menu": ORBEON.xforms.Init._menu,
                 "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
             },
-            "select": { "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree },
+            "select": {
+                "compact" : ORBEON.xforms.Init._list,
+                "{http://orbeon.org/oxf/xml/xforms}tree": ORBEON.xforms.Init._tree
+            },
             "range": { "": ORBEON.xforms.Init._range },
             "textarea": {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
@@ -1177,6 +1180,23 @@ ORBEON.xforms.Init = {
         fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
         fckEditor.ToolbarSet = "OPS";
         fckEditor.ReplaceTextarea() ;
+    },
+
+    /**
+     * For all the controls except list, we figure out the initial value of the control when
+     * receiving the first focus event. For the lists on Firefox, the value has already changed 
+     * when we receive the focus event. So here we save the value for lists when the page loads.
+     */
+    _list: function(list) {
+        var value = "";
+        for (var i = 0; i < list.options.length; i++) {
+            var option = list.options[i];
+            if (option.selected) {
+                if (value != "") value += " ";
+                value += option.value;
+            }
+        }
+        ORBEON.xforms.Globals.serverValue[list.id] = value;
     }
 };
 

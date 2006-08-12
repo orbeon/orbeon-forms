@@ -241,14 +241,14 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                     sb.append("\"");
                     sb.append(controlName);
-                    sb.append("\":");
+                    sb.append("\":{");
 
                     for (Iterator j = controlMap.entrySet().iterator(); j.hasNext();) {
                         final Map.Entry currentEntry2 = (Map.Entry) j.next();
                         final String controlAppearance = (String) currentEntry2.getKey();
                         final List idsForAppearanceList = (List) currentEntry2.getValue();
 
-                        sb.append("{\"");
+                        sb.append('"');
                         sb.append(controlAppearance != null ? controlAppearance : "");
                         sb.append("\":[");
 
@@ -261,12 +261,12 @@ public class XHTMLHeadHandler extends HandlerBase {
                                 sb.append(',');
                         }
 
-                        sb.append("]}");
+                        sb.append(']');
                         if (j.hasNext())
                             sb.append(',');
                     }
 
-                    sb.append("");
+                    sb.append("}");
                     if (i.hasNext())
                         sb.append(',');
                 }

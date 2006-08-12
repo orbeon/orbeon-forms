@@ -46,14 +46,19 @@ public class XFormsCaseHandler extends HandlerBase {
 
         final XFormsControls.ControlsState controlsState = containingDocument.getXFormsControls().getCurrentControlsState();
 
-        final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(currentCaseEffectiveId);
-        final XFormsControl switchControl = caseControl.getParent();
+        final boolean isVisible;
+        if (!handlerContext.isGenerateTemplate()) {
+            final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(currentCaseEffectiveId);
+            final XFormsControl switchControl = caseControl.getParent();
 
-        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
-        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getEffectiveId());
+            final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
+            final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getEffectiveId());
 
-        // This case is visible if it is selected or if the switch is read-only and we display read-only as static
-        final boolean isVisible = currentCaseEffectiveId.equals(selectedCaseId) || isStaticReadonly(switchControl);
+            // This case is visible if it is selected or if the switch is read-only and we display read-only as static
+            isVisible = currentCaseEffectiveId.equals(selectedCaseId) || isStaticReadonly(switchControl);
+        } else {
+            isVisible = false;
+        }
 
         newAttributes.addAttribute("", "style", "style", ContentHandlerHelper.CDATA, "display: " + (isVisible ? "block" : "none"));
 

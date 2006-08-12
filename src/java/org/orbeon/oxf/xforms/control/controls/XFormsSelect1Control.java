@@ -46,7 +46,7 @@ public class XFormsSelect1Control extends XFormsControl {
     public boolean hasJavaScriptInitialization() {
         final String appearance = getAppearance();
         return appearance != null
-                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance));
+                && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
     public void evaluateItemsets(PipelineContext pipelineContext) {

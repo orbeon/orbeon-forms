@@ -1783,21 +1783,20 @@
                     <li><p><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</p></li>
                 </ul>
                 <p>
-                    The XPath expression is evaluated by the XForms engine whenever the value bound
-                    to the <code>xforms:input</code> control changes and needs to be updated on
-                    screen. It is evaluated in the context of the instance node bound to the
-                    control. This means that the current value of the control can be accessed with
-                    "<code>.</code>". Often the value must be converted, for example to a date, in
-                    which case the conversion can be done with XPath 2.0 type casts such as
-                    <code>xs:date(.)</code>.
+                    The XPath expression is evaluated by the XForms engine whenever the value bound to the
+                    <code>xforms:input</code> control changes and needs to be updated on screen. It is evaluated in the
+                    context of the instance node bound to the control. This means that the current value of the control
+                    can be accessed with "<code>.</code>". Often the value must be converted (for example to a date) in
+                    which case the conversion can be done with a XPath 2.0 constructor such as <code>xs:date(.)</code>
+                    or with as cast such as <code>(. cast as xs:date?)</code>.
                 </p>
             </section>
             <section>
                 <title>xforms:input</title>
                 <p>
-                    When using <code>xforms:input</code> and a bound <code>xs:date</code> type, you
-                    can control the formatting of the date using the <code>xxforms:format</code>
-                    extension attribute on the <code>xforms:input</code> control. For example:
+                    When using <code>xforms:input</code> and a bound <code>xs:date</code> type, you can control the
+                    formatting of the date using the <code>xxforms:format</code> extension attribute on the
+                    <code>xforms:input</code> control. For example:
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:input ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
@@ -1806,9 +1805,8 @@
             <section>
                 <title>xforms:output</title>
                 <p>
-                    When using <code>xforms:output</code>, you can control the formatting of the
-                    date using the <code>xxforms:format</code> extension attribute on the
-                    <code>xforms:input</code> control.
+                    When using <code>xforms:output</code>, you can control the formatting of the date using the
+                    <code>xxforms:format</code> extension attribute on the <code>xforms:output</code> control.
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:output ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
@@ -2562,11 +2560,10 @@
                             <xforms:output ref="instance('my-instance')/html-content" mediatype="text/html"/>
                         </xml-source>
                         <p>
-                            This will display the result as HTML, as expected: "This is in in
-                            <b>bold</b>!". If the <code>mediatype</code> is not specified, the result
-                            would be instead: "This is in in &lt;b>bold&lt;/b>!". In the XForms
-                            instance, the HTML content must be escaped as text. On the other hand, the
-                            following content will not work as expected:
+                            This will display the result as HTML, as expected: "This is in <b>bold</b>!". If the
+                            <code>mediatype</code> is not specified, the result would be instead: "This is in 
+                            &lt;b>bold&lt;/b>!". In the XForms instance, the HTML content must be escaped as text. On
+                            the other hand, the following content will not work as expected:
                         </p>
                         <xml-source show-namespaces="false">
                             <xforms:instance>

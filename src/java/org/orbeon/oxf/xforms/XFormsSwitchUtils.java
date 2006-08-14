@@ -17,9 +17,10 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +56,7 @@ public class XFormsSwitchUtils {
 
                         final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                        final Node node = (Node) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
+                        final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
                         // Store an original case id instead of an effective case id
@@ -139,7 +140,7 @@ public class XFormsSwitchUtils {
 
                         final List currentNodeset = repeatControlInfo.getBindingContext().getNodeset();
 
-                        final Node node = (Node) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
+                        final NodeInfo node = (NodeInfo) currentNodeset.get(repeatIterationInfo.getIteration() - 1);
                         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
                         final String caseId = instanceData.getCasedIdForSwitchId(switchXFormsControl.getOriginalId());

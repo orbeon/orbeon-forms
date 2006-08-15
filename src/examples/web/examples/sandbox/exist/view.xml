@@ -39,7 +39,7 @@
                 <xforms:bind nodeset="insert" relevant="../operation = 'insert'"/>
                 <xforms:bind nodeset="formatted-result"
                         calculate="if (instance('response-instance')/*)
-                                   then saxon:serialize(xxforms:call-xpl('oxf:/config/theme/format.xpl', 'data', instance('response-instance')/*[1], 'data')/*, 'html')
+                                   then xxforms:serialize(xxforms:call-xpl('oxf:/config/theme/format.xpl', 'data', instance('response-instance')/*[1], 'data')/*, 'html')
                                    else ''"/>
             </xforms:bind>
 

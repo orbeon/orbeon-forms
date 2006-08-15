@@ -956,6 +956,12 @@ public class XMLUtils {
         public String getValue();
     }
 
+    public static String escapeXMLMinimal(String str) {
+        str = StringUtils.replace(str, "&", "&amp;");
+        str = StringUtils.replace(str, "<", "&lt;");
+        return str;
+    }
+
     static public String escapeXML(String str) {
         str = StringUtils.replace(str, "&", "&amp;");
         str = StringUtils.replace(str, "<", "&lt;");

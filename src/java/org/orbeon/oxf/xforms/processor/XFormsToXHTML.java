@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLFilterImpl;
 

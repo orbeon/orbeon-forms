@@ -46,6 +46,8 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private boolean inControl;
     private int controlLevel;
 
+    private boolean inLabelHintHelpAlert;
+
     private boolean mustOutputFirstElement = true;
 
     private final ExternalContext externalContext;
@@ -247,6 +249,11 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                 }
 
                 if (inControl) {
+
+                    if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
+                        inLabelHintHelpAlert = true;
+                    }
+
                     super.startElement(uri, localname, qName, attributes);
                 }
             } else if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
@@ -273,6 +280,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                         super.startElement(uri, localname, qName, attributes);
                     }
                 }
+            } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
+                // Preserve content
+                super.startElement(uri, localname, qName, attributes);
             }
 
             if (inModel) {
@@ -311,7 +321,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         if (inModel) {
             super.endElement(uri, localname, qName);
-        } else if (inControl && (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri))) {
+        } else if (inControl && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+            if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
+                inLabelHintHelpAlert = false;
+            }
+            super.endElement(uri, localname, qName);
+        } else if (inControl && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+            super.endElement(uri, localname, qName);
+        } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
+            // Preserve content
             super.endElement(uri, localname, qName);
         }
 

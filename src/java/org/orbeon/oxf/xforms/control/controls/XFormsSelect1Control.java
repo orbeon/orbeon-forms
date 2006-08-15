@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -164,6 +165,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
             }
 
             public void endElement(Element element) {
+            }
+
+            public void text(Text text) {
             }
         });
     }

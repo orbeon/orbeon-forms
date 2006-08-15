@@ -185,7 +185,6 @@ public class Dom4jUtils {
     }
 
     public static String domToString(final Element e, final boolean trm, final boolean cmpct) {
-//        final Branch cpy = e.createCopy(); // TODO FIXME: why did we clone here???
         return Dom4jUtils.domToString((Branch) e, trm, cmpct);
     }
 
@@ -545,17 +544,25 @@ public class Dom4jUtils {
      * @param visitorListener   listener to call back
      */
     public static void visitSubtree(Element container, VisitorListener visitorListener) {
-        for (Iterator i = container.elements().iterator(); i.hasNext();) {
-            final Element childElement = (Element) i.next();
+        for (Iterator i = container.content().iterator(); i.hasNext();) {
+            final Node childNode = (Node) i.next();
 
-            visitorListener.startElement(childElement);
-            visitSubtree(childElement, visitorListener);
-            visitorListener.endElement(childElement);
+            if (childNode instanceof Element) {
+                final Element childElement = (Element) childNode;
+                visitorListener.startElement(childElement);
+                visitSubtree(childElement, visitorListener);
+                visitorListener.endElement(childElement);
+            } else if (childNode instanceof Text) {
+                visitorListener.text((Text) childNode);
+            } else {
+                // Ignore as we don't need other node types for now
+            }
         }
     }
 
     public static interface VisitorListener {
         public void startElement(Element element);
         public void endElement(Element element);
+        public void text(Text text);
     }
 }

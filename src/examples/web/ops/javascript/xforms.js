@@ -2094,7 +2094,7 @@ function xformsHandleResponse(o) {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             }
-                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-tree")) {
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")) {
                                             // Tree
                                             var values = newControlValue.split(" ");
                                             for (nodeIndex in documentElement.xformsTree._nodes) {

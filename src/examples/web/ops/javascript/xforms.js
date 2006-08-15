@@ -1111,7 +1111,7 @@ ORBEON.xforms.Init = {
 
     _tree: function(tree) {
         // Save in the control if it allows multiple selection
-        tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select-tree");
+        tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select");
         // Parse data put by the server in the div
         var treeArray = eval(ORBEON.util.Dom.getStringValue(tree));
         ORBEON.util.Dom.setStringValue(tree, "");

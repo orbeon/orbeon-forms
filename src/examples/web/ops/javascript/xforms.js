@@ -1660,10 +1660,10 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
 // Function to find the input element below a given node
 function xformsGetInputUnderNode(node) {
     if (node.nodeType == ELEMENT_TYPE) {
-        if (node.tagName == "INPUT") {
+        if (node.tagName.toLowerCase() == "input") {
             return node;
         } else {
-            for (var childIndex in node.childNodes) {
+            for (var childIndex = 0; childIndex < node.childNodes.length; childIndex++) {
                 var result = xformsGetInputUnderNode(node.childNodes[childIndex]);
                 if (result != null) return result;
             }
@@ -1893,7 +1893,7 @@ function xformsHandleResponse(o) {
                                             if (itemCount >= options.length) {
                                                 // Add a new option
                                                 var newOption = document.createElement("OPTION");
-                                                documentElement.options.add(newOption);
+                                                documentElement.appendChild(newOption);
                                                 newOption.text = ORBEON.util.Dom.getAttribute(itemElement, "label");
                                                 newOption.value = ORBEON.util.Dom.getAttribute(itemElement, "value");
                                                 newOption.selected = xformsArrayContains(selectedValues, newOption.value);

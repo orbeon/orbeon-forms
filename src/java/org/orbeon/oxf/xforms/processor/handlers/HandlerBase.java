@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerNew;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -135,11 +136,11 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     sb.append(' ');
                 sb.append("xforms-readonly");
             }
-            if (xformsControl != null && xformsControl.isRequired()) {
+            if (xformsControl != null && xformsControl instanceof XFormsValueControl && xformsControl.isRequired()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
-                if ("".equals(xformsControl.getValue()))
+                if ("".equals(((XFormsValueControl) xformsControl).getValue()))
                     sb.append(" xforms-required-empty");
                 else
                     sb.append(" xforms-required-filled");

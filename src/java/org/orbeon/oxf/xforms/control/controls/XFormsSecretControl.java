@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.dom4j.Element;
 
 /**
  * Represents an xforms:secret control.
  */
-public class XFormsSecretControl extends XFormsControl {
+public class XFormsSecretControl extends XFormsValueControl {
     public XFormsSecretControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
     }

@@ -1233,6 +1233,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // the user interface during the deferred refresh behavior are considered to be new outermost action
                 // handler."
 
+                // Evaluate control and values so that events can use up-to-date context information
+                // NOTE: We could do this lazily!
+                xformsControl.evaluate(pipelineContext);
+
                 if ((type & EventSchedule.VALUE) != 0) {
                     containingDocument.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(xformsControl));
                 }
@@ -1281,6 +1285,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final XFormsControl xformsControl = (XFormsControl) xformsControls.getObjectById(controlInfoId);
                 if (xformsControl != null) {
                     final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
+                    xformsControl.evaluate(pipelineContext);
                     if (currentNodeInfo != null) {
                         final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentRelevantState = updatedInstanceData.getInheritedRelevant().get();

@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.common.OXFException;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -23,7 +24,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.QName;
 
 /**
  * Handle xforms:trigger.
@@ -62,21 +62,24 @@ public class XFormsTriggerHandler extends HandlerBase {
         // xforms:trigger and xforms:submit
 
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
+        final XFormsControl xformsControl = handlerContext.isGenerateTemplate() ? null : ((XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
 
-        if (isStaticReadonly(XFormsControl))
+        if (isStaticReadonly(xformsControl))
             return;
 
-        if (!handlerContext.isGenerateTemplate() && XFormsControl.getLabel() == null)
-            throw new OXFException("Missing label on xforms:trigger element.");// TODO: location data
+        if (xformsControl != null)
+            xformsControl.evaluate(pipelineContext);
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : XFormsControl.getLabel();
+        if (!handlerContext.isGenerateTemplate() && xformsControl.getLabel() == null)
+            throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
+
+        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : xformsControl.getLabel();
 
         final QName appearance = getAppearance(elementAttributes);
 
-        final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
+        final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
         if (!handlerContext.isGenerateTemplate())
-            handleMIPClasses(classes, XFormsControl);
+            handleMIPClasses(classes, xformsControl);
         final AttributesImpl newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
 
         // Handle accessibility attributes
@@ -84,7 +87,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         // Add title attribute if not yet present and there is a hint
         if (newAttributes.getValue("title") == null) {
-            final String hintValue = (XFormsControl != null) ? XFormsControl.getHint() : null;
+            final String hintValue = (xformsControl != null) ? xformsControl.getHint() : null;
             if (hintValue != null)
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }
@@ -131,7 +134,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:input
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-            handleReadOnlyAttribute(newAttributes, XFormsControl);
+            handleReadOnlyAttribute(newAttributes, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName);
 
@@ -143,13 +146,13 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:button
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
-            handleReadOnlyAttribute(newAttributes, XFormsControl);
+            handleReadOnlyAttribute(newAttributes, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
     }
 }

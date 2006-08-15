@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -44,8 +44,11 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl xformsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        
+        if (xformsControl != null)
+            xformsControl.evaluate(pipelineContext);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);

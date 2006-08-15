@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.Text;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -33,7 +31,6 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -238,7 +235,7 @@ public class XFormsControls {
                 }
 
                 // Evaluate values after index state has been computed
-                initialControlsState.evaluateValueControls(pipelineContext);
+//                initialControlsState.evaluateControls(pipelineContext);
             }
 
             // We are now clean
@@ -303,34 +300,22 @@ public class XFormsControls {
      * existing nodes, and return false if this is the case.
      *
      * @param pipelineContext   current PipelineContext
-     * @param XFormsControl       control to bind
-     * @return                  false if any part of the context path point to a non-existing node, true otherwise
+     * @param xformsControl       control to bind
      */
-    public boolean setBinding(PipelineContext pipelineContext, XFormsControl XFormsControl) {
-
-        boolean result = true;
+    public void setBinding(PipelineContext pipelineContext, XFormsControl xformsControl) {
 
         // Create ancestors-or-self list
         final List ancestorsOrSelf = new ArrayList();
-        BindingContext controlBindingContext = XFormsControl.getBindingContext();
+        BindingContext controlBindingContext = xformsControl.getBindingContext();
         while (controlBindingContext != null) {
-            final NodeInfo currentSingleNode = XFormsControl.getBoundNode();
-            if (currentSingleNode == null)
-                result = false;
             ancestorsOrSelf.add(controlBindingContext);
             controlBindingContext = controlBindingContext.getParent();
         }
         Collections.reverse(ancestorsOrSelf);
 
-        // Reinitialize context stack
-        contextStack.clear();
-
         // Bind up to the specified element
-        for (Iterator i = ancestorsOrSelf.iterator(); i.hasNext();) {
-            contextStack.push(i.next());
-        }
-
-        return result;
+        contextStack.clear();
+        contextStack.addAll(ancestorsOrSelf);
     }
 
     private void pushBinding(PipelineContext pipelineContext, XFormsControl XFormsControl) {
@@ -750,7 +735,6 @@ public class XFormsControls {
         final Map idsToXFormsControls = new HashMap();
 
         final Map switchIdToSelectedCaseIdMap = new HashMap();
-        final List valueControls = new ArrayList();
 
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
 
@@ -797,12 +781,6 @@ public class XFormsControls {
                     ((XFormsSelect1Control) xformsControl).evaluateItemsets(pipelineContext);
                 }
 
-                // Get control children values
-                xformsControl.setLabel(getLabelValue(pipelineContext));
-                xformsControl.setHelp(getHelpValue(pipelineContext));
-                xformsControl.setHint(getHintValue(pipelineContext));
-                xformsControl.setAlert(getAlertValue(pipelineContext));
-
                 // Set current binding for control element
                 final BindingContext currentBindingContext = getCurrentBindingContext();
                 final List currentNodeSet = currentBindingContext.getNodeset();
@@ -830,11 +808,6 @@ public class XFormsControls {
                         // Handle global read-only setting
                         if (containingDocument.isReadonly())
                             xformsControl.setReadonly(true);
-                        // If control can have a value, prepare it
-                        // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
-                        if (xformsControl.isValueControl()) {
-                            valueControls.add(xformsControl);
-                        }
                     } else {
                         // Control is not bound to a node - it becomes non-relevant
                         xformsControl.setReadonly(false);
@@ -936,7 +909,6 @@ public class XFormsControls {
         result.setChildren(rootChildren);
         result.setIdsToXFormsControls(idsToXFormsControls);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
-        result.setValueControls(valueControls);
 
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsServer.logger.debug("XForms - building controls state end: " + (System.currentTimeMillis() - startTime) + " ms.");
@@ -962,11 +934,11 @@ public class XFormsControls {
     /**
      * Rebuild the current controls state information if needed.
      */
-    public void rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
+    public boolean rebuildCurrentControlsStateIfNeeded(PipelineContext pipelineContext) {
 
         // Don't do anything if we are clean
         if (!currentControlsState.isDirty())
-            return;
+            return false;
 
         // Rebuild
         rebuildCurrentControlsState(pipelineContext);
@@ -974,6 +946,8 @@ public class XFormsControls {
         // Everything is clean
         initialControlsState.dirty = false;
         currentControlsState.dirty = false;
+
+        return true;
     }
 
     /**
@@ -1013,9 +987,6 @@ public class XFormsControls {
 
             result.setSwitchIdToSelectedCaseIdMap(newSwitchIdToSelectedCaseIdMap);
         }
-
-        // Evaluate controls values
-        result.evaluateValueControls(pipelineContext);
 
         // Update current state
         this.currentControlsState = result;
@@ -1198,116 +1169,6 @@ public class XFormsControls {
         }
     }
 
-    /**
-     * Return the value of the label element for the current control, null if none.
-     *
-     * 8.3.3 The label Element
-     */
-    public String getLabelValue(PipelineContext pipelineContext) {
-        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME);
-    }
-
-    /**
-     * Return the value of the help element for the current control, null if none.
-     *
-     * 8.3.4 The help Element
-     */
-    public String getHelpValue(PipelineContext pipelineContext) {
-        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME);
-    }
-
-    /**
-     * Return the value of the hint element for the current control, null if none.
-     *
-     * 8.3.5 The hint Element
-     */
-    public String getHintValue(PipelineContext pipelineContext) {
-        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME);
-    }
-
-    /**
-     * Return the value of the alert element for the current control, null if none.
-     *
-     * 8.3.6 The alert Element
-     */
-    public String getAlertValue(PipelineContext pipelineContext) {
-        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME);
-    }
-
-    private String getChildElementValue(PipelineContext pipelineContext, QName qName) {
-
-        // Check first if there is a current control element
-        Element controlElement = getCurrentBindingContext().getControlElement();
-        if (controlElement == null)
-            return null;
-
-        // Check that there is a current child element
-        Element childElement = controlElement.element(qName);
-        if (childElement == null)
-            return null;
-
-        // Child element becomes the new binding
-        pushBinding(pipelineContext, childElement);
-        String result = null;
-
-        // "the order of precedence is: single node binding attributes, linking attributes, inline text."
-
-        // Try to get single node binding
-        if (getCurrentBindingContext().isNewBind()) {
-            final NodeInfo currentNode = getCurrentSingleNode();
-            if (currentNode != null)
-                result = XFormsInstance.getValueForNode(currentNode);
-        }
-
-        // Try to get linking attribute
-        if (result == null) {
-            String srcAttributeValue = childElement.attributeValue("src");
-            if (srcAttributeValue != null) {
-                try {
-                    // TODO: should cache this?
-                    result = XFormsUtils.retrieveSrcValue(srcAttributeValue);
-                } catch (IOException e) {
-                    // Dispatch xforms-link-error to model
-                    final XFormsModel currentModel = getCurrentModel();
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
-                }
-            }
-        }
-
-        // Try to get inline value
-        if (result == null) {
-            if (childElement.element(XFormsConstants.XFORMS_OUTPUT_QNAME) != null) {
-                // There is at least one xforms:output element inside
-                final StringBuffer sb = new StringBuffer();
-                for (Iterator i = childElement.content().iterator(); i.hasNext();) {
-                    final Object currentObject = i.next();
-                    if (currentObject instanceof Element) {
-                        final Element currentElement = (Element) currentObject;
-                        if (currentElement.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                            // This is an xforms:output
-
-                            final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, currentElement, currentElement.getName(), null);
-                            outputControl.setBindingContext(getCurrentBindingContext());
-                            outputControl.evaluateValue(pipelineContext);
-                            outputControl.evaluateDisplayValue(pipelineContext);
-                            sb.append(outputControl.getDisplayValueOrValue());
-                        }
-                    } else if (currentObject instanceof Text) {
-                        final Text currentText = (Text) currentObject;
-                        sb.append(currentText.getStringValue());
-                    }
-                }
-                result = sb.toString();
-            } else {
-                // Plain text
-                result = childElement.getStringValue();
-            }
-        }
-
-        popBinding();
-        return result;
-    }
-
     public static class BindingContext {
         private BindingContext parent;
         private XFormsModel model;
@@ -1406,7 +1267,6 @@ public class XFormsControls {
         private Map repeatIdToIndex;
         private Map effectiveRepeatIdToIterations;
         private Map switchIdToSelectedCaseIdMap;
-        private List valueControls;
 
         private boolean hasRepeat;
         private boolean hasUpload;
@@ -1484,18 +1344,6 @@ public class XFormsControls {
 
         public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
             this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
-        }
-
-        public void setValueControls(List valueControls) {
-            this.valueControls = valueControls;
-        }
-
-        public void evaluateValueControls(PipelineContext pipelineContext) {
-            for (Iterator i = valueControls.iterator(); i.hasNext();) {
-                final XFormsControl currentXFormsControl = (XFormsControl) i.next();
-                currentXFormsControl.evaluateValue(pipelineContext);
-                currentXFormsControl.evaluateDisplayValue(pipelineContext);
-            }
         }
 
         public Map getRepeatIdToIndex() {

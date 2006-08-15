@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -42,17 +42,20 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
-                ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
+                ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+
+        if (xformsControl != null)
+            xformsControl.evaluate(pipelineContext);
 
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
             if (!handlerContext.isGenerateTemplate()) {
-                handleMIPClasses(classes, XFormsControl);
+                handleMIPClasses(classes, xformsControl);
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
@@ -69,20 +72,20 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             newAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
             newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
             newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                    handlerContext.isGenerateTemplate() ? "" : XFormsControl.getValue() != null ? XFormsControl.getValue() : "");
+                    handlerContext.isGenerateTemplate() ? "" : xformsControl.getValue() != null ? xformsControl.getValue() : "");
 
-            handleReadOnlyAttribute(newAttributes, XFormsControl);
+            handleReadOnlyAttribute(newAttributes, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
     }
 }

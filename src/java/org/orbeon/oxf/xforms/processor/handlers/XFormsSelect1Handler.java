@@ -17,6 +17,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -213,6 +214,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) (handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
+
+        if (xformsSelect1Control != null)
+            xformsSelect1Control.evaluate(pipelineContext);
 
         final boolean isMany = localname.equals("select");
 
@@ -539,11 +543,11 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "hint", xformsSelect1Control);
     }
 
-    private void outputJSONTreeInfo(XFormsControl XFormsControl, boolean many, ContentHandler contentHandler) throws SAXException {
+    private void outputJSONTreeInfo(XFormsValueControl xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
         if (!handlerContext.isGenerateTemplate()) {
             // Produce a JSON fragment with hierachical information
             if (items.size() > 0) { // may be null when there is no item in the itemset
-                final String controlValue = XFormsControl.getValue();
+                final String controlValue = xformsControl.getValue();
                 final StringBuffer sb = new StringBuffer();
 
                 sb.append("[");
@@ -595,7 +599,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void handleItemFull(ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
-                                XFormsControl XFormsControl, String id, String effectiveId, boolean isMany, String type, XFormsSelect1Control.Item item, String itemIndex, boolean isFirst) throws SAXException {
+                                XFormsValueControl xformsControl, String id, String effectiveId, boolean isMany, String type, XFormsSelect1Control.Item item, String itemIndex, boolean isFirst) throws SAXException {
 
         // Create an id for the item (trying to make this unique)
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
@@ -614,9 +618,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
             reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
 
-            if (!handlerContext.isGenerateTemplate() && XFormsControl != null) {
+            if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
                 final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
-                final String controlValue = ((XFormsControl.getValue() == null) ? "" : XFormsControl.getValue()).trim();
+                final String controlValue = ((xformsControl.getValue() == null) ? "" : xformsControl.getValue()).trim();
 
 
                 if (isSelected(isMany, controlValue, itemValue)) {
@@ -629,7 +633,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 }
             }
 
-            handleReadOnlyAttribute(reusableAttributes, XFormsControl);
+            handleReadOnlyAttribute(reusableAttributes, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
 
@@ -651,7 +655,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
-    private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsControl XFormsControl,
+    private void handleItemCompact(ContentHandler contentHandler, String optionQName, XFormsValueControl xformsControl,
                                    boolean isMany, XFormsSelect1Control.Item item) throws SAXException {
 
         final String optionValue = item.getValue();
@@ -660,8 +664,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue);
 
         // Figure out whether what items are selected
-        if (!handlerContext.isGenerateTemplate() && XFormsControl != null) {
-            final String controlValue = XFormsControl.getValue();
+        if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
+            final String controlValue = xformsControl.getValue();
             final boolean selected = (controlValue != null) && isSelected(isMany, controlValue, optionValue);
             if (selected)
                 optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");

@@ -42,19 +42,22 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
-        final XFormsControl XFormsControl = handlerContext.isGenerateTemplate()
+        final XFormsControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
+        if (xformsControl != null)
+            xformsControl.evaluate(pipelineContext);
+
         // xforms:label
-        handleLabelHintHelpAlert(effectiveId, "label", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, XFormsControl);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
             classes.append(" xforms-range-background");
             if (!handlerContext.isGenerateTemplate()) {
 
-                handleMIPClasses(classes, XFormsControl);
+                handleMIPClasses(classes, xformsControl);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             } else {
@@ -79,12 +82,12 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
         }
 
         // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
 
         // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
 
         // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", XFormsControl);
+        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
     }
 }

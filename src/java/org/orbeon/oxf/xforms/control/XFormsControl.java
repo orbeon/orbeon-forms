@@ -15,19 +15,19 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.common.OXFException;
+import org.dom4j.Text;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -51,8 +51,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private String help;
     private String hint;
     private String alert;
-    private String value;
-    private String displayValue;
 
     private String labelId;
     private String helpId;
@@ -216,32 +214,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.valid = valid;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Return a formatted display value of the control value, null if there is no such display value.
-     */
-    public String getDisplayValue() {
-        return displayValue;
-    }
-
-    /**
-     * Return a formatted display value of the control value, or the raw control value if there is no such display value.
-     */
-    public String getDisplayValueOrValue() {
-        return displayValue != null ? displayValue : value;
-    }
-
-    protected void setValue(String value) {
-        this.value = value;
-    }
-
-    protected void setDisplayValue(String displayValue) {
-        this.displayValue = displayValue;
-    }
-
     public XFormsControl getParent() {
         return parent;
     }
@@ -301,8 +273,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             return false;
         if (!((alert == null && other.alert == null) || (alert != null && other.alert != null && alert.equals(other.alert))))
             return false;
-        if (!((value == null && other.value == null) || (value != null && other.value != null && value.equals(other.value))))
-            return false;
 
         if (readonly != other.readonly)
             return false;
@@ -317,10 +287,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             return false;
 
         return true;
-    }
-
-    public boolean isValueControl() {
-        return XFormsControls.isValueControl(getName());
     }
 
     /**
@@ -353,92 +319,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return boundSingleNode;
     }
 
-    /**
-     * Notify the control that its value has changed due to external user interaction.
-     *
-     * @param value the new value
-     */
-    public void setExternalValue(PipelineContext pipelineContext, String value) {
-        // Set value into the instance
-
-        final NodeInfo boundNode = getBoundNode();
-        if (boundNode == null) // this should not happen
-            throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        final boolean changed = XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, boundNode, value);
-
-        if (changed) {
-            // Update this particular control's value
-            evaluateValue(pipelineContext);
-            evaluateDisplayValue(pipelineContext);
-        }
+    public void evaluate(PipelineContext pipelineContext) {
+        evaluateLabelHintHelpAlertValue(pipelineContext);
     }
 
-    /**
-     *
-     *
-     * @param pipelineContext
-     */
-    public void evaluateValue(PipelineContext pipelineContext) {
-        final NodeInfo boundNode = getBoundNode();
-        if (boundNode == null) // this should not happen
-            throw new OXFException("Control is no longer bound to a node. Cannot evaluate control value.");
-        setValue(XFormsInstance.getValueForNode(boundNode));
-    }
-
-    public void evaluateDisplayValue(PipelineContext pipelineContext) {
-        // NOP for most controls
-    }
-
-    public String convertToExternalValue(String internalValue) {
-        return internalValue;
-    }
-
-    protected void evaluateDisplayValueUseFormat(PipelineContext pipelineContext, String format) {
-        final String result;
-        if (format == null) {
-            // Try default format for known types
-
-            final Map prefixToURIMap = new HashMap();
-            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-
-            final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
-
-            if ("{http://www.w3.org/2001/XMLSchema}date".equals(type)) {
-                // Format a date
-                final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATE_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)) {
-                // Format a dateTime
-                final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(type)) {
-                // Format a time
-                final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
-                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
-            }
-
-            if (format != null) {
-                final NodeInfo boundNode = getBoundNode();
-                if (boundNode == null) // this should not happen
-                    throw new OXFException("Control is no longer bound to a node. Cannot evaluate control display value.");
-                result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
-                            format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
-            } else {
-                result = null;
-            }
-
-        } else {
-            // Format value according to format attribute
-            final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getControlElement());
-
-            final NodeInfo boundNode = getBoundNode();
-            if (boundNode == null) // this should not happen
-                throw new OXFException("Control is no longer bound to a node. Cannot evaluate control display value.");
-
-            result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
-                        format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
-        }
-        setDisplayValue(result);
+    protected void evaluateLabelHintHelpAlertValue(PipelineContext pipelineContext) {
+        this.label = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME);
+        this.help = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME);
+        this.hint = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME);
+        this.alert = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME);
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -553,5 +442,96 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                 }
             }
         }
+    }
+
+    private String getChildElementValue(PipelineContext pipelineContext, QName qName) {
+
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
+        // Check that there is a current child element
+        final Element childElement = controlElement.element(qName);
+        if (childElement == null)
+            return null;
+
+        // Child element becomes the new binding
+        String result = null;
+        xformsControls.setBinding(pipelineContext, this);
+        xformsControls.pushBinding(pipelineContext, childElement);
+        {
+            final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
+
+            // "the order of precedence is: single node binding attributes, linking attributes, inline text."
+
+            // Try to get single node binding
+            if (currentBindingContext.isNewBind()) {
+                final NodeInfo currentNode = currentBindingContext.getSingleNode();
+                if (currentNode != null)
+                    result = XFormsInstance.getValueForNode(currentNode);
+            }
+
+            // Try to get value attribute
+            // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
+            if (result == null) {
+                final String valueAttribute = childElement.attributeValue("value");
+                if (valueAttribute != null) {
+                    final List currentNodeset = currentBindingContext.getNodeset();
+                    if (currentNodeset != null && currentNodeset.size() > 0) {
+                        result = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                                currentNodeset, currentBindingContext.getPosition(),
+                                valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                    } else {
+                        result = ""; 
+                    }
+                }
+            }
+
+            // Try to get linking attribute
+            // NOTE: This is deprecated in XForms 1.1
+            if (result == null) {
+                final String srcAttributeValue = childElement.attributeValue("src");
+                if (srcAttributeValue != null) {
+                    try {
+                        // TODO: should cache this?
+                        result = XFormsUtils.retrieveSrcValue(srcAttributeValue);
+                    } catch (IOException e) {
+                        // Dispatch xforms-link-error to model
+                        final XFormsModel currentModel = currentBindingContext.getModel();
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                    }
+                }
+            }
+
+            // Try to get inline value
+            if (result == null) {
+                if (childElement.element(XFormsConstants.XFORMS_OUTPUT_QNAME) != null) {
+                    // There is at least one xforms:output element inside
+                    final StringBuffer sb = new StringBuffer();
+                    for (Iterator i = childElement.content().iterator(); i.hasNext();) {
+                        final Object currentObject = i.next();
+                        if (currentObject instanceof Element) {
+                            final Element currentElement = (Element) currentObject;
+                            if (currentElement.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                                // This is an xforms:output
+
+                                final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, currentElement, currentElement.getName(), null);
+                                outputControl.setBindingContext(currentBindingContext);
+                                outputControl.evaluate(pipelineContext);
+                                sb.append(outputControl.getDisplayValueOrValue());
+                            }
+                        } else if (currentObject instanceof Text) {
+                            final Text currentText = (Text) currentObject;
+                            sb.append(currentText.getStringValue());
+                        }
+                    }
+                    result = sb.toString();
+                } else {
+                    // Plain text
+                    result = childElement.getStringValue();
+                }
+            }
+        }
+
+        xformsControls.popBinding();
+        return result;
     }
 }

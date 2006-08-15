@@ -360,7 +360,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                            XFormsServer.diffControlsState(ch, containingDocument, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                            XFormsServer.diffControlsState(pipelineContext, ch, containingDocument, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
                                     currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
 
                             ch.endElement();

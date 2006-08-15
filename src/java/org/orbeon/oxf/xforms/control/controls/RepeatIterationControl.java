@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
  * Represents xforms:repeat iteration information.
@@ -30,6 +31,10 @@ public class RepeatIterationControl extends XFormsControl {
 
     public int getIteration() {
         return iteration;
+    }
+
+    public void evaluate(PipelineContext pipelineContext) {
+        // NOP
     }
 
     public boolean equals(Object obj) {

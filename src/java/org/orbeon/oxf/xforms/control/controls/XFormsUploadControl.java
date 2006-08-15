@@ -17,11 +17,12 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 
 /**
  * Represents an xforms:upload control.
  */
-public class XFormsUploadControl extends XFormsControl {
+public class XFormsUploadControl extends XFormsValueControl {
 
     private Element mediatypeElement;
     private Element filenameElement;

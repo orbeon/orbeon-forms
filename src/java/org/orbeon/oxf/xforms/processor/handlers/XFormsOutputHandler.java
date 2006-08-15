@@ -59,6 +59,9 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsOutputControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
+        if (xformsOutputControl != null)
+            xformsOutputControl.evaluate(pipelineContext);
+
         // The "control" is allowed to be null when xforms:output is in
         // xforms:label|xforms:hint|xforms:alert|xforms:help, because in that case currently we don't put the control in
         // the regular hierarchy of controls

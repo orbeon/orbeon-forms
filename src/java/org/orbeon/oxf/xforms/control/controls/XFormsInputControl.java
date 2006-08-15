@@ -19,11 +19,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 
 /**
  * Represents an xforms:input control.
  */
-public class XFormsInputControl extends XFormsControl {
+public class XFormsInputControl extends XFormsValueControl {
 
     // Optional display format
     private String format;

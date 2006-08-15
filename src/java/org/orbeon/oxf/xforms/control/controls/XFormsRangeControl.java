@@ -17,13 +17,14 @@ import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 
 /**
  * Represents an xforms:range control.
  */
-public class XFormsRangeControl extends XFormsControl {
+public class XFormsRangeControl extends XFormsValueControl {
 
     private String start;
     private String end;

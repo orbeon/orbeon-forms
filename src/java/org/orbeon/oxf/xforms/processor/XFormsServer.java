@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
@@ -365,7 +366,7 @@ public class XFormsServer extends ProcessorImpl {
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(pipelineContext, ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
@@ -375,7 +376,7 @@ public class XFormsServer extends ProcessorImpl {
                         final XFormsContainingDocument initialContainingDocument
                                     = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
 
-                        diffControlsState(ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControlsState(pipelineContext, ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -595,7 +596,7 @@ public class XFormsServer extends ProcessorImpl {
         return dynamicStateDocument;
     }
 
-    public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void diffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -618,6 +619,10 @@ public class XFormsServer extends ProcessorImpl {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
                 // Output diffs between controlInfo1 and controlInfo2
+
+                // Make sure the control's values are up to date
+                xformsControl2.evaluate(pipelineContext);
+
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsControl2.getEffectiveId()) != null;
                 if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
                     // Don't send anything if nothing has changed
@@ -721,18 +726,20 @@ public class XFormsServer extends ProcessorImpl {
                         // Get current value if possible for this control
                         // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
                         // client not to update the value, unlike with attributes which can be missing
-                        if (XFormsControls.isValueControl(xformsControl2.getName()) && !(xformsControl2 instanceof XFormsUploadControl)) {
+                        if (xformsControl2 instanceof XFormsValueControl && !(xformsControl2 instanceof XFormsUploadControl)) {
+
+                            final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsControl2;
 
                             // Check if a "display-value" attribute must be added
                             if (!isOutputControlWithValueAttribute) {
-                                final String displayValue = xformsControl2.getDisplayValue();
+                                final String displayValue = xformsValueControl.getDisplayValue();
                                 if (displayValue != null)
                                     attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
                             }
 
                             // Create element with text value
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                            ch.text(xformsControl2.convertToExternalValue(xformsControl2.getValue()));
+                            ch.text(xformsValueControl.convertToExternalValue(xformsValueControl.getValue()));
                             ch.endElement();
                         } else if (!"case".equals(xformsControl2.getName())) {
                             // No value, just output element with no content
@@ -784,7 +791,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(pipelineContext, ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -794,10 +801,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(pipelineContext, ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         // Issue new values for new iterations
-                        diffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(pipelineContext, ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -811,7 +818,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(pipelineContext, ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
@@ -826,7 +833,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                 } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
 
@@ -841,10 +848,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 } else {
                     // Other grouping controls
-                    diffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(pipelineContext, ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 }
             }
         }

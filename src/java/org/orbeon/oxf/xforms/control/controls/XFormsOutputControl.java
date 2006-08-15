@@ -22,9 +22,11 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.net.URI;
 import java.util.List;
@@ -32,7 +34,7 @@ import java.util.List;
 /**
  * Represents an xforms:output control.
  */
-public class XFormsOutputControl extends XFormsControl {
+public class XFormsOutputControl extends XFormsValueControl {
 
     // Optional display format
     private String format;
@@ -54,20 +56,24 @@ public class XFormsOutputControl extends XFormsControl {
         final String rawValue;
         if (valueAttribute == null) {
             // Get value from single-node binding
-            rawValue = XFormsInstance.getValueForNode(bindingContext.getSingleNode());
+            final NodeInfo currentSingleNode = bindingContext.getSingleNode();
+            if (currentSingleNode != null)
+                rawValue = XFormsInstance.getValueForNode(currentSingleNode);
+            else
+                rawValue = "";
         } else {
             // Value comes from the XPath expression within the value attribute
             final List currentNodeset = bindingContext.getNodeset();
             if (currentNodeset != null && currentNodeset.size() > 0) {
                 rawValue = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
-                        bindingContext.getNodeset(), bindingContext.getPosition(),
+                        currentNodeset, bindingContext.getPosition(),
                         valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
             } else {
                 rawValue = "";
             }
         }
 
-        // Handle mediatype if necessary
+        // Handle image mediatype if necessary
         final String updatedValue;
         if (mediaTypeAttribute != null && mediaTypeAttribute.startsWith("image/")) {
             final String type = getType();

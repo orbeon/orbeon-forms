@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -542,7 +543,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final String targetControlEffectiveId;
             {
                 // Set current context to control
-                final XFormsControl valueXFormsControl = (XFormsControl) concreteEvent.getTargetObject();
+                final XFormsValueControl valueXFormsControl = (XFormsValueControl) concreteEvent.getTargetObject();
                 targetControlEffectiveId = valueXFormsControl.getEffectiveId();
 
                 // Notify the control of the value change

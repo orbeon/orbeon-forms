@@ -93,7 +93,11 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {
-        evaluateDisplayValueUseFormat(pipelineContext, format);
+        if (valueAttribute == null) {
+            evaluateDisplayValueUseFormat(pipelineContext, format);
+        } else {
+            setDisplayValue(null);
+        }
     }
 
     public String getMediaTypeAttribute() {

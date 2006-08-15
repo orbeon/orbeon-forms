@@ -910,6 +910,13 @@ public class XFormsControls {
         result.setIdsToXFormsControls(idsToXFormsControls);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
 
+        // Evaluate all controls
+        for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) i.next();
+            final XFormsControl currentControl = (XFormsControl) currentEntry.getValue();
+            currentControl.evaluate(pipelineContext);
+        }
+
         if (XFormsServer.logger.isDebugEnabled()) {
             XFormsServer.logger.debug("XForms - building controls state end: " + (System.currentTimeMillis() - startTime) + " ms.");
         }

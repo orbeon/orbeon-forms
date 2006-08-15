@@ -206,9 +206,9 @@ public class OldXFormsServer extends ProcessorImpl {
 
             // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
-                final XFormsControls xFormsControls = containingDocument.getXFormsControls();
-                xFormsControls.rebuildCurrentControlsState(pipelineContext);
-                final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
+                final XFormsControls xformsControls = containingDocument.getXFormsControls();
+                xformsControls.rebuildCurrentControlsState(pipelineContext);
+                final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
                 try {
                     final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                     ch.startDocument();
@@ -359,8 +359,8 @@ public class OldXFormsServer extends ProcessorImpl {
                         final Map itemsetsFull2 = new HashMap();
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-
-                            XFormsServer.diffControlsState(pipelineContext, ch, containingDocument, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                            
+                            XFormsServer.diffControlsState(pipelineContext, ch, containingDocument, isInitializationRun ? null : xformsControls.getInitialControlsState().getChildren(),
                                     currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
 
                             ch.endElement();
@@ -380,7 +380,7 @@ public class OldXFormsServer extends ProcessorImpl {
                                 outputInitialRepeatInfo(ch, currentControlsState);
                             } else {
                                 // Output index updates
-                                final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
+                                final Map initialRepeatIdToIndex = xformsControls.getInitialControlsState().getRepeatIdToIndex();
                                 final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
                                 if (currentRepeatIdToIndex.size() != 0) {
                                     boolean found = false;

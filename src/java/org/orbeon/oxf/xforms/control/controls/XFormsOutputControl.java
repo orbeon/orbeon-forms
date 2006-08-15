@@ -52,7 +52,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         this.valueAttribute = element.attributeValue("value");
     }
 
-    public void evaluateValue(PipelineContext pipelineContext) {
+    protected void evaluateValue(PipelineContext pipelineContext) {
         final String rawValue;
         if (valueAttribute == null) {
             // Get value from single-node binding

@@ -67,9 +67,6 @@ public class XFormsTriggerHandler extends HandlerBase {
         if (isStaticReadonly(xformsControl))
             return;
 
-        if (xformsControl != null)
-            xformsControl.evaluate(pipelineContext);
-
         if (!handlerContext.isGenerateTemplate() && xformsControl.getLabel() == null)
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 

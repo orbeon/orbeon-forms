@@ -46,9 +46,6 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
-        
-        if (xformsControl != null)
-            xformsControl.evaluate(pipelineContext);
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);

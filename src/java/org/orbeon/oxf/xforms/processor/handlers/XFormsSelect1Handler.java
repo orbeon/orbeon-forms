@@ -215,9 +215,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) (handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
 
-        if (xformsSelect1Control != null)
-            xformsSelect1Control.evaluate(pipelineContext);
-
         final boolean isMany = localname.equals("select");
 
         QName appearance;

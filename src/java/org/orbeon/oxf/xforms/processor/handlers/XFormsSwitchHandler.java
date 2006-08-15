@@ -37,7 +37,6 @@ public class XFormsSwitchHandler extends HandlerBase {
         final StringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
             final XFormsControl switchXFormsControl = ((XFormsControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveSwitchId));
-            switchXFormsControl.evaluate(pipelineContext);
             HandlerBase.handleMIPClasses(classes, switchXFormsControl);
         }
 

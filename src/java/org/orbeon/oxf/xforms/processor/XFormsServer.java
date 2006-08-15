@@ -620,9 +620,6 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output diffs between controlInfo1 and controlInfo2
 
-                // Make sure the control's values are up to date
-                xformsControl2.evaluate(pipelineContext);
-
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsControl2.getEffectiveId()) != null;
                 if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
                     // Don't send anything if nothing has changed

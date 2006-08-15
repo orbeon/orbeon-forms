@@ -45,9 +45,6 @@ public class XFormsRangeHandler extends XFormsValueControlHandler {
         final XFormsControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId);
 
-        if (xformsControl != null)
-            xformsControl.evaluate(pipelineContext);
-
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
 

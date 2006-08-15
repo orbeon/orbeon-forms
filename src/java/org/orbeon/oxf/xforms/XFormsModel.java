@@ -1233,10 +1233,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // the user interface during the deferred refresh behavior are considered to be new outermost action
                 // handler."
 
-                // Evaluate control and values so that events can use up-to-date context information
-                // NOTE: We could do this lazily!
-                xformsControl.evaluate(pipelineContext);
-
                 if ((type & EventSchedule.VALUE) != 0) {
                     containingDocument.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(xformsControl));
                 }
@@ -1285,7 +1281,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 final XFormsControl xformsControl = (XFormsControl) xformsControls.getObjectById(controlInfoId);
                 if (xformsControl != null) {
                     final NodeInfo currentNodeInfo = xformsControl.getBoundNode();
-                    xformsControl.evaluate(pipelineContext);
                     if (currentNodeInfo != null) {
                         final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
                         final boolean currentRelevantState = updatedInstanceData.getInheritedRelevant().get();
@@ -1396,29 +1391,35 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public void endOutermostActionHandler(PipelineContext pipelineContext) {
-        // NOTE: We should be ok when this is called recursively, but this probably needs investigating 
+
+        // TODO: This is not 100% in line with the "correct" interpretation of the deferred updates, as deferred
+        // behavior is triggered at the level of outermost action handlers, not outermost event dispatches.
+
+        // TODO: upon recursion, it looks like currentDeferredActionContext can be null and it is not clear why
 
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
-        if (currentDeferredActionContext.rebuild) {
-            containingDocument.startOutermostActionHandler();
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
-        }
-        if (currentDeferredActionContext.recalculate) {
-            containingDocument.startOutermostActionHandler();
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
-        }
-        if (currentDeferredActionContext.revalidate) {
-            containingDocument.startOutermostActionHandler();
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
-        }
-        if (currentDeferredActionContext.refresh) {
-            containingDocument.startOutermostActionHandler();
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
-            containingDocument.endOutermostActionHandler(pipelineContext);
+        if (currentDeferredActionContext != null) {
+            if (currentDeferredActionContext.rebuild) {
+                containingDocument.startOutermostActionHandler();
+                containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+                containingDocument.endOutermostActionHandler(pipelineContext);
+            }
+            if (currentDeferredActionContext.recalculate) {
+                containingDocument.startOutermostActionHandler();
+                containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
+                containingDocument.endOutermostActionHandler(pipelineContext);
+            }
+            if (currentDeferredActionContext.revalidate) {
+                containingDocument.startOutermostActionHandler();
+                containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
+                containingDocument.endOutermostActionHandler(pipelineContext);
+            }
+            if (currentDeferredActionContext.refresh) {
+                containingDocument.startOutermostActionHandler();
+                containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(this));
+                containingDocument.endOutermostActionHandler(pipelineContext);
+            }
         }
         deferredActionContext = null;
     }

@@ -13,22 +13,21 @@
  */
 package org.orbeon.oxf.xforms.control;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsControls;
-import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.action.actions.XFormsSetvalueAction;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.om.NodeInfo;
-import org.dom4j.Element;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base class for all controls that hold a value.
@@ -57,9 +56,6 @@ public abstract class XFormsValueControl extends XFormsControl {
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null)
             return;
-
-//        if (boundNode == null) // this should not happen
-//            throw new ValidationException("Control is no longer bound to a node. Cannot evaluate control value.", getLocationData());
 
         setValue(XFormsInstance.getValueForNode(boundNode));
     }

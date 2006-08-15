@@ -122,32 +122,16 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return alert;
     }
 
-    public void setAlert(String alert) {
-        this.alert = alert;
-    }
-
     public String getHelp() {
         return help;
-    }
-
-    public void setHelp(String help) {
-        this.help = help;
     }
 
     public String getHint() {
         return hint;
     }
 
-    public void setHint(String hint) {
-        this.hint = hint;
-    }
-
     public String getLabel() {
         return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public String getLabelId() {

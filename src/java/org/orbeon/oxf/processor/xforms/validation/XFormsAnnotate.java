@@ -54,7 +54,7 @@ public class XFormsAnnotate extends ProcessorImpl {
 
                 // Set annotated instance on model
                 Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, false);
+                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, null, null);
 
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);

@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 
 /**
  * Utilities for XForms submission processing.
@@ -109,6 +110,8 @@ public class XFormsSubmissionUtils {
                     connectionResult.resultCode = responseAdapter.getResponseCode();
                     connectionResult.resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
                     connectionResult.resultInputStream = responseAdapter.getInputStream();
+                    connectionResult.resultHeaders = new HashMap();
+                    connectionResult.lastModified = 0;
                 }
 
                 return connectionResult;
@@ -133,8 +136,8 @@ public class XFormsSubmissionUtils {
      *
      * @param action absolute URL or absolute path (which must include the context path)
      */
-    public static XFormsModelSubmission.ConnectionResult doRegular(PipelineContext pipelineContext, ExternalContext externalContext,
-                                                                   String method, final String action, String username, String password, String mediatype, boolean doReplace,
+    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
+                                                                   String method, final String action, String username, String password, String mediatype,
                                                                    byte[] serializedInstance, String serializedInstanceString) {
 
         // Compute submission URL
@@ -171,19 +174,23 @@ public class XFormsSubmissionUtils {
 
                     // Forward cookies for session handling
                     // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
-                    final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
-                    if (cookies != null) {
-                        for (int i = 0; i < cookies.length; i++) {
-                            final String cookie = cookies[i];
-                            urlConnection.setRequestProperty("Cookie", cookie);
+                    if (username == null) {
+                        final String[] cookies = (String[]) externalContext.getRequest().getHeaderValuesMap().get("cookie");
+                        if (cookies != null) {
+                            for (int i = 0; i < cookies.length; i++) {
+                                final String cookie = cookies[i];
+                                urlConnection.setRequestProperty("Cookie", cookie);
+                            }
                         }
                     }
 
                     // Forward authorization header
                     // TODO: This should probably not be done automatically
-                    final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
-                    if (authorizationHeader != null)
-                        urlConnection.setRequestProperty("authorization", authorizationHeader);
+                    if (username == null) {
+                        final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
+                        if (authorizationHeader != null)
+                            urlConnection.setRequestProperty("authorization", authorizationHeader);
+                    }
 
                     // Write request body if needed
                     if (hasRequestBody) {
@@ -215,6 +222,7 @@ public class XFormsSubmissionUtils {
                     final String contentType = urlConnection.getContentType();
                     connectionResult.resultMediaType = NetUtils.getContentTypeMediaType(contentType);
                     connectionResult.resultHeaders = urlConnection.getHeaderFields();
+                    connectionResult.lastModified = urlConnection.getLastModified();
                     connectionResult.resultInputStream = urlConnection.getInputStream();
 
                     return connectionResult;

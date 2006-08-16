@@ -28,10 +28,10 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
-import javax.xml.transform.URIResolver;
 import java.io.IOException;
 import java.util.*;
 
@@ -54,7 +54,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private ObjectPool sourceObjectPool;
 
     // URI resolver
-    private URIResolver uriResolver;
+    private XFormsURIResolver uriResolver;
 
     // XPath evaluator
     private DocumentXPathEvaluator documentXPathEvaluator = new DocumentXPathEvaluator();
@@ -85,7 +85,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * @param xformsEngineStaticState
      * @param repeatIndexesElement
      */
-    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, URIResolver uriResolver, Element repeatIndexesElement) {
+    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, XFormsURIResolver uriResolver, Element repeatIndexesElement) {
         // Remember static state
         this.xformsEngineStaticState = xformsEngineStaticState;
 
@@ -134,11 +134,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return documentXPathEvaluator;
     }
 
-    public URIResolver getURIResolver() {
+    public XFormsURIResolver getURIResolver() {
         return uriResolver;
     }
 
-    public void setURIResolver(URIResolver uriResolver) {
+    public void setURIResolver(XFormsURIResolver uriResolver) {
         this.uriResolver = uriResolver;
     }
 

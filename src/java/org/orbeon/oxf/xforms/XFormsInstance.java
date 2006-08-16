@@ -47,20 +47,22 @@ public class XFormsInstance implements XFormsEventTarget {
     private PipelineContext pipelineContext;
     private String id;
     private String instanceSourceURI;
-    private boolean hasUsername;
+    private String username;
+    private String password;
     private XFormsModel model;
     private DocumentInfo instanceDocumentInfo;
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, boolean hasUsername, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, String username, String password, XFormsModel model) {
         // NOTE: We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(pipelineContext, id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, hasUsername, model);
+        this(pipelineContext, id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, model);
     }
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, boolean hasUsername, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.id = id;
         this.instanceSourceURI = instanceSourceURI;
-        this.hasUsername = hasUsername;
+        this.username = username;
+        this.password = password;
         this.model = model;
         setInstanceDocumentInfo(instanceDocumentInfo, true);
     }
@@ -101,7 +103,15 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public boolean isHasUsername() {
-        return hasUsername;
+        return username != null;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     /**

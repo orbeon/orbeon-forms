@@ -359,8 +359,8 @@ public class OldXFormsServer extends ProcessorImpl {
                         final Map itemsetsFull2 = new HashMap();
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-                            
-                            XFormsServer.diffControlsState(pipelineContext, ch, containingDocument, isInitializationRun ? null : xformsControls.getInitialControlsState().getChildren(),
+
+                            XFormsServer.diffControlsState(ch, containingDocument, isInitializationRun ? null : xformsControls.getInitialControlsState().getChildren(),
                                     currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
 
                             ch.endElement();

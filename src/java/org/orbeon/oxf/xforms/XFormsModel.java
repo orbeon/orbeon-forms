@@ -21,7 +21,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.*;
@@ -245,7 +244,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each
      * instance document may have an associated id that identifies it.
      */
-    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Object instanceDocument, String instanceSourceURI, boolean hasUsername) {
+    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Object instanceDocument, String instanceSourceURI, String username, String password) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -256,9 +255,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(pipelineContext, instanceId, (Document) instanceDocument, instanceSourceURI, hasUsername, this);
+                newInstance = new XFormsInstance(pipelineContext, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, this);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new XFormsInstance(pipelineContext, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, hasUsername, this);
+                newInstance = new XFormsInstance(pipelineContext, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, this);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -721,7 +720,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                         final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
-                        final boolean hasUsername;
+                        final String xxformsUsername;
+                        final String xxformsPassword;
                         if (srcAttribute == null) {
                             // Inline instance
                             final List children = instanceContainerElement.elements();
@@ -730,7 +730,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                             // TODO: support DocumentInfo (easier once static state is done with TinyTree as well)
                             instanceSourceURI = null;
-                            hasUsername = false;
+                            xxformsUsername = null;
+                            xxformsPassword = null;
                         } else {
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -754,7 +755,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
 
                                 instanceSourceURI = resolvedURI.toString();
-                                hasUsername = false;
+                                xxformsUsername = null;
+                                xxformsPassword = null;
 
                                 try {
                                     // Handle connection errors
@@ -781,20 +783,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 // Extension: username and password
                                 // NOTE: Those don't use AVTs for now, because XPath expressions in those could access
                                 // instances that haven't been loaded yet.
-                                final String xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
-                                final String xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+                                xxformsUsername = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
+                                xxformsPassword = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
 
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
 
-                                if (containingDocument.getURIResolver() == null || xxformsUsername != null) {
+                                if (containingDocument.getURIResolver() == null) {
                                     // We connect directly
 
-                                    // TODO: We should be able to use the username/password as part of the cache key,
-                                    // and therefore to use the resolver (or an extension of it supporting
-                                    // username/password) when provided.
-
-                                    connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
-                                            "get", resolvedURL, xxformsUsername, xxformsPassword, null, false, null, null);
+                                    connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
+                                            "get", resolvedURL, xxformsUsername, xxformsPassword, null, null, null);
 
                                     try {
                                         // Handle connection errors
@@ -819,7 +817,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             connectionResult.close();
                                     }
 
-                                    hasUsername = true;
                                     instanceSourceURI = connectionResult.resourceURI;
 
                                 } else {
@@ -840,11 +837,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                     try {
                                         if (!isReadonlyHint) {
-                                            instanceDocument = TransformerURIResolver.readURLAsDocument(containingDocument.getURIResolver(), urlString);
+                                            instanceDocument = containingDocument.getURIResolver().readURLAsDocument(urlString, xxformsUsername, xxformsPassword);
                                         } else {
-                                            instanceDocument = TransformerURIResolver.readURLAsDocumentInfo(containingDocument.getURIResolver(), urlString);
+                                            instanceDocument = containingDocument.getURIResolver().readURLAsDocumentInfo(urlString, xxformsUsername, xxformsPassword);
                                         }
-                                        hasUsername = false;
                                         instanceSourceURI = urlString;
                                     } catch (Exception e) {
                                         throw new ValidationException(e, new ExtendedLocationData(new LocationData(urlString, -1, -1),
@@ -854,7 +850,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             }
                         }
                         // Set instance and associated information
-                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI, hasUsername);
+                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI, xxformsUsername, xxformsPassword);
                     }
                 }
             }

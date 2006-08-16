@@ -27,9 +27,9 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
@@ -39,7 +39,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.xml.transform.URIResolver;
 import java.util.*;
 
 /**
@@ -366,7 +365,7 @@ public class XFormsServer extends ProcessorImpl {
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(pipelineContext, ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
@@ -376,7 +375,7 @@ public class XFormsServer extends ProcessorImpl {
                         final XFormsContainingDocument initialContainingDocument
                                     = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
 
-                        diffControlsState(pipelineContext, ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControlsState(ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -596,7 +595,7 @@ public class XFormsServer extends ProcessorImpl {
         return dynamicStateDocument;
     }
 
-    public static void diffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -788,7 +787,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(pipelineContext, ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -798,10 +797,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(pipelineContext, ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         // Issue new values for new iterations
-                        diffControlsState(pipelineContext, ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -815,7 +814,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(pipelineContext, ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        diffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
@@ -830,7 +829,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                 } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
 
@@ -845,10 +844,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 } else {
                     // Other grouping controls
-                    diffControlsState(pipelineContext, ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    diffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 }
             }
         }
@@ -1009,7 +1008,7 @@ public class XFormsServer extends ProcessorImpl {
      */
     public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState,
                                                                           Element filesElement, XFormsEngineStaticState xformsEngineStaticState,
-                                                                          URIResolver initializationURIResolver) {
+                                                                          XFormsURIResolver initializationURIResolver) {
 
         if (xformsEngineStaticState == null) {
             // TODO: Handle caching of this.
@@ -1068,7 +1067,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Create and set instance document on current model
                     Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
-                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, false);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
+                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, null, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
 
                     currentCount++;
                     foundInstancesCount++;

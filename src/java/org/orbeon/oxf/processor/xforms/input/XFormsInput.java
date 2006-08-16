@@ -87,7 +87,7 @@ public class XFormsInput extends ProcessorImpl {
                 XFormsInstance contextInstance = null;
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
-                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null, false);
+                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null, null, null);
                 } else {
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
@@ -99,7 +99,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null, false);
+                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null, null, null);
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(int position, XFormsInstance localInstance) {

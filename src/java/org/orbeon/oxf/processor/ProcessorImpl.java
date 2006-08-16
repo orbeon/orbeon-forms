@@ -577,7 +577,7 @@ public abstract class ProcessorImpl implements Processor {
      * @param context current PipelineContext object
      * @return        state object set by the caller of setState()
      */
-    protected Object getState(PipelineContext context) {
+    public Object getState(PipelineContext context) {
         Object state = context.getAttribute(getProcessorKey(context));
         if (state == null) {
             throw new OXFException("No state in context");

@@ -174,7 +174,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                         // Keep URI reference
                         if (uriReferences != null)
-                            uriReferences.addReference(base, href);
+                            uriReferences.addReference(base, href, null, null);
 
                         // Read document
                         xmlReader.parse(new InputSource(source.getSystemId())); // Yeah, the SAX API doesn't make much sense

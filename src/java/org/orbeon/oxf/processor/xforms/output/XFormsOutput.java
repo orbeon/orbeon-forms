@@ -60,7 +60,7 @@ public class XFormsOutput extends ProcessorImpl {
 
                 // Set annotated instance on model
                 final Document instanceDocument = (Document) readInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
-                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, false);
+                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, null, null);
 
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);

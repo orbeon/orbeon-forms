@@ -439,6 +439,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         connectionResult = new ConnectionResult(null);
                         connectionResult.resultCode = 200;
                         connectionResult.resultHeaders = new HashMap();
+                        connectionResult.lastModified = 0;
                         connectionResult.resultMediaType = "application/xml";
                         connectionResult.dontHandleResponse = false;
                         connectionResult.resultInputStream = new ByteArrayInputStream(serializedInstance);
@@ -476,8 +477,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         // Absolute URLs or absolute paths are allowed to a local servlet
                         final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
-                        connectionResult = XFormsSubmissionUtils.doRegular(pipelineContext, externalContext,
-                                method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, mediatype, isReplaceAll,
+                        connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
+                                method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, mediatype,
                                 serializedInstance, serializedInstanceString);
                     }
 
@@ -837,6 +838,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         public String resultMediaType;
         public InputStream resultInputStream;
         public Map resultHeaders;
+        public long lastModified;
         public String resourceURI;
 
         public ConnectionResult(String resourceURI) {

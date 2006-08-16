@@ -23,8 +23,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
@@ -33,16 +31,11 @@ import org.orbeon.oxf.xforms.processor.handlers.XHTMLBodyHandler;
 import org.orbeon.oxf.xforms.processor.handlers.XHTMLHeadHandler;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -55,7 +48,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private static final boolean IS_MIGRATE_TO_SESSION = false;// TODO: for tests
 
-    static public Logger logger = XFormsServer.logger;
+    public static Logger logger = XFormsServer.logger;
 
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
     private static final String OUTPUT_DOCUMENT = "document";
@@ -86,21 +79,21 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final OutputCacheKey outputCacheKey = super.getKeyImpl(pipelineContext);
 
                 if (IS_MIGRATE_TO_SESSION && outputCacheKey != null) {
-                    final InputDependencies inputDependencies = (InputDependencies) getCachedInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT));
-                    if (inputDependencies != null && inputDependencies.isDependsOnSession()) {
-                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                        final ExternalContext.Session session = externalContext.getSession(true);
-
-                        // Find cached info
-                        final XFormsEngineStaticState staticState = inputDependencies.getXFormsEngineStaticState();
-                        final String staticStateUUID = staticState.getUUID();
-                        final String encodedStaticState = staticState.getEncodedStaticState();
-
-                        final String dynamicStateUUID = (String) getOutputObject(pipelineContext, this, OUTPUT_CACHE_KEY,
-                                new KeyValidity(outputCacheKey, getValidityImpl(pipelineContext)));
-
-                        // Migrate data to current session
-                    }
+//                    final InputDependencies inputDependencies = (InputDependencies) getCachedInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT));
+//                    if (inputDependencies != null && inputDependencies.isDependsOnSession()) {
+//                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+//                        final ExternalContext.Session session = externalContext.getSession(true);
+//
+//                        // Find cached info
+//                        final XFormsEngineStaticState staticState = inputDependencies.getXFormsEngineStaticState();
+//                        final String staticStateUUID = staticState.getUUID();
+//                        final String encodedStaticState = staticState.getEncodedStaticState();
+//
+//                        final String dynamicStateUUID = (String) getOutputObject(pipelineContext, this, OUTPUT_CACHE_KEY,
+//                                new KeyValidity(outputCacheKey, getValidityImpl(pipelineContext)));
+//
+//                        // Migrate data to current session
+//                    }
                 }
 
                 return outputCacheKey;
@@ -129,7 +122,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         setState(context, new URIProcessorOutputImpl.URIReferencesState());
     }
 
-    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, ProcessorOutputImpl xhtmlOutput) {
+    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -171,7 +164,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 // Create document here so we can do appropriate analysis of caching dependencies
-                createCacheContainingDocument(pipelineContext, xformsEngineStaticState, containingDocument, xformsState);
+                createCacheContainingDocument(pipelineContext, processorOutput, xformsEngineStaticState, containingDocument, xformsState);
 
                 // Set caching dependencies
                 final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsEngineStaticState);
@@ -194,7 +187,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final String staticStateUUID;
             if (containingDocument[0] == null) {
                 logger.debug("XForms - annotated document and static state obtained from cache; creating containing document.");
-                createCacheContainingDocument(pipelineContext, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
+                createCacheContainingDocument(pipelineContext, processorOutput, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
             } else {
                 logger.debug("XForms - annotated document and static state not obtained from cache.");
             }
@@ -206,7 +199,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
 
             // Try to cache dynamic state UUID associated with the output
-            final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, xhtmlOutput, OUTPUT_CACHE_KEY, new OutputObjectCreator() {
+            final String dynamicStateUUID = (String) getCacheOutputObject(pipelineContext, processorOutput, OUTPUT_CACHE_KEY, new OutputObjectCreator() {
                 public Object create(PipelineContext pipelineContext, ProcessorOutput processorOutput) {
                     logger.debug("XForms - caching UUID for resulting document.");
                     return UUIDUtils.createPseudoUUID();
@@ -290,7 +283,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (schemaURI != null) {
                 if (logger.isDebugEnabled())
                     logger.debug("XForms - adding document cache dependency for schema: " + schemaURI);
-                inputDependencies.addReference(null, schemaURI);
+                inputDependencies.addReference(null, schemaURI, null, null);// TODO: support username / password on schema refs
             }
 
             // Add instance source dependencies
@@ -298,19 +291,11 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final XFormsInstance currentInstance = (XFormsInstance) j.next();
                 final String instanceSourceURI = currentInstance.getInstanceSourceURI();
 
-                // For now we are not able to cache when an instance load uses a username and password
-                if (currentInstance.isHasUsername()) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("XForms - found instance load using username and password, disabling caching of output.");
-                    inputDependencies.setNoCache();
-                    return;
-                }
-
                 // Add dependency
                 if (instanceSourceURI != null) {
                     if (logger.isDebugEnabled())
                         logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
-                    inputDependencies.addReference(null, instanceSourceURI);
+                    inputDependencies.addReference(null, instanceSourceURI, currentInstance.getUsername(), currentInstance.getPassword());
                 }
             }
 
@@ -323,7 +308,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void createCacheContainingDocument(final PipelineContext pipelineContext, XFormsEngineStaticState xformsEngineStaticState,
+    private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsEngineStaticState xformsEngineStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsServer.XFormsState[] xformsState) {
 
         boolean[] requireClientSubmission = new boolean[1];
@@ -332,61 +317,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
 
             // Create URIResolver
-            final TransformerURIResolver uriResolver = new TransformerURIResolver(XFormsToXHTML.this, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE) {
-                public Source resolve(String href, String base) throws TransformerException {
-
-                    final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
-                    if (inputName != null) {
-                        // Use parent resolver
-                        return super.resolve(href, base);
-                    } else {
-                        final URL url;
-                        try {
-                            url = URLFactory.createURL(base, href);
-                        } catch (MalformedURLException e) {
-                            throw new OXFException(e);
-                        }
-
-                        final String urlString = url.toExternalForm();
-                        final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) XFormsToXHTML.this.getState(pipelineContext);
-
-                        // First, put in state if necessary
-                        URIProcessorOutputImpl.readURLToStateIfNeeded(url, state);
-
-                        // Then try to read from state
-                        if (state.isDocumentSet(urlString)) {
-                            // This means the document requested is already available. We use the cached document.
-                            final XMLReader xmlReader = new XMLFilterImpl() {
-                                public void parse(String systemId) throws SAXException {
-                                    state.getDocument(urlString).replay(getContentHandler());
-                                }
-
-                                // FIXME: Is this necessary?
-                                public void setFeature(String name, boolean state) throws SAXNotRecognizedException {
-                                    // We allow these two features
-                                    if (name.equals("http://xml.org/sax/features/namespaces") && state)
-                                        return;
-                                    if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
-                                        return;
-
-//                                    System.out.println("xxx SAX feature 2: " + name + " " + state);
-
-                                    // Otherwise we throw
-                                    throw new SAXNotRecognizedException("Feature: " + name);
-                                }
-                            };
-
-                            if (logger.isDebugEnabled())
-                                logger.debug("XForms - resolving resource through initialization resolver for URI: " + urlString);
-
-                            return new SAXSource(xmlReader, new InputSource(urlString));
-                        } else {
-                            // Use parent resolver
-                            return super.resolve(href, base);
-                        }
-                    }
-                }
-            };
+            final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
             // Create containing document and initialize XForms engine
             containingDocument[0] = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, null, xformsEngineStaticState, uriResolver);

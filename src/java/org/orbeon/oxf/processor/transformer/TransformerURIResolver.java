@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
-import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.Processor;
@@ -23,10 +22,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.ForwardingXMLReader;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TeeContentHandler;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.tree.TreeBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -35,28 +30,32 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.TransformerHandler;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * URI resolver used by transformation processors, including XSLT, XQuery, and XInclude.
+ *
+ * This resolver is able to handle "input:*" URLs as well as regular URLs.
+ */
 public class TransformerURIResolver implements URIResolver {
 
-    private Processor processor;
+    private ProcessorImpl processor;
     private PipelineContext pipelineContext;
     private String prohibitedInput;
     private boolean handleXInclude;
 
     /**
-     * Create a URI resolver which handles regular URLs but also "input:*" URLs.
+     * Create a URI resolver.
      *
      * @param processor         processor of which inputs will be read for "input:*"
      * @param pipelineContext   pipeline context
      * @param prohibitedInput   name of an input which triggers and exception if read (usually "data" or "config")
      * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
      */
-    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
+    public TransformerURIResolver(ProcessorImpl processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
         this.prohibitedInput = prohibitedInput;
@@ -118,65 +117,15 @@ public class TransformerURIResolver implements URIResolver {
         }
     }
 
-    public static Document readURLAsDocument(URIResolver uriResolver, String urlString) {
-        try {
-            // TODO: forward session and authorization?
-            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
-//            source.setSystemId(urlString);
-//            return TransformerUtils.readDom4j(source);
-
-            final LocationDocumentResult documentResult = new LocationDocumentResult();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(documentResult);
-
-            final XMLReader xmlReader = source.getXMLReader();
-            xmlReader.setContentHandler(identity);
-            xmlReader.parse(urlString);
-
-            return documentResult.getDocument();
-
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
+    protected ProcessorImpl getProcessor() {
+        return processor;
     }
 
-    public static DocumentInfo readURLAsDocumentInfo(URIResolver uriResolver, String urlString) {
-        try {
-            // TODO: forward session and authorization?
-            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
-//            source.setSystemId(urlString);
-//            return TransformerUtils.readTinyTree(source);
-
-            final TreeBuilder treeBuilder = new TreeBuilder();
-            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-            identity.setResult(treeBuilder);
-
-            final XMLReader xmlReader = source.getXMLReader();
-            xmlReader.setContentHandler(identity);
-            xmlReader.parse(urlString);
-
-            return (DocumentInfo) treeBuilder.getCurrentRoot();
-
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
+    protected PipelineContext getPipelineContext() {
+        return pipelineContext;
     }
 
-//    public static void readURLAsSAX(URIResolver uriResolver, String urlString, ContentHandler contentHandler) {
-//        try {
-//            final SAXSource source = (SAXSource) uriResolver.resolve(urlString, null);
-//            // TODO: forward session and authorization?
-//
-//            final SAXResult saxResult = new SAXResult(contentHandler);
-//            final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-//            identity.setResult(saxResult);
-//
-//            final XMLReader xmlReader = source.getXMLReader();
-//            xmlReader.setContentHandler(identity);
-//            xmlReader.parse(urlString);
-//
-//        } catch (Exception e) {
-//            throw new OXFException(e);
-//        }
-//    }
+    protected boolean isHandleXInclude() {
+        return handleXInclude;
+    }
 }

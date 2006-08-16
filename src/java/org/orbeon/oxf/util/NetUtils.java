@@ -18,10 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -407,5 +404,28 @@ public class NetUtils {
             }
         }
         return allChar;
+    }
+
+    /**
+     * Resolve a URI against a base URI. (Be sure to pay attention to the order or parameters.)
+     *
+     * @param href  URI to resolve
+     * @param base  URI base
+     * @return      resolved URI
+     */
+    public static String resolveURI(String href, String base) {
+        final String resolvedURIString;
+        if (base != null) {
+            final URI baseURI;
+            try {
+                baseURI = new URI(base);
+            } catch (URISyntaxException e) {
+                throw new OXFException(e);
+            }
+            resolvedURIString = baseURI.resolve(href).toString();
+        } else {
+            resolvedURIString = href;
+        }
+        return resolvedURIString;
     }
 }

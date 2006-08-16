@@ -492,8 +492,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             // Try to get inline value
             if (result == null) {
 
-                System.out.println("...");
-
                 final StringBuffer sb = new StringBuffer();
 
                 // Visit the subtree and serialize

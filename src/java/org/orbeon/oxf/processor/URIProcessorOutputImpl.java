@@ -14,14 +14,17 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.cache.*;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xforms.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.XFormsSubmissionUtils;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import java.net.URL;
 import java.net.URLConnection;
@@ -142,9 +145,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     /**
-     * This method returns the key associated with an URI. This is a default implementation
-     * which works for "input:", "oxf:" and other URLs. However it is possible to override this
-     * method, for example to optimize HTTP access.
+     * This method returns the key associated with an URI.
      *
      * @param pipelineContext   current pipeline context
      * @param uriReference      URIReference object containing the URI to process
@@ -159,7 +160,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 return ProcessorImpl.getInputKey(pipelineContext, processorImpl.getInputByName(inputName));
             } else {
                 // Other URIs
-                return new InternalCacheKey(processorImpl, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
+                final String keyString = buildURIUsernamePasswordString(URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm(), uriReference.username, uriReference.password);
+                return new InternalCacheKey(processorImpl, "urlReference", keyString);
             }
         } catch (Exception e) {
             // If the file no longer exists, for example, we don't want to throw, just to invalidate
@@ -170,9 +172,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     /**
-     * This method returns the validity associated with an URI. This is a default implementation
-     * which works for "input:", "oxf:" and other URLs. However it is possible to override this
-     * method, for example to optimize HTTP access.
+     * This method returns the validity associated with an URI.
      *
      * @param pipelineContext   current pipeline context
      * @param uriReference      URIReference object containing the URI to process
@@ -201,8 +201,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(url, state);
-                    return state.getLastModified(urlString);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password);
+                    return state.getLastModified(urlString, uriReference.username, uriReference.password);
 
                 } else  {
                     // Other URLs
@@ -226,15 +226,15 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         }
     }
 
-    public SAXStore getDocument(PipelineContext pipelineContext, String urlString) {
-        // Use cached state if possible
-        // NOTE: We cache just for this execution of this processor, so we don't make multiple accesses
-        final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
-        if (state.isDocumentSet(urlString))
-            return state.getDocument(urlString);
-        else
-            return null;
-    }
+//    public SAXStore getDocument(PipelineContext pipelineContext, String urlString) {
+//        // Use cached state if possible
+//        // NOTE: We cache just for this execution of this processor, so we don't make multiple accesses
+//        final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
+//        if (state.isDocumentSet(urlString))
+//            return state.getDocument(urlString);
+//        else
+//            return null;
+//    }
 
     private URIReferences getCachedURIReferences(PipelineContext pipelineContext) {
         // Check if config is external
@@ -258,16 +258,20 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     public static class URIReference {
-        public URIReference(String context, String spec) {
+        public URIReference(String context, String spec, String username, String password) {
             this.context = context;
             this.spec = spec;
+            this.username = username;
+            this.password = password;
         }
 
         public String context;
         public String spec;
+        public String username;
+        public String password;
 
         public String toString() {
-            return "[" + context + ", " + spec + "]";
+            return "[" + context + ", " + spec + ", " + username + "]";
         }
     }
 
@@ -282,28 +286,28 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     public static class URIReferencesState {
-
+        
         private Map map;
 
-        public void setDocument(String urlString, SAXStore documentSAXStore, Long lastModified) {
+        public void setDocument(String urlString, String username, String password, SAXStore documentSAXStore, Long lastModified) {
             if (map == null)
                 map = new HashMap();
-            map.put(urlString, new DocumentInfo(documentSAXStore, lastModified));
+            map.put(buildURIUsernamePasswordString(urlString, username, password), new DocumentInfo(documentSAXStore, lastModified));
         }
 
-        public boolean isDocumentSet(String urlString) {
+        public boolean isDocumentSet(String urlString, String username, String password) {
             if (map == null)
                 return false;
-            return map.get(urlString) != null;
+            return map.get(buildURIUsernamePasswordString(urlString, username, password)) != null;
         }
 
-        public Long getLastModified(String urlString) {
-            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(urlString);
+        public Long getLastModified(String urlString, String username, String password) {
+            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(buildURIUsernamePasswordString(urlString, username, password));
             return documentInfo.lastModified;
         }
 
-        public SAXStore getDocument(String urlString) {
-            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(urlString);
+        public SAXStore getDocument(String urlString, String username, String password) {
+            final DocumentInfo documentInfo = (URIProcessorOutputImpl.DocumentInfo) map.get(buildURIUsernamePasswordString(urlString, username, password));
             return documentInfo.saxStore;
         }
     }
@@ -322,13 +326,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
          * @param context   optional context (can be null)
          * @param spec      URL spec
          */
-        public void addReference(String context, String spec) {
+        public void addReference(String context, String spec, String username, String password) {
             if (references == null)
                 references = new ArrayList();
 
 //            logger.info("URIProcessorOutputImpl: adding reference: context = " + context + ", spec = " + spec);
 
-            references.add(new URIReference(context, spec));
+            references.add(new URIReference(context, spec, username, password));
         }
 
         /**
@@ -363,35 +367,59 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
         throw new UnsupportedOperationException();
     }
 
-    public static void readURLToStateIfNeeded(URL url, URIReferencesState state) {
+    /**
+     * This is called to handle "http:", "https:" and other URLs (but not "oxf:" and "input:"). It is possible to
+     * override this method, for example to optimize HTTP access.
+     *
+     * @param url           URL to read
+     * @param state         state to read to
+     * @param username      optional username
+     * @param password      optional password
+     */
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password) {
 
         final String urlString = url.toExternalForm();
 
         // Use cached state if possible
-        if (!state.isDocumentSet(urlString)) {
+        if (!state.isDocumentSet(urlString, username, password)) {
             // We read the document and store it temporarily, since it will likely be read just after this anyway
             final SAXStore documentSAXStore;
             final long lastModified;
             {
-                // Connect processors and read document
-                // NOTE: below, we disable use of the URLGenerator's local cache, so that we don't check validity
-                // with HTTP and HTTPS. When would it make sense to use local caching?
-                final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, false, false, null, false);
-                final SAXStoreSerializer saxStoreSerializer = new SAXStoreSerializer();
-                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, saxStoreSerializer, ProcessorImpl.INPUT_DATA);
-                final PipelineContext tempPipelineContext = new PipelineContext();
-                saxStoreSerializer.start(tempPipelineContext);
-                documentSAXStore = saxStoreSerializer.getSAXStore();
+                // Perform connection
+                // TODO: Remove dependency on XForms code
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final XFormsModelSubmission.ConnectionResult connectionResult
+                    = XFormsSubmissionUtils.doRegular(externalContext, "get", urlString, username, password, null, null, null);
+
+                // Throw if connection failed (this is caught by the caller)
+                if (connectionResult.resultCode != 200)
+                    throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.resultCode);
+
+                // Read connection into SAXStore
+                final boolean handleXInclude = false;
+                documentSAXStore = new SAXStore();
+                XMLUtils.inputStreamToSAX(connectionResult.resultInputStream, connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
 
                 // Obtain last modified
-                final ProcessorImpl.ProcessorOutputImpl urlGeneratorOutputImpl = (ProcessorImpl.ProcessorOutputImpl) urlGenerator.getOutputByName(ProcessorImpl.OUTPUT_DATA);
-                lastModified = ProcessorImpl.findLastModified(urlGeneratorOutputImpl.getValidityImpl(tempPipelineContext));
+                lastModified = connectionResult.lastModified;
             }
+
             // Zero and negative values often have a special meaning, make sure to normalize here
             final Long lastModifiedLong = lastModified <= 0 ? null : new Long(lastModified);
 
             // Cache document and last modified
-            state.setDocument(urlString, documentSAXStore, lastModifiedLong);
+            state.setDocument(urlString, username, password, documentSAXStore, lastModifiedLong);
         }
+    }
+
+    private static String buildURIUsernamePasswordString(String uriString, String username, String password) {
+        // We don't care that the result is an actual URI
+        if (username != null && password != null)
+            return username + ":" + password + "@" + uriString;
+        else if (username != null)
+            return username + "@" + uriString;
+        else
+            return uriString;
     }
 }

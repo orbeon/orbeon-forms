@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2005 Orbeon, Inc.
   
@@ -33,10 +34,12 @@
                 <xforms:send submission="countries-submission"/>
                 <xforms:setfocus control="age-input-control"/>
             </xforms:action>
+            <!-- Here we illustrate how an XForms instance can be included with XInclude -->
             <xforms:instance id="instance">
-                <!-- Here we illustrate how an XForms instance can be included with XInclude -->
                 <xi:include href="main-xforms-instance.xml" xxi:omit-xml-base="true"/>
             </xforms:instance>
+            <!-- Here we illustrate how an XForms instance can be included with the @src attribute -->
+            <xforms:instance id="resources" src="oxf:/examples/xforms/xforms-controls/resources.xml"/>
             <xforms:instance id="items">
                 <items>
                     <flavors>
@@ -106,7 +109,7 @@
             <xforms:bind nodeset="instance('country-details')/@us-code"
                 calculate="instance('instance')/country"/>
             <xforms:bind nodeset="instance('formatted')"
-                calculate="saxon:serialize(xxforms:call-xpl
+                calculate="xxforms:serialize(xxforms:call-xpl
                     ('oxf:/config/theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
 
@@ -137,6 +140,7 @@
                             <xforms:label class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                             <xforms:alert>Invalid age</xforms:alert>
+                            <xforms:help ref="instance('resources')/help/age"/>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
@@ -144,6 +148,7 @@
                             <xforms:label class="fixed-width">Password:</xforms:label>
                             <xforms:hint>The password is 42 ;)</xforms:hint>
                             <xforms:alert>Invalid password</xforms:alert>
+                            <xforms:help><xforms:output value="instance('resources')/help/secret"/></xforms:help>
                         </xforms:secret>
                     </xhtml:p>
                     <xhtml:p>
@@ -151,22 +156,35 @@
                             <xforms:label class="fixed-width">Text area:</xforms:label>
                             <xforms:hint>Enter at least 11 characters</xforms:hint>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                            <xforms:help><xforms:output mediatype="text/html" value="instance('resources')/help/textarea"/></xforms:help>
                         </xforms:textarea>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:input ref="date" navindex="4" class="datafield">
                             <xforms:label class="fixed-width">Date:</xforms:label>
-                            <xforms:help>At most one day in the future</xforms:help>
+                            <xforms:help>
+                                <div>
+                                    <p>
+                                        This field must contain:
+                                    </p>
+                                    <ul>
+                                        <li>a valid date</li>
+                                        <li>which is at most one day in the future</li>
+                                    </ul>
+                                </div>
+                            </xforms:help>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:output ref="date" xxforms:format=".">
                             <xforms:label class="fixed-width">Date (native XML):</xforms:label>
+                            <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources')/help/date/output/xml/*, 'html')"/></xforms:help>
                         </xforms:output>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:output ref="date" xxforms:format="format-date(xs:date(.), '[FNn], le [D] [MNn] [Y]', 'fr', (), ())">
                             <xforms:label class="fixed-width">Date (in French):</xforms:label>
+                            <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources')/help/date/output/french/*, 'html')"/></xforms:help>
                         </xforms:output>
                     </xhtml:p>
                 </widget:tab>

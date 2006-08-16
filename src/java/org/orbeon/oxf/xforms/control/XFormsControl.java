@@ -499,7 +499,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                 // Visit the subtree and serialize
 
                 // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM
-                // and serialize it, which is not trivial because of the possible interleaved xforms:output's
+                // and serialize it, which is not trivial because of the possible interleaved xforms:output's.
+                // Furthermore, we perform a very simple serialization of elements and text to simple (X)HTML, not
+                // full-fledged HTML or XML serialization.
                 Dom4jUtils.visitSubtree(childElement, new Dom4jUtils.VisitorListener() {
 
                     public void startElement(Element element) {
@@ -524,11 +526,15 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                             if (attributes.size() > 0) {
                                 for (Iterator i = attributes.iterator(); i.hasNext();) {
                                     final Attribute currentAttribute = (Attribute) i.next();
-                                    sb.append(' ');
-                                    sb.append(currentAttribute.getName());
-                                    sb.append("=\"");
-                                    sb.append(currentAttribute.getValue());
-                                    sb.append('"');
+
+                                    // Only consider attributes in no namespace
+                                    if ("".equals(currentAttribute.getNamespaceURI())) {
+                                        sb.append(' ');
+                                        sb.append(currentAttribute.getName());
+                                        sb.append("=\"");
+                                        sb.append(XMLUtils.escapeXMLMinimal(currentAttribute.getValue()));
+                                        sb.append('"');
+                                    }
                                 }
                             }
                             sb.append('>');

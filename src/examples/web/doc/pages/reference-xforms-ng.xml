@@ -1020,9 +1020,8 @@
                 <section>
                     <title>Label, Alert, Help, and Hint</title>
                     <p>
-                        Nested inside each XForms control element, you can specify additional
-                        elements that can alter the way the control is displayed. The table below
-                        lists those elements:
+                        Nested inside each XForms control element, you can specify additional elements that can alter
+                        the way the control is displayed. The table below lists those elements:
                     </p>
                     <table>
                         <tr>
@@ -1032,10 +1031,7 @@
                             </td>
                             <td>
                                 <p>
-                                    By default a label is used in submit controls, as well as the
-                                    single and multiple selection controls, as shown in the table
-                                    above. The <code>label</code> element is mandatory for all
-                                    controls.
+                                    The <code>label</code> element is mandatory for all controls.
                                 </p>
                             </td>
                         </tr>
@@ -1046,9 +1042,8 @@
                             </td>
                             <td>
                                 <p>
-                                    In each control you can specify an error message that can be
-                                    displayed if the value entered by the user triggers a validation
-                                    error.
+                                    In each control you can specify an error message that can be displayed if the value
+                                    entered by the user triggers a validation error.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:secret ref="secret">
@@ -1064,9 +1059,8 @@
                             </td>
                             <td>
                                 <p>
-                                    You can specify a hint on each control, which is displayed next
-                                    to the control and becomes highlighted when the control is
-                                    selected.
+                                    You can specify a hint on each control, which is displayed next to the control and
+                                    becomes highlighted when the control is selected, or as a tooltip.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:textarea ref="textarea">
@@ -1082,19 +1076,18 @@
                             </td>
                             <td>
                                 <p>
-                                    If you specify a help message for a control, an icon with a
-                                    question mark is displayed next to the control. A pop-up shows
-                                    the help message when you position the mouse cursor over the
-                                    icon.
+                                    If you specify a help message for a control, an icon with a question mark is
+                                    displayed next to the control. A pop-up shows the help message when you position the
+                                    mouse cursor over the icon.
                                 </p>
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:input ref="date" class="xforms-date">
                                         <xforms:label class="fixed-width">Birth date:</xforms:label>
                                         <xforms:help>
-                                            This is supposed to be a help message explaining what a birth date is.
-                                            But since you already know, it mostly serves the purpose of showing how
-                                            help messages can be attached to controls, and that they can be pretty
-                                            long as they can be displayed on multiple lines.
+                                            This is supposed to be a help message explaining what a birth date is. But
+                                            since you already know, it mostly serves the purpose of showing how help
+                                            messages can be attached to controls, and that they can be pretty long as
+                                            they can be displayed on multiple lines.
                                         </xforms:help>
                                     </xforms:input>
                                 </xml-source>
@@ -1102,20 +1095,120 @@
                         </tr>
                     </table>
                     <p>
-                        In the examples above, the text displayed is directly in the
-                        <code>&lt;xforms:label></code>, <code>&lt;xforms:alert></code>,
-                        <code>&lt;xforms:help></code>, or <code>&lt;xforms:hint></code> element.
-                        Alternatively that text can come from an XForms instance with a
-                        <code>ref</code> attribute on any one of those elements. The
-                        <code>ref</code> references a node in the instant that contains the text to
-                        use. This is illustrated in the code below from the <a
-                        href="/goto-example/xforms-text">XForms Text Controls</a> example:
+                        In the examples above, the text displayed is directly in the <code>&lt;xforms:label></code>,
+                        <code>&lt;xforms:alert></code>, <code>&lt;xforms:help></code>, or <code>&lt;xforms:hint></code>
+                        element. Alternatively that text can come from an XForms instance by using a <code>ref</code>
+                        attribute on any one of those elements. The <code>ref</code> references a node in the instant
+                        that contains the text to use. This is useful to externalize resources:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:secret ref="secret">
                             <xforms:alert ref="@alert"/>
                         </xforms:secret>
                     </xml-source>
+                    <p>
+                        Alternatively, you can nest <code>xforms:output</code> elements:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:secret ref="secret">
+                            <xforms:hint><xforms:output value="instance('resources')/help/secret"/></xforms:hint>
+                        </xforms:secret>
+                    </xml-source>
+                    <p>
+                        With <code>xforms:help</code> and <code>xforms:hint</code>, you can also produce HTML, in two
+                        different ways:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                By using literal XHTML under <code>xforms:help</code> or <code>xforms:hint</code>:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:input ref="number">
+                                    <xforms:label>Number</xforms:label>
+                                    <xforms:help>
+                                        <div>
+                                            <p>
+                                                This field must contain one of the following values:
+                                            </p>
+                                            <ul>
+                                                <li>One</li>
+                                                <li>Two</li>
+                                                <li>Three</li>
+                                            </ul>
+                                        </div>
+                                    </xforms:help>
+                                </xforms:input>
+                            </xml-source>
+                            <note>
+                                <p>
+                                    Elements in the XHTML namespace and in no namespace are supported.
+                                </p>
+                            </note>
+                        </li>
+                        <li>
+                            <p>
+                                By using a nested <code>xforms:output</code> with a <code>text/html</code> mediatype:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:input ref="number">
+                                    <xforms:label>Number</xforms:label>
+                                    <xforms:help><xforms:output mediatype="text/html" ref="instance('resources')/help/number"/></xforms:help>
+                                </xforms:input>
+                            </xml-source>
+                            <p>
+                                In this case, the node pointed to by the <code>ref</code> attribute must contain escaped HTML:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:instance id="resources">
+                                    <resources>
+                                        <help>
+                                            <number>
+                                                &amp;lt;div>&amp;lt;p>This field must contain one of the following values:&amp;lt;/p>&amp;lt;ul>&amp;lt;li>One&amp;lt;/li>&amp;lt;li>Two&amp;lt;/li>&amp;lt;li>Three&amp;lt;/li>&amp;lt;/ul>&amp;lt;/div>
+                                            </number>
+                                        </help>
+                                    </resources>
+                                </xforms:instance>
+                            </xml-source>
+                            <p>
+                                If you want to have literal XHTML instead of escaped HTML in your resources, you can use
+                                the <code>value</code> attribute on <code>xforms:output</code> and the
+                                <code>xxforms:serialize</code> extension function:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:input ref="number">
+                                    <xforms:label>Number</xforms:label>
+                                    <xforms:help><xforms:output mediatype="text/html" value="xxforms:serialize(instance('resources')/help/number/*, 'html')"/></xforms:help>
+                                </xforms:input>
+                            </xml-source>
+                            <p>
+                                In this case, the resources instance contains:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:instance id="resources">
+                                    <resources>
+                                        <help>
+                                            <number>
+                                                <div>
+                                                    <p>
+                                                        This field must contain one of the following values:
+                                                    </p>
+                                                    <ul>
+                                                        <li>One</li>
+                                                        <li>Two</li>
+                                                        <li>Three</li>
+                                                    </ul>
+                                                </div>
+                                            </number>
+                                        </help>
+                                    </resources>
+                                </xforms:instance>
+                            </xml-source>
+                        </li>
+                    </ul>
+                    <p>
+                        You can mix and match literal XHTML and <code>xforms:output</code>
+                    </p>
                 </section>
                 <a name="xforms-upload"/>
                 <section>
@@ -1760,21 +1853,18 @@
             <section>
                 <title>Rationale</title>
                 <p>
-                    It is usually recommended to use native XML types within XForms instances, as
-                    this guarantees interoperability and maintainability. For example, a date of
-                    January 10, 2005 is stored in ISO format as: <code>2005-10-01</code>. However it
-                    is often necessary to format such values on screen in a user-readable format,
-                    like "January 10, 2005", "10 janvier 2005", or "10. Januar 2005".
+                    It is usually recommended to use native XML types within XForms instances, as this guarantees
+                    interoperability and maintainability. For example, a date of January 10, 2005 is stored in ISO
+                    format as: <code>2005-10-01</code>. However it is often necessary to format such values on screen
+                    in a user-readable format, like "January 10, 2005", "10 janvier 2005", or "10. Januar 2005".
                 </p>
                 <p>
-                    OPS provides an extension attribute, <code>xxforms:format</code>, for that
-                    purpose. <code>xxforms:format</code> must contain an XPath 2.0 expression. In
-                    your XPath expression you can use all the XPath 2.0 functions, including those
-                    for date manipulation (<a
+                    OPS provides an extension attribute, <code>xxforms:format</code>, for that purpose.
+                    <code>xxforms:format</code> must contain an XPath 2.0 expression. In your XPath expression you can
+                    use all the XPath 2.0 functions, including those for date manipulation (<a
                     href="http://www.w3.org/TR/2005/CR-xpath-functions-20051103/#durations-dates-times">external
-                    documentation</a>). However since XPath 2.0 functions don't provide any facility
-                    for date and time formatting, you can in this attribute also use the following
-                    XSLT 2.0 functions:
+                    documentation</a>). However since XPath 2.0 functions don't provide any facility for date and time
+                    formatting, you can in this attribute also use the following XSLT 2.0 functions:
                 </p>
                 <ul>
                     <li><p><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</p></li>
@@ -2756,6 +2846,19 @@
                                 <xforms:input ref="xxforms:evaluate(concat('instance(''my-instance'')/document', my-xpath))">
                                     <xforms:label>...</xforms:label>
                                 </xforms:input>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-serialize"/>
+                            <p>
+                                <code>xxforms:serialize($item as node(), $format as xs:string?) as xs:string</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:serialize()</code> function allows you to serialize an XML node to
+                                XML, HTML, XHTML or text. For example:
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:bind nodeset="my-html" calculate="xxforms:serialize(instance('my-instance'), 'html')"/>
                             </xml-source>
                         </li>
                         <li>

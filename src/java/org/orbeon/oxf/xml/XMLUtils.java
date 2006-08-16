@@ -962,7 +962,7 @@ public class XMLUtils {
         return str;
     }
 
-    static public String escapeXML(String str) {
+    public static String escapeXML(String str) {
         str = StringUtils.replace(str, "&", "&amp;");
         str = StringUtils.replace(str, "<", "&lt;");
         str = StringUtils.replace(str, ">", "&gt;");
@@ -971,7 +971,7 @@ public class XMLUtils {
         return str;
     }
 
-    static public String unescapeXML(String str) {
+    public static String unescapeXML(String str) {
         str = StringUtils.replace(str, "&amp;", "&");
         str = StringUtils.replace(str, "&lt;", "<");
         str = StringUtils.replace(str, "&gt;", ">");
@@ -980,7 +980,7 @@ public class XMLUtils {
         return str;
     }
 
-    static public String escapeHTML(String str) {
+    public static String escapeHTML(String str) {
         str = StringUtils.replace(str, "&", "&amp;");
         str = StringUtils.replace(str, "<", "&lt;");
         str = StringUtils.replace(str, ">", "&gt;");
@@ -989,7 +989,7 @@ public class XMLUtils {
         return str;
     }
 
-    static public String toString(final Locator loc) {
+    public static String toString(final Locator loc) {
         return loc.getSystemId() + ", line " + loc.getLineNumber() + ", column "
                 + loc.getColumnNumber();
     }

@@ -251,7 +251,8 @@
             <fileset dir="${web-examples-src.dir}">
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
-                <exclude name="ops/css/**"/>
+                <exclude name="ops/css/*.template"/>
+                <exclude name="ops/css/*.properties"/>
                 <include name="config/theme/**"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">

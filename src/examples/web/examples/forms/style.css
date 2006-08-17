@@ -53,5 +53,5 @@ td { vertical-align: top }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
-.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0px; border: none; text-align: center }
+.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0px; border: none; text-align: center; vertical-align: top }
 .dmv-plate-span { position: relative; top: 19px; background: none }

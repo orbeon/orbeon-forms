@@ -443,7 +443,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         connectionResult.lastModified = 0;
                         connectionResult.resultMediaType = "application/xml";
                         connectionResult.dontHandleResponse = false;
-                        connectionResult.resultInputStream = new ByteArrayInputStream(serializedInstance);
+                        connectionResult.setResultInputStream(new ByteArrayInputStream(serializedInstance));
 
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
@@ -514,7 +514,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     }
 
                                     // Forward content to response
-                                    NetUtils.copyStream(connectionResult.resultInputStream, response.getOutputStream());
+                                    NetUtils.copyStream(connectionResult.getResultInputStream(), response.getOutputStream());
 
                                 } else if (isReplaceInstance) {
 
@@ -522,7 +522,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         // Handling of XML media type
                                         try {
                                             // Read stream into Document
-                                            final Document resultingInstanceDocument = Dom4jUtils.read(connectionResult.resultInputStream);
+                                            final Document resultingInstanceDocument = Dom4jUtils.read(connectionResult.getResultInputStream());
 
                                             // Set new instance document to replace the one submitted
                                             final XFormsInstance replaceInstance = (replaceInstanceId == null) ? currentInstance : model.getInstance(replaceInstanceId);
@@ -632,7 +632,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
                 // Read stream into Document
                 final DocumentInfo responseBody
-                        = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+                        = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
 
                 submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
                 submitErrorEvent.setBodyDocument(responseBody);
@@ -647,7 +647,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     else
                         charset = DEFAULT_TEXT_READING_ENCODING;
                 }
-                final Reader reader = new InputStreamReader(connectionResult.resultInputStream, charset);
+                final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
                 final String responseBody = NetUtils.readStreamAsString(reader);
                 submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
                 submitErrorEvent.setBodyString(responseBody);

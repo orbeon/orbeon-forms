@@ -45,6 +45,27 @@ ORBEON.util = {};
 ORBEON.xforms = {};
 
 /**
+ * Global constants and variable
+ */
+ORBEON.xforms.Globals = {
+    isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
+    isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
+    isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
+        && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
+    overlayManager: null,
+    inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
+    inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
+    tooltipLibraryInitialized: false,
+    changedIdsRequest: {},            // Id of controls that have been touched by user since the last response was received
+    serverValue: {},                  // Values on controls known to the server
+    autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
+    autoCompleteOpen: {},
+    loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
+    activeControl: null,              // The currently active control, used to disable hint
+    autosizeTextareas: []             // Ids of the autosize textareas on the page
+};
+
+/**
  * The IE version of those methods does not store anything in the
  * elements as this has some negative side effects like IE reloading
  * background images set with CSS on the element.
@@ -99,15 +120,17 @@ ORBEON.util.IEDom = {
             }
             element.className = newClassName;
         }
-    },
-
-    /**
-     * IE doesn't support hasAttribute().
-     */
-    getAttribute: function(element, name) {
-        return element.getAttribute(name);
     }
 };
+
+/**
+ * General purpose methods on string
+ */
+ORBEON.util.String = {
+    replace: function(text, placeholder, replacement) {
+        return text.replace(new RegExp(placeholder, "g"), replacement);
+    }
+}
 
 /**
  * The hasClass, addClass and removeClass methods use a cache of the
@@ -199,10 +222,25 @@ ORBEON.util.Dom = {
     },
 
     /**
-     * Other browsers support hasAttribute().
+     * Return null when the attribute is not there.
      */
     getAttribute: function(element, name) {
-        return element.hasAttribute(name) ? element.getAttribute(name) : null;
+        if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
+            // IE incorrectly already return null when the attribute is not there
+            return element.getAttribute(name);
+        } else {
+            // Other browsers that follow the spec return an empty string when the attribute is not there,
+            // so we use hasAttribute() which is not implemented by IE to detect that case.
+            if (element.hasAttribute(name)) {
+                if (ORBEON.xforms.Globals.isRenderingEngineWebCore) {
+                    return ORBEON.util.String.replace(element.getAttribute(name), "&#38;", "&");
+                } else {
+                    return element.getAttribute(name);
+                }
+            } else {
+                return null;
+            }
+        }
     },
 
     getChildElement: function(parent, position) {
@@ -218,31 +256,10 @@ ORBEON.util.Dom = {
 };
 
 (function () {
-    var ua = navigator.userAgent.toLowerCase();
-    var isOpera = (ua.indexOf('opera') != -1);
-    var isIE = (ua.indexOf('msie') != -1 && !isOpera);
-    var methodsFrom = isIE ? ORBEON.util.IEDom : ORBEON.util.MozDom;
+    var methodsFrom = ORBEON.xforms.Globals.isRenderingEngineTridend ? ORBEON.util.IEDom : ORBEON.util.MozDom;
     for (var method in methodsFrom)
         ORBEON.util.Dom[method] = methodsFrom[method];
 }());
-
-/**
- * Global constants and variable
- */
-ORBEON.xforms.Globals = {
-
-    overlayManager: null,
-    inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
-    inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
-    tooltipLibraryInitialized: false,
-    changedIdsRequest: {},            // Id of controls that have been touched by user since the last response was received
-    serverValue: {},                  // Values on controls known to the server
-    autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
-    autoCompleteOpen: {},
-    loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
-    activeControl: null,              // The currently active control, used to disable hint
-    autosizeTextareas: []             // Ids of the autosize textareas on the page
-};
 
 ORBEON.xforms.Controls = {
 

@@ -765,9 +765,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                     // Read result as XML
                                     if (!isReadonlyHint) {
-                                        instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                        instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                     } else {
-                                        instanceDocument = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                        instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                     }
                                 } catch (Exception e) {
                                     throw new OXFException(e);
@@ -801,9 +801,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                         // Read result as XML
                                         if (!isReadonlyHint) {
-                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                            instanceDocument = TransformerUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                         } else {
-                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.resultInputStream, connectionResult.resourceURI);
+                                            instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                         }
                                     } catch (Exception e) {
                                         if (connectionResult != null && connectionResult.resourceURI != null)

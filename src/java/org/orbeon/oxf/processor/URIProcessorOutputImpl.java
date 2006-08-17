@@ -286,7 +286,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
     }
 
     public static class URIReferencesState {
-        
+
         private Map map;
 
         public void setDocument(String urlString, String username, String password, SAXStore documentSAXStore, Long lastModified) {
@@ -399,7 +399,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutp
                 // Read connection into SAXStore
                 final boolean handleXInclude = false;
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.resultInputStream, connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
+                XMLUtils.inputStreamToSAX(connectionResult.getResultInputStream(), connectionResult.resourceURI, documentSAXStore, false, handleXInclude);
 
                 // Obtain last modified
                 lastModified = connectionResult.lastModified;

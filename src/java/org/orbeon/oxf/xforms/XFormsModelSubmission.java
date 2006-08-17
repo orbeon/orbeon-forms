@@ -193,6 +193,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             boolean isDeferredSubmissionSecondPass = false;
             XFormsSubmitErrorEvent submitErrorEvent = null;
+            boolean submitDone = false;
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
@@ -486,7 +487,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Handle response
                         if (connectionResult.resultCode >= 200 && connectionResult.resultCode < 300) {// accept any success code (in particular "201 Resource Created")
                             // Sucessful response
-                            if (connectionHasContent(connectionResult)) {
+                            if (connectionResult.hasContent()) {
                                 // There is a body
 
                                 if (isReplaceAll) {
@@ -509,12 +510,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             if (headerName != null && headerValue != null) {
                                                 response.addHeader(headerName, headerValue);
                                             }
-
-//                                            if (headerName != null && headerValues != null) {
-//                                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
-//                                                    response.addHeader(headerName, (String) j.next());
-//                                                }
-//                                            }
                                         }
                                     }
 
@@ -545,7 +540,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 model.handleNewInstanceDocuments(pipelineContext);
 
                                                 // Notify that submission is done
-                                                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                                submitDone = true;
                                             }
                                         } catch (Exception e) {
                                             submitErrorEvent = createErrorEvent(connectionResult);
@@ -558,7 +553,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
-                                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    submitDone = true;
                                 } else {
                                     submitErrorEvent = createErrorEvent(connectionResult);
                                     throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
@@ -566,7 +561,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             } else {
                                 // There is no body, notify that processing is terminated
-                                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                submitDone = true;
                             }
                         } else if (connectionResult.resultCode == 302 || connectionResult.resultCode == 301) {
                             // Got a redirect
@@ -618,6 +613,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
             }
 
+            // If submission succeeded, dispatch success event
+            if (submitDone) {
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+            }
+
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
             // The default action for this event results in the following: Fatal error.
             throw new OXFException("Binding exception.");
@@ -626,7 +626,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult) throws IOException {
         XFormsSubmitErrorEvent submitErrorEvent = null;
-        if (connectionHasContent(connectionResult)) {
+        if (connectionResult.hasContent()) {
             if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                 // XML content-type
                 // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
@@ -657,33 +657,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
         }
         return submitErrorEvent;
-    }
-
-//    private Document readConnectionAsDocument(InputStream inputStream) throws TransformerException, IOException {
-//
-//        final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
-//        NetUtils.copyStream(inputStream, resultByteArrayOutputStream);
-//        byte[] submissionResponse = resultByteArrayOutputStream.toByteArray();
-//
-//        final Transformer identity = TransformerUtils.getIdentityTransformer();
-//        final LocationDocumentResult documentResult = new LocationDocumentResult();
-//        identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
-//        return documentResult.getDocument();
-//    }
-
-    private boolean connectionHasContent(ConnectionResult connectionResult) throws IOException {
-        boolean hasContent;
-        if (connectionResult.resultInputStream == null) {
-            hasContent = false;
-        } else {
-            if (!connectionResult.resultInputStream.markSupported())
-                connectionResult.resultInputStream = new BufferedInputStream(connectionResult.resultInputStream);
-
-            connectionResult.resultInputStream.mark(1);
-            hasContent = connectionResult.resultInputStream.read() != -1;
-            connectionResult.resultInputStream.reset();
-        }
-        return hasContent;
     }
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {
@@ -836,13 +809,42 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         public boolean dontHandleResponse;
         public int resultCode;
         public String resultMediaType;
-        public InputStream resultInputStream;
         public Map resultHeaders;
         public long lastModified;
         public String resourceURI;
 
+        private InputStream resultInputStream;
+        private boolean hasContent;
+
         public ConnectionResult(String resourceURI) {
             this.resourceURI = resourceURI;
+        }
+
+        public InputStream getResultInputStream() {
+        	return resultInputStream;
+        }
+
+        public boolean hasContent() {
+            return hasContent;
+        }
+
+        public void setResultInputStream(final InputStream resultInputStream) throws IOException {
+        	this.resultInputStream = resultInputStream;
+        	setHasContentFlag();
+
+        }
+
+        private void setHasContentFlag() throws IOException {
+            if (resultInputStream == null) {
+                hasContent = false;
+            } else {
+                if (!resultInputStream.markSupported())
+                    this.resultInputStream = new BufferedInputStream(resultInputStream);
+
+                resultInputStream.mark(1);
+                hasContent = resultInputStream.read() != -1;
+                resultInputStream.reset();
+            }
         }
 
         public void close() {}

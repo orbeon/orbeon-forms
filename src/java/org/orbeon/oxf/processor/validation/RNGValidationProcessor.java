@@ -338,7 +338,6 @@ public class RNGValidationProcessor extends ProcessorImpl {
                         Processor urlgen = new URLGenerator(url);
                         urlgen.createOutput(ProcessorImpl.OUTPUT_DATA).read(context, forwardingContentHandler);
                     }
-
                 }
 
                 public void setContentHandler(ContentHandler handler) {

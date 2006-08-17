@@ -579,10 +579,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             Collections.reverse(parents);
         }
 
-        // Find the final node
         final List nodeset = new ArrayList();
-        final XFormsInstance defaultInstance = getDefaultInstance();
-        nodeset.add(defaultInstance.getInstanceDocumentInfo());
+
+        // Find the root node
+        nodeset.add(getDefaultInstance().getInstanceRootElementInfo());
+
         for (Iterator i = parents.iterator(); i.hasNext();) {
             final ModelBind current = (ModelBind) i.next();
             final List currentModelBindResults = new ArrayList();

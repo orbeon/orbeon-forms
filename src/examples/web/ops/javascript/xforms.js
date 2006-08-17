@@ -555,11 +555,18 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                 if (target.value == "") {
                     // Stop end-user from deselecting last selected value
-                    target.value = target.options[0].value;
+                    target.options[0].selected = true;
+                    //target.value = target.options[0].value;
                 } else {
-                    // target.value returns the value of the first selected option
-                    // This unselects other options that might be selected as well
-                    target.value = target.value;
+                    // Unselect options other than the first one
+                    var foundSelected = false;
+                    for (var optionIndex = 0; optionIndex < target.options.length; optionIndex++) {
+                        var option = target.options[optionIndex];
+                        if (option.selected) {
+                            if (foundSelected) option.selected = false;
+                            else foundSelected = true;
+                        }
+                    }
                 }
             }
 

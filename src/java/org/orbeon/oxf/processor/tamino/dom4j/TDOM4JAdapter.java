@@ -16,7 +16,8 @@ package org.orbeon.oxf.processor.tamino.dom4j;
 
 import com.softwareag.common.instrumentation.contract.Postcondition;
 import com.softwareag.common.instrumentation.contract.Precondition;
-import com.softwareag.tamino.db.api.common.*;
+import com.softwareag.tamino.db.api.common.TPreference;
+import com.softwareag.tamino.db.api.common.TString;
 import com.softwareag.tamino.db.api.io.TStreamReadException;
 import com.softwareag.tamino.db.api.io.TStreamWriteException;
 import com.softwareag.tamino.db.api.namespace.TInoNamespace;
@@ -25,12 +26,10 @@ import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.FlyweightAttribute;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.io.*;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * DOM4JAdapter is the adaption of the DOM4J object model to the TXMLObject class.
@@ -359,7 +358,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
      * @return true if invocation of writeTo is possible, false otherwise.
      */
     protected boolean canWriteToOutputStream() {
-        return (getElement() != null) ? true : false;
+        return (getElement() != null);
     }
 
     /**
@@ -400,8 +399,6 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     /**
      * This abstract method serves as a plugin method for readStateFrom. Each time readStateFrom is called
      * this method is invoked at the end of the operation. It is needed for the implementation of deserialization.
-     *
-     * @param out the ObjectOutputStream needed for serialization.
      */
     protected void readDocumentStateFrom(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         boolean documentIsGiven = ((Boolean) in.readObject()).booleanValue();
@@ -414,32 +411,6 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
             element = null;
             isBuildFromDocument = false;
         }
-    }
-
-    /**
-     * Gets the start tag for an element with ignoring the namespace declaration.
-     */
-    private String getStartTag(Element element) {
-        StringBuffer startTag = new StringBuffer("<" + element.getQualifiedName());
-        String endTag = "</" + element.getQualifiedName() + ">";
-        List attributes = element.attributes();
-        if (attributes != null) {
-            Iterator iter = attributes.iterator();
-            while (iter.hasNext()) {
-                Attribute attrib = (Attribute) iter.next();
-                startTag.append(" " + attrib.getQualifiedName() + "=\"");
-                startTag.append(attrib.getValue() + "\"");
-            }
-        }
-        startTag.append(">");
-        return startTag.toString();
-    }
-
-    /**
-     * * Gets the end tag for an element.
-     */
-    private String getEndTag(Element element) {
-        return "</" + element.getQualifiedName() + ">";
     }
 
     /**

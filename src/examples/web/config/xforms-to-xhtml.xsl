@@ -491,7 +491,6 @@
                         <html>
                             <head>
                                 <title>Help</title>
-                                <link rel="stylesheet" type="text/css" href="config/theme/style/theme.css"/>
                             </head>
                             <body style="background: white">
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">

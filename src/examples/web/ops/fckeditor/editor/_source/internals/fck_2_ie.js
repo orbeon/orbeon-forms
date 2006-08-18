@@ -1,6 +1,6 @@
 ﻿/*
  * FCKeditor - The text editor for internet
- * Copyright (C) 2003-2005 Frederico Caldeira Knabben
+ * Copyright (C) 2003-2006 Frederico Caldeira Knabben
  * 
  * Licensed under the terms of the GNU Lesser General Public License:
  * 		http://www.opensource.org/licenses/lgpl-license.php
@@ -48,23 +48,25 @@ FCK.Paste = function()
 	if ( FCKConfig.ForcePasteAsPlainText )
 	{
 		FCK.PasteAsPlainText() ;	
-		return false ;
+		return ;
 	}
-	else if ( FCKConfig.AutoDetectPasteFromWord )
+
+	var sHTML = FCK.GetClipboardHTML() ;
+
+	if ( FCKConfig.AutoDetectPasteFromWord )
 	{
-		var sHTML = FCK.GetClipboardHTML() ;
 		var re = /<\w[^>]*(( class="?MsoNormal"?)|(="mso-))/gi ;
 		if ( re.test( sHTML ) )
 		{
 			if ( confirm( FCKLang["PasteWordConfirm"] ) )
 			{
 				FCK.PasteFromWord() ;
-				return false ;
+				return ;
 			}
 		}
 	}
-	else
-		return true ;
+
+	FCK.InsertHtml( sHTML ) ;	
 }
 
 FCK.PasteAsPlainText = function()

@@ -20,6 +20,7 @@ var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
+
 /**
  * Constants
  */
@@ -50,6 +51,7 @@ ORBEON.xforms = {};
 ORBEON.xforms.Globals = {
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
+    isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
     isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
     overlayManager: null,
@@ -473,7 +475,6 @@ ORBEON.xforms.Controls = {
         }
     }
 };
-
 
 ORBEON.xforms.Events = {
 
@@ -922,30 +923,34 @@ ORBEON.xforms.Init = {
         }
     },
 
+    _registerListerersOnFormElements: function() {
+        for (var i = 0; i < document.forms.length; i++) {
+            var form = document.forms[i];
+            if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
+                for (var j = 0; j < form.elements.length; j++) {
+                    var element = form.elements[j];
+                    YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
+                    YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
+                    YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
+                }
+            }
+        }
+    },
+
     document: function() {
 
         // Run code sent by server, which sets focus on controls
         if (typeof xformsPageLoadedServer != "undefined")
             xformsPageLoadedServer();
 
-        // Register events in capture phase for W3C-compliant browsers
-        if (window.addEventListener) {
+        // Register events in capture phase for W3C-compliant browsers.
+        // Avoid Safari 1.3 which is buggy.
+        if (window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
             window.addEventListener("focus", ORBEON.xforms.Events.focus, true);
             window.addEventListener("blur", ORBEON.xforms.Events.blur, true);
             window.addEventListener("change", ORBEON.xforms.Events.change, true);
         } else {
-            // Register event handlers on form elements
-            for (var i = 0; i < document.forms.length; i++) {
-                var form = document.forms[i];
-                if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
-                    for (var j = 0; j < form.elements.length; j++) {
-                        var element = form.elements[j];
-                        YAHOO.util.Event.addListener(element, "focus", ORBEON.xforms.Events.focus);
-                        YAHOO.util.Event.addListener(element, "blur", ORBEON.xforms.Events.blur);
-                        YAHOO.util.Event.addListener(element, "change", ORBEON.xforms.Events.change);
-                    }
-                }
-            }
+            ORBEON.xforms.Init._registerListerersOnFormElements();
         }
 
         // Register events that bubble on document for all browsers
@@ -1815,12 +1820,9 @@ function xformsHandleResponse(o) {
                                             templateNode = templateNodes[templateNodeIndex];
                                             afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
                                         }
-                                        // Initialize style on copied node
-                                        for (var templateNodeIndex in templateNodes) {
-                                            templateNode = templateNodes[templateNodeIndex];
-                                            // Maybe we need to do some initialization for advanced controls here
-                                        }
-
+                                        // Initialize newly added form elements
+                                        if (ORBEON.xforms.Globals.isRenderingEngineWebCore13)
+                                            ORBEON.xforms.Init._registerListerersOnFormElements();
                                         break;
                                     }
 

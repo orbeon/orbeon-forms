@@ -34,7 +34,7 @@ public class XHTMLHeadHandler extends HandlerBase {
     private static final ResourceConfig[] stylesheets = {
             // Calendar stylesheets
             // TODO: move to YUI if possible
-            new ResourceConfig("/config/theme/jscalendar/calendar-blue.css", null),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
             // Yahoo! UI Library
             new ResourceConfig("/ops/css/tree.css", null) {
                 public boolean isInUse(Map appearancesMap) {

@@ -18,7 +18,7 @@
     xmlns="http://www.w3.org/1999/xhtml">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-    <xsl:include href = "oxf:/config/theme/xml-formatting.xsl"/>
+    <xsl:include href = "oxf:/ops/utils/formatting/xml-formatting.xsl"/>
     <xsl:variable name="instance" as="element()" select="doc('input:instance')/form"/>
 
     <xsl:template match="/">

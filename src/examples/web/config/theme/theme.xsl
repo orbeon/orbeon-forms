@@ -24,7 +24,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <xsl:include href="formatting.xsl"/>
+    <xsl:include href="oxf:/ops/utils/formatting/formatting.xsl"/>
 <!-- This contains some useful request information -->
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
 

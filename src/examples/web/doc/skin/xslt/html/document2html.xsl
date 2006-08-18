@@ -14,7 +14,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:include href = "split.xsl"/>
-    <xsl:include href = "oxf:/config/theme/xml-formatting.xsl"/>
+    <xsl:include href = "oxf:/ops/utils/formatting/xml-formatting.xsl"/>
 
     <xsl:param name="isfaq"/>
     <xsl:param name="resource"/>

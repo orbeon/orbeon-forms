@@ -155,7 +155,6 @@
             <pathelement location="${jar.file}"/>
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
-                <exclude name="**/*jsf_1_1*.jar"/>
             </fileset>
             <!--            <pathelement location="${build.classes.dir}"/>-->
             <pathelement location="${java.home}/../lib/tools.jar"/>
@@ -180,8 +179,6 @@
             <exclude name="org/orbeon/oxf/common/Version.java"/>
             <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
             <exclude name="org/orbeon/oxf/processor/bpel/**/*.java"/>
-            <exclude name="org/orbeon/faces/**/*.java"/>
-            <exclude name="org/orbeon/faces11/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>
             <!--<exclude name="org/orbeon/saxon/dom4j/*"/>-->
         </javac>
@@ -220,12 +217,10 @@
               <include name="**/*.rng"/>
               <include name="**/*.css"/>
               <include name="**/*.xsd"/>
-              <exclude name="org/orbeon/faces/**"/>
           </fileset>
           <fileset dir="${build.classes.dir}">
               <include name="**/*.class"/>
               <include name="**/*.xsd"/>
-              <exclude name="org/orbeon/faces/**/*.class"/>
           </fileset>
           <fileset dir="${resources.dir}/oxf"/>
           <zipfileset dir="descriptors/jar" prefix="META-INF" >
@@ -806,7 +801,6 @@ ${files}
                 <include name="**/*.rng"/>
                 <include name="**/*.css"/>
                 <include name="**/*.xsd"/>
-                <exclude name="org/orbeon/faces/**"/>
             </fileset>
             <fileset dir="${resources.dir}/oxf"/>
             <fileset dir="${web-examples-src.dir}">

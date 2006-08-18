@@ -57,10 +57,10 @@ public class XHTMLHeadHandler extends HandlerBase {
 
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
-            // TODO: move to YUI if possible
-            new ResourceConfig("/config/theme/jscalendar/calendar.js", null),
-            new ResourceConfig("/config/theme/jscalendar/lang/calendar-en.js", null),
-            new ResourceConfig("/config/theme/jscalendar/calendar-setup.js", null),
+            // TODO: move to YUI in the future if possible
+            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", null),
+            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", null),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", null),
             // Yahoo UI Library
             new ResourceConfig("/ops/javascript/yahoo.js", "/ops/javascript/yahoo-min.js"),
             new ResourceConfig("/ops/javascript/event.js", "/ops/javascript/event-min.js"),

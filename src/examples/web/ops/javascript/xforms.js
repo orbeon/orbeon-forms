@@ -263,6 +263,27 @@ ORBEON.util.Dom = {
         ORBEON.util.Dom[method] = methodsFrom[method];
 }());
 
+/**
+ * This object contains function generally designed to be called from JavaScript code
+ * embedded in forms.
+ */
+ORBEON.xforms.Document = {
+
+    /**
+     * Reference: http://www.w3.org/TR/xforms/slice10.html#action-dispatch
+     */
+    dispatchEvent: function(controlId, eventName, bubbles, cancelable) {
+
+    },
+
+    /**
+     *
+     */
+    setValue: function() {
+
+    }
+};
+
 ORBEON.xforms.Controls = {
 
     // Returns MIP for a given control
@@ -504,7 +525,7 @@ ORBEON.xforms.Events = {
             if (!element) return null; // No more parent, stop search
             if (element.className != null) {
                 if (ORBEON.util.Dom.hasClass(element, "xforms-control")
-                        || ORBEON.util.Dom.hasClass(element, "xforms-help")
+                        || ORBEON.util.Dom.hasClass(element, "xforms-help-image")
                         || ORBEON.util.Dom.hasClass(element, "xforms-alert")) {
                     // We found our XForms element
                     return element;
@@ -704,10 +725,12 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
 
-            if (ORBEON.util.Dom.hasClass(target, "xforms-help")) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")) {
                 // Show help tool-tip
-                var control = document.getElementById(target.htmlFor);
-                ORBEON.xforms.Events._showToolTip(event, target, "xforms-help", ORBEON.xforms.Controls.getHelpMessage(control));
+                var label = target.nextSibling;
+                while (!ORBEON.util.Dom.isElement(label)) label = target.nextSibling;
+                var control = document.getElementById(label.htmlFor);
+                ORBEON.xforms.Events._showToolTip(event, label, "xforms-help", ORBEON.xforms.Controls.getHelpMessage(control));
             } else if (ORBEON.util.Dom.hasClass(target, "xforms-alert-active")) {
                 var control = document.getElementById(target.htmlFor);
                 var message = ORBEON.xforms.Controls.getAlertMessage(control);
@@ -724,7 +747,7 @@ ORBEON.xforms.Events = {
         if (target != null) {
 
             // Hide help
-            if (ORBEON.util.Dom.hasClass(target, "xforms-help")
+            if (ORBEON.util.Dom.hasClass(target, "xforms-help-image")
                     || ORBEON.util.Dom.hasClass(target, "xforms-alert-active"))
                 tt_Hide();
         }

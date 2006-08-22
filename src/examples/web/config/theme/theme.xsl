@@ -114,6 +114,14 @@
         </xhtml:td>
     </xsl:template>
 
+    <!-- Add images to the page instead of using CSS to get around IE reloading issue -->
+    <xsl:template match="xhtml:label[@class = 'xforms-help']" >
+        <xhtml:img alt="Help" src="/images/help.gif" class="xforms-help-image"/>
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- - - - - - - Generic copy rules - - - - - - -->
 
     <!-- Copy attributes in XHTML namespace to no namespace -->

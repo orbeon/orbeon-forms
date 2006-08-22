@@ -64,7 +64,9 @@ ORBEON.xforms.Globals = {
     autoCompleteOpen: {},
     loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
     activeControl: null,              // The currently active control, used to disable hint
-    autosizeTextareas: []             // Ids of the autosize textareas on the page
+    autosizeTextareas: [],            // Ids of the autosize textareas on the page
+    fckEditorLoading: false,          // True if  a FCK editor is currently loading
+    fckEditorsToLoad: []              // Queue of FCK editor to load
 };
 
 /**
@@ -1243,7 +1245,12 @@ ORBEON.xforms.Init = {
             document.xformsHTMLAreaNames.push(htmlArea.name);
         fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
         fckEditor.ToolbarSet = "OPS";
-        fckEditor.ReplaceTextarea() ;
+        if (ORBEON.xforms.Globals.fckEditorLoading) {
+            ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);
+        } else {
+            ORBEON.xforms.Globals.fckEditorLoading = true;
+            fckEditor.ReplaceTextarea();
+        }
     },
 
     /**
@@ -1682,6 +1689,13 @@ function FCKeditor_OnComplete(editorInstance) {
     // Register focus/blur events for IE
     YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusin", ORBEON.xforms.Events.focus);
     YAHOO.util.Event.addListener(editorInstance.EditorDocument, "focusout", ORBEON.xforms.Events.blur);
+    // Load other editors in the queue
+    if (ORBEON.xforms.Globals.fckEditorsToLoad.length > 0) {
+        var fckEditor = ORBEON.xforms.Globals.fckEditorsToLoad.shift();
+        fckEditor.ReplaceTextarea();
+    } else {
+        ORBEON.xforms.Globals.fckEditorLoading = false;
+    }
 }
 
 function xformsGetLocalName(element) {

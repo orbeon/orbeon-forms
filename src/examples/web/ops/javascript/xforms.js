@@ -1215,7 +1215,10 @@ ORBEON.xforms.Init = {
         if (ORBEON.xforms.Globals.overlayManager == null)
             ORBEON.xforms.Globals.overlayManager = new YAHOO.widget.OverlayManager();
         // Extract menu hierarchy from HTML
-        var menuArray = eval(ORBEON.util.Dom.getStringValue(valuesDiv));
+        var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);
+        menuString = ORBEON.util.String.replace(menuString, "\n", " ");
+        menuString = ORBEON.util.String.replace(menuString, "\r", " ");
+        var menuArray = eval(menuString);
         ORBEON.util.Dom.setStringValue(valuesDiv, "");
         // Initialize tree
         YAHOO.util.Dom.generateId(treeDiv);

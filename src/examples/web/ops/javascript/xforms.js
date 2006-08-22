@@ -1171,7 +1171,10 @@ ORBEON.xforms.Init = {
         // Save in the control if it allows multiple selection
         tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select");
         // Parse data put by the server in the div
-        var treeArray = eval(ORBEON.util.Dom.getStringValue(tree));
+        var treeString = ORBEON.util.Dom.getStringValue(tree);
+        treeString = ORBEON.util.String.replace(treeString, "\n", " ");
+        treeString = ORBEON.util.String.replace(treeString, "\r", " ");
+        var treeArray = eval(treeString);
         ORBEON.util.Dom.setStringValue(tree, "");
         tree.value = "";
         // Create, populate, and show the tree

@@ -496,6 +496,12 @@ ORBEON.xforms.Controls = {
                 linesAdded--;
             }
         }
+    },
+
+    updateHTMLAreaClasses: function(textarea) {
+        var iframe = textarea.previousSibling;
+        while (iframe.nodeType != ORBEON.util.Dom.ELEMENT_TYPE) iframe = textarea.previousSibling;
+        iframe.className = textarea.className;
     }
 };
 
@@ -1238,6 +1244,9 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.removeClass(menu, "xforms-initially-hidden");
     },
 
+    /**
+     * Initialize HTML areas.
+     */
     _htmlArea: function (htmlArea) {
         document.xformsHTMLAreaNames = new Array();
         var fckEditor = new FCKeditor(htmlArea.name);
@@ -1250,12 +1259,13 @@ ORBEON.xforms.Init = {
         } else {
             ORBEON.xforms.Globals.fckEditorLoading = true;
             fckEditor.ReplaceTextarea();
+            ORBEON.xforms.Controls.updateHTMLAreaClasses(document.getElementById(fckEditor.InstanceName));
         }
     },
 
     /**
      * For all the controls except list, we figure out the initial value of the control when
-     * receiving the first focus event. For the lists on Firefox, the value has already changed 
+     * receiving the first focus event. For the lists on Firefox, the value has already changed
      * when we receive the focus event. So here we save the value for lists when the page loads.
      */
     _list: function(list) {
@@ -1693,6 +1703,7 @@ function FCKeditor_OnComplete(editorInstance) {
     if (ORBEON.xforms.Globals.fckEditorsToLoad.length > 0) {
         var fckEditor = ORBEON.xforms.Globals.fckEditorsToLoad.shift();
         fckEditor.ReplaceTextarea();
+        ORBEON.xforms.Controls.updateHTMLAreaClasses(document.getElementById(fckEditor.InstanceName));
     } else {
         ORBEON.xforms.Globals.fckEditorLoading = false;
     }
@@ -2284,6 +2295,12 @@ function xformsHandleResponse(o) {
                                             }
                                         }
 
+                                        // After we update classes on textarea, copy those classes on the FCKeditor iframe
+                                        if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea")
+                                                && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                            ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
+                                        }
+                                            
                                         break;
                                     }
 

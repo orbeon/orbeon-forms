@@ -20,8 +20,9 @@
 
 // FCK represents the active editor instance
 var FCK = new Object() ;
-FCK.Name			= FCKURLParams[ 'InstanceName' ] ;
-
+// avernet 2006-08-23
+// Fix for case where the name of the control contains special characters that would be URL encoded
+FCK.Name			= decodeURI(FCKURLParams[ 'InstanceName' ]) ;
 FCK.Status			= FCK_STATUS_NOTLOADED ;
 FCK.EditMode		= FCK_EDITMODE_WYSIWYG ;
 
@@ -38,12 +39,12 @@ FCK.LoadLinkedFile = function()
 	var eLinkedField		= oDocument.getElementById( FCK.Name ) ;
 	var colElementsByName	= oDocument.getElementsByName( FCK.Name ) ;
 
-	var i = 0;
+    var i = 0;
 	while ( eLinkedField || i == 0 )
 	{
 		if ( eLinkedField && ( eLinkedField.tagName == 'INPUT' || eLinkedField.tagName == 'TEXTAREA' ) )
 		{
-			FCK.LinkedField = eLinkedField ;
+            FCK.LinkedField = eLinkedField ;
 			break ;
 		}
 		eLinkedField = colElementsByName[i++] ;

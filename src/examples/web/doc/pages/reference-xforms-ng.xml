@@ -1164,7 +1164,9 @@
                                     <resources>
                                         <help>
                                             <number>
-                                                &amp;lt;div>&amp;lt;p>This field must contain one of the following values:&amp;lt;/p>&amp;lt;ul>&amp;lt;li>One&amp;lt;/li>&amp;lt;li>Two&amp;lt;/li>&amp;lt;li>Three&amp;lt;/li>&amp;lt;/ul>&amp;lt;/div>
+                                                &amp;lt;div>&amp;lt;p>This field must contain one of the following values:&amp;lt;/p>
+                                                &amp;lt;ul>&amp;lt;li>One&amp;lt;/li> &amp;lt;li>Two&amp;lt;/li>
+                                                &amp;lt;li>Three&amp;lt;/li>&amp;lt;/ul>&amp;lt;/div>
                                             </number>
                                         </help>
                                     </resources>

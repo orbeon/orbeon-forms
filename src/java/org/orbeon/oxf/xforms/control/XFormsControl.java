@@ -307,10 +307,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     protected void evaluateLabelHintHelpAlertValue(PipelineContext pipelineContext) {
-        this.label = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME);
-        this.help = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME);
-        this.hint = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME);
-        this.alert = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME);
+        this.label = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME, false);
+        this.help = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME, true);
+        this.hint = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME, true);
+        this.alert = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME, false);
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -427,7 +427,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         }
     }
 
-    private String getChildElementValue(final PipelineContext pipelineContext, QName qName) {
+    private String getChildElementValue(final PipelineContext pipelineContext, QName qName, final boolean acceptHTML) {
 
         // NOTE: This returns an HTML string.
 
@@ -465,7 +465,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                                 currentNodeset, currentBindingContext.getPosition(),
                                 valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
 
-                        result = XMLUtils.escapeXMLMinimal(tempResult);
+                        result = (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                     } else {
                         result = ""; 
                     }
@@ -480,7 +480,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                     try {
                         // TODO: should cache this?
                         final String tempResult  = XFormsUtils.retrieveSrcValue(srcAttributeValue);
-                        result = XMLUtils.escapeXMLMinimal(tempResult);
+                        result = (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                     } catch (IOException e) {
                         // Dispatch xforms-link-error to model
                         final XFormsModel currentModel = currentBindingContext.getModel();
@@ -511,7 +511,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                             outputControl.evaluate(pipelineContext);
 
                             // Escape only if the mediatype is not HTML
-                            if (!"text/html".equals(outputControl.getMediatype()))
+                            if (acceptHTML && !"text/html".equals(outputControl.getMediatype()))
                                 sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
                             else
                                 sb.append(outputControl.getDisplayValueOrValue());
@@ -549,7 +549,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                     }
 
                     public void text(Text text) {
-                        sb.append(XMLUtils.escapeXMLMinimal(text.getStringValue()));
+                        sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
                     }
                 });
 

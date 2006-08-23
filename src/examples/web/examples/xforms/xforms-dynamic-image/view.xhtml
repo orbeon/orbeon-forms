@@ -21,7 +21,7 @@
 
     <xhtml:head>
         <xhtml:title>Dynamic Images With XForms</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+        <xforms:model>
             <xforms:instance>
                 <candidates current="1">
                     <candidate>
@@ -57,15 +57,15 @@
                 </candidates>
             </xforms:instance>
         </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
         <xhtml:style type="text/css">
             .container-outer { text-align: center; display: table; }
-            .container-inner { padding-top: 1em; width: 370px; height: 370px; border: 1px solid #99c; }
+            .container-inner { padding-top: 1em; width: 370px; height: 380px; border: 1px solid #99c; }
             .president-name  { display: block; font-weight: bold }
             .president-party { display: block; }
             .president-image { display: block; padding-top: 1em; }
         </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
         <xhtml:div class="container-outer">
             <xhtml:div class="container-inner">
                 <xforms:group ref="candidate[position() = /candidates/@current]">

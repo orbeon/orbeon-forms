@@ -2949,34 +2949,74 @@
                 <section>
                     <title>Rationale</title>
                     <p>
-                        While XForms gets you a long way towards creating a dynamic user-friendly user
-                        interface, there are some dynamic behaviors of the user interface that cannot be
-                        implemented with XForms, and that you might want to implement directly in
-                        JavaScript. We describe here how your JavaScript code can interact with XForms and
-                        in particular how you can have access to the value of an XForms control.
+                        While XForms gets you a long way towards creating a dynamic user-friendly user interface, there
+                        are some dynamic behaviors of the user interface that cannot be implemented easily or at all
+                        with XForms, or you might already have some JavaScript code that you would like to reused. A
+                        JavaScript API is provided to handle those cases, or other use cases involving JavaScript that
+                        you might have.
                     </p>
                 </section>
+                <a name="xforms-javascript-get-set-value"/>
                 <section>
-                    <title>Accessing The Value XForms Controls</title>
+                    <title>Getting and Setting The Value of XForms Controls</title>
                     <p>
-                        In JavaScript, you obtain a reference to the element representing the control with
-                        <code>var control = document.getElementById('myControl')</code> where
-                        <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
-                        id="myControl"></code>. You can read the current value of the control with
-                        <code>control.value</code> and set the value of the control assigning a value to
-                        <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
-                        do such an assignment the value of the node in the instance is updated, the
-                        <code>xforms-value-changed</code> event thrown, and all the standard XForms
-                        processing happens (validation, recalculation, etc).
+                        In JavaScript, you get the current value of an XForms control <code>var value =
+                        ORBEON.xforms.Document.getValue("myControl")</code> where <code>myControl</code> is the id of
+                        the XForms control, for instance: <code>&lt;xforms:input id="myControl"></code>.
                     </p>
-                    <note>
-                        Currently, accessing the value of a control is only supported for
-                        <code>&lt;xforms:input></code>. If you want to access the value of another control,
-                        a workaround consists in adding an <code>&lt;xforms:input></code> with
-                        <code>style="display: none"</code> bound to the same node as that control, and
-                        accessing the <code>&lt;xforms:input></code>'s id to change the value of the node
-                        and therefore indirectly the other control's value.
-                    </note>
+                    <p>
+                        You set the value of an XForms control with <code>ORBEON.xforms.Document.setValue("myControl",
+                        "42")</code> where <code>myControl</code> is the id of the XForms control, and <code>42</code>
+                        the new value. Setting the value with JavaScript is equivalent to changing the value of the
+                        control in the browser. This will trigger the recalculation of the instances, and the dispatch
+                        of the <code>xforms-value-changed</code> event. More formally, the <a
+                        href="http://www.w3.org/TR/xforms/slice4.html#rpm-event-seq-vcwfc">Value Change</a> sequence of
+                        events occurs.
+                    </p>
+                    <p>
+                        As an example, consider you have the model below. It declares an instance with two elements
+                        <code>foo</code> and <code>bar</code>, where <code>bar</code> is a copy of <code>foo</code>,
+                        implemented with a <code>calculate</code> MIP.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:model>
+                            <xforms:instance id="instance">
+                                <instance>
+                                    <foo>42</foo>
+                                    <bar/>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/bar" calculate="/instance/foo"/>
+                        </xforms:model>
+                    </xml-source>
+                    <p>
+                        The input control below is bound to <code>foo</code>, and the output control is bound to
+                        <code>bar</code>. When activated, the trigger executes JavaScript with the
+                        <code>&lt;xxforms:script></code> action. It increments the value of the input control bound to
+                        <code>foo</code>. When this happens the value displayed by the output control bound to
+                        <code>bar</code>is incremented as well, as <code>bar</code> is a copy of <code>foo</code>.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xhtml:p>
+                            <xforms:input ref="foo" id="foo">
+                                <xforms:label class="fixed-width">Value of foo:</xforms:label>
+                            </xforms:input>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:output ref="bar">
+                                <xforms:label class="fixed-width">Value of bar:</xforms:label>
+                            </xforms:output>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:trigger>
+                                <xforms:label>Increment foo with JavaScript</xforms:label>
+                                <xxforms:script ev:event="DOMActivate">
+                                    var fooValue = ORBEON.xforms.Document.getValue("foo");
+                                    ORBEON.xforms.Document.setValue("foo", Number(fooValue) + 1);
+                                </xxforms:script>
+                            </xforms:trigger>
+                        </xhtml:p>
+                    </xml-source>
                 </section>
             </section>
             <a name="other-extensions"/>

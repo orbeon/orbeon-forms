@@ -2376,12 +2376,12 @@
                         <td rowspan="6">
                             <p>The following URI is loaded in a servlet:</p>
                             <p>
-                                <code>http://a.org/ops/page</code>
+                                <code>http://a.org/c/d</code>
                             </p>
                         </td>
-                        <td rowspan="2"><code>http://b.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/e/</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://b.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/e/</code></td>
                         <td>
                             The absolute URL is left untouched. The new page replaces the existing
                             page.
@@ -2395,9 +2395,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>/new-page</code></td>
+                        <td rowspan="2"><code>/f</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://a.org/ops/new-page</code></td>
+                        <td rowspan="2"><code>http://a.org/c/f</code></td>
                         <td>
                             Absolute paths resolve against the current servlet context. The new page
                             replaces the existing page.
@@ -2411,9 +2411,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="2"><code>admin/main-page</code></td>
+                        <td rowspan="2"><code>g</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://a.org/ops/admin/main-page</code></td>
+                        <td rowspan="2"><code>http://a.org/c/g</code></td>
                         <td>
                             The new page replaces the existing page.
                         </td>
@@ -2428,12 +2428,12 @@
                         <td rowspan="8">
                             <p>The following path is loaded in a portlet:</p>
                             <p>
-                                <code>/example/page</code>
+                                <code>h/d</code>
                             </p>
                         </td>
-                        <td rowspan="2"><code>http://b.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/e/</code></td>
                         <td><code>replace</code></td>
-                        <td rowspan="2"><code>http://b.com/software/</code></td>
+                        <td rowspan="2"><code>http://b.com/e/</code></td>
                         <td>
                             This causes the application to load a page outside of the portlet,
                             replacing the entire portal.
@@ -2447,37 +2447,37 @@
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="3"><code>/new-page</code></td>
+                        <td rowspan="3"><code>/f</code></td>
                         <td><code>replace</code></td>
-                        <td><code>/new-page</code></td>
+                        <td><code>/f</code></td>
                         <td>
                             The resulting path is loaded within the portlet.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>replace</code><br/><code>f:url-type="resource"</code></td>
-                        <td><code>http://a.org/ops/new-page</code></td>
+                        <td><code>replace</code><br/><code>f:url-type= "resource"</code></td>
+                        <td><code>http://a.org/c/f</code></td>
                         <td>
                             The resulting path is loaded in the same window outside the portal.
                         </td>
                     </tr>
                     <tr>
                         <td><code>new</code></td>
-                        <td><code>http://a.org/ops/new-page</code></td>
+                        <td><code>http://a.org/c/f</code></td>
                         <td>
                             The resulting path is loaded in a new window.
                         </td>
                     </tr>
                     <tr>
-                        <td rowspan="3"><code>admin/main-page</code></td>
+                        <td rowspan="3"><code>g</code></td>
                         <td><code>replace</code></td>
-                        <td><code>/example/admin/main-page</code></td>
+                        <td><code>h/g</code></td>
                         <td>
                             The resulting path is loaded within the portlet.
                         </td>
                     </tr>
                     <tr>
-                        <td><code>replace</code><br/><code>f:url-type="resource"</code></td>
+                        <td><code>replace</code><br/><code>f:url-type= "resource"</code></td>
                         <td><i>undefined</i></td>
                         <td><i>undefined</i></td>
                     </tr>
@@ -2943,6 +2943,42 @@
                     </p>
                 </section>
             </section>
+            <a name="xforms-javascript"/>
+            <section>
+                <title>JavaScript Integration</title>
+                <section>
+                    <title>Rationale</title>
+                    <p>
+                        While XForms gets you a long way towards creating a dynamic user-friendly user
+                        interface, there are some dynamic behaviors of the user interface that cannot be
+                        implemented with XForms, and that you might want to implement directly in
+                        JavaScript. We describe here how your JavaScript code can interact with XForms and
+                        in particular how you can have access to the value of an XForms control.
+                    </p>
+                </section>
+                <section>
+                    <title>Accessing The Value XForms Controls</title>
+                    <p>
+                        In JavaScript, you obtain a reference to the element representing the control with
+                        <code>var control = document.getElementById('myControl')</code> where
+                        <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
+                        id="myControl"></code>. You can read the current value of the control with
+                        <code>control.value</code> and set the value of the control assigning a value to
+                        <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
+                        do such an assignment the value of the node in the instance is updated, the
+                        <code>xforms-value-changed</code> event thrown, and all the standard XForms
+                        processing happens (validation, recalculation, etc).
+                    </p>
+                    <note>
+                        Currently, accessing the value of a control is only supported for
+                        <code>&lt;xforms:input></code>. If you want to access the value of another control,
+                        a workaround consists in adding an <code>&lt;xforms:input></code> with
+                        <code>style="display: none"</code> bound to the same node as that control, and
+                        accessing the <code>&lt;xforms:input></code>'s id to change the value of the node
+                        and therefore indirectly the other control's value.
+                    </note>
+                </section>
+            </section>
             <a name="other-extensions"/>
             <section>
                 <title>Other Extensions</title>
@@ -3187,42 +3223,6 @@
                 </p>
             </section>
             -->
-        </section>
-        <a name="xforms-javascript"/>
-        <section>
-            <title>JavaScript Integration</title>
-            <section>
-                <title>Rationale</title>
-                <p>
-                    While XForms gets you a long way towards creating a dynamic user-friendly user
-                    interface, there are some dynamic behaviors of the user interface that cannot be
-                    implemented with XForms, and that you might want to implement directly in
-                    JavaScript. We describe here how your JavaScript code can interact with XForms and
-                    in particular how you can have access to the value of an XForms control.
-                </p>
-            </section>
-            <section>
-                <title>Accessing The Value XForms Controls</title>
-                <p>
-                    In JavaScript, you obtain a reference to the element representing the control with
-                    <code>var control = document.getElementById('myControl')</code> where
-                    <code>myControl</code> is the id of the XForms control (i.e. <code>&lt;xforms:input
-                    id="myControl"></code>. You can read the current value of the control with
-                    <code>control.value</code> and set the value of the control assigning a value to
-                    <code>control.value</code>, for instance: <code>control.value = 42</code>. When you
-                    do such an assignment the value of the node in the instance is updated, the
-                    <code>xforms-value-changed</code> event thrown, and all the standard XForms
-                    processing happens (validation, recalculation, etc).
-                </p>
-                <note>
-                    Currently, accessing the value of a control is only supported for
-                    <code>&lt;xforms:input></code>. If you want to access the value of another control,
-                    a workaround consists in adding an <code>&lt;xforms:input></code> with
-                    <code>style="display: none"</code> bound to the same node as that control, and
-                    accessing the <code>&lt;xforms:input></code>'s id to change the value of the node
-                    and therefore indirectly the other control's value.
-                </note>
-            </section>
         </section>
     </body>
 </document>

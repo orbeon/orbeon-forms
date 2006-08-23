@@ -279,10 +279,25 @@ ORBEON.xforms.Document = {
     },
 
     /**
+     * Returns the value of an XForms control.
      *
+     * @param {String} controlId    Id of the control
      */
-    setValue: function() {
+    getValue: function(controlId) {
+        var control = document.getElementById(controlId);
+        return ORBEON.xforms.Controls.getCurrentValue(control);
+    },
 
+    /**
+     * Set the value of an XForms control.
+     *
+     * @param {String} controlId    Id of the control
+     * @param {String} newValue     New value for the control
+     */
+    setValue: function(controlId, newValue) {
+        var control = document.getElementById(controlId);
+        xformsFireEvents(new Array(xformsCreateEventArray
+                (control, "xxforms-value-change-with-focus-change", String(newValue), null)), false);
     }
 };
 

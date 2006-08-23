@@ -29,10 +29,7 @@ import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.SAXParser;
 import java.io.*;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Collection of util routines for working with DOM4J.  In particular offers many methods found
@@ -250,26 +247,49 @@ public class Dom4jUtils {
      * @return          normalized Document (the same Document object, but children text nodes may have been adjusted)
      */
     public static Document normalizeTextNodes(Document document) {
+        final List nodesToDetatch = new ArrayList();
         document.accept(new VisitorSupport() {
             public void visit(Element element) {
                 final List children = element.content();
                 Node previousNode = null;
+                StringBuffer sb = null;
                 for (Iterator i = children.iterator(); i.hasNext();) {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
                         if (previousNode instanceof Text && currentNode instanceof Text) {
                             final Text previousNodeText = (Text) previousNode;
-                            previousNodeText.setText(previousNodeText.getText() + ((Text) currentNode).getText());
-                            i.remove();
+                            if (sb == null)
+                                sb = new StringBuffer(previousNodeText.getText());
+                            sb.append(((Text) currentNode).getText());
+                            nodesToDetatch.add(currentNode);
+                        } else if (previousNode instanceof Text && !(currentNode instanceof Text)) {
+                            // Update node if needed
+                            if (sb != null) {
+                                previousNode.setText(sb.toString());
+                            }
+                            previousNode = currentNode;
+                            sb = null;
                         } else {
                             previousNode = currentNode;
+                            sb = null;
                         }
                     } else {
                         previousNode = currentNode;
+                        sb = null;
                     }
+                }
+                // Update node if needed
+                if (previousNode != null && sb != null) {
+                    previousNode.setText(sb.toString());
                 }
             }
         });
+        // Detach nodes in the end so as to not confuse the acceptor above
+        for (Iterator i = nodesToDetatch.iterator(); i.hasNext();) {
+            final Node currentNode = (Node) i.next();
+            currentNode.detach();
+        }
+
         return document;
     }
 

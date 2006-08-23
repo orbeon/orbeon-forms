@@ -49,12 +49,16 @@ ORBEON.xforms = {};
  * Global constants and variable
  */
 ORBEON.xforms.Globals = {
+    // Booleans used for browser detection
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
     isRenderingEngineWebCore13: navigator.userAgent.indexOf("AppleWebKit/312") != -1,     // Safari 1.3
     isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
-    overlayManager: null,
+
+    eventQueue: [],                   // Events to be sent to the server
+    executeEventFunctionQueued: 0,    // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
+    overlayManager: null,             // YUI overlay manager used to close opened menu when user clicks on document
     inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
@@ -274,8 +278,22 @@ ORBEON.xforms.Document = {
     /**
      * Reference: http://www.w3.org/TR/xforms/slice10.html#action-dispatch
      */
-    dispatchEvent: function(controlId, eventName, bubbles, cancelable) {
+    dispatchEvent: function(targetId, eventName, form, bubbles, cancelable, incremental) {
 
+        // Use the first XForms form on the page when no form is provided
+        if (form == undefined) {
+            for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
+                var candidateForm = document.forms[formIndex];
+                if (ORBEON.util.Dom.hasClass(candidateForm, "xforms-form")) {
+                    form = candidateForm;
+                    break;
+                }
+            }
+        }
+
+        // Create event and fire
+        var event = new ORBEON.xforms.Server.Event(form, controlId, null, null, eventName, bubbles, cancelable);
+        ORBEON.xforms.Server.fireEvents([event], incremental == undefined ? false : incremental);
     },
 
     /**
@@ -1060,8 +1078,6 @@ ORBEON.xforms.Init = {
 
         // Initialize attributes on document
         document.xformsRequestInProgress = false;
-        document.xformsEvents = new Array();
-        document.xformsExecuteNextRequestInQueue = 0;
         document.xformsHTMLAreaNames = new Array();
         document.xformsRepeatTreeChildToParent = new Array();
         document.xformsRepeatIndexes = new Array();
@@ -1293,6 +1309,163 @@ ORBEON.xforms.Init = {
             }
         }
         ORBEON.xforms.Globals.serverValue[list.id] = value;
+    }
+};
+
+ORBEON.xforms.Server = {
+
+    Event: function(form, targetId, otherId, value, eventName, bubbles, cancelable) {
+        this.form = form;
+        this.targetId = targetId;
+        this.otherId = otherId;
+        this.value = value;
+        this.eventName = eventName;
+        this.bubbles = bubbles;
+        this.cancelable = cancelable;
+    },
+
+    fireEvents: function(events, incremental) {
+        // Store the time of the first event to be sent in the queue
+        var currentTime = new Date().getTime();
+        if (ORBEON.xforms.Globals.eventQueue.length == 0)
+            document.xformsEventsFirstEventTime = currentTime;
+
+        // Store events to fire
+        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+            ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
+        }
+
+        // Fire them with a delay to give us a change to aggregate events together
+        ORBEON.xforms.Globals.executeEventFunctionQueued++;
+        if (incremental && !(currentTime - document.xformsEventsFirstEventTime >
+                XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS))
+            window.setTimeout(ORBEON.xforms.Server.executeNextRequest,
+                XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
+        else ORBEON.xforms.Server.executeNextRequest(true);
+        return false;
+    },
+
+    executeNextRequest: function(bypassRequestQueue) {
+        bypassRequestQueue = typeof(bypassRequestQueue) == "boolean"  && bypassRequestQueue == true;
+
+        ORBEON.xforms.Globals.executeEventFunctionQueued--;
+        var executedRequest = false;
+        if (!document.xformsRequestInProgress
+                && ORBEON.xforms.Globals.eventQueue.length > 0
+                && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
+
+            // Collapse value change for the same control
+            {
+                var seenControlValue = {};
+                var newEvents = [];
+                for (var eventIndex = ORBEON.xforms.Globals.eventQueue.length - 1; eventIndex >= 0; eventIndex--) {
+                    // Extract information from event array
+                    var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
+                    if (event.eventName == "xxforms-value-change-with-focus-change") {
+                        // Don't send change value if there is already a change value for the same control
+                        if (!seenControlValue[event.targetId] == true) {
+                            seenControlValue[event.targetId] = true;
+                            // Don't send change value if the server already knows about the value of this control
+                            if (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
+                                    && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value) {
+                                ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
+                                newEvents.unshift(event);
+                            }
+                        }
+                    } else {
+                        newEvents.unshift(event);
+                    }
+                }
+                ORBEON.xforms.Globals.eventQueue = newEvents;
+            }
+
+            // Check again that we have events to send after collapsing
+            if (ORBEON.xforms.Globals.eventQueue.length > 0) {
+
+                // Save the form for this request
+                document.xformsRequestForm = ORBEON.xforms.Controls.getForm(ORBEON.xforms.Globals.eventQueue[0].form);
+
+                // Mark this as loading
+                document.xformsRequestInProgress = true;
+                if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
+                else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
+
+                // Build request
+                var requestDocumentString = "";
+
+                // Add entity declaration for nbsp. We are adding this as this entity is generated by the FCK editor.
+                requestDocumentString += '<!DOCTYPE xxforms:event-request [<!ENTITY nbsp "&#160;">]>\n';
+
+                var indent = "    ";
+                {
+                    // Start request
+                    requestDocumentString += '<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">\n';
+
+                    // Add static state
+                    requestDocumentString += indent;
+                    requestDocumentString += '<xxforms:static-state>';
+                    requestDocumentString += document.xformsRequestForm.xformsStaticState.value;
+                    requestDocumentString += '</xxforms:static-state>\n';
+
+                    // Add dynamic state (element is just created and will be filled just before we send the request)
+                    requestDocumentString += indent;
+                    requestDocumentString += '<xxforms:dynamic-state>';
+                    requestDocumentString += xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state");
+                    requestDocumentString += '</xxforms:dynamic-state>\n';
+
+                    // Start action
+                    requestDocumentString += indent;
+                    requestDocumentString += '<xxforms:action>\n';
+
+                    // Add events
+                    var handledEvents = [];
+                    for (var i = 0; i < ORBEON.xforms.Globals.eventQueue.length; i++) {
+                        var event = ORBEON.xforms.Globals.eventQueue[i];
+
+                        // Only handle this event if it is for the form we chose
+                        if (ORBEON.xforms.Controls.getForm(event.form) == document.xformsRequestForm) {
+                            // Create <xxforms:event> element
+                            requestDocumentString += indent + indent;
+                            requestDocumentString += '<xxforms:event';
+                            requestDocumentString += ' name="' + event.eventName + '"';
+                            if (event.targetId != null)
+                                requestDocumentString += ' source-control-id="' + event.targetId + '"';
+                            if (event.otherId != null)
+                                requestDocumentString += ' other-control-id="' + event.otherId + '"';
+                            requestDocumentString += '>';
+                            if (event.value != null) {
+                                // When the range is used we get an int here when the page is first loaded
+                                if (typeof event.value == "string")
+                                    event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
+                                requestDocumentString += event.value;
+                            }
+                            requestDocumentString += '</xxforms:event>\n';
+                            handledEvents.unshift(i);
+                        }
+                    }
+
+                    // End action
+                    requestDocumentString += indent;
+                    requestDocumentString += '</xxforms:action>\n';
+
+                    // End request
+                    requestDocumentString += '</xxforms:event-request>';
+
+                    // Remove events we have handled from event queue
+                    for (var i = 0; i < handledEvents.length; i++)
+                        ORBEON.xforms.Globals.eventQueue.splice(handledEvents[i], 1);
+                }
+
+                // Send request
+                executedRequest = true;
+                YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
+                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: xformsHandleResponse }, requestDocumentString);
+            }
+        }
+
+        // Hide loading indicator if we have started a new request and there are not events in the queue
+        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0)
+            xformsDisplayIndicator("none");
     }
 };
 
@@ -1589,23 +1762,20 @@ function xformsHandleAutoCompleteMouseChange(input) {
  * @param incremental  Are these incremental events
  */
 function xformsFireEvents(events, incremental) {
-    // Store the time of the first event to be sent in the queue
-    var currentTime = new Date().getTime();
-    if (document.xformsEvents.length == 0)
-        document.xformsEventsFirstEventTime = currentTime;
-
-    // Store events to fire
-    for (var eventIndex = 0; eventIndex < events.length; eventIndex++)
-        document.xformsEvents.push(events[eventIndex]);
-
-    // Fire them with a delay to give us a change to aggregate events together
-    document.xformsExecuteNextRequestInQueue++;
-    if (incremental && !(currentTime - document.xformsEventsFirstEventTime >
-            XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS))
-        window.setTimeout(xformsExecuteNextRequest,
-            XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
-    else xformsExecuteNextRequest(true);
-    return false;
+    var newEvents = [];
+    for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+        var event = events[eventIndex];
+        var target = event[0];
+        var eventName = event[1];
+        var value = event[2];
+        var other = event[3];
+        newEvents.push(new ORBEON.xforms.Server.Event(
+                target == undefined ? null : ORBEON.xforms.Controls.getForm(target),
+                target == undefined ? null : target.id,
+                other == undefined ? null : other.id,
+                value, eventName, null, null));
+    }
+    ORBEON.xforms.Server.fireEvents(newEvents, incremental);
 }
 
 function xformsCreateEventArray(target, eventName, value, other) {
@@ -2563,145 +2733,13 @@ function xformsHandleResponse(o) {
 
     // Go ahead with next request, if any
     document.xformsRequestInProgress = false;
-    document.xformsExecuteNextRequestInQueue++;
-    xformsExecuteNextRequest(false);
+    ORBEON.xforms.Globals.executeEventFunctionQueued++;
+    ORBEON.xforms.Server.executeNextRequest(false);
 }
 
 function xformsDisplayLoading() {
     if (document.xformsRequestInProgress == true)
         xformsDisplayIndicator("loading");
-}
-
-function xformsExecuteNextRequest(bypassRequestQueue) {
-    bypassRequestQueue = typeof(bypassRequestQueue) == "boolean"  && bypassRequestQueue == true;
-    document.xformsExecuteNextRequestInQueue--;
-    var executedRequest = false;
-    if (!document.xformsRequestInProgress
-            && document.xformsEvents.length > 0
-            && (bypassRequestQueue || document.xformsExecuteNextRequestInQueue == 0)) {
-
-        // Collapse value change for the same control
-        {
-            var seenControlValue = {};
-            var newEvents = [];
-            for (var eventIndex = document.xformsEvents.length - 1; eventIndex >= 0; eventIndex--) {
-                // Extract information from event array
-                var event = document.xformsEvents[eventIndex];
-                var target = event[0];
-                var eventName = event[1];
-                var value = event[2];
-                if (eventName == "xxforms-value-change-with-focus-change") {
-                    // Don't send change value if there is already a change value for the same control
-                    if (!seenControlValue[target.id] == true) {
-                        seenControlValue[target.id] = true;
-                        // Don't send change value if the server already knows about the value of this control
-                        if (ORBEON.xforms.Globals.serverValue[target.id] != "undefined"
-                                && ORBEON.xforms.Globals.serverValue[target.id] != value) {
-                            ORBEON.xforms.Globals.serverValue[target.id] = value;
-                            newEvents.unshift(event);
-                        }
-                    }
-                } else {
-                    newEvents.unshift(event);
-                }
-            }
-            document.xformsEvents = newEvents;
-        }
-
-        // Check again that we have events to send after collapsing
-        if (document.xformsEvents.length > 0) {
-
-            // Save the form for this request
-            document.xformsRequestForm = ORBEON.xforms.Controls.getForm(document.xformsEvents[0][0]);
-
-            // Mark this as loading
-            document.xformsRequestInProgress = true;
-            if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
-            else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
-
-            // Build request
-            var requestDocumentString = "";
-
-            // Add entity declaration for nbsp. We are adding this as this entity is generated by the FCK editor.
-            requestDocumentString += '<!DOCTYPE xxforms:event-request [\n';
-            requestDocumentString += '    <!ENTITY nbsp "&#160;">\n';
-            requestDocumentString += ']>\n';
-
-            var indent = "    ";
-            {
-                // Start request
-                requestDocumentString += '<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">\n';
-
-                // Add static state
-                requestDocumentString += indent;
-                requestDocumentString += '<xxforms:static-state>';
-                requestDocumentString += document.xformsRequestForm.xformsStaticState.value;
-                requestDocumentString += '</xxforms:static-state>\n';
-
-                // Add dynamic state (element is just created and will be filled just before we send the request)
-                requestDocumentString += indent;
-                requestDocumentString += '<xxforms:dynamic-state>';
-                requestDocumentString += xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state");
-                requestDocumentString += '</xxforms:dynamic-state>\n';
-
-                // Start action
-                requestDocumentString += indent;
-                requestDocumentString += '<xxforms:action>\n';
-
-                // Add events
-                var handledEvents = [];
-                for (var i = 0; i < document.xformsEvents.length; i++) {
-                    // Extract information from event array
-                    var event = document.xformsEvents[i];
-                    var target = event[0];
-                    var eventName = event[1];
-                    var value = event[2];
-                    var other = event[3];
-
-                    // Only handle this event if it is for the form we chose
-                    if (ORBEON.xforms.Controls.getForm(target) == document.xformsRequestForm) {
-                        // Create <xxforms:event> element
-                        requestDocumentString += indent + indent;
-                        requestDocumentString += '<xxforms:event';
-                        requestDocumentString += ' name="' + eventName + '"';
-                        if (target != null)
-                            requestDocumentString += ' source-control-id="' + target.id + '"';
-                        if (other != null)
-                            requestDocumentString += ' other-control-id="' + other.id + '"';
-                        requestDocumentString += '>';
-                        if (value != null) {
-                            // When the range is used we get an int here when the page is first loaded
-                            if (typeof value == "string")
-                                value = value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
-                            requestDocumentString += value;
-                        }
-                        requestDocumentString += '</xxforms:event>\n';
-                        handledEvents.unshift(i);
-                    }
-                }
-
-                // End action
-                requestDocumentString += indent;
-                requestDocumentString += '</xxforms:action>\n';
-
-                // End request
-                requestDocumentString += '</xxforms:event-request>';
-
-                // Remove events we have handled from event queue
-                for (var i = 0; i < handledEvents.length; i++)
-                    document.xformsEvents.splice(handledEvents[i], 1);
-            }
-
-            // Send request
-            executedRequest = true;
-            YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-            YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: xformsHandleResponse }, requestDocumentString);
-        }
-    }
-
-    // Hide loading indicator if we have started a new request and there are not events in the queue
-    if (!executedRequest && document.xformsEvents.length == 0)
-        xformsDisplayIndicator("none");
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page

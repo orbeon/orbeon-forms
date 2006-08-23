@@ -2960,7 +2960,7 @@
                 </section>
                 <a name="xforms-javascript-get-set-value"/>
                 <section>
-                    <title>Getting and Setting The Value of XForms Controls</title>
+                    <title>Getting and Setting Controls Value</title>
                     <p>
                         In JavaScript, you get the current value of an XForms control <code>var value =
                         ORBEON.xforms.Document.getValue("myControl")</code> where <code>myControl</code> is the id of
@@ -3018,6 +3018,86 @@
                                 </xxforms:script>
                             </xforms:trigger>
                         </xhtml:p>
+                    </xml-source>
+                </section>
+                <a name="xforms-javascript-events"/>
+                <section>
+                    <title>Dispatching Events</title>
+                    <p>
+                        You can dispatch your own events from JavaScript by calling the function
+                        <code>ORBEON.xforms.Document.dispatchEvent()</code>. The parameters to this function are:
+                    </p>
+                    <table>
+                        <tr>
+                            <th>targetId</th>
+                            <td>Mandatory</td>
+                            <td>
+                                Id of the target element. The element must be an element in the XForms namespace, i.e.
+                                you cannot dispatch events to HTML elements.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>eventName</th>
+                            <td>Mandatory</td>
+                            <td>
+                                Name of the event. For security reasons, only names of custom events can be used. Since
+                                your hanlers for custom events can be called by JavaScript code, when you write those
+                                handlers, you need to be aware that they can be by whoever can load the form in a
+                                browser.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>form</th>
+                            <td>Optional</td>
+                            <td>
+                                The form object that corresponds to the XForms form you want to dispatch the event to.
+                                This argument is only needed when you have multiple "XForms forms" on the same HTML
+                                page. Typically, this would only happens if you are running your form in a portal and
+                                you have multiple portlets using XForms on the same page. When the parameter is not
+                                present or <code>null</code>, the first form on the HTML page with the class
+                                <code>xforms-form</code> is used.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>bubbles</th>
+                            <td>Optional</td>
+                            <td>
+                                Optional boolean indicating if this event bubbles, as defined in <a
+                                href="http://www.w3.org/TR/DOM-Level-2-Events/">DOM2 Events</a>. The default value depends
+                                on the definition of the custom event.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>cancelable</th>
+                            <td>Optional</td>
+                            <td>
+                                Optional boolean indicating if this event bubbles, as defined in <a
+                                href="http://www.w3.org/TR/DOM-Level-2-Events/">DOM2 Events</a>. The default value depends
+                                on the definition of the custom event.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>incremental</th>
+                            <td>Optional</td>
+                            <td>
+                                When <code>false</code> the event is sent to the XForms server right away. When
+                                <code>true</code> the event is sent after a small delay, giving the opportinuty for other
+                                events that would occur during that timespan to be aggregated with the current event.
+                            </td>
+                        </tr>
+                    </table>
+                    <p>
+                        In most cases, you only need to call <code>dispatchEvent()</code> with a target id and event name,
+                        as in:
+                    </p>
+                    <source>ORBEON.xforms.Document.dispatchEvent("my-id", "my-custom-event-name");</source>
+                    <p>
+                        The event handler for the custom event can be in the model or view, and can look like:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:action id="my-id" ev:event="my-custom-event-name">
+                            Here execute XForms actions
+                        </xforms:action>
                     </xml-source>
                 </section>
             </section>

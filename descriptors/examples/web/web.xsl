@@ -139,38 +139,6 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <!-- JSF is disabled (may be re-enabled in a future release) -->
-            <!--
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'JSF example'"/>
-                <xsl:with-param name="commented" select="$target = 'devel' or $target = 'war'"/>
-                <xsl:with-param name="content">
-                    <context-param>
-                        <param-name>saveStateInClient</param-name>
-                        <param-value>false</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>com.sun.faces.validateXml</param-name>
-                        <param-value>true</param-value>
-                    </context-param>
-                    <filter>
-                        <filter-name>processor-filter</filter-name>
-                        <filter-class>org.orbeon.oxf.servlet.OPSServletFilter</filter-class>
-                    </filter>
-                    <filter-mapping>
-                        <filter-name>processor-filter</filter-name>
-                        <url-pattern>/faces/*</url-pattern>
-                    </filter-mapping>
-                    <listener>
-                        <listener-class>org.orbeon.faces.renderkit.ServletContextListener</listener-class>
-                    </listener>
-                    <listener>
-                        <listener-class>com.sun.faces.config.ConfigListener</listener-class>
-                    </listener>
-                </xsl:with-param>
-            </xsl:call-template>
-            -->
-
             <xsl:comment> All JSP files under /xforms-jsp go through the OPS filter </xsl:comment>
             <filter>
                 <filter-name>ops-main-filter</filter-name>
@@ -379,21 +347,6 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <!-- JSF is disabled (may be re-enabled in a future release) -->
-            <!--
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'JSF example'"/>
-                <xsl:with-param name="commented" select="$target = 'devel' or $target = 'war'"/>
-                <xsl:with-param name="content">
-                    <servlet>
-                        <servlet-name>jsf</servlet-name>
-                        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-                        <load-on-startup>5</load-on-startup>
-                    </servlet>
-                </xsl:with-param>
-            </xsl:call-template>
-            -->
-
             <servlet-mapping>
                 <servlet-name>ops-main-servlet</servlet-name>
                 <url-pattern>/</url-pattern>
@@ -434,20 +387,6 @@
                 <servlet-name>display-chart-servlet</servlet-name>
                 <url-pattern>/chartDisplay</url-pattern>
             </servlet-mapping>
-
-            <!-- JSF is disabled (may be re-enabled in a future release) -->
-            <!--
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'JSF example'"/>
-                <xsl:with-param name="commented" select="$target = 'devel' or $target = 'war'"/>
-                <xsl:with-param name="content">
-                    <servlet-mapping>
-                        <servlet-name>jsf</servlet-name>
-                        <url-pattern>/faces/*</url-pattern>
-                    </servlet-mapping>
-                </xsl:with-param>
-            </xsl:call-template>
-            -->
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>

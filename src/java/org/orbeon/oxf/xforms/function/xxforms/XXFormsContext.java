@@ -53,15 +53,5 @@ public class XXFormsContext extends XFormsFunction {
         final List currentNodeset = xformsControls.getContextForId(contextId);
 
         return new ListIterator(currentNodeset);
-
-        // Build results by wrapping each node
-//        final List results = new ArrayList(currentNodeset.size());
-//
-//        for (Iterator k = currentNodeset.iterator(); k.hasNext();) {
-//            final Node currentNode = (Node) k.next();
-//            results.add(xformsControls.getInstanceForNode(currentNode).wrapNode(currentNode));
-//        }
-//
-//        return new ListIterator(results);
     }
 }

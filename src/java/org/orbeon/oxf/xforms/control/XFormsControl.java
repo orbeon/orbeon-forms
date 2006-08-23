@@ -303,10 +303,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     public void evaluate(PipelineContext pipelineContext) {
-        evaluateLabelHintHelpAlertValue(pipelineContext);
-    }
 
-    protected void evaluateLabelHintHelpAlertValue(PipelineContext pipelineContext) {
+        // Set context to this control
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.setBinding(pipelineContext, this);
+
         this.label = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME, false);
         this.help = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME, true);
         this.hint = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME, true);
@@ -440,7 +441,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
 
         // Child element becomes the new binding
         String result = null;
-        xformsControls.setBinding(pipelineContext, this);
         xformsControls.pushBinding(pipelineContext, childElement);
         {
             final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();

@@ -296,8 +296,7 @@ public class XFormsControls {
     }
 
     /**
-     * Set the binding context to the current control. Check that single node bindings along the way still point to
-     * existing nodes, and return false if this is the case.
+     * Set the binding context to the current control.
      *
      * @param pipelineContext   current PipelineContext
      * @param xformsControl       control to bind

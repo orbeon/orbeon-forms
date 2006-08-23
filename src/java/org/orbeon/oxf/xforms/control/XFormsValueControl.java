@@ -43,12 +43,12 @@ public abstract class XFormsValueControl extends XFormsControl {
 
     public void evaluate(PipelineContext pipelineContext) {
 
+        // Set context and evaluate other aspects of the control if necessary
+        super.evaluate(pipelineContext);
+
         // Evaluate control value and display value if necessary
         evaluateValue(pipelineContext);
         evaluateDisplayValue(pipelineContext);
-
-        // Evaluate other aspects of the control if necessary
-        super.evaluate(pipelineContext);
     }
 
 

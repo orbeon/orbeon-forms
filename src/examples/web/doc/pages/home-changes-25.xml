@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="windows-1252"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -942,16 +942,16 @@
                             New XUpdate elements:
                             <ul>
                                 <li>
-                                    &lt;xu:message> – Just like the XSLT <code>&lt;xsl:message></code>,
+                                    &lt;xu:message> ? Just like the XSLT <code>&lt;xsl:message></code>,
                                     the content of the element is evaluated and logged. This is typically
                                     used to debug an XUpdate program.
                                 </li>
                                 <li>
-                                    &lt;xu:error> – The XUpdate program is interrupted as an exception
+                                    &lt;xu:error> ? The XUpdate program is interrupted as an exception
                                     is thrown with the result of the evaluation of the element content.
                                 </li>
                                 <li>
-                                    &lt;xu:namespace> – Adds a namespace declaration on the current
+                                    &lt;xu:namespace> ? Adds a namespace declaration on the current
                                     element, just like the XSLT <code>&lt;xsl:namespace></code>.
                                 </li>
                             </ul>
@@ -965,7 +965,7 @@
                                     2.0).
                                 </li>
                                 <li>
-                                    <code>evaluate(xpath, namespaces, nodeset)</code> – Evaluates the
+                                    <code>evaluate(xpath, namespaces, nodeset)</code> ? Evaluates the
                                     first string argument as an XPath expression in the context of the
                                     third nodeset argument. Any prefix used in the XPath expression must
                                     be defined in the second argument, which is a nodeset of namespace

@@ -21,12 +21,6 @@
 
     <xhtml:head>
         <xhtml:title>Using the getValue and setValue from JavaScript</xhtml:title>
-        <xhtml:script type="text/javascript">
-            function increment() {
-                var fooValue = ORBEON.xforms.Document.getValue("foo");
-                ORBEON.xforms.Document.setValue("foo", Number(fooValue) + 1);
-            }
-        </xhtml:script>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
@@ -35,6 +29,9 @@
                 </instance>
             </xforms:instance>
             <xforms:bind nodeset="/instance/bar" calculate="/instance/foo"/>
+            <xxforms:script ev:event="xforms-ready">
+                //alert(1);
+            </xxforms:script>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -49,7 +46,13 @@
             </xforms:output>
         </xhtml:p>
         <xhtml:p>
-            <xhtml:button onclick="increment()">Increment foo with JavaScript</xhtml:button>
+            <xforms:trigger>
+                <xforms:label>Increment foo with JavaScript</xforms:label>
+                <xxforms:script ev:event="DOMActivate">
+                    var fooValue = ORBEON.xforms.Document.getValue("foo");
+                    ORBEON.xforms.Document.setValue("foo", Number(fooValue) + 1);
+                </xxforms:script>
+            </xforms:trigger>
         </xhtml:p>
     </xhtml:body>
 </xhtml:html>

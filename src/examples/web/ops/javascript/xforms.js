@@ -535,14 +535,6 @@ ORBEON.xforms.Controls = {
         var iframe = textarea.previousSibling;
         while (iframe.nodeType != ORBEON.util.Dom.ELEMENT_TYPE) iframe = textarea.previousSibling;
         iframe.className = textarea.className;
-    },
-
-    callUserScript: function(functionName, targetId, observerId) {
-        var targetElement = document.getElementById(targetId);
-        var observer = document.getElementById(observerId);
-        var event = { "target" : targetElement };
-        var theFunction = eval(functionName);
-        theFunction.call(observer, event);
     }
 };
 
@@ -1017,10 +1009,6 @@ ORBEON.xforms.Init = {
 
     document: function() {
 
-        // Run code sent by server, which sets focus on controls
-        if (typeof xformsPageLoadedServer != "undefined")
-            xformsPageLoadedServer();
-
         // Register events in capture phase for W3C-compliant browsers.
         // Avoid Safari 1.3 which is buggy.
         if (window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
@@ -1184,6 +1172,10 @@ ORBEON.xforms.Init = {
                 }
             }
         }
+        
+        // Run code sent by server
+        if (typeof xformsPageLoadedServer != "undefined")
+            xformsPageLoadedServer();
     },
 
     _autoComplete: function(autoComplete) {
@@ -1474,6 +1466,14 @@ ORBEON.xforms.Server = {
         // Hide loading indicator if we have started a new request and there are not events in the queue
         if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0)
             xformsDisplayIndicator("none");
+    },
+
+    callUserScript: function(functionName, targetId, observerId) {
+        var targetElement = document.getElementById(targetId);
+        var observer = document.getElementById(observerId);
+        var event = { "target" : targetElement };
+        var theFunction = eval(functionName);
+        theFunction.call(observer, event);
     }
 };
 
@@ -2689,7 +2689,7 @@ function xformsHandleResponse(o) {
                             var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
                             var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
                             var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                            ORBEON.xforms.Controls.callUserScript(functionName, targetId, observerId);
+                            ORBEON.xforms.Server.callUserScript(functionName, targetId, observerId);
                             break;
                         }
                     }

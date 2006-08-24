@@ -229,7 +229,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     if (scriptsToRun != null) {
                         for (Iterator i = scriptsToRun.iterator(); i.hasNext();) {
                             final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
-                            sb.append("ORBEON.xforms.Controls.callUserScript(\"");
+                            sb.append("ORBEON.xforms.Server.callUserScript(\"");
                             sb.append(script.getFunctionName());
                             sb.append("\",\"");
                             sb.append(script.getEventTargetId());

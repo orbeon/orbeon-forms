@@ -40,7 +40,7 @@
     <page path-info="/direct/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
 
     <!-- Struts Examples -->
-    <page path-info="/examples-struts/.*" matcher="oxf:perl5-matcher" model="/examples-standalone/struts-view/model/struts.xpl"/>
+    <!--<page path-info="/examples-struts/.*" matcher="oxf:perl5-matcher" model="/examples-standalone/struts-view/model/struts.xpl"/>-->
 
     <!-- Examples that do not work within the examples portal -->
     <page path-info="/examples-standalone/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
@@ -62,6 +62,8 @@
 
     <!-- Standalone XForms Controls example -->
     <page path-info="/xforms-controls*" model="/examples/xforms/xforms-controls/page-flow.xpl"/>
+
+    <!-- Standalone XForms Wizard with Switch example -->
     <page path-info="/xforms-wizard-switch*" model="/examples/xforms/xforms-wizard-switch/page-flow.xpl"/>
 
     <!-- Standalone XForms To-Do Lists example -->
@@ -72,6 +74,9 @@
 
     <!-- Standalone XForms Sandbox example -->
     <page path-info="/xforms-sandbox*" model="/examples/sandbox/xforms/page-flow.xpl"/>
+
+    <!-- eXist XForms Sandbox example -->
+    <page path-info="/exist-sandbox*" model="/examples/sandbox/exist/page-flow.xpl"/>
 
     <!-- Standalone XForms Dynamic Image example -->
     <page path-info="/xforms-dynamic-image*" model="/examples/xforms/xforms-dynamic-image/page-flow.xpl"/>
@@ -100,8 +105,8 @@
     <page path-info="/examples/portal/*" model="/portal/config/model.xpl"/>
 
     <!-- OXFMark -->
-    <page path-info="/examples/oxfmark-machines" model="/oxfmark/machines.xpl"/>
-    <page path-info="/examples/oxfmark-vms" model="/oxfmark/vms.xpl"/>
+    <!--<page path-info="/examples/oxfmark-machines" model="/oxfmark/machines.xpl"/>-->
+    <!--<page path-info="/examples/oxfmark-vms" model="/oxfmark/vms.xpl"/>-->
 
     <!-- XTech Article -->
     <page path-info="/xtech*" model="/doc/xtech-2005/model.xpl" view="/doc/xtech-2005/docbook/html/docbook.xsl"/>

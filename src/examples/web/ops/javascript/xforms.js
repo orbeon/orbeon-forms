@@ -56,29 +56,33 @@ ORBEON.xforms.Globals = {
     isRenderingEngineTridend: navigator.userAgent.toLowerCase().indexOf("msie") != -1     // Internet Explorer
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
 
-    eventQueue: [],                   // Events to be sent to the server
-    eventsFirstEventTime: 0,          // Time when the first event in the queue was added
-    requestForm: null,                // HTML for the request currently in progress
-    requestInProgress: false,         // Indicates wether an Ajax request is currently in process
-    executeEventFunctionQueued: 0,    // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
-    maskFocusEvents: false,           // Avoid catching focus event when we do it because the server told us to
-    previousDOMFocusOut: null,        // We only send a focus out when we receive a focus in, or another focus out
-    htmlAreaNames: [],                // Names of the FCK editors, which we need to reenable them on Firefox
-    repeatTreeChildToParent: [],      // Describes the repeat hierarchy
-    repeatIndexes: [],                // The current index for each repeat
-    overlayManager: null,             // YUI overlay manager used to close opened menu when user clicks on document
-    inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
-    inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
+    eventQueue: [],                      // Events to be sent to the server
+    eventsFirstEventTime: 0,             // Time when the first event in the queue was added
+    requestForm: null,                   // HTML for the request currently in progress
+    requestInProgress: false,            // Indicates wether an Ajax request is currently in process
+    executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
+    maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
+    previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
+    htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
+    repeatTreeChildToParent: [],         // Describes the repeat hierarchy
+    repeatIndexes: [],                   // The current index for each repeat
+    repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
+    overlayManager: null,                // YUI overlay manager used to close opened menu when user clicks on document
+    inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
+    inputCalendarOnclick: {},            // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
-    changedIdsRequest: {},            // Id of controls that have been touched by user since the last response was received
-    serverValue: {},                  // Values on controls known to the server
-    autoCompleteLastKeyCode: {},      // Stores the last key entered for each auto-complete field
+    changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
+    serverValue: {},                     // Values on controls known to the server
+    autoCompleteLastKeyCode: {},         // Stores the last key entered for each auto-complete field
     autoCompleteOpen: {},
-    loadingOtherPage: false,          // Flag set when loading other page that revents the loading indicator to disappear
-    activeControl: null,              // The currently active control, used to disable hint
-    autosizeTextareas: [],            // Ids of the autosize textareas on the page
-    fckEditorLoading: false,          // True if  a FCK editor is currently loading
-    fckEditorsToLoad: []              // Queue of FCK editor to load
+    loadingOtherPage: false,             // Flag set when loading other page that revents the loading indicator to disappear
+    activeControl: null,                 // The currently active control, used to disable hint
+    autosizeTextareas: [],               // Ids of the autosize textareas on the page
+    fckEditorLoading: false,             // True if  a FCK editor is currently loading
+    fckEditorsToLoad: [],                // Queue of FCK editor to load
+    debugDiv: null,                      // Points to the div when debug messages are displayed
+    debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
+    pageLoadedRegistered: false          // If the page loaded listener has been registered already, to avoid running it more than once
 };
 
 /**
@@ -1140,13 +1144,12 @@ ORBEON.xforms.Init = {
                     var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
                     ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
                 }
-                document.xformsRepeatTreeParentToAllChildren = new Array();
                 for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
                     var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
                     while (parent != null) {
-                        if (!document.xformsRepeatTreeParentToAllChildren[parent])
-                            document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
-                        document.xformsRepeatTreeParentToAllChildren[parent].push(child);
+                        if (!ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent])
+                            ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent] = new Array();
+                        ORBEON.xforms.Globals.repeatTreeParentToAllChildren[parent].push(child);
                         parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
                     }
                 }
@@ -1621,17 +1624,17 @@ function xformsLog(text) {
 
         // Make it so user can move the debug window
         YAHOO.util.Event.addListener(debugDiv, "mousedown", function (event) {
-            document.xformsDebugDiv = getEventTarget(event);
+            ORBEON.xforms.Globals.debugDiv = getEventTarget(event);
             return false;
         });
         YAHOO.util.Event.addListener(document, "mouseup", function (event) {
-            document.xformsDebugDiv = null;
+            ORBEON.xforms.Globals.debugDiv = null;
             return false;
         });
         YAHOO.util.Event.addListener(document, "mousemove", function (event) {
-            if (document.xformsDebugDiv) {
-                document.xformsDebugDiv.style.left = event.clientX;
-                document.xformsDebugDiv.style.top = event.clientY;
+            if (ORBEON.xforms.Globals.debugDiv) {
+                ORBEON.xforms.Globals.debugDiv.style.left = event.clientX;
+                ORBEON.xforms.Globals.debugDiv.style.top = event.clientY;
             }
             return false;
         });
@@ -1641,9 +1644,9 @@ function xformsLog(text) {
 
 function xformsLogTime(text) {
     return;
-    var oldTime = document.xformsTime;
+    var oldTime = ORBEON.xforms.Globals.debugLastTime;
     var currentTime = new Date().getTime();
-    document.xformsTime = currentTime;
+    ORBEON.xforms.Globals.debugLastTime = currentTime;
     xformsLog((currentTime - oldTime) + ": " + text);
 }
 
@@ -2582,7 +2585,7 @@ function xformsHandleResponse(o) {
                             // For each repeat id that changes, see if all the children are also included in
                             // newRepeatIndexes. If they are not, add an entry with the index unchanged.
                             for (var repeatId in newRepeatIndexes) {
-                                var children = document.xformsRepeatTreeParentToAllChildren[repeatId];
+                                var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
                                 for (var childIndex in children) {
                                     var child = children[childIndex];
                                     if (!newRepeatIndexes[child])
@@ -2744,8 +2747,8 @@ function xformsDisplayLoading() {
 
 // Run xformsPageLoaded when the browser has finished loading the page
 // In case this script is loaded twice, we still want to run the initialization only once
-if (typeof document.xformsPageLoadedListener == "undefined") {
-    document.xformsPageLoadedListener = true;
+if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
+    ORBEON.xforms.Globals.pageLoadedRegistered = true;
     YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
 }
-document.xformsTime = new Date().getTime();
+ORBEON.xforms.Globals.debugLastTime = new Date().getTime();

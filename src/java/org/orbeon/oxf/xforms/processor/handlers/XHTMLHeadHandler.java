@@ -67,7 +67,6 @@ public class XHTMLHeadHandler extends HandlerBase {
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
-            new ResourceConfig("/ops/javascript/yui/logger.js", "/ops/javascript/yui/logger-min.js"),
             new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);

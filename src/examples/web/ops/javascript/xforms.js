@@ -535,6 +535,14 @@ ORBEON.xforms.Controls = {
         var iframe = textarea.previousSibling;
         while (iframe.nodeType != ORBEON.util.Dom.ELEMENT_TYPE) iframe = textarea.previousSibling;
         iframe.className = textarea.className;
+    },
+
+    callUserScript: function(functionName, targetId, observerId) {
+        var targetElement = document.getElementById(targetId);
+        var observer = document.getElementById(observerId);
+        var event = { "target" : targetElement };
+        var theFunction = eval(functionName);
+        theFunction.call(observer, event);
     }
 };
 
@@ -2680,12 +2688,8 @@ function xformsHandleResponse(o) {
                             var scriptElement = actionElement.childNodes[actionIndex];
                             var functionName = ORBEON.util.Dom.getAttribute(scriptElement, "name");
                             var targetId = ORBEON.util.Dom.getAttribute(scriptElement, "target-id");
-                            var targetElement = document.getElementById(targetId);
                             var observerId = ORBEON.util.Dom.getAttribute(scriptElement, "observer-id");
-                            var observer = document.getElementById(observerId);
-                            var event = { "target" : targetElement };
-                            var theFunction = eval(functionName);
-                            theFunction.call(observer, event);
+                            ORBEON.xforms.Controls.callUserScript(functionName, targetId, observerId);
                             break;
                         }
                     }

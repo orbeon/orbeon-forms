@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -202,14 +203,14 @@ public class XHTMLHeadHandler extends HandlerBase {
             }
 
             // User-defined scripts (with xxforms:script)
-            final Map scripts = containingDocument.getScripts();
+            final Map scriptsToDeclare = containingDocument.getScripts();
             final String focusElementId = containingDocument.getClientFocusEffectiveControlId(pipelineContext);
-            if (scripts != null || focusElementId != null) {
+            if (scriptsToDeclare != null || focusElementId != null) {
                 helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
 
-                if (scripts != null) {
-                    for (Iterator i = scripts.entrySet().iterator(); i.hasNext();) {
+                if (scriptsToDeclare != null) {
+                    for (Iterator i = scriptsToDeclare.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(currentEntry.getKey().toString()) + "(event) {\n");
                         helper.text(currentEntry.getValue().toString());
@@ -217,8 +218,30 @@ public class XHTMLHeadHandler extends HandlerBase {
                     }
                 }
 
-                if (focusElementId != null) {
-                    helper.text("\nfunction xformsPageLoadedServer() { ORBEON.xforms.Controls.setFocus(\"" + focusElementId + "\") }\n");
+                final List scriptsToRun = containingDocument.getScriptsToRun();
+
+                if (focusElementId != null || (scriptsToRun != null)) {
+                    final StringBuffer sb = new StringBuffer("\nfunction xformsPageLoadedServer() { ");
+
+                    if (focusElementId != null)
+                        sb.append("ORBEON.xforms.Controls.setFocus(\"" + focusElementId + "\");");
+
+                    if (scriptsToRun != null) {
+                        for (Iterator i = scriptsToRun.iterator(); i.hasNext();) {
+                            final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();
+                            sb.append("ORBEON.xforms.Controls.callUserScript(\"");
+                            sb.append(script.getFunctionName());
+                            sb.append("\",\"");
+                            sb.append(script.getEventTargetId());
+                            sb.append("\",\"");
+                            sb.append(script.getEventHandlerContainerId());
+                            sb.append("\");");
+                        }
+                    }
+
+                    sb.append(" }");
+
+                    helper.text(sb.toString());
                 }
 
                 helper.endElement();

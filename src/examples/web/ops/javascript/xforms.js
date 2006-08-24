@@ -470,6 +470,23 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    setRelevant: function(control, isRelevant) {
+        var elementsToUpdate = [ control,
+            ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
+            ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"),
+            ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"),
+            ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"),
+            ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert")
+        ];
+        for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
+            var element = elementsToUpdate[elementIndex];
+            if (element != null) {
+                if (isRelevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled");
+                else ORBEON.util.Dom.addClass(element, "xforms-disabled");
+            }
+        }
+    },
+
     getAlertMessage: function(control) {
         var alertElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert");
         return ORBEON.util.Dom.getStringValue(alertElement);
@@ -2441,8 +2458,7 @@ function xformsHandleResponse(o) {
                                         // Handle relevance
                                         if (relevant != null) {
                                             var isRelevant = relevant == "true";
-                                            if (isRelevant) ORBEON.util.Dom.removeClass(documentElement, "xforms-disabled");
-                                            else ORBEON.util.Dom.addClass(documentElement, "xforms-disabled");
+                                            ORBEON.xforms.Controls.setRelevant(documentElement, isRelevant);
                                         }
 
                                         // Handle required

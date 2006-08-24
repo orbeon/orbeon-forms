@@ -1029,11 +1029,6 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
         YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
 
-        // Initialize logging
-        if (typeof window.console == "undefined") {
-            window.console = { log: xformsLog }
-        }
-
         // Initialize XForms server URL
         var scripts = document.getElementsByTagName("script");
         for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {

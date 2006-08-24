@@ -37,17 +37,17 @@ public class XHTMLHeadHandler extends HandlerBase {
             // TODO: move to YUI if possible
             new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
             // Yahoo! UI Library
-            new ResourceConfig("/ops/css/tree.css", null) {
+            new ResourceConfig("/ops/css/yui/tree.css", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/css/tree-check.css", null) {
+            new ResourceConfig("/ops/css/yui/tree-check.css", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/css/menu.css", null) {
+            new ResourceConfig("/ops/css/yui/menu.css", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
@@ -63,46 +63,47 @@ public class XHTMLHeadHandler extends HandlerBase {
             new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", null),
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", null),
             // Yahoo UI Library
-            new ResourceConfig("/ops/javascript/yahoo.js", "/ops/javascript/yahoo-min.js"),
-            new ResourceConfig("/ops/javascript/event.js", "/ops/javascript/event-min.js"),
-            new ResourceConfig("/ops/javascript/dom.js", "/ops/javascript/dom-min.js"),
-            new ResourceConfig("/ops/javascript/connection.js", "/ops/javascript/connection-min.js"),
-            new ResourceConfig("/ops/javascript/animation.js", "/ops/javascript/animation-min.js") {
+            new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
+            new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
+            new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
+            new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
+            new ResourceConfig("/ops/javascript/yui/logger.js", "/ops/javascript/yui/logger-min.js"),
+            new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/dragdrop.js", "/ops/javascript/dragdrop-min.js") {
+            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/slider.js", "/ops/javascript/slider-min.js") {
+            new ResourceConfig("/ops/javascript/yui/slider.js", "/ops/javascript/yui/slider-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/treeview.js", "/ops/javascript/treeview-min.js") {
+            new ResourceConfig("/ops/javascript/yui/treeview.js", "/ops/javascript/yui/treeview-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/treeview-tasknode.js", null) {
+            new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/treeview-checkonclicknode.js", null) {
+            new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/container_core.js", "/ops/javascript/container_core-min.js") {
+            new ResourceConfig("/ops/javascript/yui/container_core.js", "/ops/javascript/yui/container_core-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/menu.js", "/ops/javascript/menu-min.js") {
+            new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
                 }

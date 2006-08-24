@@ -1995,6 +1995,7 @@ function xformsHandleResponse(o) {
         var responseRoot = responseXML.documentElement;
         var newDynamicState = null;
         var newDynamicStateTriggersPost = false;
+        var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
 
         // Whether this response has triggered a load which will replace the current page.
         var newDynamicStateTriggersReplace = false;
@@ -2657,7 +2658,7 @@ function xformsHandleResponse(o) {
                         case "submission": {
                             if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
                                 newDynamicStateTriggersPost = true;
-                                ORBEON.xforms.Globals.requestForm.xformsDynamicState.value = newDynamicState;
+                                ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
                                 ORBEON.xforms.Globals.requestForm.submit();
                             }
                             break;
@@ -2719,7 +2720,6 @@ function xformsHandleResponse(o) {
 
         // Store new dynamic state if that state did not trigger a post
         if (!newDynamicStateTriggersPost) {
-            var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
             xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
         }
 
@@ -2744,12 +2744,13 @@ function xformsHandleResponse(o) {
             }
         }
         // Display error
-        var errorContainer = ORBEON.xforms.Globals.requestForm.xformsLoadingError;
+        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
         ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
         xformsDisplayIndicator("error");
     } else {
         // The server didn't send valid XML
-        ORBEON.xforms.Globals.requestForm.xformsLoadingError.innerHTML = "Unexpected response received from server";
+        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
+        errorContainer.innerHTML = "Unexpected response received from server";
         xformsDisplayIndicator("error");
     }
 

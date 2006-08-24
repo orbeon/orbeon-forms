@@ -57,6 +57,9 @@ ORBEON.xforms.Globals = {
         && navigator.userAgent.toLowerCase().indexOf("opera") == -1,
 
     eventQueue: [],                   // Events to be sent to the server
+    eventsFirstEventTime: 0,          // Time when the first event in the queue was added
+    requestForm: null,                // HTML for the request currently in progress
+    requestInProgress: false,         // Indicates wether an Ajax request is currently in process
     executeEventFunctionQueued: 0,    // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     overlayManager: null,             // YUI overlay manager used to close opened menu when user clicks on document
     inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
@@ -1068,7 +1071,6 @@ ORBEON.xforms.Init = {
         }
 
         // Initialize attributes on document
-        document.xformsRequestInProgress = false;
         document.xformsHTMLAreaNames = new Array();
         document.xformsRepeatTreeChildToParent = new Array();
         document.xformsRepeatIndexes = new Array();
@@ -1323,7 +1325,7 @@ ORBEON.xforms.Server = {
         // Store the time of the first event to be sent in the queue
         var currentTime = new Date().getTime();
         if (ORBEON.xforms.Globals.eventQueue.length == 0)
-            document.xformsEventsFirstEventTime = currentTime;
+            ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
 
         // Store events to fire
         for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
@@ -1332,7 +1334,7 @@ ORBEON.xforms.Server = {
 
         // Fire them with a delay to give us a change to aggregate events together
         ORBEON.xforms.Globals.executeEventFunctionQueued++;
-        if (incremental && !(currentTime - document.xformsEventsFirstEventTime >
+        if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
                 XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS))
             window.setTimeout(ORBEON.xforms.Server.executeNextRequest,
                 XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
@@ -1345,7 +1347,7 @@ ORBEON.xforms.Server = {
 
         ORBEON.xforms.Globals.executeEventFunctionQueued--;
         var executedRequest = false;
-        if (!document.xformsRequestInProgress
+        if (!ORBEON.xforms.Globals.requestInProgress
                 && ORBEON.xforms.Globals.eventQueue.length > 0
                 && (bypassRequestQueue || ORBEON.xforms.Globals.executeEventFunctionQueued == 0)) {
 
@@ -1378,10 +1380,10 @@ ORBEON.xforms.Server = {
             if (ORBEON.xforms.Globals.eventQueue.length > 0) {
 
                 // Save the form for this request
-                document.xformsRequestForm = ORBEON.xforms.Controls.getForm(ORBEON.xforms.Globals.eventQueue[0].form);
+                ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Controls.getForm(ORBEON.xforms.Globals.eventQueue[0].form);
 
                 // Mark this as loading
-                document.xformsRequestInProgress = true;
+                ORBEON.xforms.Globals.requestInProgress = true;
                 if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
                 else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
 
@@ -1399,13 +1401,13 @@ ORBEON.xforms.Server = {
                     // Add static state
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:static-state>';
-                    requestDocumentString += document.xformsRequestForm.xformsStaticState.value;
+                    requestDocumentString += ORBEON.xforms.Globals.requestForm.xformsStaticState.value;
                     requestDocumentString += '</xxforms:static-state>\n';
 
                     // Add dynamic state (element is just created and will be filled just before we send the request)
                     requestDocumentString += indent;
                     requestDocumentString += '<xxforms:dynamic-state>';
-                    requestDocumentString += xformsGetFromClientState(document.xformsRequestForm, "ajax-dynamic-state");
+                    requestDocumentString += xformsGetFromClientState(ORBEON.xforms.Globals.requestForm, "ajax-dynamic-state");
                     requestDocumentString += '</xxforms:dynamic-state>\n';
 
                     // Start action
@@ -1418,7 +1420,7 @@ ORBEON.xforms.Server = {
                         var event = ORBEON.xforms.Globals.eventQueue[i];
 
                         // Only handle this event if it is for the form we chose
-                        if (ORBEON.xforms.Controls.getForm(event.form) == document.xformsRequestForm) {
+                        if (ORBEON.xforms.Controls.getForm(event.form) == ORBEON.xforms.Globals.requestForm) {
                             // Create <xxforms:event> element
                             requestDocumentString += indent + indent;
                             requestDocumentString += '<xxforms:event';
@@ -1658,7 +1660,7 @@ function xformsLogProperties(object) {
 }
 
 function xformsDisplayIndicator(state) {
-    var form = document.xformsRequestForm;
+    var form = ORBEON.xforms.Globals.requestForm;
     switch (state) {
         case "loading" :
             if (form.xformsLoadingLoading != null)
@@ -2632,8 +2634,8 @@ function xformsHandleResponse(o) {
                         case "submission": {
                             if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
                                 newDynamicStateTriggersPost = true;
-                                document.xformsRequestForm.xformsDynamicState.value = newDynamicState;
-                                document.xformsRequestForm.submit();
+                                ORBEON.xforms.Globals.requestForm.xformsDynamicState.value = newDynamicState;
+                                ORBEON.xforms.Globals.requestForm.submit();
                             }
                             break;
                         }
@@ -2694,7 +2696,7 @@ function xformsHandleResponse(o) {
 
         // Store new dynamic state if that state did not trigger a post
         if (!newDynamicStateTriggersPost) {
-            xformsStoreInClientState(document.xformsRequestForm, "ajax-dynamic-state", newDynamicState);
+            xformsStoreInClientState(ORBEON.xforms.Globals.requestForm, "ajax-dynamic-state", newDynamicState);
         }
 
         if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
@@ -2718,12 +2720,12 @@ function xformsHandleResponse(o) {
             }
         }
         // Display error
-        var errorContainer = document.xformsRequestForm.xformsLoadingError;
+        var errorContainer = ORBEON.xforms.Globals.requestForm.xformsLoadingError;
         ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
         xformsDisplayIndicator("error");
     } else {
         // The server didn't send valid XML
-        document.xformsRequestForm.xformsLoadingError.innerHTML = "Unexpected response received from server";
+        ORBEON.xforms.Globals.requestForm.xformsLoadingError.innerHTML = "Unexpected response received from server";
         xformsDisplayIndicator("error");
     }
 
@@ -2731,13 +2733,13 @@ function xformsHandleResponse(o) {
     ORBEON.xforms.Globals.changedIdsRequest = {};
 
     // Go ahead with next request, if any
-    document.xformsRequestInProgress = false;
+    ORBEON.xforms.Globals.requestInProgress = false;
     ORBEON.xforms.Globals.executeEventFunctionQueued++;
     ORBEON.xforms.Server.executeNextRequest(false);
 }
 
 function xformsDisplayLoading() {
-    if (document.xformsRequestInProgress == true)
+    if (ORBEON.xforms.Globals.requestInProgress == true)
         xformsDisplayIndicator("loading");
 }
 

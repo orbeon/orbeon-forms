@@ -682,6 +682,7 @@
                 </xsd:simpleType>
             </xsd:attribute>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="setvalue">

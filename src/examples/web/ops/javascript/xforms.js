@@ -61,6 +61,11 @@ ORBEON.xforms.Globals = {
     requestForm: null,                // HTML for the request currently in progress
     requestInProgress: false,         // Indicates wether an Ajax request is currently in process
     executeEventFunctionQueued: 0,    // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
+    maskFocusEvents: false,           // Avoid catching focus event when we do it because the server told us to
+    previousDOMFocusOut: null,        // We only send a focus out when we receive a focus in, or another focus out
+    htmlAreaNames: [],                // Names of the FCK editors, which we need to reenable them on Firefox
+    repeatTreeChildToParent: [],      // Describes the repeat hierarchy
+    repeatIndexes: [],                // The current index for each repeat
     overlayManager: null,             // YUI overlay manager used to close opened menu when user clicks on document
     inputCalendarCreated: {},         // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},         // Maps input id to the JSCalendar function that displays the calendar
@@ -587,7 +592,7 @@ ORBEON.xforms.Events = {
     },
 
     focus: function(event) {
-        if (!document.xformsMaskFocusEvents) {
+        if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
                 // Activate hint if we found one
@@ -596,15 +601,15 @@ ORBEON.xforms.Events = {
                 if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
                     ORBEON.xforms.Globals.serverValue[target.id] = target.value;
                 // Send focus events
-                if (document.xformsPreviousDOMFocusOut) {
-                    if (document.xformsPreviousDOMFocusOut != target) {
+                if (ORBEON.xforms.Globals.previousDOMFocusOut) {
+                    if (ORBEON.xforms.Globals.previousDOMFocusOut != target) {
                         var events = new Array();
                         events.push(xformsCreateEventArray
-                            (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null));
+                            (ORBEON.xforms.Globals.previousDOMFocusOut, "DOMFocusOut", null));
                         events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
                         xformsFireEvents(events, true);
                     }
-                    document.xformsPreviousDOMFocusOut = null;
+                    ORBEON.xforms.Globals.previousDOMFocusOut = null;
                 } else {
                     if (document.xformsPreviousDOMFocusIn != target) {
                         xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
@@ -613,18 +618,18 @@ ORBEON.xforms.Events = {
             }
             document.xformsPreviousDOMFocusIn = target;
         } else {
-            document.xformsMaskFocusEvents = false;
+            ORBEON.xforms.Globals.maskFocusEvents = false;
         }
     },
 
     blur: function(event) {
-        if (!document.xformsMaskFocusEvents) {
+        if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
                 // De-activate hint if we found one
                 ORBEON.xforms.Controls.hintActive(target, false);
                 // This is an event for an XForms control
-                document.xformsPreviousDOMFocusOut = target;
+                ORBEON.xforms.Globals.previousDOMFocusOut = target;
                 // HTML area does not throw value change event, so we throw it on blur
                 if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
                         && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
@@ -1070,11 +1075,6 @@ ORBEON.xforms.Init = {
             }
         }
 
-        // Initialize attributes on document
-        document.xformsHTMLAreaNames = new Array();
-        document.xformsRepeatTreeChildToParent = new Array();
-        document.xformsRepeatIndexes = new Array();
-
         // Initialize attributes on form
         for (var formIndex = 0; formIndex < document.forms.length; formIndex++) {
             var form = document.forms[formIndex];
@@ -1138,16 +1138,16 @@ ORBEON.xforms.Init = {
                     var repeatInfo = repeatTree[repeatIndex].split(" ");
                     var id = repeatInfo[0];
                     var parent = repeatInfo.length > 1 ? repeatInfo[repeatInfo.length - 1] : null;
-                    document.xformsRepeatTreeChildToParent[id] = parent;
+                    ORBEON.xforms.Globals.repeatTreeChildToParent[id] = parent;
                 }
                 document.xformsRepeatTreeParentToAllChildren = new Array();
-                for (var child in document.xformsRepeatTreeChildToParent) {
-                    var parent = document.xformsRepeatTreeChildToParent[child];
+                for (var child in ORBEON.xforms.Globals.repeatTreeChildToParent) {
+                    var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[child];
                     while (parent != null) {
                         if (!document.xformsRepeatTreeParentToAllChildren[parent])
                             document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
                         document.xformsRepeatTreeParentToAllChildren[parent].push(child);
-                        parent = document.xformsRepeatTreeChildToParent[parent];
+                        parent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
                     }
                 }
 
@@ -1158,7 +1158,7 @@ ORBEON.xforms.Init = {
                     var repeatInfo = repeatIndexes[repeatIndex].split(" ");
                     var id = repeatInfo[0];
                     var index = repeatInfo[repeatInfo.length - 1];
-                    document.xformsRepeatIndexes[id] = index;
+                    ORBEON.xforms.Globals.repeatIndexes[id] = index;
                 }
 
                 // Ask server to resend events if this is not the first time load is called
@@ -1276,10 +1276,9 @@ ORBEON.xforms.Init = {
      * Initialize HTML areas.
      */
     _htmlArea: function (htmlArea) {
-        document.xformsHTMLAreaNames = new Array();
         var fckEditor = new FCKeditor(htmlArea.name);
-        if (!xformsArrayContains(document.xformsHTMLAreaNames, htmlArea.name))
-            document.xformsHTMLAreaNames.push(htmlArea.name);
+        if (!xformsArrayContains(ORBEON.xforms.Globals.htmlAreaNames, htmlArea.name))
+            ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
         fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
         fckEditor.ToolbarSet = "OPS";
         if (ORBEON.xforms.Globals.fckEditorLoading) {
@@ -1555,11 +1554,11 @@ function xformsFindRepeatDelimiter(repeatId, index) {
     {
         var currentId = repeatId;
         while (true) {
-            var parent = document.xformsRepeatTreeChildToParent[currentId];
+            var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
             if (parent == null) break;
-            var grandParent = document.xformsRepeatTreeChildToParent[parent];
+            var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
             parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
-                    + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
+                    + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
             currentId = parent;
         }
     }
@@ -1956,7 +1955,7 @@ function xformsGetClassForReapeatId(repeatId) {
     var depth = 1;
     var currentRepeatId = repeatId;
     while (true) {
-        currentRepeatId = document.xformsRepeatTreeChildToParent[currentRepeatId];
+        currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
         if (currentRepeatId == null) break;
         depth = depth == 1 ? 2 : 1;
     }
@@ -2552,9 +2551,9 @@ function xformsHandleResponse(o) {
                             // After we display divs, we must reenable the HTML editors.
                             // This is a workaround for a Gecko bug documented at:
                             // http://wiki.fckeditor.net/Troubleshooting#gecko_hidden_div
-                            if (XFORMS_IS_GECKO && document.xformsHTMLAreaNames.length > 0) {
-                                for (var htmlAreaIndex = 0; htmlAreaIndex < document.xformsHTMLAreaNames.length; htmlAreaIndex++) {
-                                    var name = document.xformsHTMLAreaNames[htmlAreaIndex];
+                            if (XFORMS_IS_GECKO && ORBEON.xforms.Globals.htmlAreaNames.length > 0) {
+                                for (var htmlAreaIndex = 0; htmlAreaIndex < ORBEON.xforms.Globals.htmlAreaNames.length; htmlAreaIndex++) {
+                                    var name = ORBEON.xforms.Globals.htmlAreaNames[htmlAreaIndex];
                                     var editor = FCKeditorAPI.GetInstance(name);
                                     try {
                                         editor.EditorDocument.designMode = "on";
@@ -2587,12 +2586,12 @@ function xformsHandleResponse(o) {
                                 for (var childIndex in children) {
                                     var child = children[childIndex];
                                     if (!newRepeatIndexes[child])
-                                        newRepeatIndexes[child] = document.xformsRepeatIndexes[child];
+                                        newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
                                 }
                             }
                             // Unhighlight items at old indexes
                             for (var repeatId in newRepeatIndexes) {
-                                var oldIndex = document.xformsRepeatIndexes[repeatId];
+                                var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
                                 if (oldIndex != 0) {
                                     var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
                                     if (oldItemDelimiter != null) {
@@ -2610,7 +2609,7 @@ function xformsHandleResponse(o) {
                             // Store new indexes
                             for (var repeatId in newRepeatIndexes) {
                                 var newIndex = newRepeatIndexes[repeatId];
-                                document.xformsRepeatIndexes[repeatId] = newIndex;
+                                ORBEON.xforms.Globals.repeatIndexes[repeatId] = newIndex;
                             }
                             // Highlight item a new index
                             for (var repeatId in newRepeatIndexes) {
@@ -2675,7 +2674,7 @@ function xformsHandleResponse(o) {
                             var control = document.getElementById(controlId);
                             if (ORBEON.util.Dom.hasClass(control, "xforms-input"))
                                 control = ORBEON.util.Dom.getChildElement(control, 1);
-                            document.xformsMaskFocusEvents = true;
+                            ORBEON.xforms.Globals.maskFocusEvents = true;
                             control.focus();
                             break;
                         }

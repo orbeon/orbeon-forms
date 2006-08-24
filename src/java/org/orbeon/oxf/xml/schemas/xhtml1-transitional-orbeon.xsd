@@ -20,7 +20,7 @@
             PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" SYSTEM
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
 
-            $Id: xhtml1-transitional-orbeon.xsd,v 1.1 2005/11/02 19:49:02 avernet Exp $
+            $Id: xhtml1-transitional-orbeon.xsd,v 1.2 2006/08/24 18:11:13 avernet Exp $
 </xs:documentation>
     </xs:annotation>
 
@@ -676,6 +676,7 @@
                 <xs:element ref="link"/>
                 <xs:element ref="object"/>
                 <xs:element ref="isindex"/>
+                <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
             </xs:choice>
         </xs:sequence>
     </xs:group>

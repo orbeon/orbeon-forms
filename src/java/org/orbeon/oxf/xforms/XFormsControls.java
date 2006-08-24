@@ -455,7 +455,7 @@ public class XFormsControls {
                         // Restore context
                         contextStack.pop();
                     } else {
-                        newNodeset = null;
+                        newNodeset = Collections.EMPTY_LIST;
                     }
 
                 } else {
@@ -465,7 +465,7 @@ public class XFormsControls {
                         newNodeset = containingDocument.getEvaluator().evaluate(pipelineContext, currentSingleNode,
                                 ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
                     } else {
-                        newNodeset = null;
+                        newNodeset = Collections.EMPTY_LIST;
                     }
                 }
 

@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
@@ -161,20 +162,23 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                             throw new OXFException(e); // will not happen
                         }
                         // TODO: optimize and skip creation of Dom4j document
-                        final Document dom4jResult;
+                        final Document bodyDocument;
                         try {
+                            final Document dom4jResult;
                             final InputStream is = new ByteArrayInputStream(valueBytes);
                             final org.w3c.dom.Document result = tidy.parseDOM(is, null);
                             dom4jResult = TransformerUtils.domToDom4jDocument(result);
-                        } catch (TransformerException e) {
-                            throw new OXFException(e);
-                        }
 
-                        // Create content document
-                        final Element htmlElement = dom4jResult.getRootElement();
-                        final Element bodyElement = htmlElement.element("body");
-                        final Document bodyDocument =  Dom4jUtils.createDocument();
-                        bodyDocument.setRootElement((Element) bodyElement.detach());
+                            // Create content document
+                            final Element htmlElement = dom4jResult.getRootElement();
+                            final Element bodyElement = htmlElement.element("body");
+
+                            bodyDocument =  Dom4jUtils.createDocument();
+                            bodyDocument.setRootElement((Element) bodyElement.detach());
+
+                        } catch (Exception e) {
+                            throw new ValidationException("Cannot parse value as text/html for value: '" + displayValue + "'", xformsOutputControl.getLocationData());
+                        }
 
                         // Stream fragment to the output
                         try {

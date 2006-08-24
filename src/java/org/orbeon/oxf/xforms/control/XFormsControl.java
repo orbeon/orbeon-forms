@@ -507,8 +507,12 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                             // This is an xforms:output
 
                             final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
-                            outputControl.setBindingContext(currentBindingContext);
-                            outputControl.evaluate(pipelineContext);
+                            xformsControls.pushBinding(pipelineContext, element);
+                            {
+                                outputControl.setBindingContext(xformsControls.getCurrentBindingContext());
+                                outputControl.evaluate(pipelineContext);
+                            }
+                            xformsControls.popBinding();
 
                             // Escape only if the mediatype is not HTML
                             if (acceptHTML && !"text/html".equals(outputControl.getMediatype()))

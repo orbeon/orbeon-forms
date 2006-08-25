@@ -193,7 +193,6 @@ public class XFormsServer extends ProcessorImpl {
                     // it may happen.
                     String lastSourceControlId = null;
                     String lastValueChangeEventValue = null;
-                    int[] sentEventCount = { 0 } ;
 
                     containingDocument.prepareForExternalEventsSequence(pipelineContext);
 
@@ -220,7 +219,7 @@ public class XFormsServer extends ProcessorImpl {
                                     lastValueChangeEventValue = value;
                                 } else {
                                     // Send old event
-                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, sentEventCount, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
                                     // Remember new event
                                     lastSourceControlId = sourceControlId;
                                     lastValueChangeEventValue = value;
@@ -228,12 +227,12 @@ public class XFormsServer extends ProcessorImpl {
                             } else {
                                 if (lastSourceControlId != null) {
                                     // Send old event
-                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, sentEventCount, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
                                     lastSourceControlId = null;
                                     lastValueChangeEventValue = null;
                                 }
                                 // Send new event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, sentEventCount, eventName, sourceControlId, otherControlId, value);
+                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value);
                             }
 
                             if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -247,7 +246,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Flush stored event if needed
                     if (lastSourceControlId != null) {
                         // Send old event
-                        executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, sentEventCount, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                        executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
                     }
                 }
             }
@@ -277,11 +276,10 @@ public class XFormsServer extends ProcessorImpl {
      * Execute an external event while preparing containing document and controls state if an event
      * was already executed.
      */
-    private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, int[] sentEventCount, String eventName, String controlId, String otherControlId, String contextString) {
+    private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String contextString) {
         containingDocument.startOutermostActionHandler();
         containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
         containingDocument.endOutermostActionHandler(pipelineContext);
-        sentEventCount[0]++;
     }
 
     private void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,

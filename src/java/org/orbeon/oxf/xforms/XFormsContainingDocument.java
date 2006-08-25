@@ -599,12 +599,24 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
-                if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventsToDispatch[i])) {
+                if (i == 1) {
+                    // Initialize controls after all the xforms-model-construct events have been sent
                     xformsControls.initialize(pipelineContext, null, null);
                 }
+
+                // Iterate over all the models
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     final XFormsModel currentModel = (XFormsModel) j.next();
+
+                    if (i == 2) {
+                        // Performed deferred updates only for xforms-ready
+                        startOutermostActionHandler();
+                    }
                     dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                    if (i == 2) {
+                        // Performed deferred updates only for xforms-ready
+                        endOutermostActionHandler(pipelineContext);
+                    }
                 }
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {

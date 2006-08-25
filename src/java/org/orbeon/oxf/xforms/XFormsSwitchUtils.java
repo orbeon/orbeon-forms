@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -31,10 +30,13 @@ import java.util.Map;
  */
 public class XFormsSwitchUtils {
 
-    public static boolean prepareSwitches(PipelineContext pipelineContext, XFormsControls xformsControls) {
+    /**
+     * Prepare switch information before a modification to the DOM.
+     */
+    public static boolean prepareSwitches(XFormsControls xformsControls) {
         // Store temporary switch information into appropriate nodes
         boolean found = false;
-        for (Iterator i = xformsControls.getCurrentControlsState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
+        for (Iterator i = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
             final Map.Entry entry = (Map.Entry) i.next();
             final String switchId = (String) entry.getKey();
 
@@ -75,8 +77,11 @@ public class XFormsSwitchUtils {
         return found;
     }
 
-    public static void prepareSwitches(PipelineContext pipelineContext, XFormsControls xformsControls, Node sourceElement, Node clonedElement) {
-        final boolean found = prepareSwitches(pipelineContext, xformsControls);
+    /**
+     * Prepare switch information before a modification to the DOM.
+     */
+    public static void prepareSwitches(XFormsControls xformsControls, Node sourceElement, Node clonedElement) {
+        final boolean found = prepareSwitches(xformsControls);
         if (found) {
             // Propagate temporary switch information to new nodes
             copySwitchInfo(sourceElement, clonedElement);
@@ -117,8 +122,11 @@ public class XFormsSwitchUtils {
         }
     }
 
-    public static void updateSwitches(PipelineContext pipelineContext, XFormsControls xformsControls) {
-        for (Iterator i = xformsControls.getCurrentControlsState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
+    /**
+     * Update switch information after a modification to the DOM.
+     */
+    public static void updateSwitches(XFormsControls xformsControls) {
+        for (Iterator i = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap().entrySet().iterator(); i.hasNext();) {
             final Map.Entry entry = (Map.Entry) i.next();
             final String switchId = (String) entry.getKey();
 

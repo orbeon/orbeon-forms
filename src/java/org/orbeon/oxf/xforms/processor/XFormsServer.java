@@ -381,9 +381,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output divs information
                 {
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                    outputSwitchDivs(ch, xformsControls.getCurrentControlsState());// TODO: move switch state out of ControlsState + handle diffs
-                    ch.endElement();
+                    outputSwitchDivs(ch, xformsControls);
                 }
 
                 // Output repeats information
@@ -419,13 +417,9 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output itemset information
                 {
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
-
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
-
                     outputItemsets(ch, itemsetUpdate);
-                    ch.endElement();
                 }
 
                 // Check if we want to require the client to perform a form submission
@@ -537,7 +531,7 @@ public class XFormsServer extends ProcessorImpl {
         // Output divs information
         {
             final Element divsElement = dynamicStateElement.addElement("divs");
-            outputSwitchDivs(divsElement, currentControlsState);
+            outputSwitchDivs(divsElement, containingDocument.getXFormsControls());
         }
 
         // Output repeat index information
@@ -903,9 +897,10 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
-        if (itemsetIdToItemsetInfoMap != null) {
+        if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
             // There are some xforms:itemset controls
 
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
             for (Iterator i = itemsetIdToItemsetInfoMap.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String itemsetId = (String) currentEntry.getKey();
@@ -921,11 +916,12 @@ public class XFormsServer extends ProcessorImpl {
                 }
                 ch.endElement();
             }
+            ch.endElement();
         }
     }
 
-    private static void outputSwitchDivs(Element divsElement, XFormsControls.ControlsState controlsState) {
-        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
+    public static void outputSwitchDivs(Element divsElement, XFormsControls xformsControls) {
+        final Map switchIdToSelectedCaseIdMap = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
         if (switchIdToSelectedCaseIdMap != null) {
             // There are some xforms:switch/xforms:case controls
 
@@ -942,7 +938,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
+                final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
                 final List children = switchXFormsControl.getChildren();
                 if (children != null && children.size() > 0) {
                     for (Iterator j = children.iterator(); j.hasNext();) {
@@ -959,34 +955,55 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputSwitchDivs(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
-        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
-        if (switchIdToSelectedCaseIdMap != null) {
+    public static void outputSwitchDivs(ContentHandlerHelper ch, XFormsControls xformsControls) {
+
+        final XFormsControls.SwitchState state1 = xformsControls.getInitialSwitchState();
+        final XFormsControls.SwitchState state2 = xformsControls.getCurrentSwitchState();
+
+        final Map switchIdToSelectedCaseIdMap2 = state2.getSwitchIdToSelectedCaseIdMap();
+        if (switchIdToSelectedCaseIdMap2 != null) {
             // There are some xforms:switch/xforms:case controls
 
-            for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
+            // Obtain previous state
+            final Map switchIdToSelectedCaseIdMap1 = state1.getSwitchIdToSelectedCaseIdMap();
+            boolean found = false;
+
+            // Iterate over all the switches
+            for (Iterator i = switchIdToSelectedCaseIdMap2.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String switchId = (String) currentEntry.getKey();
                 final String selectedCaseId = (String) currentEntry.getValue();
 
-                // Output selected ids
-                {
+                // Only output the information if it has changed
+                final String previousSelectedCaseId = (String) switchIdToSelectedCaseIdMap1.get(switchId);
+                if (!selectedCaseId.equals(previousSelectedCaseId)) {
+
+                    if (!found) {
+                        // Open xxf:divs element
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
+                        found = true;
+                    }
+
+                    // Output selected case id
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", selectedCaseId, "visibility", "visible"});
-                }
 
-                // Output deselected ids
-                final XFormsControl switchXFormsControl = (XFormsControl) controlsState.getIdToControl().get(switchId);
-                final List children = switchXFormsControl.getChildren();
-                if (children != null && children.size() > 0) {
-                    for (Iterator j = children.iterator(); j.hasNext();) {
-                        final XFormsControl caseXFormsControl = (XFormsControl) j.next();
+                    // Output deselected case ids
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    final List children = switchXFormsControl.getChildren();
+                    if (children != null && children.size() > 0) {
+                        for (Iterator j = children.iterator(); j.hasNext();) {
+                            final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                        if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
+                            if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
+                            }
                         }
                     }
                 }
             }
+            // Close xxf:divs element
+            if (found)
+                ch.endElement();
         }
     }
 

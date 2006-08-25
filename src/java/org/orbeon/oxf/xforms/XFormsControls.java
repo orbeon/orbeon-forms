@@ -18,11 +18,12 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsControlFactory;
+import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -45,6 +46,9 @@ public class XFormsControls {
     private boolean initialized;
     private ControlsState initialControlsState;
     private ControlsState currentControlsState;
+
+    private SwitchState initialSwitchState;
+    private SwitchState currentSwitchState;
 
     private boolean dirty;
 
@@ -203,12 +207,16 @@ public class XFormsControls {
             if (initialized) {
                 // Use existing controls state
                 initialControlsState = currentControlsState;
+                initialSwitchState = currentSwitchState;
             } else {
                 // Build controls state
 
                 // Get initial controls state information
                 initialControlsState = buildControlsState(pipelineContext);
                 currentControlsState = initialControlsState;
+
+                initialSwitchState = new SwitchState(initialControlsState.getSwitchIdToSelectedCaseIdMap());
+                currentSwitchState = initialSwitchState;
 
                 // Set switch state if necessary
                 if (divsElement != null) {
@@ -218,7 +226,7 @@ public class XFormsControls {
                         final String caseId = divElement.attributeValue("id");
                         final String visibility = divElement.attributeValue("visibility");
 
-                        updateSwitchInfo(caseId, "visible".equals(visibility));
+                        currentSwitchState.updateSwitchInfo(caseId, initialControlsState, "visible".equals(visibility));
                     }
                 }
 
@@ -233,9 +241,6 @@ public class XFormsControls {
                     // Adjust repeat indexes
                     XFormsIndexUtils.adjustIndexes(pipelineContext, XFormsControls.this, initialControlsState);
                 }
-
-                // Evaluate values after index state has been computed
-//                initialControlsState.evaluateControls(pipelineContext);
             }
 
             // We are now clean
@@ -670,54 +675,6 @@ public class XFormsControls {
         return functionLibrary;
     }
 
-    /**
-     * Update xforms:switch/xforms:case information with newly selected case id.
-     */
-    public void updateSwitchInfo(final PipelineContext pipelineContext, final String selectedCaseId) {
-
-        // Find SwitchXFormsControl
-        final XFormsControl caseXFormsControl = (XFormsControl) currentControlsState.getIdToControl().get(selectedCaseId);
-        if (caseXFormsControl == null)
-            throw new OXFException("No XFormsControl found for case id '" + selectedCaseId + "'.");
-        final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
-        if (switchXFormsControl == null)
-            throw new OXFException("No SwitchXFormsControl found for case id '" + selectedCaseId + "'.");
-
-        final String currentSelectedCaseId = (String) currentControlsState.getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getEffectiveId());
-        if (!selectedCaseId.equals(currentSelectedCaseId)) {
-            // A new selection occurred on this switch
-
-            // "This action adjusts all selected attributes on the affected cases to reflect the
-            // new state, and then performs the following:"
-            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
-
-            // "1. Dispatching an xforms-deselect event to the currently selected case."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) currentControlsState.getIdToControl().get(currentSelectedCaseId)));
-
-            // "2. Dispatching an xform-select event to the case to be selected."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) currentControlsState.getIdToControl().get(selectedCaseId)));
-        }
-    }
-
-    /**
-     * Update switch info state for the given case id.
-     */
-    public void updateSwitchInfo(String caseId, boolean visible) {
-
-        // Find SwitchXFormsControl
-        final XFormsControl caseControl = (XFormsControl) currentControlsState.getIdToControl().get(caseId);
-        if (caseControl == null)
-            throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
-        final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
-        if (switchControl == null)
-            throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
-
-        // Update currently selected case id
-        if (visible) {
-            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControl.getEffectiveId(), caseId);
-        }
-    }
-
     private ControlsState buildControlsState(final PipelineContext pipelineContext) {
 
         final long startTime;
@@ -924,7 +881,7 @@ public class XFormsControls {
     }
 
     /**
-     * Get the ControlsState computed right at the end of the initialize() method.
+     * Get the ControlsState computed in the initialize() method.
      */
     public ControlsState getInitialControlsState() {
         return initialControlsState;
@@ -935,6 +892,35 @@ public class XFormsControls {
      */
     public ControlsState getCurrentControlsState() {
         return currentControlsState;
+    }
+
+    /**
+     * Get the SwitchState computed in the initialize() method.
+     */
+    public SwitchState getInitialSwitchState() {
+        return initialSwitchState;
+    }
+
+    /**
+     * Get the last computed SwitchState.
+     */
+    public SwitchState getCurrentSwitchState() {
+        return currentSwitchState;
+    }
+
+    /**
+     * Activate a switch case by case id.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param caseId            case id to activate
+     */
+    public void activateCase(PipelineContext pipelineContext, String caseId) {
+
+        if (initialSwitchState == currentSwitchState)
+            currentSwitchState = new SwitchState(new HashMap(initialSwitchState.getSwitchIdToSelectedCaseIdMap()));
+
+        getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
+
     }
 
     /**
@@ -976,8 +962,8 @@ public class XFormsControls {
             XFormsIndexUtils.adjustIndexes(pipelineContext, XFormsControls.this, result);
         }
 
-        // Update switch information
-        final Map oldSwitchIdToSelectedCaseIdMap = currentControlsState.getSwitchIdToSelectedCaseIdMap();
+        // Update switch information: use new values, except where old values are available
+        final Map oldSwitchIdToSelectedCaseIdMap = getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
         final Map newSwitchIdToSelectedCaseIdMap = result.getSwitchIdToSelectedCaseIdMap();
         {
             for (Iterator i = newSwitchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
@@ -991,7 +977,7 @@ public class XFormsControls {
                 }
             }
 
-            result.setSwitchIdToSelectedCaseIdMap(newSwitchIdToSelectedCaseIdMap);
+            this.currentSwitchState = new SwitchState(newSwitchIdToSelectedCaseIdMap);
         }
 
         // Update current state
@@ -1264,6 +1250,74 @@ public class XFormsControls {
 //    }
 
     /**
+     * Represents the state of switches.
+     */
+    public static class SwitchState {
+
+        private Map switchIdToSelectedCaseIdMap;
+
+        public SwitchState(Map switchIdToSelectedCaseIdMap) {
+            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
+        }
+
+        public Map getSwitchIdToSelectedCaseIdMap() {
+            return switchIdToSelectedCaseIdMap;
+        }
+
+        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
+            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
+        }
+
+        /**
+         * Update xforms:switch/xforms:case information with newly selected case id.
+         */
+        public void updateSwitchInfo(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ControlsState controlsState, String selectedCaseId) {
+
+            // Find SwitchXFormsControl
+            final XFormsControl caseXFormsControl = (XFormsControl) controlsState.getIdToControl().get(selectedCaseId);
+            if (caseXFormsControl == null)
+                throw new OXFException("No XFormsControl found for case id '" + selectedCaseId + "'.");
+            final XFormsControl switchXFormsControl = (XFormsControl) caseXFormsControl.getParent();
+            if (switchXFormsControl == null)
+                throw new OXFException("No SwitchXFormsControl found for case id '" + selectedCaseId + "'.");
+
+            final String currentSelectedCaseId = (String) getSwitchIdToSelectedCaseIdMap().get(switchXFormsControl.getEffectiveId());
+            if (!selectedCaseId.equals(currentSelectedCaseId)) {
+                // A new selection occurred on this switch
+
+                // "This action adjusts all selected attributes on the affected cases to reflect the
+                // new state, and then performs the following:"
+                getSwitchIdToSelectedCaseIdMap().put(switchXFormsControl.getEffectiveId(), selectedCaseId);
+
+                // "1. Dispatching an xforms-deselect event to the currently selected case."
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeselectEvent((XFormsEventTarget) controlsState.getIdToControl().get(currentSelectedCaseId)));
+
+                // "2. Dispatching an xform-select event to the case to be selected."
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSelectEvent((XFormsEventTarget) controlsState.getIdToControl().get(selectedCaseId)));
+            }
+        }
+
+        /**
+         * Update switch info state for the given case id.
+         */
+        public void updateSwitchInfo(String caseId, ControlsState controlsState, boolean visible) {
+
+            // Find SwitchXFormsControl
+            final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(caseId);
+            if (caseControl == null)
+                throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
+            final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
+            if (switchControl == null)
+                throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
+
+            // Update currently selected case id
+            if (visible) {
+                getSwitchIdToSelectedCaseIdMap().put(switchControl.getEffectiveId(), caseId);
+            }
+        }
+    }
+
+    /**
      * Represents the state of a tree of XForms controls.
      */
     public static class ControlsState {
@@ -1272,6 +1326,7 @@ public class XFormsControls {
         private Map defaultRepeatIdToIndex;
         private Map repeatIdToIndex;
         private Map effectiveRepeatIdToIterations;
+
         private Map switchIdToSelectedCaseIdMap;
 
         private boolean hasRepeat;
@@ -1344,14 +1399,6 @@ public class XFormsControls {
             return idsToXFormsControls;
         }
 
-        public Map getSwitchIdToSelectedCaseIdMap() {
-            return switchIdToSelectedCaseIdMap;
-        }
-
-        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
-            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
-        }
-
         public Map getRepeatIdToIndex() {
             if (repeatIdToIndex == null){
                 if (defaultRepeatIdToIndex != null)
@@ -1364,6 +1411,14 @@ public class XFormsControls {
 
         public Map getEffectiveRepeatIdToIterations() {
             return effectiveRepeatIdToIterations;
+        }
+
+        public Map getSwitchIdToSelectedCaseIdMap() {
+            return switchIdToSelectedCaseIdMap;
+        }
+
+        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
+            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
         }
 
         public boolean isHasRepeat() {

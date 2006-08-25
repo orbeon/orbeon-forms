@@ -99,19 +99,21 @@
                         </choice>
                     </zeroOrMore>
                 </element>
-                <element name="xxforms:divs">
-                    <zeroOrMore>
-                        <element name="xxforms:div">
-                            <attribute name="id"/>
-                            <attribute name="visibility">
-                                <choice>
-                                    <value>hidden</value>
-                                    <value>visible</value>
-                                </choice>
-                            </attribute>
-                        </element>
-                    </zeroOrMore>
-                </element>
+                <optional>
+                    <element name="xxforms:divs">
+                        <zeroOrMore>
+                            <element name="xxforms:div">
+                                <attribute name="id"/>
+                                <attribute name="visibility">
+                                    <choice>
+                                        <value>hidden</value>
+                                        <value>visible</value>
+                                    </choice>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
                 <optional>
                     <element name="xxforms:repeats">
                         <zeroOrMore>

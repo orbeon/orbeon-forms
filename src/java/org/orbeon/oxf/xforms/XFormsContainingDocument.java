@@ -599,7 +599,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
-                if (i == 1) {
+                final boolean isXFormsModelConstructDone = i == 1;
+                final boolean isXFormsReady = i == 2;
+
+                if (isXFormsModelConstructDone) {
                     // Initialize controls after all the xforms-model-construct events have been sent
                     xformsControls.initialize(pipelineContext, null, null);
                 }
@@ -608,12 +611,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     final XFormsModel currentModel = (XFormsModel) j.next();
 
-                    if (i == 2) {
+                    if (isXFormsReady) {
                         // Performed deferred updates only for xforms-ready
                         startOutermostActionHandler();
                     }
                     dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
-                    if (i == 2) {
+                    if (isXFormsReady) {
                         // Performed deferred updates only for xforms-ready
                         endOutermostActionHandler(pipelineContext);
                     }

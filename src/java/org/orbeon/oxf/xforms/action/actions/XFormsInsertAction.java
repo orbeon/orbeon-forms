@@ -149,7 +149,7 @@ public class XFormsInsertAction extends XFormsAction {
             }
 
             // Prepare switches
-            XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls, sourceNode, clonedNode);
+            XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
 
             // Identify the instance that actually changes
             final XFormsInstance modifiedInstance;
@@ -216,7 +216,7 @@ public class XFormsInsertAction extends XFormsAction {
             XFormsIndexUtils.ajustIndexesAfterInsert(pipelineContext, xformsControls, currentControlsState, clonedNode);
 
             // Update switches
-            XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
+            XFormsSwitchUtils.updateSwitches(xformsControls);
 
             // "4. If the insert is successful, the event xforms-insert is dispatched."
             containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(modifiedInstance, atAttribute));

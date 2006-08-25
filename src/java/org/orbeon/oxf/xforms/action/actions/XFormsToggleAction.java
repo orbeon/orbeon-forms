@@ -35,6 +35,6 @@ public class XFormsToggleAction extends XFormsAction {
         final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
 
         // Update xforms:switch info and dispatch events
-        xformsControls.updateSwitchInfo(pipelineContext, effectiveCaseId);
+        xformsControls.activateCase(pipelineContext, effectiveCaseId);
     }
 }

@@ -155,7 +155,7 @@ public class XFormsDeleteAction extends XFormsAction {
                     repeatIndexUpdates, nestedRepeatIndexUpdates, nodeToRemove);
 
             // Prepare switches
-            XFormsSwitchUtils.prepareSwitches(pipelineContext, xformsControls);
+            XFormsSwitchUtils.prepareSwitches(xformsControls);
 
             // Then only perform the deletion
             // "The node at the delete location in the Node Set Binding node-set is deleted"
@@ -165,7 +165,7 @@ public class XFormsDeleteAction extends XFormsAction {
             xformsControls.rebuildCurrentControlsState(pipelineContext);
 
             // Update switches
-            XFormsSwitchUtils.updateSwitches(pipelineContext, xformsControls);
+            XFormsSwitchUtils.updateSwitches(xformsControls);
 
             // Update affected repeat index information
             if (repeatIndexUpdates.size() > 0) {

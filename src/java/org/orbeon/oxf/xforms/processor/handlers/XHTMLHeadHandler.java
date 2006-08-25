@@ -150,7 +150,7 @@ public class XHTMLHeadHandler extends HandlerBase {
         final Map appearancesMap = new HashMap();
         {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.getCurrentControlsState().visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
+            xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl xformsControl) {
                     final String controlName = xformsControl.getName();
 
@@ -223,9 +223,14 @@ public class XHTMLHeadHandler extends HandlerBase {
                 if (focusElementId != null || (scriptsToRun != null)) {
                     final StringBuffer sb = new StringBuffer("\nfunction xformsPageLoadedServer() { ");
 
-                    if (focusElementId != null)
-                        sb.append("ORBEON.xforms.Controls.setFocus(\"" + focusElementId + "\");");
+                    // Initial setfocus if present
+                    if (focusElementId != null) {
+                        sb.append("ORBEON.xforms.Controls.setFocus(\"");
+                        sb.append(focusElementId);
+                        sb.append("\");");
+                    }
 
+                    // Initial xxforms:script executions if present
                     if (scriptsToRun != null) {
                         for (Iterator i = scriptsToRun.iterator(); i.hasNext();) {
                             final XFormsContainingDocument.Script script = (XFormsContainingDocument.Script) i.next();

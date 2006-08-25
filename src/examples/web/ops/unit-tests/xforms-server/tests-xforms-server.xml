@@ -106,13 +106,6 @@
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
                     </xxf:control-values>
-                    <xxf:divs>
-                        <xxf:div id="add" visibility="visible"/>
-                        <xxf:div id="subtract" visibility="hidden"/>
-                        <xxf:div id="multiply" visibility="hidden"/>
-                        <xxf:div id="divide" visibility="hidden"/>
-                    </xxf:divs>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -181,13 +174,6 @@
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
                     </xxf:control-values>
-                    <xxf:divs>
-                        <xxf:div id="add" visibility="visible"/>
-                        <xxf:div id="subtract" visibility="hidden"/>
-                        <xxf:div id="multiply" visibility="hidden"/>
-                        <xxf:div id="divide" visibility="hidden"/>
-                    </xxf:divs>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -570,8 +556,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:divs/>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -672,8 +656,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:divs/>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1031,11 +1013,9 @@
                         <xxf:control id="id125·4-4" readonly="false" required="false" relevant="true" valid="true" type="">f34</xxf:control>
                         <xxf:control id="id126·4-4" readonly="false" required="false" relevant="true" valid="true" type="">l34</xxf:control>
                     </xxf:control-values>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1111,11 +1091,9 @@
                     <xxf:control-values>
                         <xxf:delete-repeat-elements id="id124" parent-indexes="1" count="1"/>
                     </xxf:control-values>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id124" old-index="2" new-index="1"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1190,12 +1168,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
                         <xxf:repeat-index id="id124" old-index="2" new-index="4"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1266,12 +1242,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
                         <xxf:repeat-index id="id124" old-index="1" new-index="2"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1564,8 +1538,6 @@
                     <xxf:control-values>
                         <xxf:control id="id123">existing value</xxf:control>
                     </xxf:control-values>
-                    <xxf:divs/>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1787,13 +1759,11 @@
                         <xxf:copy-repeat-template id="repeat5" parent-indexes="1" id-suffix="1"/>
                         <xxf:repeat-iteration id="repeat5·1" readonly="false" required="false" relevant="true" valid="true" iteration="1"/>
                     </xxf:control-values>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="repeat2" old-index="2" new-index="1"/>
                         <xxf:repeat-index id="repeat3" old-index="1" new-index="0"/>
                         <xxf:repeat-index id="repeat5" old-index="0" new-index="1"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -2012,11 +1982,9 @@
                         <xxf:repeat-iteration id="employee-repeat" readonly="false" required="false" relevant="true" valid="true" iteration="3"/>
                         <xxf:control id="first-name-input·3" readonly="false" required="false" relevant="true" valid="true" type="">Mary</xxf:control>
                     </xxf:control-values>
-                    <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="employee-repeat" old-index="0" new-index="2"/>
                     </xxf:repeat-indexes>
-                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>

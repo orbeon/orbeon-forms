@@ -2005,6 +2005,7 @@ function xformsGetClassForReapeatId(repeatId) {
 
 function xformsHandleResponse(o) {
     var responseXML = o.responseXML;
+    var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
     if (responseXML && responseXML.documentElement
             && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
@@ -2012,7 +2013,6 @@ function xformsHandleResponse(o) {
         var responseRoot = responseXML.documentElement;
         var newDynamicState = null;
         var newDynamicStateTriggersPost = false;
-        var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
 
         // Whether this response has triggered a load which will replace the current page.
         var newDynamicStateTriggersReplace = false;

@@ -3032,18 +3032,48 @@
                             <th>targetId</th>
                             <td>Mandatory</td>
                             <td>
-                                Id of the target element. The element must be an element in the XForms namespace, i.e.
-                                you cannot dispatch events to HTML elements.
+                                Id of the target element. The element must be an element in the XForms namespace: you
+                                cannot dispatch events to HTML elements. In addition, the id must identify either a
+                                relevant and non-readonly XForms control, or a model object that supports event handlers
+                                such as <code>&lt;xforms:model></code>, <code>&lt;xforms:instance></code>, or
+                                <code>&lt;xforms:submission></code>.
                             </td>
                         </tr>
                         <tr>
                             <th>eventName</th>
                             <td>Mandatory</td>
                             <td>
-                                Name of the event. For security reasons, only names of custom events can be used. Since
-                                your hanlers for custom events can be called by JavaScript code, when you write those
-                                handlers, you need to be aware that they can be by whoever can load the form in a
-                                browser.
+                                <p>
+                                    Name of the event.
+                                </p>
+                                <warning>
+                                    <p>
+                                        For security reasons, OPS prohibits by default client-side JavaScript from
+                                        dispatching any external events except <code>DOMActivate</code>,
+                                        <code>DOMFocusIn</code> and <code>DOMFocusOut</code>. Furthermore, these events
+                                        can only be dispatched to relevant and non-readonly XForms controls. In order to
+                                        enable dispatching custom events, you must first add the
+                                        <code>xxforms:external-events</code> attribute on the first
+                                        <code>&lt;xforms:model></code> element, for example:
+                                    </p>
+                                    <xml-source show-namespaces="false">
+                                        <xforms:model xxforms:external-events="acme-super-event acme-famous-event">
+                                            ...
+                                        </xforms:model>
+                                    </xml-source>
+                                    <p>
+                                        This attribute contains a space-separated list of event name. In this example,
+                                        you explicitly enable your JavaScript code to fire the two events
+                                        <code>acme-super-event</code> and <code>acme-famous-event</code> to any relevant
+                                        and non-readonly XForms controls, or to any model object supporting event
+                                        handlers.
+                                    </p>
+                                    <p>
+                                        Since the event handlers for custom events can be called by JavaScript code that
+                                        runs on the client, you need to be aware that these handlers can potentially be
+                                        activated by anybody able to load the form in his browser.
+                                    </p>
+                                </warning>
                             </td>
                         </tr>
                         <tr>
@@ -3090,13 +3120,15 @@
                         In most cases, you only need to call <code>dispatchEvent()</code> with a target id and event name,
                         as in:
                     </p>
-                    <source>ORBEON.xforms.Document.dispatchEvent("my-id", "my-custom-event-name");</source>
+                    <source>ORBEON.xforms.Document.dispatchEvent("my-id", "acme-super-event");</source>
                     <p>
-                        The event handler for the custom event can be in the model or view, and can look like:
+                        An event handler for the custom event can be in an XForms model or control, and can execute any
+                        valid XForms action, for example:
                     </p>
                     <xml-source show-namespaces="false">
-                        <xforms:action id="my-id" ev:event="my-custom-event-name">
-                            Here execute XForms actions
+                        <xforms:action id="my-id" ev:event="acme-super-event">
+                            <xforms:setvalue ref="first-name" value="instance('default-values')/first-name"/>
+                            <xforms:toggle case="first-name-case"/>
                         </xforms:action>
                     </xml-source>
                 </section>

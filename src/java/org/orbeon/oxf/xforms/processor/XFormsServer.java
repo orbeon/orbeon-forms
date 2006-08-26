@@ -987,15 +987,20 @@ public class XFormsServer extends ProcessorImpl {
                     // Output selected case id
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", selectedCaseId, "visibility", "visible"});
 
-                    // Output deselected case ids
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
-                    final List children = switchXFormsControl.getChildren();
-                    if (children != null && children.size() > 0) {
-                        for (Iterator j = children.iterator(); j.hasNext();) {
-                            final XFormsControl caseXFormsControl = (XFormsControl) j.next();
+                    if (previousSelectedCaseId != null) {
+                        // Output deselected case ids
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", previousSelectedCaseId, "visibility", "hidden"});
+                    } else {
+                        // This is a new switch (can happen with repeat), send all deselected to be sure
+                        final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                        final List children = switchXFormsControl.getChildren();
+                        if (children != null && children.size() > 0) {
+                            for (Iterator j = children.iterator(); j.hasNext();) {
+                                final XFormsControl caseXFormsControl = (XFormsControl) j.next();
 
-                            if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
+                                if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
+                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseXFormsControl.getEffectiveId(), "visibility", "hidden"});
+                                }
                             }
                         }
                     }

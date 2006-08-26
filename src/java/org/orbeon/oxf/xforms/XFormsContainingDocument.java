@@ -83,6 +83,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private static final Map allowedXFormsOutputExternalEvents = new HashMap();
     private static final Map allowedExternalEvents = new HashMap();
     private static final Map allowedXFormsSubmissionExternalEvents = new HashMap();
+    private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
     static {
 
         // External events allowed on xforms:output
@@ -93,10 +94,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
         allowedExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
         allowedExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
-        allowedExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
 
         // External events allowed on xforms:submission
         allowedXFormsSubmissionExternalEvents.put(XFormsEvents.XXFORMS_SUBMIT, "");
+
+        // External events allowed on containing document
+        allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
     }
 
     /**
@@ -537,6 +540,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 if (allowedXFormsSubmissionExternalEvents.get(eventName) == null) {
                     return;
                 }
+            }
+        } else if (eventTarget instanceof XFormsContainingDocument) {
+            // Target is the containing document
+            // Check for implicitly allowed events
+            if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
+                return;
             }
         } else {
             // Target is not a control

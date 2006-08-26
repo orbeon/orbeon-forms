@@ -24,7 +24,7 @@
             </config>
         </p:input>
         <!--<p:output name="data" id="request-params" debug="xxxrequest-params"/>-->
-        <p:output name="data" id="request-params"/>
+        <p:output name="data" id="request-params" debug="xxxrequest-params"/>
     </p:processor>
 
     <!-- Create XForms Server request -->

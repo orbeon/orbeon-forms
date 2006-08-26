@@ -45,6 +45,11 @@ public class XFormsLoadAction extends XFormsAction {
         final boolean doReplace = "replace".equals(showAttribute);
         final String target = actionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
         final String urlType = actionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
+        final boolean urlNorewrite;
+        {
+            final String urlNorewriteAttribute = actionElement.attributeValue(new QName("url-norewrite", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
+            urlNorewrite = Boolean.valueOf(urlNorewriteAttribute).booleanValue();
+        }
 
         // "If both are present, the action has no effect."
         final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
@@ -56,7 +61,7 @@ public class XFormsLoadAction extends XFormsAction {
             final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNode(currentNode);
-                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType);
+                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite);
             } else {
                 // The action is a NOP if it's not bound to a node
                 return;
@@ -64,7 +69,7 @@ public class XFormsLoadAction extends XFormsAction {
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else if (resource != null) {
             // Use linking attribute
-            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType);
+            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType, urlNorewrite);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance
@@ -73,10 +78,15 @@ public class XFormsLoadAction extends XFormsAction {
         }
     }
 
-    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value, String target, String urlType) {
-
+    public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
+                                          Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
-        final String externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, (!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType)), value);
+        final String externalURL;
+        if (!urlNorewrite) {
+            externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, (!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType)), value);
+        } else {
+            externalURL = value;
+        }
         containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad);
         return externalURL;
     }

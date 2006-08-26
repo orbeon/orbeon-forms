@@ -41,6 +41,7 @@ public class XFormsEngineStaticState {
     private String stateHandling;
     private boolean readonly;
     private String readonlyAppearance;
+    private Map externalEventsMap;
     private String containerType;
     private String containerNamespace;
 
@@ -90,6 +91,16 @@ public class XFormsEngineStaticState {
                 ? readonlyAppearanceAttribute
                 : XFormsConstants.XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE;
 
+        final String externalEventsAttribute = staticStateDocument.getRootElement().attributeValue(XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
+        if (externalEventsAttribute != null) {
+            final StringTokenizer st = new StringTokenizer(externalEventsAttribute);
+            while (st.hasMoreTokens()) {
+                if (externalEventsMap == null)
+                    externalEventsMap = new HashMap();
+                externalEventsMap.put(st.nextToken(), "");
+            }
+        }
+
         baseURI = staticStateDocument.getRootElement().attributeValue(XMLConstants.XML_BASE_QNAME);
         containerType = staticStateDocument.getRootElement().attributeValue("container-type");
         containerNamespace = staticStateDocument.getRootElement().attributeValue("container-namespace");
@@ -134,6 +145,10 @@ public class XFormsEngineStaticState {
 
     public String getReadonlyAppearance() {
         return readonlyAppearance;
+    }
+
+    public Map getExternalEventsMap() {
+        return externalEventsMap;
     }
 
     public String getContainerType() {

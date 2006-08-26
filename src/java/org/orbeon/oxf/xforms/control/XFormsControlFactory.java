@@ -113,4 +113,6 @@ public class XFormsControlFactory {
     private static abstract class Factory {
         public abstract XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId);
     }
+
+    private XFormsControlFactory() {}
 }

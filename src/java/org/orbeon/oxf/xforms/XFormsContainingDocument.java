@@ -79,6 +79,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private String legacyContainerType;
     private String legacyContainerNamespace;
 
+    // Event information
+    private static final Map allowedXFormsOutputExternalEvents = new HashMap();
+    private static final Map allowedExternalEvents = new HashMap();
+    static {
+
+        // External events allowed on xforms:output
+        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
+        allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
+
+        // External events allowed on other controls
+        allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
+        allowedExternalEvents.put(XFormsEvents.XFORMS_DOM_ACTIVATE, "");
+        allowedExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
+        allowedExternalEvents.put(XFormsEvents.XXFORMS_SUBMIT, "");
+        allowedExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
+    }
+
     /**
      * Construct a ContainingDocument from a static state and repeat indexes elements.
      *
@@ -215,6 +232,23 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public String getReadonlyAppearance() {
         return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getReadonlyAppearance();
+    }
+
+    /**
+     * Return external-events configuration attribute.
+     */
+    private Map getExternalEventsMap() {
+        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getExternalEventsMap();
+    }
+
+    /**
+     * Return whether an external event name is explicitly allowed by the configuration.
+     *
+     * @param eventName event name to check
+     * @return          true if allowed, false otherwise
+     */
+    private boolean isExplicitlyAllowedExternalEvent(String eventName) {
+        return !XFormsEventFactory.isBuiltInEvent(eventName) && getExternalEventsMap() != null && getExternalEventsMap().get(eventName) != null;
     }
 
     /**
@@ -473,14 +507,31 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // This is also a security measures that also ensures that somebody is not able to change values in an instance
         // by hacking external events.
         if (eventTarget instanceof XFormsControl) {
-            final XFormsControl XFormsControl = (XFormsControl) eventTarget;
-            if (XFormsControl instanceof XFormsOutputControl) {
-                if (!(eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN) || eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT))) {
-                    // Event on xforms:output which is not a focus event
-                    return;
+            // Target is a control
+            final XFormsControl xformsControl = (XFormsControl) eventTarget;
+
+            if (!xformsControl.isRelevant() || xformsControl.isReadonly()) {
+                // Controls accept event only if they are relevant and not readonly
+                return;
+            }
+
+            if (!isExplicitlyAllowedExternalEvent(eventName)) {
+                // The event is not explicitly allowed: check for implicitly allowed events
+                if (xformsControl instanceof XFormsOutputControl) {
+                    if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
+                        return;
+                    }
+                } else {
+                    if (allowedExternalEvents.get(eventName) == null) {
+                        return;
+                    }
                 }
-            } else if (!XFormsControl.isRelevant() || XFormsControl.isReadonly()) {
-                // Other controls accept event only if they are relevant and not readonly
+            }
+
+        } else {
+            // Target is not a control
+            if (!isExplicitlyAllowedExternalEvent(eventName)) {
+                // The event is not explicitly allowed
                 return;
             }
         }
@@ -506,23 +557,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, contextString, null, null, filesElement);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
 
         // Interpret event
-        interpretEvent(pipelineContext, xformsEvent);
-    }
-
-    private void interpretEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        final String eventName = xformsEvent.getEventName();
-        if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)
-            || XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)
-            || XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
-
-            // These are events we allow directly from the client and actually handle
-
-            dispatchEvent(pipelineContext, xformsEvent);
-
-        } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
+        if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {
             // 4.6.7 Sequence: Value Change
 
             // What we want to do here is set the value on the initial controls state, as the value
@@ -573,17 +611,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 // NOTE: Refresh is done with the automatic deferred updates
             }
 
-        } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
-            // Internal submission event
-            dispatchEvent(pipelineContext, xformsEvent);
-
-        } else if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
-            // Internal load event
-            dispatchEvent(pipelineContext, xformsEvent);
         } else {
-            throw new OXFException("Invalid event dispatched by client: " + eventName);
+            // Dispatch any other allowed event
+            dispatchEvent(pipelineContext, xformsEvent);
         }
-        }
+    }
 
     public void dispatchExternalEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();

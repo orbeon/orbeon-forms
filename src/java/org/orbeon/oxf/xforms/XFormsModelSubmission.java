@@ -25,10 +25,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.action.actions.XFormsLoadAction;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsBindingExceptionEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmissionEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -293,7 +290,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final Document documentToSubmit;
                 if (isDeferredSubmissionSecondPass) {
                     // Handle uploaded files if any
-                    final Element filesElement = (event instanceof XXFormsSubmissionEvent) ? ((XXFormsSubmissionEvent) event).getFilesElement() : null;
+                    final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
                         for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
                             final Element parameterElement = (Element) i.next();
@@ -380,8 +377,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 // Fire xforms-submit-serialize
-                containingDocument.dispatchEvent(pipelineContext,
-                		XFormsEventFactory.createEvent(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, XFormsModelSubmission.this));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitSerializeEvent(XFormsModelSubmission.this));
                 // TODO: what follows must be executed as the default action of xforms-submit-serialize
 
                 // Serialize

@@ -18,114 +18,264 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.events.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Factory for XForms events
  */
 public class XFormsEventFactory {
 
-    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {
-        return createEvent(newEventName, targetObject, null, false, true, true, null, null, null, null);
+    private static Map nameToClassMap = new HashMap();
+
+    static {
+        nameToClassMap.put(XFormsEvents.XFORMS_DOM_ACTIVATE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDOMActivateEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_COMPUTE_EXCEPTION, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsComputeExceptionEvent(targetObject, contextString, contextThrowable);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_DELETE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDeleteEvent(targetObject, contextString);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_DESELECT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDeselectEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_INSERT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsInsertEvent(targetObject, contextString);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_LINK_ERROR, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsLinkErrorEvent(targetObject, contextString, contextElement, contextThrowable);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_LINK_EXCEPTION, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_BINDING_EXCEPTION, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsBindingExceptionEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_REFRESH, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsRefreshEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SELECT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsSelectEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_ERROR, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsSubmitErrorEvent(targetObject, contextString);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsSubmitEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_SERIALIZE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsSubmitSerializeEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SUBMIT_DONE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsSubmitDoneEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsValueChangeWithFocusChangeEvent(targetObject, otherTargetObject, contextString);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XXFORMS_SUBMIT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsSubmitEvent(targetObject, filesElement);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XXFORMS_LOAD, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsLoadEvent(targetObject, contextString);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_MODEL_CONSTRUCT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsModelConstructEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_MODEL_DESTRUCT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsModelDestructEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_RESET, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsResetEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsModelConstructDoneEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_READY, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsReadyEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_REBUILD, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsRebuildEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_RECALCULATE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsRecalculateEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_REVALIDATE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsRevalidateEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_VALUE_CHANGED, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsValueChangeEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDOMFocusOutEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDOMFocusInEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_VALID, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsValidEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_INVALID, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsInvalidEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_REQUIRED, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsRequiredEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_OPTIONAL, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsOptionalEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_READWRITE, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsReadwriteEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_READONLY, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsReadonlyEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_ENABLED, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsEnabledEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_DISABLED, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsDisabledEvent((XFormsControl) targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_FOCUS, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsFocusEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SCROLL_FIRST, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsScrollFirstEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_SCROLL_LAST, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsScrollLastEvent(targetObject);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_LINK_EXCEPTION, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
+            }
+        });
+        nameToClassMap.put(XFormsEvents.XFORMS_LINK_ERROR, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XFormsLinkErrorEvent(targetObject, contextString, contextElement, contextThrowable);
+            }
+        });
     }
 
-    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-        return createEvent(newEventName, targetObject, otherTargetObject, false, true, true, contextString, contextElement, contextThrowable, filesElement);
+    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {
+        return createEvent(newEventName, targetObject, null, false, true, true, null, null, null, null);
     }
 
     public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         return createEvent(newEventName, targetObject, null, true, bubbles, cancelable, null, null, null, null);
     }
 
-    private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
+    public static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                            String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
 
-        // TODO: more efficient way to switch!
-        if (eventName.equals(XFormsEvents.XFORMS_DOM_ACTIVATE)) {
-            return new XFormsDOMActivateEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_COMPUTE_EXCEPTION)) {
-            return new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(targetObject, contextString, contextThrowable);
-        } else if (eventName.equals(XFormsEvents.XFORMS_DELETE)) {
-            return new XFormsDeleteEvent(targetObject, contextString);
-        } else if (eventName.equals(XFormsEvents.XFORMS_DESELECT)) {
-            return new XFormsDeselectEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_INSERT)) {
-            return new XFormsInsertEvent(targetObject, contextString);
-        } else if (eventName.equals(XFormsEvents.XFORMS_LINK_ERROR)) {
-            return new XFormsLinkErrorEvent(targetObject, contextString, contextElement, contextThrowable);
-        } else if (eventName.equals(XFormsEvents.XFORMS_LINK_EXCEPTION)) {
-            return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
-        } else if (eventName.equals(XFormsEvents.XFORMS_BINDING_EXCEPTION)) {
-            return new XFormsBindingExceptionEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_REFRESH)) {
-            return new XFormsRefreshEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SELECT)) {
-            return new XFormsSelectEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT_ERROR)) {
-            return new XFormsSubmitErrorEvent(targetObject, contextString);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT)) {
-            return new XFormsSubmitEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT_SERIALIZE)) {
-            return new XFormsSubmitSerializeEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SUBMIT_DONE)) {
-            return new XFormsSubmitDoneEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-            return new XXFormsValueChangeWithFocusChangeEvent(targetObject, otherTargetObject, contextString);
-        } else if (eventName.equals(XFormsEvents.XXFORMS_SUBMIT)) {
-            return new XXFormsSubmissionEvent(targetObject, filesElement);
-        } else if (eventName.equals(XFormsEvents.XXFORMS_LOAD)) {
-            return new XXFormsLoadEvent(targetObject, contextString);
-        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {
-            return new XFormsModelConstructEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_DESTRUCT)) {
-            return new XFormsModelDestructEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_RESET)) {
-            return new XFormsResetEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)) {
-            return new XFormsModelConstructDoneEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_READY)) {
-            return new XFormsReadyEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_REBUILD)) {
-            return new XFormsRebuildEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_RECALCULATE)) {
-            return new XFormsRecalculateEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_REVALIDATE)) {
-            return new XFormsRevalidateEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_VALUE_CHANGED)) {
-            return new XFormsValueChangeEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT)) {
-            return new XFormsDOMFocusOutEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN)) {
-            return new XFormsDOMFocusInEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_VALID)) {
-            return new XFormsValidEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
-            return new XFormsInvalidEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
-            return new XFormsRequiredEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {
-            return new XFormsOptionalEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_READWRITE)) {
-            return new XFormsReadwriteEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_READONLY)) {
-            return new XFormsReadonlyEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_ENABLED)) {
-            return new XFormsEnabledEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_DISABLED)) {
-            return new XFormsDisabledEvent((XFormsControl) targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_FOCUS)) {
-            return new XFormsFocusEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SCROLL_FIRST)) {
-            return new XFormsScrollFirstEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_SCROLL_LAST)) {
-            return new XFormsScrollLastEvent(targetObject);
-        } else if (eventName.equals(XFormsEvents.XFORMS_LINK_EXCEPTION)) {
-            return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
-        } else if (eventName.equals(XFormsEvents.XFORMS_LINK_ERROR)) {
-            return new XFormsLinkErrorEvent(targetObject, contextString, contextElement, contextThrowable);
-        } else if (allowCustomEvents) {
-            return new XFormsCustomEvent(eventName, targetObject, bubbles, cancelable);
+        final Factory factory = (Factory) nameToClassMap.get(eventName);
+        if (factory == null) {
+            if (!allowCustomEvents) {
+                // No custom events are allowed, just throw
+                throw new OXFException("Invalid event name: " + eventName);
+            } else {
+                // Return a custom event
+                return new XFormsCustomEvent(eventName, targetObject, bubbles, cancelable);
+            }
         } else {
-            throw new OXFException("Event factory could not find event with name: " + eventName);
+            // Return a built-in event
+            return factory.createEvent(eventName, targetObject, otherTargetObject, allowCustomEvents, bubbles, cancelable, contextString, contextElement, contextThrowable, filesElement);
         }
+    }
+
+    /**
+     * Check whether an event name maps to a built-in event.
+     *
+     * @param eventName event name to check
+     * @return          true if built-in, false otherwise
+     */
+    public static boolean isBuiltInEvent(String eventName) {
+        return nameToClassMap.get(eventName) != null;
+    }
+
+    private static abstract class Factory {
+        public abstract XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject,
+                                                boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString,
+                                                Element contextElement, Throwable contextThrowable, Element filesElement);
     }
 
     private XFormsEventFactory() {}

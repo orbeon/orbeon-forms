@@ -31,6 +31,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
     private String stateHandling;
     private String readonly;
     private String readonlyAppearance;
+    private String externalEvents;
 
     private int level;
     private String element0;
@@ -94,6 +95,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             // Add read-only appearance
             if (readonlyAppearance != null)
                 attributesImpl.addAttribute("", "readonly-appearance", "readonly-appearance", ContentHandlerHelper.CDATA, readonlyAppearance);
+            // Add external-events configuration
+            if (externalEvents != null)
+                attributesImpl.addAttribute("", "external-events", "external-events", ContentHandlerHelper.CDATA, externalEvents);
 
             super.startElement("", "static-state", "static-state", attributesImpl);
             mustOutputFirstElement = false;
@@ -173,6 +177,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     stateHandling = xxformsStateHandling;
                 }
             }
+            // Handle extension attributes
             if (readonly == null) {
                 final String xxformsReadonly = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME);
                 if (xxformsReadonly != null) {
@@ -190,6 +195,12 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                         throw new ValidationException("Invalid xxforms:" + XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME + " attribute value: " + xxformsReadonlyAppearance, new LocationData(locator));
 
                     readonlyAppearance = xxformsReadonlyAppearance;
+                }
+            }
+            if (externalEvents == null) {
+                final String xxformsExternalEvents = attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME);
+                if (xxformsExternalEvents != null) {
+                    externalEvents = xxformsExternalEvents;
                 }
             }
         }

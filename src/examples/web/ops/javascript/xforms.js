@@ -322,7 +322,7 @@ ORBEON.xforms.Document = {
         }
 
         // Create event and fire
-        var event = new ORBEON.xforms.Server.Event(form, controlId, null, null, eventName, bubbles, cancelable);
+        var event = new ORBEON.xforms.Server.Event(form, targetId, null, null, eventName, bubbles, cancelable);
         ORBEON.xforms.Server.fireEvents([event], incremental == undefined ? false : incremental);
     },
 

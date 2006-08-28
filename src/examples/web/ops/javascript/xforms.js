@@ -862,10 +862,11 @@ ORBEON.xforms.Events = {
             if ((ORBEON.util.Dom.hasClass(target, "xforms-trigger") || ORBEON.util.Dom.hasClass(target, "xforms-submit"))) {
                 YAHOO.util.Event.preventDefault(event);
                 if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
-                    if (!window.addEventListener && target.tagName.toLowerCase() == "a") {
-                        // If this is an anchor and we didn't get a chance to register the focus event, send the focus event here
-                        ORBEON.xforms.Events.focus(event);
-                    }
+                    // If this is an anchor and we didn't get a chance to register the focus event,
+                    // send the focus event here. This is useful for anchors (we don't listen on the 
+                    // focus event on those, and for buttons on Safari which does not dispatch the focus
+                    // event for buttons.
+                    ORBEON.xforms.Events.focus(event);
                     xformsFireEvents([xformsCreateEventArray(target, "DOMActivate", null)], false);
                 }
             }
@@ -1492,6 +1493,7 @@ ORBEON.xforms.Server = {
 
                 // Send request
                 executedRequest = true;
+                YAHOO.util.Connect.setDefaultPostHeader(false);
                 YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
                 YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: xformsHandleResponse }, requestDocumentString);
             }

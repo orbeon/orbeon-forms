@@ -52,7 +52,7 @@
     <page path-info="/forms*" model="/examples/forms/page-flow.xpl"/>
 
     <!-- Standalone Address Book 2 example -->
-    <page path-info="/address-book2*" model="/examples/address-book2/page-flow.xpl"/>
+    <page path-info="/address-book*" model="/examples/address-book/page-flow.xpl"/>
 
     <!-- Standalone Blog example -->
     <page path-info="/blog*" model="/examples/blog/page-flow.xpl"/>

@@ -104,9 +104,8 @@
         <example id="pdf-upload" path="pdf/pdf-upload" label="PDF Extraction"/>
     </section>
     <section label="Database Access">
-        <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
+        <example id="address-book" label="Address Book" xforms-ng="true"/>
         <example id="employees" label="The &quot;Employees&quot; Example"/>
-        <!--<example id="petstore" label="The &quot;Pet Store&quot; Example"/>-->
     </section>
     <section label="Calling Web Services">
         <example id="quotes" label="Famous Quotes"/>

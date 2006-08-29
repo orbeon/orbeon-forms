@@ -116,7 +116,10 @@
 
     <!-- Add images to the page instead of using CSS to get around IE reloading issue -->
     <xsl:template match="xhtml:label[tokenize(@class, ' ') = 'xforms-help']" >
-        <xhtml:img alt="Help" src="/images/help.gif" class="xforms-help-image"/>
+        <xsl:variable name="image-class" as="xs:string+" select="
+            ('xforms-help-image',
+            (for $c in tokenize(@class, ' ') return if ($c = 'xforms-help') then () else $c))"/>
+        <xhtml:img alt="Help" src="/images/help.gif" class="{string-join($image-class, ' ')}"/>
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>

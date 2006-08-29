@@ -60,6 +60,7 @@ ORBEON.xforms.Globals = {
     eventsFirstEventTime: 0,             // Time when the first event in the queue was added
     requestForm: null,                   // HTML for the request currently in progress
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
+    lastRequestIsError: false,           // Whether the last XHR request returned an error
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
@@ -1499,8 +1500,11 @@ ORBEON.xforms.Server = {
             }
         }
 
-        // Hide loading indicator if we have started a new request and there are not events in the queue
-        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0)
+        // Hide loading indicator if we have not started a new request (nothing more to run)
+        // and there are not events in the queue. However make sure not to hide the error message
+        // if the last XHR query returned an error.
+        if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0
+                && !ORBEON.xforms.Globals.lastRequestIsError)
             xformsDisplayIndicator("none");
     },
 
@@ -2747,6 +2751,7 @@ function xformsHandleResponse(o) {
             xformsDisplayIndicator("loading");
             ORBEON.xforms.Globals.loadingOtherPage = true;
         }
+        ORBEON.xforms.Globals.lastRequestIsError = false;
 
     } else if (responseXML && responseXML.documentElement
             && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
@@ -2761,14 +2766,17 @@ function xformsHandleResponse(o) {
                 break;
             }
         }
+
         // Display error
         var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
         ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
+        ORBEON.xforms.Globals.lastRequestIsError = true;
         xformsDisplayIndicator("error");
     } else {
         // The server didn't send valid XML
         var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
         errorContainer.innerHTML = "Unexpected response received from server";
+        ORBEON.xforms.Globals.lastRequestIsError = true;
         xformsDisplayIndicator("error");
     }
 

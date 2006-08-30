@@ -28,164 +28,146 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon PresentationServer (OPS) 3.5!
+                Welcome to Orbeon PresentationServer (OPS) 3.5 M1 (Milestone 1)!
+            </p>
+            <note>
+                <p>
+                    This is not a final release of OPS 3.5. The purpose of OPS 3.5 M1 is to provide an intermediate
+                    milestone version of OPS on the path to OPS 3.5.
+                </p>
+            </note>
+            <p>
+                OPS 3.5 M1 features many improvements over OPS 3.0.1, including XForms engine performance
+                enhancements, bug-fixes, new features and enhanced browser support.
             </p>
             <p>
-                OPS 3.5 features [TODO]
-            </p>
-            <p>
-                This document describes changes made between OPS 3.0.1 and OPS 3.5.
+                This document describes changes made between OPS 3.0.1 and OPS 3.5 M1.
             </p>
         </section>
         <section>
             <title>Changes in Version 3.5</title>
             <p>
-                OPS 3.5 contains the following changes:
+                OPS 3.5 features the following changes:
             </p>
             <ul>
                 <li>
                     <p>
-                        The embedded eXist database has been upgraded to the 20060316 snapshot.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.7. [TODO:
-                        details]
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        XForms improvements, including [TODO: link, elaborate]:
+                        XForms improvements, including:
                     </p>
                     <ul>
                         <li>
                             <p>
-                                Entirely reworked client-side event handling. Client-side JavaScript performance is
-                                now greatly improved. Lage forms that took seconds to load because of client-side
-                                JavaScript now loads almost instantly.
+                                <b>Client-side performance improvements.</b> The client-side event handling has been
+                                entirely reworked. Client-side JavaScript performance is now greatly improved and
+                                large forms that took seconds to load because of client-side JavaScript now loads
+                                almost instantly.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Performance improvements, including in the following scenarios: [TODO: explain caching,
-                                serving static XForms, XPath cache, document cache, etc.]
+                                <b>Server-side performance improvements.</b> [TODO: details]
+                                <!--, including in the following scenarios: [TODO: explain caching, serving static XForms,-->
+                                <!--XPath cache, document cache, etc.]-->
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for Opera 8.5 and above and Safari 1.3 and above in addition to Firefox and
-                                Internet Explorer. [TODO: explain limitations such as HTML Area when relevant.]
+                                <b>Safari and Opera support.</b> Support for Safari 1.3 and above and Opera 8.5 and
+                                above in addition to Firefox and Internet Explorer. The main limitation is that the
+                                WYSIWYG HTML area does not work on Opera and Safari.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for <code>xxforms:username</code> and <code>xxforms:password</code> on
-                                <code>xforms:submission</code>.
+                                <b>Support for Liferay portal.</b> OPS, including XForms, now works within Liferay
+                                portal 3.6.1 and 4.1.0. A new epilogue pipeline,
+                                <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168 portlets
+                                into liferay.
+                            </p>
+                            <p>
+                                In addition, some bugs have been fixed relative to conflicts between OPS JavaScript
+                                files and Liferay's, as well as ensuring that multiple OPS portlets do not conflict
+                                within the same portal page.
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Atkins Transport Systems.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for attribute value templates (AVT) on <code>xforms:submission</code>
-                                <code>action</code>, <code>xxforms:username</code> and <code>xxforms:password</code>
-                                attributes.
+                                <b>Read-only mode for forms.</b> A read-only mode is now supported with the
+                                <code>xxforms:readonly-appearance</code> attribute. With
+                                <code>xxforms:readonly-appearance="static"</code>, read-only controls take a static
+                                appearance appropriate for read-only rendition of forms in HTML. See <a
+                                href="/goto-example/forms">DMV Forms</a> for an example. This feature was kindly
+                                sponsored by Esprit. [TODO: doc]
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for the HTTP <code>DELETE</code> method on <code>xforms:submission</code>.
-                                Support for this method is not included in XForms 1.0, but will be added to XForms 1.1.
-                                [TODO: Elaborate on using REST APIs for eXist] [TODO: Elaborate on using REST APIs
-                                for eXist]
+                                <b>Insert and delete actions.</b> Support for the XForms 1.1 <a
+                                href="reference-xforms-ng#context-attribute"><code>context</code></a> and <a
+                                href="reference-xforms-ng#origin-attribute"><code>origin</code></a> attributes on
+                                <code>xforms:insert</code> and <code>xforms:delete</code>. <!-- TODO: point to example,
+                                insertion into empty elements, attributes, etc. -->
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]
+                                <b>Autocomplete control.</b> You enable this on <code>xforms:select1</code> with the
+                                <code>xxforms:autocomplete</code> appearance. See <a
+                                href="/goto-example/xforms-controls">XForms Controls</a> and <a
+                                href="/goto-example/xforms-google-suggests">Google Suggests</a> for examples. This
+                                feature was kindly sponsored by Mobydoc.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for the XForms 1.1 <a
-                                href="reference-xforms-ng#context-attribute"><code>context</code> attribute</a> on
-                                <code>xforms:insert</code> and <code>xforms:delete</code>. Improvements to
-                                <code>xforms:insert</code> and <code>xforms:delete</code> as per the XForms 1.1 draft.
-                                [TODO: point to example, insertion into empty elements, attributes, etc.]
+                                <b>WYSIWYG HTML editor control.</b> You enable this on <code>xforms:textarea</code>
+                                with the <code>text/html</code> mediatype. See <a
+                                href="/goto-example/xforms-html-area">XForms HTML Area</a> for an example. This feature
+                                was kindly sponsored by Teleflex.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Autocomplete control. [TODO] [kindly sponsored by Mobydoc]
+                                <b>Tree control and menu control.</b> You enable this on <code>xforms:select1</code> and
+                                <code>xforms:select</code> (tree only) with the <code>xxforms:tree</code> and
+                                <code>xxforms:menu</code> apperances. This feature was kindly sponsored by Teleflex.
+                                [TODO: examples]
                             </p>
                         </li>
                         <li>
                             <p>
-                                HTML editor control. [TODO] [kindly sponsored by Teleflex]
+                                <b>Conditional XForms actions.</b> Support for XForms 1.1 conditional actions with the
+                                <code>if</code> (and <code>exf:if</code>) attributes. [TODO: example]
                             </p>
                         </li>
                         <li>
                             <p>
-                                Tree control and menu control. [TODO] [kindly sponsored  by Teleflex]
+                                <b>Switch within repeat.</b> Enhanced support of <code>xforms:switch</code> within
+                                <code>xforms:repeat</code>. [TODO: example]
                             </p>
                         </li>
                         <li>
                             <p>
-                                Better support of <code>xforms:switch</code> within <code>xforms:repeat</code>. [TODO]
+                                <b>Repeated XForms actions.</b> Support for XForms 1.1 actions iterations with the
+                                <code>while</code> (and <code>exf:while</code>) attributes. [TODO: example]
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for XForms 1.1 conditional actions with the <code>if</code> (and
-                                <code>exf:if</code>) attributes. [TODO]
+                                <b>HTTP authentication for instances and submissions.</b> <code>xforms:instance</code>
+                                and <code>xforms:submission</code> support the <code>xxforms:username</code> and
+                                <code>xxforms:password</code> to supply authorization credentials when using HTTP.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for XForms 1.1 actions iterations with the <code>while</code> (and
-                                <code>exf:while</code>) attributes. [TODO]
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                The <a href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a>
-                                XPath function allows you to obtain the evaluation context for an enclosing
-                                <code>xforms:group</code>, <code>xforms:repeat</code>, or <code>xforms:switch</code>.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                The <a href="reference-xforms-ng#xxforms-evaluate"><code>xxforms:evaluate()</code></a>
-                                and <a href="reference-xforms-ng#xxforms-serialize"><code>xxforms:serialize()</code></a>
-                                XPath functions allow you to respectively evaluate dynamic XPath expressions and
-                                serialize XML documents.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                A new extension action <a
-                                href="reference-xforms-ng#xxforms-script-extension"><code>xxforms:script</code></a>
-                                allows you to call client-side JavaScript code as a result of XForms events.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Extension attributes on <code>xforms:input</code> and <code>xforms:textarea</code>:
-                                <code>xxforms:size</code>, <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>,
-                                <code>xxforms:cols</code>. [TODO]
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Upgrade of the <code>http://developer.yahoo.com/yui/Yahoo! User Interface
-                                library</code>. We no longer use <a
-                                href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Support for <code>xforms:output</code> in <code>xforms:label</code>,
-                                <code>xforms:hint</code>, <code>xforms:help</code>, and <code>xforms:alert</code>. This
-                                allow you to dynamically build the value of labels, etc. For example:
+                                <b>Enhanced <code>xforms:output</code> support.</b> Support for
+                                <code>xforms:output</code> in <code>xforms:label</code>, <code>xforms:hint</code>,
+                                <code>xforms:help</code>, and <code>xforms:alert</code>. This allow you to dynamically
+                                build the value of labels, etc. For example:
                             </p>
                             <xml-source show-namespaces="false">
                                 <xforms:trigger>
@@ -193,56 +175,160 @@
                                 </xforms:trigger>
                             </xml-source>
                             <p>
-                                This feature was kindly sponsored by Esprit. [TODO: doc]
+                                This feature was kindly sponsored by Esprit. [TODO: documentation]
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for HTML and literal XHTML within <code>xforms:help</code> and
-                                <code>xforms:hint</code>. See the <a
-                                href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for
-                                details.
+                                <b>AVTs on <code>xforms:submission</code>.</b> Support for attribute value templates
+                                (AVT) on <code>xforms:submission</code> <code>action</code>,
+                                <code>xxforms:username</code> and <code>xxforms:password</code> attributes.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Support for read-only modes with <code>xxforms:readonly-appearance</code> (kindly
-                                sponsored by Esprit). With <code>xxforms:readonly-appearance="static"</code>, read-only
-                                controls take a static appearance appropriate for read-only rendition of forms in HTML.
+                                <b>HTTP DELETE method.</b> Support for the XForms 1.1 HTTP <code>DELETE</code>
+                                method on <code>xforms:submission</code>. <!--[TODO: Elaborate on using REST APIs-->
+                                <!--for eXist] [TODO: Elaborate on using REST APIs for eXist]-->
+                            </p>
+                        </li>
+                        <!--<li>-->
+                            <!--<p>-->
+                                <!--Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]-->
+                            <!--</p>-->
+                        <!--</li>-->
+                        <li>
+                            <p>
+                                <b><code>xxforms:context()</code> extension function.</b> The <a
+                                href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a> XPath
+                                function allows you to obtain the evaluation context for an enclosing
+                                <code>xforms:group</code>, <code>xforms:repeat</code>, or <code>xforms:switch</code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b><code>xxforms:evaluate()</code> extension function.</b> The <a
+                                href="reference-xforms-ng#xxforms-evaluate"><code>xxforms:evaluate()</code></a> and <a
+                                href="reference-xforms-ng#xxforms-serialize"><code>xxforms:serialize()</code></a> XPath
+                                functions allow you to respectively evaluate dynamic XPath expressions and serialize XML
+                                documents.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b><code>xxforms:repeat-current()</code> extension function.</b> [TODO]
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b><code>xxforms:script</code> extension action.</b> A new extension action <a
+                                href="reference-xforms-ng#xxforms-script-extension"><code>xxforms:script</code></a>
+                                allows you to call client-side JavaScript code as a result of XForms events.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Various extension attributes.</b> Extension attributes on <code>xforms:input</code>
+                                and <code>xforms:textarea</code>: <code>xxforms:size</code>,
+                                <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>, <code>xxforms:cols</code>.
                                 [TODO: doc]
                             </p>
                         </li>
                         <li>
                             <p>
-                                New deferred update behavior as per 1.0 errata.
-                                xxx
+                                <b>HTML and XHTML within <code>xforms:help</code></b> Support for HTML and literal XHTML
+                                within <code>xforms:help</code> and <code>xforms:hint</code>. See the <a
+                                href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for
+                                documentation. This feature was kindly sponsored by Teleflex.
                             </p>
                         </li>
+                        <!--<li>-->
+                            <!--<p>-->
+                                <!--New deferred update behavior as per 1.0 errata.-->
+                                <!--TODO-->
+                            <!--</p>-->
+                        <!--</li>-->
                         <li>
                             <p>
-                                Improvement to JavaScript and CSS loading. JavaScript and CSS files related to
-                                particular XForms controls are loaded only when necessary. In addition, the property
+                                <b>JavaScript and CSS loading.</b> JavaScript and CSS files related to particular
+                                XForms controls are loaded only when necessary. In addition, the property
                                 <code>oxf.xforms.minimal-resources</code> allows specifying whether "minimal" versions
-                                of those resources should be used when possible. xxx
+                                of those resources should be used when possible. [TODO: full documentation]
                             </p>
                         </li>
                         <li>
-                            [TODO]
+                            [TODO: new event context information; error summary; improved DMV Forms example; etc.]
                         </li>
                     </ul>
                 </li>
                 <li>
                     <p>
-                        Support of OPS, including XForms, within Liferay portal 3.6.1 and 4.1.0. [TODO] [kindly
-                        sponsored by Atkins Transport Systems] A new epilogue pipeline,
-                        <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168 portlets into
-                        liferay.
+                        Other enhancements:
                     </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>XInclude processor.</b> The <a href="processors-xinclude">XInclude processor</a> now
+                                supports an extension attribute, <code>xxi:omit-xml-base</code>, which disables
+                                producing <code>xml:base</code> attributes upon inclusion. This can be quite useful
+                                when performing schema validation on the result, or when <code>xml:base</code>
+                                resolution on the result must be performed relative to the URL base of the including
+                                document.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>New Execute processor.</b> A new Execute processor has been added. It allows
+                                executing external commands and retrieving the command's standard output and standard
+                                error. [TODO: doc]
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>XUpdate processor.</b> The XUpdate processor now supports an extension element,
+                                <code>xu:node-set</code>, which allows functions to return node-sets. [TODO: show
+                                example, add this to XUpdate doc]
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>Delegation processor.</b> When using the delegation processor to call web services,
+                                by default the processor throws an exception when the remote service returns a SOAP
+                                fault. Now the delegation processor can also be configured to return the SOAP fault
+                                document instead of throwing an exception.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
                     <p>
-                        In addition, some bugs have been fixed relative to conflicts between OPS JavaScript
-                        files and Liferay's, as well as ensuring that multiple OPS portlets do not conflict
-                        within the same portal page.
+                        Library upgrades:
                     </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Upgrade to the <code>http://developer.yahoo.com/yui/Yahoo! User Interface library</code>
+                                as a support library for the client-side part of the XForms engine. We no longer use <a
+                                href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The embedded eXist database has been upgraded to the 20060316 snapshot.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.7.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Other JAR files have been updated to their latest versions, including dom4j, Jaxen, and
+                                ant. [TODO]
+                            </p>
+                        </li>
+                    </ul>
                 </li>
                 <li>
                     <p>
@@ -250,44 +336,10 @@
                     </p>
                     <ul>
                         <li>
-                            <a href="">TODO</a>
+                            TODO: list major bug-fixes.
+                            <!--<a href=""></a>-->
                         </li>
                     </ul>
-                </li>
-                <li>
-                    <p>
-                        The <a href="processors-xinclude">XInclude processor</a> now supports an extension attribute,
-                        <code>xxi:omit-xml-base</code>, which disables producing <code>xml:base</code> attributes upon
-                        inclusion. This can be quite useful when performing schema validation on the result, or when
-                        <code>xml:base</code> resolution on the result must be performed relative to the URL base of the
-                        including document.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The XUpdate processor now supports an extension element, <code>xu:node-set</code>, which allows
-                        functions to return node-sets. [TODO: show example, add this to XUpdate doc]
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        A new Execute processor has been added. It allows executing external commands and retrieving
-                        the command's standard output and standard error. [TODO: doc]
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Some JAR files have been updated to their latest versions, including dom4j, Jaxen, and ant.
-                        [TODO]
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        When using the delegation processor to call web services, by default the
-                        processor throws an exception when the remote service returns a SOAP fault.
-                        Now the delegation processor can also be configured to return the SOAP fault
-                        document instead of throwing an exception.
-                    </p>
                 </li>
             </ul>
         </section>

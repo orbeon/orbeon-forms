@@ -23,6 +23,7 @@ td { vertical-align: top }
 .dmv-main-table th p { text-align: center; vertical-align: top }
 .dmv-action-table td { white-space: nowrap; vertical-align: middle; }
 .dmv-action-table input { vertical-align: middle;}
+.dmv-action-table xforms-trigger { vertical-align: middle;}
 .dmv-hr { height: 3px; border: 0px; background-color: #ffcc66; color: #ffcc66 }
 .dmv-last-name input { width: 20em }
 .dmv-driver-license-number input { width: 8em }
@@ -52,6 +53,7 @@ td { vertical-align: top }
 .xforms-repeat-selected-item-2 td { cursor: default;  }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
+.xforms-trigger-appearance-xxforms-image { margin-right: 0.5em}
 .dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0px; border: none; text-align: center; vertical-align: top }
 .dmv-plate-span { position: relative; top: 19px; background: none }

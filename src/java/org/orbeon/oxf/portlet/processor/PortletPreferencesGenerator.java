@@ -27,7 +27,7 @@ import javax.portlet.PortletRequest;
 import java.util.Enumeration;
 
 /**
- * This generator just outputs the preferences of the current portlet.
+ * This processor outputs the preferences for the current portlet.
  */
 public class PortletPreferencesGenerator extends ProcessorImpl {
 
@@ -36,23 +36,23 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 if (!(externalContext.getNativeRequest() instanceof PortletRequest))
-                    throw new OXFException("Portlet prefeerences are only available from within a portlet");
+                    throw new OXFException("Portlet preferences are only available from within a portlet");
 
-                PortletRequest portletRequest = (PortletRequest) externalContext.getNativeRequest();
-                PortletPreferences preferences = portletRequest.getPreferences();
+                final PortletRequest portletRequest = (PortletRequest) externalContext.getNativeRequest();
+                final PortletPreferences preferences = portletRequest.getPreferences();
 
-                ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+                final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
                 helper.startDocument();
                 helper.startElement("portlet-preferences");
 
                 for (Enumeration e = preferences.getNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
-                    String[] values = preferences.getValues(name, null);
+                    final String name = (String) e.nextElement();
+                    final String[] values = preferences.getValues(name, null);
 
                     helper.startElement("preference");
                     helper.element("name", name);

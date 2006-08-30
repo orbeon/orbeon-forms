@@ -16,6 +16,7 @@ package org.orbeon.oxf.xml;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
+import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.execute.ExecuteProcessor;
 import org.orbeon.oxf.processor.file.FileProcessor;
@@ -51,6 +52,7 @@ public class SchemaRepository {
     private static final String SCHEMA_PREFIX = "oxf.schemas.";
     private static final String GLOBAL_SCHEMA_PATH = "/org/orbeon/oxf/xml/";
     private static final String PROCESSORS_SCHEMA_PATH = "/org/orbeon/oxf/processor/";
+    private static final String PORTLET_PROCESSORS_SCHEMA_PATH = "/org/orbeon/oxf/portlet/processor/";
     private static final HashMap schemas = new HashMap();
 
     private static SchemaRepository instance;
@@ -98,6 +100,8 @@ public class SchemaRepository {
         // Portlet schemas
         schemas.put(PortletIncludeGenerator.PORTLET_INCLUDE_NAMESPACE_URI, "schemas/portlet-include-config.rng");
         schemas.put(PortletContainerProcessor.PORTLET_CONTAINER_NAMESPACE_URI, "schemas/portlet-container-config.rng");
+        schemas.put(PortletPreferencesSerializer.PORTLET_PREFERENCES_SERIALIZER_DATA_NAMESPACE_URI,
+                PORTLET_PROCESSORS_SCHEMA_PATH + "portlet-preferences-serializer-data.rng");
 
         // XSLT schemas
         schemas.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");

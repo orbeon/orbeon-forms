@@ -588,8 +588,12 @@
         <class name="org.orbeon.oxf.portlet.processor.PortletContainerProcessor"/>
     </processor>
 
-    <processor name="oxf:portlet-preferences" uri="oxf/processor/portlet-preferences">
+    <processor name="oxf:portlet-preferences-generator">
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
+    </processor>
+
+    <processor name="oxf:portlet-preferences-serializer">
+        <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer"/>
     </processor>
 
     <!-- Tamino processors -->
@@ -682,6 +686,10 @@
 
     <processor name="oxf:sax-debugger">
         <class name="org.orbeon.oxf.processor.SAXDebuggerProcessor"/>
+    </processor>
+
+    <processor name="oxf:portlet-preferences">
+        <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
     </processor>
 
     <!-- Scratchpad -->

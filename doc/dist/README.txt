@@ -27,29 +27,29 @@ For more information, visit:
 1. About Orbeon PresentationServer
 ****************************************
 
-Orbeon PresentationServer (OPS) is an open source Java-based server
-platform for XML-centric web applications. OPS is built around XHTML,
-XForms, XSLT, XML pipelines, and Web Services, which makes it ideal for
-applications that capture, process and present XML data.
+Orbeon PresentationServer is an open source platform that uses standard
+XForms to make your form-based web applications more user-friendly and
+simpler to create.
 
-Unlike other popular web application frameworks like Struts or WebWork
-that are based on Java objects and JSP, OPS is based on XML documents
-and XML technologies. This leads to an architecture better suited for
-the tasks of capturing, processing, and presenting information in XML
-format, and often does not require writing any Java code at all to
-implement your presentation layer.
+Unlike other web application frameworks based on Java objects or
+scripting languages, OPS is based on XML documents and XForms. This
+leads to an architecture perfectly suited for the tasks of capturing,
+processing, and presenting XML data, and does not require writing any
+Java or scripting code at all to implement a dynamic presentation layer
+for your web application.
 
-OPS is built around Orbeon's optimized XPL engine, a mature,
-high-performance XML pipeline engine for processing XML data.
+OPS is built around a user-friendly Ajax-based XForms engine, which
+brings standard W3C XForms to mainstream browsers, and the XPL engine,
+a mature, high-performance XML pipeline engine for processing XML data.
 
 
 ****************************************
 2. Licenses
 ****************************************
 
-The source code is distributed under the terms of the GNU Lesser
-General Public License (LGPL). The full text of the license is
-available at http://www.gnu.org/copyleft/lesser.html.
+The source code is distributed under the terms of the GNU Lesser General
+Public License (LGPL). The full text of the license is available at
+http://www.gnu.org/copyleft/lesser.html.
 
 Some examples are distributed under the terms of the Apache License,
 Version 2.0. The full text of the license is available at:
@@ -68,9 +68,9 @@ The documentation is subject to the following terms:
 
     * You may create printed copies for your own personal use.
 
-    * For all other uses, such as selling printed copies or using
-      (parts of) the manual in another publication, prior written
-      agreement from Orbeon, Inc. is required.
+    * For all other uses, such as selling printed copies or using (parts
+      of) the manual in another publication, prior written agreement
+      from Orbeon, Inc. is required.
 
 See section 9 for more details about the licenses of included
 third-party software.
@@ -82,11 +82,11 @@ third-party software.
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ops/doc/home-changes-30
+  http://www.orbeon.com/ops/doc/home-changes-35
 
 or in this distribution under:
 
-  doc/home-changes-30.html
+  doc/home-changes-35.html
 
 
 ****************************************
@@ -95,7 +95,6 @@ or in this distribution under:
 
 OPS has been tested on the following application servers:
 
-    * Apache Tomcat 4.1.31 with JDK 1.4.2
     * Apache Tomcat 5.5.4 with JDK 1.5.0
     * BEA WebLogic Server 9.1
     * IBM WebSphere 6
@@ -147,7 +146,7 @@ directly online:
 
 For information about compiling OPS, please visit:
 
-  http://www.orbeon.com/community/getting-involved
+  http://www.orbeon.com/ops/doc/integration-development
 
 
 ****************************************
@@ -158,7 +157,7 @@ Here are some pointers to useful information related to this release.
 
     * For more information and updates, go to:
 
-        http://www.orbeon.com/software/
+        http://www.orbeon.com/
 
     * If you have questions, comments, or difficulties with OPS,
       please subscribe to the ops-users mailing-list at ObjectWeb:
@@ -178,9 +177,10 @@ Here are some pointers to useful information related to this release.
 8. Known Issues
 ****************************************
 
-For a list of known issues, consult the ObjectWeb issue tracking system:
+For a list of known issues ordered by priority, consult the ObjectWeb
+issue tracking system:
 
-  http://forge.objectweb.org/tracker/?atid=350207&group_id=168&func=browse
+  http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=1&_category=100&_group=100&_sort_col=priority&_sort_ord=DESC&submit=Browse&atid=350207&group_id=168&func=browse
 
 
 ****************************************
@@ -213,7 +213,6 @@ In addition, this product includes the following software:
     * Joost (http://joost.sourceforge.net/)
     * JTidy (http://sourceforge.net/projects/jtidy/)
     * JUnit (http://www.junit.org/)
-    * Kawa (http://www.gnu.org/software/kawa/)
     * Mondrian (http://mondrian.sourceforge.net/)
     * Saxon (http://saxon.sourceforge.net/)
     * SAXPath (http://sourceforge.net/projects/saxpath/)
@@ -228,7 +227,7 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Last updated: February 2006
+Last updated: August 2006
 
 Copyright 1999-2006 (C) Orbeon, Inc. All rights reserved.
 

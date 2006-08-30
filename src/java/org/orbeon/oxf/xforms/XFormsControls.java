@@ -417,6 +417,8 @@ public class XFormsControls {
         final boolean isNewModel;
         if (modelId != null) {
             newModel = containingDocument.getModel(modelId);
+            if (newModel == null)
+                throw new ValidationException("Invalid model id: " + modelId, (bindingElement == null) ? null : (LocationData) bindingElement.getData());
             isNewModel = true;
         } else {
             newModel = currentBindingContext.getModel();

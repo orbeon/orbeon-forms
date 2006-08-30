@@ -23,6 +23,8 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
  * 10.1.4 The recalculate Element
@@ -35,6 +37,10 @@ public class XFormsRecalculateAction extends XFormsAction {
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
+
+        if (model == null)
+            throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
+
         containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
     }
 }

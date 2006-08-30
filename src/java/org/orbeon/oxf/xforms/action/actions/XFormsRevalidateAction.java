@@ -23,6 +23,8 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsRevalidateEvent;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 /**
  * 10.1.5 The revalidate Element
@@ -35,6 +37,10 @@ public class XFormsRevalidateAction extends XFormsAction {
 
         final String modelId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("model"));
         final XFormsModel model = (modelId != null) ? containingDocument.getModel(modelId) : xformsControls.getCurrentModel();
+
+        if (model == null)
+            throw new ValidationException("Invalid model id: " + modelId, (LocationData) actionElement.getData());
+
         containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
     }
 }

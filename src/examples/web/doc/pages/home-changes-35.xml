@@ -298,6 +298,17 @@
                                 document instead of throwing an exception.
                             </p>
                         </li>
+                        <li>
+                            <p>
+                                <b>Portlet preferences processor.</b>
+                                Two processors,
+                                <code>oxf:portlet-preferences-generator</code>
+                                and
+                                <code>oxf:portlet-preferences-serializer</code>,
+                                allow for reading and writing portlet
+                                preferences. [TODO: documentation]
+                            </p>
+                        </li>
                     </ul>
                 </li>
                 <li>

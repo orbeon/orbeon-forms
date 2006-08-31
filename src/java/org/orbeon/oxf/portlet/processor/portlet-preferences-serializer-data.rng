@@ -18,11 +18,11 @@
             <element name="name">
                 <data type="NCName"/>
             </element>
-            <oneOrMore>
+            <zeroOrMore>
                 <element name="value">
                     <data type="string"/>
                 </element>
-            </oneOrMore>
+            </zeroOrMore>
         </element>
     </zeroOrMore>
 </element>

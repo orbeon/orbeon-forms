@@ -15,16 +15,15 @@ package org.orbeon.oxf.processor.converter;
 
 /**
  * <!-- HTMLRewrite -->
- * @see org.orbeon.oxf.processor.converter.AbstractRewrite
- * @author dsmall
+ *
+ * @see AbstractRewrite
  */
 public class HTMLRewrite extends AbstractRewrite {
-	/**
-	 * <!-- HTMLRewrite -->
-	 * Just calls super( "" )
-	 *@author d
-	 */
-	public HTMLRewrite() {
-		super( "" );
-	}
+    /**
+     * <!-- HTMLRewrite -->
+     * Just calls super("")
+     */
+    public HTMLRewrite() {
+        super("");
+    }
 }

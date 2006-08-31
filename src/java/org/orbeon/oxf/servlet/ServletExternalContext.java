@@ -603,6 +603,14 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return rewriteURL(urlString, false);
         }
 
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return rewriteURL(urlString, false);
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return rewriteURL(urlString, false);
+        }
+
         public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
             return rewriteURL(urlString, generateAbsoluteURL);
         }

@@ -379,6 +379,14 @@ public class TestExternalContext implements ExternalContext  {
             return null;
         }
 
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return null;
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return null;
+        }
+
         public String rewriteResourceURL(String urlString, boolean absolute) {
             return null;
         }

@@ -24,7 +24,9 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 import javax.portlet.ReadOnlyException;
+import javax.portlet.ValidatorException;
 import java.util.Iterator;
+import java.io.IOException;
 
 /**
  * This processor stores the preferences for the current portlet.
@@ -47,7 +49,8 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
 
         final Document document = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
-         for (Iterator i = document.getRootElement().elements().iterator(); i.hasNext();) {
+        boolean modified = false;
+        for (Iterator i = document.getRootElement().elements().iterator(); i.hasNext();) {
              final Element currentElement = (Element) i.next();
              final String currentName = currentElement.element("name").getStringValue();
 
@@ -60,10 +63,19 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
              }
 
              try {
+                 System.out.println("Setting prefs for: " + currentName + ", " + currentValuesArray.length + ", " + currentValuesArray[0]);
+                 modified = true;
                  preferences.setValues(currentName, currentValuesArray);
              } catch (ReadOnlyException e) {
                  throw new OXFException(e);
              }
-         }
+        }
+        if (modified) {
+            try {
+                preferences.store();
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        }
     }
 }

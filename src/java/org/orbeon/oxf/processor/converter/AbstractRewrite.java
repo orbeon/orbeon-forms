@@ -360,14 +360,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace(atts);
-                final String url_typ = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
+                final String urlType = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "url-type");
+                final String portletMode = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "portlet-mode");
+                final String windowState = atts.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
 
                 final String newHref;
-                if (url_typ == null || "render".equals(url_typ)) {
-                    newHref = response.rewriteRenderURL(href);
-                } else if ("action".equals(url_typ)) {
-                    newHref = response.rewriteActionURL(href);
-                } else if ("resource".equals(url_typ)) {
+                if (urlType == null || "render".equals(urlType)) {
+                    newHref = response.rewriteRenderURL(href, portletMode, windowState);
+                } else if ("action".equals(urlType)) {
+                    newHref = response.rewriteActionURL(href, portletMode, windowState);
+                } else if ("resource".equals(urlType)) {
                     newHref = response.rewriteResourceURL(href, false);
                 } else {
                     newHref = null;

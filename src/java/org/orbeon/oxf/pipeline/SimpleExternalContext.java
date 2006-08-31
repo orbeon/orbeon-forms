@@ -259,6 +259,14 @@ public class SimpleExternalContext implements ExternalContext {
             return "";
         }
 
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return "";
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return "";
+        }
+
         public String rewriteResourceURL(String urlString) {
             return "";
         }

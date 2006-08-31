@@ -68,6 +68,14 @@ public class ResponseWrapper implements ExternalContext.Response {
         return _response.rewriteRenderURL(urlString);
     }
 
+    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+        return _response.rewriteActionURL(urlString, portletMode, windowState);
+    }
+
+    public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+        return _response.rewriteRenderURL(urlString, portletMode, windowState);
+    }
+
     public String rewriteResourceURL(String urlString, boolean generateAbsoluteURL) {
         return _response.rewriteResourceURL(urlString, generateAbsoluteURL);
     }

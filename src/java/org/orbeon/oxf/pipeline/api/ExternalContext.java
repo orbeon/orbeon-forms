@@ -104,6 +104,8 @@ public interface ExternalContext extends WebAppExternalContext {
 
         public String rewriteActionURL(String urlString);
         public String rewriteRenderURL(String urlString);
+        public String rewriteActionURL(String urlString, String portletMode, String windowState);
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState);
         public String rewriteResourceURL(String urlString, boolean absolute);
         public String getNamespacePrefix();
         public void setTitle(String title);

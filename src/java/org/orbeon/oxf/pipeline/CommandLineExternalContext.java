@@ -71,6 +71,14 @@ public class CommandLineExternalContext extends SimpleExternalContext {
             return rewriteURL(urlString, false);
         }
 
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return rewriteURL(urlString, false);
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return rewriteURL(urlString, false);
+        }
+
         public String rewriteResourceURL(String urlString) {
             return rewriteURL(urlString, false);
         }

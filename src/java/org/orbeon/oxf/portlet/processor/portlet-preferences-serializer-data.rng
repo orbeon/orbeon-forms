@@ -11,13 +11,17 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<element name="preferences" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+<element name="portlet-preferences" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
     xmlns="http://relaxng.org/ns/structure/1.0">
     <zeroOrMore>
         <element name="preference">
-            <element name="name" type="NCName"/>
+            <element name="name">
+                <data type="NCName"/>
+            </element>
             <oneOrMore>
-                <element name="value" type="string"/>
+                <element name="value">
+                    <data type="string"/>
+                </element>
             </oneOrMore>
         </element>
     </zeroOrMore>

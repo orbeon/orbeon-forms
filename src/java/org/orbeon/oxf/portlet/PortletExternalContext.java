@@ -363,23 +363,31 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public String rewriteActionURL(String urlString) {
-            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_BLOCKING_ACTION);
+            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_BLOCKING_ACTION, null, null);
         }
 
         public String rewriteRenderURL(String urlString) {
-            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_RENDER);
+            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_RENDER, null, null);
         }
 
-        private String rewritePortletURL(String urlString, int urlType) {
+        public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_BLOCKING_ACTION, portletMode,  windowState);
+        }
+
+        public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+            return rewritePortletURL(urlString, WSRPUtils.URL_TYPE_RENDER, portletMode,  windowState);
+        }
+
+        private String rewritePortletURL(String urlString, int urlType, String portletMode, String windowState) {
             // Case where a protocol is specified OR it's just a fragment: the URL is left untouched
             if (NetUtils.urlHasProtocol(urlString) || urlString.startsWith("#")) return urlString;
 
             try {
                 // Parse URL
-                URL baseURL = new URL("http", "example.org", getRequest().getRequestPath());
-                URL u = new URL(baseURL, urlString);
+                final URL baseURL = new URL("http", "example.org", getRequest().getRequestPath());
+                final URL u = new URL(baseURL, urlString);
                 // Decode query string
-                Map parameters = NetUtils.decodeQueryString(u.getQuery(), true);
+                final Map parameters = NetUtils.decodeQueryString(u.getQuery(), true);
                 // Add special path parameter
                 if (urlString.startsWith("?")) {
                     // This is a special case that appears to be implemented
@@ -390,12 +398,10 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                     parameters.put(PortletExternalContext.PATH_PARAMETER_NAME, new String[] { u.getPath() });
                 }
                 // Encode as "navigational state"
-                String navigationalState = NetUtils.encodeQueryString(parameters);
-
-                // TODO: portlet modes and window states
+                final String navigationalState = NetUtils.encodeQueryString(parameters);
 
                 // Encode the URL a la WSRP
-                return WSRPUtils.encodePortletURL(urlType, navigationalState, null, null, u.getRef(), false);
+                return WSRPUtils.encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef(), false);
             } catch (Exception e) {
                 throw new OXFException(e);
             }

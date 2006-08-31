@@ -879,7 +879,14 @@ class ResponseAdapter implements ExternalContext.Response {
     public InputStream getInputStream() {
         if (inputStream == null) {
             if (stringWriter != null) {
-                throw new OXFException("ResponseAdapter.getInputStream() does not yet support content written with getWriter().");
+                final byte[] bytes;
+                try {
+                    bytes = stringWriter.getBuffer().toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new OXFException(e); // should not happen
+                }
+                inputStream = new ByteArrayInputStream(bytes, 0, bytes.length);
+//                throw new OXFException("ResponseAdapter.getInputStream() does not yet support content written with getWriter().");
             } else if (byteStream != null) {
                 inputStream = new ByteArrayInputStream(byteStream.getByteArray(), 0, byteStream.size());
             }
@@ -929,6 +936,14 @@ class ResponseAdapter implements ExternalContext.Response {
     }
 
     public String rewriteRenderURL(String urlString) {
+        return null;
+    }
+
+    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+        return null;
+    }
+
+    public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
         return null;
     }
 

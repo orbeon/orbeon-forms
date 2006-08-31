@@ -76,18 +76,16 @@
                                 above in addition to Firefox and Internet Explorer. The main limitation is that the
                                 WYSIWYG HTML area does not work on Opera and Safari.
                             </p>
+                            <p>
+                                The Safari support was kindly sponsored by Object Consulting.
+                            </p>
                         </li>
                         <li>
                             <p>
                                 <b>Support for Liferay portal.</b> OPS, including XForms, now works within Liferay
                                 portal 3.6.1 and 4.1.0. A new epilogue pipeline,
                                 <code>epilogue-portlet-liferay.xpl</code>, can now be used to deploy JSR-168 portlets
-                                into liferay.
-                            </p>
-                            <p>
-                                In addition, some bugs have been fixed relative to conflicts between OPS JavaScript
-                                files and Liferay's, as well as ensuring that multiple OPS portlets do not conflict
-                                within the same portal page.
+                                into liferay, including multiple OPS portlets at the same time.
                             </p>
                             <p>
                                 This feature was kindly sponsored by Atkins Transport Systems.
@@ -99,8 +97,10 @@
                                 <code>xxforms:readonly-appearance</code> attribute. With
                                 <code>xxforms:readonly-appearance="static"</code>, read-only controls take a static
                                 appearance appropriate for read-only rendition of forms in HTML. See <a
-                                href="/goto-example/forms">DMV Forms</a> for an example. This feature was kindly
-                                sponsored by Esprit. [TODO: doc]
+                                href="/goto-example/forms">DMV Forms</a> for an example.
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Esprit. [TODO: doc]
                             </p>
                         </li>
                         <li>
@@ -117,24 +117,30 @@
                                 <b>Autocomplete control.</b> You enable this on <code>xforms:select1</code> with the
                                 <code>xxforms:autocomplete</code> appearance. See <a
                                 href="/goto-example/xforms-controls">XForms Controls</a> and <a
-                                href="/goto-example/xforms-google-suggests">Google Suggests</a> for examples. This
-                                feature was kindly sponsored by Mobydoc.
+                                href="/goto-example/xforms-google-suggests">Google Suggests</a> for examples.
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Mobydoc.
                             </p>
                         </li>
                         <li>
                             <p>
                                 <b>WYSIWYG HTML editor control.</b> You enable this on <code>xforms:textarea</code>
                                 with the <code>text/html</code> mediatype. See <a
-                                href="/goto-example/xforms-html-area">XForms HTML Area</a> for an example. This feature
-                                was kindly sponsored by Teleflex.
+                                href="/goto-example/xforms-html-area">XForms HTML Area</a> for an example.
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Teleflex.
                             </p>
                         </li>
                         <li>
                             <p>
                                 <b>Tree control and menu control.</b> You enable this on <code>xforms:select1</code> and
                                 <code>xforms:select</code> (tree only) with the <code>xxforms:tree</code> and
-                                <code>xxforms:menu</code> apperances. This feature was kindly sponsored by Teleflex.
-                                [TODO: examples]
+                                <code>xxforms:menu</code> apperances. [TODO: examples]
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Teleflex.
                             </p>
                         </li>
                         <li>
@@ -239,7 +245,10 @@
                                 <b>HTML and XHTML within <code>xforms:help</code></b> Support for HTML and literal XHTML
                                 within <code>xforms:help</code> and <code>xforms:hint</code>. See the <a
                                 href="reference-xforms-ng#xforms-label-alert-help-hint">XForms Reference</a> for
-                                documentation. This feature was kindly sponsored by Teleflex.
+                                documentation.
+                            </p>
+                            <p>
+                                This feature was kindly sponsored by Teleflex.
                             </p>
                         </li>
                         <!--<li>-->

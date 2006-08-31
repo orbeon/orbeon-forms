@@ -39,7 +39,6 @@
                 following application servers:
             </p>
             <ul>
-                <li>Apache Tomcat 4.1.31 (JDK 1.4.2)</li>
                 <li>Apache Tomcat 5.5.4 (JDK 1.5.0)</li>
                 <li>BEA WebLogic Server 9.1 (JRockit)</li>
                 <li>IBM WebSphere 6</li>

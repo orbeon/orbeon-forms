@@ -127,7 +127,7 @@
                 <title>How much of the XForms specification does OPS support?</title>
                 <p>
                     The OPS implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
-                    (Second Edition) Recommendation</a> (14 March 2006). OPS 3.0's XForms NG engine is close to
+                    (Second Edition) Recommendation</a> (14 March 2006). The XForms NG engine in OPS 3.5 is close to
                     supporting all of the XForms 1.0 specification. For more detailed information on what features are
                     supported in the latest version of OPS, see the <a href="reference-xforms-compliance">XForms
                     Compliance</a> section of the documentation.
@@ -190,7 +190,7 @@
                     "XForms NG".
                 </p>
                 <p>
-                    For backward compatibility reasons, the XForms Classic engine is still present in OPS 3.0. We plan
+                    For backward compatibility reasons, the XForms Classic engine is still present in OPS 3.5. We plan
                     over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well, therefore making
                     XForms Classic obsolete in OPS.
                 </p>
@@ -199,7 +199,6 @@
             <section added="2006-01-10">
                 <title>How do I know which XForms engine I am using?</title>
                 <p>
-                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
                     If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
                     later, then you may be using XForms Classic or XForms NG, but there is an easy way to tell: if a
                     <code>&lt;page></code> entry in your page flow features an <code>xforms</code> attribute, then and
@@ -211,17 +210,17 @@
             <section added="2006-01-10">
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
-                    The XForms Classic engine is available only for backward compatibility. It is currently
-                    deprecated, and may be removed in the future. If you are starting an application from scratch with
-                    OPS 3.0, we strongly advise against using XForms Classic. If you are migrating to OPS 3.0, we
-                    advise starting migrating XForms NG. You can keep your existing pages working with XForms Classic,
-                    and write new pages with XForms NG. Over time, you can migrate existing XForms Classic pages to
-                    XForms NG, making for a smooth transition.
+                    The XForms Classic engine is available only for backward compatibility. It is currently deprecated,
+                    and may be removed in the future. If you are starting an application from scratch with OPS 3.5, we
+                    strongly advise against using XForms Classic. If you are migrating to OPS 3.5, we advise starting
+                    migrating XForms NG. You can keep your existing pages working with XForms Classic, and write new
+                    pages with XForms NG. Over time, you can migrate existing XForms Classic pages to XForms NG, making
+                    for a smooth transition.
                 </p>
                 <p>
-                    As of OPS 3.0, some features of XForms Classic have not yet made it into XForms NG, in particular
-                    support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we
-                    hope to bring these features to XForms NG as well, therefore completely removing the need for XForms
+                    As of OPS 3.5, some features of XForms Classic have not yet made it into XForms NG, in particular
+                    support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we hope
+                    to bring these features to XForms NG as well, therefore completely removing the need for XForms
                     Classic.
                 </p>
             </section>
@@ -247,9 +246,8 @@
             <section added="2005-05-21">
                 <title>My XForms upload doesn't work. What can I do?</title>
                 <p>
-                    With OPS 2.8 or earlier, or if you are using XForms Classic with OPS 3.0, make
-                    sure that you have the correct submission method and encoding in your XForms
-                    model:
+                    With OPS 2.8 or earlier, or if you are using XForms Classic with OPS 3.0 or later, make sure that
+                    you have the correct submission method and encoding in your XForms model:
                 </p>
                 <p>
                     <xml-source>

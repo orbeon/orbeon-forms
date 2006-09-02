@@ -95,8 +95,8 @@
                 </p>
                 <p>
                     XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
-                    March 2006. The XForms Working Group is, as of June 2006, working on XForms 1.1, due in late 2006 or
-                    2007, before embarking on XForms 1.2 or XForms 2.0! Please visit <a
+                    March 2006. The XForms Working Group is, as of August 2006, working on XForms 1.1, due in late 2006
+                    or 2007, before embarking on XForms 1.2 or XForms 2.0! Please visit <a
                     href="http://www.w3.org/TR/xforms/">XForms - The Next Generation of Web Forms</a> for more
                     information about XForms direct from W3C.
                 </p>
@@ -133,8 +133,8 @@
                     Compliance</a> section of the documentation.
                 </p>
                 <p>
-                    OPS also supports several features from XForms 1.1 (in draft as of July 2006), as well as extensions
-                    such as new widgets (autocomplete, tree, menu, etc.).
+                    OPS also supports several features from XForms 1.1 (in draft as of August 2006), as well as
+                    extensions such as new widgets (autocomplete, tree, menu, etc.).
                 </p>
             </section>
             <a name="xforms-server-side"/>

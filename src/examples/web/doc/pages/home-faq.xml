@@ -277,9 +277,8 @@
             <section>
                 <title>Can I run XForms within JSR-168 portlets?</title>
                 <p>
-                    As of OPS 3.1 (scheduled for release in summer 2006), it is possible to use the OPS XForms engine
-                    within the Java Portlet (JSR-168) compliant Liferay portal, thanks to kind sponsoring by Atkins
-                    Transport Systems.
+                    As of OPS 3.5, it is possible to use the OPS XForms engine within the Java Portlet (JSR-168)
+                    compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
                 </p>
                 <p>
                     To do this, use the provided <code>epilogue-portlet-liferay.xpl</code> epilogue instead of the
@@ -300,7 +299,7 @@
                     fit within a portlet.
                 </p>
                 <p>
-                    <i>NOTE: Historically, there has been a lot of code in OPS to support JSR-168 since late 2003
+                    <i>HISTORICAL NOTE: There has been a lot of code in OPS to support JSR-168 since late 2003
                     already. When this code was written, the JSR-168 specification was not final and no JSR-168
                     container was available. So Orbeon developped a container based on draft specifications for testing.
                     This code was used until recently to run the OPS examples portal: examples were actually using the
@@ -309,16 +308,36 @@
             </section>
             <a name="browser-support"/>
             <section>
-                <title>What web browsers does the OPS XForms engine support?</title>
+                <title>What web browsers does the Ajax-based XForms engine support?</title>
                 <p>
-                    As of OPS 3.0.1, the OPS XForms engine supports Firefox (1.0.7 and later) and IE 6.
+                    OPS 3.5's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later), and
+                    Opera (8.5 and later).
                 </p>
                 <p>
-                    As of OPS 3.1 (scheduled for release in summer 2006), some of the functionality works with Opera 8.5
-                    and Safari. We plan over time to progressivly bring full support to these two browsers.
+                    We hope to also implement support in XForms NG for non-JavaScript, non-Ajax browsers.
+                </p>
+            </section>
+            <a name="graphical-designer"/>
+            <section>
+                <title>What visual tool / graphical designer do you recommend for XForms?</title>
+                <p>
+                    We develop all our applications and forms using an XML editor. This is the only way you can leverage
+                    all the features of XForms today, especially the more complex ones like events and actions. This
+                    means that we do not have a visual tool to recommend officially. You may however try the Intalio
+                    designer. Trial versions are available <a href="http://www.intalio.com/">from their web site</a>
+                    once you register.
                 </p>
                 <p>
-                    Finally, we also plan to fit XForms NG with support for non-JavaScript, non-Ajax browsers.
+                    Our perception is that visual tools tend to be of little use for actual developers except for the
+                    first few steps of development (and this is not only true for XForms but also for other frameworks
+                    like JavaServer Faces), so we advise not to have too high expectations when it comes to visual
+                    tools. However, we reckon that helping developers during the first stages of application development
+                    is valuable and we would like in the future to offer such a tool, most likely web-based (and itself
+                    implemented with XForms!).
+
+                </p>
+                <p>
+                    If you have good experience with a visual tool, please be sure to let us know.
                 </p>
             </section>
         </section>

@@ -58,9 +58,9 @@
                         <li>
                             <p>
                                 <b>Client-side performance improvements.</b> The client-side event handling has been
-                                entirely reworked. Client-side JavaScript performance is now greatly improved and
-                                large forms that took seconds to load because of client-side JavaScript now loads
-                                almost instantly.
+                                entirely reworked. Client-side JavaScript performance is now greatly improved and large
+                                forms that took seconds to load because of client-side JavaScript now load almost
+                                instantly.
                             </p>
                         </li>
                         <li>

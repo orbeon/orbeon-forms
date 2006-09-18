@@ -327,7 +327,7 @@
                     <ul>
                         <li>
                             <p>
-                                Upgrade to the <code>http://developer.yahoo.com/yui/Yahoo! User Interface library</code>
+                                Upgrade to the <a href="http://developer.yahoo.com/yui/">Yahoo! User Interface library</a>
                                 as a support library for the client-side part of the XForms engine. We no longer use <a
                                 href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
                             </p>

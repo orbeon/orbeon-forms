@@ -18,7 +18,7 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xu="http://www.xmldb.org/xupdate">
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xu="http://www.xmldb.org/xupdate">
     <header>
         <title>Orbeon PresentationServer (OPS) and Orbeon Studio FAQ</title>
     </header>
@@ -222,6 +222,14 @@
                     support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we hope
                     to bring these features to XForms NG as well, therefore completely removing the need for XForms
                     Classic.
+                </p>
+            </section>
+            <a name="xforms-classic-migration"/>
+            <section added="2006-09-18">
+                <title>How do I migrate from XForms Classic to XForms NG?</title>
+                <p>
+                    Please visit <a href="reference-xforms-ng#xforms-classic-migration">Migrating from XForms Classic
+                    to XForms NG</a>.
                 </p>
             </section>
             <a name="xforms-html"/>

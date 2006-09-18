@@ -36,13 +36,12 @@ import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NamePool;
+import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.type.TypeHierarchy;
 import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.trans.IndependentContext;
-import org.orbeon.saxon.trans.StaticError;
-import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
@@ -147,9 +146,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     final LocationData locDat = getLocationData();
                     final SAXResult sr = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
-                        
-                        Locator locator;
-                        
+
+                        private Locator locator;
+
                         // Saxon happens to issue such prefix mappings from time to time. Those
                         // cause issues later down the chain, and anyway serialize to incorrect XML
                         // if xmlns:xmlns="..." gets generated. This appears to happen when Saxon
@@ -162,16 +161,27 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                             super.startPrefixMapping(s, s1);
                         }
-                        public void setDocumentLocator( final Locator loc ) {
+
+                        public void setDocumentLocator(final Locator loc) {
                             locator = loc;
                         }
+
                         public void startDocument() throws SAXException {
-                            if ( ( locator == null || locator.getSystemId() == null ) 
-                                  && locDat != null ) {
-                                final Locator loc = new ConstantLocator( locDat );
-                                super.setDocumentLocator( loc );
+                            if ((locator == null || locator.getSystemId() == null)
+                                    && locDat != null) {
+                                final Locator loc = new ConstantLocator(locDat);
+                                super.setDocumentLocator(loc);
                             }
                             super.startDocument();
+                        }
+
+                        public void endDocument() throws SAXException {
+                            if (getContentHandler() == null) {
+                                // Hack to test if Saxon outputs more than one endDocument() event
+                                logger.warn("XSLT transformer attempted to call endDocument() more than once.");
+                                return;
+                            }
+                            super.endDocument();
                         }
                     });
                     if ( locDat != null ) {

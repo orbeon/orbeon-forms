@@ -114,10 +114,12 @@ public abstract class XFormsValueControl extends XFormsControl {
 
             if (format != null) {
                 final NodeInfo boundNode = getBoundNode();
-                if (boundNode == null) // this should not happen
-                    throw new OXFException("Control is no longer bound to a node. Cannot evaluate control display value.");
-                result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
+                if (boundNode == null) {
+                    result = null;
+                } else {
+                    result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
                             format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+                }
             } else {
                 result = null;
             }
@@ -127,11 +129,12 @@ public abstract class XFormsValueControl extends XFormsControl {
             final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getControlElement());
 
             final NodeInfo boundNode = getBoundNode();
-            if (boundNode == null) // this should not happen
-                throw new OXFException("Control is no longer bound to a node. Cannot evaluate control display value.");
-
-            result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
+            if (boundNode == null) {
+                result = null;
+            } else {
+                result = containingDocument.getEvaluator().evaluateAsString(pipelineContext, boundNode,
                         format, prefixToURIMap, null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+            }
         }
         setDisplayValue(result);
     }

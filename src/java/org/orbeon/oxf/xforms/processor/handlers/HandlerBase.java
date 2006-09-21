@@ -120,7 +120,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static void handleMIPClasses(StringBuffer sb, XFormsControl xformsControl) {
-        if (xformsControl != null) {// TEMP, controlInfo should not be null
+        if (xformsControl != null) {// TEMP, xformsControl should not be null
             if (!xformsControl.isRelevant()) {
                 if (sb.length() > 0)
                     sb.append(' ');
@@ -136,14 +136,16 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     sb.append(' ');
                 sb.append("xforms-readonly");
             }
-            if (xformsControl != null && xformsControl instanceof XFormsValueControl && xformsControl.isRequired()) {
+            if (xformsControl != null && xformsControl.isRequired()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
-                if ("".equals(((XFormsValueControl) xformsControl).getValue()))
-                    sb.append(" xforms-required-empty");
-                else
-                    sb.append(" xforms-required-filled");
+                if (xformsControl instanceof XFormsValueControl) {
+                    if ("".equals(((XFormsValueControl) xformsControl).getValue()))
+                        sb.append(" xforms-required-empty");
+                    else
+                        sb.append(" xforms-required-filled");
+                }
             }
         }
     }

@@ -50,7 +50,7 @@ public class DaysFromDate extends XFormsFunction {
             // normalization."
 
             final DateTimeValue dateTimeValue = (value instanceof DateTimeValue) ? (DateTimeValue) value : ((DateValue) value).toDateTime();
-            return new IntegerValue(dateTimeValue.normalize(context).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY / 1000);
+            return new IntegerValue(dateTimeValue.normalize(context.getConfiguration()).toJulianInstant().subtract(SecondsFromDateTime.BASELINE).longValue() / SECONDS_PER_DAY / 1000);
         }
     }
 }

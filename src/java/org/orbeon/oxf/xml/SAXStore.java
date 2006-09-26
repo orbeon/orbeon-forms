@@ -65,6 +65,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     private String systemId = null;
     private String publicId = null;
 
+//    private boolean started;
+//    private boolean ended;
+
     public SAXStore() {
         super.setForward(false);
         init();
@@ -234,6 +237,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(CHARACTERS);
         addToCharBuffer(chars, start, length);
         addToIntBuffer(length);
@@ -247,15 +253,22 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void endDocument() throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(END_DOCUMENT);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
             addToLineBuffer(locator.getColumnNumber());
         }
         super.endDocument();
+//        ended = true;
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(END_ELEMENT);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -269,6 +282,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void endPrefixMapping(String s) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(END_PREFIX_MAPPING);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -280,6 +296,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(IGN_WHITESPACE);
         addToCharBuffer(chars, start, length);
         addToIntBuffer(length);
@@ -293,6 +312,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void processingInstruction(String s, String s1) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(PI);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -305,6 +327,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void setDocumentLocator(Locator locator) {
+
+//        if (ended) return;
+
         addToEventBuffer(DOC_LOCATOR);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -315,6 +340,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void skippedEntity(String s) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(SKIPPED_ENTITY);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -326,6 +354,14 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void startDocument() throws SAXException {
+
+//        if (ended) return;
+
+//        if (started) {
+            // TODO: Warn
+//        }
+//        started = true;
+
         addToEventBuffer(START_DOCUMENT);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -335,6 +371,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(START_ELEMENT);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());
@@ -354,6 +393,9 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
     }
 
     public void startPrefixMapping(String s, String s1) throws SAXException {
+
+//        if (ended) return;
+
         addToEventBuffer(START_PREFIX_MAPPING);
         if (locator != null) {
             addToLineBuffer(locator.getLineNumber());

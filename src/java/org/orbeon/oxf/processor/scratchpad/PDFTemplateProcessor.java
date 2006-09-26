@@ -84,7 +84,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 for (Iterator i = XPathUtils.selectIterator(configDocument, xPath); i.hasNext();) {
                     Element e = (Element) i.next();
 
-                    Map namespaceMap = Dom4jUtils.getNamespaceContext(e);
+                    Map namespaceMap = Dom4jUtils.getNamespaceContextNoDefault(e);
 
                     String leftPosition = e.attributeValue("left-position");
                     String topPosition = e.attributeValue("top-position");

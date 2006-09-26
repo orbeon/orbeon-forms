@@ -52,6 +52,10 @@ public class SAXDebuggerProcessor extends ProcessorImpl {
 
     public static class DebugContentHandler extends ForwardingContentHandler {
 
+        public DebugContentHandler() {
+            this(new NullSerializer.NullContentHandler());
+        }
+
         public DebugContentHandler(ContentHandler contentHandler) {
             super(contentHandler);
         }

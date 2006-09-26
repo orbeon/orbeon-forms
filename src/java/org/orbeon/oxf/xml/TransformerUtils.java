@@ -435,7 +435,7 @@ class TransformerWrapper extends Transformer {
         if (publicProperty.equals(name))
             transformer.setOutputProperty(privateProperty, value);
         else
-            transformer.setOutputProperty(name, value);;
+            transformer.setOutputProperty(name, value);
     }
 
     public void setParameter(String name, Object value) {

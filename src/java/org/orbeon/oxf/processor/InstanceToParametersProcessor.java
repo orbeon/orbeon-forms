@@ -89,7 +89,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         String excludeRef = refAttribute.getValue();
                         PooledXPathExpression xpath = XPathCache.getXPathExpression(pipelineContext,
                                 instanceWrapper.wrap(instance), excludeRef,
-                                Dom4jUtils.getNamespaceContext(paramElement));
+                                Dom4jUtils.getNamespaceContextNoDefault(paramElement));
                         try {
                             markedNodes.add(xpath.evaluateSingle());
                         } finally {

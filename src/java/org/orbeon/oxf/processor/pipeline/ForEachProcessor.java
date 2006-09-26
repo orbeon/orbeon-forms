@@ -110,7 +110,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             iterationOutput = iterationProcessor.createOutput(idOrRef);
 
             select = forEachAST.getSelect();
-            namespaceContext = Dom4jUtils.getNamespaceContext((Element) forEachAST.getNode());
+            namespaceContext = Dom4jUtils.getNamespaceContextNoDefault((Element) forEachAST.getNode());
             if (forEachAST.getRoot() != null) {
                 rootQName = forEachAST.getRoot();
                 int columnPosition = rootQName.indexOf(':');

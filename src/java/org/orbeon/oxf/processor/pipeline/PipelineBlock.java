@@ -202,7 +202,7 @@ public class PipelineBlock {
 
     private void addNamespaces(Element configElement, Node node) {
         if (node != null) {
-            Map namespaces = Dom4jUtils.getNamespaceContext((Element) node);
+            Map namespaces = Dom4jUtils.getNamespaceContextNoDefault((Element) node);
             for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 String uri = (String) namespaces.get(prefix);

@@ -66,7 +66,7 @@
         <include name="jtidy-04aug2000r7.jar"/>
         <include name="junit.jar"/>
         <include name="saxon-6_5_2.jar"/>
-        <include name="saxon-8_7_orbeon.jar"/>
+        <include name="saxon-8_8_orbeon.jar"/>
         <include name="joost-20030623_orbeon.jar"/>
         <include name="batik-all-1_5.jar"/>
         <include name="avalon*"/>
@@ -180,7 +180,7 @@
             <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
             <exclude name="org/orbeon/oxf/processor/bpel/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>
-            <!--<exclude name="org/orbeon/saxon/dom4j/*"/>-->
+            <exclude name="org/orbeon/saxon/dom4j/*"/>
         </javac>
     </target>
 

@@ -43,7 +43,7 @@ public class SecondsFromDateTime extends XFormsFunction {
 
             // "the return value is equal to the number of seconds difference between the specified dateTime
             // (normalized to UTC) and 1970-01-01T00:00:00Z"
-            return new IntegerValue(value.normalize(context).toJulianInstant().subtract(BASELINE).longValue() / 1000);
+            return new IntegerValue(value.normalize(context.getConfiguration()).toJulianInstant().subtract(BASELINE).longValue() / 1000);
 
         } catch (XPathException e) {
             return NAN;

@@ -94,6 +94,10 @@ public class ProcessorUtils {
     }
 
     public static Processor createProcessorWithInputs(Element testNode, PipelineContext pipelineContext) {
+        return createProcessorWithInputs(testNode, pipelineContext, false);
+    }
+
+    public static Processor createProcessorWithInputs(Element testNode, PipelineContext pipelineContext, boolean saxDebug) {
         // Create processor
         QName processorName = XMLProcessorRegistry.extractProcessorQName(testNode);
         ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
@@ -116,8 +120,15 @@ public class ProcessorUtils {
                 addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
                 final String sid = Dom4jUtils.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
-                    ( copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid );
-                PipelineUtils.connect( domGenerator, "data", processor, name );
+                    (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
+
+                if (saxDebug) {
+                    final SAXDebuggerProcessor debuggerProcessor = new SAXDebuggerProcessor();
+                    PipelineUtils.connect(domGenerator, "data", debuggerProcessor, "data");
+                    PipelineUtils.connect(debuggerProcessor, "data", processor, name);
+                } else {
+                    PipelineUtils.connect(domGenerator, "data", processor, name );
+                }
             } else {
                 // Href
                 LocationData locationData = (LocationData) inputElement.getData();

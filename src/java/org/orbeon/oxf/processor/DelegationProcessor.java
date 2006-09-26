@@ -455,7 +455,7 @@ public class DelegationProcessor extends ProcessorImpl {
                 String select = operationElement.attributeValue("select");
                 if (select != null) {
                     operation.select = select;
-                    operation.selectNamespaceContext = Dom4jUtils.getNamespaceContext(operationElement);
+                    operation.selectNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(operationElement);
                 }
             }
         }

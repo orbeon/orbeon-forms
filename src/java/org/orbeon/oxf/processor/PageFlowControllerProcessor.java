@@ -637,7 +637,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (foundActionWithoutWhen[0])
                             throw new ValidationException("Unreachable <action>", (LocationData) actionElement.getData());
                         setTest(whenAttribute);
-                        setNamespaces(Dom4jUtils.getNamespaceContext(actionElement));
+                        setNamespaces(Dom4jUtils.getNamespaceContextNoDefault(actionElement));
                         setLocationData((LocationData) actionElement.getData());
                     } else {
                         foundActionWithoutWhen[0] = true;
@@ -700,7 +700,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addWhen(new ASTWhen() {{
                                     if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
-                                        setNamespaces(Dom4jUtils.getNamespaceContext(resultElement));
+                                        setNamespaces(Dom4jUtils.getNamespaceContextNoDefault(resultElement));
                                         final String[] locationParams =
                                             new String[] { "page id", pageElement.attributeValue("id"), "when", resultWhenAttribute };
                                         setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams, true));

@@ -139,7 +139,7 @@ public class XFormsInput extends ProcessorImpl {
                                         final String value = groupElement.getStringValue();
                                         if (!"".equals(value))
                                             localInstance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
-                                                    Dom4jUtils.getNamespaceContext(paramElement), value);
+                                                    Dom4jUtils.getNamespaceContextNoDefault(paramElement), value);
                                     }
                                 }
 

@@ -172,7 +172,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
 //                    ? XMLUtils.getNamespaceContext((Element) astWhen.getNode())
 //                    : astWhen.getNamespaces()));
             branchNamespaces.add(astWhen.getNode() != null
-                    ? Dom4jUtils.getNamespaceContext((Element) astWhen.getNode())
+                    ? Dom4jUtils.getNamespaceContextNoDefault((Element) astWhen.getNode())
                     : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to

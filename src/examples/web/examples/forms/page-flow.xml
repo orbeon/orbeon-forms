@@ -29,25 +29,18 @@
 
     <!-- ========== Pages ========== -->
 
-    <page id="summary" path-info="/forms" model="summary/summary-model.xpl" view="summary/summary-view.xhtml"/>
+    <page id="summary" path-info="/forms" view="summary/summary-view.xhtml"/>
 
     <page id="detail" path-info="/forms/detail"
           default-submission="detail/parameters.xml"
-          model="detail/detail-model.xpl"
           view="detail/detail-view.xhtml">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
         <setvalue ref="/parameters/readonly" parameter="readonly"/>
     </page>
 
-    <page id="xml-detail" path-info="/direct/forms/xml-detail"
-          default-submission="detail/parameters.xml"
-          model="detail/xml-detail-model.xpl">
-        <setvalue ref="/parameters/document-id" parameter="document-id"/>
-    </page>
-
     <page id="pdf-detail" path-info="/direct/forms/pdf-detail"
           default-submission="detail/parameters.xml"
-          model="detail/pdf-detail-model.xpl">
+          view="detail/pdf-detail-view.xpl">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
     </page>
 
@@ -57,22 +50,12 @@
     <page id="resources" path-info="/forms/service/resources/(.+)" matcher="oxf:perl5-matcher"
             view="detail/resources_${1}.xml"/>
 
-    <!-- Read services -->
-    <page id="list-documents" path-info="/forms/service/list-documents" view="services/list-documents.xpl"/>
-    <page id="read-document" path-info="/forms/service/read-document" view="services/read-document.xpl"/>
-
     <!-- Update services -->
-    <page id="save-document" path-info="/forms/service/save-document">
-        <action action="services/save-document.xpl"/>
-    </page>
     <page id="import-documents" path-info="/forms/service/import-documents">
         <action action="services/import-documents.xpl"/>
     </page>
-    <page id="delete-document" path-info="/forms/service/delete-document">
-        <action action="services/delete-document.xpl"/>
-    </page>
-    <page id="delete-all-documents" path-info="/forms/service/delete-all-documents">
-        <action action="services/delete-all-documents.xpl"/>
+    <page id="delete-documents" path-info="/forms/service/delete-documents">
+        <action action="services/delete-documents.xpl"/>
     </page>
 
     <!-- ========== Epilogue ========== -->

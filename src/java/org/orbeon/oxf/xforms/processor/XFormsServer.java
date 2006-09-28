@@ -347,6 +347,15 @@ public class XFormsServer extends ProcessorImpl {
 
             // Output action
             {
+                final XFormsContainingDocument initialContainingDocument;
+                if (!allEvents) {
+                    initialContainingDocument = null;
+                } else {
+                    // TODO: use cached static state if possible
+                    initialContainingDocument = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);
+                    initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
+                }
+
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
 
                 // Output new controls values and associated information
@@ -363,17 +372,16 @@ public class XFormsServer extends ProcessorImpl {
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(ch, containingDocument, xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(ch, containingDocument,  xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
                         xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+                        final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
 
-                        final XFormsContainingDocument initialContainingDocument
-                                    = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);// TODO: use cached static state if possible
-
-                        diffControlsState(ch, containingDocument, initialContainingDocument.getXFormsControls().getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        // Output diffs
+                        diffControlsState(ch, containingDocument, initialControlsState.getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -381,37 +389,24 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output divs information
                 {
-                    outputSwitchDivs(ch, xformsControls);
+                    if (!allEvents) {
+                        diffSwitchDivs(ch, xformsControls, xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState());
+                    } else {
+                        diffSwitchDivs(ch, xformsControls, initialContainingDocument.getXFormsControls().getCurrentSwitchState(), xformsControls.getCurrentSwitchState());
+                    }
                 }
 
                 // Output repeats information
                 {
                     // Output index updates
                     // TODO: move index state out of ControlsState + handle diffs
-                    final Map initialRepeatIdToIndex = xformsControls.getInitialControlsState().getRepeatIdToIndex();
-                    final Map currentRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
-                    if (currentRepeatIdToIndex.size() != 0) {
-                        boolean found = false;
-                        for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                            final Map.Entry currentEntry = (Map.Entry) i.next();
-                            final String repeatId = (String) currentEntry.getKey();
-                            final Integer index = (Integer) currentEntry.getValue();
 
-                            // Output information if there is a difference
-                            final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
-                            if (!index.equals(newIndex)) {
-
-                                if (!found) {
-                                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
-                                    found = true;
-                                }
-
-                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                                        new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
-                            }
-                        }
-                        if (found)
-                            ch.endElement();
+                    if (!allEvents) {
+                        diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                    } else {
+                        final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+                        final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
+                        diffIndexState(ch, initialControlsState.getRepeatIdToIndex(), currentControlsState.getRepeatIdToIndex());
                     }
                 }
 
@@ -419,6 +414,7 @@ public class XFormsServer extends ProcessorImpl {
                 {
                     // Diff itemset information
                     final Map itemsetUpdate = diffItemsets(itemsetsFull1, itemsetsFull2);
+                    // TODO: handle allEvents case
                     outputItemsets(ch, itemsetUpdate);
                 }
 
@@ -469,6 +465,32 @@ public class XFormsServer extends ProcessorImpl {
             ch.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);
+        }
+    }
+
+    private void diffIndexState(ContentHandlerHelper ch, Map initialRepeatIdToIndex, Map currentRepeatIdToIndex) {
+        if (currentRepeatIdToIndex.size() != 0) {
+            boolean found = false;
+            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String repeatId = (String) currentEntry.getKey();
+                final Integer index = (Integer) currentEntry.getValue();
+
+                // Output information if there is a difference
+                final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
+                if (!index.equals(newIndex)) {
+
+                    if (!found) {
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+                        found = true;
+                    }
+
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                            new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
+                }
+            }
+            if (found)
+                ch.endElement();
         }
     }
 
@@ -955,10 +977,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputSwitchDivs(ContentHandlerHelper ch, XFormsControls xformsControls) {
-
-        final XFormsControls.SwitchState state1 = xformsControls.getInitialSwitchState();
-        final XFormsControls.SwitchState state2 = xformsControls.getCurrentSwitchState();
+    public static void diffSwitchDivs(ContentHandlerHelper ch, XFormsControls xformsControls, XFormsControls.SwitchState state1, XFormsControls.SwitchState state2) {
 
         final Map switchIdToSelectedCaseIdMap2 = state2.getSwitchIdToSelectedCaseIdMap();
         if (switchIdToSelectedCaseIdMap2 != null) {

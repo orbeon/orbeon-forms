@@ -33,33 +33,28 @@
 
         <p:processor name="oxf:url-generator">
             <p:input name="config" href="aggregate('config', aggregate('url', current()#xpointer(concat('../schema/', string(/)))))"/>
-            <p:output name="data" id="file"/>
+            <p:output name="data" id="document"/>
         </p:processor>
 
-        <!-- Dynamically generate document to insert with a new id -->
-        <p:processor name="oxf:unsafe-xslt">
-            <p:input name="data" href="#file"/>
+        <!-- Create REST submission -->
+        <p:processor name="oxf:xslt">
             <p:input name="config">
-                <document-info xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
-                    <document-id>
-                        <!-- Create a document id by calling some Java code -->
-                        <xsl:value-of select="uuid:createPseudoUUID()"/>
-                    </document-id>
-                    <document-date>
-                        <xsl:value-of select="current-dateTime()"/>
-                    </document-date>
-                    <document>
-                        <xsl:copy-of select="/*"/>
-                    </document>
-                </document-info>
+                <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                                   xsl:version="2.0" method="put" action="/exist/rest/db/ops/dmv-example/{/*}"/>
             </p:input>
-            <p:output name="data" id="document-info"/>
+            <p:input name="data" href="current()"/>
+            <p:output name="data" id="submission"/>
         </p:processor>
 
-        <!-- Call service -->
-        <p:processor name="oxf:pipeline">
-            <p:input name="config" href="save-document.xpl"/>
-            <p:input name="instance" href="#document-info"/>
+        <!-- Execute REST submission -->
+        <p:processor name="oxf:xforms-submission">
+            <p:input name="submission" href="#submission"/>
+            <p:input name="request" href="#document"/>
+            <p:output name="response" id="response"/>
+        </p:processor>
+
+        <p:processor name="oxf:null-serializer">
+            <p:input name="data" href="#response"/>
         </p:processor>
 
     </p:for-each>

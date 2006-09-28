@@ -486,10 +486,6 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsServer"/>
     </processor>
 
-    <processor name="oxf:old-xforms-server">
-        <class name="org.orbeon.oxf.xforms.OldXFormsServer"/>
-    </processor>
-
     <processor name="oxf:xforms-to-xhtml">
         <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
@@ -500,6 +496,12 @@
 
     <processor name="oxf:xforms-request-encoder">
         <class name="org.orbeon.oxf.xforms.processor.XFormsRequestEncoder"/>
+    </processor>
+
+    <processor name="oxf:xforms-submission">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/ops/utils/submit.xpl"/>
+        </instantiation>
     </processor>
 
     <!-- Other processors -->
@@ -690,6 +692,10 @@
 
     <processor name="oxf:portlet-preferences">
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
+    </processor>
+
+    <processor name="oxf:old-xforms-server">
+        <class name="org.orbeon.oxf.xforms.OldXFormsServer"/>
     </processor>
 
     <!-- Scratchpad -->

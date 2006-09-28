@@ -123,9 +123,9 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                     final String href = XPathUtils.selectStringValueNormalize(inputElement, "@href");
 
                                     if (href != null) {
-                                        // Connect to resource generator
-                                        Processor resourceGenerator = PipelineUtils.createURLGenerator(href);
-                                        PipelineUtils.connect(resourceGenerator, OUTPUT_DATA, baseProcessor, name);
+                                        // Connect to URL generator
+                                        Processor urlGenerator = PipelineUtils.createURLGenerator(href);
+                                        PipelineUtils.connect(urlGenerator, OUTPUT_DATA, baseProcessor, name);
                                     } else {
                                         final ProcessorInput processorConfigInput = getInputByName(INPUT_CONFIG);
                                         final Object processorConfigValidity = getInputValidity(ctxt, processorConfigInput);

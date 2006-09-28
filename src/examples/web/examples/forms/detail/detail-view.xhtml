@@ -34,6 +34,11 @@
 
             <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">
+                <!-- Load document if specified -->
+                <xforms:send if="instance('parameters-instance')/document-id != ''" submission="load-submission"/>
+                <!-- Create document id if not specified -->
+                <!--<xforms:setvalue if="instance('parameters-instance')/document-id = ''"-->
+                                 <!--ref="instance('parameters-instance')/document-id" value=""/>-->
                 <!-- Build plates instance -->
                 <xforms:insert while="count(plate) lt count(instance('main-instance')//dmv:plate-number)"
                                context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
@@ -44,31 +49,18 @@
 
             <!-- This action clears all the fields of the mailing address -->
             <xforms:action ev:event="dmv-clear-mailing-address">
-                <!--<xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:number"/>-->
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-1"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:street/dmv:name-2"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:apt"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:city"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:state"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:address[@type = 'mailing']/dmv:zip"/>
-
-                <!--<xforms:setvalue while="instance('main-instance')//dmv:address[@type = 'mailing']//*[. != '']"-->
-                                 <!--ref="instance('main-instance')//dmv:address[@type = 'mailing']//*[. != '']"/>-->
+                <xforms:setvalue while="instance('main-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"
+                                 ref="instance('main-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"/>
             </xforms:action>
 
             <!-- This action clears all the fields of the vehicle address -->
             <xforms:action ev:event="dmv-clear-vehicle-address">
-                <xforms:setvalue ref="instance('main-instance')//dmv:vehicle-address/dmv:street/dmv:number"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:vehicle-address/dmv:street/dmv:name-1"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:vehicle-address/dmv:street/dmv:name-2"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:vehicle-address/dmv:city"/>
-                <xforms:setvalue ref="instance('main-instance')//dmv:vehicle-address/dmv:county"/>
+                <xforms:setvalue while="instance('main-instance')//dmv:vehicle-address//*[not(*) and . != '']"
+                                 ref="instance('main-instance')//dmv:vehicle-address//*[not(*) and . != '']"/>
             </xforms:action>
 
             <!-- Main XForms instance provided by the page model -->
-            <xforms:instance id="main-instance">
-                <xi:include href="input:data" xxi:omit-xml-base="true"/>
-            </xforms:instance>
+            <xforms:instance id="main-instance" src="oxf:/examples/forms/schema/template-form.xml"/>
 
             <xforms:bind nodeset="instance('main-instance')">
 
@@ -105,6 +97,10 @@
 
             <!-- Instance containing the page parameters -->
             <xforms:instance id="parameters-instance" src="input:instance"/>
+
+            <xforms:instance id="dummy-instance">
+                <dummy/>
+            </xforms:instance>
 
             <!-- XForms instance containing the current language -->
             <xforms:instance id="language-instance">
@@ -192,10 +188,15 @@
                              calculate="for $i in . return substring((instance('main-instance')//dmv:plate-number)[count($i/../preceding-sibling::plate) + 1], count($i/preceding-sibling::character) + 1, 1)"/>
             </xforms:bind>
 
+            <!-- Load submission -->
+            <xforms:submission id="load-submission" ref="instance('dummy-instance')"
+                    action="/exist/rest/db/ops/dmv-example/{{instance('parameters-instance')/document-id}}" validate="false"
+                    method="get" replace="instance" instance="main-instance"/>
+
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
-                    action="/forms/service/save-document"
-                    method="post" replace="none">
+                    action="/exist/rest/db/ops/dmv-example/{{instance('parameters-instance')/document-id}}"
+                    method="put" replace="none">
                 <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">validated</xforms:setvalue>
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-success"/>
@@ -258,7 +259,7 @@
             </table>
         </xforms:group>
 
-        <xforms:group ref="instance('main-instance')/document/*">
+        <xforms:group ref="instance('main-instance')">
             <!-- Clear messages upon user moving around in the form -->
             <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
 

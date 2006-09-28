@@ -2001,7 +2001,7 @@ function xformsGetInputUnderNode(node) {
     }
 }
 
-function xformsGetClassForReapeatId(repeatId) {
+function xformsGetClassForRepeatId(repeatId) {
     var depth = 1;
     var currentRepeatId = repeatId;
     while (true) {
@@ -2650,7 +2650,7 @@ function xformsHandleResponse(o) {
                                                (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                                                && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                             if (cursor.nodeType == ELEMENT_TYPE)
-                                                ORBEON.util.Dom.removeClass(cursor, xformsGetClassForReapeatId(repeatId));
+                                                ORBEON.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
                                             cursor = cursor.nextSibling;
                                         }
                                     }
@@ -2671,7 +2671,7 @@ function xformsHandleResponse(o) {
                                            (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
                                            && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
                                         if (cursor.nodeType == ELEMENT_TYPE)
-                                            ORBEON.util.Dom.addClass(cursor, xformsGetClassForReapeatId(repeatId));
+                                            ORBEON.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
                                         cursor = cursor.nextSibling;
                                     }
                                 }

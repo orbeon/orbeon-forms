@@ -19,6 +19,7 @@
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns:exist="http://exist.sourceforge.net/NS/exist"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
@@ -27,8 +28,13 @@
         <!-- Main XForms model -->
         <xforms:model id="main-model">
 
-            <xforms:instance id="main-instance">
-                <xi:include href="input:data"/>
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="list-documents-submission"/>
+                <xforms:setindex repeat="documents-repeat" index="1"/>
+            </xforms:action>
+
+            <xforms:instance id="documents-instance">
+                <document/>
             </xforms:instance>
 
             <xforms:instance id="delete-request-instance">
@@ -55,43 +61,78 @@
                     <empty-triggers/>
                     <non-empty/>
                     <empty/>
+                    <error/>
                 </control>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('main-instance')">
-                <xforms:bind nodeset="document-info/document-date" type="xs:dateTime"/>
+            <xforms:bind nodeset="instance('documents-instance')">
+                <xforms:bind nodeset="document-infos/document-info/document-date" type="xs:dateTime"/>
                 <xforms:bind nodeset="//dmv:birth-date" type="xs:date"/>
             </xforms:bind>
 
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="detail-uri"
-                             calculate="concat('/forms/detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/forms/detail?document-id=', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="readonly-uri"
-                             calculate="concat('/forms/detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id, '&amp;readonly=true')"/>
+                             calculate="concat('/forms/detail?document-id=', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id, '&amp;readonly=true')"/>
                 <xforms:bind nodeset="xml-detail-uri"
-                             calculate="concat('/direct/forms/xml-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/exist/rest/db/ops/dmv-example/', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="pdf-detail-uri"
-                             calculate="concat('/direct/forms/pdf-detail?document-id=', instance('main-instance')/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/direct/forms/pdf-detail?document-id=', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
 
-                <xforms:bind nodeset="non-empty" relevant="count(instance('main-instance')/document-info) > 0"/>
-                <xforms:bind nodeset="empty" relevant="count(instance('main-instance')/document-info) = 0"/>
+                <xforms:bind nodeset="non-empty" relevant="count(instance('documents-instance')/document-infos/document-info) > 0"/>
+                <xforms:bind nodeset="empty" relevant="count(instance('documents-instance')/document-infos/document-info) = 0"/>
 
-                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('main-instance')/document-info) > 0)"/>
-                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('main-instance')/document-info) = 0)"/>
+                <xforms:bind nodeset="non-empty-triggers" readonly="not(count(instance('documents-instance')/document-infos/document-info) > 0)"/>
+                <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('documents-instance')/document-infos/document-info) = 0)"/>
             </xforms:bind>
-
-            <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"
-                               method="post" action="/forms/service/delete-document" replace="none"/>
-
-            <xforms:submission id="list-documents-submission" ref="instance('list-request-instance')"
-                               method="post" action="/forms/service/list-documents" replace="instance" instance="main-instance"/>
 
             <xforms:submission id="import-documents-submission" ref="instance('import-request-instance')"
                                method="post" action="/forms/service/import-documents" replace="none"/>
 
+            <xforms:instance id="list-documents-query">
+                <exist:query>
+                    <exist:text>
+                        xquery version "1.0";
+                        declare namespace dmv="http://orbeon.org/oxf/examples/dmv";
+                        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+                        &lt;document-infos>
+                            {
+                                let $collection-name := '/db/ops/dmv-example/'
+                                for $resource-name in xmldb:get-child-resources($collection-name)
+                                    let $resource-date := xmldb:last-modified($collection-name, $resource-name)
+                                    let $resource := doc(concat($collection-name, $resource-name))
+                                    order by $resource-date descending
+                                    return
+                                    &lt;document-info>
+                                        &lt;document-id>{$resource-name}&lt;/document-id>
+                                        &lt;document-date>{$resource-date}&lt;/document-date>
+                                        &lt;document>
+                                            {$resource//dmv:personal-information}
+                                            {$resource//dmv:vehicle[1]}
+                                        &lt;/document>
+                                    &lt;/document-info>
+                            }
+                        &lt;/document-infos>
+                    </exist:text>
+                </exist:query>
+            </xforms:instance>
+
+            <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
+                               method="post" action="/exist/rest/db/ops/dmv-example/" replace="instance" instance="documents-instance">
+                <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
+            </xforms:submission>
+
+            <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"
+                               method="delete" action="/exist/rest/db/ops/dmv-example/{instance('delete-request-instance')/document-id}" replace="none"/>
+
         </xforms:model>
     </head>
     <body>
+
+        <xhtml:div>
+            <xforms:output ref="instance('control-instance')/error" mediatype="text/html"/>
+        </xhtml:div>
 
         <table class="dmv-title-table">
             <tr>
@@ -154,7 +195,7 @@
                             <td>
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('main-instance')/document-info[index('documents-repeat')]/document-id"/>
+                                        <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id"/>
                                         <xforms:send submission="delete-document-submission"/>
                                         <xforms:send submission="list-documents-submission"/>
                                     </xforms:action>
@@ -229,7 +270,7 @@
                                 <th>ID No.</th>
                                 <th>Vehicle</th>
                             </tr>
-                            <xforms:repeat nodeset="instance('main-instance')/document-info/document" id="documents-repeat">
+                            <xforms:repeat nodeset="instance('documents-instance')/document-infos/document-info/document" id="documents-repeat">
                                 <tr>
                                     <td>
                                         <xforms:output value="count(../preceding-sibling::*) + 1"/>
@@ -247,7 +288,9 @@
                                         <xforms:output value="dmv:personal-information/dmv:driver-license-number"/>
                                     </td>
                                     <td>
-                                        <xforms:output value="dmv:vehicle/dmv:plate-number"/>
+                                        <xforms:output value="vehicle/plate-number"/>
+                                        <!-- eXist bug, the following should work -->
+                                        <!--<xforms:output value="dmv:vehicle/dmv:plate-number"/>-->
                                     </td>
                                 </tr>
                             </xforms:repeat>
@@ -256,7 +299,7 @@
 
                         <p>
                             Selected: <xforms:output value="index('documents-repeat')"/> of
-                            <xforms:output value="count(instance('main-instance')/document-info)"/>
+                            <xforms:output value="count(instance('documents-instance')/document-infos/document-info)"/>
                         </p>
 
                     </xforms:group>

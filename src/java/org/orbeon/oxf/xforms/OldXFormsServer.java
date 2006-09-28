@@ -25,7 +25,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -369,7 +368,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         // Output divs information
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                            XFormsServer.outputSwitchDivs(ch, xformsControls);
+                            XFormsServer.diffSwitchDivs(ch, xformsControls, xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState());
                             ch.endElement();
                         }
 

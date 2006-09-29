@@ -119,12 +119,12 @@
             </xforms:instance>
 
             <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
-                               method="post" action="/exist/rest/db/ops/dmv-example/" replace="instance" instance="documents-instance">
+                               method="post" action="/exist/rest/db/ops/dmv-example/" replace="instance" instance="documents-instance" f:url-type="resource">
                 <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
             </xforms:submission>
 
             <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"
-                               method="delete" action="/exist/rest/db/ops/dmv-example/{instance('delete-request-instance')/document-id}" replace="none"/>
+                               method="delete" action="/exist/rest/db/ops/dmv-example/{instance('delete-request-instance')/document-id}" replace="none" f:url-type="resource"/>
 
         </xforms:model>
     </head>

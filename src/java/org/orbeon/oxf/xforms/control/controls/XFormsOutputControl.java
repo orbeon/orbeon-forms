@@ -79,7 +79,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             final String type = getType();
             if (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
                 // Rewrite URI
-                final URI resolvedURI = XFormsUtils.resolveURI(getControlElement(), rawValue);
+                final URI resolvedURI = XFormsUtils.resolveXMLBase(getControlElement(), rawValue);
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 updatedValue = externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), false);
             } else {

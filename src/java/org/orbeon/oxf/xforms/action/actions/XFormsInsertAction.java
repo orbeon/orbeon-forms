@@ -194,7 +194,7 @@ public class XFormsInsertAction extends XFormsAction {
                         } else if ("before".equals(positionAttribute)) {
                             actualInsertionIndex = actualIndex;
                         } else {
-                            throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
+                            throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
                         }
 
                         // "3. The index for any repeating sequence that is bound to the homogeneous

@@ -752,7 +752,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final XFormsModelSubmission.ConnectionResult connectionResult;
                             if (optimizeForPortlets) {
                                 // Use optimized local mode
-                                final URI resolvedURI = XFormsUtils.resolveURI(instanceContainerElement, srcAttribute);
+                                final URI resolvedURI = XFormsUtils.resolveXMLBase(instanceContainerElement, srcAttribute);
                                 connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext, null, "get", resolvedURI.toString(), null, false, null, null);
 
                                 instanceSourceURI = resolvedURI.toString();

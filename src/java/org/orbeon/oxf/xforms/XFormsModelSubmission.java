@@ -423,6 +423,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
+                // Get URL type
+                final String urlType = submissionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
+                final ExternalContext.Request request = externalContext.getRequest();
 
                 // Result information
                 ConnectionResult connectionResult = null;
@@ -445,8 +448,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // GET with replace="all": we can optimize and tell the client to just load the URL
                         connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString);
                     } else if (!NetUtils.urlHasProtocol(resolvedAction)
-                               && (externalContext.getRequest().getContainerType().equals("portlet")
-                                    || (externalContext.getRequest().getContainerType().equals("servlet")
+                               && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
+                                    || (request.getContainerType().equals("servlet")
                                         && (XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
                                         &&  isReplaceAll))) {
 
@@ -460,11 +463,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // resources.
 
                         // Current limitations:
-                        // o Portlets cannot access resources outside the portlet except by using absolute URLs
-                        // o Servlets cannot access resources on the same serer but not in the current application
+                        // o Portlets cannot access resources outside the portlet except by using absolute URLs (unless f:url-type="resource")
+                        // o Servlets cannot access resources on the same server but not in the current application
                         //   except by using absolute URLs
 
-                        final URI resolvedURI = XFormsUtils.resolveURI(submissionElement, resolvedAction);
+                        final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedAction);
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
                                 this, method, resolvedURI.toString(), mediatype, isReplaceAll,
                                 serializedInstance, serializedInstanceString);
@@ -473,7 +476,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // This is a regular remote submission going through a protocol handler
 
                         // Absolute URLs or absolute paths are allowed to a local servlet
-                        final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
+                        String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
+
+                        if (request.getContainerType().equals("portlet") && "resource".equals(urlType) && !NetUtils.urlHasProtocol(resolvedURL)) {
+                            // In this case, we have to prepend the complete server path
+                            resolvedURL = request.getScheme() + "://" + request.getServerName() + (request.getServerPort() > 0 ? ":" + request.getServerPort() : "") + resolvedURL;
+                        }
+
                         connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
                                 method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, mediatype,
                                 serializedInstance, serializedInstanceString);

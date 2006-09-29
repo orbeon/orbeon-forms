@@ -802,7 +802,7 @@ public class XFormsUtils {
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 
-        final URI resolvedURI = resolveURI(currentElement, value);
+        final URI resolvedURI = resolveXMLBase(currentElement, value);
         final String resolvedURISTring = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -883,7 +883,7 @@ public class XFormsUtils {
      * @param uri       URI to resolve
      * @return          resolved URI
      */
-    public static URI resolveURI(Element element, String uri) {
+    public static URI resolveXMLBase(Element element, String uri) {
         final List xmlBaseElements = new ArrayList();
 
         // Collect xml:base values

@@ -191,12 +191,12 @@
             <!-- Load submission -->
             <xforms:submission id="load-submission" ref="instance('dummy-instance')"
                     action="/exist/rest/db/ops/dmv-example/{{instance('parameters-instance')/document-id}}" validate="false"
-                    method="get" replace="instance" instance="main-instance"/>
+                    method="get" replace="instance" instance="main-instance" f:url-type="resource"/>
 
             <!-- Save submission -->
             <xforms:submission id="save-submission" ref="instance('main-instance')"
                     action="/exist/rest/db/ops/dmv-example/{{instance('parameters-instance')/document-id}}"
-                    method="put" replace="none">
+                    method="put" replace="none" f:url-type="resource">
                 <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('control-instance')/save-status">validated</xforms:setvalue>
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:setvalue ref="instance('control-instance')/message" value="instance('resources-instance')/messages/save-success"/>

@@ -23,6 +23,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
 import org.orbeon.saxon.expr.ExpressionTool;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.ComputedExpression;
+import org.orbeon.saxon.expr.Container;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.NodeInfo;
@@ -30,6 +33,8 @@ import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
+import org.orbeon.saxon.instruct.Executable;
+import org.orbeon.saxon.event.LocationProvider;
 
 import java.util.*;
 
@@ -215,6 +220,54 @@ public class XPathCache {
             try {
                 final XPathExpression exp = evaluator.createExpression(xpathExpression);
                 ExpressionTool.allocateSlots(exp.getInternalExpression(), independentContext.getStackFrameMap().getNumberOfVariables(), independentContext.getStackFrameMap());
+
+                {
+                    // Provide an Executable with the only purpose of allowing the evaluate() function find the right
+                    // FunctionLibrary
+                    final Expression expression = exp.getInternalExpression();
+                    if (expression instanceof ComputedExpression) {
+                        final ComputedExpression computedExpression = (ComputedExpression) expression;
+                        computedExpression.setParentExpression(new Container() {
+
+                            public Executable getExecutable() {
+                                return new Executable() {
+                                    {
+                                        setFunctionLibrary(functionLibrary);
+                                    }
+                                };
+                            }
+
+                            public LocationProvider getLocationProvider() {
+                                return computedExpression.getLocationProvider();
+                            }
+
+                            public int getHostLanguage() {
+                                return computedExpression.getHostLanguage();
+                            }
+
+                            public boolean replaceSubExpression(Expression expression, Expression expression1) {
+                                return computedExpression.replaceSubExpression(expression, expression1);
+                            }
+
+                            public int getColumnNumber() {
+                                return computedExpression.getColumnNumber();
+                            }
+
+                            public int getLineNumber() {
+                                return computedExpression.getLineNumber();
+                            }
+
+                            public String getPublicId() {
+                                return computedExpression.getPublicId();
+                            }
+
+                            public String getSystemId() {
+                                return computedExpression.getSystemId();
+                            }
+                        });
+                    }
+                }
+
                 return new PooledXPathExpression(exp, pool, independentContext, variables);
             } catch (Throwable t) {
                 System.out.println(xpathExpression);

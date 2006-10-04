@@ -71,7 +71,7 @@
     	<example id="tutorial-hello1" path="tutorial/hello1" label="Hello World Classic"/>
         <example id="tutorial-hello2" path="tutorial/hello2" label="Hello World MVC"/>
         <example id="tutorial-hello3" path="tutorial/hello3" label="Hello World XForms" xforms-ng="true"/>
-        <example id="tutorial-hello4" path="tutorial/hello4" label="Hello World Page Flow" xforms-ng="true"/>
+        <example id="tutorial-hello5" path="tutorial/hello5" label="Hello World Page Flow" xforms-ng="true"/>
         <example id="atm" label="ATM Page Flow"/>
         <example id="counter" label="Counter Page Flow"/>
     </section>

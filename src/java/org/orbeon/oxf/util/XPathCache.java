@@ -34,6 +34,7 @@ import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.instruct.Executable;
+import org.orbeon.saxon.instruct.LocationMap;
 import org.orbeon.saxon.event.LocationProvider;
 
 import java.util.*;
@@ -233,6 +234,7 @@ public class XPathCache {
                                 return new Executable() {
                                     {
                                         setFunctionLibrary(functionLibrary);
+                                        setLocationMap(new LocationMap());
                                     }
                                 };
                             }

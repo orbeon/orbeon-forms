@@ -36,6 +36,7 @@ import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.instruct.Executable;
 import org.orbeon.saxon.instruct.LocationMap;
 import org.orbeon.saxon.event.LocationProvider;
+import org.orbeon.saxon.Configuration;
 
 import java.util.*;
 
@@ -244,7 +245,7 @@ public class XPathCache {
                             }
 
                             public int getHostLanguage() {
-                                return computedExpression.getHostLanguage();
+                                return Configuration.JAVA_APPLICATION;
                             }
 
                             public boolean replaceSubExpression(Expression expression, Expression expression1) {

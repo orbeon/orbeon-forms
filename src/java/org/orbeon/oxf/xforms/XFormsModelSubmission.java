@@ -86,6 +86,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
     private String replaceInstanceId;
+    private String xxfReplaceInstanceId;
     private String separator = ";";
     private String includenamespaceprefixes;
 
@@ -142,6 +143,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 if (replace.equals("instance")) {
                     replaceInstanceId = XFormsUtils.namespaceId(containingDocument, submissionElement.attributeValue("instance"));
+                    xxfReplaceInstanceId = XFormsUtils.namespaceId(containingDocument, submissionElement.attributeValue(XFormsConstants.XXFORMS_INSTANCE_QNAME));
                 }
             }
             if (submissionElement.attributeValue("separator") != null) {
@@ -530,8 +532,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             final Document resultingInstanceDocument = Dom4jUtils.read(connectionResult.getResultInputStream());
 
                                             // Set new instance document to replace the one submitted
-                                            final XFormsInstance replaceInstance = (replaceInstanceId == null) ? currentInstance : model.getInstance(replaceInstanceId);
+                                            final XFormsInstance replaceInstance;
+                                            {
+                                                if (xxfReplaceInstanceId != null)
+                                                    replaceInstance = containingDocument.findInstance(xxfReplaceInstanceId);
+                                                else if (replaceInstanceId != null)
+                                                    replaceInstance = model.getInstance(replaceInstanceId);
+                                                else
+                                                    replaceInstance = currentInstance;
+                                            }
+
                                             if (replaceInstance == null) {
+                                                // Replacement instance was specified but not found
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
 
@@ -542,7 +554,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 XFormsUtils.markAllValuesChanged(replaceInstance);
 
                                                 // Handle new instance and associated events
-                                                model.handleNewInstanceDocuments(pipelineContext);
+                                                replaceInstance.getModel().handleNewInstanceDocuments(pipelineContext);
 
                                                 // Notify that submission is done
                                                 submitDone = true;

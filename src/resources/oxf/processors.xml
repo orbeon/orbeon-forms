@@ -500,7 +500,7 @@
 
     <processor name="oxf:xforms-submission">
         <instantiation name="oxf:pipeline">
-            <input name="config" href="oxf:/ops/utils/submit.xpl"/>
+            <input name="config" href="oxf:/ops/xforms/xforms-submission.xpl"/>
         </instantiation>
     </processor>
 

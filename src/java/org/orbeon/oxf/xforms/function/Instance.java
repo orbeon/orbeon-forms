@@ -55,7 +55,7 @@ public class Instance extends XFormsFunction {
         final XFormsInstance instance = model.getInstance(instanceId);
 
 
-        // Return instance document
+        // Return instance document if found
         if (instance != null) {
             // "this function returns a node-set containing just the root element node"
             return new ListIterator(Collections.singletonList(instance.getInstanceRootElementInfo()));

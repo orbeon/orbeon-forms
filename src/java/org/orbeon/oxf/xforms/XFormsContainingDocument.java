@@ -302,6 +302,22 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
+     * Find the instance with the specified id, searching in any model.
+     *
+     * @param instanceId id of the instance to find
+     * @return      instance containing the node
+     */
+    public XFormsInstance findInstance(String instanceId) {
+        for (Iterator i = getModels().iterator(); i.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) i.next();
+            final XFormsInstance currentInstance = currentModel.getInstance(instanceId);
+            if (currentInstance != null)
+                return currentInstance;
+        }
+        return null;
+    }
+
+    /**
      * Return the active submission if any or null.
      */
     public XFormsModelSubmission getActiveSubmission() {

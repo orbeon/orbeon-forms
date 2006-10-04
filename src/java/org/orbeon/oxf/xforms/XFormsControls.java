@@ -668,7 +668,7 @@ public class XFormsControls {
             final NodeInfo currentSingleNode = currentBindingContext.getSingleNode();
 
             if (currentSingleNode != null)
-                return currentBindingContext.getModel().getInstanceForNode(currentSingleNode);
+                return getContainingDocument().getInstanceForNode(currentSingleNode);
         }
         return null;
     }

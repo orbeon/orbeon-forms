@@ -54,6 +54,10 @@ public class XFormsSubmissionUtils {
                     if (isPost(method) || isPut(method)) {
                         // Simulate a POST or PUT
                         effectiveResourceURI = action;
+
+                        if (XFormsServer.logger.isDebugEnabled())
+                            XFormsServer.logger.debug("XForms - setting request body: " + new String(serializedInstance, "UTF-8"));
+
                         requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
                                 effectiveResourceURI, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
                     } else {
@@ -179,6 +183,7 @@ public class XFormsSubmissionUtils {
                         if (cookies != null) {
                             for (int i = 0; i < cookies.length; i++) {
                                 final String cookie = cookies[i];
+                                XFormsServer.logger.debug("XForms - forwarding cookie: " + cookie);
                                 urlConnection.setRequestProperty("Cookie", cookie);
                             }
                         }
@@ -188,8 +193,10 @@ public class XFormsSubmissionUtils {
                     // TODO: This should probably not be done automatically
                     if (username == null) {
                         final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
-                        if (authorizationHeader != null)
+                        if (authorizationHeader != null) {
+                            XFormsServer.logger.debug("XForms - forwarding authorization header: " + authorizationHeader);
                             urlConnection.setRequestProperty("authorization", authorizationHeader);
+                        }
                     }
 
                     // Write request body if needed

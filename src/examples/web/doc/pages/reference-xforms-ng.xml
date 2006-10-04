@@ -2919,6 +2919,34 @@
                                 </xforms:group>
                             </xml-source>
                         </li>
+                        <li>
+                            <a name="xxforms-instance"/>
+                            <p>
+                                <code>xxforms:instance($instance-id as xs:string) as element()?</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:instance()</code> function works like the standard
+                                <code>instance()</code> function except that it searches for instances in all the models
+                                of the XForms document (the standard <code>instance()</code> function only searches
+                                within the current XForms model).
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:model id="main-model">
+                                    <xforms:instance id="main-instance">
+                                        ...
+                                    </xforms:instance>
+                                </xforms:model>
+                                <xforms:model id="resources-model">
+                                    <xforms:instance id="resources-instance">
+                                        ...
+                                    </xforms:instance>
+                                </xforms:model>
+                                ...
+                                <xforms:group model="main-model">
+                                    <xforms:output value="xxforms:instance('resources-instance')/titles/company-information"/>
+                                </xforms:group>
+                            </xml-source>
+                        </li>
                     </ul>
                 </section>
                 <section>

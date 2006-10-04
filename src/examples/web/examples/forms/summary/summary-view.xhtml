@@ -19,37 +19,26 @@
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:exist="http://exist.sourceforge.net/NS/exist"
-      xmlns="http://www.w3.org/1999/xhtml">
+      xmlns="http://www.w3.org/1999/xhtml"
+      xsl:version="2.0">
 
     <head>
-        <title>OPS DMV Forms Example - Forms List</title>
+        <title>OPS DMV Forms Example - Notice of Change of Address (Summary)</title>
         <link rel="stylesheet" type="text/css" href="/examples/forms/style.css"/>
         <!-- Main XForms model -->
         <xforms:model id="main-model">
-
-            <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="list-documents-submission"/>
-                <xforms:setindex repeat="documents-repeat" index="1"/>
-            </xforms:action>
 
             <xforms:instance id="documents-instance">
                 <document/>
             </xforms:instance>
 
-            <xforms:instance id="delete-request-instance">
-                <request xmlns="">
-                    <document-id/>
-                </request>
-            </xforms:instance>
-
-            <xforms:instance id="list-request-instance">
-                <request xmlns=""/>
-            </xforms:instance>
-
-            <xforms:instance id="import-request-instance">
-                <request xmlns=""/>
-            </xforms:instance>
+            <xforms:bind nodeset="instance('documents-instance')">
+                <xforms:bind nodeset="document-infos/document-info/document-date" type="xs:dateTime"/>
+                <xforms:bind nodeset="//dmv:birth-date" type="xs:date"/>
+            </xforms:bind>
 
             <xforms:instance id="control-instance">
                 <control xmlns="">
@@ -64,11 +53,6 @@
                     <error/>
                 </control>
             </xforms:instance>
-
-            <xforms:bind nodeset="instance('documents-instance')">
-                <xforms:bind nodeset="document-infos/document-info/document-date" type="xs:dateTime"/>
-                <xforms:bind nodeset="//dmv:birth-date" type="xs:date"/>
-            </xforms:bind>
 
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="detail-uri"
@@ -87,46 +71,11 @@
                 <xforms:bind nodeset="empty-triggers" readonly="not(count(instance('documents-instance')/document-infos/document-info) = 0)"/>
             </xforms:bind>
 
-            <xforms:submission id="import-documents-submission" ref="instance('import-request-instance')"
-                               method="post" action="/forms/service/import-documents" replace="none"/>
-
-            <xforms:instance id="list-documents-query">
-                <exist:query>
-                    <exist:text>
-                        xquery version "1.0";
-                        declare namespace dmv="http://orbeon.org/oxf/examples/dmv";
-                        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
-                        &lt;document-infos>
-                            {
-                                let $collection-name := '/db/ops/dmv-example/'
-                                for $resource-name in xmldb:get-child-resources($collection-name)
-                                    let $resource-date := xmldb:last-modified($collection-name, $resource-name)
-                                    let $resource := doc(concat($collection-name, $resource-name))
-                                    order by $resource-date descending
-                                    return
-                                    &lt;document-info>
-                                        &lt;document-id>{$resource-name}&lt;/document-id>
-                                        &lt;document-date>{$resource-date}&lt;/document-date>
-                                        &lt;document>
-                                            {$resource//dmv:personal-information}
-                                            {$resource//dmv:vehicle[1]}
-                                        &lt;/document>
-                                    &lt;/document-info>
-                            }
-                        &lt;/document-infos>
-                    </exist:text>
-                </exist:query>
-            </xforms:instance>
-
-            <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
-                               method="post" action="/exist/rest/db/ops/dmv-example/" replace="instance" instance="documents-instance" f:url-type="resource">
-                <xforms:setvalue ev:event="xforms-submit-error" ref="instance('control-instance')/error" value="event('body')"/>
-            </xforms:submission>
-
-            <xforms:submission id="delete-document-submission" ref="instance('delete-request-instance')"
-                               method="delete" action="/exist/rest/db/ops/dmv-example/{instance('delete-request-instance')/document-id}" replace="none" f:url-type="resource"/>
-
         </xforms:model>
+        <!-- Model to handle persistence -->
+        <xi:include href="oxf:/examples/forms/common/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!-- Model to handle resources -->
+        <xi:include href="oxf:/examples/forms/common/resources-model.xml" xxi:omit-xml-base="true"/>
     </head>
     <body>
 
@@ -140,7 +89,7 @@
                     <img src="/examples/forms/images/dmv-logo.png" alt="DMV"/>
                 </td>
                 <td>
-                    Forms List
+                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/summary-title"/>
                 </td>
             </tr>
         </table>
@@ -154,11 +103,11 @@
                                 <xforms:group>
                                     <xforms:load ev:event="DOMActivate" resource="/forms/detail"/>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>New Form</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/new-form"/>
                                         <xxforms:img src="/images/add.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>New Form</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/new-form"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -169,11 +118,11 @@
                                         <xforms:send submission="list-documents-submission"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>Import Documents</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/import-forms"/>
                                         <xxforms:img src="/images/add-all.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>Import Documents</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/import-forms"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -184,27 +133,26 @@
                                         <xforms:load ref="instance('control-instance')/detail-uri"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>Edit Selected</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/edit-form"/>
                                         <xxforms:img src="/images/edit.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>Edit Selected</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/edit-form"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
                             <td>
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="instance('delete-request-instance')/document-id" value="instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id"/>
                                         <xforms:send submission="delete-document-submission"/>
                                         <xforms:send submission="list-documents-submission"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>Delete Selected</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/delete-form"/>
                                         <xxforms:img src="/images/remove.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>Delete Selected</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/delete-form"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -215,11 +163,11 @@
                                         <xforms:load ref="instance('control-instance')/readonly-uri"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>View Read-Only</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-readonly"/>
                                         <xxforms:img src="/images/lockedstate.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>View Read-Only</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-readonly"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -230,11 +178,11 @@
                                         <xforms:load ref="instance('control-instance')/xml-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>View XML</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-xml"/>
                                         <xxforms:img src="/images/view-xml.gif"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>View XML</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-xml"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -245,11 +193,11 @@
                                         <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label>View PDF</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-pdf"/>
                                         <xxforms:img src="/images/pdf.png"/>
                                     </xforms:trigger>
                                     <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label>View PDF</xforms:label>
+                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-pdf"/>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -258,17 +206,16 @@
 
                     <xforms:group ref="instance('control-instance')/non-empty">
                         <p>
-                            <i>Please select a form in order to perform an operation, or select
-                            "New Form" to create a new blank form.</i>
+                            <i><xforms:output model="resources-model" value="instance('resources-instance')/messages/intro"/></i>
                         </p>
                         <table class="dmv-gridtable">
                             <tr>
-                                <th>No.</th>
-                                <th>Date Saved</th>
-                                <th>Name</th>
-                                <th>Birth Date</th>
-                                <th>ID No.</th>
-                                <th>Vehicle</th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/row-number"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/save-date"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/name"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/birth-date"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/id-number"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/vehicle"/></th>
                             </tr>
                             <xforms:repeat nodeset="instance('documents-instance')/document-infos/document-info/document" id="documents-repeat">
                                 <tr>
@@ -276,13 +223,17 @@
                                         <xforms:output value="count(../preceding-sibling::*) + 1"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="../document-date"/>
+                                        <xforms:group ref="../document-date">
+                                            <xforms:output value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), xxforms:instance('resources-instance')/formats/save-datetime, xxforms:instance('language-instance'), (), ()) else ''"/>
+                                        </xforms:group>
                                     </td>
                                     <td>
                                         <xforms:output value="concat(dmv:personal-information/dmv:name/dmv:first-name, ' ', dmv:personal-information/dmv:name/dmv:initial, ' ', dmv:personal-information/dmv:name/dmv:last-name)"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="dmv:personal-information/dmv:birth-date"/>
+                                        <xforms:group ref="dmv:personal-information/dmv:birth-date">
+                                            <xforms:output value="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''"/>
+                                        </xforms:group>
                                     </td>
                                     <td>
                                         <xforms:output value="dmv:personal-information/dmv:driver-license-number"/>
@@ -298,7 +249,9 @@
                         </table>
 
                         <p>
-                            Selected: <xforms:output value="index('documents-repeat')"/> of
+                            <xforms:output model="resources-model" value="instance('resources-instance')/titles/selected"/>:
+                            <xforms:output value="index('documents-repeat')"/>
+                            <xforms:output model="resources-model" value="instance('resources-instance')/titles/of"/>
                             <xforms:output value="count(instance('documents-instance')/document-infos/document-info)"/>
                         </p>
 
@@ -307,23 +260,35 @@
                     <xforms:group ref="instance('control-instance')/empty">
                         <table class="dmv-gridtable">
                             <tr>
-                                <th>No.</th>
-                                <th>Date Saved</th>
-                                <th>Name</th>
-                                <th>Birth Date</th>
-                                <th>DL / ID Card No.</th>
-                                <th>Vehicle Information</th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/row-number"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/save-date"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/name"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/birth-date"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/id-number"/></th>
+                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/vehicle"/></th>
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <i>
-                                        No form found.<br/>Please press the "Import Test Documents"
-                                        button to get started.
-                                    </i>
+                                    <i><xforms:output model="resources-model" value="instance('resources-instance')/messages/no-form-found" mediatype="text/html"/></i>
                                 </td>
                             </tr>
                         </table>
                     </xforms:group>
+
+                    <p>
+                        <xforms:select1 model="resources-model" ref="instance('language-instance')">
+                            <xforms:label ref="instance('resources-instance')/labels/language-choice"/>
+                            <xforms:item>
+                                <xforms:label>en</xforms:label>
+                                <xforms:value>en</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>fr</xforms:label>
+                                <xforms:value>fr</xforms:value>
+                            </xforms:item>
+                            <xforms:send ev:event="xforms-value-changed" submission="update-language-submission"/>
+                        </xforms:select1>
+                    </p>
 
                 </td>
             </tr>

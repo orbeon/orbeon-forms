@@ -205,6 +205,14 @@
                         <!--</li>-->
                         <li>
                             <p>
+                                <b><code>xxforms:instance()</code> extension function.</b> The <a
+                                href="reference-xforms-ng#xxforms-instance"><code>xxforms:instance()</code></a>
+                                function works like the standard <code>instance()</code> function except that it
+                                searches for instances in all the models of the XForms document.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
                                 <b><code>xxforms:context()</code> extension function.</b> The <a
                                 href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a> XPath
                                 function allows you to obtain the evaluation context for an enclosing
@@ -287,6 +295,14 @@
                         </li>
                         <li>
                             <p>
+                                <b>New XForms Submission processor.</b> A new <a href="processors-submission">XForms
+                                Submission processor</a> has been added. It exposes the functionality of
+                                <code>&lt;xforms:submission></code> to XML pipelines and allows you to call REST
+                                services from XPL without creating XForms pages.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
                                 <b>New Execute processor.</b> A new Execute processor has been added. It allows
                                 executing external commands and retrieving the command's standard output and standard
                                 error. [TODO: doc]
@@ -339,7 +355,7 @@
                         </li>
                         <li>
                             <p>
-                                The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.7.
+                                The embedded Saxon XSLT, XQuery and XPath engine has been upgraded to version 8.8.
                             </p>
                         </li>
                         <li>
@@ -363,5 +379,13 @@
                 </li>
             </ul>
         </section>
+        <!--
+
+        TODO: note incompatible change move from oxf:/config/theme/format.xpl|xml-formatting.xsl|formatting.xsl to
+              oxf:/utils/formatting/*
+
+        TODO: note incompatible Saxon change xs:positiveInteger, etc.
+
+        -->
     </body>
 </document>

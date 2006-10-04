@@ -20,10 +20,7 @@ import org.orbeon.oxf.xforms.function.Last;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsReadonly;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRelevant;
 import org.orbeon.oxf.xforms.function.exforms.EXFormsRequired;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsCallXPL;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsContext;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsRepeatCurrent;
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsValid;
+import org.orbeon.oxf.xforms.function.xxforms.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
 import org.orbeon.saxon.functions.*;
@@ -151,6 +148,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // xxforms:instance
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // Useful XSLT function
         e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

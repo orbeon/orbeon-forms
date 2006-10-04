@@ -148,6 +148,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XFormsConstants.XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_INSTANCE_QNAME = new QName("instance", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = ProcessorUtils.XS_ANYURI_EXPLODED_QNAME;

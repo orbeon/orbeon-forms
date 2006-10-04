@@ -219,8 +219,8 @@ public class NetUtils {
     }
 
     /**
-     * @param a query string of the form n1=v1&n2=v2&... to decode.  May be null.
-     * @param true if both &amp; and '&' should be accepted as delimiters and false if only & 
+     * @param qry a query string of the form n1=v1&n2=v2&... to decode.  May be null.
+     * @param accptAmp true if both &amp; and '&' should be accepted as delimiters and false if only & 
      *              should be considered as a delimiter.
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
@@ -427,5 +427,23 @@ public class NetUtils {
             resolvedURIString = href;
         }
         return resolvedURIString;
+    }
+
+    public static String logHeaders(HttpServletRequest request) {
+        final StringBuffer sb = new StringBuffer();
+        for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
+            final String name = (String) e.nextElement();
+            sb.append(name);
+            sb.append("=");
+            for (Enumeration f = request.getHeaders(name); f.hasMoreElements();) {
+                final String value = (String) f.nextElement();
+                sb.append(value);
+                if (f.hasMoreElements())
+                    sb.append(",");
+            }
+            if (e.hasMoreElements())
+                    sb.append("|");
+        }
+        return sb.toString();
     }
 }

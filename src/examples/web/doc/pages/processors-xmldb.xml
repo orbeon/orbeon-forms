@@ -23,14 +23,36 @@
         <section>
             <title>Introduction</title>
             <p>
-                XML databases allow you to easily store, index and query XML documents. They are
-                especially useful when dealing with <i>document-centric</i> applications, where the
-                structure cannot be mapped naturally to a relational database.
+                XML databases allow you to easily store, index and query XML documents. They are especially useful when
+                dealing with <i>document-centric</i> applications, where the structure cannot be mapped naturally to a
+                relational database.
             </p>
             <p>
-                OPS integrates with Tamino XML Server databases, as well as XML:DB databases such as
-                eXist.
+                OPS provides processors to integrate with Tamino XML Server databases as well as databases that support
+                the XML:DB API, such as <a href="http://exist.sourceforge.net/">eXist</a>.
             </p>
+            <note>
+                <p>
+                    You are encouraged to use REST APIs instead of these processors whenever possible, either directly
+                    from <a href="reference-xforms-ng">XForms</a> (typically using XForms'
+                    <code>&lt;xforms:submission></code>, which supports REST since XForms 1.1) or with the <a
+                    href="processors-submission">XForms Submission processor</a>, which exposes
+                    <code>&lt;xforms:submission></code> to XML pipelines. The eXist XML database, for example, exposes a
+                    REST API.
+                </p>
+            </note>
+        </section>
+        <a name="xmldb"/>
+        <section>
+            <title>XML:DB Databases (eXist)</title>
+            <note>
+                This documentation has not yet been written.
+            </note>
+            <!--
+            <p>
+                TODO
+            </p>
+            -->
         </section>
         <a name="tamino"/>
         <section>
@@ -496,18 +518,6 @@
                     in the pipeline, the transaction in rolled back.
                 </p>
             </section>
-        </section>
-        <a name="xmldb"/>
-        <section>
-            <title>XML:DB Databases (eXist)</title>
-            <note>
-                This documentation has not yet been written.
-            </note>
-            <!--
-            <p>
-                TODO
-            </p>
-            -->
         </section>
     </body>
 </document>

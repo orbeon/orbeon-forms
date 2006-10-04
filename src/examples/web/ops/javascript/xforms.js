@@ -515,6 +515,8 @@ ORBEON.xforms.Controls = {
         var control = document.getElementById(controlId);
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
             ORBEON.util.Dom.getChildElement(control, 1).focus();
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
+            ORBEON.util.Dom.getChildElement(ORBEON.util.Dom.getChildElement(control, 0), 0).focus();
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }

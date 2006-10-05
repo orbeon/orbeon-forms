@@ -1099,15 +1099,14 @@ ORBEON.xforms.Init = {
 
         // Override image location for YUI to use local images
         var yuiBaseURL = BASE_URL + "/ops/images/yui/";
-
         if (YAHOO && YAHOO.widget) {
             if (YAHOO.widget.Module) {
-                YAHOO.widget.Module.prototype.IMG_ROOT = yuiBaseURL;
-                YAHOO.widget.Module.prototype.IMG_ROOT_SSL = yuiBaseURL;
+                YAHOO.widget.Module.IMG_ROOT = yuiBaseURL;
+                YAHOO.widget.Module.IMG_ROOT_SSL = yuiBaseURL;
             }
             if (YAHOO.widget.Calendar_Core) {
-                YAHOO.widget.Calendar_Core.prototype.IMG_ROOT = yuiBaseURL;
-                YAHOO.widget.Calendar_Core.prototype.IMG_ROOT_SSL = yuiBaseURL;
+                YAHOO.widget.Calendar_Core.IMG_ROOT = yuiBaseURL;
+                YAHOO.widget.Calendar_Core.IMG_ROOT_SSL = yuiBaseURL;
             }
             if (YAHOO.widget.MenuModuleItem) {
                 YAHOO.widget.MenuModuleItem.prototype.IMG_ROOT = yuiBaseURL;

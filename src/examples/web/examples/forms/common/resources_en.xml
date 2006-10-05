@@ -24,7 +24,7 @@
         <id-number>ID No.</id-number>
         <vehicle>Vehicle</vehicle>
         <selected>Selected</selected>
-        <of>of</of>
+        <of> of </of>
 
         <!-- Detail -->
         <detail-title>Notice of Change of Address</detail-title>

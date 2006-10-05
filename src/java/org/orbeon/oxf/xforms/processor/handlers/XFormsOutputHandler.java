@@ -13,29 +13,14 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.DocumentSource;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.w3c.tidy.Tidy;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.Locator;
 import org.xml.sax.helpers.AttributesImpl;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXResult;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Handle xforms:output.
@@ -147,84 +132,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
                 if (xformsOutputControl != null) {
                     final String displayValue = xformsOutputControl.getDisplayValueOrValue();
-                    if (displayValue != null && displayValue.length() > 0) {
-                        // Create and configure Tidy instance
-                        final Tidy tidy = new Tidy();
-                        tidy.setShowWarnings(false);
-                        tidy.setQuiet(true);
-                        tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
-
-                        // Parse and output to SAXResult
-                        final byte[] valueBytes;
-                        try {
-                            valueBytes = displayValue.getBytes("utf-8");
-                        } catch (UnsupportedEncodingException e) {
-                            throw new OXFException(e); // will not happen
-                        }
-                        // TODO: optimize and skip creation of Dom4j document
-                        final Document bodyDocument;
-                        try {
-                            final Document dom4jResult;
-                            final InputStream is = new ByteArrayInputStream(valueBytes);
-                            final org.w3c.dom.Document result = tidy.parseDOM(is, null);
-                            dom4jResult = TransformerUtils.domToDom4jDocument(result);
-
-                            // Create content document
-                            final Element htmlElement = dom4jResult.getRootElement();
-                            final Element bodyElement = htmlElement.element("body");
-
-                            bodyDocument =  Dom4jUtils.createDocument();
-                            bodyDocument.setRootElement((Element) bodyElement.detach());
-
-                        } catch (Exception e) {
-                            throw new ValidationException("Cannot parse value as text/html for value: '" + displayValue + "'", xformsOutputControl.getLocationData());
-                        }
-
-                        // Stream fragment to the output
-                        try {
-                            final Transformer identity = TransformerUtils.getIdentityTransformer();
-                            identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
-
-                                private int level = 0;
-
-                                public void startDocument() {
-                                }
-
-                                public void endDocument() {
-                                }
-
-                                public void startPrefixMapping(String s, String s1) {
-                                }
-
-                                public void endPrefixMapping(String s) {
-                                }
-
-                                public void setDocumentLocator(Locator locator) {
-                                }
-
-                                public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                                    if (level > 0) {
-                                        final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                        super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
-                                    }
-
-                                    level++;
-                                }
-
-                                public void endElement(String uri, String localname, String qName) throws SAXException {
-                                    level--;
-
-                                    if (level > 0) {
-                                        final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                                        super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
-                                    }
-                                }
-
-                            }));
-                        } catch (TransformerException e) {
-                            throw new OXFException(e);
-                        }
-                    }
+                    XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case
@@ -247,4 +155,5 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         // xforms:hint
         handleLabelHintHelpAlert(effectiveId, "hint", xformsOutputControl);
     }
+
 }

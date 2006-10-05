@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -150,11 +151,14 @@ public class XHTMLHeadHandler extends HandlerBase {
         final Map appearancesMap = new HashMap();
         {
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            final boolean isStaticReadonly = containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE);
             xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorListener() {
                 public void startVisitControl(XFormsControl xformsControl) {
                     final String controlName = xformsControl.getName();
 
-                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization();
+                    // Don't run JavaScript initialization if the control is static readonly (could change in the
+                    // future if some static readonly controls require JS initialization)
+                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization() && (!xformsControl.isReadonly() && isStaticReadonly);
                     if (hasJavaScriptInitialization) {
                         Map listForControlNameMap = (Map) appearancesMap.get(controlName);
                         if (listForControlNameMap == null) {

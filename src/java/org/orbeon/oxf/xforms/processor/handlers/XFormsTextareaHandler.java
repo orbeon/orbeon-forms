@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -91,8 +92,14 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
                 if (!handlerContext.isGenerateTemplate()) {
                     final String value = xformsControl.getValue();
-                    if (value != null)
-                        contentHandler.characters(value.toCharArray(), 0, value.length());
+                    if (value != null) {
+                        final boolean isHTMLMediaType = "text/html".equals(xformsControl.getMediatype());
+                        if (!isHTMLMediaType) {
+                            contentHandler.characters(value.toCharArray(), 0, value.length());
+                        } else {
+                            XFormsUtils.streamHTMLFragment(contentHandler, value, xformsControl.getLocationData(), xhtmlPrefix);
+                        }
+                    }
                 }
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }

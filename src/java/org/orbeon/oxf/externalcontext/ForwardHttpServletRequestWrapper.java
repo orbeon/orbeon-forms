@@ -27,6 +27,7 @@ import java.util.*;
  */
 public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
+    private HttpServletRequest httpServletRequest;
     private String pathInfo;
     private Map parameters;
 
@@ -37,6 +38,7 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
      */
     public ForwardHttpServletRequestWrapper(HttpServletRequest httpServletRequest, String pathInfo, Map parameters) {
         super(httpServletRequest);
+        this.httpServletRequest = httpServletRequest;
         this.pathInfo = pathInfo;
         this.parameters = parameters;
     }
@@ -124,44 +126,41 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
     }
 
     private List headerNamesList;
-    private Enumeration headerNames;
 
     public Enumeration getHeaderNames() {
-        if (headerNames == null) {
-            headerNamesList = Collections.list(super.getHeaderNames());
+        if (headerNamesList == null) {
+            headerNamesList = Collections.list(httpServletRequest.getHeaderNames());
 
             // Remove headers associated with body
             for (Iterator i = filterHeaders.keySet().iterator(); i.hasNext();) {
                 headerNamesList.remove(i.next());
             }
-
-            headerNames = Collections.enumeration(headerNamesList);
         }
 
-        return headerNames;
+        return Collections.enumeration(headerNamesList);
     }
 
     public String getHeader(String s) {
         if (filterHeaders.get(s) != null)
             return null;
-        return super.getHeader(s);
+        return httpServletRequest.getHeader(s);
     }
 
     public Enumeration getHeaders(String s) {
         if (filterHeaders.get(s) != null)
             return null;
-        return super.getHeaders(s);
+        return httpServletRequest.getHeaders(s);
     }
 
     public long getDateHeader(String s) {
         if (filterHeaders.get(s) != null)
             return -1;
-        return super.getDateHeader(s);
+        return httpServletRequest.getDateHeader(s);
     }
 
     public int getIntHeader(String s) {
         if (filterHeaders.get(s) != null)
             return -1;
-        return super.getIntHeader(s);
+        return httpServletRequest.getIntHeader(s);
     }
 }

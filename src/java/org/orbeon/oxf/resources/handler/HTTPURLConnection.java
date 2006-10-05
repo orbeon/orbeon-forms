@@ -95,7 +95,7 @@ public class HTTPURLConnection extends URLConnection {
             // Set headers
             for (Iterator keyIteratory = requestProperties.keySet().iterator(); keyIteratory.hasNext();) {
                 String key = (String) keyIteratory.next();
-                if (!"authorization".equals(key) || (userinfo == null && username == null))
+                if (!"authorization".equalsIgnoreCase(key) || (userinfo == null && username == null))
                     method.setRequestHeader(key, (String) requestProperties.get(key));
             }
             // Handle authentication challenge

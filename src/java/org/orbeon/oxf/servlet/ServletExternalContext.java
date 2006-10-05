@@ -46,7 +46,7 @@ import java.util.*;
  */
 public class ServletExternalContext extends ServletWebAppExternalContext implements ExternalContext  {
 
-    static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
+    public static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
 
     public static final String DEFAULT_FORM_CHARSET = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";

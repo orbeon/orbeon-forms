@@ -429,7 +429,7 @@ public class NetUtils {
         return resolvedURIString;
     }
 
-    public static String logHeaders(HttpServletRequest request) {
+    public static String headersToString(HttpServletRequest request) {
         final StringBuffer sb = new StringBuffer();
         for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
             final String name = (String) e.nextElement();

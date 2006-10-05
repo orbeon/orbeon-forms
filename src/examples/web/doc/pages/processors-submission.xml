@@ -119,7 +119,7 @@
             <xml-source show-namespaces="false">
                 <p:processor name="oxf:xforms-submission">
                     <p:input name="submission">
-                        <xforms:submission method="get" action="http://example.org/list"/>
+                        <xforms:submission method="get" action="http://example.org/list" separator="&amp;"/>
                     </p:input>
                     <p:input name="request">
                         <parameters>

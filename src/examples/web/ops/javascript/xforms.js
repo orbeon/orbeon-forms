@@ -448,7 +448,7 @@ ORBEON.xforms.Controls = {
 
     getHelpMessage: function(control) {
         var helpElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help");
-        return ORBEON.util.Dom.getStringValue(helpElement);
+        return helpElement == null ? "" : ORBEON.util.Dom.getStringValue(helpElement);
     },
 
     setHelpMessage: function(control, message) {
@@ -476,11 +476,14 @@ ORBEON.xforms.Controls = {
     setRelevant: function(control, isRelevant) {
         var elementsToUpdate = [ control,
             ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
-            ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"),
-            ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"),
             ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"),
             ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert")
         ];
+        // Also show help if there is a message attached
+        if (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "") {
+            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"));
+            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"));
+        }
         for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
             var element = elementsToUpdate[elementIndex];
             if (element != null) {

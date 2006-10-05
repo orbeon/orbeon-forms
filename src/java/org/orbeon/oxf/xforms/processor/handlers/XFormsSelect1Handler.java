@@ -368,7 +368,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // Create xhtml:div with tree info
                     final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
 
-                    handleReadOnlyAttribute(newAttributes, xformsSelect1Control);
+                    handleReadOnlyAttribute(newAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
                     outputJSONTreeInfo(xformsSelect1Control, isMany, contentHandler);
@@ -384,7 +384,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     final String liQName = XMLUtils.buildQName(xhtmlPrefix, "li");
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
 
-                    handleReadOnlyAttribute(newAttributes, xformsSelect1Control);
+                    handleReadOnlyAttribute(newAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
                     // Create xhtml:div with initial menu entries
@@ -455,7 +455,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(elementAttributes, newAttributes);
 
-                    handleReadOnlyAttribute(newAttributes, xformsSelect1Control);
+                    handleReadOnlyAttribute(newAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, newAttributes);
 
                     final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
@@ -630,7 +630,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 }
             }
 
-            handleReadOnlyAttribute(reusableAttributes, xformsControl);
+            handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
 

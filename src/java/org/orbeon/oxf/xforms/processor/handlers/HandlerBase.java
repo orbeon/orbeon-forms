@@ -112,8 +112,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
         level--;
     }
 
-    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsControl XFormsControl) {
-        if (XFormsControl != null && XFormsControl.isReadonly()) {
+    public static void handleReadOnlyAttribute(AttributesImpl newAttributes, XFormsContainingDocument containingDocument, XFormsControl xformsControl) {
+        if (xformsControl != null && xformsControl.isReadonly() && !containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE)) {
             // @disabled="disabled"
             newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
         }

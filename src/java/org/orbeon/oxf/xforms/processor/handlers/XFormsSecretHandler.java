@@ -58,7 +58,7 @@ public class XFormsSecretHandler extends XFormsValueControlHandler {
                 handleMIPClasses(classes, xformsControl);
 
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
-                handleReadOnlyAttribute(newAttributes, xformsControl);
+                handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
             } else {
                 newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
             }

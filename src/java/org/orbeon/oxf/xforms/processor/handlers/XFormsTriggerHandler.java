@@ -131,7 +131,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:input
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-            handleReadOnlyAttribute(newAttributes, xformsControl);
+            handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName, newAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", spanQName);
 
@@ -143,7 +143,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             // xhtml:button
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
-            handleReadOnlyAttribute(newAttributes, xformsControl);
+            handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
             contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);

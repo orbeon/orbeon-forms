@@ -2354,6 +2354,9 @@ function xformsHandleResponse(o) {
                                         var documentElement = document.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");
 
+                                        // Save new value sent by server
+                                        ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
+
                                         // Update value
                                         var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") || isStaticReadonly) {

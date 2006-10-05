@@ -2752,9 +2752,12 @@ function xformsHandleResponse(o) {
                             var resource = ORBEON.util.Dom.getAttribute(loadElement, "resource");
                             var show = ORBEON.util.Dom.getAttribute(loadElement, "show");
                             var target = ORBEON.util.Dom.getAttribute(loadElement, "target");
+                            var showProcess = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
                             if (show == "replace") {
                                 if (target == null) {
-                                    newDynamicStateTriggersReplace = true;
+                                    // Display loading indicator unless the server tells us not to display it
+                                    if (showProcess != "false")
+                                        newDynamicStateTriggersReplace = true;
                                     window.location.href = resource;
                                 } else {
                                     window.open(resource, target);

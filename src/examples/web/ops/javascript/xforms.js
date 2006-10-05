@@ -638,6 +638,10 @@ ORBEON.xforms.Events = {
         }
     },
 
+    _keyCodeModifiesField: function(c) {
+        return c != 9 && c != 13 && c != 16 && c != 17 && c != 18;
+    },
+
     focus: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
@@ -691,6 +695,10 @@ ORBEON.xforms.Events = {
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+            // When we move out from a field, we don't receive the keyup events corresponding to keypress
+            // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
+            if (ORBEON.xforms.Globals.changedIdsRequest[target.id] != null)
+                ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
 
             // For select1 list, make sure we have exactly one value selected
             if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
@@ -717,6 +725,18 @@ ORBEON.xforms.Events = {
         }
     },
 
+    keydown: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (target != null) {
+            // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
+            // Ignore some key codes that won't modify the value of the field
+            if (ORBEON.xforms.Events._keyCodeModifiesField(event.keyCode))
+                ORBEON.xforms.Globals.changedIdsRequest[target.id] =
+                    ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
+                    : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
+        }
+    },
+
     keypress: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
@@ -738,23 +758,15 @@ ORBEON.xforms.Events = {
         }
     },
 
-    keydown: function(event) {
-        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-        if (target != null) {
-            // Remember that the user is editing this field, so don't overwrite when we receive an event from the server
-            var c = event.keyCode;
-            // Ignore some key codes that won't modify the value of the field
-            if (c != 9 && c != 13 && c != 16 && c != 17 && c != 18)
-                ORBEON.xforms.Globals.changedIdsRequest[target.id] = true;
-        }
-    },
-
     keyup: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
             // Save keycode
             if (ORBEON.util.Dom.hasClass(target, "xforms-select1-open"))
                 ORBEON.xforms.Globals.autoCompleteLastKeyCode[target.id] = event.keyCode;
+            // Remember we have received the keyup for this element
+            if (ORBEON.xforms.Events._keyCodeModifiesField(event.keyCode))
+                ORBEON.xforms.Globals.changedIdsRequest[target.id]--;
             // Incremental control: treat keypress as a value change event
             if (ORBEON.util.Dom.hasClass(target, "xforms-incremental")) {
                 xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
@@ -1449,6 +1461,13 @@ ORBEON.xforms.Server = {
                 ORBEON.xforms.Globals.requestInProgress = true;
                 if (XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS == 0) xformsDisplayLoading();
                 else window.setTimeout(xformsDisplayLoading, XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS);
+
+                // Remove from this list of ids that changed the id of controls for
+                // which we have received the keyup corresponding to the keydown
+                for (var id  in ORBEON.xforms.Globals.changedIdsRequest) {
+                    if (ORBEON.xforms.Globals.changedIdsRequest[id] == 0)
+                        ORBEON.xforms.Globals.changedIdsRequest[id] = null;
+                }
 
                 // Build request
                 var requestDocumentString = "";
@@ -2372,7 +2391,7 @@ function xformsHandleResponse(o) {
                                             } else {
                                                 ORBEON.util.Dom.setStringValue(documentElement, newOutputControlValue);
                                             }
-                                        } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] == true) {
+                                        } else if (ORBEON.xforms.Globals.changedIdsRequest[controlId] != null) {
                                             // User has modified the value of this control since we sent our request:
                                             // so don't try to update it
                                         } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-trigger")

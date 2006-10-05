@@ -421,7 +421,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Check if we want to require the client to perform a form submission
                 {
                     if (requireClientSubmission[0])
-                        outputSubmissionInfo(externalContext, ch);
+                        outputSubmissionInfo(externalContext, ch, containingDocument.getActiveSubmission());
                 }
 
                 // TODO: the following should be correctly ordered in the order they were requested
@@ -877,11 +877,11 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", Integer.toString(idSuffix) });
     }
 
-    private void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch) {
+    private void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
         final String requestURL = externalContext.getRequest().getRequestURL();
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
-                new String[]{"action", requestURL, "method", "POST"});
+                new String[]{"action", requestURL, "method", "POST", "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false"});
     }
 
     private void outputMessagesInfo(ContentHandlerHelper ch, List messages) {
@@ -900,7 +900,7 @@ public class XFormsServer extends ProcessorImpl {
 
             if (!(load.isReplace() && load.isPortletLoad() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
-                        new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new" });
+                        new String[]{ "resource", load.getResource(), (load.getTarget() != null) ? "target" : null, load.getTarget(), "show", load.isReplace() ? "replace" : "new", "show-progress", load.isShowProgress() ? null : "false" });
             }
         }
     }

@@ -95,6 +95,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String avtXXFormsPassword;
     private String resolvedXXFormsPassword;
 
+    private boolean xxfShowProgress;
+
     public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
         this.containingDocument = containingDocument;
         this.id = id;
@@ -111,6 +113,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     public Element getSubmissionElement() {
         return submissionElement;
+    }
+
+
+    public boolean isXxfShowProgress() {
+        return xxfShowProgress;
     }
 
     private void extractSubmissionElement() {
@@ -154,6 +161,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // Extension: username and password
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
             avtXXFormsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+
+            // Whether we must show progress or not
+            xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
             // Remember that we did this
             submissionElementExtracted = true;
@@ -448,7 +458,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
-                        connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString);
+                        connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString, xxfShowProgress);
                     } else if (!NetUtils.urlHasProtocol(resolvedAction)
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
@@ -676,9 +686,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return submitErrorEvent;
     }
 
-    private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString) {
+    private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString, boolean isShowProgress) {
         final String actionString = resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
-        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, false);
+        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, false, isShowProgress);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;
         return connectionResult;

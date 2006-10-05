@@ -94,8 +94,10 @@ public class ContentHandlerHelper {
     public void startElement(String prefix, String namespaceURI, String name, String[] attributes) {
         attributesImpl.clear();
         for (int i = 0; i < attributes.length / 2; i++) {
-            if (attributes[i * 2] != null)
-                attributesImpl.addAttribute("", attributes[i * 2], attributes[i * 2], CDATA, attributes[i * 2 + 1]);
+            final String attributeName = attributes[i * 2];
+            final String attributeValue = attributes[i * 2 + 1];
+            if (attributeName != null && attributeValue != null)
+                attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue);
         }
         startElement(prefix, namespaceURI, name, attributesImpl);
     }

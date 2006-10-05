@@ -50,6 +50,7 @@ public class XFormsLoadAction extends XFormsAction {
             final String urlNorewriteAttribute = actionElement.attributeValue(new QName("url-norewrite", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
             urlNorewrite = Boolean.valueOf(urlNorewriteAttribute).booleanValue();
         }
+        final boolean isShowProgress = !"false".equals(actionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."
         final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
@@ -61,7 +62,7 @@ public class XFormsLoadAction extends XFormsAction {
             final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNode(currentNode);
-                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite);
+                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
                 return;
@@ -69,7 +70,7 @@ public class XFormsLoadAction extends XFormsAction {
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else if (resource != null) {
             // Use linking attribute
-            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType, urlNorewrite);
+            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance
@@ -79,7 +80,7 @@ public class XFormsLoadAction extends XFormsAction {
     }
 
     public static String resolveLoadValue(XFormsContainingDocument containingDocument, PipelineContext pipelineContext,
-                                          Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite) {
+                                          Element currentElement, boolean doReplace, String value, String target, String urlType, boolean urlNorewrite, boolean isShowProgress) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
         final String externalURL;
         if (!urlNorewrite) {
@@ -87,7 +88,7 @@ public class XFormsLoadAction extends XFormsAction {
         } else {
             externalURL = value;
         }
-        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad);
+        containingDocument.addLoadToRun(externalURL, target, urlType, doReplace, isPortletLoad, isShowProgress);
         return externalURL;
     }
 }

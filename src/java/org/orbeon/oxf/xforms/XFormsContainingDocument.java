@@ -426,10 +426,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Add an XForms load to send to the client.
      */
-    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad) {
+    public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
         if (loadsToRun == null)
             loadsToRun = new ArrayList();
-        loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad));
+        loadsToRun.add(new Load(resource, target, urlType, isReplace, isPortletLoad, isShowProgress));
     }
 
     /**
@@ -445,13 +445,15 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         private String urlType;
         private boolean isReplace;
         private boolean isPortletLoad;
+        private boolean isShowProgress;
 
-        public Load(String resource, String target, String urlType, boolean replace, boolean portletLoad) {
+        public Load(String resource, String target, String urlType, boolean isReplace, boolean isPortletLoad, boolean isShowProgress) {
             this.resource = resource;
             this.target = target;
             this.urlType = urlType;
-            isReplace = replace;
-            isPortletLoad = portletLoad;
+            this.isReplace = isReplace;
+            this.isPortletLoad = isPortletLoad;
+            this.isShowProgress = isShowProgress;
         }
 
         public String getResource() {
@@ -472,6 +474,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         public boolean isPortletLoad() {
             return isPortletLoad;
+        }
+
+        public boolean isShowProgress() {
+            return isShowProgress;
         }
     }
 

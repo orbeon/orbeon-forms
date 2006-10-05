@@ -190,7 +190,7 @@
                                 <xforms:group ref="instance('control-instance')/non-empty-triggers">
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:recalculate/>
-                                        <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource"/>
+                                        <xforms:load ref="instance('control-instance')/pdf-detail-uri" f:url-type="resource" xxforms:show-progress="false"/>
                                     </xforms:action>
                                     <xforms:trigger appearance="xxforms:image">
                                         <xforms:label model="resources-model" ref="instance('resources-instance')/labels/view-pdf"/>

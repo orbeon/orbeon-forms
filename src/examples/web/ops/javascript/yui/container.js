@@ -500,7 +500,7 @@ YAHOO.widget.Module.CSS_FOOTER = "ft";
 * @type string
 * @final
 */
-YAHOO.widget.Module.RESIZE_MONITOR_SECURE_URL = null;
+YAHOO.widget.Module.RESIZE_MONITOR_SECURE_URL = "javascript:false";
 
 YAHOO.widget.Module.prototype = {
 
@@ -820,9 +820,9 @@ YAHOO.widget.Module.prototype = {
     
                 var bIE = (this.browser.indexOf("ie") === 0);
     
-                if(this.isSecure && this.RESIZE_MONITOR_SECURE_URL && bIE) {
+                if(this.isSecure && YAHOO.widget.Module.RESIZE_MONITOR_SECURE_URL && bIE) {
     
-                    resizeMonitor.src = this.RESIZE_MONITOR_SECURE_URL;
+                    resizeMonitor.src = YAHOO.widget.Module.RESIZE_MONITOR_SECURE_URL;
     
                 }
                 

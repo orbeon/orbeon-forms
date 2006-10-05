@@ -257,7 +257,8 @@ ORBEON.util.Dom = {
      */
     getAttribute: function(element, name) {
         if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
-            // IE incorrectly already return null when the attribute is not there
+            // IE incorrectly already return null when the attribute is not there,
+            // but this happens to be what we want to do here
             return element.getAttribute(name);
         } else {
             // Other browsers that follow the spec return an empty string when the attribute is not there,
@@ -2701,11 +2702,14 @@ function xformsHandleResponse(o) {
 
                         // Submit form
                         case "submission": {
-                            if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
-                                newDynamicStateTriggersPost = true;
-                                ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
-                                ORBEON.xforms.Globals.requestForm.submit();
-                            }
+                            var submissionElement = actionElement.childNodes[actionIndex];
+                            var showProcess = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
+                            // Display loading indicator unless the server tells us not to display it
+                            if (showProcess != "false")
+                                newDynamicStateTriggersReplace = true;
+                            newDynamicStateTriggersPost = true;
+                            ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
+                            ORBEON.xforms.Globals.requestForm.submit();
                             break;
                         }
 
@@ -2768,7 +2772,7 @@ function xformsHandleResponse(o) {
             xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
         }
 
-        if (newDynamicStateTriggersReplace || newDynamicStateTriggersPost) {
+        if (newDynamicStateTriggersReplace) {
             // Display loading indicator when we go to another page.
             // Display it even if it was not displayed before as loading the page could take time.
             xformsDisplayIndicator("loading");

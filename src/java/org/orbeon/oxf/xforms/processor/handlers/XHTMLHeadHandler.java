@@ -158,7 +158,7 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                     // Don't run JavaScript initialization if the control is static readonly (could change in the
                     // future if some static readonly controls require JS initialization)
-                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization() && (!xformsControl.isReadonly() && isStaticReadonly);
+                    final boolean hasJavaScriptInitialization = xformsControl.hasJavaScriptInitialization() && !(xformsControl.isReadonly() && isStaticReadonly);
                     if (hasJavaScriptInitialization) {
                         Map listForControlNameMap = (Map) appearancesMap.get(controlName);
                         if (listForControlNameMap == null) {

@@ -2573,6 +2573,16 @@ function xformsHandleResponse(o) {
                                                     var input = span.firstChild;
                                                     setReadonlyOnFormElement(input, isReadonly);
                                                 }
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea") && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                // XForms HTML area
+                                                var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
+                                                if (isReadonly) {
+                                                    htmlEditor.ToolbarSet.Collapse();
+                                                    // TODO
+                                                } else {
+                                                    htmlEditor.ToolbarSet.Expand();
+                                                    // TODO
+                                                }
                                             } else {
                                                 // Other controls
                                                 setReadonlyOnFormElement(documentElement, isReadonly);

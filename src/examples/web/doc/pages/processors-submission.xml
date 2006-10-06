@@ -24,6 +24,7 @@
         <title>REST and XForms Submission</title>
     </header>
     <body>
+        <a name="introduction"/>
         <section>
             <title>Introduction</title>
             <p>
@@ -34,6 +35,7 @@
                 without creating XForms pages.
             </p>
         </section>
+        <a name="inputs-outputs"/>
         <section>
             <title>Inputs and Outputs</title>
             <table>
@@ -81,6 +83,7 @@
                 </p:processor>
             </xml-source>
         </section>
+        <a name="processing-model"/>
         <section>
             <title>Processing Model</title>
             <p>
@@ -112,6 +115,7 @@
                 if you do not wish to handle the response document.
             </p>
         </section>
+        <a name="http-get"/>
         <section>
             <title>GET Example</title>
             <p>
@@ -132,6 +136,7 @@
                 </p:processor>
             </xml-source>
         </section>
+        <a name="http-post"/>
         <section>
             <title>POST Example</title>
             <p>
@@ -148,6 +153,7 @@
                 </p:processor>
             </xml-source>
         </section>
+        <a name="http-put"/>
         <section>
             <title>PUT Example</title>
             <p>
@@ -164,6 +170,7 @@
                 </p:processor>
             </xml-source>
         </section>
+        <a name="http-delete"/>
         <section>
             <title>DELETE Example</title>
             <p>
@@ -186,6 +193,7 @@
                 In this case the response is read but discarded by using the Null Serializer.
             </p>
         </section>
+        <a name="error-handling"/>
         <section>
             <title>Handling Errors</title>
             <p>
@@ -218,6 +226,7 @@
                 <code>/request/submission-error = 'true'</code>.
             </p>
         </section>
+        <a name="authentication"/>
         <section>
             <title>Handling Authentication</title>
             <p>

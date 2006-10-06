@@ -17,6 +17,7 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <header>
@@ -216,6 +217,48 @@
                 You can then check that an error occurred by testing that the response document satisfies
                 <code>/request/submission-error = 'true'</code>.
             </p>
+        </section>
+        <section>
+            <title>Handling Authentication</title>
+            <p>
+                You can use <a href="ftp://ftp.isi.edu/in-notes/rfc2617.txt">Basic HTTP authentication</a> (the most
+                widely used authentication mechanism over HTTP) in two different ways:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        With username and password encoded in the URL, for example:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xforms-submission">
+                            <p:input name="submission">
+                                <xforms:submission method="get" action="http://john:password@example.org/list" separator="&amp;"/>
+                            </p:input>
+                            <p:input name="request" href="#request"/>
+                            <p:output name="response" id="response"/>
+                        </p:processor>
+                    </xml-source>
+                    <p>
+                        This method has the obvious drawback of making authorization credentials visible on the URL. In
+                        particular, if that URL may show in logs, error messages, etc.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        With two extension attributes, <code>xxforms:username</code> and <code>xxforms:password</code>:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xforms-submission">
+                            <p:input name="submission">
+                                <xforms:submission method="get" action="http://example.org/list" separator="&amp;"
+                                                   xxforms:username="john" xxforms:password="password"/>
+                            </p:input>
+                            <p:input name="request" href="#request"/>
+                            <p:output name="response" id="response"/>
+                        </p:processor>
+                    </xml-source>
+                </li>
+            </ul>
         </section>
     </body>
 </document>

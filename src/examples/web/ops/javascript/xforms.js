@@ -2483,6 +2483,10 @@ function xformsHandleResponse(o) {
                                             if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
+                                                // Autosize textarea
+                                                if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
+                                                    ORBEON.xforms.Controls.autosizeTextarea(documentElement);
+                                                }
                                             }
                                         }
 
@@ -2513,6 +2517,10 @@ function xformsHandleResponse(o) {
                                         if (relevant != null) {
                                             var isRelevant = relevant == "true";
                                             ORBEON.xforms.Controls.setRelevant(documentElement, isRelevant);
+                                            // Autosize textarea
+                                            if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
+                                                ORBEON.xforms.Controls.autosizeTextarea(documentElement);
+                                            }
                                         }
 
                                         // Handle required

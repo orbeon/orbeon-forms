@@ -863,7 +863,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             }
                         } else {
                             // Got a blank src attribute, just dispatch xforms-link-exception
-                            final Throwable throwable = new ValidationException("Invalid URL specified for instance: " + srcAttribute, locationData);
+                            final String instanceId = instanceContainerElement.attributeValue("id");
+                            final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, locationData);
                             containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
                             break;
                         }

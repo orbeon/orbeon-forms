@@ -703,16 +703,16 @@
                 <xxf:static-state xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <static-state>
                         <controls xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:repeat id="id123" nodeset="/form/departments/department">
+                            <xforms:repeat nodeset="/form/departments/department" id="id123">
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert at="2" nodeset="../department" position="after"/>
+                                    <xforms:insert nodeset="../department" at="2" position="after"/>
                                 </xforms:action>
-                                <xforms:repeat id="id124" nodeset="employee" startindex="2">
+                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert at="2" nodeset="../../department[index(&apos;id123&apos;)]/employee" position="after"/>
+                                        <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
                                     </xforms:action>
-                                    <xforms:output id="id125" ref="@first"/>
-                                    <xforms:output id="id126" ref="@last"/>
+                                    <xforms:output ref="@first" id="id125"/>
+                                    <xforms:output ref="@last" id="id126"/>
                                 </xforms:repeat>
                             </xforms:repeat>
                         </controls>
@@ -914,10 +914,10 @@
                                     <tr class="xforms-repeat-delimiter"/>
                                     <tr>
                                         <td>
-                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output"/>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output"></xhtml:span>
                                         </td>
                                         <td>
-                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output"/>
+                                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output"></xhtml:span>
                                         </td>
                                     </tr>
                                     <tr id="repeat-end-id124" class="xforms-repeat-begin-end"/>

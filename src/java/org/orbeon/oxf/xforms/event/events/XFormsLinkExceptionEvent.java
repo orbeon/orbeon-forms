@@ -15,9 +15,9 @@ package org.orbeon.oxf.xforms.event.events;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.XFormsExceptionEvent;
 
 /**
  * 4.5.4 The xforms-compute-exception Event
@@ -25,36 +25,22 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
  * The default action for this event results in the following: Fatal error.
  */
-public class XFormsLinkExceptionEvent extends XFormsEvent {
-    private Throwable throwable;
+public class XFormsLinkExceptionEvent extends XFormsExceptionEvent {
+
     private Element controlElement;
     private String urlString;
 
     public XFormsLinkExceptionEvent(XFormsEventTarget targetObject, String urlString, Element controlElement, Throwable throwable) {
-        super(XFormsEvents.XFORMS_LINK_EXCEPTION, targetObject, true, false);
+        super(XFormsEvents.XFORMS_LINK_EXCEPTION, targetObject, throwable, true, false);
         this.urlString = urlString;
         this.controlElement = controlElement;
-        this.throwable = throwable;
     }
 
     public Element getControlElement() {
         return controlElement;
     }
 
-    public Throwable getThrowable() {
-        return throwable;
-    }
-
     public String getUrlString() {
         return urlString;
-    }
-
-    public RuntimeException createException() {
-        String message = getEventName() + ": " + getControlElement().toString();
-
-        if (getThrowable() != null)
-            return new OXFException(message, getThrowable());
-        else
-            return new OXFException(message);
     }
 }

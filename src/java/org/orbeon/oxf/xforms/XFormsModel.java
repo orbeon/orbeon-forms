@@ -718,6 +718,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             continue;
 
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
+                        final LocationData locationData = (LocationData) instanceContainerElement.getData();
 
                         final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
@@ -726,14 +727,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         if (srcAttribute == null) {
                             // Inline instance
                             final List children = instanceContainerElement.elements();
-                            if (children == null || children.size() == 0)
-                                throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
+                            if (children == null || children.size() != 1) {
+                                final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", locationData);
+                                containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
+                                break;
+                            }
                             instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                             // TODO: support DocumentInfo (easier once static state is done with TinyTree as well)
                             instanceSourceURI = null;
                             xxformsUsername = null;
                             xxformsPassword = null;
-                        } else {
+                        } else if (!srcAttribute.trim().equals("")) {
+
                             // External instance
                             final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -761,8 +766,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 try {
                                     // Handle connection errors
-                                    if (connectionResult.resultCode != 200)
-                                        throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+                                    if (connectionResult.resultCode != 200) {
+                                        final ValidationException validationException = new ValidationException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode, locationData);
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
+                                        break;
+                                    }
 
                                     // Read result as XML
                                     if (!isReadonlyHint) {
@@ -771,7 +779,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                     }
                                 } catch (Exception e) {
-                                    throw new OXFException(e);
+                                    final ValidationException validationException = new ValidationException(e, locationData);
+                                    dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
+                                    break;
                                 } finally {
                                     // Clean-up
                                     if (connectionResult != null)
@@ -797,8 +807,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                     try {
                                         // Handle connection errors
-                                        if (connectionResult.resultCode != 200)
-                                            throw new OXFException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode);
+                                        if (connectionResult.resultCode != 200) {
+                                            final ValidationException validationException = new ValidationException("Got invalid return code while loading instance: " + srcAttribute + ", " + connectionResult.resultCode, locationData);
+                                            dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, validationException, instanceContainerElement, locationData);
+                                            break;
+                                        }
 
                                         // Read result as XML
                                         if (!isReadonlyHint) {
@@ -807,11 +820,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                             instanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                         }
                                     } catch (Exception e) {
-                                        if (connectionResult != null && connectionResult.resourceURI != null)
-                                            throw new ValidationException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
-                                                    "reading external instance", instanceContainerElement));
-                                        else
-                                            throw new OXFException(e);
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, connectionResult, srcAttribute, e, instanceContainerElement, locationData);
+                                        break;
                                     } finally {
                                         // Clean-up
                                         if (connectionResult != null)
@@ -844,18 +854,24 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         }
                                         instanceSourceURI = urlString;
                                     } catch (Exception e) {
-                                        throw new ValidationException(e, new ExtendedLocationData(new LocationData(urlString, -1, -1),
+                                        final ValidationException validationException = new ValidationException(e, new ExtendedLocationData(new LocationData(urlString, -1, -1),
                                                 "reading external instance", instanceContainerElement));
+                                        dispatchXFormsLinkExceptionEvent(pipelineContext, new XFormsModelSubmission.ConnectionResult(urlString), srcAttribute, validationException, instanceContainerElement, locationData);
+                                        break;
                                     }
                                 }
                             }
+                        } else {
+                            // Got a blank src attribute, just dispatch xforms-link-exception
+                            final Throwable throwable = new ValidationException("Invalid URL specified for instance: " + srcAttribute, locationData);
+                            containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
+                            break;
                         }
-                        // Set instance and associated information
+                        // Set instance and associated information if everything went well
                         setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI, xxformsUsername, xxformsPassword);
                     }
                 }
             }
-            // TODO: throw exception event
 
             // Call special listener to update instance
             if (instanceConstructListener != null) {
@@ -925,14 +941,36 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 
-        } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName)) {
+        } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName) || XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
             // 4.5.4 The xforms-compute-exception Event
             // Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
             // The default action for this event results in the following: Fatal error.
 
-            // TODO
+            // 4.5.2 The xforms-link-exception Event
+            // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
+            // The default action for this event results in the following: Fatal error.
 
+            final XFormsExceptionEvent exceptionEvent = (XFormsExceptionEvent) event;
+            final Throwable throwable = exceptionEvent.getThrowable();
+            if (throwable instanceof RuntimeException)
+                throw (RuntimeException) throwable;
+            else
+                throw new ValidationException("Received fatal error event: " + eventName, throwable, (LocationData) modelDocument.getRootElement().getData());
         }
+    }
+
+    private void dispatchXFormsLinkExceptionEvent(PipelineContext pipelineContext, XFormsModelSubmission.ConnectionResult connectionResult, String srcAttribute, Exception e, Element instanceContainerElement, LocationData locationData) {
+        final Throwable throwable;
+        if (connectionResult != null && connectionResult.resourceURI != null) {
+            final ValidationException validationException
+                = new ValidationException(e, new ExtendedLocationData(new LocationData(connectionResult.resourceURI, -1, -1),
+                    "reading external instance", instanceContainerElement));
+            validationException.addLocationData(locationData);
+            throwable = validationException;
+        } else {
+            throwable = new ValidationException(e, locationData);
+        }
+        containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
     }
 
     public static class EventSchedule {

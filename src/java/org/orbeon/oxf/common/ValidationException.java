@@ -97,19 +97,19 @@ public class ValidationException extends OXFException {
         this(message, null, locationData);
     }
 
-    public ValidationException(Exception exception, LocationData locationData) {
-        this(exception.getMessage(), exception, locationData);
+    public ValidationException(Throwable throwable, LocationData locationData) {
+        this(throwable.getMessage(), throwable, locationData);
     }
 
-    public ValidationException(String message, Exception exception, LocationData locationData) {
+    public ValidationException(String message, Throwable throwable, LocationData locationData) {
         super((locationData == null ? "" : locationData.getSystemID() + ", line "
-                + locationData.getLine() + ", column " + locationData.getCol() + ": ") + message, exception);
+                + locationData.getLine() + ", column " + locationData.getCol() + ": ") + message, throwable);
         this.simpleMessage = message;
         if (locationData != null)
             this.locationDataList.add(locationData);
     }
 
-    public static ValidationException wrapException(Exception e, LocationData locationData) {
+    public static ValidationException wrapException(Throwable e, LocationData locationData) {
         if (e instanceof ValidationException) {
             final ValidationException validationException = (ValidationException) e;
             if (locationData != null)

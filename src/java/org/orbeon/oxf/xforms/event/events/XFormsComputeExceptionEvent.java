@@ -14,9 +14,9 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.XFormsExceptionEvent;
 
 /**
  * 4.5.4 The xforms-compute-exception Event
@@ -24,30 +24,15 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
  * The default action for this event results in the following: Fatal error.
  */
-public class XFormsComputeExceptionEvent extends XFormsEvent {
+public class XFormsComputeExceptionEvent extends XFormsExceptionEvent {
     private String errorString;
-    private Throwable throwable;
 
     public XFormsComputeExceptionEvent(XFormsEventTarget targetObject, String errorString, Throwable throwable) {
-        super(XFormsEvents.XFORMS_COMPUTE_EXCEPTION, targetObject, true, false);
+        super(XFormsEvents.XFORMS_COMPUTE_EXCEPTION, targetObject, throwable, true, false);
         this.errorString = errorString;
-        this.throwable = throwable;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
     }
 
     public String getErrorString() {
         return errorString;
-    }
-
-    public RuntimeException createException() {
-        String message = getEventName() + ": " + getErrorString();
-
-        if (getThrowable() != null)
-            return new OXFException(message, getThrowable());
-        else
-            return new OXFException(message);
     }
 }

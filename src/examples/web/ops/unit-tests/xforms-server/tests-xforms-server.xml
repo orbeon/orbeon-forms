@@ -295,44 +295,44 @@
                 <xxf:static-state>
                     <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
                         <controls>
-                            <xforms:group id="group111" ref="/">
-                                <xforms:group id="group112" ref="nested111">
-                                    <xforms:group id="group113" ref="nested112">
-                                        <xforms:output id="id111" ref="first"/>
-                                        <xforms:output id="id112" ref="second"/>
-                                        <xforms:output id="id113" ref="third"/>
-                                        <xforms:output id="id114" ref="fourth"/>
+                            <xforms:group ref="/" id="group111">
+                                <xforms:group ref="nested111" id="group112">
+                                    <xforms:group ref="nested112" id="group113">
+                                        <xforms:output ref="first" id="id111"/>
+                                        <xforms:output ref="second" id="id112"/>
+                                        <xforms:output ref="third" id="id113"/>
+                                        <xforms:output ref="fourth" id="id114"/>
                                     </xforms:group>
                                 </xforms:group>
                             </xforms:group>
-                            <xforms:group id="group121" ref="instance(&apos;instance12&apos;)">
-                                <xforms:group id="group122" ref="nested122">
-                                    <xforms:output id="id121" ref="first"/>
-                                    <xforms:output id="id122" ref="second"/>
-                                    <xforms:output id="id123" ref="third"/>
-                                    <xforms:output id="id124" ref="fourth"/>
+                            <xforms:group ref="instance('instance12')" id="group121">
+                                <xforms:group ref="nested122" id="group122">
+                                    <xforms:output ref="first" id="id121"/>
+                                    <xforms:output ref="second" id="id122"/>
+                                    <xforms:output ref="third" id="id123"/>
+                                    <xforms:output ref="fourth" id="id124"/>
                                 </xforms:group>
                             </xforms:group>
-                            <xforms:group id="group211" model="model2" ref="/">
-                                <xforms:group id="group212" ref="nested211">
-                                    <xforms:group id="group213" ref="nested212">
-                                        <xforms:output id="id211" ref="first"/>
-                                        <xforms:output id="id212" ref="second"/>
-                                        <xforms:output id="id213" ref="third"/>
-                                        <xforms:output id="id214" ref="fourth"/>
+                            <xforms:group model="model2" ref="/" id="group211">
+                                <xforms:group ref="nested211" id="group212">
+                                    <xforms:group ref="nested212" id="group213">
+                                        <xforms:output ref="first" id="id211"/>
+                                        <xforms:output ref="second" id="id212"/>
+                                        <xforms:output ref="third" id="id213"/>
+                                        <xforms:output ref="fourth" id="id214"/>
                                     </xforms:group>
-                                    <xforms:group id="group214" ref="instance(&apos;instance22&apos;)">
-                                        <xforms:group id="group8" ref="nested222">
-                                            <xforms:output id="id221" ref="first"/>
-                                            <xforms:output id="id222" ref="second"/>
-                                            <xforms:output id="id223" ref="third"/>
-                                            <xforms:output id="id224" ref="fourth"/>
-                                            <xforms:group id="group215" ref="instance(&apos;instance21&apos;)">
-                                                <xforms:group id="group10" ref="nested212">
-                                                    <xforms:output id="id211b" ref="first"/>
-                                                    <xforms:output id="id212b" ref="second"/>
-                                                    <xforms:output id="id213b" ref="third"/>
-                                                    <xforms:output id="id214b" ref="fourth"/>
+                                    <xforms:group ref="instance('instance22')" id="group214">
+                                        <xforms:group ref="nested222" id="group8">
+                                            <xforms:output ref="first" id="id221"/>
+                                            <xforms:output ref="second" id="id222"/>
+                                            <xforms:output ref="third" id="id223"/>
+                                            <xforms:output ref="fourth" id="id224"/>
+                                            <xforms:group ref="instance('instance21')" id="group215">
+                                                <xforms:group ref="nested212" id="group10">
+                                                    <xforms:output ref="first" id="id211b"/>
+                                                    <xforms:output ref="second" id="id212b"/>
+                                                    <xforms:output ref="third" id="id213b"/>
+                                                    <xforms:output ref="fourth" id="id214b"/>
                                                 </xforms:group>
                                             </xforms:group>
                                         </xforms:group>

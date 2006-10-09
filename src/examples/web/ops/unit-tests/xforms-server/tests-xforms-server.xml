@@ -1290,7 +1290,7 @@
                 <xxf:static-state>
                     <static-state xmlns:xforms="http://www.w3.org/2002/xforms">
                         <controls>
-                            <xforms:group id="id1" ref="instance(&apos;tests&apos;)">
+                            <xforms:group id="id1" ref="instance('tests')">
                                 <xforms:input id="id2" ref="noFoundData">
                                     <xforms:label class="fixed-width" id="id3">test noFoundData:</xforms:label>
                                 </xforms:input>
@@ -1303,7 +1303,7 @@
                                         <noFoundData>0</noFoundData>
                                     </instance>
                                 </xforms:instance>
-                                <xforms:bind id="id4" nodeset="instance(&apos;tests&apos;)">
+                                <xforms:bind id="id4" nodeset="instance('tests')">
                                     <xforms:bind calculate=". + 1" id="id5" nodeset="noFoundData"/>
                                 </xforms:bind>
                             </xforms:model>

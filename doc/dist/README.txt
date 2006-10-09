@@ -95,7 +95,7 @@ or in this distribution under:
 
 OPS has been tested on the following application servers:
 
-    * Apache Tomcat 5.5.4 with JDK 1.5.0
+    * Apache Tomcat 5.5.20 with JDK 1.5.0
     * BEA WebLogic Server 9.1
     * IBM WebSphere 6
     * JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)

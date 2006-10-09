@@ -64,7 +64,6 @@
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
-                <!-- Template for alert messages -->
             </xhtml:body>
         </xhtml:html>
     </xsl:template>

@@ -671,6 +671,11 @@ ${files}
             <include name="**/*.js"/>
             <include name="**/*.css"/>
             <include name="**/*.java"/>
+            <include name="**/*.properties"/>
+            <include name="**/*.rng"/>
+            <include name="**/*.xsd"/>
+            <include name="**/*.xhtml"/>
+            <include name="**/*.wsdl"/>
         </fixcrlf>
         <zip zipfile="${build.distrib.dir}/ops-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
         <!-- Fix EOL for Unix platform -->
@@ -685,10 +690,35 @@ ${files}
             <include name="**/*.js"/>
             <include name="**/*.css"/>
             <include name="**/*.java"/>
+            <include name="**/*.properties"/>
+            <include name="**/*.rng"/>
+            <include name="**/*.xsd"/>
+            <include name="**/*.xhtml"/>
+            <include name="**/*.wsdl"/>
         </fixcrlf>
         <tar tarfile="${build.distrib.dir}/ops-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
+
+    <!--<target name="test-crlf">-->
+        <!--<fixcrlf srcDir="c:/temp/opswar" eol="crlf">-->
+            <!--<include name="**/*.txt"/>-->
+            <!--<include name="**/*.xml"/>-->
+            <!--<include name="**/*.xsl"/>-->
+            <!--<include name="**/*.xpl"/>-->
+            <!--<include name="**/*.jsp"/>-->
+            <!--<include name="**/*.jspx"/>-->
+            <!--<include name="**/*.html"/>-->
+            <!--<include name="**/*.js"/>-->
+            <!--<include name="**/*.css"/>-->
+            <!--<include name="**/*.java"/>-->
+            <!--<include name="**/*.properties"/>-->
+            <!--<include name="**/*.rng"/>-->
+            <!--<include name="**/*.xsd"/>-->
+            <!--<include name="**/*.xhtml"/>-->
+            <!--<include name="**/*.wsdl"/>-->
+        <!--</fixcrlf>-->
+    <!--</target>-->
 
     <target name="orbeon-dist-install" depends="orbeon-dist-war">
 

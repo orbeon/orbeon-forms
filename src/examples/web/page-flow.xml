@@ -105,12 +105,6 @@
     <!-- Portal -->
     <page path-info="/examples/portal/*" model="/portal/config/model.xpl"/>
 
-    <!-- TESTS -->
-
-    <page path-info="/graham/(.+)" matcher="oxf:perl5-matcher"  model="file:/c:/model.xpl" view="file:/c:/view.xhtml"/>
-    <page path-info="/tutorial-hello1" model="/examples/tutorial/hello1/page-flow.xpl"/>
-    <page path-info="/tutorial-hello2" model="/examples/tutorial/hello2/page-flow.xpl"/>
-
     <!-- OXFMark -->
     <!--<page path-info="/examples/oxfmark-machines" model="/oxfmark/machines.xpl"/>-->
     <!--<page path-info="/examples/oxfmark-vms" model="/oxfmark/vms.xpl"/>-->

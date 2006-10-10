@@ -15,7 +15,10 @@
     Please contact Orbeon at info@orbeon.com for more information.
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
     <header>
         <title>XML Databases</title>
     </header>
@@ -42,17 +45,242 @@
                 </p>
             </note>
         </section>
-        <a name="xmldb"/>
+        <a name="exist"/>
         <section>
-            <title>XML:DB Databases (eXist)</title>
-            <note>
-                This documentation has not yet been written.
-            </note>
-            <!--
-            <p>
-                TODO
-            </p>
-            -->
+            <title>eXist</title>
+            <a name="api"/>
+            <section>
+                <title>API</title>
+                <p>
+                    The eXist database can be accessed through the XML:DB API or through a REST Web API:
+                </p>
+                <ul>
+                    <li>
+                        The REST API is a web API to access the database through HTTP with the methods GET, POST, PUT,
+                        and DELETE. You can call the eXist REST API directly from XForms. You can also call the
+                        eXist REST API from XPL using the <a href="processors-submission">XForms submission
+                        processor</a>.
+                    </li>
+                    <li>
+                        The XML:DB API is a Java API, which you can call from XPL using the XML:DB processors provided
+                        by PresentationServer.
+                    </li>
+                </ul>
+                <a name="rest"/>
+                <section>
+                    <title>The REST API from XPL</title>
+                    <p>
+                        The example below uses <a href="processors-submission">XForms submission processor</a> to  call
+                        to the eXist REST API from XPL:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xforms-submission">
+                            <p:input name="submission">
+                                <xforms:submission method="post"
+                                    action="http://localhost:8080/ops/direct/xforms-translate/post"/>
+                            </p:input>
+                            <p:input name="request">
+                                <translation>
+                                    <source>This is a table.</source>
+                                    <language-pair>en|fr</language-pair>
+                                </translation>
+                            </p:input>
+                            <p:output name="response" ref="data"/>
+                        </p:processor>
+                    </xml-source>
+                </section>
+                <a name="xmldb"/>
+                <section>
+                    <title>The XML:DB API</title>
+                    <p>
+                        XML:DB is a Java API for XML databases, just like JDBC is a Java API for relational databases.
+                        The XML:DB processor interface with the XML:DB API and so may be used with any XML databases
+                        that implements XML:DB, including eXist.
+                    </p>
+                    <p>
+                        There are 4 different XML:DB processors, for querying, updating, deleting, and inserting data in
+                        the database. All 4 processors take 2 inputs: <code>datasource</code> and <code>query</code>.
+                        The <code>datasource</code> input points to a description of the database. For instance, to
+                        connect to an embedded eXist, use:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <datasource>
+                            <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                            <uri>xmldb:exist:///</uri>
+                            <username>admin</username>
+                            <password>admin</password>
+                        </datasource>
+                    </xml-source>
+                    <p>
+                        To connect to eXist deployed as a servlet, use:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <datasource>
+                            <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                            <uri>xmldb:exist://localhost:9999/exist/xmlrpc</uri>
+                            <username>admin</username>
+                            <password>admin</password>
+                        </datasource>
+                    </xml-source>
+                    <p>
+                        The 4 examples below show how to use the XML:DB query, update, delete, and insert processors.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xmldb-query">
+                            <p:input name="datasource" href="datasource.xml"/>
+                            <p:input name="query">
+                                <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true"
+                                        xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
+                                    xquery version "1.0";
+                                    <company>
+                                        {
+                                        for $d in /company/department return
+                                        <department employee-count="{count($d/employee)}"/>
+                                        }
+                                    </company>
+                                </xdb:query>
+                            </p:input>
+                            <p:output name="data" ref="categories"/>
+                        </p:processor>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xmldb-update">
+                            <p:input name="datasource" href="datasource.xml"/>
+                            <p:input name="query">
+                                <xdb:update collection="/db/orbeon/bizdoc-example"
+                                        xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
+                                    <xu:modifications version="1.0">
+                                        <xu:update select="/document-info[document-id = '123']/document">
+                                            <something/>
+                                        </xu:update>
+                                    </xu:modifications>
+                                </xdb:update>
+                            </p:input>
+                        </p:processor>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xmldb-delete">
+                            <p:input name="datasource" href="datasource.xml"/>
+                            <p:input name="query">
+                                <xdb:delete xsl:version="2.0" collection="/db/ops/dmv-example"
+                                        xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
+                                    /document-info[document-id = '123']
+                                </xdb:delete>
+                            </p:input>
+                        </p:processor>
+                    </xml-source>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xmldb-insert">
+                            <p:input name="datasource" href="datasource.xml"/>
+                            <p:input name="query">
+                                <xdb:insert collection="/db/ops/dmv-example"/>
+                            </p:input>
+                            <p:input name="data" href="#document-info"/>
+                        </p:processor>
+                    </xml-source>
+                </section>
+            </section>
+            <a name="how-to"/>
+            <section>
+                <title>How-To</title>
+                <a name="named-file-xmldb"/>
+                <section>
+                    <title>Create a Named File with the XML:DB Processor</title>
+                    <p>
+                        When using the insert processor, you cannot specify the name of the "file" that gets created in
+                        eXist. The XML:DB API does not provide a facility to specify the name of the resource that gets
+                        created in the database. So when using XML:DB, you need to call the
+                        <code>oxf:xmldb-query</code> processor and the <code>xmldb:store()</code> extension function in
+                        your query. If the collection where you want to add the document does not exist yet, you will
+                        also need to use the <code>xmldb-create-collection()</code> function.
+                    </p>
+                    <p>
+                        Calling the <code>oxf:xmldb-query</code> processor as in the code below will create a
+                        collection <code>myCollection</code> and a file in that collection called
+                        <code>myFile.xml</code>. The file will just have a root element <code>&lt;root/></code>.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xmldb-query">
+                            <p:input name="datasource" href="datasource.xml"/>
+                            <p:input name="query">
+                                <xdb:query xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
+                                    xmldb:create-collection('/db', 'myCollection'),
+                                    xmldb:store('/db/myCollection', 'myFile.xml', <gaga/>)
+                                </xdb:query>
+                            </p:input>
+                            <p:output name="data" ref="categories"/>
+                        </p:processor>
+                    </xml-source>
+                </section>
+                <a name="named-file-rest"/>
+                <section>
+                    <title>Create a Named File with the REST API</title>
+                    <p>
+                        With the REST API, to create a "file" <code>/db/myCollection/myFile.xml</code>, you PUT the
+                        XML data for you file to the URL <code>/db/myCollection/myFile.xml</code>. You can do this
+                        with an XForms submission, directly from XForms, or by calling the <a
+                        href="processors-submission">XForms submission processor</a>, as in the example below:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:config>
+                            <p:processor name="oxf:xforms-submission">
+                                <p:input name="submission">
+                                    <xforms:submission method="put"
+                                        action="/exist/rest/db/myCollection/myFile.xml"/>
+                                </p:input>
+                                <p:input name="request">
+                                    <gaga/>
+                                </p:input>
+                                <p:output name="response" id="dummy"/>
+                            </p:processor>
+                            <p:processor name="oxf:null-serializer">
+                                <p:input name="data" href="#dummy"/>
+                            </p:processor>
+                        </p:config>
+                    </xml-source>
+                </section>
+                <a name="exist-command-line"/>
+                <section>
+                    <title>Execute Queries from The Command Line</title>
+                    <p>
+                        It is sometimes convenient to run queries from the command line. The method below uses the
+                        eXist REST API, the same that is used if you access eXist directly from XForms.
+                    </p>
+                    <ul>
+                        <li>
+                            You first need to install curl. If you are running UNIX, curl might already be installed,
+                            and if it isn't, look for the curl package for your UNIX distribution. On Windows, you can
+                            <a href="http://curl.haxx.se/">download</a> an executable with no dependencies of any
+                            library (no need for cygwin).
+                        </li>
+                        <li>
+                            Create an XML file that contains your query, for instance:
+                            <xml-source>
+                                <exist:query xmlns:exist="http://exist.sourceforge.net/NS/exist" max="0">
+                                    <exist:text>
+                                        <![CDATA[
+                                            declare namespace SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/";
+                                            count(/*)
+                                        ]]>
+                                    </exist:text>
+                                </exist:query>
+                            </xml-source>
+                        </li>
+                        <li>
+                            Assuming the context for your application is <code>/ops</code>, the file that contains your
+                            query is <code>query.xml</code>, the web server is running on port 8080, and you want
+                            to run the query on the collection <code>yourCollection</code>, execute the command line:
+                            <p>
+                                <code>curl http://localhost:8080/ops/exist/rest/db/yourCollection
+                                -H "Content-Type: application/xml" --data-binary @query.xml</code>
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        For more on curl, see the <a href="http://www.hmug.org/man/1/curl.php">curl man page</a>.
+                    </p>
+                </section>
+            </section>
         </section>
         <a name="tamino"/>
         <section>

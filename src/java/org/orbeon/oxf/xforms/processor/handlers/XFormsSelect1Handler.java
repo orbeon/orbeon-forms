@@ -635,18 +635,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
 
             // We don't output the label within <input></input>, because XHTML won't display it.
-            final AttributesImpl itemAttributes;
-            {
-                if (item.getAttributes() != null) {
-                    itemAttributes = new AttributesImpl(item.getAttributes());
-                } else {
-                    reusableAttributes.clear();
-                    itemAttributes = reusableAttributes;
-                }
-            }
 
             final String label = item.getLabel();
-            outputLabelHintHelpAlert(handlerContext, itemAttributes, itemEffectiveId, label);
+            reusableAttributes.clear();
+            outputLabelHintHelpAlert(handlerContext, reusableAttributes, itemEffectiveId, label);
         }
 
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

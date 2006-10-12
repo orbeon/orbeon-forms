@@ -91,7 +91,10 @@ public class XFormsServerDocumentCache {
      * @param xformsState           state used to search cache
      * @return                      XFormsContainingDocument
      */
-    public synchronized XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
+    public XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
+
+        // NOTE: It looks save to make this non-synchronized. If we make it synchronized, we risk deadlocks (verified!)
+        // when a submission occurs during createXFormsContainingDocument() and submits to the same document.
 
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);

@@ -58,7 +58,7 @@
                     <li>
                         The REST API is a web API to access the database through HTTP with the methods GET, POST, PUT,
                         and DELETE. You can call the eXist REST API directly from XForms. You can also call the
-                        eXist REST API from XPL using the <a href="processors-submission">XForms submission
+                        eXist REST API from XPL using the <a href="processors-submission">XForms Submission
                         processor</a>.
                     </li>
                     <li>
@@ -70,7 +70,7 @@
                 <section>
                     <title>The REST API from XPL</title>
                     <p>
-                        The example below uses <a href="processors-submission">XForms submission processor</a> to  call
+                        The example below uses <a href="processors-submission">XForms Submission processor</a> to  call
                         to the eXist REST API from XPL:
                     </p>
                     <xml-source show-namespaces="false">

@@ -24,14 +24,41 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <message>Help message</message>
+                    <show>false</show>
+                    <real-message>Help message</real-message>
+                    <empty-message/>
                 </instance>
             </xforms:instance>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:input ref=".">
-            <xforms:help ref="message"/>
-        </xforms:input>
+        <xforms:trigger>
+            <xforms:label>Show</xforms:label>
+            <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">true</xforms:setvalue>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Hide</xforms:label>
+            <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">false</xforms:setvalue>
+        </xforms:trigger>
+        <xforms:group ref=".[/instance/show = 'true']">
+            <xhtml:div>
+                <xforms:input ref=".">
+                    <xforms:label>Ref to real help</xforms:label>
+                    <xforms:help ref="real-message"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:input ref=".">
+                    <xforms:label>Ref to empty help</xforms:label>
+                    <xforms:help ref="empty-message"/>
+                </xforms:input>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:input ref=".">
+                    <xforms:label>Ref to empty nodeset</xforms:label>
+                    <xforms:help ref="inexistant-message"/>
+                </xforms:input>
+            </xhtml:div>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

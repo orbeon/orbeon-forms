@@ -2008,15 +2008,26 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
         element.id = xformsAppendRepeatSuffix(element.id, idSuffixWithDepth);
     if (element.htmlFor)
         element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
-    if (element.name)
-        element.name= xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
+    if (element.name) {
+        var newName = xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
+        if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
+            // IE does not support changing the name of elements, so we have to recreate the element instead. See:
+            // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
+            var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
+            for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
+                var attribute = element.attributes[attributeIndex];
+                if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
+                    clone.setAttribute(attribute.nodeName, attribute.nodeValue);
+            }
+            YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);
+            YAHOO.util.Event.addListener(clone, "blur", ORBEON.xforms.Events.blur);
+            YAHOO.util.Event.addListener(clone, "change", ORBEON.xforms.Events.change);
+            element.replaceNode(clone);
+        } else {
+            element.name = newName;
+        }
+    }
     // Remove references to hint, help, alert, label as they might have changed
-    if (xformsIsDefined(element.labelElement)) element.labelElement = null;
-    if (xformsIsDefined(element.hintElement)) element.hintElement = null;
-    if (xformsIsDefined(element.helpElement)) element.helpElement = null;
-    if (xformsIsDefined(element.alertElement)) element.alertElement = null;
-    if (xformsIsDefined(element.divId)) element.divId = null;
-    element.styleListenerRegistered = false;
     for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
         var childNode = element.childNodes[childIndex];
         if (childNode.nodeType == ELEMENT_TYPE) {

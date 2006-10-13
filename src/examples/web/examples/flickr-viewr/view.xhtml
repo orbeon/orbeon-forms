@@ -27,12 +27,6 @@
         <xforms:model>
             <xforms:instance id="query">
                 <xi:include href="input:instance"/>
-                <!--<query>-->
-                    <!--<method>flickr.photos.search</method>-->
-                    <!--<api_key>d0c3b54d6fbc1ed217ecc67feb42568b</api_key>-->
-                    <!--<tags>kitesurfing</tags>-->
-                    <!--<user_id>70138573@N00</user_id>-->
-                <!--</query>-->
             </xforms:instance>
             <xforms:instance id="images">
                 <rsp stat="ok">
@@ -43,7 +37,7 @@
                 </rsp>
             </xforms:instance>
             <xforms:submission ref="instance('query')" id="send-query"
-                    method="get" action="http://localhost:8090/services/rest/"
+                    method="get" action="http://api.flickr.com/services/rest/"
                     replace="instance" instance="images" separator="&amp;"/>
             <xforms:send submission="send-query" ev:event="xforms-ready"/>
         </xforms:model>

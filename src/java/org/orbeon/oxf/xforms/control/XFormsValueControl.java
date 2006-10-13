@@ -110,6 +110,22 @@ public abstract class XFormsValueControl extends XFormsControl {
                 // Format a time
                 final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
+            } else if ("{http://www.w3.org/2001/XMLSchema}decimal".equals(type)) {
+                // Format a decimal
+                final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then . else .";
+                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY, DEFAULT_FORMAT);
+            } else if ("{http://www.w3.org/2001/XMLSchema}integer".equals(type)) {
+                // Format an integer
+                final String DEFAULT_FORMAT = "if (. castable as xs:integer) then . else .";
+                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY, DEFAULT_FORMAT);
+            } else if ("{http://www.w3.org/2001/XMLSchema}float".equals(type)) {
+                // Format a float
+                final String DEFAULT_FORMAT = "if (. castable as xs:float) then . else .";
+                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY, DEFAULT_FORMAT);
+            } else if ("{http://www.w3.org/2001/XMLSchema}double".equals(type)) {
+                // Format a double
+                final String DEFAULT_FORMAT = "if (. castable as xs:double) then . else .";
+                format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY, DEFAULT_FORMAT);
             }
 
             if (format != null) {

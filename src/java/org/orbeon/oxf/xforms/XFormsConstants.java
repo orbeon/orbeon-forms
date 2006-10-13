@@ -102,9 +102,15 @@ public class XFormsConstants {
     public static final String XFORMS_ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";
     public static final String XFORMS_ENCRYPT_HIDDEN_PROPERTY = "oxf.xforms.encrypt-hidden";
     public static final String XFORMS_VALIDATION_PROPERTY = "oxf.xforms.validate";
+
     public static final String XFORMS_DEFAULT_DATE_FORMAT_PROPERTY = "oxf.xforms.format.date";
     public static final String XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY = "oxf.xforms.format.dateTime";
     public static final String XFORMS_DEFAULT_TIME_FORMAT_PROPERTY = "oxf.xforms.format.time";
+    public static final String XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY = "oxf.xforms.format.decimal";
+    public static final String XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY = "oxf.xforms.format.integer";
+    public static final String XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY = "oxf.xforms.format.float";
+    public static final String XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY = "oxf.xforms.format.double";
+
     public static final String XFORMS_STATE_HANDLING_PROPERTY = "oxf.xforms.state-handling";
     public static final String XFORMS_CACHE_DOCUMENT_PROPERTY = "oxf.xforms.cache.document";
     public static final String XFORMS_CACHE_SESSION_SIZE_PROPERTY = "oxf.xforms.cache.session.size";

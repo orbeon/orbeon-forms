@@ -36,10 +36,14 @@
     <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
     <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
 
-    <!-- Default formatting of xs:date, xs:dateTime and xs:time -->
+    <!-- Default formatting of XForms types -->
     <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.integer"                       value="if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
 
     <!-- XForms cache configuration -->
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>

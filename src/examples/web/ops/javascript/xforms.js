@@ -1248,6 +1248,9 @@ ORBEON.xforms.Init = {
         // Run code sent by server
         if (typeof xformsPageLoadedServer != "undefined")
             xformsPageLoadedServer();
+        
+        var myDialog = new YAHOO.widget.Dialog("myDialog");
+        myDialog.render();
     },
 
     _autoComplete: function(autoComplete) {
@@ -2010,8 +2013,11 @@ function xformsAddSuffixToIds(element, idSuffix, repeatDepth) {
         element.htmlFor = xformsAppendRepeatSuffix(element.htmlFor, idSuffixWithDepth);
     if (element.name) {
         var newName = xformsAppendRepeatSuffix(element.name, idSuffixWithDepth);
-        if (ORBEON.xforms.Globals.isRenderingEngineTridend) {
-            // IE does not support changing the name of elements, so we have to recreate the element instead. See:
+        if (element.tagName.toLowerCase() == "input" && element.type.toLowerCase() == "radio"
+                && ORBEON.xforms.Globals.isRenderingEngineTridend) {
+            // IE supports changing the name of elements, but according to the Microsoft documentation, "This does not
+            // cause the name in the programming model to change in the collection of elements". This has a implication
+            // for radio buttons where using a same name for a set of radio buttons is used to group them together.
             // http://msdn.microsoft.com/library/default.asp?url=/workshop/author/dhtml/reference/properties/name_2.asp
             var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
             for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {

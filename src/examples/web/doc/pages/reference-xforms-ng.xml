@@ -1906,21 +1906,25 @@
                     <xforms:output ref="size" xxforms:format="format-number(., '###,##0')"/>
                 </xml-source>
             </section>
+            <a name="xforms-default-formatting"/>
             <section>
                 <title>Default Formatting</title>
                 <p>
-                    For both <code>xforms:input</code> and <code>xforms:output</code>, if the bound
-                    node is of type <code>xs:date</code>, <code>xs:dateTime</code> or
-                    <code>xs:time</code>, and if no <code>xxforms:format</code> attribute is present
-                    on the control, formatting is based on <a
-                    href="reference-properties">properties</a>. If the properties are missing, a
-                    built-in default formatting is used. The default properties, as well as the
-                    built-in defaults, are as follows:
+                    For both <code>xforms:input</code> and <code>xforms:output</code>, if the bound node is of one of
+                    the following types: <code>xs:date</code>, <code>xs:dateTime</code>, <code>xs:time</code>,
+                    <code>xs:decimal</code>, <code>xs:integer</code>, <code>xs:float</code>, and <code>xs:double</code>,
+                    and if no <code>xxforms:format</code> attribute is present on the control, formatting is based on
+                    <a href="reference-properties">properties</a>. If the properties are missing, a built-in default
+                    formatting is used. The default properties, as well as the built-in defaults, are as follows:
                 </p>
                 <xml-source>
                     <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
                     <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
                     <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.integer"                       value="if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
                 </xml-source>
                 <p>
                     They produce results as follows:
@@ -1928,23 +1932,38 @@
                 <ul>
                     <li>
                         <p>
-                            <code>2004-01-07</code> is displayed as <code>Wednesday January 7, 2004</code>
+                            <code>2004-01-07</code> as <code>xs:date</code> is displayed as <code>Wednesday January 7, 2004</code>
                         </p>
                     </li>
                     <li>
                         <p>
-                            <code>2004-01-07T04:38:35.123</code> is displayed as <code>Wednesday January 7, 2004 04:38:35 UTC</code>
+                            <code>2004-01-07T04:38:35.123</code> as <code>xs:dateTime</code> is displayed as <code>Wednesday January 7, 2004 04:38:35 UTC</code>
                         </p>
                     </li>
                     <li>
                         <p>
-                            <code>04:38:35.123</code> is displayed as <code>04:38:35 UTC</code>
+                            <code>04:38:35.123</code> as <code>xs:time</code> is displayed as <code>04:38:35 UTC</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>123456.789</code> as <code>xs:decimal</code> is displayed as <code>123,456.79</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>123456.789</code> as <code>xs:integer</code> is displayed as <code>123,456</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>123456.789</code> as <code>xs:float</code> or <code>xs:double</code> is displayed as <code>123,456.789</code>
                         </p>
                     </li>
                 </ul>
                 <p>
-                    Note that with the condition in the XPath expressions, a value which cannot be
-                    converted to the appropriate type is simply displayed as is.
+                    Note that with the "if" condition in the XPath expressions, a value which cannot be converted to
+                    the appropriate type is simply displayed as is.
                 </p>
             </section>
         </section>

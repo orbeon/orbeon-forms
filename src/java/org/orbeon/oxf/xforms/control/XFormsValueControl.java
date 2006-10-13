@@ -112,19 +112,19 @@ public abstract class XFormsValueControl extends XFormsControl {
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
             } else if ("{http://www.w3.org/2001/XMLSchema}decimal".equals(type)) {
                 // Format a decimal
-                final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then . else .";
+                final String DEFAULT_FORMAT = "if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else .";
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DECIMAL_FORMAT_PROPERTY, DEFAULT_FORMAT);
             } else if ("{http://www.w3.org/2001/XMLSchema}integer".equals(type)) {
                 // Format an integer
-                final String DEFAULT_FORMAT = "if (. castable as xs:integer) then . else .";
+                final String DEFAULT_FORMAT = "if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else .";
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_INTEGER_FORMAT_PROPERTY, DEFAULT_FORMAT);
             } else if ("{http://www.w3.org/2001/XMLSchema}float".equals(type)) {
                 // Format a float
-                final String DEFAULT_FORMAT = "if (. castable as xs:float) then . else .";
+                final String DEFAULT_FORMAT = "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .";
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_FLOAT_FORMAT_PROPERTY, DEFAULT_FORMAT);
             } else if ("{http://www.w3.org/2001/XMLSchema}double".equals(type)) {
                 // Format a double
-                final String DEFAULT_FORMAT = "if (. castable as xs:double) then . else .";
+                final String DEFAULT_FORMAT = "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .";
                 format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DOUBLE_FORMAT_PROPERTY, DEFAULT_FORMAT);
             }
 

@@ -1,27 +1,21 @@
 <!--
     Copyright (C) 2005 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xu="http://www.xmldb.org/xupdate">
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="/flickr-viewr/([^/]+)/tags/([^/]+)/"
-            default-submission="query.xml" matcher="oxf:perl5-matcher" view="view.xhtml">
-        <setvalue ref="/query/user_id" matcher-group="1"/>
-        <setvalue ref="/query/tags" matcher-group="2"/>
-    </page>
+    <p:processor name="oxf:page-flow">
+        <p:input name="controller" href="page-flow.xml"/>
+    </p:processor>
 
-
-    <epilogue url="oxf:/config/epilogue.xpl"/>
-
-</config>
+</p:config>

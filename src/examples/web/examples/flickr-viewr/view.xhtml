@@ -19,75 +19,44 @@
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         xmlns:env="http://www.w3.org/2003/05/soap-envelope"
         xmlns:orbeon="http://www.orbeon.com/"
+        xmlns:xi="http://www.w3.org/2003/XInclude"
         xmlns:flickr="urn:flickr">
 
     <xhtml:head>
-        <xhtml:title>Flickr Spell</xhtml:title>
+        <xhtml:title>XForms Flickr Viewer</xhtml:title>
         <xforms:model>
-            <xforms:instance id="input">
-                <input>
-                    <text/>
-                    <seed>1</seed>
-                </input>
+            <xforms:instance id="query">
+                <xi:include href="input:instance"/>
+                <!--<query>-->
+                    <!--<method>flickr.photos.search</method>-->
+                    <!--<api_key>d0c3b54d6fbc1ed217ecc67feb42568b</api_key>-->
+                    <!--<tags>kitesurfing</tags>-->
+                    <!--<user_id>70138573@N00</user_id>-->
+                <!--</query>-->
             </xforms:instance>
             <xforms:instance id="images">
-                <images/>
+                <rsp stat="ok">
+                    <photos page="1" pages="1" perpage="100" total="11">
+                        <photo id="266341596" owner="70138573@N00" secret="fb8fd0b661" server="91" title="" ispublic="1"
+                                isfriend="0" isfamily="0"/>
+                    </photos>
+                </rsp>
             </xforms:instance>
-            <xforms:submission ref="instance('input')" id="spell"
-                method="post" action="/direct/flickr-spell/spell"
-                replace="instance" instance="images"/>
-            <xforms:bind nodeset="instance('images')" relevant="instance('input')/text != ''"/>
+            <xforms:submission ref="instance('query')" id="send-query"
+                    method="get" action="http://localhost:8090/services/rest/"
+                    replace="instance" instance="images" separator="&amp;"/>
+            <xforms:send submission="send-query" ev:event="xforms-ready"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background: none; }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:ul>
-            <xhtml:li>
-                <xhtml:p>
-                    <xhtml:b>Usage.</xhtml:b> Enter some text and we'll pull for each letter a random
-                    image from <xhtml:a href="http://flickr.com/">Flickr</xhtml:a>.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    <xhtml:b>Implementation.</xhtml:b> The UI an interaction with the server is
-                    implemented 100% in XForms. The <xhtml:a href="/goto-source/flickr-spell/view.xhtml"
-                    f:url-type="resource">XForms UI</xhtml:a> sends the text you type in an XML
-                    document to the server which responds with an XML document that contains link to the
-                    images. The <xhtml:a href="/goto-source/flickr-spell/spell.xpl"
-                    f:url-type="resource">server-side code</xhtml:a> is implemented in an <xhtml:a
-                    href="http://www.w3.org/Submission/xpl/">XPL pipeline</xhtml:a>, calls a web service
-                    provided to Flickr and caches the response to avoid sending the same query over and
-                    over to the Flickr.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    <xhtml:b>Credits.</xhtml:b> All the credits go to <xhtml:a
-                    href="http://metaatem.net/">kastner</xhtml:a>, who was the first to <xhtml:a
-                    href="http://metaatem.net/words/">implement</xhtml:a> this cool idea ;). And thanks
-                    to Flickr for being so open with their web services.
-                </xhtml:p>
-            </xhtml:li>
-        </xhtml:ul>
-        <xforms:group>
+        <xforms:repeat nodeset="instance('images')/photos/photo">
             <xhtml:p>
-                <xforms:input ref="instance('input')/text" incremental="true">
-                    <xforms:label>Type here: </xforms:label>
-                    <xforms:send submission="spell" ev:event="xforms-value-changed"/>
-                </xforms:input>
+                <xforms:output value="concat('http://static.flickr.com/', @server, '/',
+                    @id, '_', @secret, '_b.jpg')" mediatype="image/jpeg"/>
             </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="instance('images')" mediatype="text/html"/>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:trigger ref="instance('images')">
-                    <xforms:label>Change letters!</xforms:label>
-                    <xforms:action  ev:event="DOMActivate">
-                        <xforms:setvalue ref="instance('input')/seed" value="instance('input')/seed + 1"/>
-                        <xforms:send submission="spell"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:p>
-        </xforms:group>
+        </xforms:repeat>
     </xhtml:body>
 </xhtml:html>

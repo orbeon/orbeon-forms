@@ -1248,9 +1248,6 @@ ORBEON.xforms.Init = {
         // Run code sent by server
         if (typeof xformsPageLoadedServer != "undefined")
             xformsPageLoadedServer();
-        
-        var myDialog = new YAHOO.widget.Dialog("myDialog");
-        myDialog.render();
     },
 
     _autoComplete: function(autoComplete) {

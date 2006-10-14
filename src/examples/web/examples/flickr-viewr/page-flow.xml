@@ -15,6 +15,11 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
+    <page path-info="/flickr-viewr/([^/]+)/"
+            default-submission="list-sets-query.xml" matcher="oxf:perl5-matcher" view="list-sets.xhtml">
+        <setvalue ref="/query/user_id" matcher-group="1"/>
+    </page>
+
     <page path-info="/flickr-viewr/([^/]+)/tags/([^/]+)/"
             default-submission="query.xml" matcher="oxf:perl5-matcher" view="view.xhtml">
         <setvalue ref="/query/user_id" matcher-group="1"/>

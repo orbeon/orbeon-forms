@@ -18,6 +18,7 @@ import org.orbeon.oxf.util.Base64;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
@@ -63,13 +64,14 @@ public class Digest extends XFormsFunction {
         return new StringValue(result);
     }
 
-    final static String HEXADECIMAL_DIGITS = "0123456789ABCDEF";
+    final static char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
     public String byteArrayToHex(byte[] bytes) {
-        final StringBuilder sb = new StringBuilder(bytes.length * 2);
+//        final StringBuilder sb = new StringBuilder(bytes.length * 2);
+        final FastStringBuffer sb = new FastStringBuffer(bytes.length * 2);
         for (int i = 0; i < bytes.length; i++) {
-            sb.append(HEXADECIMAL_DIGITS.charAt((bytes[i] >> 4) & 0xf));
-            sb.append(HEXADECIMAL_DIGITS.charAt(bytes[i] & 0xf));
+            sb.append(HEXADECIMAL_DIGITS[(bytes[i] >> 4) & 0xf]);
+            sb.append(HEXADECIMAL_DIGITS[bytes[i] & 0xf]);
         }
         return sb.toString();
     }

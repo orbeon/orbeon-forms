@@ -15,9 +15,21 @@
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/flickr-viewr/([^/]+)/"
-            default-submission="list-sets-query.xml" matcher="oxf:perl5-matcher" view="list-sets.xhtml">
+    <page path-info="/flickr-viewr/callback" default-submission="callback-submission.xml" view="callback-view.xhtml">
+        <setvalue ref="/*/frob" parameter="frob"/>
+    </page>
+
+    <page path-info="/flickr-viewr/service/authentication" view="authentication.xpl"/>
+
+    <page path-info="/flickr-viewr/([^/]+)/sets/"
+            default-submission="sets-query.xml" matcher="oxf:perl5-matcher" view="sets.xhtml">
         <setvalue ref="/query/user_id" matcher-group="1"/>
+    </page>
+
+    <page path-info="/flickr-viewr/([^/]+)/sets/([^/]+)/"
+            default-submission="sets-getphotos-query.xml" matcher="oxf:perl5-matcher" view="set.xhtml">
+        <setvalue ref="/query/user_id" matcher-group="1"/>
+        <setvalue ref="/query/photoset_id" matcher-group="2"/>
     </page>
 
     <page path-info="/flickr-viewr/([^/]+)/tags/([^/]+)/"
@@ -25,7 +37,6 @@
         <setvalue ref="/query/user_id" matcher-group="1"/>
         <setvalue ref="/query/tags" matcher-group="2"/>
     </page>
-
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -1,0 +1,84 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:orbeon="http://www.orbeon.com/"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:flickr="urn:flickr">
+
+    <xhtml:head>
+        <xhtml:title>XForms Flickr Viewer</xhtml:title>
+        <xforms:model id="main-model">
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:setvalue ref="xxforms:instance('photosets-getPhotos-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
+                <xforms:send submission="photosets-getPhotos-submission"/>
+            </xforms:action>
+
+            <xforms:instance id="parameters-instance">
+                <xi:include href="input:instance"/>
+            </xforms:instance>
+
+        </xforms:model>
+        <!-- Include Flickr API model -->
+        <xi:include href="oxf:/examples/flickr-viewr/flickr-api-model.xml" xxi:omit-xml-base="true"/>
+
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background: none; }
+            .set-info { float: left; margin: .5em; padding: .5em; background: #ddd; height: 300px; width: 260px; overflow: hidden; text-align: center }
+            .set-image { width: 240px; height: 240px; margin-left: auto; margin-right: auto; display: block }
+            .set-image img { margin: 0px; border: 0px }
+            <!--.set-title { font-weight: bold; font-size: 90%; margin-top: 0.5em; display: block }-->
+            .set-photos { font-size: 80%; margin-top: 0.5em; display: block }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:trigger>
+            <xforms:label>Test Authentication</xforms:label>
+            <xforms:dispatch target="flickr-api-model" name="flickr-viewr-authenticate" ev:event="DOMActivate"/>
+        </xforms:trigger>
+
+        <xforms:repeat model="flickr-api-model" nodeset="instance('photosets-getPhotos-response')/photoset/photo" id="photo-repeat">
+            <!--<xforms:message level="modal" ev:event="DOMActivate">Test</xforms:message>-->
+            <xhtml:div class="set-info">
+                <!--<xforms:group ref="description[normalize-space(.) != '']">-->
+                    <!--Description:-->
+                    <!--<xforms:output value="description"/>-->
+                <!--<xforms:output class="set-image" value="concat('http://static.flickr.com/', @server, '/',-->
+                    <!--@primary, '_', @secret, '_t.jpg')" mediatype="image/jpeg"/>-->
+
+                <xforms:output class="set-image" value="concat('&lt;a href=&quot;/', @server, '/',
+                    @primary, '_', @secret, '_t.jpg&quot;>&lt;img src=&quot;http://static.flickr.com/', @server, '/',
+                    @id, '_', @secret, '_m.jpg&quot;/>&lt;/a>')" mediatype="text/html"/>
+
+                <xforms:input class="set-title" ref="@title">
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:setvalue ref="instance('photos-setMeta-query')/photo_id" value="xxforms:repeat-current('photo-repeat')/@id"/>
+                        <xforms:setvalue ref="instance('photos-setMeta-query')/title" value="xxforms:repeat-current('photo-repeat')/@title"/>
+                        <xforms:setvalue ref="instance('photos-setMeta-query')/description" value="xxforms:repeat-current('photo-repeat')/@description"/>
+                        <xforms:send submission="photos-setMeta-submission"/>
+                    </xforms:action>
+                </xforms:input>
+                <!--<xforms:output class="set-photos" value="concat('(', @photos, ' photos)')"/>-->
+            </xhtml:div>
+        </xforms:repeat>
+    </xhtml:body>
+</xhtml:html>

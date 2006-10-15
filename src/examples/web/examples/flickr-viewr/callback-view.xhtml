@@ -1,0 +1,64 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+            xmlns:orbeon="http://www.orbeon.com/"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:flickr="urn:flickr">
+
+    <xhtml:head>
+        <xhtml:title>XForms Flickr Viewer</xhtml:title>
+        <xforms:model id="main-model">
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:setvalue ref="xxforms:instance('auth-getToken-query')/frob" value="instance('parameters-instance')/frob"/>
+                <xforms:send submission="auth-getToken-submission"/>
+                <xforms:send submission="save-auth-instance"/>
+            </xforms:action>
+
+            <xforms:instance id="parameters-instance">
+                <xi:include href="input:instance"/>
+            </xforms:instance>
+
+            <xforms:submission id="save-auth-instance" ref="xxforms:instance('auth-getToken-response')/auth"
+                               method="post" action="/flickr-viewr/service/authentication"
+                               replace="none"/>
+
+        </xforms:model>
+        <!-- Include Flickr API model -->
+        <xi:include href="oxf:/examples/flickr-viewr/flickr-api-model.xml" xxi:omit-xml-base="true"/>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:group model="flickr-api-model" ref="instance('auth-getToken-response')">
+            <xforms:group ref=".[@stat = 'ok']">
+                <xhtml:p>
+                    You are now authenticated.
+                </xhtml:p>
+            </xforms:group>
+            <xforms:group ref=".[not(@stat = 'ok')]">
+                <xhtml:p>
+                    An error has occurred during authenfication: <xforms:output value="@stat"/>
+                </xhtml:p>
+            </xforms:group>
+        </xforms:group>
+
+    </xhtml:body>
+</xhtml:html>

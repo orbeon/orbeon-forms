@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.action;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -137,7 +135,19 @@ public class XFormsActionInterpreter {
             xformsControls.setBinding(pipelineContext, (XFormsControl) eventHandlerContainer);
         } else {
             // The event handler is not contained within a control (e.g. model or submission)
-            xformsControls.resetBindingContext();
+            // TODO: Separate context handling from XFormsControls
+            if (eventHandlerContainer instanceof XFormsModel) {
+                final XFormsModel xformsModel = (XFormsModel) eventHandlerContainer;
+                xformsControls.resetBindingContext(xformsModel);
+            } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
+                final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
+                final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer();
+                xformsControls.resetBindingContext(xformsModel);
+                xformsControls.pushBinding(pipelineContext, submission.getSubmissionElement());
+            } else {
+                // TODO: Other possible contexts?
+                xformsControls.resetBindingContext();
+            }
         }
         xformsControls.pushBinding(pipelineContext, actionElement);
     }
@@ -160,7 +170,8 @@ public class XFormsActionInterpreter {
         xformsControls.popBinding();
         // But the @context attribute actually _replaces_ that context
         pushContextAttributeIfNeeded(pipelineContext, actionElement);
-        // We are now in the right context to evaluate
+        // TODO: also push @model
+        // We are now in the right context to evaluate the condition
 
         // Don't evaluate the condition if the context has gone missing
         final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();

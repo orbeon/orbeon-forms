@@ -149,6 +149,12 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:digest
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}digest", Digest.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // xxforms:instance
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

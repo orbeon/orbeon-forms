@@ -271,13 +271,16 @@ public class XFormsControls {
      * Reset the binding context to the root of the containing document.
      */
     public void resetBindingContext() {
+        resetBindingContext(containingDocument.getModel(""));
+    }
+
+    public void resetBindingContext(XFormsModel xformsModel) {
         // Clear existing stack
         contextStack.clear();
 
         // Push the default context
-        final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getInstanceRootElementInfo()});
-        contextStack.push(new BindingContext(null, defaultModel, defaultNodeset, 1, null, true, null));
+        final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
+        contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null));
     }
 
     public XFormsContainingDocument getContainingDocument() {

@@ -3096,11 +3096,11 @@
                                 </p>
                                 <warning>
                                     <p>
-                                        For security reasons, OPS prohibits by default client-side JavaScript from
+                                        For security reasons, by default OPS prohibits client-side JavaScript from
                                         dispatching any external events except <code>DOMActivate</code>,
                                         <code>DOMFocusIn</code> and <code>DOMFocusOut</code>. Furthermore, these events
                                         can only be dispatched to relevant and non-readonly XForms controls. In order to
-                                        enable dispatching custom events, you must first add the
+                                        enable dispatching of custom events, you must first add the
                                         <code>xxforms:external-events</code> attribute on the first
                                         <code>&lt;xforms:model></code> element, for example:
                                     </p>
@@ -3114,7 +3114,9 @@
                                         you explicitly enable your JavaScript code to fire the two events
                                         <code>acme-super-event</code> and <code>acme-famous-event</code> to any relevant
                                         and non-readonly XForms controls, or to any model object supporting event
-                                        handlers.
+                                        handlers. Note that you can only enable custom events, but you cannot enable
+                                        standard XForms or DOM events in addition to <code>DOMActivate</code>,
+                                        <code>DOMFocusIn</code> and <code>DOMFocusOut</code>.
                                     </p>
                                     <p>
                                         Since the event handlers for custom events can be called by JavaScript code that

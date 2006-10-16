@@ -232,7 +232,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (instances != null) {
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) i.next();
-                if (currentInstance.getInstanceDocumentInfo() == documentInfo)
+                if (currentInstance.getInstanceDocumentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
         }

@@ -15,71 +15,92 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Iterator;
 
 public class StdOutTrace implements Trace {
-	
-	private static class TraceNode {
-		final TraceInfo traceInfo;
-		final TraceNode parent;
-		final java.util.ArrayList children = new java.util.ArrayList( 0 );
-		TraceNode( final TraceInfo tinf, final TraceNode prnt ) {
-			traceInfo = tinf;
-			parent = prnt;
-		}
-		public String toString() {
-			final long cmTm = traceInfo.end - traceInfo.start;
-			long myTm = cmTm;
-			final java.util.Iterator itr = children.iterator();
-			while ( itr.hasNext() ) {
-				final TraceNode chld = ( TraceNode )itr.next();
-				final long chldCmTm = chld.traceInfo.end - chld.traceInfo.start;
-				myTm -= chldCmTm;
-			}
-			final String ret = myTm + " " + cmTm + " " + traceInfo.systemID + " " + traceInfo.line;
-			return ret;
-		}
-	}
-	
-	final java.util.ArrayList traceInfs = new java.util.ArrayList( 0 );
 
-	public void add( final TraceInfo tinf ) {
-        traceInfs.add( tinf );
-	}
-	
-    private static void dumpTraceNodes( final TraceNode rt, final int lvl ) {
-    	for ( int i = 0; i < lvl; i++ ) {
-    		System.out.print( "  " );
-    	}
-    	System.out.println( rt );
-    	final java.util.Iterator itr = rt.children.iterator();
-    	final int nxtLvl = lvl + 1;
-    	while ( itr.hasNext() ) {
-    		final TraceNode chld = ( TraceNode )itr.next();
-    		dumpTraceNodes( chld, nxtLvl );
-    	}
+    public static class TraceNode {
+        final TraceInfo traceInfo;
+        final TraceNode parent;
+        final List children = new ArrayList(0);
+
+        public TraceNode(final TraceInfo tinf, final TraceNode prnt) {
+            traceInfo = tinf;
+            parent = prnt;
+        }
+
+        public String toString() {
+            return getLocalTime() + " " + getCumulativeTime() + " " + traceInfo.systemID + " " + traceInfo.line;
+        }
+
+        public long getLocalTime() {
+            long localTime = getCumulativeTime();
+            final Iterator iterator = children.iterator();
+            while (iterator.hasNext()) {
+                final TraceNode childTraceNode = (TraceNode) iterator.next();
+                final long childCumulativeTime = childTraceNode.traceInfo.end - childTraceNode.traceInfo.start;
+                localTime -= childCumulativeTime;
+            }
+            return localTime;
+        }
+
+        public long getCumulativeTime() {
+            return traceInfo.end - traceInfo.start;
+        }
     }
-	
-	public void contextDestroyed( final boolean scss ) {
-    	if ( traceInfs != null ) {
-    		final java.util.Iterator itr = traceInfs.iterator();
-    		final java.util.LinkedList stck = new java.util.LinkedList();
-    		final TraceInfo rtInf = new TraceInfo( Long.MIN_VALUE, "root", -1 );
-    		rtInf.end = Long.MAX_VALUE;
-    		final TraceNode rt = new TraceNode( rtInf, null );
-    		stck.add( rt );
-    		while ( itr.hasNext() ) {
-    			final TraceInfo tinf = ( TraceInfo )itr.next();
-				TraceNode top = ( TraceNode)stck.getLast();
-				while ( top.traceInfo.end <= tinf.start ) {
-					stck.removeLast();
-					top = ( TraceNode )stck.getLast();
-				}
-				final TraceNode tnd = new TraceNode( tinf, top );
-				top.children.add( tnd );
-				stck.add( tnd );
-    		}
-    		dumpTraceNodes( rt, 0 );
-    	}
-	}
 
+    private PipelineContext pipelineContext;
+    private final List traceInfos = new ArrayList(0);
+
+    public void setPipelineContext(PipelineContext pipelineContext) {
+        this.pipelineContext = pipelineContext;
+    }
+
+    public void add(final TraceInfo traceInfo) {
+        traceInfos.add(traceInfo);
+    }
+
+    private static void dumpTraceNodes(final TraceNode traceNode, final int level) {
+        for (int i = 0; i < level; i++) {
+            System.out.print("  ");
+        }
+        System.out.println(traceNode);
+        final java.util.Iterator itr = traceNode.children.iterator();
+        final int nxtLvl = level + 1;
+        while (itr.hasNext()) {
+            final TraceNode chld = (TraceNode) itr.next();
+            dumpTraceNodes(chld, nxtLvl);
+        }
+    }
+
+    public void contextDestroyed(final boolean success) {
+        if (traceInfos != null) {
+            dumpTraceNodes(getTraceNodes(traceInfos), 0);
+        }
+    }
+
+    public static TraceNode getTraceNodes(List traceInfos) {
+        final java.util.Iterator iterator = traceInfos.iterator();
+        final java.util.LinkedList stack = new java.util.LinkedList();
+        final TraceInfo rootTraceInfo = new TraceInfo(Long.MIN_VALUE, "root", -1);
+        rootTraceInfo.end = Long.MAX_VALUE;
+        final TraceNode traceNode = new TraceNode(rootTraceInfo, null);
+        stack.add(traceNode);
+        while (iterator.hasNext()) {
+            final TraceInfo traceInfo = (TraceInfo) iterator.next();
+            TraceNode top = (TraceNode) stack.getLast();
+            while (top.traceInfo.end <= traceInfo.start) {
+                stack.removeLast();
+                top = (TraceNode) stack.getLast();
+            }
+            final TraceNode tnd = new TraceNode(traceInfo, top);
+            top.children.add(tnd);
+            stack.add(tnd);
+        }
+        return traceNode;
+    }
 }

@@ -237,31 +237,34 @@ public class OXFProperties {
         }
 
         public java.util.Date getDate(String name) {
-            return ( java.util.Date ) getProperty(name, XMLConstants.XS_DATE_QNAME);
+            return (java.util.Date) getProperty(name, XMLConstants.XS_DATE_QNAME);
         }
 
         public java.util.Date getDateTime(String name) {
-            return ( java.util.Date ) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
+            return (java.util.Date) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
         }
 
         public org.dom4j.QName getQName(String name) {
             return (org.dom4j.QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
         }
 
-        /**
+        /*
          * For now, the type xs:anyURI is used, but we really expect URLs.
          */
         public java.net.URL getURL(String name) {
-            return ( java.net.URL ) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
+            return (java.net.URL) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
         }
-        public Integer getNonNegativeInteger( final String nm ) {
-            return ( Integer )getProperty( nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME );
+
+        public Integer getNonNegativeInteger(final String nm) {
+            return (Integer) getProperty(nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME);
         }
-        public String getNCName( final String nm ) {
-            return ( String )getProperty( nm, XMLConstants.XS_NCNAME_QNAME );
+
+        public String getNCName(final String nm) {
+            return (String) getProperty(nm, XMLConstants.XS_NCNAME_QNAME);
         }
-        public String getNMTOKEN( final String nm ) {
-            return ( String )getProperty( nm, XMLConstants.XS_NMTOKEN_QNAME );
+
+        public String getNMTOKEN(final String nm) {
+            return (String) getProperty(nm, XMLConstants.XS_NMTOKEN_QNAME);
         }
     }
 }

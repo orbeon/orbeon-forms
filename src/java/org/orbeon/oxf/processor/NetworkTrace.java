@@ -13,20 +13,23 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.OXFProperties.PropertySet;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NetworkTrace implements Trace {
 
-    private static final String host;
-    private static final int port;
-
     static private Logger logger = LoggerFactory.createLogger(NetworkTrace.class);
+
+    private PipelineContext pipelineContext;
 
     public NetworkTrace() {
         if (logger.isDebugEnabled())
@@ -34,46 +37,66 @@ public class NetworkTrace implements Trace {
     }
 
     static {
-        final OXFProperties prps = OXFProperties.instance();
-        final PropertySet prpSet = prps.getPropertySet();
-        final String hst = prpSet.getNMTOKEN("processor.trace.host");
-        host = hst == null ? "localhost" : hst;
-        final Integer prtInt = prpSet.getNonNegativeInteger("processor.trace.port");
-        port = prtInt == null ? 9191 : prtInt.intValue();
+
     }
 
-    final java.util.ArrayList traceInfs = new java.util.ArrayList(0);
+    final List traceInfos = new ArrayList(0);
 
-    public void add(final TraceInfo tinf) {
-        traceInfs.add(tinf);
+    public void setPipelineContext(PipelineContext pipelineContext) {
+        this.pipelineContext = pipelineContext;
     }
 
-    public void contextDestroyed(final boolean scss) {
+    public void add(final TraceInfo traceInfo) {
+        traceInfos.add(traceInfo);
+    }
+
+    public void contextDestroyed(final boolean success) {
         if (logger.isDebugEnabled())
             logger.debug("Destroying network trace object: " + hashCode());
-        final java.util.Iterator itr = traceInfs.iterator();
-        if (itr.hasNext()) {
+
+        final String host;
+        final int port;
+        {
+            final OXFProperties properties = OXFProperties.instance();
+            final PropertySet propertySet = properties.getPropertySet();
+            final String traceHost = propertySet.getNMTOKEN("processor.trace.host");
+            host = traceHost == null ? "localhost" : traceHost;
+            final Integer tracePortInteger = propertySet.getNonNegativeInteger("processor.trace.port");
+            port = tracePortInteger == null ? 9191 : tracePortInteger.intValue();
+        }
+
+//        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+//        String requestURI;
+//        try {
+//            requestURI = externalContext.getRequest().getRequestURI();
+//        } catch (UnsupportedOperationException e) {
+//            requestURI = "";
+//        }
+
+        final java.util.Iterator iterator = traceInfos.iterator();
+        if (iterator.hasNext()) {
             java.io.ObjectOutputStream oos = null;
-            Throwable t = null;
+            Throwable throwable = null;
 
             try {
-                final java.net.Socket sckt = new java.net.Socket(host, port);
-                final java.io.OutputStream os = sckt.getOutputStream();
+                final java.net.Socket socket = new java.net.Socket(host, port);
+                final java.io.OutputStream os = socket.getOutputStream();
                 oos = new java.io.ObjectOutputStream(os);
                 oos.writeShort(2501); // magic
                 oos.writeShort(1); // version
-                while (itr.hasNext()) {
-                    final TraceInfo tinf = (TraceInfo) itr.next();
-                    oos.writeObject(tinf.systemID != null ? tinf.systemID : "");
-                    oos.writeInt(tinf.line);
-                    oos.writeLong(tinf.start);
-                    oos.writeLong(tinf.end);
+                while (iterator.hasNext()) {
+                    final TraceInfo traceInfo = (TraceInfo) iterator.next();
+                    final String systemId = traceInfo.systemID != null ? traceInfo.systemID : "";
+                    oos.writeObject(systemId);
+                    oos.writeInt(traceInfo.line);
+                    oos.writeLong(traceInfo.start);
+                    oos.writeLong(traceInfo.end);
 
                 }
             } catch (final java.net.UnknownHostException e) {
-                t = e;
+                throwable = e;
             } catch (final java.io.IOException e) {
-                t = e;
+                throwable = e;
             }
             finally {
                 if (oos != null) {
@@ -84,7 +107,7 @@ public class NetworkTrace implements Trace {
                     }
                 }
             }
-            if (t != null) throw new OXFException(t);
+            if (throwable != null) throw new OXFException(throwable);
         }
     }
 }

@@ -661,6 +661,10 @@
         <class name="org.orbeon.oxf.processor.test.CacheViewProcessor"/>
     </processor>
 
+    <processor name="oxf:pipeline-trace">
+        <class name="org.orbeon.oxf.processor.SessionTraceProcessor"/>
+    </processor>
+
     <!-- This is kept only for backward compatibility -->
     <processor name="oxf:webapp-controller" uri="oxf/processor/webapp-controller">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>

@@ -799,6 +799,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 final String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, instanceContainerElement, false, srcAttribute);
 
+                                final long startTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
                                 if (containingDocument.getURIResolver() == null) {
                                     // We connect directly
 
@@ -858,6 +859,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                                 "reading external instance", instanceContainerElement));
                                         dispatchXFormsLinkExceptionEvent(pipelineContext, new XFormsModelSubmission.ConnectionResult(urlString), srcAttribute, validationException, instanceContainerElement, locationData);
                                         break;
+                                    }
+
+                                    if (XFormsServer.logger.isDebugEnabled()) {
+                                        final long submissionTime = System.currentTimeMillis() - startTime;
+                                        XFormsServer.logger.debug("XForms - instance loading time (including handling returned body): " + submissionTime);
                                     }
                                 }
                             }

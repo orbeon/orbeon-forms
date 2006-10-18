@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -203,6 +204,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             boolean isDeferredSubmissionSecondPass = false;
             XFormsSubmitErrorEvent submitErrorEvent = null;
             boolean submitDone = false;
+            final long submissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
@@ -441,6 +443,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Result information
                 ConnectionResult connectionResult = null;
+                final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
                 try {
                     if (isReplaceInstance && resolvedAction.startsWith("test:")) {
                         // Test action
@@ -554,6 +557,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                             if (replaceInstance == null) {
                                                 // Replacement instance was specified but not found
+                                                // TODO: XForms 1.1 won't dispatch xforms-binding-exception here
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
 
@@ -625,6 +629,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if (connectionResult != null) {
                         connectionResult.close();
                     }
+                    // Log time spent in submission if needed
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        final long submissionTime = System.currentTimeMillis() - externalSubmissionStartTime;
+                        XFormsServer.logger.debug("XForms - external submission time (including handling returned body): " + submissionTime);
+                    }
                 }
             } catch (Throwable e) {
                 if (isDeferredSubmissionSecondPass && XFormsUtils.isOptimizePostAllSubmission()) {
@@ -638,11 +647,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     submitErrorEvent.setThrowable(e);
                     containingDocument.dispatchEvent(pipelineContext, submitErrorEvent);
                 }
-            }
-
-            // If submission succeeded, dispatch success event
-            if (submitDone) {
-                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+            } finally {
+                // If submission succeeded, dispatch success event
+                if (submitDone) {
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                }
+                // Log total time spent in submission if needed
+                if (XFormsServer.logger.isDebugEnabled()) {
+                    final long submissionTime = System.currentTimeMillis() - submissionStartTime;
+                    XFormsServer.logger.debug("XForms - total submission time: " + Long.toString(submissionTime));
+                }
             }
 
         } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
@@ -794,8 +808,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && logger.isDebugEnabled()) {
-                        logger.debug("Found invalid element: " + element.getQName() + ", value:" + element.getText());
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - found invalid element: " + element.getQName() + ", value:" + element.getText());
                     }
                 }
 
@@ -805,8 +819,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     instanceSatisfiesValidRequired[0] &= valid;
 
-                    if (!valid && logger.isDebugEnabled()) {
-                        logger.debug("Found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
+                    if (!valid && XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
                     }
                 }
 

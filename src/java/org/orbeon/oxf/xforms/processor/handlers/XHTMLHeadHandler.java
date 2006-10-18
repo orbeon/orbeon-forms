@@ -60,9 +60,9 @@ public class XHTMLHeadHandler extends HandlerBase {
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
             // TODO: move to YUI in the future if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", null),
-            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", null),
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", null),
+            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
+            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),// our min version
+            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
             // Yahoo UI Library
             new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
@@ -115,22 +115,22 @@ public class XHTMLHeadHandler extends HandlerBase {
                 }
             },
             // Autocomplete
-            new ResourceConfig("/ops/javascript/suggest-common.js", null) {
+            new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {// our min version
                 public boolean isInUse(Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/suggest-actb.js", null) {
+            new ResourceConfig("/ops/javascript/suggest-actb.js", "/ops/javascript/suggest-actb-min.js") {// our min version
                 public boolean isInUse(Map appearancesMap) {
                     return isAutocompleteInUse(appearancesMap);
                 }
             },
             // Other standard scripts
-            new ResourceConfig("/ops/javascript/wz_tooltip.js", null),// TODO: move to YUI
-            new ResourceConfig("/ops/javascript/overlib_mini.js", null),// TODO: move to YUI
-            new ResourceConfig("/ops/javascript/time-utils.js", null),// TODO: check who uses this
+            new ResourceConfig("/ops/javascript/wz_tooltip.js", "/ops/javascript/wz_tooltip-min.js"),// TODO: move to YUI // our min version
+            new ResourceConfig("/ops/javascript/overlib_mini.js", "/ops/javascript/overlib_mini-min.js"),// TODO: move to YUI // our min version
+            new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
             // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js", null)
+            new ResourceConfig("/ops/javascript/xforms.js", null)// our min version
     };
 
     public XHTMLHeadHandler() {

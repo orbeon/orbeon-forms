@@ -14,7 +14,7 @@
   <loader-repository >
      ops.war:loader=ops.war
      <loader-repository-config >
-        java2ParentDelegaton=false
+        java2ParentDelegation=false
      </loader-repository-config>
   </loader-repository>
   </class-loading>

@@ -26,7 +26,7 @@ public class LoggerFactory {
     public static final String LOG4J_DOM_CONFIG_PROPERTY = "oxf.log4j-config";
     public static final String LOG4J_DOM_CONFIG_PROPERTY_OLD = "oxf.servlet.log4j";
     
-    static 
+    static
     {
     	// 11-22-2004 d : Current log4j tries to load a default config. This is
     	//                why we are seeing a message about a log4j.properties being

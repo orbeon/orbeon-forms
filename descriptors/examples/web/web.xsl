@@ -80,6 +80,12 @@
                 <param-value>oxf:/config/properties.xml</param-value>
             </context-param>
 
+            <xsl:comment> Determine whether logging initialization must take place </xsl:comment>
+            <context-param>
+               <param-name>oxf.initialize-logging</param-name>
+               <param-value>true</param-value>
+            </context-param>
+
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'Set XML Server configuration file'"/>
                 <xsl:with-param name="commented" select="true()"/>

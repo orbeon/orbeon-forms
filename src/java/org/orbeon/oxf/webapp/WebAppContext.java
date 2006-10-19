@@ -44,6 +44,7 @@ public class WebAppContext {
     }
 
     public static final String PROPERTIES_PROPERTY = "oxf.properties";
+    public static final String LOGGING_PROPERTY = "oxf.initialize-logging";
 
     private static WebAppContext instance;
     private static Logger logger = LoggerFactory.createLogger(WebAppContext.class);
@@ -69,11 +70,16 @@ public class WebAppContext {
 
     private WebAppContext(ServletContext servletContext) {
         try {
-            LoggerFactory.initBasicLogger();
-            logger.info("Starting PresentationServer Release " + Version.getVersion());
-
             // Remember Servlet context
             this.servletContext = servletContext;
+            
+            // Check whether logging initialization is disabled
+            final boolean initializeLogging = !"false".equals(getServletInitParametersMap().get(LOGGING_PROPERTY));
+
+            if (initializeLogging) {
+                LoggerFactory.initBasicLogger();
+            }
+            logger.info("Starting PresentationServer Release " + Version.getVersion());
 
             // 1. Initialize the Resource Manager
             Map properties = new HashMap();
@@ -93,7 +99,9 @@ public class WebAppContext {
                 OXFProperties.init(propertiesFile);
 
             // 3. Initialize log4j with a DOMConfiguration
-            LoggerFactory.initLogger();
+            if (initializeLogging) {
+                LoggerFactory.initLogger();
+            }
 
             // 4. Register processor definitions with the default XML Processor Registry
             InitUtils.initializeProcessorDefinitions();

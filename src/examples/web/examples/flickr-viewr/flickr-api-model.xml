@@ -60,6 +60,78 @@
         </xforms:action>
     </xforms:submission>
 
+    <!-- flickr.photos.getInfo -->
+
+    <xforms:instance id="photos-getInfo-query">
+        <query>
+            <api_key/>
+            <method>flickr.photos.getInfo</method>
+            <photo_id/>
+            <secret/>
+        </query>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('photos-getInfo-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+
+    <xforms:instance id="photos-getInfo-response">
+        <rsp stat="ok">
+            <photo id="2733" secret="123456" server="12"
+                isfavorite="0" license="3" rotation="90" originalformat="png">
+                <owner nsid="12037949754@N01" username="Bees"
+                    realname="Cal Henderson" location="Bedford, UK" />
+                <title>orford_castle_taster</title>
+                <description>hello!</description>
+                <visibility ispublic="1" isfriend="0" isfamily="0" />
+                <dates posted="1100897479" taken="2004-11-19 12:51:19"
+                    takengranularity="0" lastupdate="1093022469" />
+                <permissions permcomment="3" permaddmeta="2" />
+                <editability cancomment="1" canaddmeta="1" />
+                <comments>1</comments>
+                <notes>
+                    <note id="313" author="12037949754@N01"
+                        authorname="Bees" x="10" y="10"
+                        w="50" h="50">foo</note>
+                </notes>
+                <tags>
+                    <tag id="1234" author="12037949754@N01" raw="woo yay">wooyay</tag>
+                    <tag id="1235" author="12037949754@N01" raw="hoopla">hoopla</tag>
+                </tags>
+                <urls>
+                    <url type="photopage">http://www.flickr.com/photos/bees/2733/</url>
+                </urls>
+            </photo>
+        </rsp>
+    </xforms:instance>
+
+    <xforms:submission id="photos-getInfo-submission" ref="instance('photos-getInfo-query')" method="get"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photos-getInfo-response"/>
+
+    <!-- flickr.photosets.getInfo -->
+
+    <xforms:instance id="photosets-getInfo-query">
+        <query>
+            <api_key/>
+            <method>flickr.photosets.getInfo</method>
+            <photoset_id/>
+        </query>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('photosets-getInfo-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+
+    <xforms:instance id="photosets-getInfo-response">
+        <rsp stat="ok">
+            <photoset id="46" owner="12037949754@N01" primary="2541" photos="4">
+                <title>my title</title>
+                <description>my description</description>
+            </photoset>
+        </rsp>
+    </xforms:instance>
+
+    <xforms:submission id="photosets-getInfo-submission" ref="instance('photosets-getInfo-query')" method="get"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photosets-getInfo-response"/>
+
     <!-- flickr.photosets.getPhotos -->
 
     <xforms:instance id="photosets-getPhotos-query">

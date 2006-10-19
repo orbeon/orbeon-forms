@@ -883,7 +883,7 @@ ORBEON.xforms.Events = {
                 YAHOO.util.Event.preventDefault(event);
                 if (!ORBEON.util.Dom.hasClass(target, "xforms-readonly")) {
                     // If this is an anchor and we didn't get a chance to register the focus event,
-                    // send the focus event here. This is useful for anchors (we don't listen on the 
+                    // send the focus event here. This is useful for anchors (we don't listen on the
                     // focus event on those, and for buttons on Safari which does not dispatch the focus
                     // event for buttons.
                     ORBEON.xforms.Events.focus(event);
@@ -1244,7 +1244,7 @@ ORBEON.xforms.Init = {
                 }
             }
         }
-        
+
         // Run code sent by server
         if (typeof xformsPageLoadedServer != "undefined")
             xformsPageLoadedServer();
@@ -1454,7 +1454,7 @@ ORBEON.xforms.Server = {
             if (ORBEON.xforms.Globals.eventQueue.length > 0) {
 
                 // Save the form for this request
-                ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Controls.getForm(ORBEON.xforms.Globals.eventQueue[0].form);
+                ORBEON.xforms.Globals.requestForm = ORBEON.xforms.Globals.eventQueue[0].form;
                 var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
 
                 // Mark this as loading
@@ -2616,7 +2616,7 @@ function xformsHandleResponse(o) {
                                                 && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                             ORBEON.xforms.Controls.updateHTMLAreaClasses(documentElement);
                                         }
-                                            
+
                                         break;
                                     }
 

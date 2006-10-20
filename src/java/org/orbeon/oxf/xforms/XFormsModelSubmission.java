@@ -396,11 +396,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Serialize
                 // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data
-                final byte[] serializedInstance;
-                final String serializedInstanceString;
+                final byte[] messageBody;
+                final String queryString;
+                final String defaultMediatype;
                 {
-                    if (XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method)) {
+                    if (method.equals("multipart-post")) {
+                        // TODO
+                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                    } else if (method.equals("form-data-post")) {
+                        // TODO
+                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                    } else if (method.equals("urlencoded-post")) {
 
+                        // Perform "application/x-www-form-urlencoded" serialization
+                        queryString = null;
+                        messageBody = createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8");// the resulting string is already ASCII
+                        defaultMediatype = "application/x-www-form-urlencoded";
+
+                    } else if (XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method)) {
+
+                        // Serialize XML to a stream of bytes
                         try {
                             final Transformer identity = TransformerUtils.getIdentityTransformer();
                             TransformerUtils.applyOutputProperties(identity,
@@ -410,26 +425,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             final ByteArrayOutputStream os = new ByteArrayOutputStream();
                             identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                            serializedInstance = os.toByteArray();
+                            messageBody = os.toByteArray();
                         } catch (Exception e) {
                             throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
                         }
-                        serializedInstanceString = null;
+                        queryString = null;
+                        defaultMediatype = "application/xml";
 
                     } else if (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isDelete(method)) {
 
                         // Perform "application/x-www-form-urlencoded" serialization
-                        serializedInstanceString = createWwwFormUrlEncoded(documentToSubmit);
-                        serializedInstance = null;
+                        queryString = createWwwFormUrlEncoded(documentToSubmit);
+                        messageBody = null;
+                        defaultMediatype = null;
 
-                    } else if (method.equals("multipart-post")) {
-                        // TODO
-                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                    } else if (method.equals("form-data-post")) {
-                        // TODO
-                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                    } else if (method.equals("urlencoded-post")) {
-                        throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
                     } else {
                         throw new OXFException("xforms:submission: invalid submission method requested: " + method);
                     }
@@ -448,7 +457,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if (isReplaceInstance && resolvedAction.startsWith("test:")) {
                         // Test action
 
-                        if (serializedInstance == null)
+                        if (messageBody == null)
                             throw new OXFException("Action 'test:' can only be used with POST method.");
 
                         connectionResult = new ConnectionResult(null);
@@ -457,11 +466,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         connectionResult.lastModified = 0;
                         connectionResult.resultMediaType = "application/xml";
                         connectionResult.dontHandleResponse = false;
-                        connectionResult.setResultInputStream(new ByteArrayInputStream(serializedInstance));
+                        connectionResult.setResultInputStream(new ByteArrayInputStream(messageBody));
 
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
-                        connectionResult = doOptimizedGet(pipelineContext, serializedInstanceString, xxfShowProgress);
+                        connectionResult = doOptimizedGet(pipelineContext, queryString, xxfShowProgress);
                     } else if (!NetUtils.urlHasProtocol(resolvedAction)
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
@@ -484,8 +493,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedAction);
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
-                                this, method, resolvedURI.toString(), mediatype, isReplaceAll,
-                                serializedInstance, serializedInstanceString);
+                                this, method, resolvedURI.toString(), (mediatype == null) ? defaultMediatype : mediatype, isReplaceAll,
+                                messageBody, queryString);
 
                     } else {
                         // This is a regular remote submission going through a protocol handler
@@ -499,8 +508,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
 
                         connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                                method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, mediatype,
-                                serializedInstance, serializedInstanceString);
+                                method, resolvedURL, resolvedXXFormsUsername, resolvedXXFormsPassword, (mediatype == null) ? defaultMediatype : mediatype,
+                                messageBody, queryString);
                     }
 
                     if (!connectionResult.dontHandleResponse) {

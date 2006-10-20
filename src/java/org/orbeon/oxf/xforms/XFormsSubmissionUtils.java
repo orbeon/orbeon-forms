@@ -142,10 +142,10 @@ public class XFormsSubmissionUtils {
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
                                                                    String method, final String action, String username, String password, String mediatype,
-                                                                   byte[] serializedInstance, String serializedInstanceString) {
+                                                                   byte[] serializedInstance, String queryString) {
 
         // Compute submission URL
-        final URL submissionURL = createAbsoluteURL(action, serializedInstanceString, externalContext);
+        final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -265,22 +265,22 @@ public class XFormsSubmissionUtils {
      * Create an absolute URL from an action string and a search string.
      *
      * @param action            absolute URL or absolute path
-     * @param searchString      optional search string to append to the action URL
+     * @param queryString       optional query string to append to the action URL
      * @param externalContext   current ExternalContext
      * @return                  an absolute URL
      */
-    public static URL createAbsoluteURL(String action, String searchString, ExternalContext externalContext) {
+    public static URL createAbsoluteURL(String action, String queryString, ExternalContext externalContext) {
         URL resultURL;
         try {
             final String actionString;
             {
                 final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                if (searchString != null && searchString.length() > 0) {
+                if (queryString != null && queryString.length() > 0) {
                     if (action.indexOf('?') == -1)
                         updatedActionStringBuffer.append('?');
                     else
                         updatedActionStringBuffer.append('&');
-                    updatedActionStringBuffer.append(searchString);
+                    updatedActionStringBuffer.append(queryString);
                 }
                 actionString = updatedActionStringBuffer.toString();
             }
@@ -306,7 +306,7 @@ public class XFormsSubmissionUtils {
     }
 
     public static boolean isPost(String method) {
-        return method.equals("post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
+        return method.equals("post") || method.equals("urlencoded-post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
     }
 
     public static boolean isPut(String method) {

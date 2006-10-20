@@ -50,7 +50,7 @@
         <rsp stat="ok"/>
     </xforms:instance>
 
-    <xforms:submission id="photos-setMeta-submission" ref="instance('photos-setMeta-query')" method="get"
+    <xforms:submission id="photos-setMeta-submission" ref="instance('photos-setMeta-query')" method="urlencoded-post"
                        action="http://api.flickr.com/services/rest/" separator="&amp;"
                        replace="instance" instance="photos-setMeta-response">
         <xforms:action ev:event="xforms-submit">

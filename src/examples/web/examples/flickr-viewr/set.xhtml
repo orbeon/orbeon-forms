@@ -54,7 +54,7 @@
                 <xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>
                 <xforms:send submission="photos-getInfo-submission"/>
                 <xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>
-                <xxforms:script>
+                <xxforms:script if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
                     ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
                 </xxforms:script>
             </xforms:action>

@@ -25,23 +25,39 @@
 
     <xhtml:head>
         <xhtml:title>XForms Flickr Viewer</xhtml:title>
-        <xforms:model id="main-model">
+        <xforms:model id="main-model" xxforms:external-events="get-one-photo-info">
 
             <xforms:action ev:event="xforms-ready">
                 <xforms:setvalue ref="xxforms:instance('photosets-getInfo-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
                 <xforms:send submission="photosets-getInfo-submission"/>
                 <xforms:setvalue ref="xxforms:instance('photosets-getPhotos-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
                 <xforms:send submission="photosets-getPhotos-submission"/>
-                <xforms:action while="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
-                    <xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>
-                    <xforms:send submission="photos-getInfo-submission"/>
-                    <xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>
-                </xforms:action>
+                <xforms:dispatch target="main-model" name="get-one-photo-info"/>
+                <!--<xforms:action while="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">-->
+                    <!--<xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>-->
+                    <!--<xforms:send submission="photos-getInfo-submission"/>-->
+                    <!--<xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>-->
+                <!--</xforms:action>-->
+
+                <!--<xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id[1]" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>-->
+                <!--<xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id[2]" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][2]/@id"/>-->
+                <!--<xforms:send submission="photos-getInfo-submission"/>-->
+                <!--<xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>-->
+
             </xforms:action>
 
             <xforms:instance id="parameters-instance">
                 <xi:include href="input:instance"/>
             </xforms:instance>
+
+            <xforms:action ev:event="get-one-photo-info" if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
+                <xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>
+                <xforms:send submission="photos-getInfo-submission"/>
+                <xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>
+                <xxforms:script>
+                    ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
+                </xxforms:script>
+            </xforms:action>
 
         </xforms:model>
         <!-- Include Flickr API model -->

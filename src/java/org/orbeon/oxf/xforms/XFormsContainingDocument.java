@@ -597,14 +597,25 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
         }
 
-        // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
-
         // Handle repeat focus
         if (controlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
-            // The event target is in a repeated structure, so make sure it gets  foic
+            // The event target is in a repeated structure, so make sure it gets repeat focus
             dispatchEvent(pipelineContext, new XXFormsRepeatFocusEvent(eventTarget));
         }
+
+        // Don't actually dispatch event to xforms:output (but repeat focus may have been dispatched)
+        if (eventTarget instanceof XFormsOutputControl) {
+            return;
+
+            // NOTE: We always receive DOMFocusIn from the client on xforms:output. Would it make sense to turn this
+            // into a DOMActivate if the control is not read-only?
+
+//            final XFormsOutputControl xformsOutputControl = (XFormsOutputControl) eventTarget;
+//            if (xformsOutputControl.isReadonly()) ...
+        }
+
+        // Create event
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
 
         // Interpret event
         if (xformsEvent instanceof XXFormsValueChangeWithFocusChangeEvent) {

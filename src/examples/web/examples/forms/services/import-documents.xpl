@@ -31,24 +31,18 @@
     <!-- For each document, read it, format it and insert it -->
     <p:for-each href="#documents" select="/*/name">
 
+        <!-- Retrieve local document by name -->
         <p:processor name="oxf:url-generator">
             <p:input name="config" href="aggregate('config', aggregate('url', current()#xpointer(concat('../schema/', string(/)))))"/>
             <p:output name="data" id="document"/>
         </p:processor>
 
-        <!-- Create REST submission -->
-        <p:processor name="oxf:xslt">
-            <p:input name="config">
-                <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                   xsl:version="2.0" method="put" action="/exist/rest/db/ops/dmv-example/{{digest(string(random(true)), 'MD5', 'hex')}}"/>
-            </p:input>
-            <p:input name="data" href="current()"/>
-            <p:output name="data" id="submission"/>
-        </p:processor>
-
         <!-- Execute REST submission -->
         <p:processor name="oxf:xforms-submission">
-            <p:input name="submission" href="#submission"/>
+            <p:input name="submission">
+                <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms"
+                                   method="put" action="/exist/rest/db/ops/dmv-example/{digest(string(random(true)), 'MD5', 'hex')}"/>
+            </p:input>
             <p:input name="request" href="#document"/>
             <p:output name="response" id="response"/>
         </p:processor>

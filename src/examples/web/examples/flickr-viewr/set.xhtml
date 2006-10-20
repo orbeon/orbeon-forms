@@ -32,7 +32,9 @@
                 <xforms:send submission="photosets-getInfo-submission"/>
                 <xforms:setvalue ref="xxforms:instance('photosets-getPhotos-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
                 <xforms:send submission="photosets-getPhotos-submission"/>
-                <xforms:dispatch target="main-model" name="get-one-photo-info"/>
+                <xxforms:script if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
+                    ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
+                </xxforms:script>
                 <!--<xforms:action while="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">-->
                     <!--<xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>-->
                     <!--<xforms:send submission="photos-getInfo-submission"/>-->

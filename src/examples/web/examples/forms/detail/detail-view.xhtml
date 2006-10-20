@@ -48,6 +48,10 @@
                 <xforms:setfocus control="dmv-last-name-control"/>
             </xforms:action>
 
+            <!-- Mark document as dirty in case of insertion or deletion -->
+            <xforms:setvalue ev:event="xforms-insert" ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:event="xforms-delete" ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
+
             <!-- This action clears all the fields of the mailing address -->
             <xforms:action ev:event="dmv-clear-mailing-address">
                 <xforms:setvalue while="instance('main-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"

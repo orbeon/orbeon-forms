@@ -20,8 +20,10 @@
         <title>Performance and Tuning</title>
     </header>
     <body>
+        <a name="jvm"/>
         <section>
             <title>Tuning the Java Virtual Machine (JVM)</title>
+            <a name="jvm-heap-ms-mx"/>
             <section>
                 <title>Set <code>-Xms</code> and <code>-Xmx</code> to the same value</title>
                 <p>
@@ -47,6 +49,7 @@
                     you set both <code>-Xms</code> and <code>-Xmx</code> to the same value.
                 </p>
             </section>
+            <a name="jvm-heap-size"/>
             <section>
                 <title>Allocate a large heap but don't cause swapping</title>
                 <p>
@@ -74,8 +77,10 @@
                 </p>
             </section>
         </section>
+        <a name="application-server"/>
         <section>
             <title>Tuning the application server</title>
+            <a name="application-server-weblogic"/>
             <section>
                 <title>WebLogic: Disable automatic redeployment</title>
                 <p>
@@ -95,6 +100,7 @@
                     <code>ServletReloadCheckSecs="-1"</code>.
                 </p>
             </section>
+            <a name="application-server-dns"/>
             <section>
                 <title>All application servers: Disable DNS lookup</title>
                 <p>
@@ -122,6 +128,7 @@
                 </p>
             </section>
             <a name="gzip"/>
+            <a name="application-server-gzip"/>
             <section>
                 <title>Enable gzip compression for generated text content</title>
                 <p>
@@ -176,6 +183,7 @@
                     see how they impact performance.
                 </p>
             </section>
+            <a name="ops-state"/>
             <section>
                 <title>Consider server-side XForms state handling</title>
                 <p>
@@ -191,8 +199,10 @@
                 </p>
             </section>
         </section>
+        <a name="your-app"/>
         <section>
             <title>Tunning your application</title>
+            <a name="your-app-size-xml"/>
             <section>
                 <title>Reduce the size of your XML documents</title>
                 <p>
@@ -232,6 +242,7 @@
                     retrieving large XML documents and processing them in OPS.
                </p>
             </section>
+            <a name="your-app-xslt"/>
             <section>
                 <title>Tune your XSLT code</title>
                 <p>
@@ -245,6 +256,7 @@
                     will typically run more efficiently.
                 </p>
             </section>
+            <a name="your-app-xpl-profiling"/>
             <section>
                 <title>Enable XPL profiling</title>
                 <p>
@@ -265,6 +277,7 @@
                     href="reference-properties#trace">properties documentation</a>.
                 </p>
             </section>
+            <a name="your-app-portal"/>
             <section>
                 <title>Do not run your code in the examples portal</title>
                 <p>
@@ -275,6 +288,7 @@
                     are present in the main page flow file (<code>resources/page-flow.xml</code>).
                 </p>
             </section>
+            <a name="your-app-epilogue"/>
             <section>
                 <title>Customize the standard epilogue</title>
                 <p>
@@ -286,6 +300,7 @@
                     likely), you can remove the test for portlets.
                 </p>
             </section>
+            <a name="your-app-debug"/>
             <section>
                 <title>Make sure you remove all your XPL <code>debug</code> attributes</title>
                 <p>
@@ -296,6 +311,7 @@
                     attributes.
                 </p>
             </section>
+            <a name="your-app-static-files"/>
             <section>
                 <title>Don't serve your static files through OPS</title>
                 <p>
@@ -306,8 +322,10 @@
                 </p>
             </section>
         </section>
+        <a name="other"/>
         <section>
             <title>Other recommendations</title>
+            <a name="other-analysis-tools"/>
             <section>
                 <title>Use a performance analysis tool</title>
                 <p>
@@ -317,6 +335,7 @@
                     before recording your performance numbers.
                 </p>
             </section>
+            <a name="other-measure"/>
             <section>
                 <title>Make sure of what you are measuring</title>
                 <p>

@@ -25,11 +25,9 @@ import org.orbeon.saxon.value.StringValue;
 import java.security.MessageDigest;
 
 /**
- *
+ * XForms digest() function (XForms 1.1).
  */
 public class Digest extends XFormsFunction {
-
-    // hash-encode(data, 'sha1' | 'md5', 'base64'|'hex')
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 

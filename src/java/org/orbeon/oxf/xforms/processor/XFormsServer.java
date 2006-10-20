@@ -1121,9 +1121,9 @@ public class XFormsServer extends ProcessorImpl {
 
         // Initialize XForms Engine
         if (isInitializeEvent)
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement));
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement));
 
         // Run automatic event if present
         if (eventElement != null) {

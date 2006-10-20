@@ -71,12 +71,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("boolean-from-string", BooleanFromString.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // NOTE: Deprecated under this name. Use xxforms:if() instead
         e = register("xfif", If.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // 7.8 Number Funtions (avg(), min(), max() are implemented in XPath 2.0)
+        // 7.8 Number Functions (avg(), min(), max() are implemented in XPath 2.0)
         e = register("count-non-empty", CountNonEmpty.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.ANY_ATOMIC_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
@@ -89,7 +90,6 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         // 7.10 Date and Time Functions
 
-        // Masquerade Saxon's current-datetime()
         e = register("now", Now.class, 0, 0, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
@@ -109,11 +109,22 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("instance", Instance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
-        // The event() Function
+        // The event() Function (XForms 1.1)
         e = register("event", Event.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // The digest() function (XForms 1.1)
+        e = register("digest", Digest.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // The random() function (XForms 1.1)
+        e = register("random", Random.class, 0, 0, 1, Type.NUMBER_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.BOOLEAN_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+
         // OPS XXForms functions
+
         // xxforms:call-xpl
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}call-xpl", XXFormsCallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         //StandardFunction.arg(e, 0, Type.ANY_URI_TYPE, StaticProperty.EXACTLY_ONE);
@@ -146,12 +157,6 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         // xxforms:if
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}if", If.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.BOOLEAN_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-
-        // xxforms:digest
-        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}digest", Digest.class, 0, 3, 3, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
-        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 2, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 

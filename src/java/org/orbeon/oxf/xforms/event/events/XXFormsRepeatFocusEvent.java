@@ -11,18 +11,17 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.function;
+package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.trans.XPathException;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 
-public class If extends XFormsFunction {
-
-    public Item evaluateItem(XPathContext c) throws XPathException {
-        if(argument[0].effectiveBooleanValue(c))
-            return argument[1].evaluateItem(c);
-        else
-            return argument[2].evaluateItem(c);
+/**
+ * Custom focus event.
+ */
+public class XXFormsRepeatFocusEvent extends XFormsEvent {
+    public XXFormsRepeatFocusEvent(XFormsEventTarget targetObject) {
+        super(XFormsEvents.XXFORMS_REPEAT_FOCUS, targetObject, false, false);
     }
 }

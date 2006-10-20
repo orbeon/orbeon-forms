@@ -166,7 +166,7 @@ public class XFormsInput extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 if (logger.isDebugEnabled())
                     logger.debug("3) Instance with model item properties applied:\n"

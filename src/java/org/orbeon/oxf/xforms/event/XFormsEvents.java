@@ -30,6 +30,9 @@ public class XFormsEvents {
     // Custom load event
     public static final String XXFORMS_LOAD = "xxforms-load";
 
+    // Custom focus event
+    public static final String XXFORMS_REPEAT_FOCUS = "xxforms-focus";
+
     // Standard sequences
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 

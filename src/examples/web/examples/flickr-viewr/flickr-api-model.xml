@@ -260,7 +260,7 @@
     <xforms:action ev:event="flickr-viewer-sign">
         <xforms:setvalue ref="instance(instance('signature-instance'))/api_key" value="instance('api-key-instance')/api_key"/>
         <xforms:setvalue ref="instance(instance('signature-instance'))/api_sig"
-                         value="lower-case(xxforms:digest(concat(instance('api-key-instance')/secret,
+                         value="lower-case(digest(concat(instance('api-key-instance')/secret,
                                     string-join(for $i in instance(instance('signature-instance'))/*[not(name() = ('api_sig')) and not(. = '')] return concat(name($i), $i), '')),
                                     'MD5', 'hex'))"/>
     </xforms:action>

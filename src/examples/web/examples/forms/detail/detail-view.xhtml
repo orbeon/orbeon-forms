@@ -37,8 +37,9 @@
                 <!-- Load document if specified -->
                 <xforms:send if="instance('parameters-instance')/document-id != ''" submission="load-submission"/>
                 <!-- Create document id if not specified -->
-                <!--<xforms:setvalue if="instance('parameters-instance')/document-id = ''"-->
-                                 <!--ref="instance('parameters-instance')/document-id" value=""/>-->
+                <xforms:setvalue if="instance('parameters-instance')/document-id = ''"
+                                 ref="instance('parameters-instance')/document-id"
+                                 value="digest(string(random(true)), 'MD5', 'hex')"/>
                 <!-- Build plates instance -->
                 <xforms:insert while="count(plate) lt count(instance('main-instance')//dmv:plate-number)"
                                context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>

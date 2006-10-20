@@ -40,7 +40,7 @@
         <p:processor name="oxf:xslt">
             <p:input name="config">
                 <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                   xsl:version="2.0" method="put" action="/exist/rest/db/ops/dmv-example/{/*}"/>
+                                   xsl:version="2.0" method="put" action="/exist/rest/db/ops/dmv-example/{{digest(string(random(true)), 'MD5', 'hex')}}"/>
             </p:input>
             <p:input name="data" href="current()"/>
             <p:output name="data" id="submission"/>

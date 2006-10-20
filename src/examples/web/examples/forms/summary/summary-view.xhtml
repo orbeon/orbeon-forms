@@ -228,7 +228,9 @@
                                         </xforms:group>
                                     </td>
                                     <td>
-                                        <xforms:output value="concat(dmv:personal-information/dmv:name/dmv:first-name, ' ', dmv:personal-information/dmv:name/dmv:initial, ' ', dmv:personal-information/dmv:name/dmv:last-name)"/>
+                                        <xforms:output value="concat(dmv:personal-information/dmv:name/dmv:first-name, ' ',
+                                                                     dmv:personal-information/dmv:name/dmv:initial, if (dmv:personal-information/dmv:name/dmv:initial != '') then '. ' else (),
+                                                                     dmv:personal-information/dmv:name/dmv:last-name)"/>
                                     </td>
                                     <td>
                                         <xforms:group ref="dmv:personal-information/dmv:birth-date">

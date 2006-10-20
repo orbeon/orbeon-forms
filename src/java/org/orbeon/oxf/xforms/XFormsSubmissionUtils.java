@@ -45,7 +45,7 @@ public class XFormsSubmissionUtils {
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
                                                                      byte[] serializedInstance, String serializedInstanceString) {
         try {
-            if (isPost(method) || isPut(method) || isGet(method)) {
+            if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
 
                 // Create requestAdapter depending on method
                 final ForwardExternalContextRequestWrapper requestAdapter;
@@ -125,8 +125,6 @@ public class XFormsSubmissionUtils {
             } else if (method.equals("form-data-post")) {
                 // TODO
                 throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-            } else if (method.equals("urlencoded-post")) {
-                throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
             } else {
                 throw new OXFException("xforms:submission: invalid submission method requested: " + method);
             }
@@ -240,8 +238,6 @@ public class XFormsSubmissionUtils {
                 } else if (method.equals("form-data-post")) {
                     // TODO
                     throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                } else if (method.equals("urlencoded-post")) {
-                    throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
                 } else {
                     throw new OXFException("xforms:submission: invalid submission method requested: " + method);
                 }

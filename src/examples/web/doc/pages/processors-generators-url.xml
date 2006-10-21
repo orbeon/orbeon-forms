@@ -121,6 +121,10 @@
                         <config>
                             <url>http://www.cnn.com</url>
                             <content-type>text/html</content-type>
+                            <tidy-options>
+                                <show-warnings>true</show-warnings>
+                                <quiet>true</quiet>
+                            </tidy-options>
                         </config>
                     </p:input>
                     <p:output name="data" id="html"/>
@@ -133,17 +137,25 @@
                             <url>oxf:/html/example.html</url>
                             <content-type>text/html</content-type>
                             <force-content-type>true</force-content-type>
+                            <tidy-options>
+                                <show-warnings>true</show-warnings>
+                                <quiet>true</quiet>
+                            </tidy-options>
                         </config>
                     </p:input>
                     <p:output name="data" id="html"/>
                 </p:processor>
             </xml-source>
-            <note>
-                <p>
-                    HTML Tidy has some tolerance for malformed HTML, but it is encouraged to access
-                    well-formed HTML whenever possible.
-                </p>
-            </note>
+            <p>
+                The <code>&lt;tidy-options></code> part of the configuration in the two examples above is optional.
+                However, by default <code>quiet</code> is set to false, which causes HTML Tidy to output messages to
+                the console when it finds invalid HTML. To prevent this, add a <code>&lt;tidy-options></code> section
+                to the configuration with <code>quiet</code> set to true.
+            </p>
+            <p>
+                Even if HTML Tidy has some tolerance for malformed HTML, you should use well-formed HTML whenever
+                possible.
+            </p>
         </section>
         <a name="text-mode"/>
         <section>

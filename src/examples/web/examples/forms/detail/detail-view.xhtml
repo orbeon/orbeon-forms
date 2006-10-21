@@ -46,6 +46,8 @@
                 <xforms:recalculate/>
                 <!-- Set initial focus -->
                 <xforms:setfocus control="dmv-last-name-control"/>
+                <!-- Make sure we look clean after initialization, as insertions can take place above -->
+                <xforms:setvalue ref="instance('control-instance')/data-status"/>
             </xforms:action>
 
             <!-- Mark document as dirty in case of insertion or deletion -->
@@ -142,8 +144,6 @@
                 <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('main-instance')//dmv:vehicle-address"/>
                 <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('main-instance')//dmv:vehicle-address) != ''"/>
 
-                <!-- Uncomment this line to test read-only version -->
-                <!-- TODO: Control this from the outside -->
                 <xforms:bind nodeset="*[contains(name(), 'add') or contains(name(), 'remove')]" readonly="instance('parameters-instance')/readonly = 'true'"/>
             </xforms:bind>
 

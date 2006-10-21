@@ -1227,12 +1227,15 @@
                         </xforms:upload>
                     </xml-source>
                     <p>
-                        The related section of the XForms instance can look like this:
+                        The related section of the XForms model can look like this:
                     </p>
-                    <xml-source>
-                        <files>
-                            <file filename="" mediatype="" size="" xsi:type="xs:anyURI"/>
-                        </files>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="my-instance">
+                            <files>
+                                <file filename="" mediatype="" size=""/>
+                            </files>
+                        </xforms:instance>
+                        <xforms:bind nodeset="file" type="xs:anyURI"/>
                     </xml-source>
                     <p>
                         The <code>file</code> element is the element storing the result of the file
@@ -1247,12 +1250,6 @@
                         binary data. For more information, please refer to the <a
                         href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
                     </ul>
-                    <note>
-                        <p>
-                            It is mandatory to specify either one of <code>xs:anyURI</code> or
-                            <code>xs:base64Binary</code>.
-                        </p>
-                    </note>
                     <p>
                         The optional <code>xforms:filename</code>, <code>xforms:mediatype</code>, and
                         <code>xxforms:size</code> (the latter being an extension) allow storing metadata
@@ -1274,8 +1271,8 @@
                         The result of a file upload can look as follows when using
                         <code>xs:anyURI</code>:
                     </p>
-                    <xml-source>
-                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345" xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</file>
+                    <xml-source show-namespaces="false">
+                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345">file:/C:/Tomcat/temp/upload_00000005.tmp</file>
                     </xml-source>
                     <warning>
                         The URL stored as the value of the upload is temporary and only valid for the
@@ -1301,7 +1298,7 @@
                         <code>xs:base64Binary</code>:
                     </p>
                     <xml-source>
-                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345" xsi:type="xs:base64Binary">
+                        <file filename="photo.jpg" mediatype="image/jpeg" size="2345">
                             /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAO
                             EA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwc
                             ...
@@ -1311,15 +1308,6 @@
                         In this case, the uploaded file is encoded an directly embedded into the XML
                         instance. This is a good method to handle small files only, because the entire
                         file is converted and stored in memory.
-                    </p>
-                    <p>
-                        Make sure, in your XForms model, that you have the correct submission method and
-                        encoding:
-                    </p>
-                    <p>
-                        <xml-source>
-                            <xforms:submission method="post" encoding="multipart/form-data"/>
-                        </xml-source>
                     </p>
                 </section>
             </section>
@@ -1973,119 +1961,177 @@
             <section>
                 <title>Rationale</title>
                 <p>
-                    An XForms page often needs to contain initial data when first loaded. The data
-                    may come from a database, a form submitted on a previous page, etc. There are
-                    several ways to achieve this with OPS.
+                    An XForms page usually needs to contain initial data when first loaded. The data may be inline, come
+                    from a database, from a form submitted on a previous page, etc. This section looks at the different
+                    ways to initialize XForms instances.
                 </p>
             </section>
             <section>
-                <title>Page Flow Definitions</title>
-                <p>
-                    Within your page flow, you define a page model and either a static page view:
-                </p>
-                <xml-source>
-                    <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xhtml"/>
-                </xml-source>
-                <p>
-                    Or a dynamic XSLT page view:
-                </p>
-                <xml-source>
-                    <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xsl"/>
-                </xml-source>
-                <p>
-                    The page model is in charge of producing an XML document which is then going to
-                    be used by the page view to initialize the XForms instance. As always with OPS,
-                    the page model produces this document on its <code>data</code> output, and the
-                    page view can access this document on its <code>data</code> input, as shown in
-                    the following sections. This mechanism is described in details in the <a
-                    href="reference-page-flow#page-model-page-view">PFC documentation</a>.
-                </p>
-            </section>
-            <section>
-                <title>Using XInclude</title>
-                <p>
-                    Following the MVC architecture, the PFC page model generates an XML document
-                    which contains an XForms instance. A static PFC page view then includes this
-                    instance using <code>xi:include</code>, as follows:
-                </p>
-                <xml-source show-namespaces="false">
-                    <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                          xmlns:xi="http://www.w3.org/2001/XInclude-doc"
-                          xmlns="http://www.w3.org/1999/xhtml">
-                        <head>
-                            <title>Summary</title>
-                            <xforms:model>
-                                <xforms:instance id="document-infos-instance">
-                                    <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
-                                    <xi:include href="input:data"/>
-                                </xforms:instance>
+                <title>Initializing XForms Instances from the PFC</title>
+                <section>
+                    <title>Page Flow Definitions</title>
+                    <p>
+                        The Page Flow Controller supports an MVC architecture that allows pages to be built with a
+                        page model and a page view. The page model is in charge of preparing data then sent to the page
+                        view for display. Assume the following definitions in your page flow, with a page model and
+                        either a static page view:
+                    </p>
+                    <xml-source>
+                        <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xhtml"/>
+                    </xml-source>
+                    <p>
+                        Or a dynamic XSLT page view:
+                    </p>
+                    <xml-source>
+                        <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xsl"/>
+                    </xml-source>
+                    <p>
+                        As always with OPS, the page model produces a page model document on its <code>data</code>
+                        output, and the page view can access this document on its <code>data</code> input, as shown in
+                        the following sections. The page view also has access on its <code>instance</code> input to the
+                        current XML submission, which may be an unmodified submission performed on the page (in case the
+                        page model doesn't have an <code>instance</code> output), or a submission created or modified by
+                        the page model and produced on its <code>instance</code> output. These mechanisms are described
+                        in details in the <a href="reference-page-flow#page-model-page-view">PFC documentation</a>.
+                    </p>
+                </section>
+                <section>
+                    <title>Using XInclude</title>
+                    <p>
+                        In this scenario, the PFC page model generates an XML document which contains an XForms
+                        instance on its <code>data</code> output. A static PFC page view then includes this document
+                        using <code>xi:include</code>, as follows:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
+                              xmlns="http://www.w3.org/1999/xhtml">
+                            <head>
+                                <title>Summary</title>
+                                <xforms:model>
+                                    <xforms:instance id="document-infos-instance">
+                                        <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                                        <xi:include href="input:data"/>
+                                    </xforms:instance>
+                                    ...
+                                </xforms:model>
+                            </head>
+                            <body>
                                 ...
-                            </xforms:model>
-                        </head>
-                        <body>
-                            ...
-                        </body>
-                    </html>
-                </xml-source>
-                <p>
-                    The use of the URI <code>input:data</code> instructs XInclude processing to
-                    dynamically include the <code>data</code> output of the page view, which is
-                    produced on the <code>data</code> output of the page model. Note that it is
-                    possible to use the <code>instance</code> input, which then refers to the
-                    current XML submission.
-                </p>
-            </section>
-            <section>
-                <title>Using XSLT</title>
-                <p>
-                    It is also possible to use a dynamic XSLT page view to perform the inclusion of
-                    the instance. XSLT is more flexible than XInclude, but less efficient at
-                    runtime. This is an example:
-                </p>
-                <xml-source show-namespaces="false">
-                    <html xmlns:xforms="http://www.w3.org/2002/xforms"
-                          xmlns="http://www.w3.org/1999/xhtml"
-                          xsl:version="2.0">
-                        <head>
-                            <title>Summary</title>
-                            <xforms:model>
-                                <xforms:instance id="document-infos-instance">
-                                    <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
-                                    <xsl:copy-of select="doc('input:data')/*"/>
-                                </xforms:instance>
+                            </body>
+                        </html>
+                    </xml-source>
+                    <p>
+                        The use of the URI <code>input:data</code> instructs XInclude processing to dynamically include the
+                        <code>data</code> output of the page view, which is produced on the <code>data</code> output of the
+                        page model. Note that you can also use the <code>instance</code> input, which then refers to the
+                        current XML submission:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="document-infos-instance">
+                            <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                            <xi:include href="input:instance"/>
+                        </xforms:instance>
+                    </xml-source>
+                </section>
+                <section>
+                    <title>Using XSLT</title>
+                    <p>
+                        You can use a dynamic XSLT page view to perform the inclusion of the instance. XSLT is more
+                        flexible than XInclude, but less efficient at runtime. The following example uses the
+                        <code>data</code> input of the page view to initialize an XForms instance:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                              xmlns="http://www.w3.org/1999/xhtml"
+                              xsl:version="2.0">
+                            <head>
+                                <title>Summary</title>
+                                <xforms:model>
+                                    <xforms:instance id="document-infos-instance">
+                                        <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                                        <xsl:copy-of select="/*"/>
+                                    </xforms:instance>
+                                    ...
+                                </xforms:model>
+                            </head>
+                            <body>
                                 ...
-                            </xforms:model>
-                        </head>
-                        <body>
-                            ...
-                        </body>
-                    </html>
-                </xml-source>
-                <p>
-                    Note the use of <code>xsl:version="2.0"</code> on the root element of the
-                    document, which instructs the PFC to process the page view as an XSLT
-                    stylesheet.
-                </p>
-                <p>
-                    The use of the XPath <code>doc()</code> function with a URI
-                    <code>input:data</code> instructs XSLT processing to dynamically include the
-                    <code>data</code> output of the page view, which is produced on the
-                    <code>data</code> output of the page model.
-                </p>
-                <note>
-                    It is possible to use XInclude instructions in a dynamic XSLT page view as well.
-                    In this case, it is important to note that XInclude instructions are processed
-                    before XSLT instructions, i.e. the result of XInclude instructions is an XSLT
-                    stylesheet, which is then executed.
+                            </body>
+                        </html>
+                    </xml-source>
+                    <p>
+                        Note the use of <code>xsl:version="2.0"</code> on the root element of the document, which instructs
+                        the PFC to process the page view as an XSLT stylesheet.
+                    </p>
+                    <p>
+                        The following example uses instead the <code>instance</code> input of the page view to
+                        initialize an XForms instance:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:instance id="document-infos-instance">
+                            <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                            <xsl:copy-of select="doc('input:instance')"/>
+                        </xforms:instance>
+                    </xml-source>
+                    <p>
+                        The use of the XPath <code>doc()</code> function with a URI <code>input:instance</code>
+                        instructs XSLT processing to dynamically include the <code>instance</code> input of the page
+                        view.
+                    </p>
+                    <note>
+                        You can use XInclude instructions in a dynamic XSLT page view as well. In this case, it is
+                        important to note that XInclude instructions are processed before XSLT instructions, i.e. the result
+                        of XInclude instructions is an XSLT stylesheet, which is then executed.
 
-                    <!--[TODO: Figure showing XInclude -> XSLT processing.]-->
-                </note>
-                <note>
-                    Using XSLT for page views has an impact for debugging, as the output of XSLT
-                    transformations do not contain valuable location information. For performance
-                    and ease of debugging reasons, we recommend using static XHTML views with
-                    XInclude whenever possible.
-                </note>
+                        <!--[TODO: Figure showing XInclude -> XSLT processing.]-->
+                    </note>
+                    <note>
+                        Using XSLT for page views has an impact for debugging, as the output of XSLT transformations do not
+                        contain valuable location information. For performance and ease of debugging reasons, we recommend
+                        using static XHTML views with XInclude whenever possible.
+                    </note>
+                </section>
+                <section>
+                    <title>Using the <code>src</code> Attribute</title>
+                    <p>
+                        The <code>xforms:instance</code> element supports an <code>src</code> attribute, able to access the
+                        current XML submission using the <code>input:instance</code> URI.
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                              xmlns:xi="http://www.w3.org/2001/XInclude-doc"
+                              xmlns="http://www.w3.org/1999/xhtml">
+                            <head>
+                                <title>Summary</title>
+                                <xforms:model>
+                                    <xforms:instance id="document-infos-instance" src="input:instance"/>
+                                    ...
+                                </xforms:model>
+                            </head>
+                            <body>
+                                ...
+                            </body>
+                        </html>
+                    </xml-source>
+                    <note>
+                        <p>
+                            Note that the URI <code>input:data</code> is not supported in the <code>src</code> attribute.
+                        </p>
+                    </note>
+                </section>
+            </section>
+            <section>
+                <title>Initializing XForms Instances from a URI</title>
+                <p>
+                    TODO (xforms:instance/@src).
+                </p>
+            </section>
+            <section>
+                <title>Initializing XForms Instances with an XForms Submission</title>
+                <p>
+                    TODO.
+                </p>
             </section>
         </section>
         <!--
@@ -3427,6 +3473,71 @@
                 </p>
             </section>
             -->
+        </section>
+        <a name="xforms-debugging"/>
+        <section added="2006-10-21">
+            <title>Debugging XForms Pages</title>
+            <p>
+                When a fatal error occurs, the XForms engine throws a Java exception which either results in an error
+                page in your web browser (when the error occurrs during page initialization) or in an error message at
+                the top of the displayed XForms page (when the error occurs during an Ajax request after the page is
+                loaded). The main Java exception is also logged on the server. Often, this provides enough information
+                to the developer to figure out what went wrong. When this is not sufficient, the best tool available is
+                the XForms engine logging facility. To enable it, make sure you uncomment the following lines in
+                <code>config/log4j.xml</code>:
+            </p>
+            <xml-source>
+                <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
+                    <priority value="debug"/>
+                </category>
+                <category name="org.orbeon.oxf.xforms.processor.XFormsModelSubmission">
+                    <priority value="debug"/>
+                </category>
+            </xml-source>
+            <note>
+                <p>
+                    You must restart your Servlet container for those changes to be taken into account.
+                </p>
+            </note>
+            <p>
+                This setting enables verbose logging of the XForms engine's operations, in particular:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Dispatching of events.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Execution of actions.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Loading of instances.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Execution of submissions.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Resulting XForms instances.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        XForms cache-related operations.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The following figure shows a sample XForms logging session in Orbeon Studio:
+            </p>
+            <img src="pages/reference-xforms-logging.png" style="clear: both; margin-left: 1em "/>
         </section>
         <a name="xforms-classic-migration"/>
         <section added="2006-09-18">

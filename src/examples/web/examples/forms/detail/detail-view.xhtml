@@ -198,7 +198,7 @@
         <xi:include href="oxf:/examples/forms/common/resources-model.xml" xxi:omit-xml-base="true"/>
     </head>
     <body>
-        <table class="dmv-title-table">
+        <table class="forms-title-table">
             <tr>
                 <td>
                     <img src="/examples/forms/images/dmv-logo.png" alt="DMV"/>
@@ -211,7 +211,7 @@
 
         <!-- Error summary -->
         <xforms:group model="main-model" ref="instance('errors-instance')/error">
-            <table class="dmv-errors-table">
+            <table class="forms-errors-table">
                 <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
                     <tr>
                         <th>
@@ -234,12 +234,12 @@
             <!-- Clear messages upon user moving around in the form -->
             <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
 
-            <table class="dmv-main-table">
+            <table class="forms-main-table">
                 <xforms:group model="main-model">
                     <tr>
                         <td colspan="2">
                             <!-- Main form actions -->
-                            <table class="dmv-action-table" id="main-action-table">
+                            <table class="forms-action-table" id="main-action-table">
                                 <tr>
                                     <td>
                                         <xforms:group ref="instance('control-instance')/back-trigger">
@@ -273,17 +273,17 @@
                                                 <span/>
                                             </xforms:case>
                                             <xforms:case id="ok-message">
-                                                <span class="dmv-message-positive">
+                                                <span class="forms-message-positive">
                                                     <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
                                                 </span>
                                             </xforms:case>
                                             <xforms:case id="validation-error-message">
-                                                <span class="dmv-message-negative">
+                                                <span class="forms-message-negative">
                                                     <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
                                                 </span>
                                             </xforms:case>
                                             <xforms:case id="fatal-error-message">
-                                                <span class="dmv-message-fatal">
+                                                <span class="forms-message-fatal">
                                                     <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
                                                 </span>
                                             </xforms:case>
@@ -374,7 +374,7 @@
                                 </td>
                             </tr>
                         </xforms:group>
-                        <tr><td colspan="2" class="dmv-hr"/></tr>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
                         <xforms:group ref="dmv:address-information">
                             <xforms:group ref="dmv:voter-address-change">
                                 <tr>
@@ -392,7 +392,7 @@
                                     </td>
                                 </tr>
                             </xforms:group>
-                            <tr><td colspan="2" class="dmv-hr"/></tr>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
                             <xforms:group ref="dmv:address[@type = 'residence']">
                                 <tr>
                                     <th>
@@ -460,7 +460,7 @@
                                     </td>
                                 </tr>
                             </xforms:group>
-                            <tr><td colspan="2" class="dmv-hr"/></tr>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
                             <tr>
                                 <th>
                                     <xforms:output model="resources-model" value="instance('resources-instance')/titles/new-mailing-address" mediatype="text/html"/><br/>
@@ -470,7 +470,7 @@
                                 </th>
                                 <td>
 
-                                    <table class="dmv-action-table">
+                                    <table class="forms-action-table">
                                         <tr>
                                             <td>
                                                 <xforms:group ref="instance('triggers-instance')/remove-mailing-address-trigger">
@@ -577,7 +577,7 @@
                                 </td>
                             </tr>
                         </xforms:group>
-                        <tr><td colspan="2" class="dmv-hr"/></tr>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
                         <xforms:group ref="dmv:vehicle-information">
                             <xforms:group ref="dmv:vehicles">
                                 <tr>
@@ -585,7 +585,7 @@
                                         <xforms:output model="resources-model" value="instance('resources-instance')/titles/vehicles-owned" mediatype="text/html"/><br/>
                                     </th>
                                     <td>
-                                        <table class="dmv-action-table">
+                                        <table class="forms-action-table">
                                             <tr>
                                                 <td>
                                                     <xforms:group ref="instance('triggers-instance')/add-vehicle-trigger">
@@ -623,7 +623,7 @@
                                             </tr>
                                         </table>
 
-                                        <table class="dmv-gridtable" id="dmv-vehicles">
+                                        <table class="forms-gridtable" id="dmv-vehicles">
                                             <tr>
                                                 <th colspan="2"><xforms:output model="resources-model" value="instance('resources-instance')/titles/plate-number" mediatype="text/html"/></th>
                                                 <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/vin" mediatype="text/html"/></th>
@@ -675,7 +675,7 @@
                                     </td>
                                 </tr>
                             </xforms:group>
-                            <tr><td colspan="2" class="dmv-hr"/></tr>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
                             <xforms:group ref="dmv:leased-vehicles">
                                 <tr>
                                     <th>
@@ -689,14 +689,14 @@
                                     </td>
                                 </tr>
                             </xforms:group>
-                            <tr><td colspan="2" class="dmv-hr"/></tr>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
                             <tr>
                                 <th>
                                     <xforms:output model="resources-model" value="instance('resources-instance')/titles/coach-vessel-location" mediatype="text/html"/><br/>
                                 </th>
                                 <td>
 
-                                    <table class="dmv-action-table">
+                                    <table class="forms-action-table">
                                         <tr>
                                             <td>
                                                 <xforms:group ref="instance('triggers-instance')/remove-vehicle-address-trigger">
@@ -787,7 +787,7 @@
                                 </td>
                             </tr>
                         </xforms:group>
-                        <tr><td colspan="2" class="dmv-hr"/></tr>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
                         <xforms:group ref="dmv:address-information/dmv:address[@type = 'old']">
                             <tr>
                                 <th>

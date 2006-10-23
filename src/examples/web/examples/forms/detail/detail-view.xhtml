@@ -135,16 +135,14 @@
             <xforms:bind nodeset="instance('control-instance')">
                 <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0)"/>
                 <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty'"/>
-                <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3"/>
-                <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2"/>
-                <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing'])"/>
-                <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('main-instance')//dmv:address[@type = 'mailing']"/>
+                <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) >= 3 or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('main-instance')//dmv:vehicles/dmv:vehicle) &lt; 2 or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('main-instance')//dmv:address[@type = 'mailing']) or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('main-instance')//dmv:address[@type = 'mailing'] or instance('parameters-instance')/readonly = 'true'"/>
                 <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('main-instance')//dmv:address[@type = 'mailing']) != ''"/>
-                <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('main-instance')//dmv:vehicle-address)"/>
-                <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('main-instance')//dmv:vehicle-address"/>
+                <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('main-instance')//dmv:vehicle-address) or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('main-instance')//dmv:vehicle-address or instance('parameters-instance')/readonly = 'true'"/>
                 <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('main-instance')//dmv:vehicle-address) != ''"/>
-
-                <xforms:bind nodeset="*[contains(name(), 'add') or contains(name(), 'remove')]" readonly="instance('parameters-instance')/readonly = 'true'"/>
             </xforms:bind>
 
             <!-- XForms instance for error information -->

@@ -1429,7 +1429,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     public void startOutermostActionHandler() {
-        deferredActionContext = new DeferredActionContext();
+        if (deferredActionContext == null)
+            deferredActionContext = new DeferredActionContext();
     }
 
     public void endOutermostActionHandler(PipelineContext pipelineContext) {

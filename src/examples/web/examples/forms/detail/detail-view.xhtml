@@ -30,7 +30,7 @@
         <!-- Main XForms model -->
         <!-- NOTE: We only use XSLT here to set the value of xxforms:readonly-appearance. It would be nice to be able to forgo XSLT entirely -->
         <!-- Global model -->
-        <xforms:model id="main-model" xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
+        <xforms:model id="common-model" xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
 
             <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">
@@ -70,7 +70,7 @@
 
         </xforms:model>
         <!-- Form-specific model -->
-        <xforms:model id="dmv-model" schema="oxf:/examples/forms/detail/form-schema.xsd">
+        <xforms:model id="dmv-model" schema="oxf:/examples/forms/schema/dmv-schema.xsd">
             <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">
                 <!-- Build plates instance -->
@@ -78,11 +78,12 @@
                                while="count(plate) lt count(instance('document-instance')//dmv:plate-number)"
                                nodeset="plate" origin="instance('plate-template')"/>
                 <xforms:recalculate/>
+                <xforms:refresh/>
                 <!-- Set initial focus -->
                 <xforms:setfocus control="dmv-last-name-control"/>
                 <!-- Make sure we look clean after initialization, as insertions can take place above -->
                 <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
-                <xforms:recalculate model="main-model"/>
+
             </xforms:action>
 
             <!-- Mark document as dirty in case of insertion or deletion -->
@@ -210,7 +211,7 @@
         </table>
 
         <!-- Error summary -->
-        <xforms:group model="main-model" ref="instance('errors-instance')/error">
+        <xforms:group model="common-model" ref="instance('errors-instance')/error">
             <table class="forms-errors-table">
                 <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
                     <tr>
@@ -235,7 +236,7 @@
             <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
 
             <table class="forms-main-table">
-                <xforms:group model="main-model">
+                <xforms:group model="common-model">
                     <tr>
                         <td colspan="2">
                             <!-- Main form actions -->
@@ -308,7 +309,7 @@
                         </td>
                     </tr>
                 </xforms:group>
-                <xforms:group model="main-model">
+                <xforms:group model="common-model">
                     <!-- Handle invalid and valid events in order to update error summary -->
                     <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
                         <xforms:action if="not(instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')])">
@@ -324,7 +325,7 @@
                     </xforms:action>
                     <!-- Mark that data has changed -->
                     <xforms:action ev:event="xforms-value-changed">
-                        <xforms:setvalue model="main-model" ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
+                        <xforms:setvalue model="common-model" ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
                     </xforms:action>
 
                     <xforms:group model="dmv-model" ref="instance('document-instance')">

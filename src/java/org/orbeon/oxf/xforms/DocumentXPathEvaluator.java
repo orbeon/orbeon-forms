@@ -13,20 +13,19 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.trans.XPathException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Facilitate XPath evaluation.
+ *
+ * NOTE: This is here for historical reasons. It now just delegates to XPathCache. Should everybody just use
+ * XPathCache directly?
  */
 public class DocumentXPathEvaluator {
 
@@ -38,18 +37,7 @@ public class DocumentXPathEvaluator {
      */
     public List evaluate(PipelineContext pipelineContext, NodeInfo contextNode, String xpathExpression,
                          Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        final List contextNodeSet = Collections.singletonList(contextNode);
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, 1,
-                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return expr.evaluateKeepNodeInfo();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
-        }
+        return XPathCache.evaluate(pipelineContext, contextNode, xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
     }
 
     /**
@@ -57,40 +45,20 @@ public class DocumentXPathEvaluator {
      */
     public Object evaluateSingle(PipelineContext pipelineContext, NodeInfo contextNode, String xpathExpression,
                                  Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-
-        final List contextNodeSet = Collections.singletonList(contextNode);
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, 1,
-                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return expr.evaluateSingleKeepNodeInfo();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
-        }
+        return XPathCache.evaluateSingle(pipelineContext, contextNode, xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
     }
 
     /**
      * Evaluate an XPath expression on the document and return its string value.
      */
     public String evaluateAsString(PipelineContext pipelineContext, NodeInfo contextNode, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-        return evaluateAsString(pipelineContext, Collections.singletonList(contextNode), 1, xpath, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
+        return XPathCache.evaluateAsString(pipelineContext, contextNode, xpath, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
     }
 
     /**
      * Evaluate an XPath expression on the document and return its string value.
      */
     public String evaluateAsString(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-        PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition, "string(subsequence(" + xpath + ", 1, 1))",
-                        prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return xpathExpression.evaluateSingleKeepNodeInfo().toString();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null) xpathExpression.returnToPool();
-        }
+        return XPathCache.evaluateAsString(pipelineContext, contextNodeSet, contextPosition, xpath, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
     }
 }

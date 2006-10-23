@@ -106,6 +106,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Construct a ContainingDocument from a static state and repeat indexes elements.
      *
      * @param xformsEngineStaticState
+     * @param uriResolver
      * @param repeatIndexesElement
      */
     public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, XFormsURIResolver uriResolver, Element repeatIndexesElement) {

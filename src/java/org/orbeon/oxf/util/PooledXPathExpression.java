@@ -27,10 +27,7 @@ import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.SequenceExtent;
-import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.Value;
+import org.orbeon.saxon.value.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -168,17 +165,20 @@ public class PooledXPathExpression {
                 final Variable variable = (Variable) entry.getValue();
 
                 final Object object = variableToValueMap.get(name);
-                final String value;
+                final AtomicValue atomicValue;
                 if (object instanceof String) {
-                    value = (String) object;
+                    atomicValue = new StringValue((String) object);
                 } else if (object instanceof Integer) {
-                    value = ((Integer) object).toString();
+                    atomicValue = new IntegerValue(((Integer) object).intValue());
+                } else if (object instanceof Float) {
+                    atomicValue = new FloatValue(((Float) object).floatValue());
+                } else if (object instanceof Double) {
+                    atomicValue = new DoubleValue(((Double) object).doubleValue());
                 } else {
                     throw new OXFException("Invalid variable type: " + object.getClass());
                 }
 
-
-                xpathContext.setLocalVariable(variable.getLocalSlotNumber(), new StringValue(value));
+                xpathContext.setLocalVariable(variable.getLocalSlotNumber(), atomicValue);
             }
         }
 

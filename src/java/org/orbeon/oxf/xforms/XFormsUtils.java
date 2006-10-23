@@ -25,10 +25,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.SoftReferenceObjectPool;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
 import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
@@ -45,6 +42,7 @@ import org.orbeon.saxon.om.Axis;
 import org.orbeon.saxon.om.AxisIterator;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -932,12 +930,13 @@ public class XFormsUtils {
      * Resolve attribute value templates (AVTs).
      *
      * @param pipelineContext   current pipeline context
-     * @param xformsControls    XFormsControls object (to obtain context information)
+     * @param contextNode       context node for evaluation
+     * @param functionLibrary   XPath function libary to use
      * @param element           element on which the AVT attribute is present
      * @param attributeValue    attribute value
      * @return                  resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, XFormsControls xformsControls, Element element, String attributeValue) {
+    public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, Element element, String attributeValue) {
 
         if (attributeValue == null)
             return null;
@@ -952,8 +951,8 @@ public class XFormsUtils {
                 throw new OXFException("Missing closing '}' in attribute value: " + attributeValue);
             final String xpathExpression = attributeValue.substring(openingIndex + 1, closingIndex);
 
-            final String result = xformsControls.getContainingDocument().getEvaluator().evaluateAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
-                    xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), null, xformsControls.getFunctionLibrary(), null);
+            final String result = XPathCache.evaluateAsString(pipelineContext, contextNode,
+                    xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null);
 
             sb.append(result);
             startIndex = closingIndex + 1;

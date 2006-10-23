@@ -66,7 +66,7 @@
                                  ref="instance('main-instance')//dmv:vehicle-address//*[not(*) and . != '']"/>
             </xforms:action>
 
-            <!-- Main XForms instance provided by the page model -->
+            <!-- Main XForms instance -->
             <xforms:instance id="main-instance" src="oxf:/examples/forms/schema/template-form.xml"/>
 
             <xforms:bind nodeset="instance('main-instance')">
@@ -104,14 +104,14 @@
             <!-- Instance containing the page parameters -->
             <xforms:instance id="parameters-instance" src="input:instance"/>
 
-            <!-- XForms instance containing the XML schema -->
+            <!-- XForms instance containing the XML schema (for enumerations) -->
             <xforms:instance id="schema-instance" src="oxf:/examples/forms/schema/dmv-schema.xsd"/>
 
             <!-- XForms instance containing template for mailing address -->
-            <xforms:instance id="mailing-address-template-instance" src="oxf:/examples/forms/schema/template-mailing-address.xml"/>
+            <xforms:instance id="mailing-address-template" src="oxf:/examples/forms/schema/template-mailing-address.xml"/>
 
             <!-- XForms instance containing template for vehicle address -->
-            <xforms:instance id="vehicle-address-template-instance" src="oxf:/examples/forms/schema/template-vehicle-address.xml"/>
+            <xforms:instance id="vehicle-address-template" src="oxf:/examples/forms/schema/template-vehicle-address.xml"/>
 
             <!-- XForms instance for widget control information -->
             <xforms:instance id="control-instance">
@@ -310,6 +310,7 @@
                         <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
                     </xforms:action>
 
+                    <!-- Start form-specific controls -->
                     <xforms:group ref="dmv:personal-information">
                         <tr>
                             <th class="dmv-heading-column">
@@ -484,7 +485,7 @@
                                             <xforms:group ref="instance('control-instance')/add-mailing-address-trigger" >
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="instance('main-instance')//dmv:address-information/dmv:address" at="last()" position="after"
-                                                            origin="instance('mailing-address-template-instance')"/>
+                                                            origin="instance('mailing-address-template')"/>
                                                 </xforms:action>
                                                 <xforms:trigger appearance="xxforms:image">
                                                     <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-mailing-address"/>
@@ -710,7 +711,7 @@
                                             <xforms:group ref="instance('control-instance')/add-vehicle-address-trigger">
                                                 <xforms:action ev:event="DOMActivate">
                                                     <xforms:insert nodeset="instance('main-instance')//dmv:vehicle-information/dmv:leased-vehicles" at="last()" position="after"
-                                                            origin="instance('vehicle-address-template-instance')"/>
+                                                            origin="instance('vehicle-address-template')"/>
                                                 </xforms:action>
                                                 <xforms:trigger appearance="xxforms:image">
                                                     <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-vehicle-address"/>
@@ -832,6 +833,7 @@
                                 </table>
                             </td>
                         </tr>
+                        <!-- End form-specific controls -->
                     </xforms:group>
                 </xforms:group>
             </table>

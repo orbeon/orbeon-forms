@@ -251,11 +251,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Evaluate AVTs
                 // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
-                resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtAction);
-                resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsUsername);
-                resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls, submissionElement, avtXXFormsPassword);
+                resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtAction);
+                resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtXXFormsUsername);
+                resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtXXFormsPassword);
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+
+                // TODO: Somewhere around here, check flags and doRecalculate() if needed
 
                 final Document initialDocumentToSubmit;
                 if (!isDeferredSubmissionSecondPass) {
@@ -405,6 +407,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("form-data-post")) {
                         // TODO
+
+//                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
+
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("urlencoded-post")) {
 

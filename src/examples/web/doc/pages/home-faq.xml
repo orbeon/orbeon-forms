@@ -23,12 +23,14 @@
         <title>Orbeon PresentationServer (OPS) and Orbeon Studio FAQ</title>
     </header>
     <body>
+        <a name="introduction"/>
         <section>
             <title>Introduction</title>
             <p>
                 This FAQ answsers technical questions about Orbeon Presentation Server (OPS) and the OPS XForms engine.
             </p>
         </section>
+        <a name="general"/>
         <section>
             <title>General Orbeon PresentationServer FAQ</title>
             <a name="what-is"/>
@@ -84,6 +86,7 @@
             </section>
             -->
         </section>
+        <a name="xforms"/>
         <section>
             <title>XForms FAQ</title>
             <a name="xforms"/>
@@ -347,6 +350,7 @@
                 </p>
             </section>
         </section>
+        <a name="xpl"/>
         <section>
             <title>XML pipelines (XPL) FAQ</title>
             <a name="xml-pipeline"/>
@@ -659,8 +663,27 @@
                 </p>
             </section>
         </section>
+        <a name="other"/>
         <section>
             <title>Other Orbeon PresentationServer FAQ</title>
+            <a name="ie-cannot-find-server"/>
+            <section added="2006-10-24">
+                <title>Why am I getting an error page "Cannot find server or DNS server error" on IE only?</title>
+                <p>
+                    If you get the white IE error page with the message "Cannot find server or DNS server error" when
+                    navigating to another page, it most likely means that the length of the URL for that page exceeds
+                    the limit imposed by IE. This can happen if you are passing an XForms instance from one page to
+                    another with a redirect. The solution often involves changing in your <code>properties.xml</code>
+                    the value of the <code>instance-passing</code> property for the processor
+                    <code>oxf:page-flow</code> from <code>redirect</code> to <code>forward</code>.
+                </p>
+                <p>
+                    The <code>instance-passing</code> can be defined at application level in
+                    <code>properties.xml</code>, the page flow level, or the <code>&lt;result></code> element level. See
+                    the changes in version 2.5 for <a href="home-changes-25#instance-passing">more information about
+                    <code>instance-passing</code></a>.
+                </p>
+            </section>
             <a name="illgal-html-character"/>
             <section added="2006-06-16">
                 <title>Why am I getting an "Illegal HTML character" exception?</title>

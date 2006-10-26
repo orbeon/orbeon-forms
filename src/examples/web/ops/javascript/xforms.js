@@ -82,6 +82,7 @@ ORBEON.xforms.Globals = {
     autosizeTextareas: [],               // Ids of the autosize textareas on the page
     fckEditorLoading: false,             // True if  a FCK editor is currently loading
     fckEditorsToLoad: [],                // Queue of FCK editor to load
+    dialogs: {},                         // Map for dialogs: id -> YUI dialog object
     debugDiv: null,                      // Points to the div when debug messages are displayed
     debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
     pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
@@ -987,7 +988,8 @@ ORBEON.xforms.Init = {
             "textarea": {
                 "{http://orbeon.org/oxf/xml/xforms}autosize": ORBEON.xforms.Init._widetextArea,
                 "text/html": ORBEON.xforms.Init._htmlArea
-            }
+            },
+            "dialog": { "": ORBEON.xforms.Init._dialog}
         };
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
@@ -1380,6 +1382,25 @@ ORBEON.xforms.Init = {
             }
         }
         ORBEON.xforms.Globals.serverValue[list.id] = value;
+    },
+
+    /**
+     * Initialize dialogs
+     */
+    _dialog: function(dialog) {
+        var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
+        var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close");
+        var yuiDialog = new YAHOO.widget.Dialog("myDialog", {
+            modal: isModal,
+            close: hasClose,
+            visible: false,
+            draggable: true,
+            fixedcenter: true,
+            constraintoviewport: true,
+            underlay: "shadow"
+        });
+        yuiDialog.render();
+        ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
 };
 
@@ -2656,21 +2677,29 @@ function xformsHandleResponse(o) {
                                     var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
                                     var visibile = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
 
-                                    var caseBeginId = "xforms-case-begin-" + controlId;
-                                    var caseBegin = document.getElementById(caseBeginId);
-                                    var caseBeginParent = caseBegin.parentNode;
-                                    var foundCaseBegin = false;
-                                    for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
-                                        var cursor = caseBeginParent.childNodes[childId];
-                                        if (!foundCaseBegin) {
-                                            if (cursor.id == caseBegin.id) foundCaseBegin = true;
-                                            else continue;
+                                    var dialog = ORBEON.xforms.Globals.dialogs[controlId];
+                                    if (dialog == null) {
+                                        // This is a case, not a dialog
+                                        var caseBeginId = "xforms-case-begin-" + controlId;
+                                        var caseBegin = document.getElementById(caseBeginId);
+                                        var caseBeginParent = caseBegin.parentNode;
+                                        var foundCaseBegin = false;
+                                        for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
+                                            var cursor = caseBeginParent.childNodes[childId];
+                                            if (!foundCaseBegin) {
+                                                if (cursor.id == caseBegin.id) foundCaseBegin = true;
+                                                else continue;
+                                            }
+                                            if (cursor.nodeType == ELEMENT_TYPE) {
+                                                if (cursor.id == "xforms-case-end-" + controlId) break;
+                                                ORBEON.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
+                                                ORBEON.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
+                                            }
                                         }
-                                        if (cursor.nodeType == ELEMENT_TYPE) {
-                                            if (cursor.id == "xforms-case-end-" + controlId) break;
-                                            ORBEON.util.Dom.addClass(cursor, visibile ? "xforms-case-selected" : "xforms-case-deselected");
-                                            ORBEON.util.Dom.removeClass(cursor, visibile ? "xforms-case-deselected" : "xforms-case-selected");
-                                        }
+                                    } else {
+                                        // This is a dialog
+                                        if (visibile) dialog.show();
+                                        else dialog.hide();
                                     }
                                 }
                             }

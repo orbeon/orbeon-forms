@@ -140,17 +140,54 @@
                     extensions such as new widgets (autocomplete, tree, menu, etc.).
                 </p>
             </section>
+            <a name="xforms-browsers"/>
+            <section added="2006-10-27">
+                <title>I hear that XForms is not well supported in web browser. This is a problem, right?</title>
+                <p>
+                    No, this is not a problem at all, because XForms can run on the server, in the same way that other
+                    web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
+                </p>
+                <p>
+                    You run XForms on the server by installing the OPS XForms engine on your server. The XForms engine
+                    translates your XForms pages to HTML, CSS and JavaScript that your browser understands. Your web
+                    browser sees a regular Ajax application, but as a developer you write standard XForms instead of
+                    JavaScript!
+                </p>
+                <p>
+                    Running XForms on the server has even several benefits over running it in the client:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Users don't have to upgrade their web browser or install plugins or extensions. You can use
+                            and develop with XForms today and target over 90% of the users on the web.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The data used by your XForms application remains safely on the server. With client-side
+                            implementations, on the other hand, you have to be very careful not to send confidential
+                            information to the XForms engine, as that information may be seen by the user.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You can upgrade your XForms implementation at a single location on your server instead of
+                            waiting for users ot upgrade their browsers when bugs are fixed or new features are
+                            implemented.
+                        </p>
+                    </li>
+                </ul>
+            </section>
             <a name="xforms-server-side"/>
             <section added="2006-01-10">
                 <title>What is a server-side XForms implementation?</title>
                 <p>
-                    The XForms specification assumes that XForms is implemented on the client-side, that is natively
-                    within a web browser. Until XForms becomes standard on mainstream browsers, XForms-based
-                    applications can use server-side implementations (that delegate a good part of the XForms processing
-                    to server-side code), or hybrid implementations, that share XForms processing between server-side
-                    code and client-side code and rely on Ajax technology. Orbeon PresentationServer features such an
-                    Ajax-based implementation. We believe that Ajax-based implementations is the best possible migration
-                    path towards XForms.
+                    Historically, the XForms specification assumed that XForms was implemented on the client-side,
+                    natively within a web browser. But as discussed <a href="#xforms-browsers">here</a>, XForms-based
+                    applications can use server-side or hybrid implementations that share XForms processing between
+                    server-side code and client-side code and rely on Ajax technology. Orbeon PresentationServer
+                    features such an Ajax-based implementation.
                 </p>
                 <p>
                     A server-side implementation of XForms translates your forms described in terms of the XForms
@@ -162,8 +199,8 @@
                     <div class="legend">Ajax-Based XForms</div>
                 </div>
                 <p>
-                    For more information about server-side XForms, we refer you to these articles we presented at the
-                    XTech 2005 and XTech 2006 conferences:
+                    For more information, we refer you to these articles we presented at the XTech 2005 and XTech 2006
+                    conferences:
                 </p>
                 <ul>
                     <li>
@@ -451,6 +488,11 @@
                     group will certainly not be exactly XPL, we do hope that in its first version it
                     will cover a significant number of use cases currently covered by the XPL
                     implementation found in Orbeon PresentationServer.
+                </p>
+                <p>
+                    As of September 2006, the XML Processing Model Working Group (of which Orbeon is a member) has
+                    released a <a href="http://www.w3.org/TR/2006/WD-xproc-20060928/">first public draft</a> of the
+                    XProc XML Pipeline Language.
                 </p>
             </section>
             <a name="xpl-impl"/>

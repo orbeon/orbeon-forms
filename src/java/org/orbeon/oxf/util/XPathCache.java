@@ -163,14 +163,33 @@ public class XPathCache {
             // Find pool from cache
             final Long validity = new Long(0);
             final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME);
-            String cacheKeyString = xpathExpressionString;
+            final StringBuffer cacheKeyString = new StringBuffer(xpathExpressionString);
             {
-                if (functionLibrary != null)// This is ok
-                    cacheKeyString = cacheKeyString + functionLibrary.hashCode();
+                if (functionLibrary != null) {// This is ok
+                    cacheKeyString.append('|');
+                    cacheKeyString.append(functionLibrary.hashCode());
+                }
+            }
+            {
+                // NOTE: It is not clear whether we actually need to cache the expression with a key that depends on
+                // the namespace context. The question is whether XPath "compilation" depends on that context. But it is
+                // safe to do so functionally, while not always optimal in memory as you may cache several times the
+                // same expression, except for the namespace context. If we do not cache per the namespace context, then
+                // we need to restore the namespace context before using the expression.
+                if (prefixToURIMap != null) {
+                    // NOTE: Should we sort keys here, or will we always get a consistent order if we use HashMap() anyway?
+                    for (Iterator i = prefixToURIMap.entrySet().iterator(); i.hasNext();) {
+                        final Map.Entry currentEntry = (Map.Entry) i.next();
+                        cacheKeyString.append('|');
+                        cacheKeyString.append(currentEntry.getKey());
+                        cacheKeyString.append('=');
+                        cacheKeyString.append(currentEntry.getValue());
+                    }
+                }
             }
 
             // Get or create pool
-            final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString);
+            final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString());
             ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
             if (pool == null) {
                 pool = createXPathPool(xpathExpressionString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
@@ -268,7 +287,7 @@ public class XPathCache {
                 }
             }
 
-            // Declare variables
+            // Declare variables (we don't use the values here, just the names)
             final Map variables = new HashMap();
             if (variableToValueMap != null) {
                 for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {

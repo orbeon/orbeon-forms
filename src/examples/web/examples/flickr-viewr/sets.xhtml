@@ -27,123 +27,25 @@
         <xhtml:title>XForms Flickr Viewer</xhtml:title>
         <xforms:model>
 
-            <xforms:send submission="list-albums-submission" ev:event="xforms-ready"/>
+            <xforms:action ev:event="xforms-ready">
+                <xforms:setvalue ref="xxforms:instance('photosets-getList-query')/user_id" value="instance('parameters-instance')/user_id"/>
+                <xforms:send submission="photosets-getList-submission"/>
+            </xforms:action>
 
-            <xforms:instance id="query">
+            <xforms:instance id="parameters-instance">
                 <xi:include href="input:instance"/>
             </xforms:instance>
-            
-            <xforms:instance id="response">
-                <rsp stat="ok">
-                    <photosets cancreate="1">
-                        <photoset id="5" primary="2483" secret="abcdef"
-                                  server="8" photos="4">
-                            <title>Test</title>
-                            <description>foo</description>
-                        </photoset>
-                        <photoset id="4" primary="1234" secret="832659"
-                                  server="3" photos="12">
-                            <title>My Set</title>
-                            <description>bar</description>
-                        </photoset>
-                    </photosets>
-                </rsp>
+
+            <xforms:instance id="control-instance">
+                <control>
+                    <selected/>
+                    <sort-order>ascending</sort-order>
+                </control>
             </xforms:instance>
-
-            <xforms:submission ref="instance('query')" id="list-albums-submission"
-                               method="get" action="http://api.flickr.com/services/rest/"
-                               replace="instance" instance="response" separator="&amp;">
-
-                <!--<xforms:action ev:event="xforms-submit-done" while="instance('response')/photosets/photoset[not(size)]">-->
-                    <!--<xforms:setvalue ref="instance('photo-get-sizes-query')/photo_id"-->
-                                     <!--value="instance('response')/photosets/photoset[not(size)][1]/@primary"/>-->
-                    <!--<xforms:send submission="photo-get-sizes-submission"/>-->
-                    <!--<xforms:insert context="instance('response')/photosets/photoset[not(size)][1]" nodeset="*"-->
-                                   <!--origin="instance('photo-get-sizes-response')/sizes/size[@label = 'Thumbnail']"/>-->
-                <!--</xforms:action>-->
-
-            </xforms:submission>
-
-            <xforms:instance id="photo-get-info-query">
-                <query>
-                    <method>flickr.photos.getInfo</method>
-                    <api_key>4dbabf4e2dbdb812e99a34838e6705dd</api_key>
-                    <photo_id/>
-                </query>
-            </xforms:instance>
-
-            <xforms:instance id="photo-get-info-response">
-                <rsp stat="ok">
-                    <photo id="2733" secret="123456" server="12"
-                           isfavorite="0" license="3" rotation="90" originalformat="png">
-                        <owner nsid="12037949754@N01" username="Bees"
-                               realname="Cal Henderson" location="Bedford, UK"/>
-                        <title>orford_castle_taster</title>
-                        <description>hello!</description>
-                        <visibility ispublic="1" isfriend="0" isfamily="0"/>
-                        <dates posted="1100897479" taken="2004-11-19 12:51:19"
-                               takengranularity="0" lastupdate="1093022469"/>
-                        <permissions permcomment="3" permaddmeta="2"/>
-                        <editability cancomment="1" canaddmeta="1"/>
-                        <comments>1</comments>
-                        <notes>
-                            <note id="313" author="12037949754@N01"
-                                  authorname="Bees" x="10" y="10"
-                                  w="50" h="50">foo
-                            </note>
-                        </notes>
-                        <tags>
-                            <tag id="1234" author="12037949754@N01" raw="woo yay">wooyay</tag>
-                            <tag id="1235" author="12037949754@N01" raw="hoopla">hoopla</tag>
-                        </tags>
-                        <urls>
-                            <url type="photopage">http://www.flickr.com/photos/bees/2733/</url>
-                        </urls>
-                    </photo>
-                </rsp>
-            </xforms:instance>
-
-            <xforms:submission ref="instance('photo-get-info-query')" id="photo-get-info-submission"
-                               method="get" action="http://api.flickr.com/services/rest/"
-                               replace="instance" instance="photo-get-info-response" separator="&amp;">
-            </xforms:submission>
-
-            <xforms:instance id="photo-get-sizes-query">
-                <query>
-                    <method>flickr.photos.getSizes</method>
-                    <api_key>4dbabf4e2dbdb812e99a34838e6705dd</api_key>
-                    <photo_id/>
-                </query>
-            </xforms:instance>
-
-            <xforms:instance id="photo-get-sizes-response">
-                <rsp stat="ok">
-                    <sizes>
-                        <size label="Square" width="75" height="75"
-                            source="http://www.flickr.com/photos/2836_12037949754@N01_s.jpg"
-                            url="http://www.flickr.com/photo_zoom.gne?id=2836&amp;size=sq" />
-                        <size label="Thumbnail" width="100" height="75"
-                            source="http://www.flickr.com/photos/2836_12037949754@N01_t.jpg"
-                            url="http://www.flickr.com/photo_zoom.gne?id=2836&amp;size=t" />
-                        <size label="Small" width="240" height="180"
-                            source="http://www.flickr.com/photos/2836_12037949754@N01_m.jpg"
-                            url="http://www.flickr.com/photo_zoom.gne?id=2836&amp;size=s" />
-                        <size label="Medium" width="500" height="375"
-                            source="http://www.flickr.com/photos/2836_12037949754@N01.jpg"
-                            url="http://www.flickr.com/photo_zoom.gne?id=2836&amp;size=m" />
-                        <size label="Original" width="640" height="480"
-                            source="http://www.flickr.com/photos/2836_12037949754@N01_o.jpg"
-                            url="http://www.flickr.com/photo_zoom.gne?id=2836&amp;size=o" />
-                    </sizes>
-                </rsp>
-            </xforms:instance>
-
-            <xforms:submission ref="instance('photo-get-sizes-query')" id="photo-get-sizes-submission"
-                               method="get" action="http://api.flickr.com/services/rest/"
-                               replace="instance" instance="photo-get-sizes-response" separator="&amp;">
-            </xforms:submission>
 
         </xforms:model>
+        <!-- Include Flickr API model -->
+        <xi:include href="oxf:/examples/flickr-viewr/flickr-api-model.xml" xxi:omit-xml-base="true"/>
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background: none; }
             .set-info { float: left; margin: .5em; padding: .5em; background: #ddd; height: 160px; width: 120px; overflow: hidden; text-align: center }
@@ -154,7 +56,32 @@
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="instance('response')/photosets/photoset">
+
+        <!--<xforms:select1 ref="xxforms:instance('control-instance')/sort-order">-->
+            <!--<xforms:label>Sort order</xforms:label>-->
+            <!--<xforms:item>-->
+                <!--<xforms:label>Ascending</xforms:label>-->
+                <!--<xforms:value>ascending</xforms:value>-->
+            <!--</xforms:item>-->
+            <!--<xforms:item>-->
+                <!--<xforms:label>Descending</xforms:label>-->
+                <!--<xforms:value>descending</xforms:value>-->
+            <!--</xforms:item>-->
+        <!--</xforms:select1>-->
+
+        <!--<xforms:trigger>-->
+            <!--<xforms:label>Order Sets by Date</xforms:label>-->
+            <!--<xforms:action ev:event="DOMActivate">-->
+                <!--<xforms:setvalue ref="instance('photosets-orderSets-query')/photoset_ids"-->
+                                 <!--value="string-join(for $photoset in exforms:sort(instance('photosets-getList-response')/photosets/photoset, '@datetaken', 'text', xxforms:instance('control-instance')/sort-order) return $photo/@id, ',')"/>-->
+                <!--<xforms:setvalue ref="instance('photosets-editPhotos-query')/primary_photo_id"-->
+                                 <!--value="instance('photosets-getInfo-response')/photoset/@primary"/>-->
+                <!--<xforms:send submission="photosets-editPhotos-submission"/>-->
+                <!--<xforms:send submission="photosets-getPhotos-submission"/>-->
+            <!--</xforms:action>-->
+        <!--</xforms:trigger>-->
+
+        <xforms:repeat model="flickr-api-model" nodeset="instance('photosets-getList-response')/photosets/photoset">
             <!--<xforms:message level="modal" ev:event="DOMActivate">Test</xforms:message>-->
             <xhtml:div class="set-info">
                 <!--<xforms:group ref="description[normalize-space(.) != '']">-->

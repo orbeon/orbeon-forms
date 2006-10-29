@@ -12,6 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -30,7 +31,6 @@
     <xforms:instance id="session-auth-instance" src="/flickr-viewr/service/authentication"/>
 
     <!-- flickr.photos.setMeta -->
-
     <xforms:instance id="photos-setMeta-query">
         <query>
             <api_key/>
@@ -60,8 +60,36 @@
         </xforms:action>
     </xforms:submission>
 
-    <!-- flickr.photos.getInfo -->
+    <!-- flickr.photos.addTags -->
+    <xforms:instance id="photos-addTags-query">
+        <query>
+            <api_key/>
+            <auth_token/>
+            <method>flickr.photos.addTags</method>
+            <photo_id/>
+            <tags/>
+            <api_sig/>
+        </query>
+    </xforms:instance>
 
+    <xforms:bind nodeset="instance('photos-addTags-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+    <xforms:bind nodeset="instance('photos-addTags-query')/auth_token" calculate="instance('session-auth-instance')/token"/>
+
+    <xforms:instance id="photos-addTags-response">
+        <rsp stat="ok"/>
+    </xforms:instance>
+
+    <xforms:submission id="photos-addTags-submission" ref="instance('photos-addTags-query')" method="urlencoded-post"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photos-addTags-response">
+        <xforms:action ev:event="xforms-submit">
+            <xforms:recalculate/>
+            <xforms:setvalue ref="instance('signature-instance')" value="'photos-addTags-query'"/>
+            <xforms:dispatch target="flickr-api-model" name="flickr-viewer-sign"/>
+        </xforms:action>
+    </xforms:submission>
+
+    <!-- flickr.photos.getInfo -->
     <xforms:instance id="photos-getInfo-query">
         <query>
             <api_key/>
@@ -108,7 +136,6 @@
                        replace="instance" instance="photos-getInfo-response"/>
 
     <!-- flickr.photosets.getInfo -->
-
     <xforms:instance id="photosets-getInfo-query">
         <query>
             <api_key/>
@@ -133,7 +160,6 @@
                        replace="instance" instance="photosets-getInfo-response"/>
 
     <!-- flickr.photosets.getPhotos -->
-
     <xforms:instance id="photosets-getPhotos-query">
         <query>
             <api_key/>
@@ -157,13 +183,92 @@
             </photoset>
         </rsp>
     </xforms:instance>
+    <xforms:bind nodeset="instance('photosets-getPhotos-response')//@datetaken"
+                 calculate="if (substring(., 11, 1) = ' ') then replace(., ' ', 'T') else ." type="xs:dateTime"/>
 
     <xforms:submission id="photosets-getPhotos-submission" ref="instance('photosets-getPhotos-query')" method="get"
                        action="http://api.flickr.com/services/rest/" separator="&amp;"
                        replace="instance" instance="photosets-getPhotos-response"/>
 
-    <!-- flickr.auth.getFrob -->
+    <!-- flickr.photosets.editPhotos -->
+    <xforms:instance id="photosets-editPhotos-query">
+        <query>
+            <api_key/>
+            <auth_token/>
+            <method>flickr.photosets.editPhotos</method>
+            <photo_ids/>
+            <photoset_id/>
+            <primary_photo_id/>
+            <api_sig/>
+        </query>
+    </xforms:instance>
 
+    <xforms:bind nodeset="instance('photosets-editPhotos-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+    <xforms:bind nodeset="instance('photosets-editPhotos-query')/auth_token" calculate="instance('session-auth-instance')/token"/>
+
+    <xforms:instance id="photosets-editPhotos-response">
+        <rsp stat="ok"/>
+    </xforms:instance>
+
+    <xforms:submission id="photosets-editPhotos-submission" ref="instance('photosets-editPhotos-query')" method="urlencoded-post"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photosets-editPhotos-response">
+        <xforms:action ev:event="xforms-submit">
+            <xforms:recalculate/>
+            <xforms:setvalue ref="instance('signature-instance')" value="'photosets-editPhotos-query'"/>
+            <xforms:dispatch target="flickr-api-model" name="flickr-viewer-sign"/>
+        </xforms:action>
+    </xforms:submission>
+
+    <!-- flickr.photosets.orderSets -->
+    <xforms:instance id="photosets-orderSets-query">
+        <query>
+            <api_key/>
+            <auth_token/>
+            <method>flickr.photosets.orderSets</method>
+            <photoset_ids/>
+            <api_sig/>
+        </query>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('photosets-orderSets-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+    <xforms:bind nodeset="instance('photosets-orderSets-query')/auth_token" calculate="instance('session-auth-instance')/token"/>
+
+    <xforms:instance id="photosets-orderSets-response">
+        <rsp stat="ok"/>
+    </xforms:instance>
+
+    <xforms:submission id="photosets-orderSets-submission" ref="instance('photosets-orderSets-query')" method="urlencoded-post"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photosets-orderSets-response">
+        <xforms:action ev:event="xforms-submit">
+            <xforms:recalculate/>
+            <xforms:setvalue ref="instance('signature-instance')" value="'photosets-orderSets-query'"/>
+            <xforms:dispatch target="flickr-api-model" name="flickr-viewer-sign"/>
+        </xforms:action>
+    </xforms:submission>
+
+    <!-- flickr.photosets.getList -->
+    <xforms:instance id="photosets-getList-query">
+        <query>
+            <api_key/>
+            <method>flickr.photosets.getList</method>
+            <user_id/>
+        </query>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('photosets-getList-query')/api_key" calculate="instance('api-key-instance')/api_key"/>
+
+    <xforms:instance id="photosets-getList-response">
+        <rsp stat="ok"/>
+    </xforms:instance>
+
+    <xforms:submission id="photosets-getList-submission" ref="instance('photosets-getList-query')" method="urlencoded-post"
+                       action="http://api.flickr.com/services/rest/" separator="&amp;"
+                       replace="instance" instance="photosets-getList-response">
+    </xforms:submission>
+
+    <!-- flickr.auth.getFrob -->
     <xforms:instance id="auth-getFrob-query">
         <query>
             <api_key/>
@@ -190,7 +295,6 @@
     </xforms:submission>
 
     <!-- flickr.auth.getToken -->
-
     <xforms:instance id="auth-getToken-query">
         <query>
             <api_key/>

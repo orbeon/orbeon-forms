@@ -17,6 +17,7 @@
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exforms="http://www.exforms.org/exf/1-0"
             xmlns:env="http://www.w3.org/2003/05/soap-envelope"
             xmlns:orbeon="http://www.orbeon.com/"
             xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -52,6 +53,13 @@
                 <xi:include href="input:instance"/>
             </xforms:instance>
 
+            <xforms:instance id="control-instance">
+                <control>
+                    <selected/>
+                    <sort-order>ascending</sort-order>
+                </control>
+            </xforms:instance>
+
             <xforms:action ev:event="get-one-photo-info" if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
                 <xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>
                 <xforms:send submission="photos-getInfo-submission"/>
@@ -67,14 +75,14 @@
 
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background: none; }
-            .photo-info { float: left; margin: .2em; padding: .2em; background: #ddd; height: 340px; width: 260px; overflow: hidden; text-align: center }
+            .photo-info { float: left; margin: .2em; padding: .2em; background: #ddd; height: 400px; width: 260px; overflow: hidden; text-align: center }
             .photo-image { width: 250px; height: 250px; margin-left: auto; padding: 5px; background: white; margin-right: auto; display: block }
-            .photo-image img { margin: 0px; border: 0px }
+            .photo-image img { margin: 0px; border: 2px solid orange }
             <!--.set-title { font-weight: bold; font-size: 90%; margin-top: 0.5em; display: block }-->
-            .xforms-label { font-weight: bold; margin-right: 1em }
             .photo-details { font-size: 90%; text-align: left; display: block; margin-top: 1em }
-            .photo-details .xforms-label { width: 8em }
-            .photo-details input { font-size: 90%; width: auto}
+            .photo-details table { padding: 0; margin: 0; border: none }
+            .photo-details .xforms-label { font-weight: bold; margin-right: 1em; display: inline-block; display: -moz-inline-box; width: 60px; font-size: 90% }
+            .photo-details .xforms-input input { width: 150px; font-size: 90%  }
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
@@ -93,6 +101,51 @@
                 <xforms:output model="flickr-api-model" ref="description">
                     <xforms:label>Set description:</xforms:label>
                 </xforms:output>
+                <xhtml:br/>
+                <xforms:output model="flickr-api-model" value="string-join(distinct-values(instance('photosets-getPhotos-response')/photoset/photo/photo/tags/tag/@raw), ', ')">
+                    <xforms:label>All tags:</xforms:label>
+                </xforms:output>
+                <xhtml:br/>
+                <!--<xforms:output value="concat('[', xxforms:instance('control-instance')/selected, ']')">-->
+                    <!--<xforms:label>Test:</xforms:label>-->
+                <!--</xforms:output>-->
+                <!--<xhtml:br/>-->
+                <!--<xforms:output value="string-join(tokenize(xxforms:instance('control-instance')/selected, '\s+'), ' | ')">-->
+                    <!--<xforms:label>Test:</xforms:label>-->
+                <!--</xforms:output>-->
+                <!--<xhtml:br/>-->
+                <!--<xforms:output value="string-join(for $i in tokenize(xxforms:instance('control-instance')/selected, '\s+') return string(string-length($i)), ' | ')">-->
+                    <!--<xforms:label>Test:</xforms:label>-->
+                <!--</xforms:output>-->
+                <!--<xforms:output value="instance('photosets-editPhotos-query')/photo_ids">-->
+                    <!--<xforms:label>Test:</xforms:label>-->
+                <!--</xforms:output>-->
+
+                <xforms:select1 ref="xxforms:instance('control-instance')/sort-order">
+                    <xforms:label>Sort order</xforms:label>
+                    <xforms:item>
+                        <xforms:label>Ascending</xforms:label>
+                        <xforms:value>ascending</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>Descending</xforms:label>
+                        <xforms:value>descending</xforms:value>
+                    </xforms:item>
+                </xforms:select1>
+
+                <xforms:trigger>
+                    <xforms:label>Order Images Date</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref="instance('photosets-editPhotos-query')/photoset_id"
+                                         value="instance('photosets-getInfo-response')/photoset/@id"/>
+                        <xforms:setvalue ref="instance('photosets-editPhotos-query')/photo_ids"
+                                         value="string-join(for $photo in exforms:sort(instance('photosets-getPhotos-response')/photoset/photo, '@datetaken', 'text', xxforms:instance('control-instance')/sort-order) return $photo/@id, ',')"/>
+                        <xforms:setvalue ref="instance('photosets-editPhotos-query')/primary_photo_id"
+                                         value="instance('photosets-getInfo-response')/photoset/@primary"/>
+                        <xforms:send submission="photosets-editPhotos-submission"/>
+                        <xforms:send submission="photosets-getPhotos-submission"/>
+                    </xforms:action>
+                </xforms:trigger>
             </xhtml:p>
         </xforms:group>
 
@@ -116,17 +169,54 @@
                         <xforms:setvalue ref="instance('photos-setMeta-query')/description" value="xxforms:repeat-current('photo-repeat')/photo/description"/>
                         <xforms:send submission="photos-setMeta-submission"/>
                     </xforms:action>
-                    <xforms:input class="set-title" ref="@title">
-                        <xforms:label>Title:</xforms:label>
-                    </xforms:input>
-                    <xhtml:br/>
-                    <xforms:input class="set-description" ref="photo/description">
-                        <xforms:label>Description:</xforms:label>
-                    </xforms:input>
-                    <xhtml:br/>
-                    <xforms:output class="set-tags" value="string-join(photo/tags/tag, ' ')">
-                        <xforms:label>Tags:</xforms:label>
-                    </xforms:output>
+                    <xhtml:table>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output class="set-title" ref="@datetaken">
+                                    <xforms:label>Date:</xforms:label>
+                                </xforms:output>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input class="set-title" ref="@title">
+                                    <xforms:label>Title:</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input class="set-description" ref="photo/description">
+                                    <xforms:label>Description:</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:output class="set-tags" value="if (photo/tags/tag) then string-join(photo/tags/tag, ', ') else '(none)'">
+                                    <xforms:label>Tags:</xforms:label>
+                                </xforms:output>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:trigger ref=".[not(tokenize(xxforms:instance('control-instance')/selected, '\s+') = xxforms:repeat-current('photo-repeat')/@id)]">
+                                    <xforms:label>Select</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="xxforms:instance('control-instance')/selected"
+                                                         value="concat(., if (string-length(.) gt 0) then ' ' else '', xxforms:repeat-current('photo-repeat')/@id)"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                <xforms:trigger ref=".[tokenize(xxforms:instance('control-instance')/selected, '\s+') = xxforms:repeat-current('photo-repeat')/@id]">
+                                    <xforms:label>Deselect</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="xxforms:instance('control-instance')/selected"
+                                                         value="string-join(remove(tokenize(., '\s+'), index-of(tokenize(., '\s+'), xxforms:repeat-current('photo-repeat')/@id)), ' ')"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xhtml:table>
                 </xforms:group>
                 <!--<xforms:output class="set-photos" value="concat('(', @photos, ' photos)')"/>-->
             </xhtml:div>

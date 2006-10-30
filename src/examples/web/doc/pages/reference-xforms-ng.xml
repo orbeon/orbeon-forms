@@ -3034,8 +3034,17 @@
                         </li>
                     </ul>
                     <p>
-                        eXForms functions live in the <code>http://www.exforms.org/exf/1-0</code>
-                        namespace, usually bound to the prefix <code>exf</code>.
+                        OPS also supports the following from the <a href="http://exforms.org/sorting.html">sorting
+                        module</a>:
+                    </p>
+                    <ul>
+                        <li>
+                            <p><code>exf:sort()</code></p>
+                        </li>
+                    </ul>
+                    <p>
+                        eXForms functions live in the <code>http://www.exforms.org/exf/1-0</code> namespace, usually
+                        bound to the prefix <code>exf</code> or <code>exforms</code>.
                     </p>
                 </section>
             </section>

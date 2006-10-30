@@ -278,6 +278,14 @@
                     </li>
                     <li>
                         <p>
+                            <b><code>exforms:sort()</code> extension function.</b> The <a
+                            href="reference-xforms-ng#exforms-sort"><code>exforms:sort()</code></a> function
+                            implements the <a href="http://exforms.org/sorting.html">eXforms proposal's</a> sorting
+                            function.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b><code>xxforms:context()</code> extension function.</b> The <a
                             href="reference-xforms-ng#xxforms-context"><code>xxforms:context()</code></a> XPath
                             function allows you to obtain the evaluation context for an enclosing

@@ -212,8 +212,16 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
             element1 = XMLUtils.buildExplodedQName(uri, localname);
         } else if (level >= 2 && HTML_QNAME.equals(element0)) {
             // We are under /xhtml:html
-            if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-                // This is an XForms element
+            final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+            final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+            if (isXForms || isXXForms) {
+                // This is an XForms element or an extension element
+
+                if (BODY_QNAME.equals(element1) && isXXForms) {
+                    // Check that we are getting a valid xxforms:* element if used in body
+                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname) || "dialog".equals(localname)))
+                        throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
+                }
 
                 if (!inModel && !inControl && localname.equals("model") && HEAD_QNAME.equals(element1)) {
                     // Start extracting model
@@ -259,24 +267,9 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                     sendStartPrefixMappings();
                 }
 
-                if (inControl) {
-
-                    if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
-                        inLabelHintHelpAlert = true;
-                    }
-
-                    super.startElement(uri, localname, qName, attributes);
-                }
-            } else if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
-
-                if (BODY_QNAME.equals(element1)) {// NOTE: This test is a little harsh, as the user may use xxforms:* elements for examples, etc.
-                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname)))
-                        throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
-                }
-
                 if (inControl || inModel) {
 
-                    if ("script".equals(localname)) {
+                    if ("script".equals(localname) && isXXForms) {
                         if (xxformsScriptMap == null) {
                             xxformsScriptMap = new HashMap();
                             xxformsScriptStringBuffer = new StringBuffer();
@@ -286,10 +279,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
                         xxformsScriptId = attributes.getValue("id");
                         inScript = true;
                     }
+                }
 
-                    if (inControl) {
-                        super.startElement(uri, localname, qName, attributes);
+                if (inControl) {
+
+                    if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
+                        inLabelHintHelpAlert = true;
                     }
+
+                    super.startElement(uri, localname, qName, attributes);
                 }
             } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
                 // Preserve content
@@ -330,14 +328,17 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         level--;
 
+        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
+        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
+
         if (inModel) {
             super.endElement(uri, localname, qName);
-        } else if (inControl && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
+        } else if (inControl && isXForms) {
             if (localname.equals("label") || localname.equals("alert") || localname.equals("hint") || localname.equals("help")) {
                 inLabelHintHelpAlert = false;
             }
             super.endElement(uri, localname, qName);
-        } else if (inControl && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+        } else if (inControl && isXXForms) {
             super.endElement(uri, localname, qName);
         } else if (inLabelHintHelpAlert && (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) || "".equals(uri))) {
             // Preserve content

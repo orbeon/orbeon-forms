@@ -99,6 +99,11 @@ public class XFormsControlFactory {
                 return new XFormsUploadControl(containingDocument, parent, element, name, effectiveId);
             }
         });
+        nameToClassMap.put("dialog", new Factory() {
+            public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
+                return new XXFormsDialogControl(containingDocument, parent, element, name, effectiveId);
+            }
+        });
     }
 
     public static XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {

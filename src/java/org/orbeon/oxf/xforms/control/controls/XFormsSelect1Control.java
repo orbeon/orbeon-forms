@@ -73,13 +73,15 @@ public class XFormsSelect1Control extends XFormsValueControl {
                         xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null));
                         {
                             // Handle children of xforms:itemset
-                            final Element labelElement = itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                            if (labelElement == null)
-                                throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
-                            final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
-                            xformsControls.pushBinding(pipelineContext, labelElement);
-                            final String label = xformsControls.getCurrentSingleNodeValue();
-                            xformsControls.popBinding();
+                            final String label;
+                            {
+                                final Element labelElement = itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                                if (labelElement == null)
+                                    throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
+
+                                label = getChildElementValue(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                            }
+
                             final Element valueCopyElement;
                             {
                                 final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
@@ -88,14 +90,16 @@ public class XFormsSelect1Control extends XFormsValueControl {
                             }
                             if (valueCopyElement == null)
                                 throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", getLocationData());
-                            xformsControls.pushBinding(pipelineContext, valueCopyElement);
-                            {
-                                final String value = xformsControls.getCurrentSingleNodeValue();
-                                // TODO: handle xforms:copy
+
+                            final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
+                            if (valueCopyElement.getName().equals("value")) {
+                                // Handle xforms:value
+                                final String value = getChildElementValue(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
                                 if (value != null)
                                     itemsetInfos.add(new ItemsetInfo(getEffectiveId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
+                            } else {
+                                // TODO: handle xforms:copy
                             }
-                            xformsControls.popBinding();
                         }
                         xformsControls.getContextStack().pop();
                     }

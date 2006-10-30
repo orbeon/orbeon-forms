@@ -308,10 +308,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.setBinding(pipelineContext, this);
 
-        this.label = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME, false);
-        this.help = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME, true);
-        this.hint = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME, true);
-        this.alert = getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME, false);
+        this.label = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+        this.help = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true);
+        this.hint = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true);
+        this.alert = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -428,14 +428,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         }
     }
 
-    private String getChildElementValue(final PipelineContext pipelineContext, QName qName, final boolean acceptHTML) {
+    protected String getChildElementValue(final PipelineContext pipelineContext, Element childElement, final boolean acceptHTML) {
 
         // NOTE: This returns an HTML string.
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
         // Check that there is a current child element
-        final Element childElement = controlElement.element(qName);
         if (childElement == null)
             return null;
 

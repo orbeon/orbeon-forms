@@ -2482,8 +2482,9 @@ function xformsHandleResponse(o) {
                                             }
 
                                             // Populate values
-                                            if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date"))
-                                                ORBEON.util.Dom.setStringValue(displayField, displayValue == null ? "" : displayValue);
+                                            if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")) {
+                                                ORBEON.util.Dom.setStringValue(displayField, (displayValue == null || displayValue == "") ? "\u00a0" : displayValue);
+                                            }
                                             if (documentElement.value != newControlValue) {
                                                 documentElement.previousValue = newControlValue;
                                                 documentElement.valueSetByXForms++;

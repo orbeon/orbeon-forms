@@ -29,6 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class XFormsInputHandler extends XFormsValueControlHandler {
 
     private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size", "maxlength", "autocomplete" };
+    private static final String NBSP = "\u00a0";
     private Attributes elementAttributes;
 
     public XFormsInputHandler() {
@@ -83,9 +84,13 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                 if (!handlerContext.isGenerateTemplate() && isDate) {
-                    final String displayValue = xformsControl.getDisplayValueOrValue();
-                    if (displayValue != null)
-                        contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
+                    final String displayValueOrValue = xformsControl.getDisplayValueOrValue();
+                    if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
+                        contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
+                    } else {
+                        // Add an nbsp to facilitate styling
+                        contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
+                    }
                 }
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }

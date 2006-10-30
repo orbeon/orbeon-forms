@@ -3483,6 +3483,31 @@
             </section>
             -->
         </section>
+        <a name="xforms-minimal-resources"/>
+        <section>
+            <title>Minimal Resources</title>
+            <p>
+                Most JavaScript and CSS files used by the XForms engine are available in two versions:
+            </p>
+            <ul>
+                <li>
+                    <p>A full version, which may contain comments, spaces, longer identifiers, etc.</p>
+                </li>
+                <li>
+                    <p>A minimal version, which is usually much smaller</p>
+                </li>
+            </ul>
+            <p>
+                Both versions work exactly the same. For development and debugging of the XForms engine itself, the full
+                version is easier to work with. But if you never work directly with these JavaScript and CSS files, as
+                well as for deployment, the minimal versions are recommended as they will load faster in the user's web
+                browser. You enable minimal resources in <code>properties.xml</code> as follows:
+            </p>
+            <xml-source>
+                <comment> Enable minimal resources </comment>
+                <property as="xs:boolean" name="oxf.xforms.minimal-resources" value="true"/>
+            </xml-source>
+        </section>
         <a name="xforms-debugging"/>
         <section added="2006-10-21">
             <title>Debugging XForms Pages</title>

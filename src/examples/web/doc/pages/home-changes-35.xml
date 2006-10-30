@@ -71,7 +71,8 @@
                             <b>JavaScript and CSS loading.</b> JavaScript and CSS files related to particular XForms
                             controls are loaded only when necessary. In addition, the property
                             <code>oxf.xforms.minimal-resources</code> allows specifying whether "minimal" versions of
-                            those resources should be used when possible. [TODO: full documentation]
+                            those resources should be used when possible. See the <a
+                            href="reference-xforms-ng#xforms-minimal-resources">XForms reference</a> for details.
                         </p>
                     </li>
                 </ul>

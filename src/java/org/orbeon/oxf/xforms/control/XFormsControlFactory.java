@@ -86,7 +86,7 @@ public class XFormsControlFactory {
         });
         nameToClassMap.put("textarea", new Factory() {
             public XFormsControl createXFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
-                return new XFormsTextareaControl(containingDocument, parent, element, name, effectiveId);
+                return new XFormsTextarea1Control(containingDocument, parent, element, name, effectiveId);
             }
         });
         nameToClassMap.put("trigger", new Factory() {

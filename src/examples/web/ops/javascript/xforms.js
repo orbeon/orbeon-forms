@@ -17,6 +17,7 @@
  */
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
+var XFORMS_DELAY_BEFORE_ANY_REQUEST_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
@@ -963,6 +964,15 @@ ORBEON.xforms.Events = {
         var value = userObject["value"];
         ORBEON.xforms.Globals.overlayManager.hideAll();
         xformsFireEvents([xformsCreateEventArray(menu, "xxforms-value-change-with-focus-change", value)], false);
+    },
+
+    /**
+     * Event listener on dialogs called by YUI when the dialog is closed. If the dialog was closed by the user (not
+     * because the server told use to close the dialog), then we want to notify the server that this happened.
+     */
+    dialogClose: function(type, args, me) {
+        var dialogId = me;
+        console.log(dialogId);
     }
 };
 
@@ -1400,6 +1410,7 @@ ORBEON.xforms.Init = {
             underlay: "shadow"
         });
         yuiDialog.render();
+        yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
 };
@@ -1430,10 +1441,20 @@ ORBEON.xforms.Server = {
         // Fire them with a delay to give us a change to aggregate events together
         ORBEON.xforms.Globals.executeEventFunctionQueued++;
         if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS))
-            window.setTimeout(ORBEON.xforms.Server.executeNextRequest,
+                XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS)) {
+            // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
+            // if there are no other executeNextRequest() that have been added to the queue after this
+            // request.
+            window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(false); },
                 XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS);
-        else ORBEON.xforms.Server.executeNextRequest(true);
+        } else {
+            // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
+            // to be sent to the server, even if there are other executeNextRequest() queued.
+            // The small delay is here so we don't send multiple requests to the server when the
+            // browser gives us a sequence of events (e.g. focus out, change, focus in).
+            window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(true); },
+                XFORMS_DELAY_BEFORE_ANY_REQUEST_IN_MS);
+        }
         return false;
     },
 
@@ -2622,10 +2643,10 @@ function xformsHandleResponse(o) {
                                                 var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                                 if (isReadonly) {
                                                     htmlEditor.ToolbarSet.Collapse();
-                                                    // TODO
+                                                    // TO-DO
                                                 } else {
                                                     htmlEditor.ToolbarSet.Expand();
-                                                    // TODO
+                                                    // TO-DO
                                                 }
                                             } else {
                                                 // Other controls

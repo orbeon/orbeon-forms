@@ -382,7 +382,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             protected boolean isFilterElement(String uri, String localname, String qName, Attributes attributes) {
                 // We filter everything that is not a control
                 // TODO: There are some temporary exceptions, but those should actually be handled by the ControlInfo in the first place
-                return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !localname.equals("img"))
+                return (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri) && !(localname.equals("img") || localname.equals("dialog")))
                         || (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)
                             && !(XFormsControls.isActualControl(localname) || exceptionXFormsElements.get(localname) != null));
             }

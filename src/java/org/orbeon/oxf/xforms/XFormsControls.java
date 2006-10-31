@@ -75,6 +75,7 @@ public class XFormsControls {
         groupingControls.put("repeat", "");
         groupingControls.put("switch", "");
         groupingControls.put("case", "");
+        groupingControls.put("dialog", "");
 
         valueControls.put("input", "");
         valueControls.put("secret", "");

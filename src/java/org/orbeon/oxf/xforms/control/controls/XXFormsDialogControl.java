@@ -22,9 +22,26 @@ import org.dom4j.Element;
  */
 public class XXFormsDialogControl extends XFormsControl {
 
+    private String level;
+    private boolean close;
+
     public XXFormsDialogControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         super(containingDocument, parent, element, name, effectiveId);
+        this.level = element.attributeValue("level");
+        if (this.level == null)
+            this.level = "modal";
+        this.close = !"false".equals(element.attributeValue("close"));
     }
 
+    public boolean hasJavaScriptInitialization() {
+        return true;
+    }
 
+    public String getLevel() {
+        return level;
+    }
+
+    public boolean isClose() {
+        return close;
+    }
 }

@@ -38,7 +38,7 @@ public class XFormsElementContext extends XFormsControls {
     public XFormsElementContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ContentHandler contentHandler) {
 
         super(containingDocument, null, null);
-        super.initialize(pipelineContext, null, null);
+        super.initialize(pipelineContext);
 
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;

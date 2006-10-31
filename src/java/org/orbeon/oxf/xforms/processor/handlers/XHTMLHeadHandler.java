@@ -53,6 +53,11 @@ public class XHTMLHeadHandler extends HandlerBase {
                     return isMenuInUse(appearancesMap);
                 }
             },
+            new ResourceConfig("/ops/css/yui/container.css", null) {
+                public boolean isInUse(Map appearancesMap) {
+                    return isDialogInUse(appearancesMap);
+                }
+            },
             // Other standard stylesheets
             new ResourceConfig("/config/theme/xforms.css", null)
     };
@@ -106,6 +111,16 @@ public class XHTMLHeadHandler extends HandlerBase {
             new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isMenuInUse(appearancesMap);
+                }
+            },
+            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js") {
+                public boolean isInUse(Map appearancesMap) {
+                    return isDialogInUse(appearancesMap);
+                }
+            },
+            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {
+                public boolean isInUse(Map appearancesMap) {
+                    return isDialogInUse(appearancesMap);
                 }
             },
             // HTML area
@@ -372,6 +387,10 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         protected boolean isHtmlAreaInUse(Map appearancesMap) {
             return isInUse(appearancesMap, "textarea", "text/html");
+        }
+
+        protected boolean isDialogInUse(Map appearancesMap) {
+            return isInUse(appearancesMap, "dialog");
         }
     }
 }

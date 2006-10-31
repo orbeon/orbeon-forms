@@ -44,6 +44,8 @@ public class XFormsActions {
 
     // Extension actions
     public static final String XXFORMS_SCRIPT_ACTION = "script";
+    public static final String XXFORMS_SHOW_ACTION = "show";
+    public static final String XXFORMS_HIDE_ACTION = "hide";
 
     private static final Map actions = new HashMap();
 
@@ -66,6 +68,8 @@ public class XFormsActions {
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, XFORMS_SETINDEX_ACTION), new XFormsSetindexAction());
 
         actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SCRIPT_ACTION), new XXFormsScriptAction());
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_SHOW_ACTION), new XXFormsShowAction());
+        actions.put(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_HIDE_ACTION), new XXFormsHideActions());
     }
 
     /**

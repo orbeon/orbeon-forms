@@ -41,14 +41,14 @@
             </xforms:input>
             <xforms:trigger>
                 <xforms:label>Hide dialog</xforms:label>
-                <xforms:toggle case="myDialogOther" ev:event="DOMActivate"/>
+                <xxforms:hide dialog="myDialogOther" ev:event="DOMActivate"/>
             </xforms:trigger>
         </xxforms:dialog>
 
         <!-- Button to show the dialog -->
         <xforms:trigger>
             <xforms:label>Show dialog</xforms:label>
-            <xforms:toggle case="myDialog" ev:event="DOMActivate"/>
+            <xxforms:show dialog="myDialog" ev:event="DOMActivate"/>
         </xforms:trigger>
         <!-- Displays value entered in the dialog -->
         <xhtml:p>
@@ -56,11 +56,6 @@
                 <xforms:label>Text:</xforms:label>
             </xforms:output>
         </xhtml:p>
-
-        <xforms:switch>
-            <xforms:case id="myDialogOther"></xforms:case>
-            <xforms:case id="myDialogX"></xforms:case>
-        </xforms:switch>
 
     </xhtml:body>
 </xhtml:html>

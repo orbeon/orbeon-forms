@@ -219,7 +219,7 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
                 if (BODY_QNAME.equals(element1) && isXXForms) {
                     // Check that we are getting a valid xxforms:* element if used in body
-                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname) || "dialog".equals(localname)))
+                    if (!("img".equals(localname) || "size".equals(localname) || "script".equals(localname) || "dialog".equals(localname) || "show".equals(localname) || "hide".equals(localname)))
                         throw new ValidationException("Invalid element in XForms document: xxforms:" + localname, new LocationData(locator));
                 }
 

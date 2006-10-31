@@ -50,6 +50,9 @@ public class XFormsControls {
     private SwitchState initialSwitchState;
     private SwitchState currentSwitchState;
 
+    private DialogState initialDialogState;
+    private DialogState currentDialogState;
+
     private boolean dirty;
 
     private XFormsContainingDocument containingDocument;
@@ -201,7 +204,24 @@ public class XFormsControls {
         });
     }
 
-    public void initialize(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
+    /**
+     * Initialize the controls if needed. This is usually called upon initial creation of the engine.
+     *
+     * @param pipelineContext   current PipelineContext
+     */
+    public void initialize(PipelineContext pipelineContext) {
+        initializeState(pipelineContext, null, null);
+    }
+
+    /**
+     * Initialize the controls if needed, passing initial state information. This is called if the state of the engine
+     * needs to be rebuilt.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param divsElement           current div elements, or null
+     * @param repeatIndexesElement  current repeat indexes, or null
+     */
+    public void initializeState(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
 
         if (controlsDocument != null) {
 
@@ -209,6 +229,7 @@ public class XFormsControls {
                 // Use existing controls state
                 initialControlsState = currentControlsState;
                 initialSwitchState = currentSwitchState;
+                initialDialogState = currentDialogState;
             } else {
                 // Build controls state
 
@@ -219,15 +240,25 @@ public class XFormsControls {
                 initialSwitchState = new SwitchState(initialControlsState.getSwitchIdToSelectedCaseIdMap());
                 currentSwitchState = initialSwitchState;
 
+                initialDialogState = new DialogState(initialControlsState.getDialogIdToVisibleMap());
+                currentDialogState = initialDialogState;
+
                 // Set switch state if necessary
                 if (divsElement != null) {
                     for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
                         final Element divElement = (Element) i.next();
 
-                        final String caseId = divElement.attributeValue("id");
-                        final String visibility = divElement.attributeValue("visibility");
+                        final String id = divElement.attributeValue("id");
+                        final String visibilityString = divElement.attributeValue("visibility");
+                        final boolean visibility = "visible".equals(visibilityString);
 
-                        currentSwitchState.updateSwitchInfo(caseId, initialControlsState, "visible".equals(visibility));
+                        if (currentControlsState.getDialogIdToVisibleMap().get(id) != null) {
+                            // xxforms:dialog
+                            currentDialogState.showHide(id, visibility);
+                        } else {
+                            // xforms:switch/xforms:case
+                            currentSwitchState.initializeState(id, initialControlsState, visibility);
+                        }
                     }
                 }
 
@@ -235,7 +266,7 @@ public class XFormsControls {
                 if (initialControlsState.isHasRepeat()) {
                     // Get default xforms:repeat indexes beforehand
                     getDefaultRepeatIndexes(initialControlsState);
-                    
+
                     // Set external updates
                     setRepeatIndexState(repeatIndexesElement);
 
@@ -697,6 +728,7 @@ public class XFormsControls {
         final Map idsToXFormsControls = new HashMap();
 
         final Map switchIdToSelectedCaseIdMap = new HashMap();
+        final Map dialogIdToVisibleMap = new HashMap();
 
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
 
@@ -735,6 +767,11 @@ public class XFormsControls {
                         if ("true".equals(selectedAttribute))
                             switchIdToSelectedCaseIdMap.put(switchId, effectiveControlId);
                     }
+                }
+
+                // Handle xxforms:dialog
+                if (controlName.equals("dialog")) {
+                    dialogIdToVisibleMap.put(effectiveControlId, Boolean.valueOf(false));
                 }
 
                 // Handle xforms:itemset
@@ -871,6 +908,7 @@ public class XFormsControls {
         result.setChildren(rootChildren);
         result.setIdsToXFormsControls(idsToXFormsControls);
         result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
+        result.setDialogIdToVisibleMap(dialogIdToVisibleMap);
 
         // Evaluate all controls
         for (Iterator i = idsToXFormsControls.entrySet().iterator(); i.hasNext();) {
@@ -914,6 +952,15 @@ public class XFormsControls {
         return currentSwitchState;
     }
 
+
+    public DialogState getInitialDialogState() {
+        return initialDialogState;
+    }
+
+    public DialogState getCurrentDialogState() {
+        return currentDialogState;
+    }
+
     /**
      * Activate a switch case by case id.
      *
@@ -927,6 +974,14 @@ public class XFormsControls {
 
         getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
 
+    }
+
+
+    public void showHideDialog(String dialogId, boolean show) {
+        if (initialDialogState == currentDialogState)
+            currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
+
+        currentDialogState.showHide(dialogId, show);
     }
 
     /**
@@ -968,7 +1023,7 @@ public class XFormsControls {
             XFormsIndexUtils.adjustIndexes(pipelineContext, XFormsControls.this, result);
         }
 
-        // Update switch information: use new values, except where old values are available
+        // Update xforms;switch information: use new values, except where old values are available
         final Map oldSwitchIdToSelectedCaseIdMap = getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
         final Map newSwitchIdToSelectedCaseIdMap = result.getSwitchIdToSelectedCaseIdMap();
         {
@@ -985,6 +1040,9 @@ public class XFormsControls {
 
             this.currentSwitchState = new SwitchState(newSwitchIdToSelectedCaseIdMap);
         }
+
+        // Update xxforms:dialog information
+        this.currentDialogState = new DialogState(result.getDialogIdToVisibleMap());
 
         // Update current state
         this.currentControlsState = result;
@@ -1270,10 +1328,6 @@ public class XFormsControls {
             return switchIdToSelectedCaseIdMap;
         }
 
-        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
-            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
-        }
-
         /**
          * Update xforms:switch/xforms:case information with newly selected case id.
          */
@@ -1306,7 +1360,7 @@ public class XFormsControls {
         /**
          * Update switch info state for the given case id.
          */
-        public void updateSwitchInfo(String caseId, ControlsState controlsState, boolean visible) {
+        public void initializeState(String caseId, ControlsState controlsState, boolean visible) {
 
             // Find SwitchXFormsControl
             final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(caseId);
@@ -1324,6 +1378,25 @@ public class XFormsControls {
     }
 
     /**
+     * Represents the state of dialogs.
+     */
+    public static class DialogState {
+        private Map dialogIdToVisibleMap;
+
+        public DialogState(Map dialogIdToVisibleMap) {
+            this.dialogIdToVisibleMap = dialogIdToVisibleMap;
+        }
+
+        public Map getDialogIdToVisibleMap() {
+            return dialogIdToVisibleMap;
+        }
+
+        public void showHide(String dialogId, boolean show) {
+            dialogIdToVisibleMap.put(dialogId, Boolean.valueOf(show));
+        }
+    }
+
+    /**
      * Represents the state of a tree of XForms controls.
      */
     public static class ControlsState {
@@ -1334,6 +1407,7 @@ public class XFormsControls {
         private Map effectiveRepeatIdToIterations;
 
         private Map switchIdToSelectedCaseIdMap;
+        private Map dialogIdToVisibleMap;
 
         private boolean hasRepeat;
         private boolean hasUpload;
@@ -1425,6 +1499,15 @@ public class XFormsControls {
 
         public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
             this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
+        }
+
+
+        public Map getDialogIdToVisibleMap() {
+            return dialogIdToVisibleMap;
+        }
+
+        public void setDialogIdToVisibleMap(Map dialogIdToVisibleMap) {
+            this.dialogIdToVisibleMap = dialogIdToVisibleMap;
         }
 
         public boolean isHasRepeat() {

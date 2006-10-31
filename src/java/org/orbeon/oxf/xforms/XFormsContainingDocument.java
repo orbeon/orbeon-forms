@@ -741,7 +741,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         clearClientState();
 
         // Initialize controls
-        xformsControls.initialize(pipelineContext, null, null);
+        xformsControls.initialize(pipelineContext);
     }
 
     public void startOutermostActionHandler() {
@@ -816,7 +816,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 if (isXFormsModelConstructDone) {
                     // Initialize controls after all the xforms-model-construct events have been sent
-                    xformsControls.initialize(pipelineContext, null, null);
+                    xformsControls.initialize(pipelineContext);
                 }
 
                 // Iterate over all the models
@@ -847,7 +847,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
 
             // Restore controls
-            xformsControls.initialize(pipelineContext, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement());
+            xformsControls.initializeState(pipelineContext, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement());
         }
     }
 

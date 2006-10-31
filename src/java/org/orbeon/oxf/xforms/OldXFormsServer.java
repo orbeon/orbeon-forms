@@ -241,7 +241,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         // Output divs information
                         {
                             final Element divsElement = dynamicStateElement.addElement("divs");
-                            XFormsServer.outputSwitchDivs(divsElement, xformsControls);
+                            XFormsServer.outputDivs(divsElement, xformsControls);
                         }
 
                         // Output repeat index information
@@ -368,7 +368,8 @@ public class OldXFormsServer extends ProcessorImpl {
                         // Output divs information
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                            XFormsServer.diffSwitchDivs(ch, xformsControls, xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState());
+                            XFormsServer.diffDivs(ch, xformsControls, xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(),
+                                                 xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
                             ch.endElement();
                         }
 

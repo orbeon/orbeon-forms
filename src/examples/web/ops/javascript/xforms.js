@@ -424,11 +424,18 @@ ORBEON.xforms.Controls = {
     _setMessage: function(control, className, message) {
         var label = ORBEON.xforms.Controls._getControlLabel(control, className);
         if (label != null) {
+            ORBEON.util.Dom.setStringValue(label, message);
+            var helpImage = ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image");
             if (message == "") {
                 ORBEON.util.Dom.addClass(label, "xforms-disabled");
+                // If this is the help label, also disable help image
+                if (className == "xforms-help")
+                    ORBEON.util.Dom.addClass(helpImage, "xforms-disabled");
             } else {
                 ORBEON.util.Dom.removeClass(label, "xforms-disabled");
-                ORBEON.util.Dom.setStringValue(label, message);
+                // If this is the help label, also enable the help image
+                if (className == "xforms-help")
+                    ORBEON.util.Dom.removeClass(helpImage, "xforms-disabled");
             }
         }
     },
@@ -972,7 +979,6 @@ ORBEON.xforms.Events = {
      */
     dialogClose: function(type, args, me) {
         var dialogId = me;
-        console.log(dialogId);
     }
 };
 
@@ -1407,9 +1413,10 @@ ORBEON.xforms.Init = {
             draggable: true,
             fixedcenter: true,
             constraintoviewport: true,
-            underlay: "shadow"
+            underlay: "shadow",
+            iframe: true
         });
-        yuiDialog.render();
+        //yuiDialog.render();
         yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
@@ -2720,6 +2727,7 @@ function xformsHandleResponse(o) {
                                         }
                                     } else {
                                         // This is a dialog
+                                        dialog.render();
                                         if (visibile) dialog.show();
                                         else dialog.hide();
                                     }

@@ -24,16 +24,12 @@ public class XFormsEvents {
     public static final String XXFORMS_INITIALIZE_STATE = "xxforms-initialize-state";
     public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";
 
-    // Custom submit event
+    // Other custom events
     public static final String XXFORMS_SUBMIT = "xxforms-submit";
-
-    // Custom load event
     public static final String XXFORMS_LOAD = "xxforms-load";
-
-    // Custom focus event
     public static final String XXFORMS_REPEAT_FOCUS = "xxforms-focus";
+    public static final String XXFORMS_DIALOG_CLOSE = "xxforms-dialog-close";
 
-    // Standard sequences
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 
     // Standard XForms events

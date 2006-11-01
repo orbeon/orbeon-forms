@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -84,6 +85,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private static final Map allowedExternalEvents = new HashMap();
     private static final Map allowedXFormsSubmissionExternalEvents = new HashMap();
     private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
+    private static final Map allowedXXFormsDialogExternalEvents = new HashMap();
     static {
 
         // External events allowed on xforms:output
@@ -100,6 +102,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // External events allowed on containing document
         allowedXFormsContainingDocumentExternalEvents.put(XFormsEvents.XXFORMS_LOAD, "");
+
+        // External events allowed on xxforms:dialog
+        allowedXXFormsDialogExternalEvents.put(XFormsEvents.XXFORMS_DIALOG_CLOSE, "");
     }
 
     /**
@@ -568,6 +573,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Target is the containing document
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
+                return;
+            }
+        } else if (eventTarget instanceof XXFormsDialogControl) {
+            // Target is a dialog
+            // Check for implicitly allowed events
+            if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
                 return;
             }
         } else {

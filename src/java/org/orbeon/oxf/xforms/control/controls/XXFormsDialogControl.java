@@ -15,6 +15,11 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.dom4j.Element;
 
 /**
@@ -43,5 +48,17 @@ public class XXFormsDialogControl extends XFormsControl {
 
     public boolean isClose() {
         return close;
+    }
+
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getEventName())) {
+            // Mark the dialog as closed
+            final XXFormsDialogCloseEvent dialogCloseEvent = (XXFormsDialogCloseEvent) event;
+            final XXFormsDialogControl dialogControl = (XXFormsDialogControl) dialogCloseEvent.getTargetObject();
+
+            final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            xformsControls.showHideDialog(dialogControl.getEffectiveId(), false);
+        }
+        super.performDefaultAction(pipelineContext, event);
     }
 }

@@ -1442,6 +1442,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Process deferred behavior
         final DeferredActionContext currentDeferredActionContext = deferredActionContext;
+        deferredActionContext = null;
         if (currentDeferredActionContext != null) {
             if (currentDeferredActionContext.rebuild) {
                 containingDocument.startOutermostActionHandler();
@@ -1464,7 +1465,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 containingDocument.endOutermostActionHandler(pipelineContext);
             }
         }
-        deferredActionContext = null;
     }
 
     public void processDeferredUpdates(PipelineContext pipelineContext) {

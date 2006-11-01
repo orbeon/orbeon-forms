@@ -39,7 +39,7 @@ public class XXFormsDialogHandler extends HandlerBase {
         effectiveDialogId = handlerContext.getEffectiveId(attributes);
 
         // Find classes to add
-        final StringBuffer classes = new StringBuffer("xforms-dialog");
+        final StringBuffer classes = new StringBuffer("xforms-dialog xforms-initially-hidden");
         if (!handlerContext.isGenerateTemplate()) {// NOTE: xxforms:dialog cannot be in a template
             dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveDialogId));
             classes.append(" xforms-dialog-");

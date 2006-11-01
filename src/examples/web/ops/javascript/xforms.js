@@ -1406,7 +1406,8 @@ ORBEON.xforms.Init = {
     _dialog: function(dialog) {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close");
-        var yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
+        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
+        yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
             modal: isModal,
             close: hasClose,
             visible: false,
@@ -1416,8 +1417,8 @@ ORBEON.xforms.Init = {
             underlay: "shadow",
             iframe: true
         });
-        //yuiDialog.render();
         yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
+        yuiDialog.render();
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
 };
@@ -2706,8 +2707,8 @@ function xformsHandleResponse(o) {
                                     var controlId = ORBEON.util.Dom.getAttribute(divElement, "id");
                                     var visibile = ORBEON.util.Dom.getAttribute(divElement, "visibility") == "visible";
 
-                                    var dialog = ORBEON.xforms.Globals.dialogs[controlId];
-                                    if (dialog == null) {
+                                    var yuiDialog = ORBEON.xforms.Globals.dialogs[controlId];
+                                    if (yuiDialog == null) {
                                         // This is a case, not a dialog
                                         var caseBeginId = "xforms-case-begin-" + controlId;
                                         var caseBegin = document.getElementById(caseBeginId);
@@ -2727,9 +2728,8 @@ function xformsHandleResponse(o) {
                                         }
                                     } else {
                                         // This is a dialog
-                                        dialog.render();
-                                        if (visibile) dialog.show();
-                                        else dialog.hide();
+                                        if (visibile) yuiDialog.show();
+                                        else yuiDialog.hide();
                                     }
                                 }
                             }

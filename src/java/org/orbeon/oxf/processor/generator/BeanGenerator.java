@@ -44,6 +44,8 @@ import java.util.List;
  *
  * o a JavaBean
  * o a configuration (config and mapping inputs)
+ *
+ * NOTE: This processor is deprecated. Use ScopeGenerator instead.
  */
 public class BeanGenerator extends ProcessorImpl {
 

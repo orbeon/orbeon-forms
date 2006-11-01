@@ -1042,7 +1042,7 @@ public class XFormsControls {
         }
 
         // Update xxforms:dialog information
-        this.currentDialogState = new DialogState(result.getDialogIdToVisibleMap());
+        // NOP!
 
         // Update current state
         this.currentControlsState = result;

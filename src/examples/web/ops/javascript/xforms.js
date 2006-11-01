@@ -979,6 +979,8 @@ ORBEON.xforms.Events = {
      */
     dialogClose: function(type, args, me) {
         var dialogId = me;
+        var dialog = document.getElementById(dialogId);
+        xformsFireEvents([xformsCreateEventArray(dialog, "xxforms-dialog-close")], false);
     }
 };
 

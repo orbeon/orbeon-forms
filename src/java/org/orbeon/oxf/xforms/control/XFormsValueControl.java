@@ -75,12 +75,10 @@ public abstract class XFormsValueControl extends XFormsControl {
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        final boolean changed = XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, boundNode, value);
+        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, boundNode, value);
 
-        if (changed) {
-            // Update this particular control's value
-            evaluate(pipelineContext);
-        }
+        // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
+        // the controls as dirty, and they will be evaluated when necessary later.
     }
 
     public String convertToExternalValue(String internalValue) {

@@ -1406,7 +1406,6 @@ ORBEON.xforms.Init = {
     _dialog: function(dialog) {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close");
-        ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
         yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
             modal: isModal,
             close: hasClose,
@@ -1414,8 +1413,7 @@ ORBEON.xforms.Init = {
             draggable: true,
             fixedcenter: true,
             constraintoviewport: true,
-            underlay: "shadow",
-            iframe: true
+            underlay: "shadow"
         });
         yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         yuiDialog.render();

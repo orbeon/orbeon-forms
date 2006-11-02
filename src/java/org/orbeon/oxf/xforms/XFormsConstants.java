@@ -134,6 +134,8 @@ public class XFormsConstants {
     public static final String XXFORMS_READONLY_APPEARANCE_STATIC_VALUE = "static";
     public static final String XXFORMS_READONLY_APPEARANCE_DYNAMIC_VALUE = "dynamic";
 
+    public static final QName XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final String XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME = "external-events";
 
     public static final QName XFORMS_FULL_APPEARANCE_QNAME = new QName("full");

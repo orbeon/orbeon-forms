@@ -313,7 +313,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
     protected boolean isStaticReadonly(XFormsControl xformsControl) {
         return (xformsControl != null && xformsControl.isReadonly())
-                && XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance());
+                && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
+                    || XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(xformsControl.getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
     }
 
     protected void handleLabelHintHelpAlert(String parentId, String type, XFormsControl xformsControl) throws SAXException {

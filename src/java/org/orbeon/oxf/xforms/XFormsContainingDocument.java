@@ -542,22 +542,32 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // by hacking external events.
         if (eventTarget instanceof XFormsControl) {
             // Target is a control
-            final XFormsControl xformsControl = (XFormsControl) eventTarget;
 
-            if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
-                // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
-                return;
-            }
+            if (eventTarget instanceof XXFormsDialogControl) {
+                // Target is a dialog
+                // Check for implicitly allowed events
+                if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
+                    return;
+                }
+            } else {
+                // Target is a regular control
+                final XFormsControl xformsControl = (XFormsControl) eventTarget;
 
-            if (!isExplicitlyAllowedExternalEvent(eventName)) {
-                // The event is not explicitly allowed: check for implicitly allowed events
-                if (xformsControl instanceof XFormsOutputControl) {
-                    if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
-                        return;
-                    }
-                } else {
-                    if (allowedExternalEvents.get(eventName) == null) {
-                        return;
+                if (!xformsControl.isRelevant() || (xformsControl.isReadonly() && !(xformsControl instanceof XFormsOutputControl))) {
+                    // Controls accept event only if they are relevant and not readonly, except for xforms:output which may be readonly
+                    return;
+                }
+
+                if (!isExplicitlyAllowedExternalEvent(eventName)) {
+                    // The event is not explicitly allowed: check for implicitly allowed events
+                    if (xformsControl instanceof XFormsOutputControl) {
+                        if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
+                            return;
+                        }
+                    } else {
+                        if (allowedExternalEvents.get(eventName) == null) {
+                            return;
+                        }
                     }
                 }
             }
@@ -573,12 +583,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Target is the containing document
             // Check for implicitly allowed events
             if (allowedXFormsContainingDocumentExternalEvents.get(eventName) == null) {
-                return;
-            }
-        } else if (eventTarget instanceof XXFormsDialogControl) {
-            // Target is a dialog
-            // Check for implicitly allowed events
-            if (allowedXXFormsDialogExternalEvents.get(eventName) == null) {
                 return;
             }
         } else {

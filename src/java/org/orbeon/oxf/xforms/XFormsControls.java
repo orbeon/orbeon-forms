@@ -978,6 +978,13 @@ public class XFormsControls {
 
 
     public void showHideDialog(String dialogId, boolean show) {
+
+        // Make sure the id refers to an existing xxforms:dialog
+        final Object object = getObjectById(dialogId);
+        if (object == null || !(object instanceof XXFormsDialogControl))
+            return;
+
+        // Update state
         if (initialDialogState == currentDialogState)
             currentDialogState = new DialogState(new HashMap(initialDialogState.getDialogIdToVisibleMap()));
 

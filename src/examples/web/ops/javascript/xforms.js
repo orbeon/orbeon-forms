@@ -2527,7 +2527,9 @@ function xformsHandleResponse(o) {
                                             // HTML area
                                             var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
                                             if (xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)) {
-                                                htmlEditor.SetHTML(newControlValue);
+                                                // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
+                                                // as we loose our listeners after using the later
+                                                htmlEditor.EditorDocument.body.innerHTML = newControlValue;
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             }
@@ -2944,6 +2946,8 @@ function xformsDisplayLoading() {
 // In case this script is loaded twice, we still want to run the initialization only once
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.pageLoadedRegistered = true;
+    // If the browser does not provide a console object, create one which delegates log() to xformsLog()
+    if (typeof console == "undefined") console = { log: xformsLog };
     YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
 }
 ORBEON.xforms.Globals.debugLastTime = new Date().getTime();

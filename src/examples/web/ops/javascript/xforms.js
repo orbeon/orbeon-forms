@@ -1408,12 +1408,13 @@ ORBEON.xforms.Init = {
     _dialog: function(dialog) {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
         var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
+        var draggable = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-draggable-true");
         ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
         yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
             modal: isModal,
             close: hasClose,
             visible: false,
-            draggable: true,
+            draggable: draggable,
             fixedcenter: true,
             constraintoviewport: true,
             underlay: "shadow"

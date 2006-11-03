@@ -1966,6 +1966,7 @@
                     ways to initialize XForms instances.
                 </p>
             </section>
+            <a name="xforms-instance-initialization-pfc"/>
             <section>
                 <title>Initializing XForms Instances from the PFC</title>
                 <section>
@@ -1995,6 +1996,7 @@
                         in details in the <a href="reference-page-flow#page-model-page-view">PFC documentation</a>.
                     </p>
                 </section>
+                <a name="xforms-instance-initialization-xinclude"/>
                 <section>
                     <title>Using XInclude</title>
                     <p>
@@ -2034,6 +2036,7 @@
                         </xforms:instance>
                     </xml-source>
                 </section>
+                <a name="xforms-instance-initialization-xslt"/>
                 <section>
                     <title>Using XSLT</title>
                     <p>
@@ -2092,6 +2095,7 @@
                         using static XHTML views with XInclude whenever possible.
                     </note>
                 </section>
+                <a name="xforms-instance-initialization-src"/>
                 <section>
                     <title>Using the <code>src</code> Attribute</title>
                     <p>

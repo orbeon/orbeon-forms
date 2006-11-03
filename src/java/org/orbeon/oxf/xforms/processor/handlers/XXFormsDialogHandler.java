@@ -44,8 +44,10 @@ public class XXFormsDialogHandler extends HandlerBase {
             dialogXFormsControl = ((XXFormsDialogControl) containingDocument.getObjectById(handlerContext.getPipelineContext(), effectiveDialogId));
             classes.append(" xforms-dialog-");
             classes.append(dialogXFormsControl.getLevel());
-            classes.append(" xforms-dialog-");
-            classes.append(dialogXFormsControl.isClose() ? "close" : "no-close");
+            classes.append(" xforms-dialog-close-");
+            classes.append(Boolean.toString(dialogXFormsControl.isClose()));
+            classes.append(" xforms-dialog-draggable-");
+            classes.append(Boolean.toString(dialogXFormsControl.isDraggable()));
         }
 
         // Start main xhtml:div

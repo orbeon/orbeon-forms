@@ -980,7 +980,7 @@ ORBEON.xforms.Events = {
     dialogClose: function(type, args, me) {
         var dialogId = me;
         var dialog = document.getElementById(dialogId);
-        xformsFireEvents([xformsCreateEventArray(dialog, "xxforms-dialog-close")], false);
+        xformsFireEvents([xformsCreateEventArray(dialog, "xxforms-dialog-close-true")], false);
     }
 };
 
@@ -1407,7 +1407,7 @@ ORBEON.xforms.Init = {
      */
     _dialog: function(dialog) {
         var isModal = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-modal");
-        var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close");
+        var hasClose = ORBEON.util.Dom.hasClass(dialog, "xforms-dialog-close-true");
         ORBEON.util.Dom.removeClass(dialog, "xforms-initially-hidden");
         yuiDialog = new YAHOO.widget.Dialog(dialog.id, {
             modal: isModal,

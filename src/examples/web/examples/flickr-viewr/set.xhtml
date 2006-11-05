@@ -22,6 +22,7 @@
             xmlns:orbeon="http://www.orbeon.com/"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:exist="http://exist.sourceforge.net/NS/exist"
             xmlns:flickr="urn:flickr">
 
     <xhtml:head>
@@ -29,13 +30,13 @@
         <xforms:model id="main-model" xxforms:external-events="get-one-photo-info">
 
             <xforms:action ev:event="xforms-ready">
+                <!-- Get set info -->
                 <xforms:setvalue ref="xxforms:instance('photosets-getInfo-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
                 <xforms:send submission="photosets-getInfo-submission"/>
+                <!-- Get photos -->
                 <xforms:setvalue ref="xxforms:instance('photosets-getPhotos-query')/photoset_id" value="instance('parameters-instance')/photoset_id"/>
-                <xforms:send submission="photosets-getPhotos-submission"/>
-                <xxforms:script if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
-                    ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
-                </xxforms:script>
+                <xforms:dispatch name="viewr-get-photos" target="main-model"/>
+
                 <!--<xforms:action while="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">-->
                     <!--<xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>-->
                     <!--<xforms:send submission="photos-getInfo-submission"/>-->
@@ -49,25 +50,90 @@
 
             </xforms:action>
 
+            <xforms:action ev:event="viewr-get-photos">
+                <xforms:send submission="photosets-getPhotos-submission"/>
+                <xforms:send submission="cache-get-photos-submission"/>
+                <xxforms:script if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
+                    ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
+                </xxforms:script>
+            </xforms:action>
+
             <xforms:instance id="parameters-instance">
                 <xi:include href="input:instance"/>
             </xforms:instance>
 
             <xforms:instance id="control-instance">
                 <control>
+                    <show-private>true</show-private>
                     <selected/>
+                    <selected-temp/>
                     <sort-order>ascending</sort-order>
+                    <is_public/>
+                    <is_family/>
+                    <is_friend/>
+                    <error/>
                 </control>
             </xforms:instance>
 
+            <xforms:bind nodeset="xxforms:instance('photosets-getPhotos-response')/photoset/photo">
+                <xforms:bind nodeset="." relevant="xxforms:instance('control-instance')/show-private = 'true' or photo/visibility/@ispublic = 1"/>
+            </xforms:bind>
+
             <xforms:action ev:event="get-one-photo-info" if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
+                <!-- Get next info -->
                 <xforms:setvalue ref="xxforms:instance('photos-getInfo-query')/photo_id" value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]/@id"/>
                 <xforms:send submission="photos-getInfo-submission"/>
+                <!-- Save info -->
                 <xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)][1]" nodeset="*" origin="xxforms:instance('photos-getInfo-response')/photo"/>
+                <xforms:send submission="cache-update-photo-submission"/>
+                <!-- Schedule next info if needed -->
                 <xxforms:script if="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]">
                     ORBEON.xforms.Document.dispatchEvent("main-model", "get-one-photo-info");
                 </xxforms:script>
             </xforms:action>
+
+            <!-- Save photo information to cache -->
+            <xforms:submission id="cache-update-photo-submission" ref="xxforms:instance('photos-getInfo-response')/photo"
+                       method="put" action="/exist/rest/db/ops/flickr-example/photos/{@id}"
+                       replace="none" f:url-type="resource"/>
+
+            <!-- Request available photo information from cache -->
+            <xforms:instance id="cache-get-photos-query">
+                <exist:query>
+                    <exist:text>
+                        xquery version "1.0";
+                        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+                        declare namespace request = "http://exist-db.org/xquery/request";
+                        &lt;photos>
+                            {
+                                let $collection-name := '/db/ops/flickr-example/photos/'
+                                let $ids := tokenize(request:request-parameter('ids', ()), ',')
+                                let $lastupdates := tokenize(request:request-parameter('lastupdates', ()), ',')
+                                for $photo in collection($collection-name)/photo[@id = $ids]
+                                    return if ($lastupdates[index-of($ids, $photo/@id)] = $photo/dates/@lastupdate) then $photo else ()
+                            }
+                        &lt;/photos>
+                    </exist:text>
+                </exist:query>
+            </xforms:instance>
+
+            <xforms:instance id="cache-get-photos-response">
+                <photos/>
+            </xforms:instance>
+
+            <xforms:submission id="cache-get-photos-submission" ref="instance('cache-get-photos-query')"
+                       method="post" action="/exist/rest/db/ops/flickr-example/?ids={string-join(xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]/@id, ',')}&amp;lastupdates={string-join(xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo)]/@lastupdate, ',')}"
+                       replace="instance" instance="cache-get-photos-response" f:url-type="resource">
+                <xforms:action ev:event="xforms-submit-done" while="instance('cache-get-photos-response')/photos/photo[1]">
+                    <!-- Move information received, if any, to destination -->
+                    <xforms:insert context="xxforms:instance('photosets-getPhotos-response')/photoset/photo[not(photo) and @id = instance('cache-get-photos-response')/photos/photo[1]/@id]"
+                                   nodeset="*"
+                                   origin="instance('cache-get-photos-response')/photos/photo[1]"/>
+                    <xforms:delete nodeset="instance('cache-get-photos-response')/photos/photo[1]"/>
+                </xforms:action>
+            </xforms:submission>
+
+            <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('body')"/>
 
         </xforms:model>
         <!-- Include Flickr API model -->
@@ -87,10 +153,21 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:trigger>
-            <xforms:label>Test Authentication</xforms:label>
-            <xforms:dispatch target="flickr-api-model" name="flickr-viewr-authenticate" ev:event="DOMActivate"/>
-        </xforms:trigger>
+        <xhtml:div>
+            <xforms:output ref="instance('control-instance')/error" mediatype="text/html"/>
+        </xhtml:div>
+
+        <xforms:group ref=".[xxforms:instance('session-auth-instance')/token != '']">
+            You are authenticated as <xforms:output value="xxforms:instance('session-auth-instance')/user/@username"/>
+            (<xforms:output value="xxforms:instance('session-auth-instance')/user/@fullname"/>).
+        </xforms:group>
+        <xforms:group ref=".[not(xxforms:instance('session-auth-instance')/token != '')]">
+            Your are not authenticated.
+            <xforms:trigger>
+                <xforms:label>Authenticate</xforms:label>
+                <xforms:dispatch target="flickr-api-model" name="flickr-viewr-authenticate" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xforms:group>
 
         <xforms:group model="flickr-api-model" ref="instance('photosets-getInfo-response')/photoset">
             <xhtml:p>
@@ -106,9 +183,17 @@
                     <xforms:label>All tags:</xforms:label>
                 </xforms:output>
                 <xhtml:br/>
-                <!--<xforms:output value="concat('[', xxforms:instance('control-instance')/selected, ']')">-->
-                    <!--<xforms:label>Test:</xforms:label>-->
-                <!--</xforms:output>-->
+                <xforms:select ref="xxforms:instance('control-instance')/show-private" appearance="full">
+                    <xforms:label/>
+                    <xforms:item>
+                        <xforms:label>Show Private</xforms:label>
+                        <xforms:value>true</xforms:value>
+                    </xforms:item>
+                </xforms:select>
+                <xhtml:br/>
+                <xforms:output value="concat('[', xxforms:instance('control-instance')/selected, ']')">
+                    <xforms:label>Test:</xforms:label>
+                </xforms:output>
                 <!--<xhtml:br/>-->
                 <!--<xforms:output value="string-join(tokenize(xxforms:instance('control-instance')/selected, '\s+'), ' | ')">-->
                     <!--<xforms:label>Test:</xforms:label>-->
@@ -136,6 +221,7 @@
                 <xforms:trigger>
                     <xforms:label>Order Images Date</xforms:label>
                     <xforms:action ev:event="DOMActivate">
+                        <!-- Edit photos -->
                         <xforms:setvalue ref="instance('photosets-editPhotos-query')/photoset_id"
                                          value="instance('photosets-getInfo-response')/photoset/@id"/>
                         <xforms:setvalue ref="instance('photosets-editPhotos-query')/photo_ids"
@@ -143,7 +229,65 @@
                         <xforms:setvalue ref="instance('photosets-editPhotos-query')/primary_photo_id"
                                          value="instance('photosets-getInfo-response')/photoset/@primary"/>
                         <xforms:send submission="photosets-editPhotos-submission"/>
-                        <xforms:send submission="photosets-getPhotos-submission"/>
+                        <!-- Get updated information -->
+                        <xforms:dispatch name="viewr-get-photos" target="main-model"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:select ref="xxforms:instance('control-instance')/is_public" appearance="full">
+                    <xforms:label/>
+                    <xforms:item>
+                        <xforms:label>Public</xforms:label>
+                        <xforms:value>true</xforms:value>
+                    </xforms:item>
+                </xforms:select>
+                <xforms:select ref="xxforms:instance('control-instance')/is_family[xxforms:instance('control-instance')/is_public = 'true']" appearance="full">
+                    <xforms:label/>
+                    <xforms:item>
+                        <xforms:label>Family</xforms:label>
+                        <xforms:value>true</xforms:value>
+                    </xforms:item>
+                </xforms:select>
+                <xforms:select ref="xxforms:instance('control-instance')/is_friend[xxforms:instance('control-instance')/is_public = 'true']" appearance="full">
+                    <xforms:label/>
+                    <xforms:item>
+                        <xforms:label>Friend</xforms:label>
+                        <xforms:value>true</xforms:value>
+                    </xforms:item>
+                </xforms:select>
+
+                <xforms:trigger>
+                    <xforms:label>Set Visibility</xforms:label>
+                    <xforms:action ev:event="DOMActivate" if="xxforms:instance('control-instance')/selected != ''">
+                        <!-- Set working sequence -->
+                        <xforms:setvalue ref="xxforms:instance('control-instance')/selected-temp"
+                                         value="xxforms:instance('control-instance')/selected"/>
+                        <xforms:action while="xxforms:instance('control-instance')/selected-temp != ''">
+                            <!-- Handle first element in the sequence -->
+                            <xforms:setvalue ref="xxforms:instance('photos-setPerms-query')/photo_id"
+                                             value="tokenize(xxforms:instance('control-instance')/selected-temp, '\s+')[1]"/>
+
+                            <xforms:setvalue ref="instance('photos-setPerms-query')/is_public"
+                                             value="if (xxforms:instance('control-instance')/is_public = 'true') then 1 else 0"/>
+                            <xforms:setvalue ref="instance('photos-setPerms-query')/is_family"
+                                             value="if (xxforms:instance('control-instance')/is_family = 'true') then 1 else 0"/>
+                            <xforms:setvalue ref="instance('photos-setPerms-query')/is_friend"
+                                             value="if (xxforms:instance('control-instance')/is_friend = 'true') then 1 else 0"/>
+                            <xforms:setvalue ref="instance('photos-setPerms-query')/perm_addmeta"
+                                             value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[@id = xxforms:instance('photos-setPerms-query')/photo_id]/photo/permissions/@permaddmeta"/>
+                            <xforms:setvalue ref="instance('photos-setPerms-query')/perm_comment"
+                                             value="xxforms:instance('photosets-getPhotos-response')/photoset/photo[@id = xxforms:instance('photos-setPerms-query')/photo_id]/photo/permissions/@permcomment"/>
+
+                            <xforms:send submission="photos-setPerms-submission"/>
+
+                            <!-- Remove first element from the sequence -->
+                            <xforms:setvalue ref="xxforms:instance('control-instance')/selected-temp"
+                                             value="string-join(subsequence(tokenize(xxforms:instance('control-instance')/selected-temp, '\s+'), 2), ' ')"/>
+
+                        </xforms:action>
+                        <!-- Get updated information -->
+                        <xforms:dispatch name="viewr-get-photos" target="main-model"/>
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:p>
@@ -164,6 +308,7 @@
 
                 <xforms:group class="photo-details">
                     <xforms:action ev:event="xforms-value-changed">
+                        <!-- TODO: Issue: when repeat changes, we get value changed events! -->
                         <xforms:setvalue ref="instance('photos-setMeta-query')/photo_id" value="xxforms:repeat-current('photo-repeat')/@id"/>
                         <xforms:setvalue ref="instance('photos-setMeta-query')/title" value="xxforms:repeat-current('photo-repeat')/@title"/>
                         <xforms:setvalue ref="instance('photos-setMeta-query')/description" value="xxforms:repeat-current('photo-repeat')/photo/description"/>

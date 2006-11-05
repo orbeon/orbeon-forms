@@ -219,7 +219,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Return the XFormsInstance with given id, null if not found.
      */
     public XFormsInstance getInstance(String instanceId) {
-        return (XFormsInstance) (instancesMap.get(instanceId));
+        return (instancesMap == null) ? null : (XFormsInstance) (instancesMap.get(instanceId));
     }
 
     /**

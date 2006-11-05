@@ -57,6 +57,22 @@
     </xhtml:head>
     <xhtml:body>
 
+        <xforms:group ref=".[xxforms:instance('session-auth-instance')/token != '']">
+            You are authenticated as <xforms:output value="xxforms:instance('session-auth-instance')/user/@username"/>
+            (<xforms:output value="xxforms:instance('session-auth-instance')/user/@fullname"/>).
+        </xforms:group>
+        <xforms:group ref=".[not(xxforms:instance('session-auth-instance')/token != '')]">
+            Your are not authenticated.
+            <xforms:trigger>
+                <xforms:label>Authenticate</xforms:label>
+                <xforms:dispatch target="flickr-api-model" name="flickr-viewr-authenticate" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xforms:group>
+
+        There are <xforms:output value="count(xxforms:instance('photosets-getList-response')/photosets/photoset)"/>
+        photosets for a total of <xforms:output
+        value="sum(xxforms:instance('photosets-getList-response')/photosets/photoset/@photos)"/> photos.
+
         <!--<xforms:select1 ref="xxforms:instance('control-instance')/sort-order">-->
             <!--<xforms:label>Sort order</xforms:label>-->
             <!--<xforms:item>-->

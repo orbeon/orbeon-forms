@@ -120,6 +120,8 @@ public class StreamInterceptor {
                     if (tidyConfig != null) {
                         tidy.setShowWarnings(tidyConfig.isShowWarnings());
                         tidy.setQuiet(tidyConfig.isQuiet());
+                        if (tidyConfig.isQuiet())
+                            tidy.setErrout(new PrintWriter(new StringWriter()));
                     }
 
                     InputStream inputStream;

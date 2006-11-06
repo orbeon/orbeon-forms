@@ -37,9 +37,9 @@
             <section added="2006-01-10">
                 <title>What is Orbeon PresentationServer (OPS)?</title>
                 <p>
-                    <!--Form-based web applications done the right way--> Orbeon PresentationServer is an <b>open
-                    source</b> platform that uses <b>standard XForms</b> and <b>Ajax technology</b> to make your
-                    form-based web applications more <b>user-friendly</b> and <b>simpler to create</b>.
+                    Orbeon PresentationServer is an <b>open source</b> platform that uses <b>standard XForms</b> and
+                    <b>Ajax technology</b> to make your form-based web applications more <b>user-friendly</b> and
+                    <b>simpler to create</b>.
                 </p>
                 <p>
                     Unlike other web application platforms based on Java objects or scripting languages, OPS is based
@@ -85,6 +85,55 @@
                 </p>
             </section>
             -->
+            <a name="name-change"/>
+            <section>
+                <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
+                <p>
+                    Renaming a product is not something to be taken lightly. However we feel that:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <i>Orbeon Forms</i> better reflects the fact that forms have been the main focus of our
+                            development efforts over the last two years.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            This new face will help potential users understand more easily what the platform can do for
+                            them.
+                        </p>
+                    </li>
+                    <li>
+                        <p><i>Orbeon Forms</i> is just an easier name to remember!</p>
+                    </li>
+                </ul>
+                <p>
+                    We are encouraged in this decision by the fact that almost all current users build complex web forms
+                    using our Ajax-based XForms engine. The name change also conveys that we plan to keep focusing on
+                    form-related capabilities in the future like we have done in the last two years.
+                </p>
+                <p>
+                    It is important to precise the following:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            We are not creating a separate product: <i>Orbeon Forms</i> is simply the new name of
+                            Orbeon PresentationServer.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Other XML technologies like XSLT and XML pipelines remain an important part of the
+                            platform.
+                        </p>
+                    </li>
+                    <li>
+                        <p>And of course, Orbeon Forms remains an open source solution!</p>
+                    </li>
+                </ul>
+            </section>
         </section>
         <a name="xforms"/>
         <section>
@@ -250,12 +299,12 @@
             <section added="2006-01-10">
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
-                    The XForms Classic engine is available only for backward compatibility. It is currently deprecated,
-                    and may be removed in the future. If you are starting an application from scratch with OPS 3.5, we
-                    strongly advise against using XForms Classic. If you are migrating to OPS 3.5, we advise starting
-                    migrating XForms NG. You can keep your existing pages working with XForms Classic, and write new
-                    pages with XForms NG. Over time, you can migrate existing XForms Classic pages to XForms NG, making
-                    for a smooth transition.
+                    The XForms Classic engine is available only for backward compatibility. It is deprecated and may
+                    be removed in the future. If you are starting an application from scratch with OPS 3.5, we strongly
+                    advise against using XForms Classic. If you are migrating to OPS 3.5, we advise starting migrating
+                    XForms NG. You can keep your existing pages working with XForms Classic, and write new pages with
+                    XForms NG. Over time, you can migrate existing XForms Classic pages to XForms NG, making for a
+                    smooth transition.
                 </p>
                 <p>
                     As of OPS 3.5, some features of XForms Classic have not yet made it into XForms NG, in particular

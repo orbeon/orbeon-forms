@@ -239,6 +239,11 @@ public class XFormsEventFactory {
                 return new XXFormsDialogCloseEvent(targetObject);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_DIALOG_OPEN, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsDialogOpenEvent(targetObject);
+            }
+        });
     }
 
     public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {

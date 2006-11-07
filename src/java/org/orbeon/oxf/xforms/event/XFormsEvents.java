@@ -29,6 +29,7 @@ public class XFormsEvents {
     public static final String XXFORMS_LOAD = "xxforms-load";
     public static final String XXFORMS_REPEAT_FOCUS = "xxforms-focus";
     public static final String XXFORMS_DIALOG_CLOSE = "xxforms-dialog-close";
+    public static final String XXFORMS_DIALOG_OPEN = "xxforms-dialog-open";
 
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 

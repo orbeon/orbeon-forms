@@ -21,6 +21,8 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 
 /**
  * Extension xxforms:show action.
@@ -33,6 +35,7 @@ public class XXFormsShowAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
 
-        xformsControls.showHideDialog(dialogId, true);
+        // Dispatch xxforms-dialog-open event to dialog
+        containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId)));
     }
 }

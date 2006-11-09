@@ -15,6 +15,8 @@ package org.orbeon.oxf.processor.transformer;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.tree.DefaultText;
+import org.dom4j.tree.DefaultProcessingInstruction;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;
@@ -66,17 +68,10 @@ public class XPathProcessor extends ProcessorImpl {
                                     namespaceElement.attributeValue("uri"));
                         }
 
-                        // Create xpath object   (Jaxen)
-//                        XPath xpath = XPathCache.createCacheXPath(context, (String) config.selectObject("string(/config/xpath)"));
-//                        xpath.setNamespaceContext(new SimpleNamespaceContext(namespaces));
-//                        xpath.setFunctionContext(new OXFFunctionContext());
-//                        return xpath;
-
                         return  new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
                     }
                 });
 
-//                List results = xpath.selectNodes(readCacheInputAsDOM4J(context, INPUT_DATA));
                 DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null, new Configuration());
                 PooledXPathExpression xpath = null;
                 try {
@@ -88,16 +83,18 @@ public class XPathProcessor extends ProcessorImpl {
                     // connected to an aggregator, which adds a new root node.
                     for (Iterator i = results.iterator(); i.hasNext();) {
                         Object result = i.next();
-                        if ( result == null ) continue;
-                        final String strVal;
-                        if ( result instanceof org.dom4j.Element || result instanceof org.dom4j.Document ) {
+                        if (result == null) continue;
+                        String strVal = null;
+
+                        if (result instanceof org.dom4j.Element || result instanceof org.dom4j.Document) {
+                            // If element or document, serialize it to content handler
                             final org.dom4j.Element elt = result instanceof org.dom4j.Element
-                                              ? ( org.dom4j.Element )result
-                                              : ( ( org.dom4j.Document )result ).getRootElement();
-                            final String sid = Dom4jUtils.makeSystemId( elt  );
+                                    ? (org.dom4j.Element) result
+                                    : ((org.dom4j.Document) result).getRootElement();
+                            final String sid = Dom4jUtils.makeSystemId(elt);
                             final DOMGenerator domGenerator = new DOMGenerator
-                                ( elt, "xpath result doc", DOMGenerator.ZeroValidity, sid );
-                            final ProcessorOutput domOutput = domGenerator.createOutput( OUTPUT_DATA );
+                                    (elt, "xpath result doc", DOMGenerator.ZeroValidity, sid);
+                            final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
                             domOutput.read(context, new ForwardingContentHandler(contentHandler) {
                                 public void startDocument() {
                                 }
@@ -105,13 +102,17 @@ public class XPathProcessor extends ProcessorImpl {
                                 public void endDocument() {
                                 }
                             });
-                            continue;
-                        } else if ( result instanceof String ) {
-                            strVal = ( String )result;
-                        } else if ( result instanceof Double ) {
-                            final double d = ( ( Double )result ).doubleValue();
-                            strVal = XMLUtils.removeScientificNotation( d );
-                        } else if ( result instanceof Boolean ) {
+                        } else if (result instanceof DefaultProcessingInstruction) {
+                            DefaultProcessingInstruction processingInstruction = (DefaultProcessingInstruction) result;
+                            contentHandler.processingInstruction(processingInstruction.getTarget(), processingInstruction.getText());
+                        } else if (result instanceof DefaultText) {
+                            strVal = ((DefaultText) result).getText();
+                        } else if (result instanceof String) {
+                            strVal = (String) result;
+                        } else if (result instanceof Double) {
+                            final double d = ((Double) result).doubleValue();
+                            strVal = XMLUtils.removeScientificNotation(d);
+                        } else if (result instanceof Boolean) {
                             strVal = ((Boolean) result).toString();
                         } else if (result instanceof org.orbeon.saxon.om.FastStringBuffer) {
                             strVal = result.toString();
@@ -120,9 +121,13 @@ public class XPathProcessor extends ProcessorImpl {
                                     + (result == null ? "null" : result.getClass().getName());
                             throw new ValidationException(message, locationData);
                         }
-                        final char[] ch = strVal.toCharArray();
-                        final int len = strVal.length();
-                        contentHandler.characters( ch, 0, len );
+
+                        // Send string representation of simple type to content handler
+                        if (strVal != null) {
+                            final char[] ch = strVal.toCharArray();
+                            final int len = strVal.length();
+                            contentHandler.characters( ch, 0, len );
+                        }
                     }
                     contentHandler.endDocument();
                 }catch (XPathException xpe) {

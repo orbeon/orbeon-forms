@@ -68,7 +68,7 @@ ORBEON.xforms.Globals = {
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
     htmlAreaNames: [],                   // Names of the FCK editors, which we need to reenable them on Firefox
     repeatTreeChildToParent: [],         // Describes the repeat hierarchy
-    repeatIndexes: [],                   // The current index for each repeat
+    repeatIndexes: {},                   // The current index for each repeat
     repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
     overlayManager: null,                // YUI overlay manager used to close opened menu when user clicks on document
     inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
@@ -2250,12 +2250,19 @@ function xformsHandleResponse(o) {
                                             lastElementToDelete = repeatEnd.previousSibling;
                                             if (parentIndexes == "") {
                                                 // Top-level repeat: need to go over template
-                                                while (lastElementToDelete.nodeType != ELEMENT_TYPE
-                                                        || !ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter"))
+                                                while (true) {
+                                                    // Look for delimiter that comes just before the template
+                                                    if (lastElementToDelete.nodeType == ELEMENT_TYPE
+                                                            && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter")
+                                                            && !ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-template"))
+                                                        break;
                                                     lastElementToDelete = lastElementToDelete.previousSibling;
+                                                }
                                                 lastElementToDelete = lastElementToDelete.previousSibling;
                                             }
                                         }
+                                        console.log("Last to delete");
+                                        console.log(lastElementToDelete);
                                         // Perform delete
                                         for (var countIndex = 0; countIndex < count; countIndex++) {
                                             var nestedRepeatLevel = 0;

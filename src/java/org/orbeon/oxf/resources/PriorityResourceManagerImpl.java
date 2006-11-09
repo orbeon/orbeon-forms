@@ -23,10 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The priority resource manager delegates to two or more resource managers the
@@ -42,34 +39,54 @@ public class PriorityResourceManagerImpl implements ResourceManager {
 
     public PriorityResourceManagerImpl(Map props) {
 
-        // Populate resource manager factories list with nulls
+        // Map an order number to a Map of local properties
+        final Map orderToPropertyNames = new HashMap();
+
         for (Iterator i = props.keySet().iterator(); i.hasNext();) {
-            String priorityKey = (String) i.next();
-            if (priorityKey.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY))
-                resourceManagers.add(null);
+            final String key = (String) i.next();
+            if (key.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY)) {
+                final String substring = key.substring(PriorityResourceManagerFactory.PRIORITY_PROPERTY.length());
+                final int dotIndex = substring.indexOf('.');
+                final Integer position;
+                final String localPropertyName;
+                if (dotIndex == -1) {
+                    position = new Integer(substring);
+                    localPropertyName = null;
+                } else {
+                    position = new Integer(substring.substring(0, dotIndex));
+                    localPropertyName = substring.substring(dotIndex + 1);
+                }
+
+                if (orderToPropertyNames.get(position) == null)
+                    orderToPropertyNames.put(position, new HashMap());
+
+                final Map localProperties = (Map) orderToPropertyNames.get(position);
+                localProperties.put(localPropertyName, props.get(key));
+            }
+        }
+
+        // Populate resource manager factories list with nulls
+        for (int i = 0; i < orderToPropertyNames.size(); i++) {
+            resourceManagers.add(null);
         }
 
         // Create resource managers
-        for (Iterator i = props.keySet().iterator(); i.hasNext();) {
-            String priorityKey = (String) i.next();
-            if (priorityKey.startsWith(PriorityResourceManagerFactory.PRIORITY_PROPERTY)) {
-                try {
-                    // Get position
-                    String positionString = priorityKey.substring
-                            (PriorityResourceManagerFactory.PRIORITY_PROPERTY.length());
-                    int position = Integer.parseInt(positionString);
+        for (Iterator i = orderToPropertyNames.entrySet().iterator(); i.hasNext();) {
+            final Map.Entry currentEntry = (Map.Entry) i.next();
+            final int position = ((Integer) currentEntry.getKey()).intValue();
+            final Map localProperties = (Map) currentEntry.getValue();
+            try {
+                // Create instance
+                final Class clazz = Class.forName((String) props.get(PriorityResourceManagerFactory.PRIORITY_PROPERTY + position));
+                final Constructor constructor = clazz.getConstructor(new Class[]{Map.class});
+                final Map allProps = new HashMap(props);
+                allProps.putAll(localProperties);
+                final ResourceManagerFactoryFunctor factory = (ResourceManagerFactoryFunctor) constructor.newInstance(new Object[]{allProps});
+                final ResourceManager instance = factory.makeInstance();
 
-                    // Create instance
-                    Class clazz = Class.forName((String) props.get(priorityKey));
-                    Constructor constructor = clazz.getConstructor(new Class[]{Map.class});
-                    ResourceManagerFactoryFunctor factory =
-                            (ResourceManagerFactoryFunctor) constructor.newInstance(new Object[]{props});
-                    ResourceManager instance = factory.makeInstance();
-
-                    resourceManagers.set(position - 1, instance);
-                } catch (Exception e) {
-                    throw new OXFException(e);
-                }
+                resourceManagers.set(position - 1, instance);
+            } catch (Exception e) {
+                throw new OXFException(e);
             }
         }
     }

@@ -2258,9 +2258,23 @@ function xformsHandleResponse(o) {
                                         }
                                         // Perform delete
                                         for (var countIndex = 0; countIndex < count; countIndex++) {
+                                            var nestedRepeatLevel = 0;
                                             while (true) {
-                                                var wasDelimiter = lastElementToDelete.nodeType == ELEMENT_TYPE
-                                                    && ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
+                                                var wasDelimiter = false;
+                                                if (lastElementToDelete.nodeType == ELEMENT_TYPE) {
+                                                    if (ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-begin-end") &&
+                                                            lastElementToDelete.id.indexOf("repeat-end-") == 0) {
+                                                        // Entering nested repeat
+                                                        nestedRepeatLevel++;
+                                                    } else if (ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-begin-end") &&
+                                                            lastElementToDelete.id.indexOf("repeat-begin-") == 0) {
+                                                        // Exiting nested repeat
+                                                        nestedRepeatLevel--;
+                                                    } else {
+                                                        wasDelimiter = nestedRepeatLevel == 0 &&
+                                                           ORBEON.util.Dom.hasClass(lastElementToDelete, "xforms-repeat-delimiter");
+                                                    }
+                                                }
                                                 var previous = lastElementToDelete.previousSibling;
                                                 lastElementToDelete.parentNode.removeChild(lastElementToDelete);
                                                 lastElementToDelete = previous;

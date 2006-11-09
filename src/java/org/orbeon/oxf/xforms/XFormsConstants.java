@@ -149,6 +149,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_LINK_APPEARANCE_QNAME = new QName("link", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_IMAGE_APPEARANCE_QNAME = new QName("image", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_HTML_APPEARANCE_QNAME = new QName("html", XFormsConstants.XXFORMS_NAMESPACE);// legacy
+    public static final QName XXFORMS_FIELDSET_APPEARANCE_QNAME = new QName("fieldset", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);

@@ -13,10 +13,12 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -27,6 +29,7 @@ public class XFormsGroupHandler extends HandlerBase {
 
     protected String effectiveGroupId;
     private XFormsControl groupXFormsControl;
+    private boolean isFieldsetAppearance;
 
     public XFormsGroupHandler() {
         super(false, true);
@@ -36,6 +39,9 @@ public class XFormsGroupHandler extends HandlerBase {
 
         effectiveGroupId = handlerContext.getEffectiveId(attributes);
 
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        isFieldsetAppearance = XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
+
         // Find classes to add
         final StringBuffer classes = getInitialClasses(localname, attributes, null);
         if (!handlerContext.isGenerateTemplate()) {
@@ -44,16 +50,26 @@ public class XFormsGroupHandler extends HandlerBase {
             HandlerBase.handleMIPClasses(classes, groupXFormsControl);
         }
 
-        // Start xhtml:span
+        // Start xhtml:span or xhtml:fieldset
+        final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-        handlerContext.getController().getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
         // xforms:label
         final String labelValue = handlerContext.isGenerateTemplate() ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
-            outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
+            if (isFieldsetAppearance) {
+                // Output an xhtml:legend element
+                final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, labelAttributes);
+                contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
+            } else {
+                // Output an xhtml:label element
+                outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
+            }
         }
 
         // NOTE: This doesn't work because attributes for the label are only gathered after start()
@@ -64,8 +80,9 @@ public class XFormsGroupHandler extends HandlerBase {
 
         // Close xhtml:span
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-        handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+        final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
+        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
+        handlerContext.getController().getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
 
         // xforms:help
         handleLabelHintHelpAlert(effectiveGroupId, "help", groupXFormsControl, false);

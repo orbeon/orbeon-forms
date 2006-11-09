@@ -76,6 +76,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean validate = true;
     private boolean relevant = true;
+    private boolean serialize = true;
 
     private String version;
     private boolean indent;
@@ -130,6 +131,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             validate = !"false".equals(submissionElement.attributeValue("validate"));
             relevant = !"false".equals(submissionElement.attributeValue("relevant"));
+            serialize = !"false".equals(submissionElement.attributeValue("serialize"));
 
             version = submissionElement.attributeValue("version");
 
@@ -260,7 +262,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // TODO: Somewhere around here, check flags and doRecalculate() if needed
 
                 final Document initialDocumentToSubmit;
-                if (!isDeferredSubmissionSecondPass) {
+                if (serialize && !isDeferredSubmissionSecondPass) {
                     // Create document to submit
                     final Document backupInstanceDocument = currentInstance.getInstanceDocument();
                     try {
@@ -304,7 +306,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 final Document documentToSubmit;
-                if (isDeferredSubmissionSecondPass) {
+                if (serialize && isDeferredSubmissionSecondPass) {
                     // Handle uploaded files if any
                     final Element filesElement = (event instanceof XXFormsSubmitEvent) ? ((XXFormsSubmitEvent) event).getFilesElement() : null;
                     if (filesElement != null) {
@@ -403,15 +405,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final String defaultMediatype;
                 {
                     if (method.equals("multipart-post")) {
+                        if (!serialize)
+                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
                         // TODO
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("form-data-post")) {
+                        if (!serialize)
+                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
                         // TODO
 
 //                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
 
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("urlencoded-post")) {
+                        if (!serialize)
+                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
 
                         // Perform "application/x-www-form-urlencoded" serialization
                         queryString = null;
@@ -419,6 +427,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         defaultMediatype = "application/x-www-form-urlencoded";
 
                     } else if (XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method)) {
+                        if (!serialize)
+                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
 
                         // Serialize XML to a stream of bytes
                         try {
@@ -440,7 +450,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     } else if (XFormsSubmissionUtils.isGet(method) || XFormsSubmissionUtils.isDelete(method)) {
 
                         // Perform "application/x-www-form-urlencoded" serialization
-                        queryString = createWwwFormUrlEncoded(documentToSubmit);
+                        queryString = serialize ? createWwwFormUrlEncoded(documentToSubmit) : null;
                         messageBody = null;
                         defaultMediatype = null;
 

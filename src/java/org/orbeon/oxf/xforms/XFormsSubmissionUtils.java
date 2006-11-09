@@ -43,7 +43,7 @@ public class XFormsSubmissionUtils {
      */
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
-                                                                     byte[] serializedInstance, String serializedInstanceString) {
+                                                                     byte[] serializedInstance, String queryString) {
         try {
             if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
 
@@ -64,12 +64,12 @@ public class XFormsSubmissionUtils {
                         // Simulate a GET
                         {
                             final StringBuffer updatedActionStringBuffer = new StringBuffer(action);
-                            if (serializedInstanceString != null) {
+                            if (queryString != null) {
                                 if (action.indexOf('?') == -1)
                                     updatedActionStringBuffer.append('?');
                                 else
                                     updatedActionStringBuffer.append('&');
-                                updatedActionStringBuffer.append(serializedInstanceString);
+                                updatedActionStringBuffer.append(queryString);
                             }
                             effectiveResourceURI = updatedActionStringBuffer.toString();
                         }
@@ -225,7 +225,7 @@ public class XFormsSubmissionUtils {
                     // Get response information that needs to be forwarded
                     connectionResult.resultCode = (httpURLConnection != null) ? httpURLConnection.getResponseCode() : 200;
                     final String contentType = urlConnection.getContentType();
-                    connectionResult.resultMediaType = NetUtils.getContentTypeMediaType(contentType);
+                    connectionResult.resultMediaType = (contentType != null) ? NetUtils.getContentTypeMediaType(contentType) : "application/xml";
                     connectionResult.resultHeaders = urlConnection.getHeaderFields();
                     connectionResult.lastModified = urlConnection.getLastModified();
                     connectionResult.setResultInputStream(urlConnection.getInputStream());

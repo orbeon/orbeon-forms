@@ -29,6 +29,14 @@
     <files path-info="*.txt" mime-type="text/plain"/>
     <files path-info="*.xq" mime-type="text/plain"/>
 
+    <!-- Home redirects to Welcome application -->
+    <page id="home" path-info="/">
+        <action><result page="welcome"/></action>
+    </page>
+
+    <!-- Welcome application -->
+    <page id="welcome" path-info="/welcome/" model="apps/welcome/page-flow.xml"/>
+
     <!-- Dispatch request to a specific application -->
     <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>
 

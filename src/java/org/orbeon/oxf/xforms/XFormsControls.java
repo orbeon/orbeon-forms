@@ -515,7 +515,14 @@ public class XFormsControls {
                 if (nodeset != null && context != null) {
                     popBinding();
                 }
-
+            } else if (isNewModel) {
+                // Only the model has changed
+                final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
+                if (currentSingleNodeForModel != null) {
+                    newNodeset = Collections.singletonList(currentSingleNodeForModel);
+                } else {
+                    newNodeset = Collections.EMPTY_LIST;
+                }
             } else {
                 // No change to current nodeset
                 newNodeset = currentBindingContext.getNodeset();
@@ -576,7 +583,10 @@ public class XFormsControls {
             return bindingContext.getNodeset();
 
         // If not found, return the document element of the model's default instance
-        return Collections.singletonList(containingDocument.getModel(modelId).getDefaultInstance().getInstanceRootElementInfo());
+        final XFormsInstance defaultInstance = containingDocument.getModel(modelId).getDefaultInstance();
+        if (defaultInstance == null)
+            throw new OXFException("Cannot find default instance in model: " + modelId);
+        return Collections.singletonList(defaultInstance.getInstanceRootElementInfo());
     }
 
     /**

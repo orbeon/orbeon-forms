@@ -1,0 +1,41 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- Files to serve directly -->
+    <files path-info="*.gif"/>
+    <files path-info="*.css"/>
+    <files path-info="*.pdf"/>
+    <files path-info="*.js"/>
+    <files path-info="*.png"/>
+    <files path-info="*.jpg"/>
+    <files path-info="*.xsd"/>
+    <files path-info="*.xml" mime-type="application/xml"/>
+    <files path-info="*.html" mime-type="text/html"/>
+    <files path-info="*.java" mime-type="text/plain"/>
+    <files path-info="*.txt" mime-type="text/plain"/>
+    <files path-info="*.xq" mime-type="text/plain"/>
+
+    <!-- Dispatch request to a specific application -->
+    <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>
+
+    <!-- "Not Found" page displayed when no page matches the request URL -->
+    <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
+
+    <epilogue url="/config/epilogue.xpl"/>
+    <not-found-handler page="not-found"/>
+    
+</config>

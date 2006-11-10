@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Changes in Version 2.7</title>
+    </header>
+    <body>
+        <section>
+            <title>JBoss Support</title>
+            <p>
+                JBoss is now supported. See the <a href="intro-install#jboss">installation
+                instruction</a> for more information on how to setup OPS on JBoss.
+            </p>
+        </section>
+        <section>
+            <title>XForms</title>
+            <section>
+                <title>Compliance Matrix</title>
+                <p>
+                    In line with our commitment to fully support the XForms specification, we now
+                    clearly document the level of support for each part of the specification in a
+                    <a href="reference-xforms-compliance">compliance matrix</a>.
+                </p>
+            </section>
+            <section>
+                <title>Open Selection</title>
+                <p>
+                    The <code>&lt;xforms:select></code> and <code>&lt;xforms:select1</code>
+                    controls let the end-user select on of more items from a list. You can now
+                    add the <code>selection="open"</code> attribute on those controls; 
+                    when specified, the end-user can enter a value of its choice in text field,
+                    of choose one of more of the suggested values.
+                </p>
+            </section>
+            <section>
+                <title>Linking Attribute</title>
+                <p>
+                    You can now use the <code>src</code> attribute on 
+                    <code>&lt;xforms:label></code>, <code>&lt;xforms:hint></code>, 
+                    <code>&lt;xforms:help></code>, <code>&lt;xforms:alert></code>, and
+                    <code>&lt;xforms:message></code> to specify the URL from where the text
+                    should be loaded, instead of having the text inline in the XForms view or in the 
+                    XForms instance (<code>ref</code> or <code>bind</code> 
+                    attribute).
+                </p>
+            </section>
+            <section>
+                <title>Single-Node and Node-Set Binding Attributes</title>
+                <p>
+                    In your XForms views, in addition of using the <code>ref</code> and 
+                    <code>nodeset</code> attributes to reference nodes of the XForms instance,
+                    you can now use the <code>bind</code> attribute. You first assign an id
+                    to a nodeset in the XForms model: e.g. <code>&lt;xforms:bind 
+                    nodeset="/company/ceo" id="ceo"/></code>; you then reference this id in
+                    your XForms view: e.g. <code>&lt;xforms:input bind="ceo"/></code>.
+                </p>
+            </section>
+            <section>
+                <title>Nested Bind</title>
+                <p>
+                    You can now nest <code>&lt;xforms:bind></code> elements in the XForms model.
+                    The <code>nodeset</code> XPath expression in nested elements is relative to the
+                    nodeset selected by the <code>nodeset</code> expression on the parent element.
+                </p>
+            </section>
+            <section>
+                <title>doc() in Model Item Properties</title>
+                <p>
+                    You can now use the XPath 2.0 <code>doc()</code> function in XPath expressions in
+                    the XForms model. For instance, assuming that you have a "lookup table" defined in
+                    an XML file mapping department id to department name, you can write a model item
+                    property calculating the value of <code>&lt;department-name></code> element
+                    based on the value entered by the user for <code>&lt;department-id></code>:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:bind nodeset="/instance/department-name"
+                        calculate="doc('oxf:/departments.xml')/departments/department[@id = /instance/department-id]/name"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>Short Form Element Names</title>
+                <p>
+                    In this version the names generated by OPS for HTML form
+                    elements are much shorter than in previous versions. Under certain
+                    circumstances (low bandwidth between server and end-user, large forms, complex
+                    XForms instances with many levels of nested elements using namespaces),
+                    submitting a form was slow as a lot of data had to be sent from the browser back
+                    to the server. A new name generation scheme has been implemented in this
+                    version. It solves the problem and guaranties that names will be short even if
+                    your XForms instance has many levels of nested elements and is using namespaces.
+                </p>
+            </section>
+            <section>
+                <title>Handling of Prefixes and Namespace Declarations</title>
+                <p>
+                    In previous versions of OPS, when a form was submitted and the
+                    XForms instance recreated, all the elements and attribute where in the right
+                    namespace, but the actual prefix was not necessarily kept and namespace
+                    declarations where inserted only where used. In this version, Presentation
+                    Server keeps the exact value of the prefixes and the location of namespace
+                    declaration when a form is submitted and the XForms instance is recreated.
+                </p>
+            </section>
+            <section>
+                <title>xxforms:hidden Extension Control</title>
+                <p>
+                    The XForms extension control <code>xxforms:hidden</code> is supported again
+                    and documented.
+                </p>
+            </section>
+            <section>
+                <title>Semantic of XForms Conditionals</title>
+                <p>
+                    The <code>&lt;xxforms:choose></code> used to run all the "true" 
+                    <code>&lt;xxforms:when></code>. Instead, it now only run the first one if any, 
+                    and the <code>&lt;xxforms:otherwise></code> otherwise. This is inline with 
+                    the behavior of the <code>&lt;xsl:choose></code>.
+                </p>
+            </section>
+            <section>
+                <title>&lt;xforms:message></title>
+                <p>
+                    <code>&lt;xforms:message></code> is now supported. This lets you display a message in a dialog when 
+                    a submit control is clicked. See the <a href="reference-xforms-ng#message-action">message
+                    action</a> documentation for more details.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>XPath 2.0 Support</title>
+            <p>
+                Using XPath 2.0 expressions is now supported in:
+            </p>
+            <ul>
+                <li>
+                    XPL: for XPointer expressions, <code>test</code> expressions in a
+                    <code>&lt;p:when></code>, and <code>select</code> expressions in a
+                    <code>&lt;p:for-each></code>.
+                </li>
+                <li>
+                    Page Flow: for <code>when</code> expressions in <code>&lt;action></code>
+                    and <code>&lt;result></code>.
+                </li>
+                <li>
+                    XForms: binding expressions in the XForms view (<code>ref</code> and 
+                    <code>nodeset</code> attribute), XPath expressions in model item properties
+                    (<code>&lt;xforms:bind></code>), and XPath expressions in XForms actions.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>User-Defined Processor Inputs</title>
+            <p>
+                User-defined processor inputs, used by several processors including the XSLT
+                processor and the Email processor, are now documented (<a
+                href="reference-xpl-pipelines#optional">XPL documentation</a>, <a
+                href="processors-xslt#user-defined">XSLT documentation</a>). The URI schemes to
+                access user-defined inputs and outputs are now <code>input:</code> and
+                <code>output:</code>, to avoid confusion with the <code>oxf:</code> scheme used
+                for the OPS resource manager sandbox.
+            </p>
+        </section>
+        <section>
+            <title>eXist Native XML Database</title>
+            <p>
+                OPS ships with the latest stable version of eXist
+                (eXist-1.0b2-build-1107). This fixes the issue of connecting to an external
+                eXist instance. Here is an example <code>datasource.xml</code> to connect to a
+                standalone eXist:
+            </p>
+            <xml-source>
+                <datasource>
+                    <comment> Specify the driver for the eXist database </comment>
+                    <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                    <comment> Example of URL for a non-embedded use </comment>
+                    <uri>xmldb:exist://localhost:8080/exist/xmlrpc</uri>
+                </datasource>
+            </xml-source>
+        </section>
+        <section>
+            <title>Examples Setup</title>
+            <p>
+                All the examples using the SQL processor now work out of the box without
+                configuring datasources at the application server or servlet container level.
+                This includes the following examples:
+            </p>
+            <ul>
+                <li>Address Book</li>
+                <li>Employees</li>
+                <li>Data in multiple formats</li>
+                <li>XForms Upload</li>
+                <li>Email</li>
+            </ul>
+        </section>
+        <section>
+            <title>Saxon Upgraded to Version 8.1.1</title>
+            <p>
+                <a href="http://saxon.sourceforge.net/">Saxon</a> is the default XSLT engine 
+                and is used throughout OPS for XPath 2.0 expressions. Saxon 8.1.1
+                is now bundled with OPS. See the
+                <a href="http://www.saxonica.com/documentation/contents.html">changes section</a> 
+                of the Saxon documentation for more details.
+            </p>
+        </section>
+        <section>
+            <title>Documentation Printing</title>
+            <p>
+                Printing the documentation has been improved through the use of CSS. As you print
+                a given section of the documentation the left sidebar showing the chapters will not
+                be printed.
+            </p>
+        </section>
+        <section>
+            <title>Processors</title>
+            <section>
+                <title>SQL Processor</title>
+                <ul>
+                    <li>
+                        <p>
+                            The SQL processor now supports external datasource definitions using the
+                            optional <code>datasource</code> input. Those directly refer to connections
+                            without using JNDI names mapped by the container. This allows examples to work
+                            out of the box. This is an example of datasource definition:
+                        </p>
+                        <xml-source>
+                            <datasource>
+                                <comment> Specify the driver for the database </comment>
+                                <driver-class-name>org.hsqldb.jdbcDriver</driver-class-name>
+                                <comment> This causes the use of the embedded database </comment>
+                                <uri>jdbc:hsqldb:file:orbeondb</uri>
+                                <comment> Optional username and password </comment>
+                                <username>sa</username>
+                                <password></password>
+                            </datasource>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            OPS ships with a recent version of HSQLDB (version 1.7.2.8).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
+                            </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The SQL processor's <code>data</code> input and output are now optional. This
+                            removes the need for "dummy" input content or Null serializers with the SQL
+                            processor.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>URL generator</title>
+                <section>
+                    <title>Relative URLs</title>
+                    <p>
+                        The <a href="processors-generators-url">URL generator</a> now supports
+                        URLs relative to the location where the generator is used, instead of just
+                        absolute URLs.
+                    </p>
+                </section>
+                <section>
+                    <title>XInclude Dependencies</title>
+                    <p>
+                        The <a href="processors-generators-url">URL generator</a> also deals
+                        correctly with XInclude dependencies. For example, if a file called
+                        <code>file1.xml</code> includes a file called <code>file2.xml</code>, which in
+                        turn includes a file called <code>file3.xml</code>, and you modify
+                        <code>file3.xml</code>, then <code>file1.xml</code> is re-read automatically.
+                        Of course, this works with other dependency scenarios as well!
+                    </p>
+                </section>
+            </section>
+            <section>
+                <title>Java Processor</title>
+                <p>
+                    The <a href="processors-java">Java processor</a> now works correctly in command
+                    line mode. It also supports relative source paths and supports specifying
+                    alternate compilers.
+                </p>
+            </section>
+            <section>
+                <title>Email Processor</title>
+                <p>
+                    The <a href="processors-messaging-email">Email processor</a> now supports
+                    <code>Cc</code> and <code>Bcc</code> recipients. See the <a
+                    href="/goto-example/email">Email example</a> for an illustration.
+                </p>
+            </section>
+            <section>
+                <title>Scope Generator</title>
+                <p>
+                    The <a href="processors-generators#scope-generator">Scope generator</a> is now
+                    able to marshall regular JavaBeans in addition to XML stored as Strings, W3C
+                    and dom4j documents. This functionality deprecates the <a
+                    href="processors-generators#bean-generator">Bean generator</a>. These two
+                    processors previously had some overlap in functionality.
+                </p>
+            </section>
+            <section>
+                <title>Error Processor</title>
+                <p>
+                    The error processor now follows the same configuration mechanism as the main
+                    processor. The following property names have been deprecated:
+                </p>
+                <ul>
+                    <li><code>oxf.servlet.error.processor.uri</code></li>
+                    <li><code>oxf.servlet.error.input.*</code></li>
+                </ul>
+                <p>
+                    The new names are as follows:
+                </p>
+                <ul>
+                    <li><code>oxf.error-processor.name</code></li>
+                    <li><code>oxf.error-processor.input.*</code></li>
+                </ul>
+                <p>
+                    Visit <a href="integration-packaging#error-processor">Packaging and
+                    Deployment</a> for more information on configuring the error processor, as well
+                    as <a href="reference-error-pipeline">Error Pipeline</a> for information about
+                    creating an error pipeline.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Command Line Interface</title>
+            <p>
+                The command to invoke is now:
+            </p>
+            <source>java -jar cli-orbeon.jar ...</source>
+            <p>
+                instead of:
+            </p>
+            <source>java -jar orbeon.jar ...</source>
+        </section>
+    </body>
+</document>

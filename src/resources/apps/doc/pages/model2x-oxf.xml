@@ -1,0 +1,150 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Beyond Model 2X with OPS</title>
+    </header>
+    <body>
+        <section>
+            <title>Implementing Model 2X with OPS</title>
+            <p>
+                Model 2X defines in broad terms the relationship between Struts and XSLT. When
+                implementing Model 2X, it becomes clear that making the presentation layer modular
+                and flexible requires more than one XSLT transformation. There is a clear need to
+                combine resources and static documents, chain XSLT transformations, generate
+                different outputs depending on the client used, provide form handling, and more.
+            </p>
+            <p>
+                This is where OPS and its implementation of the XML Pipeline
+                Definition Language (XPL) are put to use. See <a href="model2x-struts">Using
+                OPS with Struts</a> for more information.
+            </p>
+        </section>
+        <section>
+            <title>Beyond Model 2X</title>
+            <p>
+                Once XML pipelines are available, you can extend the presentation layer of an
+                application to use XML pipelines for implementing or integrating the business logic
+                of the application. XML processors can:
+
+                <ul>
+                    <li>Access relational databases
+                        -
+                        <a href="processors-sql">SQL Processor</a>
+                    </li>
+                    <li>Call existing EJBs and Web Services
+                        -
+                        <a href="processors-delegation">Delegation Processor</a>
+                    </li>
+                    <li>Control the application workflow
+                        -
+                        <a href="reference-page-flow">Page Flow Controller</a>
+                    </li>
+                    <li>Implement custom processors
+                        -
+                        <a href="processors-java">Java Processor</a> and
+                        <a href="reference-processor-api">Processor API</a>
+                    </li>
+
+                </ul>
+            </p>
+
+            <p>A completely new way of building Web applications has emerged.</p>
+
+            <p>
+                With a higher-level paradigm, Model 2 frameworks like Struts are no longer
+                necessary, even though they can coexist with the new model. Struts and Java are not
+                going away any time soon, but for many applications the OPS model
+                will bring enhanced flexibility, modularity and productivity. See <a
+                href="reference-resource-managers">Building Web Apps with OPS</a>
+                for more information.
+            </p>
+        </section>
+        <section>
+            <title>Benefits of OPS and XPL</title>
+            <p>
+                The doors opened by XML processors, XML pipelines and XPL are numerous. Uses include
+                helping component reuse, building standalone applications, and making Web
+                publishing and Web application development more effective.
+            </p>
+            <p>
+                Some of the benefits of OPS are listed below. In general,
+                OPS addresses many of the issues and limitations that developers
+                stumble upon when using technologies such as JSP and XML:
+            </p>
+
+            <section>
+                <title>Modularity and componentization</title>
+                <p>
+                    Most frameworks and platforms fail to deliver on the promise of CBD (Component
+                    Based Development). OPS provides the infrastructure to build
+                    modular applications with reusable XML components. In addition, the <a
+                    href="reference-page-flow">Web Application Controller</a> provides advanced
+                    separation of concerns by separating site logic, page logic, page layout, and
+                    site presentation following the MVC architecture.
+                </p>
+            </section>
+
+            <section>
+                <title>Separating business logic and presentation logic</title>
+                <p>
+                    Whether written in OPS XML pipeline technologies or in
+                    traditional Java/J2EE technologies such as Struts and EJBs, backend systems
+                    integrate elegantly with presentation logic using the popular MVC architecture.
+                    OPS goes one step further and advocates the separation of
+                    different aspects of the presentation layer (such as page layout, navigation,
+                    localization, look and feel) into several components assembled together with
+                    XPL.
+                </p>
+            </section>
+
+            <section>
+                <title>Agility and Consistency across applications</title>
+                <p>
+                    OPS advocates centralizing the look and feel code. This allows
+                    for much more flexibility when business requirements change.
+                </p>
+            </section>
+
+            <section>
+                <title>Accelerated development cycles</title>
+                <p>
+                    OPS allows developers to avoid the tedious J2EE development
+                    cycles Save -> Compile -> Package -> Deploy -> Reload. In the Presentation
+                    Server realm, you change your XML document, save it and reload your page and
+                    you're done! While OPS relies on and expands the J2EE
+                    platform, we strongly believe that enterprise developers should not have to put
+                    up with the intricacies of J2EE development. OPS alleviates
+                    those difficulties and at the same time allows developers to access and
+                    effectively leverage all J2EE technologies.</p>
+            </section>
+
+            <section>
+                <title>XML development made easier</title>
+                <p>
+                    The number of available XML tools and APIs is daunting. With the concept of XML
+                    processors and its implementation of the XML Pipeline Definition Language (XPL),
+                    OPS simplifies XML development. XML processors talk to
+                    each-other using state-of-the-art, performance-tuned techniques based on SAX,
+                    with built-in validation, debugging, and caching.</p>
+            </section>
+
+
+        </section>
+
+    </body>
+</document>

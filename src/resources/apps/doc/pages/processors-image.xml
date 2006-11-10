@@ -1,0 +1,542 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+	<header>
+		<title>Image Server</title>
+	</header>
+	<body>
+        <p>
+            The Image Server processor serves images stored locally or remotely (for example
+            through HTTP) to a Web browser. Only the JPEG format is supported at the moment.
+            Before sending or transforming a resource, the Image Server checks that the
+            resource is a JPEG image. The Image Server is able to perform simple
+            transformations such as scaling and cropping, in which case it also handles a cache
+            of transformed images.
+        </p>
+        <section>
+            <title>Configuration</title>
+            <p>
+                The <code>config</code> input must follow this Relax NG schema:
+            </p>
+            <xml-source>
+<element name="config"
+    xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+    <interleave>
+        <element name="image-directory">
+            <text/>
+        </element>
+        <element name="default-quality">
+            <data type="float"/>
+        </element>
+        <optional>
+            <element name="use-sandbox">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="cache">
+                <element name="directory">
+                    <text/>
+                </element>
+                <optional>
+                    <element name="path-encoding">
+                        <choice>
+                            <value>flat</value>
+                            <value>hierarchical</value>
+                        </choice>
+                    </element>
+                </optional>
+            </element>
+        </optional>
+    </interleave>
+</element>
+            </xml-source>
+            <p>
+                This is an example of configuration:
+            </p>
+            <xml-source>
+<config>
+<image-directory>file:C:/images</image-directory>
+<default-quality>0.8</default-quality>
+<cache>
+    <directory>c:/oxf-image-cache</directory>
+</cache>
+</config>
+            </xml-source>
+            <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+                <tr>
+                    <th>Element</th>
+                    <th>Purpose</th>
+                    <th>Format</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td>
+                        <code>image-directory</code>
+                    </td>
+                    <td>
+                        Specifies the root of the directory containing all the images.
+                    </td>
+                    <td>
+                        URL with a protocol specified. If the directory is local, use the
+                        <code>file</code> protocol. You can also use the <code>http</code> or
+                        <code>oxf</code> protocols.
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>default-quality</code>
+                    </td>
+                    <td>
+                        Specifies the JPEG quality factor to use when encoding JPEG images..
+                    </td>
+                    <td>
+                        Number between 0.0 and 1.0.
+                    </td>
+                    <td>
+                        0.5
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>use-sandbox</code>
+                    </td>
+                    <td>
+                        <p>
+                            If set to <code>false</code>, it disables checking that the images served
+                            are strictly under the <code>image-directory</code> hierarchy.
+                        </p>
+                        <warning>
+                            <p>
+                                Disabling the sandbox can be a security hazard and should be used at
+                                your own risk. If the image paths come from untrustworthy sources,
+                                for example the URL entered by a user in a Web browser, you have to
+                                make sure that they do not access protected content. Ideally, only
+                                paths coming from trusted sources, such as your database or XML
+                                configuration files, should be used when the sandbox is disabled.
+                            </p>
+                        </warning>
+                    </td>
+                    <td>
+                        <code>true</code> or <code>false</code>.
+                    </td>
+                    <td>
+                        <code>true</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache</code>
+                    </td>
+                    <td>
+                        Optional element. If it is not specified, no caching of transformations
+                        takes place. If it is specified, at least the <code>directory</code> child
+                        element is required.
+                    </td>
+                    <td>
+                        N/A
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache/directory</code>
+                    </td>
+                    <td>
+                        Specifies the cache directory.
+                    </td>
+                    <td>
+                        Path specifying the local filesystem directory that contains the cached
+                        transformed images.
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache/path-encoding</code>
+                    </td>
+                    <td>
+                        <p>
+                            Specifies how cache file names are computed. In this case, the cache
+                            builds a hierarchy of directories. A directory is created for each part
+                            of the image path separated by either a "/", a "\" or a ":". The benefit
+                            of this encoding is that in most cases, the cache directory hierarchy
+                            will mirror the hierarchy of the image directory. If different images
+                            can be accessed with paths differing only by the "/", a "\" or a ":",
+                            this scheme should not be used.
+                        </p>
+                        <p>
+                            If the <code>flat</code> cache path encoding scheme is selected, the
+                            cache will store all files directly under the cache directory. File
+                            names will be URL-encoded. This guaranties the uniqueness of the file
+                            names in the cache.
+                        </p>
+                    </td>
+                    <td>
+                        <code>hierarchical</code> or <code>flat</code>.
+                    </td>
+                    <td>
+                        <code>hierarchical</code>
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <title>Image Input</title>
+            <p>
+                Once the Image Server is configured, its <code>image</code> input can receive
+                processing information. This input must follow this Relax NG schema:
+            </p>
+            <xml-source>
+                <grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+                    <start>
+                        <ref name="image"/>
+                    </start>
+
+                    <define name="image">
+                        <element name="image">
+                            <interleave>
+                                <element name="url">
+                                    <text/>
+                                </element>
+                                <optional>
+                                    <element name="quality">
+                                        <data type="float"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="use-cache">
+                                        <data type="boolean"/>
+                                    </element>
+                                </optional>
+                            </interleave>
+
+                            <zeroOrMore>
+                                <choice>
+                                    <element name="transform">
+                                        <attribute name="type">
+                                            <value>scale</value>
+                                        </attribute>
+                                        <optional>
+                                            <element name="quality">
+                                                <choice>
+                                                    <value>high</value>
+                                                    <value>low</value>
+                                                </choice>
+                                            </element>
+                                        </optional>
+                                        <optional>
+                                            <element name="scale-up">
+                                                <data type="boolean"/>
+                                            </element>
+                                        </optional>
+                                        <choice>
+                                            <ref name="width-height"/>
+                                            <ref name="max-size"/>
+                                        </choice>
+                                    </element>
+                                    <element name="transform">
+                                        <attribute name="type">
+                                            <value>crop</value>
+                                        </attribute>
+                                        <interleave>
+                                            <optional>
+                                                <element name="x">
+                                                    <data type="nonNegativeInteger"/>
+                                                </element>
+                                            </optional>
+                                            <optional>
+                                                <element name="y">
+                                                    <data type="nonNegativeInteger"/>
+                                                </element>
+                                            </optional>
+                                            <optional>
+                                                <element name="width">
+                                                    <data type="positiveInteger"/>
+                                                </element>
+                                            </optional>
+                                            <optional>
+                                                <element name="height">
+                                                    <data type="positiveInteger"/>
+                                                </element>
+                                            </optional>
+                                        </interleave>
+                                    </element>
+                                    <element name="transform">
+                                        <attribute name="type">
+                                            <value>draw</value>
+                                        </attribute>
+                                        <oneOrMore>
+                                            <choice>
+                                                <element name="rect">
+                                                    <attribute name="x">
+                                                        <data type="nonNegativeInteger"/>
+                                                    </attribute>
+                                                    <attribute name="y">
+                                                        <data type="nonNegativeInteger"/>
+                                                    </attribute>
+                                                    <attribute name="width">
+                                                        <data type="positiveInteger"/>
+                                                    </attribute>
+                                                    <attribute name="height">
+                                                        <data type="positiveInteger"/>
+                                                    </attribute>
+                                                    <optional>
+                                                        <ref name="color"/>
+                                                    </optional>
+                                                </element>
+                                                <element name="fill">
+                                                    <attribute name="x">
+                                                        <data type="nonNegativeInteger"/>
+                                                    </attribute>
+                                                    <attribute name="y">
+                                                        <data type="nonNegativeInteger"/>
+                                                    </attribute>
+                                                    <attribute name="width">
+                                                        <data type="positiveInteger"/>
+                                                    </attribute>
+                                                    <attribute name="height">
+                                                        <data type="positiveInteger"/>
+                                                    </attribute>
+                                                    <optional>
+                                                        <ref name="color"/>
+                                                    </optional>
+                                                </element>
+                                                <element name="line">
+                                                    <attribute name="x1">
+                                                        <data type="int"/>
+                                                    </attribute>
+                                                    <attribute name="y1">
+                                                        <data type="int"/>
+                                                    </attribute>
+                                                    <attribute name="x2">
+                                                        <data type="int"/>
+                                                    </attribute>
+                                                    <attribute name="y2">
+                                                        <data type="int"/>
+                                                    </attribute>
+                                                    <optional>
+                                                        <ref name="color"/>
+                                                    </optional>
+                                                </element>
+                                            </choice>
+                                        </oneOrMore>
+                                    </element>
+                                </choice>
+                            </zeroOrMore>
+                        </element>
+                    </define>
+
+                    <define name="width-height">
+                        <interleave>
+                            <element name="width">
+                                <data type="positiveInteger"/>
+                            </element>
+                            <element name="height">
+                                <data type="positiveInteger"/>
+                            </element>
+                        </interleave>
+                    </define>
+
+                    <define name="max-size">
+                        <choice>
+                            <element name="max-size">
+                                <data type="positiveInteger"/>
+                            </element>
+                            <element name="max-width">
+                                <data type="positiveInteger"/>
+                            </element>
+                            <element name="max-height">
+                                <data type="positiveInteger"/>
+                            </element>
+                        </choice>
+                    </define>
+
+                    <define name="color">
+                        <element name="color">
+                            <choice>
+                                <attribute name="name">
+                                    <choice>
+                                        <value>white</value>
+                                        <value>lightGray</value>
+                                        <value>gray</value>
+                                        <value>darkGray</value>
+                                        <value>black</value>
+                                        <value>red</value>
+                                        <value>pink</value>
+                                        <value>orange</value>
+                                        <value>yellow</value>
+                                        <value>green</value>
+                                        <value>magenta</value>
+                                        <value>cyan</value>
+                                        <value>blue</value>
+                                    </choice>
+                                </attribute>
+                                <attribute name="rgb">
+                                    <data type="string">
+                                        <param name="pattern">#[0-9A-Fa-f]{6}</param>
+                                    </data>
+                                </attribute>
+                            </choice>
+                            <optional>
+                                <attribute name="alpha"/>
+                            </optional>
+                        </element>
+                    </define>
+
+                </grammar>
+
+            </xml-source>
+            <p>
+                The only required element is the <code>url</code> element. This is interpreted
+                as a URL relative to the image directory.
+            </p>
+            <p>
+                If <code>use-sandbox</code> is not set to <code>false</code> and the resulting
+                path is not in the sandbox, the processor returns a <code>404</code> error code
+                to the Web browser. If the resource does not exist, the processor also returns a
+                <code>404</code> error code to the Web browser.
+            </p>
+            <p>
+                The cache can be disabled by setting the <code>use-cache</code> element to
+                <code>false</code>. It defaults to <code>true</code>.
+            </p>
+            <p>
+                If only the <code>url</code> element is set, no transformation takes place.
+            </p>
+            <p>
+                Zero or more transformations can be specified with the <code>transform</code>
+                element. Each transformation is identified by a <code>type</code> attribute
+                that identifies the type of transformation. Each transformation is performed
+                sequentially. If at least one transformation is specified, the
+                <code>quality</code> element can be used to override the configuration's default
+                JPEG quality setting.
+            </p>
+            <section>
+                <title>Scaling</title>
+                <p>
+                    If the <code>type</code> attribute is set to <code>scale</code>, a scaling
+                    operation is performed. It is possible to either specify a width and height
+                    to scale the image to, or one of <code>max-size</code>,
+                    <code>max-width</code> or <code>max-height</code>. If <code>scale-up</code>
+                    is set to <code>false</code>, no scaling takes place if the specified
+                    parameters produce an image larger than the original image. The
+                    <code>quality</code> element can be set to <code>low</code> to use a faster
+                    but lower-quality algorithm. The default is <code>high</code>.
+                </p>
+            </section>
+            <section>
+                <title>Cropping</title>
+                <p>
+                    If the <code>type</code> attribute is set to <code>crop</code>, a cropping
+                    operation is performed. All parameters are optional: <code>x</code>,
+                    <code>y</code>, <code>width</code> and <code>height</code>. <code>x</code>
+                    and <code>y</code> specify the top left corner of the cropping rectangle.
+                    They default to 0. <code>width</code> and <code>height</code> specify the
+                    size of the cropping rectangle. They default to covering the rest of the
+                    image to the right and bottom sides.
+                </p>
+            </section>
+            <p>
+                Example of <code>image</code> input that will make sure that the maximum size
+                of the image is 100 pixels, without scaling up:
+            </p>
+            <xml-source>
+<image>
+<url>relative-path/to/my/image.jpg</url>
+<transform type="scale">
+    <scale-up>false</scale-up>
+    <max-size>100</max-size>
+</transform>
+</image>
+            </xml-source>
+            <p>
+                Example of use of the Image Server processor:
+            </p>
+            <xml-source>
+<p:processor name="oxf:image-server">
+<p:input name="image">
+    <image>
+        <url>relative-path/to/my/image.jpg</url>
+        <transform type="scale">
+            <scale-up>false</scale-up>
+            <max-size>100</max-size>
+        </transform>
+    </image>
+</p:input>
+<p:input name="config">
+    <config>
+        <image-directory>file:C:/images</image-directory>
+        <default-quality>0.8</default-quality>
+        <cache>
+            <directory>c:/oxf-image-cache</directory>
+        </cache>
+    </config>
+</p:input>
+</p:processor>
+            </xml-source>
+            <p>
+                In this example, the image file that is accessed is:
+                <code>C:/images/path/to/my/image.jpg</code>. The cached image is stored under
+                <code>c:/oxf-image-cache/path/to/my/</code>.
+            </p>
+            <p>
+                The <code>image</code> input can be be generated dynamically, for example with
+                an XSLT transformation.
+            </p>
+            <warning>
+                Image transformations can take a lot of memory depending on the size of the
+                source and transformed images. Be sure to set your memory settings accordingly.
+                Concurrent transformations can also yield to higher memory consumption.
+            </warning>
+        </section>
+        <section>
+            <title>Drawing</title>
+            <p>
+                The Image Server also supports drawing basic shapes on an image. Empty and
+                filled rectangles, and lines are supported. Each shape may have a color
+                element.
+            </p>
+            <xml-source>
+                <image>
+                    <url>ca-coast.jpg</url>
+                    <quality>0.7</quality>
+                    <use-cache>false</use-cache>
+                    <rect x="10" y="10" height="100" width="100">
+                        <color rgb="#ff0000" alpha="ff"/>
+                    </rect>
+                    <fill x="100" y="100" height="200" width="200">
+                        <color rgb="#00ff00" alpha="55"/>
+                    </fill>
+                    <line x1="200" y1="200" x2="300" y2="300">
+                        <color rgb="#0000ff" alpha="ff"/>
+                    </line>
+                </image>
+            </xml-source>
+        </section>
+    </body>
+</document>

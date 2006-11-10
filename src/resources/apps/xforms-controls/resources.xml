@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources>
+    <help>
+        <age>This field must contain your age.</age>
+        <secret>This field must contain your secret password.</secret>
+        <textarea>This field must contain some &lt;i>very&lt;/i> insightful quote.</textarea>
+        <date>
+            <output>
+                <french>
+                    <div>
+                        <p>
+                            This field should show:
+                        </p>
+                        <ul>
+                            <li>a valid date</li>
+                            <li>localized in French</li>
+                        </ul>
+                    </div>
+                </french>
+                <xml>
+                    <div>
+                        <p>
+                            This field should show:
+                        </p>
+                        <ul>
+                            <li>a valid date</li>
+                            <li>in native XML format</li>
+                        </ul>
+                    </div>
+                </xml>
+            </output>
+        </date>
+    </help>
+</resources>

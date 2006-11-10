@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Changes in Version 2.8</title>
+    </header>
+    <body>
+        <section>
+            <title>XForms</title>
+            <ul>
+                <li>
+                    <p>
+                        It is now possible to have multiple <code>&lt;xforms:alert></code> in an
+                        XForms control. They will be all kept by the XForms engine and transformed
+                        into <code>&lt;f:alert></code>. The theme can then decide which one should
+                        be displayed. The default theme displays all the alerts.
+                    </p>
+                    <p>
+                        You can use multiple <code>&lt;xforms:alert></code> for internationalization
+                        by adding on each <code>&lt;xforms:alert></code> an <code>xml:lang</code>
+                        attribute (e.g. <code>xml:lang="en"</code>, <code>xml:lang="fr"</code>) and
+                        selecting in your theme the appropriate message to display for the current
+                        user based on his preferred language.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        XForms schema validation can now be used to <a
+                        href="http://tinyurl.com/5l7q8">validate attributes in the XForms
+                        instance</a>. Note that the <code>xxforms:valid="false"</code> attribute is
+                        still only added on invalid elements in the XForms instance. The XForms
+                        engine does not annotate the XForms instance for invalid attributes.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Instance nodes of type <code>xs:date</code> and <code>xs:time</code> bound
+                        to an XForms input control are rendered with an <a
+                        href="http://tinyurl.com/6wu6p">appropriate date or time widget</a>. You
+                        set the type of an instance node with a <code>&lt;xforms:bind
+                        nodeset="/path/to/your/node" type="xs:date"/></code> in your XForms model.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        As the XForms engine validates the XForms instance with a schema and
+                        evaluates the model item properties on the instance, it annotates the
+                        instance with attributes using the <code>xxforms</code> prefix. For
+                        instance, if an element is validated, an attribute
+                        <code>xxforms:valid="true|false"</code> is added on the element. In previous
+                        versions of OPS you could override the value set by the
+                        XForms engine in the MVC model or MVC view by modifying the value of those
+                        attributes in the instance. As the instance can be modified in the MVC
+                        model and view, the model item properties are reevaluated and the instance
+                        revalidated with the schema after the MVC view, in the epilogue. At that
+                        point, for example, if there is a <code>xxforms:valid="false"</code>
+                        attribute on a given element, but validation with the schema and model
+                        item properties returns "true", the XForms engine does not know if the
+                        content of the element was modified in the MVC model or view and the error
+                        corrected (in which case the element should be considered valid), or if the
+                        <code>xxforms:valid="false"</code> was added by the MVC model or view to
+                        tell the XForms engine that this element is invalid (in which case the
+                        element should be considered invalid).
+                    </p>
+                    <p>
+                        To solve this problem, starting with OPS 2.8, you cannot
+                        override the annotations added by the XForms engine on the instance. Those
+                        annotations should be considered read-only. Instead, to instruct the XForms
+                        engine that a given node is invalid, use the method described in the <a
+                        href="reference-xforms-ng#custom-validation">Custom Validation</a> section of
+                        the XForms reference. The benefit of this method is that it does not require
+                        the use of proprietary XForms extensions and that it can be used on elements
+                        as well as attributes.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Move to ObjectWeb and Product Name</title>
+            <ul>
+                <li>
+                    Orbeon <a href="http://www.orbeon.com/company/pr-objectweb">joined the ObjectWeb
+                    consortium</a> and the project is now hosted on the <a
+                    href="http://forge.objectweb.org/projects/ops/">ObjectWeb Forge</a>.
+                </li>
+                <li>
+                    The name of the product is now written Orbeon PresentationServer (in one word).
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Performance Improvements</title>
+            <p>
+                Memory usage has been improved, which leads to significant performance improvements
+                under heavy load or when the JVM is running with a relatively small heap, as the JVM
+                spends less time doing garbage collection. Our testing shows performance
+                improvement that range from 5% to 20% over version 2.7.
+            </p>
+        </section>
+        <section>
+            <title>Miscellaneous Bug Fixes</title>
+            <ul>
+                <li>
+                    <a href="http://tinyurl.com/5eq9d">XUpdate removing attributes and namespace
+                    declarations</a> &#8213; When using the <code>&lt;xu:xupdate></code> instruction to
+                    update the content of an element, the existing attributes and namespaces of the
+                    element were incorrectly removed.
+                </li>
+                <li>
+                    <a href="http://tinyurl.com/47eqg">XForms xhtml:onclick attribute</a> &#8213;
+                    The attribute xhtml:onclick on XForms submit control was ignored.
+                </li>
+                <li>
+                    <a href="http://tinyurl.com/5hqzy">Rendering issues of the documentation under
+                    Safari</a> &#8213; Those issues have been solved.
+                </li>
+                <li>
+                    Other bugs have been fixed relative to the URL generator, Request generator,
+                    HTTP serializer, and server-side forwards following a file upload.
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

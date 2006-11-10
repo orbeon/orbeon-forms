@@ -1,0 +1,32 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<instance>
+    <age>35</age>
+    <secret>42</secret>
+    <textarea>The world is but a canvas for the imagination.</textarea>
+    <label>Hello, World!</label>
+    <date/>
+    <flavor>v c</flavor>
+    <carrier>fedex</carrier>
+    <country-name/>
+    <new-item>
+        <label>Key lime</label>
+        <value>lime</value>
+    </new-item>
+    <range>
+        <value>1</value>
+        <letter>A</letter>
+    </range>
+    <country/>
+</instance>

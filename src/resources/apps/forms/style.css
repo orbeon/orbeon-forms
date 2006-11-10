@@ -1,0 +1,71 @@
+/*
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+th { padding: 1em; padding-top: 0; text-align: left; vertical-align: top }
+td { vertical-align: top }
+
+#main-action-table { width: 100% }
+#language-choice-td { width: 100%; text-align: right }
+
+.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 62em; background: #fcc }
+.forms-errors-table .xforms-repeat-selected-item-1 { background: none }
+.forms-errors-table th { padding: 0; color: red }
+
+.forms-main-table { border: solid 2px #ffcc66; width: 64em }
+.forms-main-table th p { text-align: center; vertical-align: top }
+.forms-main-table td { white-space: nowrap }
+
+.forms-action-table td { white-space: nowrap; vertical-align: middle; }
+.forms-action-table input { vertical-align: middle;}
+.forms-action-table xforms-trigger { vertical-align: middle;}
+
+.forms-gridtable { border-collapse: collapse; width: 95%; margin-left: 1em; margin-right: 1em }
+.forms-gridtable th { background-color: #ffcc66; text-align: center; padding: .3em; border: 1px solid #f93 }
+.forms-gridtable td { padding: .3em; border: 1px solid #f93; margin: 0; cursor: pointer; vertical-align: middle }
+
+.forms-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana,sans-serif }
+
+.forms-message-positive { color: green }
+.forms-message-negative { color: orange }
+.forms-message-fatal { color: red }
+
+.forms-hr { height: 3px; border: 0; background-color: #ffcc66; color: #ffcc66 }
+
+.xforms-label { margin-right: 1em; font-style: italic }
+.xforms-repeat-selected-item-1 td { cursor: default }
+.xforms-repeat-selected-item-2 td { cursor: default;  }
+.xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
+.xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
+.xforms-trigger-appearance-xxforms-image { margin-right: 0.5em}
+
+#dmv-vehicles .xforms-label { display: none }
+
+.dmv-last-name input { width: 20em }
+.dmv-driver-license-number input { width: 8em }
+.dmv-first-name input { width: 10em }
+.dmv-initial input { width: 1.5em }
+.dmv-street-number input { width: 5em }
+.dmv-street-name-1 input { width: 21em }
+.dmv-street-name-2 input { width: 22em }
+.dmv-city input { width: 22em }
+.dmv-state input { width: 2em }
+.dmv-zip input { width: 5em }
+.dmv-plate-number input { width: 8em }
+.dmv-vin input { width: 17em }
+.dmv-company-name input { width: 22em }
+.dmv-street-number-name input { width: 22em }
+.dmv-apt-number input { width: 4em }
+
+.dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
+.dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
+.dmv-plate-span { position: relative; top: 19px; background: none }

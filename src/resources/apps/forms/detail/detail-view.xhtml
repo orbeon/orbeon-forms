@@ -1,0 +1,871 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:exforms="http://www.exforms.org/exf/1-0"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xsl:version="2.0">
+
+    <head>
+        <title>Orbeon Forms - Detail Page</title>
+        <link rel="stylesheet" type="text/css" href="/apps/forms/style.css"/>
+        <!-- Main XForms model -->
+        <!-- NOTE: We only use XSLT here to set the value of xxforms:readonly-appearance. It would be nice to be able to forgo XSLT entirely -->
+        <!-- Global model -->
+        <xforms:model id="common-model" xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
+
+            <!-- This is called when the XForms engine is ready -->
+            <xforms:action ev:event="xforms-ready">
+                <!-- Load document if specified -->
+                <xforms:send if="instance('parameters-instance')/document-id != ''" submission="load-submission"/>
+                <!-- Create document id if not specified -->
+                <xforms:setvalue if="instance('parameters-instance')/document-id = ''"
+                                 ref="instance('parameters-instance')/document-id"
+                                 value="digest(string(random(true)), 'MD5', 'hex')"/>
+            </xforms:action>
+
+            <!-- Instance containing the page parameters -->
+            <xforms:instance id="parameters-instance" src="input:instance"/>
+
+            <!-- XForms instance for widget control information -->
+            <xforms:instance id="control-instance">
+                <control xmlns="">
+                    <data-status/>
+                    <save-trigger/>
+                    <back-trigger/>
+                </control>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0)"/>
+                <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty'"/>
+            </xforms:bind>
+
+            <!-- XForms instance for error information -->
+            <xforms:instance id="errors-instance">
+                <errors xmlns=""/>
+            </xforms:instance>
+
+            <xforms:instance id="error-template">
+                <error xmlns="" id="" indexes="" label="" alert=""/>
+            </xforms:instance>
+
+        </xforms:model>
+        <!-- Form-specific model -->
+        <xforms:model id="dmv-model" schema="oxf:/apps/forms/schema/dmv-schema.xsd">
+            <!-- This is called when the XForms engine is ready -->
+            <xforms:action ev:event="xforms-ready">
+                <!-- Build plates instance -->
+                <xforms:insert context="instance('plates-instance')"
+                               while="count(plate) lt count(instance('document-instance')//dmv:plate-number)"
+                               nodeset="plate" origin="instance('plate-template')"/>
+                <xforms:recalculate/>
+                <xforms:refresh/>
+                <!-- Set initial focus -->
+                <xforms:setfocus control="dmv-last-name-control"/>
+                <!-- Make sure we look clean after initialization, as insertions can take place above -->
+                <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
+
+            </xforms:action>
+
+            <!-- Mark document as dirty in case of insertion or deletion -->
+            <xforms:setvalue ev:event="xforms-insert" ref="xxforms:instance('control-instance')/data-status">dirty</xforms:setvalue>
+            <xforms:setvalue ev:event="xforms-delete" ref="xxforms:instance('control-instance')/data-status">dirty</xforms:setvalue>
+
+            <!-- This action clears all the fields of the mailing address -->
+            <xforms:action ev:event="dmv-clear-mailing-address">
+                <xforms:setvalue while="instance('document-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"
+                                 ref="instance('document-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"/>
+            </xforms:action>
+
+            <!-- This action clears all the fields of the vehicle address -->
+            <xforms:action ev:event="dmv-clear-vehicle-address">
+                <xforms:setvalue while="instance('document-instance')//dmv:vehicle-address//*[not(*) and . != '']"
+                                 ref="instance('document-instance')//dmv:vehicle-address//*[not(*) and . != '']"/>
+            </xforms:action>
+
+            <!-- Main XForms instance -->
+            <xforms:instance id="document-instance" src="oxf:/apps/forms/schema/template-form.xml"/>
+
+            <xforms:bind nodeset="instance('document-instance')">
+
+                <!-- Metadata -->
+                <xforms:bind nodeset="document-date" calculate="current-dateTime()" type="xs:dateTime"/>
+                <!-- Business data -->
+                <xforms:bind nodeset="//dmv:form">
+                    <!-- Uncomment this line to test read-only version -->
+                    <xforms:bind nodeset="." readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                    <xforms:bind nodeset="dmv:personal-information">
+                        <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                        <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
+                        <xforms:bind nodeset="dmv:driver-license-number | dmv:birth-date" required="true()"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="dmv:address-information">
+                        <xforms:bind nodeset="dmv:address">
+                            <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                            <xforms:bind nodeset="dmv:city | dmv:state | dmv:zip" required="true()"/>
+                        </xforms:bind>
+                    </xforms:bind>
+                    <xforms:bind nodeset="dmv:vehicle-information">
+                        <xforms:bind nodeset="dmv:vehicles/dmv:vehicle">
+                            <xforms:bind nodeset="dmv:plate-number | dmv:vin" required="true()"/>
+                        </xforms:bind>
+                        <xforms:bind nodeset="dmv:vehicle-address">
+                            <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                            <xforms:bind nodeset="dmv:city | dmv:county" required="true()"/>
+                        </xforms:bind>
+                    </xforms:bind>
+                </xforms:bind>
+
+            </xforms:bind>
+
+            <!-- XForms instance containing the XML schema (for enumerations) -->
+            <xforms:instance id="schema-instance" src="oxf:/apps/forms/schema/dmv-schema.xsd"/>
+
+            <!-- XForms instance containing template for mailing address -->
+            <xforms:instance id="mailing-address-template" src="oxf:/apps/forms/schema/template-mailing-address.xml"/>
+
+            <!-- XForms instance containing template for vehicle address -->
+            <xforms:instance id="vehicle-address-template" src="oxf:/apps/forms/schema/template-vehicle-address.xml"/>
+
+            <!-- XForms instance for widget control information -->
+            <xforms:instance id="triggers-instance">
+                <control xmlns="">
+                    <add-vehicle-trigger/>
+                    <remove-vehicle-trigger/>
+                    <add-mailing-address-trigger/>
+                    <remove-mailing-address-trigger/>
+                    <clear-mailing-address-trigger/>
+                    <add-vehicle-address-trigger/>
+                    <remove-vehicle-address-trigger/>
+                    <clear-vehicle-address-trigger/>
+                </control>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('triggers-instance')">
+                <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) >= 3 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('document-instance')//dmv:address[@type = 'mailing']) or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('document-instance')//dmv:address[@type = 'mailing'] or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:address[@type = 'mailing']) != ''"/>
+                <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('document-instance')//dmv:vehicle-address) or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('document-instance')//dmv:vehicle-address or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:vehicle-address) != ''"/>
+            </xforms:bind>
+
+            <!-- XForms instance for license plate information -->
+            <xforms:instance id="plates-instance">
+                <plates xmlns=""/>
+            </xforms:instance>
+
+            <xforms:instance id="plate-template">
+                <plate xmlns="">
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                    <character/>
+                </plate>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('plates-instance')">
+                <xforms:bind nodeset="plate/character"
+                             calculate="for $i in . return substring((instance('document-instance')//dmv:plate-number)[count($i/../preceding-sibling::plate) + 1], count($i/preceding-sibling::character) + 1, 1)"/>
+            </xforms:bind>
+        </xforms:model>
+        <!-- Model to handle persistence -->
+        <xi:include href="oxf:/apps/forms/common/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!-- Model to handle resources -->
+        <xi:include href="oxf:/apps/forms/common/resources-model.xml" xxi:omit-xml-base="true"/>
+    </head>
+    <body>
+        <table class="forms-title-table">
+            <tr>
+                <td>
+                    <img src="/apps/forms/images/dmv-logo.png" alt="DMV"/>
+                </td>
+                <td>
+                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/detail-title"/>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Error summary -->
+        <xxforms:dialog level="modeless" close="false" id="error-summary-dialog">
+            <xforms:label>Errors</xforms:label>
+            <xforms:group model="common-model" ref="instance('errors-instance')/error">
+                <table class="forms-errors-table">
+                    <!--<xforms:repeat nodeset="exforms:sort(instance('errors-instance')/error, '@id', 'text')" id="errors-repeat">-->
+                    <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
+                        <tr>
+                            <th>
+                                <xforms:output value="@label"/>
+                            </th>
+                            <td>
+                                <i>
+                                    <xforms:output value="if (string-length(@indexes) > 0) then concat('(Row ', @indexes, ')') else ''"/>
+                                </i>
+                            </td>
+                            <td>
+                                <xforms:output value="@alert"/>
+                            </td>
+                        </tr>
+                    </xforms:repeat>
+                </table>
+            </xforms:group>
+        </xxforms:dialog>
+
+        <xforms:group>
+            <!-- Clear messages upon user moving around in the form -->
+            <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
+
+            <table class="forms-main-table">
+                <xforms:group model="common-model">
+                    <tr>
+                        <td colspan="2">
+                            <!-- Main form actions -->
+                            <table class="forms-action-table" id="main-action-table">
+                                <tr>
+                                    <td>
+                                        <xforms:group ref="instance('control-instance')/back-trigger">
+                                            <xforms:load ev:event="DOMActivate" resource="/forms/"/>
+                                            <xforms:trigger appearance="xxforms:image">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/return"/>
+                                                <xxforms:img src="/apps/forms/images/back.gif"/>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="xxforms:link">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/return"/>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                    </td>
+                                    <td>
+                                        <xforms:group ref="instance('control-instance')/save-trigger">
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:send submission="save-submission"/>
+                                            </xforms:action>
+                                            <xforms:trigger appearance="xxforms:image">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/save-document"/>
+                                                <xxforms:img src="/apps/forms/images/save.gif"/>
+                                            </xforms:trigger>
+                                            <xforms:trigger appearance="xxforms:link">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/save-document"/>
+                                            </xforms:trigger>
+                                        </xforms:group>
+                                    </td>
+                                    <td>
+                                        <xforms:switch>
+                                            <xforms:case id="no-message">
+                                                <span/>
+                                            </xforms:case>
+                                            <xforms:case id="ok-message">
+                                                <span class="forms-message-positive">
+                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                                </span>
+                                            </xforms:case>
+                                            <xforms:case id="validation-error-message">
+                                                <span class="forms-message-negative">
+                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                                </span>
+                                            </xforms:case>
+                                            <xforms:case id="fatal-error-message">
+                                                <span class="forms-message-fatal">
+                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                                </span>
+                                            </xforms:case>
+                                        </xforms:switch>
+                                    </td>
+                                    <td id="language-choice-td">
+                                        <xforms:select1 model="resources-model" ref="instance('language-instance')">
+                                            <xforms:label ref="instance('resources-instance')/labels/language-choice"/>
+                                            <xforms:item>
+                                                <xforms:label>en</xforms:label>
+                                                <xforms:value>en</xforms:value>
+                                            </xforms:item>
+                                            <xforms:item>
+                                                <xforms:label>fr</xforms:label>
+                                                <xforms:value>fr</xforms:value>
+                                            </xforms:item>
+                                            <xforms:send ev:event="xforms-value-changed" submission="update-language-submission"/>
+                                        </xforms:select1>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </xforms:group>
+                <xforms:group model="common-model">
+                    <!-- Handle invalid and valid events in order to update error summary -->
+                    <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
+                        <xforms:action if="not(instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')])">
+                            <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target-id')"/>
+                            <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
+                            <xxforms:show dialog="error-summary-dialog"/>
+                        </xforms:action>
+                        <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
+                        <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
+                    </xforms:action>
+                    <xforms:action ev:event="xforms-valid" if="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]">
+                        <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target-id') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
+                        <xxforms:hide if="count(instance('errors-instance')/error) = 0" dialog="error-summary-dialog"/>
+                    </xforms:action>
+                    <!-- Mark that data has changed -->
+                    <xforms:action ev:event="xforms-value-changed">
+                        <xforms:setvalue model="common-model" ref="instance('control-instance')/data-status">dirty</xforms:setvalue>
+                    </xforms:action>
+
+                    <xforms:group model="dmv-model" ref="instance('document-instance')">
+                        <!-- Start form-specific controls -->
+                        <xforms:group ref="dmv:personal-information">
+                            <tr>
+                                <th class="dmv-heading-column">
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
+                                    <p>
+                                        <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
+                                    </p>
+                                </th>
+                                <td class="dmv-data-column">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <xforms:input id="dmv-last-name-control" incremental="true" ref="dmv:name/dmv:last-name" class="dmv-last-name">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/last-name"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/last-name"/>
+                                                </xforms:input>
+                                                <xforms:input incremental="true" ref="dmv:driver-license-number" class="dmv-driver-license-number">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/driver-license-number"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/driver-license-number"/>
+                                                </xforms:input>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <xforms:group ref="dmv:name">
+                                                    <xforms:input incremental="true" ref="dmv:first-name" class="dmv-first-name">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/first-name"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/first-name"/>
+                                                    </xforms:input>
+                                                    <xforms:input incremental="true" ref="dmv:initial" xhtml:size="2" class="dmv-initial">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/initial"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/initial"/>
+                                                    </xforms:input>
+                                                </xforms:group>
+                                                <xforms:input incremental="true" ref="dmv:birth-date"
+                                                              xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/birth-date"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/birth-date"/>
+                                                </xforms:input>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </xforms:group>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
+                        <xforms:group ref="dmv:address-information">
+                            <xforms:group ref="dmv:voter-address-change">
+                                <tr>
+                                    <th>
+                                        <xforms:output model="resources-model" value="instance('resources-instance')/titles/voter-address-change" mediatype="text/html"/><br/>
+                                    </th>
+                                    <td>
+                                        <xforms:select ref="dmv:change-address" appearance="full">
+                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/change-voting-address"/>
+                                            <xforms:item>
+                                                <xforms:label/>
+                                                <xforms:value>N</xforms:value>
+                                            </xforms:item>
+                                        </xforms:select>
+                                    </td>
+                                </tr>
+                            </xforms:group>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
+                            <xforms:group ref="dmv:address[@type = 'residence']">
+                                <tr>
+                                    <th>
+                                        <xforms:output model="resources-model" value="instance('resources-instance')/titles/new-residence-address" mediatype="text/html"/><br/>
+                                        <p>
+                                            <img src="/apps/forms/images/residence-address.png" alt="New or Correct Residence Address"/>
+                                        </p>
+                                    </th>
+                                    <td>
+                                        <table>
+                                            <tr>
+                                                <td align="right">
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-number"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-number"/>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-1"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-1"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right">
+                                                    <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/apt"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/apt"/>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-2"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-2"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/city"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/city"/>
+                                                        <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                                    </xforms:input>
+                                                    <xforms:select1 ref="dmv:state">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/state"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/state"/>
+                                                        <xforms:item>
+                                                            <xforms:label/>
+                                                            <xforms:value/>
+                                                        </xforms:item>
+                                                        <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                            <xforms:label ref="@value"/>
+                                                            <xforms:value ref="@value"/>
+                                                        </xforms:itemset>
+                                                    </xforms:select1>
+                                                    <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/zip"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/zip"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </xforms:group>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
+                            <tr>
+                                <th>
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/new-mailing-address" mediatype="text/html"/><br/>
+                                    <p>
+                                        <img src="/apps/forms/images/mailing-address.png" alt="New or Correct Mailing Address"/>
+                                    </p>
+                                </th>
+                                <td>
+
+                                    <table class="forms-action-table">
+                                        <tr>
+                                            <td>
+                                                <xforms:group ref="instance('triggers-instance')/remove-mailing-address-trigger">
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:delete nodeset="instance('document-instance')//dmv:address[@type = 'mailing']" at="last()"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-mailing-address"/>
+                                                        <xxforms:img src="/apps/forms/images/remove.gif"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-mailing-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+
+                                                <xforms:group ref="instance('triggers-instance')/clear-mailing-address-trigger">
+                                                    <xforms:action ev:event="DOMActivate" >
+                                                        <xforms:dispatch name="dmv-clear-mailing-address" target="dmv-model"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/clear-address"/>
+                                                        <xxforms:img src="/apps/forms/images/recycle-green.png"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/clear-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+                                            </td>
+                                            <td>
+                                                <xforms:group ref="instance('triggers-instance')/add-mailing-address-trigger" >
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:insert nodeset="instance('document-instance')//dmv:address-information/dmv:address" at="last()" position="after"
+                                                                origin="instance('mailing-address-template')"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-mailing-address"/>
+                                                        <xxforms:img src="/apps/forms/images/add.gif"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-mailing-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+                                            </td>
+                                        </tr>
+                                    </table>
+
+                                    <xforms:group ref="dmv:address[@type = 'mailing']">
+                                        <table>
+                                            <tr>
+                                                <td align="right">
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-number"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-number"/>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-1"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-1"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right">
+                                                    <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/apt"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/apt"/>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-2"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-2"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/city"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/city"/>
+                                                        <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                                    </xforms:input>
+                                                    <xforms:select1 ref="dmv:state">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/state"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/state"/>
+                                                        <xforms:item>
+                                                            <xforms:label/>
+                                                            <xforms:value/>
+                                                        </xforms:item>
+                                                        <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                            <xforms:label ref="@value"/>
+                                                            <xforms:value ref="@value"/>
+                                                        </xforms:itemset>
+                                                    </xforms:select1>
+                                                    <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/zip"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/zip"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </xforms:group>
+                                </td>
+                            </tr>
+                        </xforms:group>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
+                        <xforms:group ref="dmv:vehicle-information">
+                            <xforms:group ref="dmv:vehicles">
+                                <tr>
+                                    <th>
+                                        <xforms:output model="resources-model" value="instance('resources-instance')/titles/vehicles-owned" mediatype="text/html"/><br/>
+                                    </th>
+                                    <td>
+                                        <table class="forms-action-table">
+                                            <tr>
+                                                <td>
+                                                    <xforms:group ref="instance('triggers-instance')/add-vehicle-trigger">
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <xforms:insert nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')" position="after"/>
+                                                            <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:plate-number"/>
+                                                            <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:vin"/>
+                                                            <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
+                                                            <xforms:insert context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
+                                                        </xforms:action>
+                                                        <xforms:trigger appearance="xxforms:image">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-vehicle"/>
+                                                            <xxforms:img src="/apps/forms/images/add.gif"/>
+                                                        </xforms:trigger>
+                                                        <xforms:trigger appearance="xxforms:link">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-vehicle"/>
+                                                        </xforms:trigger>
+                                                    </xforms:group>
+                                                </td>
+                                                <td>
+                                                    <xforms:group ref="instance('triggers-instance')/remove-vehicle-trigger">
+                                                        <xforms:action ev:event="DOMActivate">
+                                                            <xforms:delete nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
+                                                            <xforms:delete context="instance('plates-instance')" nodeset="plate"/>
+                                                        </xforms:action>
+                                                        <xforms:trigger appearance="xxforms:image">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-vehicle"/>
+                                                            <xxforms:img src="/apps/forms/images/remove.gif"/>
+                                                        </xforms:trigger>
+                                                        <xforms:trigger appearance="xxforms:link">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-vehicle"/>
+                                                        </xforms:trigger>
+                                                    </xforms:group>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <table class="forms-gridtable" id="dmv-vehicles">
+                                            <tr>
+                                                <th colspan="2"><xforms:output model="resources-model" value="instance('resources-instance')/titles/plate-number" mediatype="text/html"/></th>
+                                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/vin" mediatype="text/html"/></th>
+                                                <th><xforms:output model="resources-model" value="instance('resources-instance')/titles/leased" mediatype="text/html"/></th>
+                                            </tr>
+                                            <xforms:repeat nodeset="dmv:vehicle" id="vehicles-repeat">
+                                                <tr>
+                                                    <td>
+                                                        <xforms:input incremental="true" ref="dmv:plate-number" class="dmv-plate-number">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/plate-number"/>
+                                                            <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/plate-number"/>
+                                                            <xforms:setvalue ev:event="DOMFocusOut" ref="." value="upper-case(.)"/>
+                                                        </xforms:input>
+                                                    </td>
+                                                    <td>
+                                                        <table class="dmv-plate-table">
+                                                            <tr>
+                                                                <td>
+                                                                    <span class="dmv-plate-span">
+                                                                        <xforms:repeat nodeset="instance('plates-instance')/plate[count(xxforms:repeat-current('vehicles-repeat')/preceding-sibling::dmv:vehicle) + 1]/character[normalize-space(.) != '']">
+                                                                            <xforms:output mediatype="image/gif" value="concat('/apps/forms/images/_', if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_', '_small.gif')"/>
+                                                                        </xforms:repeat>
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
+                                                    <td>
+                                                        <xforms:input incremental="true" ref="dmv:vin" class="dmv-vin">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/vin"/>
+                                                            <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/vin"/>
+                                                            <xforms:setvalue ev:event="DOMFocusOut" ref="." value="upper-case(.)"/>
+                                                            <!--<xforms:hint>Last 17 Positions</xforms:hint>-->
+                                                        </xforms:input>
+                                                    </td>
+                                                    <td align="center">
+                                                        <xforms:select ref="dmv:leased" appearance="full">
+                                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/leased"/>
+                                                            <xforms:item>
+                                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/leased"/>
+                                                                <xforms:value>Y</xforms:value>
+                                                            </xforms:item>
+                                                        </xforms:select>
+                                                    </td>
+                                                </tr>
+                                            </xforms:repeat>
+                                            <tr/><!-- This is to work around a bug in IE -->
+                                        </table>
+                                    </td>
+                                </tr>
+                            </xforms:group>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
+                            <xforms:group ref="dmv:leased-vehicles">
+                                <tr>
+                                    <th>
+                                        <xforms:output model="resources-model" value="instance('resources-instance')/titles/leased-vehicles" mediatype="text/html"/>
+                                    </th>
+                                    <td>
+                                        <xforms:input incremental="true" ref="dmv:company-name" class="dmv-company-name">
+                                            <xforms:label model="resources-model" ref="instance('resources-instance')/labels/company-name"/>
+                                            <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/company-name"/>
+                                        </xforms:input>
+                                    </td>
+                                </tr>
+                            </xforms:group>
+                            <tr><td colspan="2" class="forms-hr"/></tr>
+                            <tr>
+                                <th>
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/coach-vessel-location" mediatype="text/html"/><br/>
+                                </th>
+                                <td>
+
+                                    <table class="forms-action-table">
+                                        <tr>
+                                            <td>
+                                                <xforms:group ref="instance('triggers-instance')/remove-vehicle-address-trigger">
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:delete nodeset="instance('document-instance')//dmv:vehicle-address" at="last()"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-vehicle-address"/>
+                                                        <xxforms:img src="/apps/forms/images/remove.gif"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/remove-vehicle-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+
+                                                <xforms:group ref="instance('triggers-instance')/clear-vehicle-address-trigger">
+                                                    <xforms:action ev:event="DOMActivate" >
+                                                        <xforms:dispatch name="dmv-clear-vehicle-address" target="dmv-model"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/clear-address"/>
+                                                        <xxforms:img src="/apps/forms/images/recycle-green.png"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/clear-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+                                            </td>
+                                            <td>
+                                                <xforms:group ref="instance('triggers-instance')/add-vehicle-address-trigger">
+                                                    <xforms:action ev:event="DOMActivate">
+                                                        <xforms:insert nodeset="instance('document-instance')//dmv:vehicle-information/dmv:leased-vehicles" at="last()" position="after"
+                                                                origin="instance('vehicle-address-template')"/>
+                                                    </xforms:action>
+                                                    <xforms:trigger appearance="xxforms:image">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-vehicle-address"/>
+                                                        <xxforms:img src="/apps/forms/images/add.gif"/>
+                                                    </xforms:trigger>
+                                                    <xforms:trigger appearance="xxforms:link">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/add-vehicle-address"/>
+                                                    </xforms:trigger>
+                                                </xforms:group>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <xforms:group ref="dmv:vehicle-address">
+                                        <table>
+                                            <tr>
+                                                <td align="right">
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-number"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-number"/>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-1"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-1"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="right">
+                                                </td>
+                                                <td>
+                                                    <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-2"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-2"/>
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/city"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/city"/>
+                                                        <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                                    </xforms:input>
+                                                    <xforms:input incremental="true" ref="dmv:county" class="dmv-county">
+                                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/county"/>
+                                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/county"/>
+                                                        <!--<xforms:hint>Do Not Abbreviate</xforms:hint>-->
+                                                    </xforms:input>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </xforms:group>
+                                </td>
+                            </tr>
+                        </xforms:group>
+                        <tr><td colspan="2" class="forms-hr"/></tr>
+                        <xforms:group ref="dmv:address-information/dmv:address[@type = 'old']">
+                            <tr>
+                                <th>
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/old-address" mediatype="text/html"/><br/>
+                                </th>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td align="right">
+                                                <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-number"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-number"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-1"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-1"/>
+                                                </xforms:input>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="right">
+                                                <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/apt"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/apt"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/street-name-2"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/street-name-2"/>
+                                                </xforms:input>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/city"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/city"/>
+                                                    <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
+                                                </xforms:input>
+                                                <xforms:select1 ref="dmv:state">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/state"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/state"/>
+                                                    <xforms:item>
+                                                        <xforms:label></xforms:label>
+                                                        <xforms:value/>
+                                                    </xforms:item>
+                                                    <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state']//xs:enumeration">
+                                                        <xforms:label ref="@value"/>
+                                                        <xforms:value ref="@value"/>
+                                                    </xforms:itemset>
+                                                </xforms:select1>
+                                                <xforms:input incremental="true" ref="dmv:zip" class="dmv-zip">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/zip"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/zip"/>
+                                                </xforms:input>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <!-- End form-specific controls -->
+                        </xforms:group>
+                    </xforms:group>
+                </xforms:group>
+            </table>
+
+        </xforms:group>
+
+    </body>
+</html>

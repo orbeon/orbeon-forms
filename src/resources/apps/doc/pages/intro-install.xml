@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<!DOCTYPE document [
+    <!ENTITY jboss-vers "JBoss 4.0.4">
+    <!ELEMENT document (ANY)>
+]>
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Installing Orbeon PresentationServer</title>
+    </header>
+    <body>
+        <section>
+            <title>Downloading</title>
+            <p>
+            	Orbeon PresentationServer (OPS) can be downloaded from
+                <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
+            </p>
+        </section>
+        <section>
+            <title>System Requirements</title>
+            <p>
+                To install OPS you need an application server that runs on Java version 1.4.2 (or
+                later) and implements the Servlet API 2.3 (or later). OPS has been tested on the
+                following application servers:
+            </p>
+            <ul>
+                <li>Apache Tomcat 5.5.20 (JDK 1.5.0)</li>
+                <li>BEA WebLogic Server 9.1 (JRockit)</li>
+                <li>IBM WebSphere 6</li>
+                <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
+                <li>&jboss-vers;</li>
+            </ul>
+            <p>
+                Please contact us if you have questions about support for other application servers
+                or versions.
+            </p>
+        </section>
+        <section>
+            <title>Installing OPS on Apache Tomcat</title>
+            <ol>
+                <li>
+                    <p>
+                        Assuming that <code>TOMCAT_HOME</code> represents the location of your
+                        Tomcat installation: create a new <code>TOMCAT_HOME/webapps/ops</code>
+                        directory.
+                    </p>
+                </li>
+
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>ops</code> directory you just
+                        created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        With Tomcat 5, move <code>xercesImpl.jar</code> and
+                        <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
+                        <code>server/lib</code>. This way Xerces will be available to Tomcat, but it
+                        won't override the version of Xerces and standard XML APIs that comes with
+                        OPS.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        You can now start Tomcat, and access <code>http://localhost:8080/ops/</code>
+                        to test your installation (replacing <code>localhost</code> and
+                        <code>8080</code> with the host name and port number of your Tomcat
+                        installation if different from the default), or perform one of the optional
+                        installation steps below.</p>
+                    </li>
+
+<!--
+                <li><p>Optionally, configure a datasource to use the SQL examples
+                using the bundled HSQLDB database:
+
+                   <ol>
+                        <li>Open <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code> and
+                        uncomment the three sections delimited with "Uncomment this for the SQL
+                        example".</li>
+
+                        <li>Copy <code>hsqldb-1_7_2_4_orbeon.jar</code> from
+                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code> to
+                        <code>TOMCAT_HOME/common/lib</code>.</li>
+
+                        <li>If you are using Tomcat 4.1 LE, download <link
+                        href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</link>
+                        and <link href="http://jakarta.apache.org/commons/pool/">Jakarta Commons
+                        Pool</link> and copy the JAR files to <code>TOMCAT_HOME/common/lib</code>.
+                        </li>
+
+                        <li>With Tomcat 5.0.x or earlier, open <code>server.xml</code> and add a
+                        new context with the following properties:
+
+                            <xml-source>
+                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
+                                    <Resource name="jdbc/db" auth="Container"
+                                        type="javax.sql.DataSource"/>
+
+                                    <ResourceParams name="jdbc/db">
+                                        <parameter>
+                                            <name>factory</name>
+                                            <value>org.apache.commons.dbcp.BasicDataSourceFactory</value>
+                                        </parameter>
+                                        <parameter>
+                                            <name>driverClassName</name>
+                                            <value>org.hsqldb.jdbcDriver</value>
+                                        </parameter>
+                                        <parameter>
+                                            <name>url</name>
+                                            <value>jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb</value>
+                                        </parameter>
+                                        <parameter>
+                                            <name>username</name>
+                                            <value>sa</value>
+                                        </parameter>
+                                        <parameter>
+                                            <name>password</name>
+                                            <value></value>
+                                        </parameter>
+                                    </ResourceParams>
+                                </Context>
+                            </xml-source>
+                        </li>
+
+                        <li>
+                            With Tomcat 5.5.x, open <code>server.xml</code> and add a new context
+                            with the following properties:
+
+                            <xml-source>
+                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
+                                   <Resource name="jdbc/db" auth="Container"
+                                      type="javax.sql.DataSource" driverClassName="org.hsqldb.jdbcDriver"
+                                      url="jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb"
+                                      username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1"/>
+                                </Context>
+                            </xml-source>
+                        </li>
+
+                    </ol></p>
+                </li>
+-->
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
+                    <ol>
+                        <li>
+                            Open <code>TOMCAT_HOME/webapps/ops/WEB-INF/web.xml</code> and
+                            uncomment the <code>security-constraint</code>,
+                            <code>login-config</code> and <code>security-role</code> declarations at
+                            the end of the file.
+                        </li>
+                        <li>
+                            Open <code>TOMCAT_HOME/conf/server.xml</code> and uncomment the
+                            following declaration: <code>&lt;Realm
+                            className="org.apache.catalina.realm.MemoryRealm" /&gt;</code>
+                        </li>
+                        <li>
+                            Edit <code>TOMCAT_HOME/conf/tomcat-users.xml</code> and replace the
+                            content of this by with:
+                            <xml-source>
+                                <tomcat-users>
+                                  <role rolename="administrator"/>
+                                  <user username="admin" password="password" roles="administrator"/>
+                                </tomcat-users>
+                            </xml-source>
+                        </li>
+                    </ol>
+                </li>
+
+               <!--
+               <li>Optionally, to run the JSF example:
+                   <ol>
+                        <li>
+                            Open
+                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/web.xml</code>
+                            and, following the marker text "Uncomment this for
+                            the JSF example", uncomment all the code (in three
+                            places) related to the JSF example. This enables a
+                            filter, a servlet, a listener, and sets some
+                            parameters.
+                        </li>
+                        <li>
+                            Download the Sun Reference implementation version
+                            1.0 Early Access 4 (EA4) of JSF, part of the JWSDP, available from
+                            <a href="http://java.sun.com/webservices/downloads/webservicespack.html">
+                            http://java.sun.com/webservices/downloads/webservicespack.html</a>.
+                        </li>
+                        <li>Install the JWSDP.</li>
+                        <li>
+                            Copy the following files from the jsf/lib
+                            directory to
+                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/lib/</code>:
+                            <ul>
+                                <li><code>jsf-api.jar</code></li>
+                                <li><code>jsf-ri.jar</code></li>
+                            </ul>
+                        </li>
+                        <li>
+                            Copy the following files from the OXF jsf/lib directory
+                            to
+                            <code>TOMCAT_HOME/webapps/oxf/WEB-INF/lib/</code>:
+                            <ul>
+                                <li><code>jsf-components-ea4_orbeon.jar</code> (modified version of some of the EA 4 components)</li>
+                                <li><code>jsf-examples.jar</code> (examples)</li>
+                                <li><code>jsf-xml-renderkit.jar</code> (XML RenderKit)</li>
+                                <li><code>jstl-1_0_3.jar</code></li>
+                                <li><code>jstl-standard-1_0_3.jar</code></li>
+                            </ul>
+                            The source code for the first three JARs is
+                            available under the <code>src/jsf</code> directory.
+                        </li>
+                    </ol>
+                </li>
+                -->
+                <!--
+                <li>Optionally, to run the Portlet examples:
+                    <p>
+                        <ol>
+                            <li>
+                                    Download the Portlet API archive (JSR-168
+                                    Proposed Final Draft) from <a
+                                        href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">the
+                                    JCP site</a>
+                            </li>
+                            <li>
+                                    Extract the archive and copy
+                                <code>lib/portlet.jar</code> into the OXF
+                                <code>WEB-INF/lib</code> directory.
+                            </li>
+                        </ol>
+                    </p>
+                </li>
+                -->
+            </ol>
+        </section>
+        <section>
+            <title>Installing OPS on BEA WebLogic 9.1</title>
+            <ol>
+                <li>
+                    <p>
+                        Select a directory where you want to store your web application. Let's
+                        assume the path you chose is <code>C:/WebApps/ops</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> into <code>C:/WebApps/ops</code>. There should
+                        now be a directory called <code>WEB-INF</code> under
+                        <code>C:/WebApps/ops</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Start WebLogic's adminstration console.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Use the console to install a new Web application. When prompted to select a
+                        WAR file, point to the directory <code>C:/WebApps/ops</code>. When prompted
+                        for a context path, choose a value such as <code>ops</code>. Complete the
+                        installation and start the web application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        You should now be able to access the OPS examples by pointing your browser
+                        to the address of your WebLogic server followed by the context path you
+                        chose, for example: <code>http://localhost:7001/ops/</code>.
+                    </p>
+                </li>
+                <!--
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
+                    <ol>
+                        <li>
+                            <p>
+                                Open <code>C:/WebApps/ops/WEB-INF/web.xml</code> and
+                                uncomment the lines between <code>&lt;!- - Uncomment this for the
+                                authentication example - -></code> and <code>&lt;!- - End
+                                authentication example - -></code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Open <code>C:/WebApps/ops/WEB-INF/weblogic.xml</code> and
+                                uncomment the lines between <code>&lt;!- - Uncomment this for the
+                                authentication example - -></code> and <code>&lt;!- - End
+                                authentication example - -></code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Open the WebLogic Console.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Create a new user named <code>admin</code> with a password of your
+                                choice.
+                            </p>
+                        </li>
+                    </ol>
+                </li>
+                -->
+            </ol>
+        </section>
+        <section>
+            <title>Installing OPS on BEA WebLogic 7.0 and 8.1</title>
+            <warning>
+                <p>
+                    OPS 3.0 hasn't been tested with these versions of WebLogic, but you may want to
+                    try the following instructions for OPS 2.8.
+                </p>
+            </warning>
+            <ol>
+                <li>
+                    <p>
+                        Assume that <code>DOMAIN</code> represents your WebLogic domain directory
+                        (typically <code>c:\bea\user_projects</code>). Create a new directory:
+                        <code>DOMAIN\applications\orbeon</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>orbeon</code> directory you just
+                        created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Edit the <code>startWeblogic.cmd</code> (in <code>DOMAIN</code>) and
+                        change <code>set STARTMODE=true</code> to <code>set
+                        STARTMODE=false</code>. This starts WebLogic in development mode. In
+                        development mode, WebLogic automatically loads and deploys the content of
+                        the <code>application</code> directory. If you don't want to start the
+                        server in development mode, you have to explicitly declare a Web application
+                        in the <code>config.xml</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        To improve performance on WebLogic (<b>highly recommended!</b>):
+                    </p>
+                    <ol>
+                        <li>
+                            Start WebLogic (e.g. with <code>startWebLogic.cmd</code>)
+                        </li>
+                        <li>
+                            Make sure you can access the OPS examples with your browser (by going
+                            to <code>http://localhost:7001/orbeon/</code>)
+                        </li>
+                        <li>
+                            Stop WebLogic
+                        </li>
+                        <li>
+                            Open the <code>config.xml</code> file in an editor. Look for the
+                            <code>&lt;WebAppComponent Name="orbeon"&gt;</code> element and add the
+                            attribute: <code>ServletReloadCheckSecs="-1"</code>. This will prevent
+                            WebLogic from checking if a servlet has changed in the application and
+                            will make OPS <i>much</i> faster.
+                        </li>
+                    </ol>
+                </li>
+
+<!--
+                <li><p>Optionally, configure a datasource to use the SQL examples
+                using the bundled HSQLDB database:
+
+                    <p><ol>
+                        <li>Open
+                        <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code>
+                        and uncomment the <code>jdbc/db</code> data source
+                        declaration.</li>
+
+                        <li>Edit <code>DOMAIN/startWeblogic.cmd</code>:
+
+                            <p><ul>
+                                <li>On WebLogic 7: before the call to
+                                <code>startWLS.cmd</code> add a line: <code>set
+                                PRE_CLASSPATH=applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code>.</li>
+
+                                <li>On WebLogic 8: at the end of the line
+                                <code>set CLASSPATH=...</code>, add:
+                                <code>;applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code></li>
+                            </ul></p>
+                        </li>
+
+                        <li>Go to the WebLogic Console with a browser.</li>
+
+                        <li>Create a new connection pool (in Services / JDBC /
+                        Connection Pools). Name it <code>orbeon</code>, set the
+                        URL to
+                        <code>jdbc:hsqldb:http://localhost:7001/orbeon/db</code>,
+                        the driver classname to
+                        <code>org.hsqldb.jdbcDriver</code> and the properties
+                        to <code>user=sa</code>.</li>
+
+                        <li>Go to the Connections tab of the connection pool
+                        you just created. Set the initial capacity to 0, and
+                        the maximum capacity to 5.</li>
+
+                        <li>Go to the Targets tab and deploy the pool.</li>
+
+                        <li>Create a Data Source for this connection pool.
+                        Name it <code>orbeon</code>, set the JNDI name to
+                        <code>weblogic.jdbc.jts.orbeon</code> and the pool
+                        name to <code>orbeon</code>.</li>
+
+                        <li>Go to the <code>Targets</code> tab and deploy the
+                        data source.</li>
+                    </ol></p>
+                </p></li>
+-->
+
+                <li>
+                    <p>
+                        Optionally, to run the authentication example:
+                    </p>
+                    <ol>
+                        <li>
+                            Open <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code> and
+                            uncomment the <code>security-constraint</code>,
+                            <code>login-config</code> and <code>security-role</code> declarations at
+                            the end of the file.
+                        </li>
+                        <li>
+                            Go to the WebLogic Console with a browser.
+                        </li>
+                        <li>
+                            Create a new user named <code>admin</code> with a password of your
+                            choice.
+                        </li>
+                    </ol>
+                </li>
+                <!--
+                <li><p>Optionally, to run the JSF example (tested with
+                WebLogic 7.0. and 8.1):
+                    <p><ol>
+                        <li>
+                            Open
+                            <code>DOMAIN/applications/oxf/WEB-INF/web.xml</code>
+                            and, following the marker text "Uncomment this for
+                            the JSF example", uncomment all the code (in three
+                            places) related to the JSF example. This enables a
+                            filter, a servlet, a listener, and sets some
+                            parameters.
+                        </li>
+                        <li>
+                            Download the Sun Reference implementation version
+                            1.0 Early Access 4 (EA4) of JSF, part of the JWSDP, available from
+                            <a href="http://java.sun.com/webservices/downloads/webservicespack.html">
+                            http://java.sun.com/webservices/downloads/webservicespack.html</a>.
+                        </li>
+                        <li>Install the JWSDP.</li>
+                        <li>
+                            Copy the following files from the jsf/lib
+                            directory to
+                            <code>DOMAIN/applications/oxf/WEB-INF/lib/</code>:
+                            <ul>
+                                <li><code>jsf-api.jar</code></li>
+                                <li><code>jsf-ri.jar</code></li>
+                            </ul>
+                        </li>
+                        <li>
+                            Copy the following files from the OXF jsf/lib directory
+                            to
+                            <code>DOMAIN/applications/oxf/WEB-INF/lib/</code>:
+                            <ul>
+                                <li><code>jsf-components-ea4_orbeon.jar</code> (modified version of some of the EA 4 components)</li>
+                                <li><code>jsf-examples.jar</code> (examples)</li>
+                                <li><code>jsf-xml-renderkit.jar</code> (XML RenderKit)</li>
+                                <li><code>jstl-1_0_3.jar</code></li>
+                                <li><code>jstl-standard-1_0_3.jar</code></li>
+                            </ul>
+                            The source code for the first three JARs is
+                            available under the <code>src/jsf</code> directory.
+                        </li>
+                        <li>
+                            Open <code>jsf-ri.jar</code>. Edit the file named
+                            <code>faces.properties</code> within that JAR file.
+                            Replace the line containing:
+                            <code>javax.faces.tree.TreeFactory=com.sun.faces.tree.SimpleTreeFactoryImpl</code>
+                            with
+                            <code>javax.faces.tree.TreeFactory=org.orbeon.faces.renderkit.TreeFactoryImpl</code>.
+                            NOTE: This is a temporary hack due to the fact that
+                            in the JSF RI EA 4, setting a RenderKit
+                            declaratively does not work. Alternatively, you can
+                            start WebLogic (modify
+                            <code>startWeblogic.cmd</code>) with the following
+                            option:
+                            <code>-Djavax.faces.tree.TreeFactory=org.orbeon.faces.renderkit.TreeFactoryImpl</code>.
+                        </li>
+                    </ol></p>
+                </p></li>
+                -->
+                <li>
+                    <p>
+                        Once OPS is properly installed, you can start WebLogic as usual with the
+                        <code>startWeblogic.cmd</code> script (in <code>DOMAIN</code>).
+                    </p>
+                </li>
+            </ol>
+        </section>
+        <a name="websphere"/>
+        <section>
+            <title>Installing OPS on IBM WebSphere 6</title>
+            <ol>
+                <li>
+                    <p>
+                        Launch WebSphere server.
+                        <ul>
+                            <li>
+                                On Windows go to Control Panel, Administrative Tools, Services.
+                                Look for IBM WebSphere Application Server and make sure it is
+                                started.
+                            </li>
+                            <li>
+                                On Linux/UNIX, assuming that <code>WSAS_HOME</code> represents the
+                                location of your WebSphere installation, run
+                                <code>WSAS_HOME/profiles/default/bin/startServer.sh server1</code>.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Log in to the administrative console.
+                        <ul>
+                            <li>Got to <code>http://localhost:9060/ibm/console/</code>.</li>
+                            <li>The default administrator login is <code>admin</code>.</li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Install and deploy OPS (<code>ops.war</code>).
+                        <ul>
+                            <li>Click on Applications / Install New Application.</li>
+                            <li>
+                                Select the <code>ops.war</code> to upload, choose a context path
+                                like <code>/ops</code> (from now on we will assume this was your
+                                choice).
+                            </li>
+                            <li>
+                                Hit "next" until you get to the end of the wizard, then hit
+                                "finish". You can leave the defaults everywhere while going through
+                                the wizard.
+                            </li>
+                            <li>Save the configuration.</li>
+                            <li>Click on Applications / Enterprise Applications.</li>
+                            <li>Select <code>ops_war</code> and click on the "start" button.</li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Run and modify the examples.
+                        <ul>
+                            <li>Go to <code>http://localhost:9080/ops/</code>.</li>
+                            <li>
+                                You can view the log from OPS in
+                                <code>WSAS_HOME/profiles/default/logs/server1/SystemOut.log</code>.
+                            </li>
+                            <li>
+                                You can modify the examples resources as the application sever is
+                                running and see the results of your modifications on the fly. The
+                                resources are stored under
+                                <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
+                                orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance,
+                                try to modify <code>examples/tutorial/hello1/view.xhtml</code>:
+                                replace "Hello World!" by your own message, and reload the page in
+                                the browser to see the result.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+<!--
+                <li>
+                     Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:
+                     <ul>
+                         <li><p>
+                             Extract the
+                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OPS
+                             WAR file, and save it on WebSphere's directory.
+                         </p></li>
+
+                       <p>  <li>
+                             In the administrative console, go to the Resources
+                             tab, and create a new JDBC Provider. Make sure you
+                             add the HSQLDB JAR to the
+                             <code>classpath</code> option and put
+                             <code>org.hsqldb.jdbcDataSource</code> in the Implementation Class field.
+                         </p></li>
+
+                         <li><p>
+                             Create a new datasource, using the following information:
+                             <p><table>
+                                 <tr>
+                                     <th>Name</th>
+                                     <td><code>db</code></td>
+                                 </tr>
+                                 <tr>
+                                     <th>JNDI Name</th>
+                                     <td><code>jdbc/db</code></td>
+                                 </tr>
+
+                                 <tr>
+                                     <th>Database Name</th>
+                                     <td><code>http://localhost:9080/orbeon/db</code></td>
+                                 </tr>
+                                 <tr>
+                                     <th>username</th>
+                                     <td><code>sa</code></td>
+                                 </tr>
+                             </table></p>
+                         </p></li>
+
+                         <li><p>
+                             Save the configuration.
+                         </p></li>
+
+                     </ul>
+                 </li>
+-->
+            </ol>
+        </section>
+<!--        <section>-->
+<!--            <title>Installing OXF on Sun ONE Application Server 7.0</title>-->
+<!--            <ol>-->
+<!--                <li>-->
+<!--                    Install and deploy OXF (<code>oxf.war</code>) by:-->
+<!--                    <ul>-->
+<!--                        <li>Using the administrative console and uploading the war file</li>-->
+<!--                        <li>Or by adding the following lines to the server-->
+<!--                            configuration file (the default is-->
+<!--                            <code>domains/domain1/server1/config/server.xml</code>). Don't forget-->
+<!--                            to change the war file's path.-->
+<!--                            <xml-source>-->
+<!--                                <applications dynamic-reload-enabled="true" dynamic-reload-poll-interval-in-seconds="2">-->
+<!--                                    <web-module enabled="true" location="c:/oxf/oxf.war" name="oxf" context-root="oxf" virtual-servers="server1"/>-->
+<!--                                </applications>-->
+<!--                            </xml-source>-->
+<!--                        </li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:-->
+<!--                    <ul>-->
+<!--                       <p> <li>-->
+<!--                            Extract the <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OXF-->
+<!--                            WAR file, and save it on your hard drive.-->
+<!--                        </p></li>-->
+<!---->
+<!--                       <li><p>-->
+<!--                            Open-->
+<!--                            <code>domains/domain1/server1/config/server.xml</code>,-->
+<!--                            locate the <code>/server/java-config</code> element and-->
+<!--                            change the <code>server-classpath</code> attribute to include the path to the HSQLDB JAR.-->
+<!--                        </p></li>-->
+<!---->
+<!--                        <li><p>-->
+<!--                            In the same file, add the following snippet to initialize the JDBC DataSource:-->
+<!--                            <xml-source>-->
+<!--                                <resources>-->
+<!--                                    <jdbc-resource enabled="true" pool-name="hsqldb" jndi-name="jdbc/db"/>-->
+<!--                                    <jdbc-connection-pool steady-pool-size="8" max-pool-size="32" max-wait-time-in-millis="60000" pool-resize-quantity="2" idle-timeout-in-seconds="300" is-isolation-level-guaranteed="false" is-connection-validation-required="false" connection-validation-method="auto-commit" fail-all-connections="false" datasource-classname="org.hsqldb.jdbcDataSource" name="hsqldb">-->
+<!--                                        <property value="sa" name="user"/>-->
+<!--                                        <property value="http://localhost/oxf/db" name="database"/>-->
+<!--                                    </jdbc-connection-pool>-->
+<!--                                </resources>-->
+<!--                            </xml-source>-->
+<!--                        </li> </p>-->
+<!--                        <li><p>Save <code>server.xml</code> and start the server.</p></li>-->
+<!--                    </ul>-->
+<!--                    <li>Optionally, to run the authentication example:-->
+<!---->
+<!--                    <p><ol>-->
+<!--                        <li>Open-->
+<!--                        <code>SUNONE_HOME/domains/domain1/server1/applications/j2ee-modules/oxf/WEB-INF/web.xml</code>-->
+<!--                        and uncomment the <code>security-constraint</code>,-->
+<!--                        <code>login-config</code> and <code>security-role</code>-->
+<!--                        declarations at the end of the file.</li>-->
+<!---->
+<!--                        <li>Log into the adminitrative console and check that a-->
+<!--                        file authentication realm exists and is active.</li>-->
+<!---->
+<!--                        <li>Add a user to the file realm, and assign him to the-->
+<!--                        <code>admmistrator</code> group.</li>-->
+<!--                    </ol></p>-->
+<!--                    </li>-->
+<!--                </li>-->
+<!--            </ol>-->
+<!--        </section>-->
+<!--        <a name="oc4j"/>-->
+<!--        <section>-->
+<!--            <title>Installing OXF on Oracle 9i AS</title>-->
+<!--            <p>-->
+<!--                This section assumes you are using OC4J version 9.0.3.0.0. You-->
+<!--                can either use the Enterprise Manager to deploy OXF, or use the-->
+<!--                instructions below to edit the configuration files.-->
+<!--            </p>-->
+<!--            <ol>-->
+<!--                <li>-->
+<!--                    <p>-->
+<!--                        Edit <code>application.xml</code> to declare-->
+<!--                        the OXF application. Add the following line near the top-->
+<!--                        of the file, replacing the filename by your actual-->
+<!--                        value.-->
+<!--                        <xml-source>-->
+<!--                            <web-module id="oxf" path="c:\oxf\oxf.war" />-->
+<!--                        </xml-source>-->
+<!--                    </p>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <p>-->
+<!--                        Edit <code>http-web-site.xml</code> to map the-->
+<!--                        OXF Web Application to a context path. Add the following line:-->
+<!--                        <xml-source>-->
+<!--                            <web-app application="default" name="oxf" root="/oxf" />-->
+<!--                        </xml-source>-->
+<!--                    </p>-->
+<!--                </li>-->
+<!---->
+<!--                <li>Optionally, configure a datasource to use the SQL examples-->
+<!--                using the bundled HSQLDB database. Copy the file-->
+<!--                <code>hsqldb-1_7_2_4_orbeon.jar</code> from the OXF distribution to-->
+<!--                the <code>lib</code> directory of OC4J. Edit <code>data-sources.xml</code>-->
+<!--                and add the following element:-->
+<!--                    <xml-source>-->
+<!--                        <data-source-->
+<!--                            class="com.evermind.sql.DriverManagerDataSource"-->
+<!--                            name="hsqldbDS"-->
+<!--                            location="jdbc/hsqldbDS"-->
+<!--                            connection-driver="org.hsqldb.jdbcDriver"-->
+<!--                            username="sa"-->
+<!--                            password=""-->
+<!--                            url="jdbc:hsqldb:http://localhost:8888/oxf/db"-->
+<!--                            inactivity-timeout="30"-->
+<!--                            />-->
+<!--                    </xml-source>-->
+<!--                </li>-->
+<!---->
+<!--                <li>Optionally, to run the Portlet examples:-->
+<!--                    <p>-->
+<!--                        <ol>-->
+<!--                            <li>-->
+<!--                                Download the Portlet API archive (JSR-168-->
+<!--                                Proposed Final Draft) from <a-->
+<!--                                    href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">the-->
+<!--                                    JCP site</a>-->
+<!--                            </li>-->
+<!--                            <li>-->
+<!--                                Extract the archive and copy-->
+<!--                                <code>lib/portlet.jar</code> into the OXF-->
+<!--                                <code>WEB-INF/lib</code> directory.-->
+<!--                            </li>-->
+<!--                        </ol>-->
+<!--                    </p>-->
+<!--                </li>-->
+<!--            </ol>-->
+<!--        </section>-->
+        <a name="jboss"/>
+        <section>
+            <title>Installing OPS on &jboss-vers;</title>
+            <ol>
+                <li>
+                    <p>
+                        Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss installation:
+                        create a new <code>JBOSS_HOME/server/default/deploy/ops.war</code> directory.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Unzip <code>ops.war</code> in the <code>ops.war</code> directory you just created.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Set the following parameter in <code>web.xml</code>:
+                    </p>
+                    <xml-source>
+                        <context-param>
+                           <param-name>oxf.initialize-logging</param-name>
+                           <param-value>false</param-value>
+                        </context-param>
+                    </xml-source>
+                </li>
+                <li>
+                    <p>
+                        Rename the default OPS log4j JAR file under WEB-INF/lib from <code>log4j-*.jar</code> to
+                        <code>log4j-*.jar.bak</code>. Additionally, you can remove this JAR file altogether.
+                    </p>
+                </li>
+                <note>
+                    <p>
+                        NOTE: With certain versions of JBoss, in particular prior to 4.0.4, omitting the two steps
+                        above (setting the parameter and renaming the log4j JAR) but doing the following instead, may work:
+                    </p>
+                    <p>
+                        In
+                        <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat55.sar/META-INF/jboss-service.xml</code>
+                        and change the value in
+                        <code>&lt;attribute name="UseJBossWebLoader"></code> from <code>false</code> to
+                        <code>true</code>.
+                    </p>
+                </note>
+                <li>
+                    <p>
+                        Start JBoss by running <code>JBOSS_HOME/bin/run.bat</code> (or
+                        <code>run.sh</code> on UNIX).
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Run and modify the examples.
+                        <ul>
+                            <li>Go to <code>http://localhost:8080/ops/</code></li>
+                            <li>
+                                You can modify the examples resources as the application sever is
+                                running and see the results of your modifications on the fly. The
+                                resources are stored under
+                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/resources</code>.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Optionally, to run the authentication sample:
+                        <ul>
+                            <li>
+                                Open
+                                <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/web.xml</code>
+                                and uncomment the <code>security-constraint</code>,
+                               <code>login-config</code> and <code>security-role</code>
+                               declarations at the end of the file.
+                            </li>
+                            <li>
+                                Open <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/jboss-web.xml</code>
+                                and uncomment the <code>security-domain</code> element near the end of
+                                bottom of the file.
+                            </li>
+                            <li>
+                                Open <code>JBOSS_HOME/server/default/conf/login-config.xml</code> and
+                                add the following aplication policy to the list of policies :
+                                <xml-source>
+                                    <application-policy name = "orbeon-demo">
+                                       <authentication>
+                                          <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
+                                             flag = "required">
+                                             <module-option name="usersProperties">orbeon-demo-users.properties</module-option>
+                                             <module-option name="rolesProperties">orbeon-demo-roles.properties</module-option>
+                                          </login-module>
+                                       </authentication>
+                                    </application-policy>
+                                </xml-source>
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+            </ol>
+        </section>
+        <a name="security"/>
+        <section>
+            <title>Security</title>
+            <p>
+                For security reasons, you might want to run OPS under a Security Manager. Java's
+                Security Manager allows you to control the Java sandbox and which resources the
+                application can access. When installed correctly, the Security Manager can prevent
+                unauthorized code to execute malicious actions, such as deleting files on the server
+                or initializing network connections. For more information, please read the <link
+                href="http://java.sun.com/docs/books/tutorial/security1.2/">Security in Java 2 SDK
+                1.2</link> tutorial and the <link
+                href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/SecurityManager.html">Security
+                Manager API</link>.
+            </p>
+
+            <p>
+                Follow the steps below to install the Security Manager:
+                <ol>
+                    <li>
+                        Download the <a href="../apps/doc/images/oxf-policy.txt.html">policy</a> file.
+                    </li>
+                    <li>
+                        Append the permissions to the application server
+                        policy file. The table lists the policy file for
+                        the supported servers.
+                        <p/>
+                        <table>
+                            <tr>
+                                <th>Apache Tomcat</th>
+                                <td>catalina.policy</td>
+                            </tr>
+                            <tr>
+                                <th>BEA Weblogic</th>
+                                <td>weblogic.policy</td>
+                            </tr>
+                            <tr>
+                                <th>IBM WebSphere</th>
+                                <td>was.policy</td>
+                            </tr>
+                            <tr>
+                                <th>Sun ONE</th>
+                                <td>server.policy</td>
+                            </tr>
+                        </table>
+                    </li>
+                    <p/>
+                    <li>
+                        Add the following system properties to the server startup script.
+                        <ul>
+                            <li><i>oxf.home</i>: Location of the OPS exploded WAR file</li>
+                            <li><i>oxf.resources</i>: Location of OPS resources directory</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Modify the startup script to enable the security
+                        manager. Add the following system properties:
+
+                        <ul>
+                            <li>-Djava.security.manager</li>
+                            <li>-Djava.security.policy=="path to the policy file"</li>
+                        </ul>
+
+                    </li>
+                </ol>
+            </p>
+        </section>
+    </body>
+</document>

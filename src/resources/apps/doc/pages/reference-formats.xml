@@ -1,0 +1,151 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Non-XML Documents in XPL</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                In OPS <a href="reference-xpl-pipelines">XPL and pipelines</a> only
+                deal with XML documents. This means that between processor outputs and processor
+                inputs in a pipeline, only pure XML infosets circulate. There is however often a
+                need to handle non-XML data in pipelines, in particular:
+            </p>
+            <ul>
+                <li>
+                    <b>Binary document:</b> any document that can be represented as a stream of
+                    bytes. In general this is the case of any document, but some document formats
+                    are almost always represented this way: images, sounds, PDF documents, etc.
+                </li>
+                <li>
+                    <b>Text documents:</b> any document that can be represented as a stream of
+                    characters. Some documents are better looked at this way, like plain txt files,
+                    HTML files, and even the textual representation of XML.
+                </li>
+            </ul>
+            <p>
+                OPSs addresses this question by defining two standard XML document
+                formats to embed binary and text documents within an XML infoset. This solution has
+                the benefit of keeping XPL simple by limiting it to pure XML infosets, while
+                allowing XPL to conveniently manipulate any binary and text document.
+            </p>
+        </section>
+        <a name="binary-documents"/>
+        <section>
+            <title>Binary Documents</title>
+            <p>
+                A binary document consist of a <code>document</code> root node containing
+                character data encoded with Base64. An <code>xsi:type</code> attribute is also
+                present, as well as an optional <code>content-type</code> attribute, for
+                example:
+            </p>
+            <xml-source>
+<document xsi:type="xs:base64Binary" content-type="image/jpeg">
+/9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
+...
+KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
+</document>
+            </xml-source>
+            <note>
+                <p>
+                    For the curious, the Base64 encoding is documented in <a
+                    href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>. This encoding represents
+                    binary data by mapping it to a set of 64 ASCII characters.
+                </p>
+            </note>
+            <p>
+                Such documents are not meant to be read by users, in the same way that regular
+                binary files are not meant to be examined by users. Binary documents are generated
+                by OPS processors, like the <a
+                href="processors-generators-url">URL generator</a> and <a
+                href="processors-converters">converters</a>. They are consumed by processors like
+                the <a href="processors-serializers-http">HTTP serializer</a>, the <a
+                href="processors-messaging-email">Email processor</a>, and <a
+                href="processors-converters">converters</a>.
+            </p>
+        </section>
+        <a name="text-documents"/>
+        <section>
+            <title>Text Documents</title>
+            <p>
+                A text document consists of a <code>document</code> root element containing the
+                text. An <code>xsi:type</code> attribute is also present, as well as an optional
+                <code>content-type</code> attribute:
+            </p>
+            <xml-source>
+<document xsi:type="xs:string" content-type="text/plain">
+    This is line one of the input document!
+    This is line two of the input document!
+    This is line three of the input document!
+</document>
+            </xml-source>
+            <p>
+                The <code>content-type</code> attribute may have a <code>charset</code> parameter
+                providing a hint for the character encoding, for example:
+            </p>
+            <xml-source>
+<document xsi:type="xs:string" content-type="text/plain; charset=iso-8859-1">
+    This is line one of the input document!
+    This is line two of the input document!
+    This is line three of the input document!
+</document>
+            </xml-source>
+            <p>
+                Because XML character data itself is represented in Unicode (in other words it is
+                designed to allow representing in a same document all the characters specified by
+                the Unicode specification), there is no requirement for specifying character
+                encoding in XML pipelines. However, when an XML infoset is read or written as an
+                textual XML document, specifying a character encoding may may be a useful hint. For
+                example a URL generator can, with this mechanism, communicate to an HTTP serializer
+                the preferred character encoding obtained when the document was read. The serializer
+                may then use that hint, but it is by no means authoritative.
+            </p>
+            <p>
+                In general, XML documents can be read and written using the <code>utf-8</code>
+                character encoding, which allows representing all the Unicode characters. However,
+                when dealing with other types of text documents, tools such as text editors may not
+                be able to deal correctly with <code>utf-8</code>. In such cases, it can be useful
+                to use even more widespread character encodings such as <code>iso-8859-1</code> or
+                <code>us-ascii</code>. The drawback is that such encodings allow representing a much
+                smaller set of characters than <code>utf-8</code>.
+            </p>
+            <p>
+                Unlike binary documents, text documents can easily be examined by users. They can
+                also be easily manipulated by languages such as <a href="processors-xslt">XSLT</a>.
+                Like binary documents, they are generated by OPS processors, like
+                the <a href="processors-generators-url">URL generator</a> and <a
+                href="processors-converters">converters</a>. They are consumed by processors like
+                the <a href="processors-serializers-http">HTTP serializer</a>, the <a
+                href="processors-messaging-email">Email processor</a>, and <a
+                href="processors-converters">converters</a>.
+            </p>
+        </section>
+        <section>
+            <title>Streaming</title>
+            <p>
+                Processors can stream binary and text documents by issuing a number of short
+                character SAX events. It is therefore possible to generate "infinitely" long binary
+                and text documents with a constant amount of memory, assuming both the sender and
+                the receiver of the document are able to perform streaming. This is the case for
+                example of the <a href="processors-generators-url">URL generator</a> and
+                the <a href="processors-serializers-http">HTTP serializer</a>.
+            </p>
+        </section>
+    </body>
+</document>

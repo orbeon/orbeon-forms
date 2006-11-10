@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>REST and XForms Submission</title>
+    </header>
+    <body>
+        <a name="introduction"/>
+        <section>
+            <title>Introduction</title>
+            <p>
+                More and more services are exposed and consumed through REST APIs, in other words APIs that leverage
+                HTTP. In particular, <a href="reference-xforms">XForms</a>' <code>&lt;xforms:submission></code> supports
+                REST as of XForms 1.1. The XForms Submission processor exposes the functionality of
+                <code>&lt;xforms:submission></code> to XML pipelines and allows you to call REST services from XPL
+                without creating XForms pages.
+            </p>
+        </section>
+        <a name="inputs-outputs"/>
+        <section>
+            <title>Inputs and Outputs</title>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Purpose</th>
+                    <th>Mandatory</th>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td>
+                        <code>submission</code>
+                    </td>
+                    <td>Configures the XForms submission</td>
+                    <td align="center">Yes</td>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td>
+                        <code>request</code>
+                    </td>
+                    <td>Refers to the document to submit</td>
+                    <td align="center">Yes</td>
+                </tr>
+                <tr>
+                    <td align="center">Output</td>
+                    <td>
+                        <code>response</code>
+                    </td>
+                    <td>Produces the result document if any</td>
+                    <td align="center">Yes</td>
+                </tr>
+            </table>
+            <p>
+                The XForms Submission processor is typically called this way from XPL pipelines:
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="put" action="/exist/rest/db/ops/dmv-example/resources.xml"/>
+                    </p:input>
+                    <p:input name="request" href="#document"/>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+            </xml-source>
+        </section>
+        <a name="processing-model"/>
+        <section>
+            <title>Processing Model</title>
+            <p>
+                The <code>submission</code> input follows the semantic of <code>&lt;xforms:submission></code>, with the
+                difference that the <code>replace</code> attribute defaults to the value <code>instance</code>.
+                Processing follows the following steps:
+            </p>
+            <ol>
+                <li>
+                    <p>The document provided on the <code>request</code> input is set as the default XForms
+                    instance.</p>
+                </li>
+                <li>
+                    <p>The submission is executed. By default, the submission serializes the default instance, that is
+                    the document provided on the <code>request</code> input.</p>
+                </li>
+                <li>
+                    <p>The resulting default instance is produced on the <code>response</code> output. In case of
+                    sucessful instance replacement, this means that the document resulting from the submission is
+                    produced.</p>
+                </li>
+            </ol>
+            <p>
+                If an XForms submission error occurs during the processing of the submission, the response document will
+                be identical to the request document unless you modify it using XForms events and actions.
+            </p>
+            <p>
+                You have to consume the <code>response</code> output in order for the submission to be performed, even
+                if you do not wish to handle the response document.
+            </p>
+        </section>
+        <a name="http-get"/>
+        <section>
+            <title>GET Example</title>
+            <p>
+                This is how you perform a GET of an XML document to the URL <code>http://example.org/list?first=12&amp;size=100</code>:
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="get" action="http://example.org/list" separator="&amp;amp;"/>
+                    </p:input>
+                    <p:input name="request">
+                        <parameters>
+                            <first>12</first>
+                            <size>100</size>
+                        </parameters>
+                    </p:input>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+            </xml-source>
+        </section>
+        <a name="http-post"/>
+        <section>
+            <title>POST Example</title>
+            <p>
+                This is how you perform a POST of an XML document to the URL
+                <code>http://example.org/rest/my-collection</code> and retrieve an XML response:
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="post" action="http://example.org/rest/my-collection"/>
+                    </p:input>
+                    <p:input name="request" href="#request"/>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+            </xml-source>
+        </section>
+        <a name="http-put"/>
+        <section>
+            <title>PUT Example</title>
+            <p>
+                This is how you perform a PUT of an XML document to the URL
+                <code>http://example.org/rest/my-collection/my-document</code> and retrieve an XML response:
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="put" action="http://example.org/rest/my-collection/my-document"/>
+                    </p:input>
+                    <p:input name="request" href="#request"/>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+            </xml-source>
+        </section>
+        <a name="http-delete"/>
+        <section>
+            <title>DELETE Example</title>
+            <p>
+                This is how you perform a DELETE of a resource located at
+                <code>http://example.org/rest/my-collection/my-resource</code>:
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="delete" action="http://example.org/rest/my-collection/my-resource"/>
+                    </p:input>
+                    <p:input name="request"><dummy/></p:input>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#response"/>
+                </p:processor>
+            </xml-source>
+            <p>
+                In this case the response is read but discarded by using the Null Serializer.
+            </p>
+        </section>
+        <a name="error-handling"/>
+        <section>
+            <title>Handling Errors</title>
+            <p>
+                You can handle errors using XML events and actions, including <code>xforms-submit-error</code> and
+                <code>xforms:setvalue</code>.
+            </p>
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xforms-submission">
+                    <p:input name="submission">
+                        <xforms:submission method="put" action="http://example.org/rest/my-collection/my-resource">
+                            <xforms:setvalue ev:event="xforms-submit-error" ref="submission-error" value="'true'"/>
+                        </xforms:submission>
+                    </p:input>
+                    <p:input name="request" href="#request"/>
+                    <p:output name="response" id="response"/>
+                </p:processor>
+            </xml-source>
+            <p>
+                The above example assumes that the request document contains a <code>&lt;submission-error></code>
+                element under its root element, for example:
+            </p>
+            <xml-source show-namespaces="false">
+                <request>
+                    <submission-error>false</submission-error>
+                    ...
+                </request>
+            </xml-source>
+            <p>
+                You can then check that an error occurred by testing that the response document satisfies
+                <code>/request/submission-error = 'true'</code>.
+            </p>
+        </section>
+        <a name="authentication"/>
+        <section>
+            <title>Handling Authentication</title>
+            <p>
+                You can use <a href="ftp://ftp.isi.edu/in-notes/rfc2617.txt">Basic HTTP authentication</a> (the most
+                widely used authentication mechanism over HTTP) in two different ways:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        With username and password encoded in the URL, for example:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xforms-submission">
+                            <p:input name="submission">
+                                <xforms:submission method="get" action="http://john:password@example.org/list" separator="&amp;amp;"/>
+                            </p:input>
+                            <p:input name="request" href="#request"/>
+                            <p:output name="response" id="response"/>
+                        </p:processor>
+                    </xml-source>
+                    <p>
+                        This method has the obvious drawback of making authorization credentials visible on the URL. In
+                        particular, if that URL may show in logs, error messages, etc.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        With two extension attributes, <code>xxforms:username</code> and <code>xxforms:password</code>:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <p:processor name="oxf:xforms-submission">
+                            <p:input name="submission">
+                                <xforms:submission method="get" action="http://example.org/list" separator="&amp;amp;"
+                                                   xxforms:username="john" xxforms:password="password"/>
+                            </p:input>
+                            <p:input name="request" href="#request"/>
+                            <p:output name="response" id="response"/>
+                        </p:processor>
+                    </xml-source>
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,1339 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xu="http://www.xmldb.org/xupdate">
+    <header>
+        <title>Orbeon Forms FAQ</title>
+    </header>
+    <body>
+        <a name="introduction"/>
+        <section>
+            <title>Introduction</title>
+            <p>
+                This FAQ answsers technical questions about Orbeon Forms.
+            </p>
+        </section>
+        <a name="general"/>
+        <section>
+            <title>General Orbeon PresentationServer FAQ</title>
+            <a name="what-is"/>
+            <section added="2006-01-10" updated="2006-11-06">
+                <title>What is Orbeon Forms?</title>
+                <p>
+                    Orbeon Forms Orbeon Forms (formerly Orbeon PresentationServer (OPS)) is an open source forms
+                    solution that handles the complexity of forms typical of the enterprise or government. It is brought
+                    to standard web browsers (including Internet Explorer, Firefox, Safari and Opera) thanks to Ajax
+                    technology, with no need for client-side software or plugins. Orbeon Forms allows you to build fully
+                    interactive forms with features that include as-you-type validation, optional and repeated sections,
+                    always up-to-date error summaries, PDF output, full internationalization, and controls like
+                    auto-completion, tabs, dialogs, trees and menus. Orbeon Forms already supports parts of the XForms
+                    1.1 specification.
+                </p>
+                <p>
+                    Unlike other web application platforms based on Java objects or scripting languages, OPS is based on
+                    XML documents and XForms. This leads to an architecture perfectly suited for the tasks of capturing,
+                    processing, and presenting XML data (in particular form data), and does not require writing any Java
+                    or scripting code at all.
+                </p>
+                <p>
+                    OPS is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to standard
+                    browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature, high-performance XML
+                    pipeline engine for processing XML data.
+                </p>
+            </section>
+            <section added="2006-02-04">
+                <title>Is Orbeon PresentationServer an XForms Engine?</title>
+                <p>
+                    Orbeon PresentationServer does contain an XForms engine, which we refer to as the OPS XForms engine.
+                    It also contains an XML pipeline engine running the XPL pipeline language, an application
+                    controller (the Page Flow Controller or PFC), and built-in components to perform XSLT
+                    transformations, database access, and more. Needless to say, OPS ships with examples and
+                    documentation.
+                </p>
+                <p>
+                    You are free to use OPS only for its XForms functionality, but you can also leverage more of OPS to
+                    build your application's presentation layer.
+                </p>
+            </section>
+            <!--
+            <a name="compare-model2x"/>
+            <section>
+                <title>How does OPS compare with Model 2X?</title>
+                <p>
+                    Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to Web applications.
+                    Model 2X builds on top of Model 2 and replaces the JSP layer with XML and XSLT. Model 2X was first
+                    described in an <a
+                    href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a> Orbeon
+                    published by JavaWorld in February 2002. A variant of the concept using JavaServer Faces was <a
+                    href="http://www.theserverside.com/articles/article.tss?l=BestBothWorlds">published</a> in
+                    TheServerSide in 2003. OPS can be used to implement Model 2X and much more, but the current focus of
+                    the platform remains XForms technology. For more information, please refer to the <a href=".">OPS
+                    User Guide</a>.
+                </p>
+            </section>
+            -->
+            <a name="name-change"/>
+            <section>
+                <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
+                <p>
+                    Renaming a product is not something to be taken lightly. However we feel that:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <i>Orbeon Forms</i> better reflects the fact that forms have been the main focus of our
+                            development efforts over the last two years.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            This new face will help potential users understand more easily what the platform can do for
+                            them.
+                        </p>
+                    </li>
+                    <li>
+                        <p><i>Orbeon Forms</i> is just an easier name to remember!</p>
+                    </li>
+                </ul>
+                <p>
+                    We are encouraged in this decision by the fact that almost all current users build complex web forms
+                    using our Ajax-based XForms engine. The name change also conveys that we plan to keep focusing on
+                    form-related capabilities in the future like we have done in the last two years.
+                </p>
+                <p>
+                    It is important to precise the following:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            We are not creating a separate product: <i>Orbeon Forms</i> is simply the new name of
+                            Orbeon PresentationServer.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Other XML technologies like XSLT and XML pipelines remain an important part of the
+                            platform.
+                        </p>
+                    </li>
+                    <li>
+                        <p>And of course, <i>Orbeon Forms</i> remains an open source solution!</p>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <a name="xforms"/>
+        <section>
+            <title>XForms FAQ</title>
+            <a name="xforms"/>
+            <section>
+                <title>What is XForms?</title>
+                <p>
+                    W3C XForms is a standard, markup-based, declarative, XML- and HTML-friendly user interface
+                    technology. XForms makes it easy to build dynamic user interfaces able to talk to XML services.
+                </p>
+                <p>
+                    XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
+                    March 2006. The XForms Working Group is, as of August 2006, working on XForms 1.1, due in late 2006
+                    or 2007, before embarking on XForms 1.2 or XForms 2.0! Please visit <a
+                    href="http://www.w3.org/TR/xforms/">XForms - The Next Generation of Web Forms</a> for more
+                    information about XForms direct from W3C.
+                </p>
+                <p>
+                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms
+                    is to make web forms design easier, allowing the developer to write less client-side scripting (or
+                    none at all), and less server-side code thanks to a feature-rich declarative approach.
+                </p>
+                <p>
+                    Benefits of XForms include:
+                </p>
+                <ul>
+                    <li>Clear separation between data captured and presentation (separation of concerns)</li>
+                    <li>Flexible, structured XML-based data model: define your data model as an XML document, then create forms accessing the data</li>
+                    <li>Built-in facilities for validation and data integrity based on XML Schema and/or assertions</li>
+                    <li>Declarative approach requiring less / no scripting at all, in particular thanks to declarative events and actions</li>
+                    <li>Ease of internationalization</li>
+                    <li>Support for a variety of devices</li>
+                    <li>W3C standard</li>
+                    <li>Not tied to a particular platform or language such as Java or .NET</li>
+                </ul>
+                <p>
+                    See also the OPS <a href="reference-xforms-ng#introduction">XForms Introduction</a> section.
+                </p>
+            </section>
+            <a name="xforms-compliance"/>
+            <section>
+                <title>How much of the XForms specification does OPS support?</title>
+                <p>
+                    The OPS implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
+                    (Second Edition) Recommendation</a> (14 March 2006). The XForms NG engine in OPS 3.5 is close to
+                    supporting all of the XForms 1.0 specification. For more detailed information on what features are
+                    supported in the latest version of OPS, see the <a href="reference-xforms-compliance">XForms
+                    Compliance</a> section of the documentation.
+                </p>
+                <p>
+                    OPS also supports several features from XForms 1.1 (in draft as of August 2006), as well as
+                    extensions such as new widgets (autocomplete, tree, menu, etc.).
+                </p>
+            </section>
+            <a name="xforms-browsers"/>
+            <section added="2006-10-27">
+                <title>I hear that XForms is not well supported in web browser. This is a problem, right?</title>
+                <p>
+                    No, this is not a problem at all, because XForms can run on the server, in the same way that other
+                    web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
+                </p>
+                <p>
+                    You run XForms on the server by installing the OPS XForms engine on your server. The XForms engine
+                    translates your XForms pages to HTML, CSS and JavaScript that your browser understands. Your web
+                    browser sees a regular Ajax application, but as a developer you write standard XForms instead of
+                    JavaScript!
+                </p>
+                <p>
+                    Running XForms on the server has even several benefits over running it in the client:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Users don't have to upgrade their web browser or install plugins or extensions. You can use
+                            and develop with XForms today and target over 90% of the users on the web.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The data used by your XForms application remains safely on the server. With client-side
+                            implementations, on the other hand, you have to be very careful not to send confidential
+                            information to the XForms engine, as that information may be seen by the user.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You can upgrade your XForms implementation at a single location on your server instead of
+                            waiting for users ot upgrade their browsers when bugs are fixed or new features are
+                            implemented.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="xforms-server-side"/>
+            <section added="2006-01-10">
+                <title>What is a server-side XForms implementation?</title>
+                <p>
+                    Historically, the XForms specification assumed that XForms was implemented on the client-side,
+                    natively within a web browser. But as discussed <a href="#xforms-browsers">here</a>, XForms-based
+                    applications can use server-side or hybrid implementations that share XForms processing between
+                    server-side code and client-side code and rely on Ajax technology. Orbeon PresentationServer
+                    features such an Ajax-based implementation.
+                </p>
+                <p>
+                    A server-side implementation of XForms translates your forms described in terms of the XForms
+                    specification into HTML, CSS and JavaScript code understood by your web browser. The following
+                    diagram shows a high-level overview of the architecture of an Ajax-based  XForms implementation:
+                </p>
+                <div class="image">
+                    <img width="620" height="454" src="../apps/doc/images/xforms-hybrid.png"/>
+                    <div class="legend">Ajax-Based XForms</div>
+                </div>
+                <p>
+                    For more information, we refer you to these articles we presented at the XTech 2005 and XTech 2006
+                    conferences:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <a href="http://xtech06.usefulinc.com/schedule/detail/133">XForms: an alternative to
+                            Ajax?</a> (XTech 2006)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <a href="http://www.orbeon.com/ops/xtech">Are Server-Side XForms Engines the Future of
+                            XForms?</a> (XTech 2005) (see also the <a
+                            href="http://www.idealliance.org/proceedings/xtech05/papers/03-08-03/">pre-conference
+                            proceedings</a>, which contain an out of date version of the article)
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="xforms-classic-ng"/>
+            <section added="2006-01-10">
+                <title>What are the XForms Classic and XForms NG engnes?</title>
+                <p>
+                    Up to version 2.8, OPS featured a pure server-side XForms engine with limited XForms functionality.
+                    With version 3.0, OPS features a much enhanced XForms engine, with support for almost the entire
+                    XForms specification, with the intent to completely support XForms 1.0 and XForms 1.1 in the future.
+                    The older XForms engine has been informally dubbed "XForms Classic", and the new XForms engine
+                    "XForms NG".
+                </p>
+                <p>
+                    For backward compatibility reasons, the XForms Classic engine is still present in OPS 3.5. We plan
+                    over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well, therefore making
+                    XForms Classic obsolete in OPS.
+                </p>
+            </section>
+            <a name="xforms-classic-or-ng"/>
+            <section added="2006-01-10">
+                <title>How do I know which XForms engine I am using?</title>
+                <p>
+                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
+                    later, then you may be using XForms Classic or XForms NG, but there is an easy way to tell: if a
+                    <code>&lt;page></code> entry in your page flow features an <code>xforms</code> attribute, then and
+                    only then that page is using XForms Classic. Otherwise, if the page view contains at least one
+                    XForms model under its <code>xhtml:head</code> element, then it is using XForms NG.
+                </p>
+            </section>
+            <a name="xforms-classic-deprecation"/>
+            <section added="2006-01-10">
+                <title>Should I keep using the XForms Classic engine?</title>
+                <p>
+                    The XForms Classic engine is available only for backward compatibility. It is deprecated and may
+                    be removed in the future. If you are starting an application from scratch with OPS 3.5, we strongly
+                    advise against using XForms Classic. If you are migrating to OPS 3.5, we advise starting migrating
+                    XForms NG. You can keep your existing pages working with XForms Classic, and write new pages with
+                    XForms NG. Over time, you can migrate existing XForms Classic pages to XForms NG, making for a
+                    smooth transition.
+                </p>
+                <p>
+                    As of OPS 3.5, some features of XForms Classic have not yet made it into XForms NG, in particular
+                    support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we hope
+                    to bring these features to XForms NG as well, therefore completely removing the need for XForms
+                    Classic.
+                </p>
+            </section>
+            <a name="xforms-classic-migration"/>
+            <section added="2006-09-18">
+                <title>How do I migrate from XForms Classic to XForms NG?</title>
+                <p>
+                    Please visit <a href="reference-xforms-ng#xforms-classic-migration">Migrating from XForms Classic
+                    to XForms NG</a>.
+                </p>
+            </section>
+            <a name="xforms-html"/>
+            <section>
+                <title>Do I need to use XForms to create my HTML forms?</title>
+                <p>
+                    It is not a requirement to use XForms. It is possible to generate HTML form elements and to examine
+                    request parameters manually. We recommend however using XForms whenever possible, because it
+                    provides an elegant abstraction that greatly simplifies form handling.
+                </p>
+            </section>
+            <a name="file-upload"/>
+            <a name="xforms-upload"/>
+            <section>
+                <title>How can I perform a file upload?</title>
+                <p>
+                    Check the <a href="reference-xforms-ng#xforms-upload">XForms upload control</a>
+                    and the <a href="/goto-example/xforms-upload">XForms upload example</a>
+                </p>
+            </section>
+            <a name="xforms-upload-trouble"/>
+            <section added="2005-05-21">
+                <title>My XForms upload doesn't work. What can I do?</title>
+                <p>
+                    With OPS 2.8 or earlier, or if you are using XForms Classic with OPS 3.0 or later, make sure that
+                    you have the correct submission method and encoding in your XForms model:
+                </p>
+                <p>
+                    <xml-source>
+                        <xforms:submission method="post" encoding="multipart/form-data"/>
+                    </xml-source>
+                </p>
+                <p>
+                    With OPS 3.0 and XForms NG, uploaded files can only be retrieved with a
+                    submission with <code>replace="all"</code>.
+                </p>
+            </section>
+            <a name="xforms-jsp-mix"/>
+            <section added="2006-01-11">
+                <title>Can I mix and match XForms and JSP?</title>
+                <p>
+                    Yes, you can use JSP alongside XForms, even within the same web app. You can
+                    "call" JSP by redirecting or forwarding using the <a
+                    href="processors-other#redirect-processor">Redirect processor</a>. You can also
+                    use the Servlet Include generator to include the content produced by a JSP.
+                    Finally, you can use the Servlet Filter generator and implement JSP
+                    post-processing with OPS.
+                </p>
+            </section>
+            <a name="jsr-168"/>
+            <section>
+                <title>Can I run XForms within JSR-168 portlets?</title>
+                <p>
+                    As of OPS 3.5, it is possible to use the OPS XForms engine within the Java Portlet (JSR-168)
+                    compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
+                </p>
+                <p>
+                    To do this, use the provided <code>epilogue-portlet-liferay.xpl</code> epilogue instead of the
+                    default <code>epilogue-portlet.xpl</code>. It is expected that OPS will work within other JSR-168
+                    portals, or that only minor adjustments will be needed in such cases.
+                </p>
+                <p>
+                    The great thing about OPS and portlets is that there is very little difference if any between
+                    writing an application working in a portlet vs. a servlet. In fact, all the OPS XForms examples work
+                    unmodified as portlets. You can use some particularities of portlets, like preferences, and you have
+                    to be careful about paths to serve resources, but otherwise portlets are transparent to the
+                    developer. This contrasts with many other web platforms.
+                </p>
+                <p>
+                    In other words, OPS gives you the flexibility to write an application that works in standalone mode,
+                    and allows you to migrate to a portlet environment at minimal cost. This contrasts with many other
+                    web application technologies, which sometimes require you to rewrite your application entirely to
+                    fit within a portlet.
+                </p>
+                <p>
+                    <i>HISTORICAL NOTE: There has been a lot of code in OPS to support JSR-168 since late 2003
+                    already. When this code was written, the JSR-168 specification was not final and no JSR-168
+                    container was available. So Orbeon developped a container based on draft specifications for testing.
+                    This code was used until recently to run the OPS examples portal: examples were actually using the
+                    portlet code and running as portlets, and the examples portal is an early JSR-168 portal.</i>
+                </p>
+            </section>
+            <a name="browser-support"/>
+            <section>
+                <title>What web browsers does the Ajax-based XForms engine support?</title>
+                <p>
+                    OPS 3.5's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later), and
+                    Opera (8.5 and later).
+                </p>
+                <p>
+                    We hope to also implement support in XForms NG for non-JavaScript, non-Ajax browsers.
+                </p>
+            </section>
+            <a name="graphical-designer"/>
+            <section>
+                <title>What visual tool / graphical designer do you recommend for XForms?</title>
+                <p>
+                    We develop all our applications and forms using an XML editor. This is the only way you can leverage
+                    all the features of XForms today, especially the more complex ones like events and actions. This
+                    means that we do not have a visual tool to recommend officially. You may however try the Intalio
+                    designer. Trial versions are available <a href="http://www.intalio.com/">from their web site</a>
+                    once you register.
+                </p>
+                <p>
+                    Our perception is that visual tools tend to be of little use for actual developers except for the
+                    first few steps of development (and this is not only true for XForms but also for other frameworks
+                    like JavaServer Faces), so we advise not to have too high expectations when it comes to visual
+                    tools. However, we reckon that helping developers during the first stages of application development
+                    is valuable and we would like in the future to offer such a tool, most likely web-based (and itself
+                    implemented with XForms!).
+
+                </p>
+                <p>
+                    If you have good experience with a visual tool, please be sure to let us know.
+                </p>
+            </section>
+        </section>
+        <a name="xpl"/>
+        <section>
+            <title>XML pipelines (XPL) FAQ</title>
+            <a name="xml-pipeline"/>
+            <section>
+                <title>What is an XML pipeline and why do I care?</title>
+                <p>
+                    XML pipelining is an approach to processing XML where the inputs and outputs of
+                    multiple processing steps (e.g., XSLT transformations) are connected together
+                    using a pipeline metaphor. Orbeon has implemented an XML pipeline engine in Java
+                    that executes a declarative XML pipelining language called <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XPL</a>.
+                </p>
+                <p>
+                    "Programming" pipelines using declarative XML instead of writing procedural
+                    code results in a significant increase in productivity for tasks that require
+                    high volume or complex XML processing. XML documents enter a pipeline, are
+                    efficiently processed by one or more processors as specified by XPL
+                    instructions, and are then output for further processing, display, or storage.
+                    XPL features advanced capabilities such as document aggregation, conditionals
+                    ("if" conditions), loops, schema validation, caching, and sub-pipelines.
+                </p>
+                <p>
+                    XML pipelines are built up from smaller components called XML processors. An
+                    XML processor is a software component which consumes and produces XML documents.
+                    New XML processors are most often written in Java, but most often developers do
+                    not need to write their own processors because the engine provides a
+                    comprehensive library. Example processors include an XSLT processor, database
+                    processors that interface with both SQL and native XML databases, and a
+                    serializer processor that writes XML documents to disk. XPL orchestrates these
+                    to create business logic, similar to the way Java code "orchestrates" Java
+                    object method calls.
+                </p>
+            </section>
+            <a name="what-is-xpl"/>
+            <section>
+                <title>What is XPL?</title>
+                <p>
+                    At the core of OPS lies a powerful XML processing engine that
+                    natively speaks the <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XML Pipeline
+                    Language (XPL)</a>. XPL is a declarative language for processing XML using a
+                    pipeline metaphor. XML documents enter a pipeline, are efficiently processed by
+                    one or more processors as specified by XPL instructions, and are then output for
+                    further processing, display, or storage. XPL features advanced capabilities such
+                    as document aggregation, conditionals ("if" conditions), loops, schema
+                    validation, and sub-pipelines.
+                </p>
+                <p>
+                    The Orbeon XPL pipeline engine used in OPS is designed for
+                    low-memory consumption and supports transparent caching.
+                </p>
+            </section>
+            <a name="xml-processor"/>
+            <section>
+                <title>What is an XML processor?</title>
+                <p>
+                    The term XML processor is commonly used to refer to XML parsers. In the context
+                    of OPS, the term
+                    <i>XML processor</i> is used to refer to
+                    any software component consuming and/or producing XML documents. An XML
+                    processor can also simply be called an
+                    <i>XML component</i>.
+                </p>
+            </section>
+            <a name="xml-pipeline-looks"/>
+            <section>
+                <title>What does an XML pipeline look like?</title>
+                <p>
+                    This particular example illustrates a simple 2-stage XPL pipeline that performs
+                    an XSLT transformation on an XML document that is located on disk, and then
+                    writes the result back to a another file on disk. For more details about XPL,
+                    please see the <a href="reference-xpl-pipelines">XPL and Pipelines reference
+                    documentation</a>, or the <a href="/doc/pages/OPS Tutorial.pdf">OPS tutorial</a>.
+                </p>
+                <div class="image">
+                    <img width="482" height="310" src="../apps/doc/images/2-stage-pipeline.png"/>
+                    <div class="legend">2-Stage XPL Pipeline Diagram</div>
+                </div>
+                <br/>
+                <div class="image">
+                    <img src="../apps/doc/images/2-stage-pipeline-code.png"/>
+                    <div class="legend">2-Stage Pipeline XPL Code</div>
+                </div>
+            </section>
+            <a name="xpl-spec"/>
+            <section>
+                <title>Is there a specification for XPL?</title>
+                <p>
+                    As of February 2005, a <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">draft
+                    specification</a> has been completed amd submitted to W3C. It serves as a basis
+                    of discussion for an XPL 1.0 specification.
+                </p>
+                <p>
+                    As of December 2005, XML Processing Model Working Group meetings have started at
+                    W3C. This working group, of which Orbeon is a member, is in charge of working
+                    on a standard XML processing language. While the deliverable of the working
+                    group will certainly not be exactly XPL, we do hope that in its first version it
+                    will cover a significant number of use cases currently covered by the XPL
+                    implementation found in Orbeon PresentationServer.
+                </p>
+                <p>
+                    As of September 2006, the XML Processing Model Working Group (of which Orbeon is a member) has
+                    released a <a href="http://www.w3.org/TR/2006/WD-xproc-20060928/">first public draft</a> of the
+                    XProc XML Pipeline Language.
+                </p>
+            </section>
+            <a name="xpl-impl"/>
+            <section>
+                <title>Is anybody free to implement XPL?</title>
+                <p>Yes.</p>
+            </section>
+            <a name="xpointer-support"/>
+            <section>
+                <title>How much of the XPointer specification does XPL support?</title>
+                <p>
+                    OPS supports a subset of <a
+                    href="http://www.w3.org/TR/xptr-xpointer/">XPointer</a>. You can use the
+                    XPointer <code>document#xpointer(/xpath/expression)</code> syntax to extract a
+                    nodeset from a document.
+                </p>
+            </section>
+            <a name="xslt-params"/>
+            <section>
+                <title>How can I pass parameters to an XSLT stylesheet?</title>
+                <p>
+                    It is possible by importing the stylesheet within another
+                    stylesheet, as follows:
+                </p>
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:input name="data" href="..."/>
+                        <p:input name="config">
+                            <xsl:stylesheet version="2.0"
+                                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                                <comment>This is the stylesheet to pass parameters to</comment>
+                                <xsl:import href="tour.xsl"/>
+                                <comment>Here we assign a value to the "start" parameter</comment>
+                                <xsl:param name="start" select="'a1'"/>
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:output name="data" id="..."/>
+                    </p:processor>
+                </xml-source>
+            </section>
+            <a name="caching"/>
+            <section>
+                <title>How does caching work in OPS?</title>
+                <p>
+                    Caching mechanisms should have no impact on the behavior of a system, except
+                    for a gain in performance. This is also the principle followed by the
+                    OPS cache: when you develop an application with
+                    OPS, you should be able to ignore that caching takes place. This
+                    may be all you want to know about caching in OPS!
+                </p>
+                <p>
+                    To get a better understanding of the underlying mechanism,
+                    consider the example below:
+                </p>
+                <div class="image">
+                    <img src="../apps/doc/images/faq-caching.png" width="461" height="154"/>
+                </div>
+                <p>
+                    Let's assume the following:
+                </p>
+                <ul>
+                    <li>The XSLT processor's
+                        <code>config</code> input is an XSLT stylesheet on disk
+                    </li>
+                    <li>The XSLT processor's
+                        <code>data</code> input is an XML file on disk
+                    </li>
+                    <li>
+                        The XSLT stylesheet does not contain imports, includes,
+                        the document() function, or calls to Java code.
+                    </li>
+                </ul>
+                <p>
+                    Under those assumptions, the XSLT transformation does not
+                    have side effects, which means that if neither the XSLT
+                    stylesheet
+                    (
+                    <code>config</code> input) nor the input XML
+                    document (
+                    <code>data</code> input) change, the output of the
+                    transformation will be the same.
+                </p>
+                <p>
+                    If you were to keep the result of the transformation,
+                    knowing that both inputs have not changed since the last
+                    time you generated that output, you wouldn't have to
+                    actually run the transformation again: you could just reuse
+                    the result you already have. This is the basic of caching in
+                    OPS.
+                </p>
+                <p>
+                    In this example, the result of the XSLT transformation is
+                    used to create an XUpdate processor configuration, which is
+                    an XUpdate program that will be interpreted or compiled by
+                    the XUpdate processor. Instead of keeping the result of the
+                    XSLT transformation as an XML document, the XUpdate
+                    processor can cache the compiled XUpdate program. Compared
+                    to a solution where the XML document is cached, this
+                    technique saves memory by not keeping the XML document in
+                    cache, and saves processing power by preventing the XUpdate
+                    processor to recompile its program.
+                </p>
+                <p>
+                    Therefore, if neither the XSLT transformer's
+                    <code>config</code> nor
+                    <code>data</code> input has changed, the XUpdate processor can keep the
+                    same program in the OPS object cache, saving an XSLT stylesheet
+                    compilation, an XSLT transformation, and an XUpdate program compilation.
+                </p>
+                <p>
+                    The same mechanism applies to the XSLT transformer configuration: the compiled
+                    XSLT stylesheet can be kept in the OPS object cache. And if the
+                    output of the XUpdate transformation is sent to an HTML serializer, the HTML
+                    output could be cached as well.
+                </p>
+                <p>
+                    In general, OPS does not unnecessarily cache the XML
+                    documents passed between processors. Instead, it caches the
+                    result of time-consuming operations, as illustrated above.
+                </p>
+                <p>
+                    Some cases are more complex than the example shown here. For
+                    example in the case of XSLT 1.0, OPS handles caching and
+                    dependencies related to imports, includes as well as the
+                    XPath
+                    <code>document()</code> function when the URL passed
+                    to the function is static. Some processors, like the SQL
+                    processors, never allow their output to be cached.
+                </p>
+            </section>
+            <a name="debug-attr-perf"/>
+            <section>
+                <title>
+                    Do debug attributes make my application slower?
+                </title>
+                <p>
+                    The OPS cache avoids executing the parts of a pipeline that do
+                    not need to be re-evaluated. However when the a debug attribute is set, the
+                    point where the attribute is set needs to be evaluated so that meaningful data
+                    can be displayed. This can cause the performance to degrade. Debug attributes
+                    should be removed in production.
+                </p>
+            </section>
+            <a name="debug-disable"/>
+            <section>
+                <title>Can I disable debug attributes globally?</title>
+                <p>
+                    Not at this time.
+                </p>
+            </section>
+            <a name="xpl-name-id"/>
+            <section>
+                <title>When invoking a processor in XPL, what is the difference between a name and an id?</title>
+                <p>
+                    Processors can be compared to functions in traditional programming languages.
+                    Processors (just like functions) have inputs (arguments) and outputs (return
+                    values). Each input and output has a <i>name</i>. The name is part of the
+                    processor's interface. For instance, using an informal function-like notation,
+                    the XSLT processor interface is:
+                </p>
+                <blockquote>
+                    <code>(data) = xslt(data, config)</code>
+                </blockquote>
+                <p>
+                    since the XSLT processor has 2 inputs named <code>data</code> and
+                    <code>config</code>, and one output named <code>data</code>.
+                </p>
+                <p>
+                    The interface to a processor is the contract that defines what inputs and
+                    outputs do. If you are using an existing processor, for example the XSLT
+                    transformer, you have to use the names declared by that processor. To know what
+                    names you must use, you have to consult the documentation for each processor. We
+                    have tried to be consistent and to use "config" and "data" as often as possible.
+                    You can for example call the XSLT transformer like this:
+                </p>
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:input name="config" href="stylesheet.xsl"/>
+                        <p:input name="data" href="input.xml"/>
+                        <p:output name="data" id="my-output"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    A pipeline can also be viewed as a processor. If that pipeline decides to
+                    export inputs and outputs, it must do so using the <code>&lt;p:param
+                    name="..."/></code> syntax. This defines its interface. You can compare this to
+                    writing your own method in Java, as opposed to using an existing method. The
+                    difference is that in Java, you address method parameters by position when you
+                    call a method. In XPL, you always address them by name. Therefore it is
+                    important to use the right name when you call a processor (or a pipeline).
+                </p>
+                <p>
+                    This also applies to the cases where the Web Application Controller calls your
+                    own pipelines: the PFC has to know the names of the inputs and outputs to
+                    connect to. Therefore, you have to use the names ( <code>data</code> and
+                    <code>instance</code>) <a
+                    href="http://www.orbeon.com/ops/doc/processors-controller">documented</a>.
+                </p>
+                <p>
+                    If you implement a pipeline or write a new processor in Java, and you don't
+                    have any external naming constraints (such as the ones defined by the PFC, or
+                    if somebody expects to call your pipeline using names defined in advance), you
+                    are free to use any name.
+                </p>
+                <p>
+                    In XPL an <i>id</i> can be assigned to an output when invoking a processor. This
+                    id can then be used latter on in the same pipeline to refer to that specific
+                    output, and for instance connect it to the input of another processor. Ids are
+                    similar to variable names in most programming languages.
+                </p>
+            </section>
+        </section>
+        <a name="other"/>
+        <section>
+            <title>Other Orbeon PresentationServer FAQ</title>
+            <a name="ie-cannot-find-server"/>
+            <section added="2006-10-24">
+                <title>Why am I getting an error page "Cannot find server or DNS server error" on IE only?</title>
+                <p>
+                    If you get the white IE error page with the message "Cannot find server or DNS server error" when
+                    navigating to another page, it most likely means that the length of the URL for that page exceeds
+                    the limit imposed by IE. This can happen if you are passing an XForms instance from one page to
+                    another with a redirect. The solution often involves changing in your <code>properties.xml</code>
+                    the value of the <code>instance-passing</code> property for the processor
+                    <code>oxf:page-flow</code> from <code>redirect</code> to <code>forward</code>.
+                </p>
+                <p>
+                    The <code>instance-passing</code> can be defined at application level in
+                    <code>properties.xml</code>, the page flow level, or the <code>&lt;result></code> element level. See
+                    the changes in version 2.5 for <a href="home-changes-25#instance-passing">more information about
+                    <code>instance-passing</code></a>.
+                </p>
+            </section>
+            <a name="illgal-html-character"/>
+            <section added="2006-06-16">
+                <title>Why am I getting an "Illegal HTML character" exception?</title>
+                <p>
+                    The exception typically looks like:
+                </p>
+                <blockquote>
+                    <code>
+                        org.orbeon.saxon.trans.DynamicError: Illegal HTML character: decimal 150<br/>
+                        at org.orbeon.saxon.event.HTMLEmitter.writeEscape(HTMLEmitter.java:321)
+                    </code>
+                </blockquote>
+                <p>
+                    In general, you get this error when the encoding on your XML file missing or is
+                    incorrect. In the example above, we had specified the encoding to be ISO-8859-1,
+                    while editing the file on a Windows machine. The file contained a dash encoded
+                    as the character 150 in decimal, 96 in hexadecimal, which is not a valid
+                    character for the ISO-8859-1 encoding. In this case changing the encoding to
+                    windows-1252 solves the problem.
+                </p>
+                <p>
+                    Specifying ISO-8859-1 instead of windows-1252 on files that contain characters
+                    invalid in ISO-8859-1 does sometimes work, but not always. In particular, more
+                    recent versions of Saxon became stricter checking for invalid characters. So
+                    we recommend you use windows-1252 instead of ISO-8859-1 when appropriate. You
+                    specify the windows-1252 encoding by starting your XML file with the following
+                    XML declaration:
+                </p>
+                <code>
+                    &lt;?xml version="1.0" encoding="windows-1252"?>
+                </code>
+                <p>
+                    For more information, see this discussion on the <a
+                    href="http://www.orbeon.com/blog/2006/06/14/how-browser-have-been-saving-us-from-incorrect-encodings/">difference
+                    between ISO-8859-1 and Windows-1252</a>.
+                </p>
+            </section>
+            <a name="performance-numbers"/>
+            <section added="2006-01-11">
+                <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
+                <p>
+                    We provide recommendations on how to tune OPS applications in the <a
+                    href="integration-tuning">Performance and Tuning</a> section. Orbeon does not
+                    provide performance figures at this point, due to the number of different
+                    possible scenarios, the differences between hardware platforms, and the
+                    different expectations of users. We believe that the best way to tackle
+                    performance questions is to go beyond theory and work on a small but
+                    representative prototype. Orbeon can help you build that prototype, a task often
+                    done in just a few days. Upon completion of the prototype, you can evaluate
+                    whether the performance of the prototype is satisfying or not, and if not, Orbeon
+                    can help you determine whether and how performance can be improved. The final
+                    appreciation belongs to you.
+                </p>
+            </section>
+            <a name="xslt-perf"/>
+            <a name="xslt-processor"/>
+            <section>
+                <title>What is the recommended XSLT transformer for OPS?</title>
+                <p>
+                    <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within OPS. It has proven
+                    reliable, and supports the latest <a href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> and <a
+                    href="http://www.w3.org/TR/xpath20/">XPath 2.0</a> drafts from the W3C.
+                </p>
+                <p>
+                    OPS also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
+                </p>
+            </section>
+            <a name="xslt-perf"/>
+            <section>
+                <title>Isn't XSLT processing slow?</title>
+                <p>
+                    XSLT performance can vary greatly depending on the XSLT processor used. In
+                    general, XSLT performance has shown perfectly adequate for all but the most
+                    performance-intensive applications. This being said, OPS
+                    minimizes the performance hit with its advanced cache, which for example caches
+                    objects such as XSLT templates, therefore avoiding reparsing and revalidating
+                    stylesheets unless absolutely necessary.
+                </p>
+                <p>
+                    OPS also ships with XSLTC, an XSLT compiler now part of Apache
+                    Jakarta. XSLTC has shown significant performance improvements over the regular
+                    Xalan implementation, at the cost of a lack of maturity.
+                </p>
+            </section>
+            <a name="xsltc"/>
+            <section>
+                <title>Is XSLTC a mature product?</title>
+                <p>
+                    XSLTC is not quite mature yet and caution must be exercised when using it. If
+                    you plan to use XSLTC, we recommend extensive testing as well as switching back
+                    and forth between XSLTC and the regular Xalan implementation during development
+                    to ensure proper behavior. We also recommend <a
+                    href="http://nagoya.apache.org/bugzilla/">submitting bugs</a> to the Jakarta
+                    project if necessary.
+                </p>
+            </section>
+            <a name="dom4j-illegal-add"/>
+            <section>
+                <title>
+                    Why am I getting an "org.dom4j.IllegalAddException" error?
+                </title>
+
+                    <p>The full message looks like:</p>
+                    <p>
+                        <tt>
+                            org.dom4j.IllegalAddException: The node
+                            "org.dom4j.util.UserDataElement@c11567 [Element: &lt;gaga attributes:
+                            []/>] userData: null, line 0, column 0" could not be added to the branch
+                            "null" because: Cannot add another element to this Document as it already
+                            has a root element of: gaga
+                        </tt>
+                    </p>
+                    <p>
+                        You get this error when you have a stylesheet that generate two or more root
+                        elements. This tends to happen if your stylesheet does not match on "/". For
+                        instance, say you have this stylesheet:
+                    </p>
+                    <xml-source>
+                        <xsl:stylesheet version="2.0"
+                            xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:template match="a">
+                                <x/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </xml-source>
+                    <p>And this input document:</p>
+                    <xml-source>
+                        <root>
+                            <a/>
+                            <a/>
+                        </root>
+                    </xml-source>
+                    <p>
+                        The XSLT output will be <tt>&lt;x/>&lt;x/></tt>, which is a not legal XML
+                        document (of course, you can only have one root element in an XML document).
+                    </p>
+            </section>
+            <a name="parse-xml-string"/>
+            <section>
+                <title>
+                    How can I parse a string containing XML into a document that OPS can process?
+                </title>
+
+                    <p>
+                        Use the XSLT transformer and the
+                        <a href="http://www.saxonica.com/documentation/extensions/functions.html">
+                            <code>saxon:parse</code>
+                        </a>
+                        function. This function parses an XML document supplied as a string and returns
+                        a document node. To copy the resulting document to the output of your XSLT
+                        transformation, use
+                        <code>xsl:copy</code>. For example, assuming your input
+                        document is as follows:
+                    </p>
+                    <xml-source>
+                        <document>
+                            <xml-string>
+                                &lt;name&gt;
+                                &lt;first&gt;John&lt;/first&gt;
+                                &lt;last&gt;Smith&lt;/last&gt;
+                                &lt;/name&gt;
+                            </xml-string>
+                        </document>
+                    </xml-source>
+                    <p>
+                        Consider also the following XSLT transformation:
+                    </p>
+                    <xml-source>
+                        <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:saxon="http://saxon.sf.net/" version="2.0">
+                            <xsl:template match="/">
+                                <xsl:copy-of select="saxon:parse(/document/xml-string)"/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </xml-source>
+                    <p>
+                        Running this transformation on the input document above generates the following
+                        output:
+                    </p>
+                    <xml-source>
+                        <name>
+                            <first>John</first>
+                            <last>Smith</last>
+                        </name>
+                    </xml-source>
+                    <p>
+                        This tip is particularly useful for parsing XML strings returned by EJBs, Web
+                        Services, or entered by a user in XForms textarea controls.
+                    </p>
+
+            </section>
+            <a name="app-server-hangs"/>
+            <section>
+                <title>
+                    What can I do if the application server hangs?
+                </title>
+                <p>
+                    <ul>
+                        <li>
+                            <p>
+                                If your JVM is running but is not responding to HTTP requests, you
+                                might first want to see where in the Java code threads are blocked. To do so, on
+                                Windows hit ctrl-break in the command prompt window where your application
+                                server is running; on Linux identify the process id of the JVM running
+                                your application server and issue a <code>kill -3 pid</code>.
+                            </p>
+                            <p>
+                                If you are using Tomcat and the threads are blocked in database code
+                                (e.g. SQLProcessor, PoolingDataSource) open your <code>server.xml</code>,
+                                locate the element configuring the Coyote HTTP 1.1 Connector. Make sure
+                                that the <code>maxProcessors</code> attribute on Tomcat 4.1 or the <code>maxThreads</code>
+                                attribute on Tomcat 5 is set to a value that is much lower than the value of
+                                the <code>acceptCount</code> attribute. Typically values for <code>maxProcessor</code>
+                                or <code>maxThreads</code> are 3 for a single-CPU server or 4 for a dual-CPU server,
+                                while the value of <code>acceptCount</code> can be much higher, typically between
+                                50 and 100.
+                            </p>
+                            <p>
+                                For more information on those and other attributes configuring the Coyote HTTP
+                                1.1 Connector in general, see the
+                                <a href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/config/coyote.html">Tomcat 4.1</a>
+                                or <a href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/config/http.html">Tomcat 5</a>
+                                documentation.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Some versions of Chainsaw have a bug where Chainsaw stops responding
+                                in certain situations, which blocks the application server. If you are
+                                using Chainsaw, this might be the problem: use the FileAppender
+                                instead, or use <a href="http://www.orbeon.com/software/studio">Orbeon
+                                Studio</a> instead of Chainsaw to view log messages.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                If you are running RedHat 9, set the environment variable
+                                LD_ASSUME_KERNEL=2.4.1 and restart the application server.
+                            </p>
+                        </li>
+                    </ul>
+                </p>
+            </section>
+            <a name="saxon-namespace-node"/>
+            <section>
+                <title>
+                    What can I do about the error "Cannot output a namespace node for the default
+                    namespace when the element is in no namespace"?
+                </title>
+                <p>
+                    This is a Saxon issue. It might happen when in the input document of a
+                    stylesheet or in the output of the stylesheet you have an element declared with
+                    no prefix as the child of an element with a prefix. One way to get around this
+                    is to add a prefix to all the element having a parent declared with a prefix.
+                </p>
+            </section>
+            <a name="xupdate"/>
+            <section>
+                <title>
+                    Where can I find more information about XUpdate?
+                </title>
+                <p>
+                    Efforts around the XUpdate language appear to be stalled. XML databases now
+                    tend to bid on proprietary extensions to the standard XQuery language (e.g. see
+                    what Tamino does, and there are talks about implementing something similar in
+                    the open source eXist database). In the future, XQuery will support standard
+                    update features, but that is probably years away.
+                </p>
+                <p>
+                    We do recognize that XUpdate has definite advantages over XSLT in certain use
+                    cases (which is why we implemented it in the first place), but it seems that the
+                    market is currently not supporting what is considered "yet another XML
+                    transformation language".
+                </p>
+                <p>
+                    For use as a general-purpose XML update language with Orbeon Presentation
+                    Server, we now recommend using XSLT. Use either XSLT 1.0 or XSLT 2.0 (12
+                    November 2003 Draft as implemented by Saxon) instead of using the XUpdate
+                    processor. The only place where XUpdate is not deprecated is within Page Flow,
+                    but only a subset of XUpdate is required and you can simply consider that it is
+                    part of the Page Flow syntax.
+                </p>
+                <p>
+                    This being said, our XUpdate implementation is functional and of course anybody
+                    is free to use it or contribute to it. Like the rest of OPS, it
+                    is available under the LGPL license.
+                </p>
+            </section>
+            <a name="xupdate-debug"/>
+            <section>
+                <title>How can I debug the XUpdate code in my page flow?</title>
+                <p>
+                    Insert at the very beginning of the in the XUpdate code those 3 lines to log the
+                    instance being modified (instance of target page), the current instance, and
+                    the output of the action pipeline:
+                </p>
+                <xml-source>
+                    <xu:message>Instance of target page before XUpdate: <xu:copy-of select="/*"/></xu:message>
+                    <xu:message>Instance of this page: <xu:copy-of select="doc('oxf:instance')/*"/></xu:message>
+                    <xu:message>Action output: <xu:copy-of select="doc('oxf:action')/*"/></xu:message>
+                </xml-source>
+                <p>
+                    Then as the very last instruction in the XUpdate code, add:
+                </p>
+                <xml-source>
+                    <xu:message>Instance of target page after XUpdate: <xu:copy-of select="/*"/></xu:message>
+                </xml-source>
+            </section>
+            <a name="empty-local-name"/>
+            <section>
+                <title>
+                    Why am I getting a "Empty local name in SAX event" exception?
+                </title>
+                <p>
+                    If this exception is thrown from the class TransformerImpl class in a Xalan
+                    package (<code>orbeon.apache.xalan.transformer</code>), a bug in Xalan is at
+                    the source of the problem. Xalan calls the SAX <code>startElement()</code>
+                    method with an attribute that has an empty local name.
+                </p>
+                <p>
+                    Switching to Saxon will solve the problem. Saxon is now the default XSLT 1.0 and
+                    XSLT 2.0 processor in OPS, and will get used when using <code>oxf:xslt</code>.
+                    See the <a href="processors-xslt">XSLT documentation</a> for more information.
+                </p>
+            </section>
+            <a name="xml-base"/>
+            <section>
+                <title>
+                    Why am I getting extra <code>xml:base</code> attributes on my documents?
+                </title>
+                <p>
+                    This usually happens when you use XInclude. As per the <a
+                    href="http://www.w3.org/TR/2004/REC-xinclude-20041220/">XInclude
+                    specification</a>, such attributes are added upon inclusion. You can get rid of
+                    them by using XSLT:
+                </p>
+                <xml-source>
+                    <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                        <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                        <xsl:template match="@xml:base"/>
+                    </xsl:stylesheet>
+                </xml-source>
+            </section>
+            <a name="jboss-log4j"/>
+            <section>
+                <title>
+                    What should I do about the error message
+                    <code>ERROR: invalid console appender config detected, console stream looping when deploying to JBOSS:</code>
+                </title>
+                <p>
+                    This used to happen with JBoss 3.2.1 and OXF 2.2. The work around a the time
+                    was to add <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code> to
+                    the end of the JAVA_OPTS line in JBOSS_HOME/bin/run.bat. (run.sh on UNIX)
+                </p>
+            </section>
+            <a name="out-of-memory"/>
+            <section added="2005-05-21">
+                <title>
+                    I am getting frequent Out of Memory errors with OPS. What can I do?
+                </title>
+                <p>
+                    Often, this is due to too many threads doing processing within OPS at the same
+                    time. There is just a lot going on in OPS when a request is processed, including
+                    typically several XSLT transformations.
+                </p>
+                <p>
+                    Servlet containers like Tomcat, or application servers like WebLogic, by default
+                    allow a very large number of concurrent threads to enter a servlet. For Tomcat,
+                    the default is 200. This means that memory usage cannot be effectively bound. It
+                    is enough to have a few requests slightly overlapping to cause extra memory
+                    consuption that can lead to Out of Memory errors. In addition, extra memory
+                    usage leads to poorer performance.
+                </p>
+                <p>
+                    It is recommended to start by changing the container parameters that control
+                    threads. With Tomcat (see the <a
+                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html">documentation</a>),
+                    try first:
+                </p>
+                <ul>
+                    <li>maxThreads="3"</li>
+                    <li>acceptCount="50"</li>
+                </ul>
+                <p>
+                    This setting will set a small maximum of 3 concurrent requests, and 50 more
+                    requests being queued. This will ensure that memory usage does not go out of
+                    control.
+                </p>
+                <p>
+                    Then, experiment with a tool like Apache JMeter to test load, and adjust those
+                    parameters, as well as your virtual machine heap, until you get results that are
+                    satisfactory as far as memory consumption and number of concurrent requests are
+                    concerned.
+                </p>
+                <p>
+                    Note that it is typical for Java virtual machines to have maximum heap sizes of
+                    256 MB to 1 GB in production.
+                </p>
+            </section>
+            <a name="stack-traces"/>
+            <section>
+                <title>OPS Java stack traces are very long. Does that mean that performance is necessarily bad?</title>
+                <p>
+                    Java stack traces are indeed very long in OPS. This is due mainly to the nature
+                    of XPL pipelines, which are implemented on top of the event-based SAX API.
+                </p>
+                <p>
+                    In reality you cannot make any reasonable conclusion about performance just by
+                    looking at the length of a typical stack trace: you would have in addition to
+                    that to look at the pattern of execution of those methods. For example, if every
+                    top-level method call was going through, say, 300 levels of method calls, this
+                    would likely be an issue, but it is not the case in OPS. The bottom line is that
+                    no, the length of a stack trace does not directly correlate with poor
+                    performance.
+                </p>
+                <p>
+                    To reach valid conclusions about performance, run a tool like <a
+                    href="http://jakarta.apache.org/jmeter/">Apache JMeter</a> on your application.
+                </p>
+            </section>
+            <a name="session-sharing"/>
+            <section added="2006-01-11">
+                <title>Can JSP or other servlets share a session with OPS?</title>
+                <p>
+                    Yes, the <a href="processors-serializers#scope-serializer">Scope serializer</a>
+                    and <a href="processors-generators#scope-generator">Scope generator</a> simply
+                    use the Servlet (or Portlet) session to store and retrieve information.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Studio FAQ</title>
+            <a name="studio-xpl-trace"/>
+            <section>
+                <title>In Studio, why nothing shows up in the XPL Trace Views?</title>
+                <p>
+                    The XPL Trace facility provides information for a given page served by
+                    PresentationServer. For that page, it shows a tree of processor calls and
+                    indicates on that tree how much time has been spent on each node. This
+                    information collected by XPL Trace can be either sent to the standard output, or
+                    to Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL
+                    Trace Tree views. For this to work as expected:
+                </p>
+                <ul>
+                    <li>
+                        You need to setup the port Studio listens to, from Preferences / Orbeon. That
+                        port must match the one you have setup in the PresentationServer <a
+                        href="reference-properties#trace">properties</a>.
+                    </li>
+                    <li>
+                        After changing the port number in Studio, you might have to restart
+                        Eclipse.
+                    </li>
+                    <li>
+                        For Studio to listen on the specified port, you need to have two views (XPL
+                        Trace Table and XPL Trace Tree) open. You might also need to at least make
+                        one of the views active before Studio starts listening on the specified
+                        port. On Windows, you can check if Studio is listening on the port you
+                        specified using <a
+                        href="http://www.sysinternals.com/Utilities/TcpView.html">TCPView</a>.
+                    </li>
+                </ul>
+            </section>
+            <a name="studio-vm-args"/>
+            <section>
+                <title>
+                    In Studio, how can I add my own VM arguments (e.g. heap size, debugging)
+                </title>
+                <ul>
+                    <li>For version 1.0.3 or higher :
+                        <ol>
+                            <li>Select the menu item
+                                <code>Run | Run...</code>
+                            </li>
+                            <li>
+                                Either create a new J2EE Container Container for OPS launch configuration
+                                or select an existing one.
+                            </li>
+                            <li>Select the Argguments tab.</li>
+                            <li>In the VM arguments field add your VM arguments.</li>
+                            <li>Click the Apply button to save the change.</li>
+                        </ol>
+                    </li>
+                    <li>For versions lower than 1.0.3 :
+                        <ol>
+                            <li>Open the
+                                <i>Window | Preferences</i> dialog.
+                            </li>
+                            <li>Under
+                                <i>Java | Installed JRE</i>, select the "Standard VM".
+                            </li>
+                            <li>Click on the
+                                <i>Edit</i> button.
+                            </li>
+                            <li>Enter your own VM arguments in the
+                                <i>Default VM Arguments</i> text field.
+                            </li>
+                        </ol>
+                        <p>
+                            Note that this sets the VM arguments for all the applications you run
+                            from Eclipse. At this point there is no way to set VM arguments that
+                            are only used when starting the J2EE container.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <a name="studio-empty-events"/>
+            <section>
+                <title>
+                    In Studio, why is the Logging Events view always empty?
+                </title>
+                <p>Check the following:</p>
+                <ol>
+                    <li>
+                        <p>
+                            Make you don't have any "Address already in use" error in the Console
+                            view when you start the application server. If you do, it means that you
+                            already have another application (other program, or other OPS
+                            application maybe deployed in the same application server) using the
+                            same port. On Windows, you can use <a
+                            href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
+                            to determine what application is using the port you mention in the
+                            <code>log4j.xml</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Make sure you don't have any filter setup in Logging Events view by
+                            right-clicking on the "down arrow" icon and selecting "Filters".
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            To populate the Logging Events view, Studio connects to log4j, and
+                            log4j listens on the port specified in the log4j.xml file.
+                        </p>
+                        <p>
+                            There is nothing in the Studio preferences to tell Studio to which port
+                            it should connect. Instead, Studio finds the port by looking at all the
+                            log4j.xml files you have in all the open projects. It will then try to
+                            connect to all the ports specified those files.
+                        </p>
+                        <p>
+                            If log4j was able to listen on the port specified in your log4j.xml (see
+                            point 1 above) and still no messages appear in the Logging Events view,
+                            that might be because Studio cannot find your log4j.xml. So make sure
+                            that this file is in an open project defined in the Studio. Also note
+                            that if you modify this file outside of Eclipse with an external
+                            program, Studio won't pick up that modification. In that case, in the
+                            Navigator view, right click on the project that contains your log4j.xml
+                            and choose Refresh. Right after this, events should start to appear in
+                            the Logging Event view as you load pages in the browser.
+                        </p>
+                    </li>
+                </ol>
+            </section>
+        </section>
+    </body>
+</document>

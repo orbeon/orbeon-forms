@@ -1,0 +1,483 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Other Generators</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Generators are a special category of processors that have no XML data inputs, only
+                outputs. They are generally used at the top of an XML pipeline to generate XML data
+                from a Java object or other non-XML source. OPS provides several
+                generators as described below. See also the <a
+                href="processors-generators-url">URL</a> and <a
+                href="processors-generators-request">Request</a> generators.
+            </p>
+        </section>
+        <a name="scope-generator"/>
+        <section>
+            <title>Scope Generator</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    The Scope generator can retrieve documents from the application, session and request
+                    scopes. It can work together with the <a
+                    href="processors-serializers#scope-serializer">Scope serializer</a>, or retrieve
+                    documents stored by custom processors or other application modules.
+                </p>
+            </section>
+            <p>
+                The following Java object types are supported and checked in this order:
+            </p>
+            <ul>
+                <li>
+                    <b>org.dom4j.Document</b> - An XML document represented using the dom4j class
+                    hierarchy.
+                </li>
+                <li>
+                    <b>org.w3c.dom.Document</b> - An XML document represented using the W3C DOM
+                    class hierarchy.
+                </li>
+                <li>
+                    <b>java.lang.String</b> - An XML document represented as a String.
+                </li>
+                <li>
+                    <b>java.lang.Object</b> - Any Java object. In this case, the object is
+                    serialized to XML using <a href="http://www.castor.org">Castor</a>. An optional
+                    <code>mapping</code> input may specify a custom <a
+                    href="http://www.castor.org/xml-mapping.html">Castor mapping document</a>.
+                </li>
+            </ul>
+            <section>
+                <title>Inputs and Outputs</title>
+                <p>
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Purpose</th>
+                            <th>Mandatory</th>
+                        </tr>
+                        <tr>
+                            <td align="center">Input</td>
+                            <td><code>config</code></td>
+                            <td>Configuration</td>
+                            <td align="center">Yes</td>
+                        </tr>
+                        <tr>
+                            <td align="center">Input</td>
+                            <td><code>mapping</code></td>
+                            <td>Castor XML mapping</td>
+                            <td align="center">No</td>
+                        </tr>
+                        <tr>
+                            <td align="center">Output</td>
+                            <td><code>data</code></td>
+                            <td>Result XML data</td>
+                            <td align="center">Yes</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    The <code>config</code> input has the following format:
+                </p>
+                <xml-source>
+                    <config>
+                        <key>cart</key>
+                        <scope>application|session|request</scope>
+                        <session-scope>application|portlet</session-scope>
+                    </config>
+                </xml-source>
+                <table>
+                    <tr>
+                        <th>key</th>
+                        <td>
+                            The <code>&lt;key></code> element contains a string used to identify
+                            the document. The same key must be used to store and retrieve a
+                            document.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>scope</th>
+                        <td>
+                            <p>
+                                The <code>&lt;scope></code> element specifies in what scope the
+                                document is to be retrieved from. The available scopes are:
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>application</b> - The application scope starts when the Web
+                                    application is deployed. It ends when the Web application is
+                                    undeployed. The application scope provides an efficient storage for
+                                    data that does not need to be persisted and that is common for all
+                                    users. It is typically used to cache information (e.g. configuration
+                                    data for the application read from a database).
+                                </li>
+                                <li>
+                                    <b>session</b> - The session scope is attached to a given user of
+                                    the Web application. It is typically used to store information that
+                                    does not need to be persisted and is specific to a given user. It is
+                                    typically used to cache the user's profile.
+                                </li>
+                                <li>
+                                    <b>request</b> - The request scope starts when an HTTP request is
+                                    sent to the server. It ends when the corresponding HTTP response is
+                                    sent back to the client. The request scope can be used to integrate
+                                    a OPS application with legacy J2EE servlets.
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>session-scope</th>
+                        <td>
+                            <p>
+                                The <code>&lt;session-scope></code> element specifies in what
+                                session scope the document is to be retrieved from. This element is
+                                only allowed when the &lt;scope> element is set to
+                                <code>session</code>. The available session scopes are:
+                            </p>
+                            <ul>
+                                <li>
+                                    <b>application</b> - access the entire application session. This
+                                    is always a valid value.
+                                </li>
+                                <li>
+                                    <b>portlet</b> - access the local portlet session. This is only
+                                    valid if the processor is run hithin a portlet.
+                                </li>
+                            </ul>
+                            <p>
+                                If the element is missing, a default value is used:
+                                <code>application</code> when the processor runs within a servlet,
+                                and <code>portlet</code> when the processor runs within a portlet.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    The optional <code>mapping</code> input contains a custom <a
+                    href="http://www.castor.org/xml-mapping.html">Castor mapping document</a>. This
+                    mapping is used only if the object retrieved can only be handled as
+                    <code>java.lang.Object</code> and not as one of the other types.
+                </p>
+                <p>
+                    The <code>data</code> output contains the document retrieved. When the Scope
+                    generator cannot find any document in scope for the given key, it returns a
+                    "null document":
+                </p>
+                <xml-source>
+                    <null xsi:nil="true"/>
+                </xml-source>
+            </section>
+            <note>
+                <p>
+                    The Session generator, previously used to retrieve documents from the session
+                    scope, is now deprecated. Use the Scope generator with session scope instead.
+                </p>
+            </note>
+            <note>
+                <p>
+                    The Bean generator, previously used to retrieve JavaBeans from the request and
+                    session scopes, is now deprecated. Use the Scope generator instead.
+                </p>
+            </note>
+        </section>
+        <a name="servletinclude"/>
+        <section>
+            <title>Servlet Include Generator</title>
+            <p>
+                The Servlet Include generator, using the <a
+                href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/servletapi/javax/servlet/RequestDispatcher.html">RequestDispatcher</a>,
+                calls and parses the result of another servlet running in the same Java virtual
+                machine. The servlet can generate either XML or HTML. The generator automatically
+                detects HTML and uses HTMLTidy to clean and parse the stream as XML.
+            </p>
+            <note>
+                <p>
+                    This generator works only in a servlet environment. It is not supported in portlets.
+                </p>
+            </note>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The <code>config</code> input describes the servlet to call, and optionally
+                    configures the HTMLTidy process. You can specify the servlet either by name or
+                    path, and optionally specify a context path. The RelaxNG schema for this input
+                    is the following:
+                </p>
+                <xml-source>
+                    <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
+                        <interleave>
+                            <choice>
+                                <element name="servlet-name">
+                                    <data type="string"/>
+                                </element>
+                                <element name="path">
+                                    <data type="string"/>
+                                </element>
+                            </choice>
+                            <optional>
+                                <element name="context-uripath">
+                                    <data type="string"/>
+                                </element>
+                            </optional>
+                            <optional>
+                                <element name="tidy-options">
+                                    <interleave>
+                                        <optional>
+                                            <element name="show-warnings">
+                                                <choice>
+                                                    <value>true</value>
+                                                    <value>false</value>
+                                                </choice>
+                                            </element>
+                                            <optional>
+                                                <element name="quiet">
+                                                    <choice>
+                                                        <value>true</value>
+                                                        <value>false</value>
+                                                    </choice>
+                                                </element>
+                                            </optional>
+                                        </optional>
+                                    </interleave>
+                                </element>
+                            </optional>
+                        </interleave>
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Data Output</title>
+                <p>
+                    The data output contains the result in the servlet include call.
+                </p>
+            </section>
+            <section>
+                <title>Example</title>
+                <p>
+                    This generator calls the <code>reports</code> servlet in the
+                    <code>/admin</code> context path. Since this servlet is generating HTML, it's
+                    better to have verbose error reporting from HTMLTidy.
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:servlet-include">
+                        <p:input name="config">
+                            <config>
+                                <servlet-name>reports</servlet-name>
+                                <context-path>/admin</context-path>
+                                <tidy-options>
+                                    <show-warnings>true</show-warnings>
+                                    <quiet>false</quiet>
+                                </tidy-options>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="#report"/>
+                    </p:processor>
+                </xml-source>
+            </section>
+        </section>
+        <a name="exception-generator"/>
+        <section>
+            <title>Exception Generator</title>
+            <p>
+                The Exception generator is usually used in an <link
+               href="reference-error-pipeline">error pipeline</link>. It serializes to XML the data
+               contained in a Java exception retrieved from the request scope, with the following
+               information:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        All the exceptions, starting from the top-level exception down to the root
+                        cause.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        For each exception, the exception class name, message, hierachy of location
+                        information, and list of stack trace elements.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The following is an XML document resulting from an exception:
+            </p>
+            <xml-source>
+                <exceptions>
+                    <exception>
+                        <type>org.orbeon.oxf.common.ValidationException</type>
+                        <message>null, line 8, column 109, description xforms:bind element: Bind element is missing nodeset attribute null, line 8, column 109: Bind element is missing nodeset attribute</message>
+                        <location>
+                            <system-id/>
+                            <line>8</line>
+                            <column>109</column>
+                            <description>xforms:bind element</description>
+                            <element>&lt;xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="xforms-element-2" ref="/instance/a" calculate=". + 1"/&gt;</element>
+                        </location>
+                        <location>
+                            <system-id>oxf:/ops/pfc/xforms-epilogue.xpl</system-id>
+                            <line>99</line>
+                            <column>66</column>
+                            <description>reading processor output</description>
+                            <parameters>
+                                <parameter>
+                                    <name>name</name>
+                                    <value>response</value>
+                                </parameter>
+                                <parameter>
+                                    <name>id</name>
+                                    <value>response</value>
+                                </parameter>
+                                <parameter>
+                                    <name>ref</name>
+                                    <value/>
+                                </parameter>
+                            </parameters>
+                            <element>&lt;p:output xmlns:p="http://www.orbeon.com/oxf/pipeline" name="response" id="response"/&gt;</element>
+                        </location>
+                        <location>
+                            ...
+                        </location>
+                        ...
+                        <stack-trace-elements>
+                            <element>
+                                <class-name>org.orbeon.oxf.common.ValidationException</class-name>
+                                <method-name>wrapException</method-name>
+                                <file-name>ValidationException.java</file-name>
+                                <line-number>119</line-number>
+                            </element>
+                            ...
+                        </stack-trace-elements>
+                    </exception>
+                    <exception>
+                       ...
+                    </exception>
+                </exceptions>
+            </xml-source>
+            <p>
+                A typical error pipeline should include an Exception generator followed by one or
+                more transformation(s), and an HTML serializer.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:exception">
+                    <p:output name="data" id="exception"/>
+                </p:processor>
+            </xml-source>
+        </section>
+        <a name="bean-generator"/>
+        <section>
+            <title>Bean Generator</title>
+            <note>
+                <p>
+                    This processor is deprecated. Please refer to the <a
+                    href="#scope-generator">Scope generator</a> instead.
+                </p>
+            </note>
+            <p>
+                The Bean generator serializes objects in the request or session to XML. If an object
+                is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this document is
+                sent as-is. Otherwise, the object is assumed to be a JavaBean and is serialized to
+                XML with <link href="http://www.castor.org">Castor</link>. This generator takes
+                two inputs:
+            </p>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The configuration input describes which bean to serialize, and two optional
+                    sources. The sources can be <code>request</code>, <code>session</code> or both.
+                    If both are specified, they are tried in order. In the example below, the
+                    request is searched for the <code>guess</code> bean. If not found, the session
+                    is tried.
+                </p>
+                <xml-source>
+                    <p:input name="config">
+                        <config>
+                            <attribute>guess</attribute>
+                            <source>request</source>
+                            <source>session</source>
+                        </config>
+                    </p:input>
+                </xml-source>
+                <p>Here is the RelaxNG schema:</p>
+                <xml-source>
+                    <element name="config"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
+
+                        <interleave>
+
+                            <oneOrMore>
+                                <element name="attribute">
+                                    <data type="string"/>
+                                </element>
+                            </oneOrMore>
+
+                            <interleave>
+                                <optional>
+                                    <element name="source">
+                                        <value>request</value>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="source">
+                                        <value>session</value>
+                                    </element>
+                                </optional>
+                            </interleave>
+
+                        </interleave>
+
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Mapping Input</title>
+                <p>
+                    This input specifies the Castor mapping file. See <link
+                    href="http://www.castor.org/xml-mapping.html">Castor Documentation</link> for
+                    more information on the mapping file. In most instances, the default mapping is
+                    sufficient:
+                </p>
+                <xml-source>
+                    <p:input name="mapping">
+                        <mapping/>
+                    </p:input>
+                </xml-source>
+            </section>
+            <section>
+                <title>Output</title>
+                <p>
+                    The output document contains a <code>beans</code> root node. Each serialized
+                    bean is a child of the root node. The example above generates the following
+                    document:
+                </p>
+                <xml-source>
+                    <beans>
+                        <guess useraguess="0">
+                            <message>Hello</message>
+                        </guess>
+                    </beans>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,1 @@
+This is the "doc" application, which is in charge of displaying the Orbeon Forms documentation.

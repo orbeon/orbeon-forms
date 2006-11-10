@@ -1,0 +1,236 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Using the OPS XUpdate Engine in Java</title>
+    </header>
+    <body>
+        <section>
+            <title>Scope</title>
+
+            <p>OPS applications use the <link href="processors-xupdate">XUpdate
+            processor</link> to perform XUpdate transformations. The OPS XUpdate
+            engine implements the JAXP API that can be used directly by Java programs for
+            experimentation purposes. This section describes the JAXP interface exposed by the
+            OPS XUpdate engine. We assume here that you are familiar with the basics
+            of the JAXP APIs.</p>
+        </section>
+        <section>
+            <title>API</title>
+
+            <p>Note: The JAXP methods described in this section are the only ones supported by
+            OPS.</p>
+
+            <section>
+                <title>Creating a Templates</title>
+                <ol>
+                    <li>Create an instance of
+                    <code>org.orbeon.oxf.transformer.xupdate.TransformerFactoryImpl</code>.
+                    This class extends
+                    <code>javax.xml.transform.sax.SAXTransformerFactory</code>.</li>
+
+                    <li>Call <code>newTemplatesHandler()</code> on the
+                    factory. This returns an instance of
+                    <code>javax.xml.transform.sax.TemplatesHandler</code>.</li>
+
+                    <li>A <code>TemplatesHandler</code> implements that SAX
+                    <code>ContentHandler</code> interface. Feed this content
+                    handler with the XUpdate program.</li>
+
+                    <li>Call the <code>getTemplates()</code> method on the
+                    templates handler. This returns an instance of
+                    <code>javax.xml.transform.Templates</code>. This object
+                    contains the internal representation of the XUpdate
+                    program.</li>
+                </ol>
+            </section>
+            <section>
+                <title>Performing a Transformation</title>
+                <ol>
+                    <li>Call <code>newTransformer()</code> on the
+                    <code>Templates</code> object. This returns a
+                    <code>javax.xml.transform.Transformer</code></li>
+
+                    <li>Call <code>transform()</code> on the transformer by
+                    passing a <code>SAXSource</code> and <code>SAXResult</code>
+                    as arguments.</li>
+                </ol>
+            </section>
+        </section>
+        <section>
+            <title>Running Your Program</title>
+
+            <p>To run your program, you need to have the following JAR files in
+            your classpath:</p>
+
+            <ul>
+                <li>OPS: <code>ops.jar</code></li>
+                <li>dom4j: <code>dom4j-1_4.jar</code></li>
+                <li>Jaxen: <code>jaxen-1_1-beta-1-dev.jar</code></li>
+                <li>SAXPath: <code>saxpath-dev_orbeon.jar</code></li>
+                <li>Xerces: <code>xercesImpl-2_2_1_orbeon.jar</code></li>
+                <li>XML APIs: <code>xml-apis-2_5_1.jar</code></li>
+            </ul>
+
+            <p> To get those JAR files:</p>
+            <ol>
+                <li><link href="http://www.orbeon.com/oxf/download">Download
+                OPS</link></li>
+
+                <li>Extract ops.war from the ZIP archive.</li>
+
+                <li>Extract the JAR files from the WAR archive. They are
+                stored in the <code>WEB-INF/lib</code> directory.</li>
+            </ol>
+        </section>
+        <section>
+            <title>Sample Driver</title>
+            <section>
+                <title>Source Code</title>
+                <source>
+package org.orbeon.oxf.transformer.xupdate;
+
+import org.apache.crimson.parser.XMLReaderImpl;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXContentHandler;
+import org.dom4j.io.XMLWriter;
+import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TemplatesHandler;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+
+public class XUpdateDriver {
+
+    private final static String XUPDATE_FACTORY =
+            "org.orbeon.oxf.transformer.xupdate.TransformerFactoryImpl";
+
+    public static void main(String[] args) throws TransformerException, IOException {
+
+        // Check arguments
+        if (args.length != 2) {
+            System.err.println("Syntax: java " +
+                    XUpdateDriver.class.getName() + " input.xml xupdate.xml");
+            return;
+        }
+
+        // Perform transformation
+        Templates templates = createTemplates(new FileReader(args[1]));
+        SAXContentHandler saxContentHandler = new SAXContentHandler();
+        templates.newTransformer().transform(new SAXSource(new XMLReaderImpl(),
+                new InputSource(new FileReader(args[0]))),
+                new SAXResult(saxContentHandler));
+
+        // Output result
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        format.setIndentSize(4);
+        XMLWriter xmlWriter = new XMLWriter(System.out, format);
+        xmlWriter.write(saxContentHandler.getDocument());
+    }
+
+    private static Templates createTemplates(Reader xupdateReader) {
+        try {
+            SAXTransformerFactory factory = (SAXTransformerFactory)
+                    Class.forName(XUPDATE_FACTORY).newInstance();
+            TemplatesHandler templatesHandler = factory.newTemplatesHandler();
+            XMLReader xmlReader = new XMLReaderImpl();
+            xmlReader.setContentHandler(templatesHandler);
+            xmlReader.parse(new InputSource(xupdateReader));
+            return templatesHandler.getTemplates();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}</source>
+            </section>
+            <section>
+                <title>Running the Driver</title>
+
+                <p>You can run the driver with <code>java
+                org.orbeon.oxf.transformer.xupdate.XUpdateDriver input.xml
+                xupdate.xml</code>. Make sure to have in your CLASSPATH the JAR
+                files listed earlier. Assuming that <code>input.xml</code>
+                contains:</p>
+
+                <xml-source>
+                    <company>
+                        <year id="2000">
+                            <quarter id="1" sales="80"/>
+                            <quarter id="2" sales="56"/>
+                            <quarter id="3" sales="97"/>
+                            <quarter id="4" sales="150"/>
+                        </year>
+                        <year id="2001">
+                            <quarter id="1" sales="20"/>
+                            <quarter id="2" sales="54"/>
+                            <quarter id="3" sales="80"/>
+                            <quarter id="4" sales="90"/>
+                        </year>
+                        <year id="2002">
+                            <quarter id="1" sales="54"/>
+                            <quarter id="2" sales="65"/>
+                            <quarter id="3" sales="96"/>
+                            <quarter id="4" sales="164"/>
+                        </year>
+                    </company>
+                </xml-source>
+
+                <p>And <code>xupdate.xml</code> contains:</p>
+
+                <xml-source>
+                    <xu:modifications xmlns:xu="http://www.xmldb.org/xupdate">
+                        <xu:function name="double">
+                            <xu:param name="f"/>
+                            <xu:function name="result">
+                                <xu:param name="x"/>
+                                <xu:value-of select="f($x) * 2"/>
+                            </xu:function>
+                            <xu:copy-of select="$result"/>
+                        </xu:function>
+
+                        <xu:function name="increment">
+                            <xu:param name="x"/>
+                            <xu:value-of select="$x + 1"/>
+                        </xu:function>
+
+                        <xu:variable name="incrementAndDouble" select="double($increment)"/>
+                        <xu:update select="/">
+                            <result>
+                                <xu:value-of select="incrementAndDouble(2)"/>
+                            </result>
+                        </xu:update>
+                    </xu:modifications>
+                </xml-source>
+
+                <p>Then the output on the console will be:</p>
+
+                <xml-source>
+                    <result>6</result>
+                </xml-source>
+            </section>
+
+        </section>
+    </body>
+</document>

@@ -1,0 +1,341 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <header>
+        <title>Delegation Processor</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                The Delegation processor allows calling services implemented as:
+            </p>
+            <ul>
+                <li>A JavaBean</li>
+                <li>An EJB</li>
+                <li>A Web service</li>
+            </ul>
+            <p>
+                The main benefit of the Delegation processor is that you do not need to implement
+                your own XML processor in Java to call services.
+            </p>
+        </section>
+        <section>
+            <title>Inputs and Outputs</title>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Purpose</th>
+                    <th>Mandatory</th>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td><code>interface</code></td>
+                    <td>
+                        <p>
+		                	The <code>interface</code> input declares services that you can then call in the
+		                	<code>call</code> input. You define one or more service identifiers and map those
+		                	to a given JavaBean, EJB or Web service. You also need to provide information
+		                	that the delegation processor needs to call
+		                    the service: for instance a JNDI name for an EJB or a class name for a
+		                    JavaBean.
+		                </p>
+		                <p>
+		                	The <code>interface</code> input is the only document with information
+		                    specific to the service type (EJB, Web service or JavaBean). This means that
+		                    if, at some point, a service is moved from, say, a JavaBean to an EJB, ohly
+		                    the interface has to be modified, but not the <code>call</code> input.
+		                </p>
+                    </td>
+                    <td align="center">Yes</td>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td><code>call</code></td>
+                    <td>
+                        <ul>
+                            <li>
+                                The <code>call</code> input contains an XML document which is a
+                                template containing <code>&lt;delegation:execute&gt;</code>
+                                elements.
+                            </li>
+                            <li>
+                                The <code>&lt;delegation:execute&gt;</code> element must be in the
+                                <code>http://orbeon.org/oxf/xml/delegation</code> namespace. The
+                                <code>delegation</code> prefix is usually mapped to this namespace.
+                            </li>
+                            <li>
+                                Each <code>&lt;delegation:execute&gt;</code> element specifies a
+                                service to be called and the parameters to be sent to that service.
+                            </li>
+                            <li>
+                                For calls to JavaBeans and EJBs in particular, it is important that the
+                                resulting document be a well-formed XML document. In particular, the
+                                resulting document must have a root element. In this case, always be
+                                sure that your <code>call</code> input contains at least one root
+                                element around <code>&lt;delegation:execute&gt;</code> elements.
+                            </li>
+                        </ul>
+                    </td>
+                    <td align="center">Yes</td>
+                </tr>
+                <tr>
+                    <td align="center">Output</td>
+                    <td><code>data</code></td>
+                    <td>
+                        The <code>data</code> output produces a document based on the
+                        <code>call</code> input where the <code>&lt;delegation:execute&gt;</code>
+                        elements have been replaced with the value returned by the service.
+                    </td>
+                    <td align="center">Yes</td>
+                </tr>
+            </table>
+        </section>
+        <section>
+        	<title>Calling a JavaBean</title>
+            <p>
+            	This is an example of using the Delegation processor to call a JavaBean:
+            </p>
+            <xml-source show-namespaces="false">
+			    <p:processor name="oxf:delegation">
+                    <p:input name="interface">
+                        <config>
+                            <service id="my-service" type="javabean" class="MyClass"/>
+                        </config>
+                    </p:input>
+                    <p:input name="call">
+                        <result>
+                            <delegation:execute service="my-service" operation="myMethod">
+                                <param1 xsi:type="xs:string">param1</param1>
+                            </delegation:execute>
+                        </result>
+                    </p:input>
+                    <p:output name="data" id="result"/>
+                </p:processor>
+            </xml-source>
+            <ul>
+            	<li>
+                    <p>
+                        The <code>interface</code> input declares the JavaBean to call:
+                    </p>
+                    <ul>
+	            		<li>
+	            			The value of the <code>type</code> attribute must be set to <code>javabean</code>.
+            			</li>
+	            		<li>
+	            			The <code>class</code> attribute references the Java class to instanciate.
+            			</li>
+	        		</ul>
+        		</li>
+        		<li>
+                    <p>
+                        The <code>call</code> input defines the method to call and the parameters
+                        to pass:
+                    </p>
+                    <ul>
+        				<li>
+        					The <code>service</code> attribute references the service id declared
+							in the <code>interface</code> input.
+    					</li>
+    					<li>
+    						Each child element of <code>&lt;delegation:execute></code> corresponds to a parameter of
+    						the method to be called, in the order they appear in the method signature. The value in
+    						the <code>xsi:type</code> attribute must match the parameter type. The content of the
+    						element is the value passed to the Java method.
+						</li>
+                        <note>
+                            Note: the only two supported types are: <code>xs:string</code> and <code>xs:double</code>.
+                        </note>
+                    </ul>
+    			</li>
+            </ul>
+        </section>
+        <section>
+        	<title>Calling an EJB</title>
+            <p>
+            	This is an example of using the Delegation processor to call an EJB:
+            </p>
+            <xml-source show-namespaces="false">
+			    <p:processor name="oxf:delegation">
+			        <p:input name="interface">
+			            <config>
+	                        <service id="creditcard-validation" type="stateless-ejb" 
+	                        	uri="java:comp/env/ejb/creditcard-validation"/>
+			            </config>
+			        </p:input>
+			        <p:input name="call">
+			            <delegation:execute service="creditcard-validation" operation="validate">
+			            	<number xsi:type="xs:string">1234123412341234</number>
+			            	<type xsi:type="xs:string">visa</type>
+			            </delegation:execute>
+			        </p:input>
+			        <p:output name="data" id="result"/>
+			    </p:processor>
+            </xml-source>
+            <ul>
+            	<li>
+                    <p>
+                        The <code>interface</code> input declares the EJB that will be called:
+                    </p>
+                    <ul>
+	            		<li>
+	            			The value of the <code>type</code> attribute must be set to
+	            			<code>stateless-ejb</code>.
+            			</li>
+	            		<li>
+	            			The <code>uri</code> attribute references the JNDI name of the EJB.
+            			</li>
+	        		</ul>
+        		</li>
+        		<li>
+                    <p>
+                        The <code>call</code> input defines the method to be called and the parameters:
+                    </p>
+                    <ul>
+        				<li>
+        					The <code>service</code> attribute references the service id declared
+							in the <code>interface</code> input.
+    					</li>
+    					<li>
+    						Each child element of <code>&lt;delegation:execute></code> corresponds to an attribute of
+    						the method to be called. The name of each element must match the attribute name, and the
+    						value in the <code>xsi:type</code> attribute must match the attribute type. The content
+    						of the element is the value passed to the EJB method.
+						</li>
+        			</ul>
+    			</li>
+            </ul>
+        </section>
+        <section>
+        	<title>Calling a Web Service</title>
+        	<section>
+        		<title>Example: RPC-Style</title>
+	        	<xml-source show-namespaces="false">
+				    <p:processor name="oxf:delegation">
+				        <p:input name="interface">
+				            <config>
+				                <service id="quotes" type="webservice" style="rpc"
+				                        endpoint="http://www.scdi.org/~avernet/webservice/">
+				                    <operation nsuri="urn:avernet" name="getRandomQuote"
+				                        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+				                </service>
+				            </config>
+				        </p:input>
+				        <p:input name="call">
+				            <delegation:execute service="quotes" operation="getRandomQuote"/>
+				        </p:input>
+				        <p:output name="data" id="result"/>
+				    </p:processor>
+	        	</xml-source>
+        	</section>
+        	<section>
+        		<title>Example: Document-Style</title>
+	        	<xml-source show-namespaces="false">
+				    <p:processor name="oxf:delegation">
+				        <p:input name="interface">
+				            <config>
+				                <service id="stock-quote" type="webservice" style="document"
+				                    endpoint="http://ws.cdyne.com/delayedstockquote/delayedstockquote.asmx">
+				                    <operation name="get-quote" soap-action="http://ws.cdyne.com/GetQuote"/>
+				                </service>
+				            </config>
+				        </p:input>
+				        <p:input name="call">
+				            <delegation:execute service="stock-quote" operation="get-quote" xsl:version="2.0">
+				                <m:GetQuote xmlns:m="http://ws.cdyne.com/">
+				                    <m:StockSymbol><xsl:value-of select="/symbol"/></m:StockSymbol>
+				                    <m:LicenseKey>0</m:LicenseKey>
+				                </m:GetQuote>
+				            </delegation:execute>
+			            </p:input>
+				        <p:output name="data" id="result"/>
+				    </p:processor>
+	        	</xml-source>
+        	</section>
+        	<section>
+        		<title>Usage</title>
+        		<ul>        		
+        			<li>
+                        <p>
+                            The <code>interface</code> input declares the Web service to be called:
+                        </p>
+                        <ul>
+        					<li>
+        						Valid values for the style attribute are <code>rpc</code>
+    							and <code>document</code>. The default value if the attribute is missing is
+    							<code>rpc</code>.
+							</li>
+							<li>
+								The <code>id</code> (referenced when Web service is called in the <code>call</code> input)
+								and <code>endpoint</code> (the SOAP endpoint) attributes are mandatory.
+							</li>
+							<li>
+								Declaring the Web service operations is optional for document-style services. You only need
+								to do so if you want to specify a SOAP action for a given operation.
+							</li>
+							<li>
+								Optionally you can declare for each operation the encoding style (<code>encodingStyle</code>
+								attribute) and SOAP action (<code>soap-action</code> attribute).
+							</li>
+                            <li>
+                                Optionally you can declare what part of the SOAP result document is
+                                returned by specifying an XPath expression in the optional
+                                <code>select</code> attribute on the <code>operation</code> element.
+                                If you don't specify an expression, by default when the style is
+                                RPC the content of the first child element under the SOAP body is
+                                returned, and when the style is document the content of the SOAP
+                                body is returned.
+                            </li>
+                            <li>
+                                By default, if the web service returns a SOAP fault, the delegation
+                                processor throws an exception. If you set the
+                                <code>return-fault</code> attribute on the <code>&lt;service></code>
+                                element to <code>true</code>, then the SOAP fault document is returned.
+                            </li>
+                        </ul>
+    				</li>
+    				<li>
+                        <p>
+                            In the <code>call</code> input:
+                        </p>
+                        <ul>
+    						<li>
+				                The XML fragment you specify in the <code>execute</code> element is sent as is,
+				                and you are responsible of making sure that it is valid according to the
+				                encoding style.
+			                </li>
+			                <li>
+			                	Referencing a specific operation in the <code>operation</code> attribute is
+			                	mandatory for RPC-style services, and is optional for document-style services
+			                	(you only want to do so if you declared specific information about the operation
+			                	in the <code>interface</code> input).
+		                	</li>
+                            <li>
+			                	The optional <code>timeout</code> attribute on the <code>execute </code> element
+			                	specifies a connection timeout in milliseconds. The value must be a
+			                	non-negative integer, with the value <code>0</code> meaning no timeout. If not
+			                	specified, the timeout value is the default timeout of the underlying web
+			                	service implementation.
+		                	</li>
+                        </ul>
+	                </li>
+                </ul>
+            </section>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,115 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Command Line Applications</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                You can use OPS to build standalone command-line applications running pipelines. Use
+                cases include: creating a hardcopy of a web site, importing or exporting XML data to
+                and from a relational database, testing pipelines, automating repetitive operations
+                on XML files (selection, transformation, aggregation, etc.). OPS becomes your "XML
+                toolbox".
+            </p>
+        </section>
+        <section>
+            <title>Command Line Interface</title>
+            <p>
+                OPS ships with a command line interface (CLI). The easiest way to run it is to use
+                the executable <code>cli-ops.jar</code> file and pass it a pipeline file:
+            </p>
+            <source>java -jar cli-ops.jar pipeline.xpl</source>
+            <p>
+                In this case, a pipeline can use relative URLs, or, if using absolute URLs, can use
+                either the <code>file:</code> protocol to access files or, equivalently, the
+                <code>oxf:</code> protocol.
+            </p>
+            <p>
+                Sometimes, it is better to group files under a resources <i>sandbox</i> addressed by
+                the <code>oxf:</code> protocol. This is the standard way of accessing resources
+                (files) within web applications, but it is also useful with command-line
+                applications. In such cases, specify a resource manager root directory with the
+                <code>-r</code> option, for example:
+            </p>
+            <source>java -jar cli-ops.jar -r . oxf:/pipeline.xpl</source>
+            <p>
+                or:
+            </p>
+            <source>java -jar cli-ops.jar -r C:/my-example oxf:/pipeline.xpl</source>
+            <p>
+                When specifying a resource manager root directory, it is mandatory to use a protocol
+                and an absolute path within the sandbox, as shown above.
+            </p>
+            <note>
+                <p>
+                    OPS's jar file (<code>cli-ops.jar</code>) is executable via the <code>java
+                    -jar</code> mechanism. However, it depends on a number of libraries that must be
+                    in the 'lib' directory beneath the directory containing
+                    <code>cli-ops.jar</code>. It is recommended to expand the WAR file, and refer
+                    to the <code>cli-ops.jar</code> file under the WAR file's <i>WEB-INF</i>
+                    directory.
+                </p>
+            </note>
+        </section>
+        <section>
+            <title>Examples</title>
+            <p>
+                OPS comes with simple examples of command-line applications under the
+                <code>src/examples/cli</code> directory. To run those examples, from a command
+                prompt, enter either one of the subdirectories and run the <code>java</code> command
+                following the explanations above, for example, from the <code>simple</code>
+                directory:
+            </p>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-ops.jar stdout.xpl</source>
+            <p>
+                or, from the <code>transform</code> directory:
+            </p>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-ops.jar transform.xpl</source>
+            <p>
+                Notice that those two example pipelines use serializers, for example:
+            </p>
+            <xml-source>
+                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="foo.xml"/>
+                        <p:input name="config" href="foo.xsl"/>
+                        <p:output name="data" id="result"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:xml-serializer">
+                        <p:input name="config">
+                            <config/>
+                        </p:input>
+                        <p:input name="data" href="#result"/>
+                    </p:processor>
+
+                </p:config>
+            </xml-source>
+            <p>
+                It is important to note that, when running from within a servlet or portlet
+                environment, serializers send their data to the web client, such as a web browser.
+                When running from a command-line environment, serializers output data to the
+                standard output.
+            </p>
+        </section>
+    </body>
+</document>

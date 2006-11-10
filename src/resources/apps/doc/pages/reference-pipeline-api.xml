@@ -1,0 +1,168 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Pipeline Engine API</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                The pipeline engine API allows embedding the execution of pipelines in your Java
+                applications, whether server-side or client-side.
+            </p>
+        </section>
+        <section>
+            <title>API</title>
+            <p>
+                The reference example using those APIs is the command-line application found under
+                <code>OPS.java</code>. The steps required to execute a pipeline are detailed below.
+                Please also refer to the source code of <code>OPS.java</code>.
+            </p>
+            <section>
+                <title>Parse the command-line arguments</title>
+                <p>
+                    Please refer to the source code for more details.
+                </p>
+            </section>
+            <section>
+                <title>Initialize a resource manager</title>
+                <p>
+                    Pipelines usually access resources (or files) through an abstraction layer
+                    composed of one or more <a href="reference-resource-managers">resource
+                    managers</a>. The code below initializes a Priority Resource Manager, which
+                    attempts to load resources first from the filesystem, then from the classloader.
+                    The reason for using the classloader is that the Orbeon JAR file contain
+                    bundled configuration resources that must be accessible.
+                </p>
+                <p>
+                    In this particular case, if the <code>-r</code> command-line argument is
+                    present, a sandbox directory path is passed to the Filesystem resource manager
+                    upon instanciation.
+                </p>
+                <source><![CDATA[
+Map props = new HashMap();
+props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
+if (resourceManagerSandbox != null) {
+    // Use a sandbox
+    props.put("oxf.resources.filesystem.sandbox-directory", resourceManagerSandbox);
+}
+props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
+props.put("oxf.resources.priority.2", "org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory");
+if (logger.isInfoEnabled())
+    logger.info("Initializing Resource Manager with: " + props);
+ResourceManagerWrapper.init(props);]]></source>
+            </section>
+            <section>
+                <title>Initialize OPS Properties</title>
+                <p>
+                    This initializes the OPS properties with the default properties file bundled in
+                    the Orbeon JAR file.
+                </p>
+                <source><![CDATA[
+OXFProperties.init(OXFProperties.DEFAULT_PROPERTIES_URI);]]></source>
+            </section>
+            <section>
+                <title>Initialize logger based on properties</title>
+                <p>
+                    This initializes a logger.
+                </p>
+                <source><![CDATA[
+LoggerFactory.initLogger();]]></source>
+            </section>
+            <section>
+                <title>Build a processor definition object</title>
+                <p>
+                    This step builds a <code>ProcessorDefinition</code> object containing the name
+                    of the processor to run (here the <code>oxf:pipeline</code> processor), as well
+                    as the URL to bind to the <code>config</code> input of that processor. The
+                    mapping of processor names to classes is done in <code>processors.xml</code>, a
+                    resource bundled in the Orbeon JAR file.
+                </p>
+                <source><![CDATA[
+if (otherArgs != null && otherArgs.length == 1) {
+    // Assume the pipeline processor and a config input
+    processorDefinition = new ProcessorDefinition();
+    processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
+
+    String configURL;
+    if (!NetUtils.urlHasProtocol(otherArgs[0])) {
+        // URL is considered relative to current directory
+        try {
+            // Create absolute URL, and switch to the oxf: protocol
+            String fileURL = new URL(new File(".").toURL(), otherArgs[0]).toExternalForm();
+            configURL = "oxf:" + fileURL.substring(fileURL.indexOf(':') + 1);
+        } catch (MalformedURLException e) {
+            throw new OXFException(e);
+        }
+    } else {
+        configURL = otherArgs[0];
+    }
+
+    processorDefinition.addInput("config", configURL);
+} else {
+    throw new OXFException("No main processor definition found.");
+}]]></source>
+            </section>
+            <section>
+                <title>Initialize a PipelineContext</title>
+                <p>
+                    The <code>PipelineContext</code> represents a context object passed to all the
+                    processors running in a given pipeline session. In general, you just need to
+                    create an instance.
+                </p>
+                <source><![CDATA[
+PipelineContext pipelineContext = new PipelineContext();
+
+// Some processors may require a JNDI context. In general, this is not required.
+Context jndiContext;
+try {
+    jndiContext = new InitialContext();
+} catch (NamingException e) {
+    throw new OXFException(e);
+}
+pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);]]></source>
+            </section>
+            <section>
+                <title>Run the pipeline</title>
+                <p>
+                    This is where all the real work is done. A <code>PipelineEngineFactory</code>
+                    instanciates a <code>PipelineEngine</code> object, which then runs the
+                    pipeline. This method is provided with the <code>ProcessorDefinition</code> and
+                    the <code>PipelineContext</code> created earlier, as well as an
+                    <code>ExternalContext</code> instance providing input and output access to the
+                    pipeline.
+                </p>
+                <source><![CDATA[
+PipelineEngineFactory.instance().executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext);]]></source>
+            </section>
+            <section>
+                <title>Display exceptions if needed</title>
+                <p>
+                    If an exception is caught, information about the error is displayed.
+                </p>
+                <source><![CDATA[
+LocationData locationData = ValidationException.getRootLocationData(e);
+Throwable throwable = OXFException.getRootThrowable(e);
+String message = locationData == null
+        ? "Exception with no location data"
+        : "Exception at " + locationData.toString();
+logger.error(message, throwable);]]></source>
+            </section>
+        </section>
+    </body>
+</document>

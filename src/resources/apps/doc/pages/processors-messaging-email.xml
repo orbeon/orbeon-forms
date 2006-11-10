@@ -1,0 +1,489 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>Email Processor</title>
+    </header>
+    <body>
+        <a name="email-processor"/>
+        <section>
+            <title>Scope</title>
+            <p>
+                The Email processor can send emails through an SMTP server (the usual way of
+                sending emails). Its input contains the basic configuration (SMTP host, subject,
+                etc.) as well as inline message body content. Alternatively, the message content can
+                refer to external resources, such as resources on disk or dynamically generated
+                content. It features the following high-level functionality:
+            </p>
+            <ul>
+                <li>
+                    <b>Multiple recipients:</b> send the same email to multiple recipients.
+                </li>
+                <li>
+                    <b>Multipart hierarchy:</b> it is possible to have multiple levels of multipart
+                    messages.
+                </li>
+                <li>
+                    <b>Binary attachments:</b> binary files such as images and PDF files can be
+                    attached to an email.
+                </li>
+                <li>
+                    <b>Dynamic attachments:</b> attachments can be generated dynamically. It is for
+                    example possible to attach a dynamically generated chart or PDF file.
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Data Input</title>
+            <p>
+                The <code>data</code> input contains the configuration of the processor as well
+                as the message header and body. The following table describes the configuration
+                elements:
+            </p>
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Cardinality</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>message</td>
+                    <td>1</td>
+                    <td>Root element</td>
+                </tr>
+                <tr>
+                    <td>message/smtp-host</td>
+                    <td>0..1</td>
+                    <td>The SMTP host used to send the message</td>
+                </tr>
+                <tr>
+                    <td>message/from</td>
+                    <td>1</td>
+                    <td>Sender of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
+                    <td>message/to</td>
+                    <td>1..n</td>
+                    <td>Recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
+                    <td>message/cc</td>
+                    <td>0..n</td>
+                    <td>Carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
+                    <td>message/bcc</td>
+                    <td>0..n</td>
+                    <td>Blind carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
+                    <td>message/subject</td>
+                    <td>1</td>
+                    <td>Subject of the message</td>
+                </tr>
+                <tr>
+                    <td>message/header</td>
+                    <td>0..n</td>
+                    <td>
+                        Optional extra email header to add. Contains a <code>name</code> element
+                        and a <code>value</code> element.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body</td>
+                    <td>1</td>
+                    <td>Indicates a message body optionally containing multiple parts</td>
+                </tr>
+                <tr>
+                    <td>message/body/@content-type</td>
+                    <td>1</td>
+                    <td>
+                        The content-type of this body part. This attribute can also include a
+                        <code>charset</code> attribute to specify a character encoding for text
+                        types. For example: <code>text/plain; charset=utf-8</code>. This
+                        attribute may also specify a multipart data type:
+                        <code>multipart/mixed</code>, <code>multipart/alternative</code> or
+                        <code>multipart/related</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body/part</td>
+                    <td>0..n</td>
+                    <td>
+                        A message body part, if the body element specifies a multipart
+                        <code>content-type</code> attribute.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body/part/@name</td>
+                    <td>1</td>
+                    <td>The name of this body part</td>
+                </tr>
+                <tr>
+                    <td>message/body/part@/content-type</td>
+                    <td>1</td>
+                    <td>
+                        The content-type of this body part. This can also include a
+                        <code>charset</code> attribute to specify a character encoding for text
+                        types. For example: <code>text/plain; charset=utf-8</code>. This
+                        attribute may also specify a multipart data type:
+                        <code>multipart/mixed</code>, <code>multipart/alternative</code> or
+                        <code>multipart/related</code>. In this case, the part contains an
+                        embedded multipart message. This replaces the depreated
+                        <code>mime-multipart</code> attribute.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body/part@/content-disposition</td>
+                    <td>0..1</td>
+                    <td>
+                        The optional Content-Disposition header of this body part. Not allowed
+                        if the part contains embedded parts.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body/part@/content-id</td>
+                    <td>0..1</td>
+                    <td>
+                        The optional Content-ID header of this body part.
+                    </td>
+                </tr>
+                <tr>
+                    <td>message/body/part/*</td>
+                    <td>1</td>
+                    <td>
+                        The content of the body part. This can contain embedded
+                        <code>part</code> elements if the content is multipart. It can be XHTML
+                        if the content-type is <code>text/html</code>. Finally, it can be any
+                        text content, including just plain HTML (which can be embedded in a
+                        CDATA section for convenience).
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <title>Simple Messages</title>
+            <p>
+                A simple message requires a <code>body</code> element with:
+            </p>
+            <ul>
+                <li>A text <code>content-type</code> attribute, for example <code>text/plain</code></li>
+                <li>Text content</li>
+            </ul>
+            <p>
+                For example:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:email">
+                    <p:input name="data">
+                        <message>
+                            <smtp-host>mail.example.org</smtp-host>
+                            <from>
+                                <email>trove@smith.com</email>
+                                <name>Trove Smith</name>
+                            </from>
+                            <to>
+                                <email>jani@smith.com</email>
+                                <name>Jani Smith</name>
+                            </to>
+                            <subject>Reminder</subject>
+                            <body content-type="text/plain">
+                                Hello, Jani!
+                            </body>
+                        </message>
+                    </p:input>
+                </p:processor>
+            </xml-source>
+        </section>
+        <section>
+            <title>Character Encoding</title>
+            <p>
+                In the example above, no character encoding is specified for the
+                <code>body</code> element. This determines what character encoding is used in
+                the body of the email message constructed by the Email processor. If no
+                encoding is specified, the default <code>iso-8859-1</code> is used. In some
+                cases, it is useful to specify a character encoding. For example, if it is known
+                that the message only contains ASCII characters, the <code>us-ascii</code>
+                encoding can be specified. If, on the other hand, the message contains
+                characters from multiple languages, the <code>utf-8</code> encoding can be
+                specified.
+            </p>
+            <p>
+                Use the <code>content-type</code> attribute to specify an encoding, for
+                example: <code>content-type="text/plain; charset=utf-8"</code>.
+            </p>
+            <note>
+                <p>
+                    XML itself support Unicode, in other words it is designed to allow representing
+                    all the characters specified by the Unicode specification. Those characters can
+                    all be represented with the UTF-8 encoding. Because of this, the Email
+                    processor could always encode text using the UTF-8 encoding. However, some mail
+                    clients may not all support that encoding. It is therefore left to the user of
+                    the Email processor to specify the appropriate encoding.
+                </p>
+            </note>
+        </section>
+        <section>
+            <title>Message Parts</title>
+            <p>
+                An email message can be composed of several parts. Parts can be used for:
+            </p>
+            <ul>
+                <li>
+                    <b>Attachments:</b> for example, a simple text message may have one of more
+                    image attachments. Usually, the <code>multipart/mixed</code> content type
+                    is used for this purpose.
+                </li>
+                <li>
+                    <b>Alternative Formats:</b> for example, both a plain text and an HTML
+                    version of a same message may be sent. The recipient, or her mail software,
+                    can then choose the most appropriate format to display. The
+                    <code>multipart/alternative</code> content type is used for this purpose.
+                </li>
+                <li>
+                    <b>Dependencies:</b> for example, an HTML message may refer to images or
+                    other resources embedded in the same email. The
+                    <code>multipart/related</code> content type is used for this purpose.
+                </li>
+            </ul>
+            <p>
+                To create a multipart email, specify one of the multipart content types on the
+                <code>body</code> element. The <code>body</code> element must contain one or
+                more <code>part</code> elements.
+            </p>
+            <p>
+                In turn, <code>part</code> elements may contain other parts. In that case, a
+                <code>part</code> element must declare a multipart content type attribute, and
+                contain at least one <code>part</code> element.
+            </p>
+            <p>
+                The main part of the body is encapsulated by the <code>body</code> element of
+                the message.
+            </p>
+        </section>
+        <section>
+            <title>Inline and Out of Line Parts</title>
+            <p>
+                The content of a part can be specified in two ways:
+            </p>
+            <ul>
+                <li>
+                    <b>Inline:</b> the content is directly embedded in the <code>body</code> or
+                    <code>part</code> element.
+                </li>
+                <li>
+                    <b>Out of line:</b> the content is available from a resource or dynamically
+                    generated.
+                </li>
+            </ul>
+            <section>
+                <title>Inline Parts</title>
+                <p>
+                    The content of the <code>body</code> or <code>part</code> element can be of
+                    the following types:
+                </p>
+                <ul>
+                    <li>
+                        <b>HTML: </b> the content type is <code>text/html</code>. In this case,
+                        the inline content is considered as HTML and converted to HTML. A root
+                        <code>html</code> element must be present.
+                    </li>
+                    <li>
+                        <b>Text type:</b> this is the case when the content type starts with
+                        <code>text/</code>, for example <code>text/plain</code>. In thise case,
+                        a character encoding can be specified as well.
+                    </li>
+                    <li>
+                        <b>Binary Type:</b> for all other content types, the body of the part
+                        must contain Base64-encoded binary data.
+                    </li>
+                </ul>
+            </section>
+            <a name="out-of-line-parts"/>
+            <section>
+                <title>Out of Line Parts</title>
+                <p>
+                    This mode is enabled when the <code>part</code> element contains an
+                    <code>src</code> attribute.
+                </p>
+                <p>
+                    You can refer to a part content using a regular URI, for example:
+                </p>
+                <xml-source>
+                    <part src="oxf:/image.jpg" content-type="image/jpeg"/>
+                </xml-source>
+                <p>
+                    You can also refer to dynamically generated content by referring to <a
+                    href="reference-xpl-pipelines#optional">optional processor inputs</a>. For
+                    example:
+                </p>
+                <xml-source>
+                    <part src="input:image-content" content-type="image/jpeg"/>
+                </xml-source>
+                <p>
+                    In this case, the content of the image is obtained by reading the
+                    <code>image-content</code> input of the Email processor. You can choose an
+                    arbitray name for the input, as long as it is not <code>data</code>. Then,
+                    connect a processor to the input, for example:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>oxf:/image.jpg</url>
+                                <content-type>image/jpeg</content-type>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="file"/>
+                    </p:processor>
+                    <p:processor name="oxf:email">
+                        <p:input name="data">
+                            <message>
+                                ...
+                            </message>
+                        </p:input>
+                        <p:input name="image-content" href="#file"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    When the content type of the input read is text (starts with
+                    <code>text/</code>) or XML (<code>text/xml</code>,
+                    <code>application/xml</code>, or ends with <code>+xml</code>), the input
+                    document is expected to be in the text format specified by the <a
+                    href="reference-formats#text-documents">text document format</a>. When the
+                    content type of the input read is binary (all the other cases), the input
+                    document is expected to be in the binary format specified by the <a
+                    href="reference-formats#binary-documents">binary document format</a>.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Properties</title>
+            <p>
+                Several global properties are relevant to the Email processor. Refer to the <a
+                href="reference-properties#email-processor">Properties</a> section for more
+                information.
+            </p>
+        </section>
+        <section>
+            <title>Examples</title>
+            <section>
+                <title>Sending Alternative Parts</title>
+                <p>
+                    This example shows how to send both a text and HTML version of a message to
+                    two recipients.
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:email">
+                        <p:input name="data">
+                            <message>
+                                <smtp-host>mail.company.com</smtp-host>
+                                <from>
+                                    <email>trove@smith.com</email>
+                                    <name>Trove Smith</name>
+                                </from>
+                                <to>
+                                    <email>jani@smith.com</email>
+                                    <name>Jani Smith</name>
+                                </to>
+                                <to>
+                                    <email>tori@smith.com</email>
+                                    <name>Tori Smith</name>
+                                </to>
+                                <subject>Reminder</subject>
+                                <body mime-multipart="alternative">
+                                    <part name="part1" content-type="text/plain">
+                                      This is part 1
+                                    </part>
+                                    <part name="part2" content-type="text/html">
+                                        <html>
+                                            <body>
+                                                <p>
+                                                    This is part 2
+                                                </p>
+                                            </body>
+                                        </html>
+                                    </part>
+                                </body>
+                            </message>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+            </section>
+            <section>
+                <title>Related Parts and Attachments</title>
+                <p>
+                    This example shows how to send related parts with HTML, as well as
+                    dynamically generated attachements.
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:email">
+                        <p:input name="data">
+                            <message>
+                                <smtp-host>mail.company.com</smtp-host>
+                                <from>
+                                    <email>trove@smith.com</email>
+                                    <name>Trove Smith</name>
+                                </from>
+                                <to>
+                                    <email>jani@smith.com</email>
+                                    <name>Jani Smith</name>
+                                </to>
+                                <subject>Email Example</subject>
+                                <body mime-multipart="alternative">
+                                    <comment> Provide simple text alternative </comment>
+                                    <part name="text" content-type="text/plain">This is some important message body.</part>
+                                    <comment> HTML alternative </comment>
+                                    <part name="html" content-type="multipart/related">
+                                        <part name="main" content-type="text/html">
+                                            <html>
+                                                <head>
+                                                    <title>Email Example</title>
+                                                </head>
+                                                <body>
+                                                    <p style="border: dotted 1px gray; padding: 5px">This is some <em>important</em> message body.</p>
+                                                    <p>
+                                                        This is a static image attached to the email and referred to by the HTML version:
+                                                    </p>
+                                                    <div style="border: dotted 1px gray; padding: 5px">
+                                                        <img src="cid:id1"/>
+                                                    </div>
+                                                    <p>
+                                                        This is an dynamic chart image attached to the email and referred to by the HTML version:
+                                                    </p>
+                                                    <div style="border: dotted 1px gray; padding: 5px">
+                                                        <img src="cid:id2"/>
+                                                    </div>
+                                                </body>
+                                            </html>
+                                        </part>
+                                        <comment> Attachments </comment>
+                                        <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/logo.gif"/>
+                                        <part name="chart" content-type="image/png" content-disposition="inline; filename=&quot;chart.png&quot;" content-id="id2" src="input:png-document"/>
+                                        <part name="pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;report.pdf&quot;" src="input:pdf-document"/>
+                                    </part>
+                                </body>
+                            </message>
+                        </p:input>
+                        <p:input name="png-document"/>
+                        <p:input name="pdf-document"/>
+                    </p:processor>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

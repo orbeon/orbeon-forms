@@ -1,0 +1,71 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html 
+  xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+  xmlns:portlet="http://orbeon.org/oxf/xml/portlet" 
+  xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+>
+    <!-- Make sure text from foreign elements is untouched.  Added because Erik noticed we were -->
+    <!-- actually dropping text in this case. -->
+    <p>
+      <a/>c
+    </p>
+    <p>
+      <a f:url-norewrite="true" />c
+      <a f:url-norewrite="true" />c
+    </p>
+    <xhtml:body background="/images/body-background1.png"  >
+        <!-- Simple rewrites -->
+        <xhtml:div>
+            <xhtml:form action="/my-action">
+                <xhtml:a href="/path">Click Here!</xhtml:a>
+                <xhtml:img src="/my-image1.png"/>
+                <xhtml:a href="path">Click Here!</xhtml:a>
+                <xhtml:img src="my-image2.png"/>
+                <xhtml:img src="?a=1&amp;b=1"/>
+                <xhtml:input type="image" src="/my-image3.png"/>
+                <xhtml:input type="text" src="/my-image4.png"/>
+            </xhtml:form>
+        </xhtml:div>
+        <!-- Check f:url-norewrite -->
+        <xhtml:div>
+            <xhtml:form action="/my-action" f:url-norewrite="true">
+                <xhtml:a href="/path">Click Here!</xhtml:a>
+                <xhtml:img src="/my-image5.png" f:url-norewrite="false"/>
+                <xhtml:a href="path">Click Here!</xhtml:a>
+                <xhtml:img src="my-image6.png" f:url-norewrite="false"/>
+                <xhtml:img src="?a=1&amp;b=2"/>
+            </xhtml:form>
+        </xhtml:div>
+        <!-- Text handling -->
+        <xhtml:div>
+            <xhtml:p>123wsrp_rewrite456</xhtml:p>
+            <xhtml:script>
+                <xhtml:p>123wsrp_rewrite456</xhtml:p>
+            </xhtml:script>
+            <SCRIPT>
+                <xhtml:p>123wsrp_rewrite456</xhtml:p>
+            </SCRIPT>
+        </xhtml:div>
+        <!-- Table background -->
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td background="/images/td-background.png">
+                    Hello
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+    </xhtml:body>
+    <brody background="/images/body-background2.png"/>
+</xhtml:html>

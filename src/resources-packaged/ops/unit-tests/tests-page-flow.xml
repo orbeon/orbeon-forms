@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Page Flow" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Setvalues 1 (with elements and attributes)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-extract.xsl"/>
+        <input name="data">
+            <form username-2="">
+                <username/>
+                <blog-id/>
+                <count>10</count>
+                <post-id/>
+                <format/>
+                <category/>
+                <other>
+                    <element format-2=""/>
+                </other>
+                <untouched/>
+            </form>
+        </input>
+        <input name="request-info">
+            <request>
+                <parameters>
+                    <parameter>
+                        <name>format</name>
+                        <value>rss</value>
+                    </parameter>
+                    <parameter>
+                        <name>category</name>
+                        <value>13</value>
+                    </parameter>
+                </parameters>
+            </request>
+        </input>
+        <input name="matcher-result">
+            <matcher-result>
+                <group>orbeon</group>
+                <group>CB2BAE93-3FB9-EC0E-CD12-79AAA2DC5314</group>
+                <group>B59D3F50-AE5C-15AB-BDA7-21892E05CAF5#comments</group>
+            </matcher-result>
+        </input>
+        <input name="setvalues">
+            <params xmlns="http://www.orbeon.com/oxf/controller">
+                <!-- Test for elements -->
+                <setvalue ref="/form/username" matcher-group="1"/>
+                <setvalue ref="/form/blog-id" matcher-group="2"/>
+                <setvalue ref="/form/post-id" matcher-group="3"/>
+                <setvalue ref="/form/format" parameter="format"/>
+                <setvalue ref="/form/category" parameter="category"/>
+                <!-- Test for attributes -->
+                <setvalue ref="/form/@username-2" matcher-group="1"/>
+                <setvalue ref="/form/other/element/@format-2" parameter="format"/>
+            </params>
+        </input>
+        <output name="data">
+            <form username-2="orbeon">
+                <username>orbeon</username>
+                <blog-id>CB2BAE93-3FB9-EC0E-CD12-79AAA2DC5314</blog-id>
+                <count>10</count>
+                <post-id>B59D3F50-AE5C-15AB-BDA7-21892E05CAF5#comments</post-id>
+                <format>rss</format>
+                <category>13</category>
+                <other>
+                    <element format-2="rss"/>
+                </other>
+                <untouched/>
+            </form>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues 1 (legacy)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/([^/]*)/([^/]*)/([^/]*)/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/123/456/789/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues 1 (new format)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/([^/]*)/([^/]*)/([^/]*)/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id" matcher-group="1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id" matcher-group="3"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id"  matcher-group="2"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/123/456/789/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues 2 (legacy)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues 2 (new format)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id" matcher-group="1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id" matcher-group="3"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id" matcher-group="2"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues 3: namespaces" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <localns:object id="789" xmlns:localns="http://orbeon.org/oxf/xml/test/localns"/>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id" matcher-group="1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/localns2:object/@id" matcher-group="3" xmlns:localns2="http://orbeon.org/oxf/xml/test/localns"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id" matcher-group="2"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues With Parameters" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+                <first-name>Joe</first-name>
+                <last-name>Doe</last-name>
+                <first-name-1>Mary</first-name-1>
+                <last-name-1>Smith</last-name-1>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id" matcher-group="1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id" matcher-group="3"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id" matcher-group="2"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/first-name" parameter="first-name"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/last-name" parameter="name1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/first-name-1" parameter="first-name"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                        <value>Doe</value>
+                    </parameter>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                    <parameter>
+                        <name>first-name</name>
+                        <value>Joe</value>
+                        <value>Mary</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Setvalues With Parameters (missing source parameters)" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/setvalue-reverse.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+                <first-name>Joe</first-name>
+                <last-name>Doe</last-name>
+                <first-name-1>Mary</first-name-1>
+                <last-name-1>Smith</last-name-1>
+            </form>
+        </input>
+        <input name="setvalues">
+            <params>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id" matcher-group="1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id" matcher-group="3"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id" matcher-group="2"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/first-name" parameter="first-name"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/last-name" parameter="name1"/>
+                <setvalue xmlns="http://www.orbeon.com/oxf/controller" ref="/form/first-name-1" parameter="first-name"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>first-name</name>
+                        <value>Joe</value>
+                        <value>Mary</value>
+                    </parameter>
+                    <parameter>
+                        <name>name1</name>
+                        <value>Doe</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Instance to parameters" name="oxf:pipeline">
+        <input name="instance">
+            <instance xmlns:a="a">
+                <a:a/>
+                <a:b c=""/>
+            </instance>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="instance"/>
+                <p:param type="output" name="data"/>
+
+                <!-- All the nodes are references from parameters -->
+                <p:processor name="oxf:instance-to-parameters">
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="filter">
+                        <params xmlns:a="a">
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/a:b"/>
+                            <param ref="/instance/a:b/@c"/>
+                        </params>
+                    </p:input>
+                    <p:output name="data" id="all-referenced"/>
+                </p:processor>
+                
+                <!-- Attribute is not referenced -->
+                <p:processor name="oxf:instance-to-parameters">
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="filter">
+                        <params xmlns:a="a">
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/a:b"/>
+                        </params>
+                    </p:input>
+                    <p:output name="data" id="attribute-not-referenced"/>
+                </p:processor>
+                
+                <!-- Empty $instance as the encoding might change -->
+                <p:processor name="oxf:xslt-2.0">
+                    <p:input name="data" href="aggregate('root', #all-referenced, #attribute-not-referenced)"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                            <xsl:template match="value[../name = '$instance' or ../name = '$key']">
+                                <xsl:copy/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>
+                <parameters/>
+                <parameters>
+                    <parameter>
+                        <name>$instance</name>
+                        <value/>
+                    </parameter>
+                </parameters>
+            </root>
+        </output>
+    </test>
+
+</group>

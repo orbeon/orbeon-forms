@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<tests xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2003/XInclude">
+
+    <xi:include href="tests-xpl.xml"/>
+    <xi:include href="tests-xforms.xml"/>
+    <xi:include href="xforms-server/tests-xforms-server.xml"/>
+    <xi:include href="tests-qname-converter.xml"/>
+    <xi:include href="tests-xupdate.xml"/>
+    <xi:include href="tests-validation.xml"/>
+    <xi:include href="tests-transformations.xml"/>
+    <xi:include href="converters/tests-converters.xml"/>
+    <xi:include href="tests-page-flow.xml"/>
+    <xi:include href="tests-java.xml"/>
+    <xi:include href="tests-sql.xml"/>
+<!--    <xi:include href="tests-tamino.xml"/>-->
+<!--    <xi:include href="tests-ldap.xml"/>-->
+    <xi:include href="tests-email.xml"/>
+    <xi:include href="tests-matchers.xml"/>
+    <xi:include href="tests-url-rewrite.xml"/>
+    <xi:include href="url-generator/tests.xml"/>
+    <xi:include href="xinclude/tests-xinclude.xml"/>
+    <xi:include href="cache/tests-cache.xml"/>
+
+    <!-- This test should probably be hand-customized to be clearer -->
+    <test description="xforms-portlet-forms" name="oxf:unsafe-xslt">
+        <input name="config" href="oxf:/ops/pfc/xforms-portlet-forms.xsl"/>
+        <input name="data" href="oxf:/ops/unit-tests/xforms-portlet-forms/input-data.xml"/>
+        <input name="annotated-data" href="oxf:/ops/unit-tests/xforms-portlet-forms/input-annotated-data.xml"/>
+        <output name="data" href="oxf:/ops/unit-tests/xforms-portlet-forms/output-data.xml"/>
+    </test>
+
+    <test description="Identity" name="oxf:identity">
+        <input name="data">
+            <root>
+                <a/>
+                <b/>
+            </root>
+        </input>
+        <output name="data">
+            <root>
+                <a/>
+                <b/>
+            </root>
+        </output>
+    </test>
+
+    <test description="Trivial aggregation" name="oxf:aggregator">
+        <input name="config">
+            <config>
+                <root>gaga</root>
+            </config>
+        </input>
+        <input name="data">
+            <a>foo</a>
+        </input>
+        <input name="data">
+            <b>bar</b>
+        </input>
+        <output name="data">
+            <gaga>
+                <a>foo</a>
+                <b>bar</b>
+            </gaga>
+        </output>
+    </test>
+
+    <test description="Delegation Processor" name="oxf:delegation" ignore="true">
+        <input name="interface">
+            <config>
+                <service id="ca-traffic" type="webservice"
+                    endpoint="http://services.xmethods.net:80/soap/servlet/rpcrouter">
+                    <operation nsuri="urn:xmethods-CATraffic" name="getTraffic"/>
+                </service>
+                <service id="deep-thought-ws" type="webservice"
+                    endpoint="http://www.scdi.org/~avernet/webservice/">
+                    <operation nsuri="urn:avernet" name="answerUltimateQuestionOfLife"/>
+                    <operation nsuri="urn:avernet" name="getRandomQuote"/>
+                </service>
+                <service id="gaga" type="stateless-ejb" uri="...">
+                    <operation name="methodCall"/>
+                </service>
+                <service id="deep-thought-jb" type="javabean"
+                    class="org.orbeon.oxf.test.DelegationHello"/>
+            </config>
+        </input>
+        <input name="data">
+            <dummy/>
+        </input>
+        <input name="call">
+            <answers>
+                <ultimate-answer-1>
+                    <delegation:execute service="deep-thought-ws" operation="answerUltimateQuestionOfLife"/>
+                </ultimate-answer-1>
+                <ultimate-answer-2>
+                    <delegation:execute service="deep-thought-jb" operation="congratulate">
+                        <name xsi:type="xs:string">John</name>
+                    </delegation:execute>
+                </ultimate-answer-2>
+            </answers>
+        </input>
+        <output name="data">
+            <answers>
+                <ultimate-answer-1>
+                    <text xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">42</text>
+                </ultimate-answer-1>
+                <ultimate-answer-2>Congratulations John!</ultimate-answer-2>
+            </answers>
+        </output>
+    </test>
+
+    <test description="XPath Processor" name="oxf:xpath">
+        <input name="config">
+            <config>
+                <xpath>/*[name() = 'a']/b[@c = 'a']/d</xpath>
+            </config>
+        </input>
+        <input name="data">
+            <a>
+                <b c="a">
+                    <d/>
+                </b>
+            </a>
+        </input>
+        <output name="data">
+            <d/>
+        </output>
+    </test>
+
+    <test description="Signature Test" name="oxf:pipeline">
+        <input name="data">
+            <a>
+                <b/>
+            </a>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:key-pair">
+                    <p:output name="data" id="keys"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#keys"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <private-key>
+                                    <xsl:value-of select="/key-pair/private-key"/>
+                                </private-key>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="private-key"/>
+                </p:processor>
+
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#keys"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <public-key>
+                                    <xsl:value-of select="/key-pair/public-key"/>
+                                </public-key>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="public-key"/>
+                </p:processor>
+
+                <p:processor name="oxf:signature">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="private-key" href="#private-key"/>
+                    <p:output name="data" id="signed"/>
+                </p:processor>
+
+                <p:processor name="oxf:signature-verifier">
+                    <p:input name="data" href="#signed"/>
+                    <p:input name="public-key" href="#public-key"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="data">
+            <a>
+                <b/>
+            </a>
+        </output>
+    </test>
+    
+    <test description="Scope serializer and generator" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:scope-serializer">
+                    <p:input name="data"><x/></p:input>
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
+    <test description="Element around result of delegation processor" name="oxf:pipeline">
+        <input name="call">
+            <root>
+                <delegation:execute service="string" operation="indexOf">
+                    <str xsi:type="xs:string">dummy</str>
+                </delegation:execute>
+            </root>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="call" type="input"/>
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:delegation">
+                    <p:input name="interface">
+                        <config>
+                            <service id="string" type="javabean" class="java.lang.String"/>
+                        </config>
+                    </p:input>
+                    <p:input name="call" href="#call"/>
+                    <p:output name="data" id="delegation-out"/>
+                </p:processor>
+                <p:processor name="oxf:xml-converter">
+                    <p:input name="config">
+                        <config>
+                            <omit-xml-declaration>true</omit-xml-declaration>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#delegation-out"/>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/xml; charset=utf-8">&lt;root&gt; -1 &lt;/root&gt;</document>
+        </output>
+    </test>
+
+    <test description="Sleep processor" name="oxf:sleep">
+        <input name="config">
+            <sleep>5000</sleep>
+        </input>
+        <input name="data">
+            <data/>
+        </input>
+        <output name="data">
+            <data/>
+        </output>
+    </test>
+
+<!--    <test description="XInclude with 2001 namespace (recommended one)" name="oxf:identity" only="true"-->
+<!--            xmlns:xi2001="http://www.w3.org/2001/XInclude">-->
+<!--        <input name="data">-->
+<!--            <xi2001:include href="note.xml"/>-->
+<!--        </input>-->
+<!--        <output name="data">-->
+<!--            <xi2001:include href="note.xml"/>-->
+<!--        </output>-->
+<!--    </test>-->
+
+    <!-- TODO: -->
+<!--    <test description="Page Flow Controller: 'when' on 'result' with no action" name="oxf:page-flow" only="true">-->
+<!--        <input name="controller">-->
+<!--            <config xmlns="http://www.orbeon.com/oxf/controller">-->
+<!--                <page path-info="/" model="model.xpl">-->
+<!--                    <action>-->
+<!--                        <result when="true()"/>-->
+<!--                    </action>-->
+<!--                </page>-->
+<!--            </config>-->
+<!--        </input>-->
+<!--    </test>-->
+
+<!--    <test description="URL Serializer" name="oxf:pipeline">-->
+<!--        <input name="data">-->
+<!--            <numbers>-->
+<!--                <number>1</number>-->
+<!--                <number>2</number>-->
+<!--                <number>3</number>-->
+<!--                <number>4</number>-->
+<!--                <number>5</number>-->
+<!--                <number>6</number>-->
+<!--                <number>7</number>-->
+<!--                <number>8</number>-->
+<!--                <number>9</number>-->
+<!--                <number>10</number>-->
+<!--            </numbers>-->
+<!--        </input>-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                <p:param type="input" name="data"/>-->
+<!--                <p:param type="output" name="data"/>-->
+<!--                <p:processor name="oxf:url-serializer">-->
+<!--                    <p:input name="config">-->
+<!--                        <config>-->
+<!--                            <url>oxf:/ops/unit-tests/url-serializer.xml</url>-->
+<!--                        </config>-->
+<!--                    </p:input>-->
+<!--                    <p:input name="data">-->
+<!--                        <numbers/>-->
+<!--                    </p:input>-->
+<!--                </p:processor>-->
+<!--                <p:for-each href="#data" select="/numbers/number">-->
+<!--                    <p:processor name="oxf:url-serializer">-->
+<!--                        <p:input name="config">-->
+<!--                            <config>-->
+<!--                                <url>oxf:/ops/unit-tests/url-serializer.xml</url>-->
+<!--                            </config>-->
+<!--                        </p:input>-->
+<!--                        <p:input name="data" href="aggregate('numbers', oxf:/ops/unit-tests/url-serializer.xml#xpointer(/numbers/number), current())"/>-->
+<!--                    </p:processor>-->
+<!--                </p:for-each>-->
+<!--                <p:processor name="oxf:identity">-->
+<!--                    <p:input name="data" href="url-serializer.xml"/>-->
+<!--                    <p:output name="data" ref="data"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="data">-->
+<!--            <numbers>-->
+<!--                <number>1</number>-->
+<!--                <number>2</number>-->
+<!--                <number>3</number>-->
+<!--                <number>4</number>-->
+<!--                <number>5</number>-->
+<!--                <number>6</number>-->
+<!--                <number>7</number>-->
+<!--                <number>8</number>-->
+<!--                <number>9</number>-->
+<!--                <number>10</number>-->
+<!--            </numbers>-->
+<!--        </output>-->
+<!--    </test>-->
+
+</tests>

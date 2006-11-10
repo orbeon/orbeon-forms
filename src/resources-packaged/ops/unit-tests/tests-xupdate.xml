@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XUpdate" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <test description="Remove, insert-after, insert-before" name="oxf:xupdate">
+        <input name="data">
+            <root>
+                <element>1</element>
+                <element>x</element>
+                <element>3</element>
+                <element>5</element>
+            </root>
+        </input>
+        <input name="config">
+            <xu:modifications version="1.0">
+                <xu:remove select="/root/element[2]"/>
+                <xu:insert-after select="/root/element[1]">
+                    <element>2</element>
+                </xu:insert-after>
+                <xu:insert-before select="/root/element[4]">
+                    <element>4</element>
+                </xu:insert-before>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root>
+                <element>1</element>
+                <element>2</element>
+                <element>3</element>
+                <element>4</element>
+                <element>5</element>
+            </root>
+        </output>
+    </test>
+
+    <test description="First order function" name="oxf:xupdate">
+        <input name="data">
+            <dummy/>
+        </input>
+        <input name="config">
+            <xu:modifications>
+                <xu:function name="double">
+                    <xu:param name="f"/>
+                    <xu:function name="result">
+                        <xu:param name="x"/>
+                        <xu:value-of select="f($x) * 2"/>
+                    </xu:function>
+                    <xu:copy-of select="$result"/>
+                </xu:function>
+                <xu:function name="increment">
+                    <xu:param name="x"/>
+                    <xu:value-of select="$x + 1"/>
+                </xu:function>
+                <xu:variable name="incrementAndDouble" select="double($increment)"/>
+                <xu:update select="/">
+                    <result>
+                        <xu:value-of select="incrementAndDouble(2)"/>
+                    </result>
+                </xu:update>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <result>6</result>
+        </output>
+    </test>
+
+    <test description="Order of insertion for attribute" name="oxf:xupdate">
+        <input name="data">
+            <root/>
+        </input>
+        <input name="config">
+            <xu:modifications>
+                <xu:append select="/root">
+                    <xu:attribute name="attribute">
+                        <xu:value-of select="'a'"/>
+                        <xu:value-of select="'b'"/>
+                        <xu:value-of select="'c'"/>
+                    </xu:attribute>
+                </xu:append>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root attribute="abc"/>
+        </output>
+    </test>
+    
+    <test description="Iterate of nodeset" name="oxf:xupdate">
+        <input name="data">
+            <root xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <source>
+                    <form>
+                        <person/>
+                        <givenName valid="false"/>
+                        <country valid="false"/>
+                    </form>                
+                </source>
+                <target>
+                    <form>
+                        <person/>
+                        <givenName/>
+                        <country/>
+                    </form>                
+                </target>
+            </root>
+        </input>
+        <input name="config">
+            <xu:modifications xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xu:variable name="target" select="/root/target//*"/>
+                <xu:for-each select="/root/source//*">
+                    <xu:variable name="i" select="position()"/>
+                    <xu:variable name="valid" select="@valid"/>
+                    <xu:message><xu:value-of select="$valid"/></xu:message>
+                    <xu:if test="$valid">
+                        <xu:append select="$target[$i]">
+                            <xu:attribute name="xxforms:valid"><xu:value-of select="$valid"/></xu:attribute>
+                        </xu:append>
+                    </xu:if>
+                </xu:for-each>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <source>
+                    <form>
+                        <person/>
+                        <givenName valid="false"/>
+                        <country valid="false"/>
+                    </form>                
+                </source>
+                <target>
+                    <form>
+                        <person/>
+                        <givenName xxforms:valid="false"/>
+                        <country xxforms:valid="false"/>
+                    </form>                
+                </target>
+            </root>
+        </output>
+    </test>
+
+    <test description="Keep unused namespace mappings in xu:copy-of and xu:value-of" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="result"/>
+                <p:processor name="oxf:xupdate">
+                    <p:input name="data">
+                        <a>
+                            <b/>
+                            <c xmlns:xs="http://www.w3.org/2001/XMLSchema"/>
+                        </a>
+                    </p:input>
+                    <p:input name="other">
+                        <d xmlns:xs="http://www.w3.org/2001/XMLSchema">string</d>
+                    </p:input>
+                    <p:input name="config">
+                        <xu:modifications xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                            <xu:update select="/a/b">
+                                <xu:copy-of select="doc('input:other')/d"/>
+                            </xu:update>
+                            <xu:update select="/a/c">
+                                <xu:value-of select="doc('input:other')/d"/>
+                            </xu:update>
+                        </xu:modifications>
+                    </p:input>
+                    <p:output name="data" id="xupdate"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xupdate"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <copy-of>
+                                <xsl:value-of select="namespace-uri-for-prefix('xs', /a/b/d)"/>
+                            </copy-of>
+                            <value-of>
+                                <xsl:value-of select="namespace-uri-for-prefix('xs', /a/c)"/>
+                            </value-of>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result>
+                <copy-of>http://www.w3.org/2001/XMLSchema</copy-of>
+                <value-of>http://www.w3.org/2001/XMLSchema</value-of>
+            </result>
+        </output>
+    </test>
+
+    <test description="doc() in a repeat reads input only once" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="result"/>
+
+                <p:processor name="oxf:counter">
+                    <p:output name="data" id="counter"/>
+                </p:processor>
+
+                <p:processor name="oxf:xupdate">
+                    <p:input name="counter" href="#counter"/>
+                    <p:input name="data">
+                        <a><b/><b/></a>
+                    </p:input>
+                    <p:input name="config">
+                        <xu:modifications>
+                            <xu:for-each select="/a/b">
+                                <xu:update select=".">
+                                    <xu:copy-of select="string(doc('input:counter'))"/>
+                                </xu:update>
+                            </xu:for-each>
+                        </xu:modifications>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <a>
+                <b>1</b>
+                <b>1</b>
+            </a>
+        </output>
+    </test>
+
+</group>

@@ -1,0 +1,72 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
+    <root>
+        <sql:connection>
+            <sql:pool>test</sql:pool>
+            <!-- First query -->
+            <first-query>
+                <sql:execute>
+                    <sql:query>
+                        SELECT *
+                          FROM oxf_employee e
+                         WHERE e.employee_id = <sql:parameter direction="in" type="int" select="/root/id"/>
+                    </sql:query>
+                    <sql:results>
+                        <rows>
+                            <sql:row-results>
+                                <row>
+                                    <column name="first-name"><sql:get-string column="first_name"/></column>
+                                    <column name="last-name"><sql:get-string column="last_name"/></column>
+                                </row>
+                            </sql:row-results>
+                        </rows>
+                    </sql:results>
+                    <sql:no-results>
+                        <message>No result available.</message>
+                    </sql:no-results>
+                </sql:execute>
+            </first-query>
+            <!-- Second query -->
+            <second-query>
+                <sql:execute>
+                    <sql:query>
+                        SELECT <sql:parameter direction="in" type="string" select="/root/value"/> value FROM DUAL
+                    </sql:query>
+                    <sql:results>
+                        <rows>
+                            <sql:row-results>
+                                <value><sql:get-string column="value"/></value>
+                            </sql:row-results>
+                        </rows>
+                    </sql:results>
+                    <sql:no-results>
+                        <message>No result available.</message>
+                    </sql:no-results>
+                </sql:execute>
+            </second-query>
+            <!-- Third query -->
+            <!--
+            <sql:execute>
+                <sql:update>
+                    INSERT INTO oxf_employee (employee_id, first_name, last_name)
+                        VALUES (<sql:parameter direction="in" type="int" select="/root/employee/id"/>,
+                                <sql:parameter direction="in" type="string" select="/root/employee/first-name"/>,
+                                <sql:parameter direction="in" type="string" select="/root/employee/last-name"/>)
+                </sql:update>
+            </sql:execute>
+            -->
+        </sql:connection>
+    </root>
+</sql:config>

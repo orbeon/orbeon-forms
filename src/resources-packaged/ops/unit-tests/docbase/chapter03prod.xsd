@@ -1,0 +1,49 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/prod"
+            xmlns="http://example.org/prod"
+            xmlns:prod2="http://example.org/prod2"
+            elementFormDefault="qualified">
+
+  <xsd:import namespace="http://example.org/prod2" schemaLocation="docbase/chapter03prod2.xsd"/>
+
+  <xsd:element name="product" type="ProductType"/>
+
+  <xsd:complexType name="ProductType">
+    <xsd:sequence>
+      <xsd:element name="number" type="ProdNumType"/>
+      <xsd:element name="name" type="xsd:string" form="unqualified"/>
+      <xsd:element name="size" type="SizeType"/>
+      <xsd:element ref="prod2:color"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProdNumType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="id" type="xsd:ID" form="qualified" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SizeType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:integer">
+        <xsd:attribute name="system" type="xsd:string"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,1569 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XForms" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2003/XInclude"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events">
+
+    <test description="Annotate" name="oxf:xforms-annotate">
+        <input name="instance">
+            <d:form>
+                <d:id>42</d:id>
+                <d:id>4x</d:id>
+                <d:firstname>John</d:firstname>
+                <d:firstname>John</d:firstname>
+                <d:lastname>Smith</d:lastname>
+                <d:zip>4x</d:zip>
+            </d:form>
+        </input>
+        <input name="model">
+            <xforms:model xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xforms:instance/>
+                <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
+                <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
+                <xforms:bind nodeset='/d:form/d:firstname[ 2 ]' constraint='false()' />
+                <xforms:bind nodeset='/d:form/d:lastname[ 1 ]' constraint='true()' />
+            </xforms:model>
+        </input>
+        <output name="instance">
+            <d:form xmlns:d="http://orbeon.org/oxf/xml/document">
+                <d:id>42</d:id>
+                <d:id xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">4x</d:id>
+                <d:firstname>John</d:firstname>
+                <d:firstname xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">John</d:firstname>
+                <d:lastname>Smith</d:lastname>
+                <d:zip xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">4x</d:zip>
+            </d:form>
+        </output>
+    </test>
+
+    <test description="Conditionals: if" name="oxf:pipeline"  >
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                    <d/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                            <d>4</d>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <xxforms:if test="c = 4">
+                                        <xforms:input ref="a" xhtml:id="a"/>
+                                    </xxforms:if>
+                                    <xxforms:if test="a = 1">
+                                        <xforms:input ref="b" xhtml:id="b"/>
+                                    </xxforms:if>
+                                    <xxforms:if test="count(/form/*) = 4">
+                                        <xforms:input ref="c" xhtml:id="c"/>
+                                    </xxforms:if>
+                                    <xxforms:if test="count-non-empty(/form/*)">
+                                        <xforms:input ref="d" xhtml:id="d"/>
+                                    </xxforms:if>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" id="xhtml"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xhtml"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:value-of select="//@xhtml:id"/>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <result>b c d</result>
+        </output>
+    </test>
+
+    <test description="Conditionals: choose" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                    <d/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                            <d>4</d>
+                            <e>5</e>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <!-- Should select first when -->
+                                    <xxforms:choose>
+                                        <xxforms:when test="a = '1'">
+                                            <xforms:input ref="b" xhtml:id="b"/>
+                                        </xxforms:when>
+                                        <xxforms:when test="b = '2'">
+                                            <xforms:input ref="c" xhtml:id="c"/>
+                                        </xxforms:when>
+                                        <xxforms:otherwise>
+                                            <xforms:input ref="d" xhtml:id="d"/>
+                                        </xxforms:otherwise>
+                                    </xxforms:choose>
+
+                                    <!-- Should select otherwise -->
+                                    <xxforms:choose>
+                                        <xxforms:when test="a = '2'">
+                                            <xforms:input ref="b" xhtml:id="b"/>
+                                        </xxforms:when>
+                                        <xxforms:when test="b = '1'">
+                                            <xforms:input ref="c" xhtml:id="c"/>
+                                        </xxforms:when>
+                                        <xxforms:otherwise>
+                                            <xforms:input ref="e" xhtml:id="e"/>
+                                        </xxforms:otherwise>
+                                    </xxforms:choose>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:unsafe-xslt"><!-- saxon1 -->
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" id="xhtml"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xhtml"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:value-of select="//@xhtml:id"/>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <result>b e</result>
+        </output>
+    </test>
+
+    <test description="Keep namespace prefixes" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="out"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-instance-recreate.xpl"/>
+                    <p:input name="model">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <form>
+                                    <a:claim a:id="1" xmlns:a="http://orbeon.com/a" xmlns:c="http://orbeon.com/c">
+                                        <b:person xmlns:b="http://orbeon.com/b1">
+                                            <c:name>
+                                                <a:first>John</a:first>
+                                                <b:last xmlns:b="http://orbeon.com/b2" >Smith</b:last>
+                                            </c:name>
+                                        </b:person>
+                                        <c:address>
+                                            <a:street>850 N. Shoreline Blvd</a:street>
+                                            <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
+                                            <c:state>CA</c:state>
+                                            <zip>94043</zip>
+                                            <country>USA</country>
+                                        </c:address>
+                                    </a:claim>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="view">
+                        <html>
+                            <xforms:group ref="/*"/>
+                        </html>
+                    </p:input>
+                    <p:output name="instance" ref="out"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="out">
+            <form>
+                <a:claim a:id="1" xmlns:a="http://orbeon.com/a" xmlns:c="http://orbeon.com/c">
+                    <b:person xmlns:b="http://orbeon.com/b1">
+                        <c:name>
+                            <a:first>John</a:first>
+                            <b:last xmlns:b="http://orbeon.com/b2" >Smith</b:last>
+                        </c:name>
+                    </b:person>
+                    <c:address>
+                        <a:street>850 N. Shoreline Blvd</a:street>
+                        <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
+                        <c:state>CA</c:state>
+                        <zip>94043</zip>
+                        <country>USA</country>
+                    </c:address>
+                </a:claim>
+            </form>
+        </output>
+    </test>
+
+    <test description="xforms-repeat-speed-test" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" 
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <p:param name="result" type="output"/>
+    
+                <p:processor name="oxf:xslt">
+                    <p:input name="data">
+                        <dummy/>
+                    </p:input>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    
+                            <xsl:template match="@*|node()" priority="-2">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@*|node()"/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                            <xsl:template match="/">
+                                <form>
+                                    <action/>
+                                    <name>Repeat Test</name>
+                                     <date>
+                                        <month>11</month>
+                                        <day>11</day>
+                                        <year>2004</year>
+                                    </date>
+                                    <selected-sub-task/>
+                                    <sub-tasks>
+                                        <xsl:call-template name="task">
+                                            <xsl:with-param name="times" select="300"/>
+                                        </xsl:call-template>
+                                    </sub-tasks>
+                                </form>
+                            </xsl:template>
+    
+                            <xsl:template name="task">
+                                <xsl:param name="times" as="xs:integer"/>
+                                <xsl:if test="$times > 0">
+                                    <xsl:call-template name="task">
+                                        <xsl:with-param name="times" select="$times - 1"/>
+                                    </xsl:call-template>
+                                        <task>
+                                            <task-id><xsl:value-of select="$times"/></task-id>
+                                            <parent-task-id>826</parent-task-id>
+                                            <task-type-code>FS</task-type-code>
+                                            <task-status-code>A</task-status-code>
+                                            <task-status-date>
+                                                <month>11</month>
+                                                <day>05</day>
+                                                <year>2004</year>
+                                            </task-status-date>
+                                            <role-id>9</role-id>
+                                            <assigned-to/>
+                                            <person-id/>
+                                            <rec-num/>
+                                            <lodge-id>1</lodge-id>
+                                            <district-id/>
+                                            <task-name>Form a 2004 (<xsl:value-of select="$times"/>)</task-name>
+                                            <description>Form a 2004</description>
+                                            <seqn>0</seqn>
+                                            <start-date>
+                                                <month>11</month>
+                                                <day>05</day>
+                                                <year>2004</year>
+                                            </start-date>
+                                            <end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </end-date>
+                                            <days-to-complete/>
+                                            <projected-end-date>
+                                                <month>11</month>
+                                                <day>12</day>
+                                                <year>2004</year>
+                                            </projected-end-date>
+                                            <grace-period>7</grace-period>
+                                            <cmc-ref/>
+                                            <reminder-interval/>
+                                            <reminder-text/>
+                                            <received></received>
+                                        </task>
+                                </xsl:if>
+                            </xsl:template>
+    
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="instance"/>
+                </p:processor>
+    
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <xforms:group ref="/form">
+                            <xforms:input ref="name"/>
+                            <xforms:group ref="date">
+                                <xforms:input ref="year"/>
+                            </xforms:group>
+                            <xforms:repeat nodeset="sub-tasks/task" id="subtask-set">
+    <!--                        <xforms:repeat nodeset="sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">-->
+                                <xforms:input ref="task-id"/>
+                                <xforms:input ref="task-name"/>
+                                <xforms:select1 ref="task-type-code" appearance="minimal">
+                                    <xforms:choices>
+                                        <xforms:item>
+                                            <xforms:label>-</xforms:label>
+                                            <xforms:value></xforms:value>
+                                        </xforms:item>
+                                    </xforms:choices>
+                                </xforms:select1>
+                                <xforms:select1 ref="task-status-code" appearance="minimal">
+                                    <xforms:choices>
+                                        <xforms:item>
+                                            <xforms:label>-</xforms:label>
+                                            <xforms:value></xforms:value>
+                                        </xforms:item>
+                                    </xforms:choices>
+                                </xforms:select1>
+                                <xforms:input ref="lodge-id"/>
+                                <xxforms:if test="task-status-code != 'C'">
+                                    <xforms:select ref="received" appearance="minimal">
+                                        <xforms:item>
+                                            <xforms:value>true</xforms:value>
+                                            <xforms:label/>
+                                        </xforms:item>
+                                    </xforms:select>
+                                </xxforms:if>
+                                <xxforms:if test="task-status-code = 'C'">
+                                  Yes
+                                </xxforms:if>
+                                <xforms:submit>
+                                    <xforms:label>Edit</xforms:label>
+                                    <xforms:setvalue ref="/form/action">edit-task</xforms:setvalue>
+                                    <xforms:setvalue ref="/form/selected-sub-task" value="/form/tasks/task[index('subtask-set')]/task-id"/>
+                                </xforms:submit>
+                            </xforms:repeat>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="data"/>
+                </p:processor>
+    
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <action/>
+                                    <name/>
+                                    <date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </date>
+                                    <selected-sub-task/>
+                                    <sub-tasks>
+                                        <task>
+                                            <task-id/>
+                                            <parent-task-id/>
+                                            <task-type-code/>
+                                            <task-status-code/>
+                                            <task-status-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </task-status-date>
+                                            <role-id/>
+                                            <member-id/>
+                                            <lodge-id/>
+                                            <district-id/>
+                                            <task-name/>
+                                            <description/>
+                                            <seqn/>
+                                            <start-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </start-date>
+                                            <end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </end-date>
+                                            <days-to-complete/>
+                                            <projected-end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </projected-end-date>
+                                            <grace-period/>
+                                            <cmc-ref/>
+                                            <reminder-interval/>
+                                            <reminder-text/>
+                                        </task>
+                                    </sub-tasks>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="model"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="data" href="#data"/>
+                    <p:output name="data" id="xf-out"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xf-out"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:template match="/">
+                                <request>
+                                    <parameters>
+                                        <xsl:for-each select="//*[@xxforms:name and @xxforms:value]">
+                                            <parameter>
+                                                <name>
+                                                    <xsl:value-of select="@xxforms:name"/>
+                                                </name>
+                                                <value>
+                                                    <xsl:value-of select="@xxforms:value"/>
+                                                </value>
+                                            </parameter>
+                                        </xsl:for-each>
+                                    </parameters>
+                                </request>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request" href="#request"/>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
+                    <p:output name="data" id="xf-input"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xf-input"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                             <xsl:template match="@*|node()" priority="-2">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@*|node()"/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                            <xsl:template match="/">
+                                <form>
+                                    <count><xsl:value-of select="count(/form/sub-tasks/task)"/></count>
+                                    <xsl:apply-templates select="/form/sub-tasks/task[2]"/>
+                                </form>
+                            </xsl:template>
+    
+                            <xsl:template match="task">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="/form/name"/>
+                                    <xsl:apply-templates select="/form/date"/>
+                                    <xsl:apply-templates/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+    
+            </p:config>
+        </input>
+        <output name="result">
+            <form>
+                <count>300</count>
+                <task>
+                    <name>Repeat Test</name>
+                    <date>
+                        <month>11</month>
+                        <day>11</day>
+                        <year>2004</year>
+                    </date>
+                    <task-id>2</task-id>
+                    <parent-task-id>826</parent-task-id>
+                    <task-type-code>FS</task-type-code>
+                    <task-status-code>A</task-status-code>
+                    <task-status-date>
+                        <month>11</month>
+                        <day>05</day>
+                        <year>2004</year>
+                    </task-status-date>
+                    <role-id>9</role-id>
+                    <assigned-to/>
+                    <person-id/>
+                    <rec-num/>
+                    <lodge-id>1</lodge-id>
+                    <district-id/>
+                    <task-name>Form a 2004 (2)</task-name>
+                    <description>Form a 2004</description>
+                    <seqn>0</seqn>
+                    <start-date>
+                        <month>11</month>
+                        <day>05</day>
+                        <year>2004</year>
+                    </start-date>
+                    <end-date>
+                        <month/>
+                        <day/>
+                        <year/>
+                    </end-date>
+                    <days-to-complete/>
+                    <projected-end-date>
+                        <month>11</month>
+                        <day>12</day>
+                        <year>2004</year>
+                    </projected-end-date>
+                    <grace-period>7</grace-period>
+                    <cmc-ref/>
+                    <reminder-interval/>
+                    <reminder-text/>
+                    <received/>
+                </task>
+            </form>
+        </output>
+    </test>
+    
+    <test description="Ref attribute pointing to multiple nodes" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xforms="http://www.w3.org/2002/xforms"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <data>1</data>
+                            <data>2</data>
+                            <data>3</data>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="/instance">
+                            <xforms:input ref="data"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('value', #annotated-data#xpointer(string(//xforms:input/@xxforms:value)))"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <value>1</value>
+        </output>
+    </test>
+    
+    <test description="Relative URL in xforms:delete" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a/>
+                        <b/>
+                        <c/>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:submit>
+                    <xforms:delete nodeset="*" at="2"/>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a/>
+                <c/>
+            </instance>
+        </output>
+    </test>
+
+
+    <!--<test description="Core Function Library" name="oxf:pipeline">-->
+        <!--<input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>-->
+        <!--<input name="model">-->
+            <!--<xforms:model id="form">-->
+                <!--<xforms:instance>-->
+                    <!--<instance>-->
+                        <!--<boolean>-->
+                            <!--<from-string-1>1</from-string-1>-->
+                            <!--<from-string-2>true</from-string-2>-->
+                            <!--<from-string-3>0</from-string-3>-->
+                            <!--<from-string-4>false</from-string-4>-->
+                            <!--<if-1/>-->
+                            <!--<if-2/>-->
+                        <!--</boolean>-->
+                        <!--<number>-->
+                            <!--<avg>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</avg>-->
+                            <!--<min>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</min>-->
+                            <!--<max>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<result/>-->
+                            <!--</max>-->
+                            <!--<count-non-empty>-->
+                                <!--<arg>2</arg>-->
+                                <!--<arg/>-->
+                                <!--<arg>4</arg>-->
+                                <!--<arg>6</arg>-->
+                                <!--<arg/>-->
+                                <!--<result/>-->
+                            <!--</count-non-empty>-->
+                        <!--</number>-->
+                        <!--<string>-->
+                            <!--<property-version/>-->
+                            <!--<property-conformance/>-->
+                        <!--</string>-->
+                        <!--<date>-->
+                            <!--<now/>-->
+                            <!--<days-from-date-1/>-->
+                            <!--<days-from-date-2/>-->
+                            <!--<days-from-date-3/>-->
+                            <!--<days-from-date-4/>-->
+                            <!--<seconds-from-date-1/>-->
+                            <!--<seconds-from-date-2/>-->
+                            <!--<seconds-from-date-3/>-->
+                            <!--<seconds-1/>-->
+                            <!--<seconds-2/>-->
+                            <!--<seconds-3/>-->
+                            <!--<seconds-4/>-->
+                            <!--<months-1/>-->
+                            <!--<months-2/>-->
+                            <!--<months-3/>-->
+                        <!--</date>-->
+                    <!--</instance>-->
+                <!--</xforms:instance>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-1" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-2" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-3" calculate="boolean-from-string(.)"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/from-string-4" calculate="boolean-from-string(.)"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/boolean/if-1" calculate="xfif(../from-string-1 = 'true', '1', '2')"/>-->
+                <!--<xforms:bind nodeset="/instance/boolean/if-2" calculate="xfif(../from-string-1 != 'true', '1', '2')"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/number/avg/result" calculate="avg(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/min/result" calculate="min(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/max/result" calculate="max(../arg)"/>-->
+                <!--<xforms:bind nodeset="/instance/number/count-non-empty/result" calculate="count-non-empty(../arg)"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/string/property-version" calculate="property('version')"/>-->
+                <!--<xforms:bind nodeset="/instance/string/property-conformance" calculate="property('conformance-level')"/>-->
+<!---->
+                <!--<xforms:bind nodeset="/instance/date/now" calculate="now('test')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-1" calculate="days-from-date('2002-01-01')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-2" calculate="days-from-date('1969-12-31')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-3" calculate="days-from-date('2001-12-31T14:40:30.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/days-from-date-4" calculate="days-from-date('invalid')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-1" calculate="seconds-from-dateTime('2001-12-31T14:40:30.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-2" calculate="seconds-from-dateTime('invalid')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-from-date-3" calculate="seconds-from-dateTime('1969-12-31T23:00:00.000Z')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-1" calculate="seconds('P1Y2M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-2" calculate="seconds('P3DT10H30M1.5S')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-3" calculate="seconds('3')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/seconds-4" calculate="seconds('-P1S')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-1" calculate="months('P1Y2M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-2" calculate="months('-P19M')"/>-->
+                <!--<xforms:bind nodeset="/instance/date/months-3" calculate="months('3')"/>-->
+            <!--</xforms:model>-->
+        <!--</input>-->
+        <!--<input name="view">-->
+            <!--<xforms:group ref="/instance">-->
+            <!--</xforms:group>-->
+        <!--</input>-->
+        <!--<output name="instance">-->
+            <!--<instance>-->
+                <!--<boolean>-->
+                    <!--<from-string-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-1>-->
+                    <!--<from-string-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-2>-->
+                    <!--<from-string-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-3>-->
+                    <!--<from-string-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-4>-->
+                    <!--<if-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</if-1>-->
+                    <!--<if-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</if-2>-->
+                <!--</boolean>-->
+                <!--<number>-->
+                    <!--<avg>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">4</result>-->
+                    <!--</avg>-->
+                    <!--<min>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</result>-->
+                    <!--</min>-->
+                    <!--<max>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">6</result>-->
+                    <!--</max>-->
+                    <!--<count-non-empty>-->
+                        <!--<arg>2</arg>-->
+                        <!--<arg/>-->
+                        <!--<arg>4</arg>-->
+                        <!--<arg>6</arg>-->
+                        <!--<arg/>-->
+                        <!--<result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</result>-->
+                    <!--</count-non-empty>-->
+                <!--</number>-->
+                <!--<string>-->
+                    <!--<property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.0</property-version>-->
+                    <!--<property-conformance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">full</property-conformance>-->
+                <!--</string>-->
+                <!--<date>-->
+                    <!--<now xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2004-12-31T12:00:00Z</now>-->
+                    <!--<days-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11688</days-from-date-1>-->
+                    <!--<days-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</days-from-date-2>-->
+                    <!--<days-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11687</days-from-date-3>-->
+                    <!--<days-from-date-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</days-from-date-4>-->
+                    <!--<seconds-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1009809630</seconds-from-date-1>-->
+                    <!--<seconds-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-from-date-2>-->
+                    <!--<seconds-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-3600</seconds-from-date-3>-->
+                    <!--<seconds-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">0</seconds-1>-->
+                    <!--<seconds-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">297001.5</seconds-2>-->
+                    <!--<seconds-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-3>-->
+                    <!--<seconds-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</seconds-4>-->
+                    <!--<months-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">14</months-1>-->
+                    <!--<months-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-19</months-2>-->
+                    <!--<months-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</months-3>-->
+                <!--</date>-->
+            <!--</instance>-->
+        <!--</output>-->
+    <!--</test>-->
+
+    <test description="Nested binds" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xforms:instance>
+                    <instance>
+                        <a>
+                            <b/>
+                        </a>
+                        <b>
+                            <c>
+                                <d/>
+                                <e/>
+                            </c>
+                            <c>
+                                <d/>
+                                <e/>
+                            </c>
+                        </b>
+                        <c>
+                            <d>1</d>
+                            <d>2</d>
+                            <d>3</d>
+                        </c>
+                    </instance>
+                </xforms:instance>
+
+                <xforms:bind nodeset="/instance">
+                    <xforms:bind nodeset="a">
+                        <xforms:bind nodeset="b" calculate="'1'"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="b/c">
+                        <xforms:bind nodeset="d" calculate="'2'"/>
+                        <xforms:bind nodeset="e" calculate="'3'"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="c/d" type="xs:int"/>
+                </xforms:bind>
+
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+            </xforms:group>
+        </input>
+        <output name="instance" >
+            <instance>
+                <a>
+                    <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</b>
+                </a>
+                <b>
+                    <c>
+                        <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</d>
+                        <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</e>
+                    </c>
+                    <c>
+                        <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</d>
+                        <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</e>
+                    </c>
+                </b>
+                <c>
+                    <d>1</d>
+                    <d>2</d>
+                    <d>3</d>
+                </c>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Constraint with Korean character" name="oxf:xforms-annotate">
+        <input name="instance">
+            <instance>
+                <a>&#x1105;</a>
+                <b>&#x1200;</b>
+            </instance>
+        </input>
+        <input name="model">
+            <xforms:model>
+                <xforms:instance/>
+                <xforms:bind nodeset="/instance/*" constraint="matches(.,'[&#x1100;-&#x11FF;]+')"/>
+            </xforms:model>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>&#x1105;</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">&#x1200;</b>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Bind And Ref on Controls" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a>
+                            <b>1</b>
+                            <c>2</c>
+                            <d>3</d>
+                            <e>
+                                <f>4</f>
+                            </e>
+                            <g/>
+                            <g/>
+                            <h/>
+                        </a>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a">
+                    <xforms:bind nodeset="b" id="b"/>
+                    <xforms:bind nodeset="g" id="g"/>
+                </xforms:bind>
+                <xforms:bind nodeset="/instance/a/c" id="c"/>
+                <xforms:bind nodeset="/instance/a/e" id="e"/>
+                <xforms:bind nodeset="/instance/a/h" id="h"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:input bind="b"/>
+                <xforms:input bind="c"/>
+                <xforms:input ref="a/d"/>
+                <xforms:group bind="e">
+                    <xforms:input ref="f"/>
+                </xforms:group>
+                <xforms:submit>
+                    <xforms:delete bind="g" at="1"/>
+                    <xforms:setvalue bind="h">5</xforms:setvalue>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>
+                    <b>1</b>
+                    <c>2</c>
+                    <d>3</d>
+                    <e>
+                        <f>4</f>
+                    </e>
+                    <g/>
+                    <h>5</h>
+                </a>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Doc() in Model Item Properties" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a/>
+                        <b/>
+                        <c/>
+                        <d/>
+                        <e/>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a" calculate="doc('company.xml')/company/name"/>
+                <xforms:bind nodeset="/instance/b" constraint="doc('company.xml')/company/name = 'Orbeon'"/>
+                <xforms:bind nodeset="/instance/c" required="doc('company.xml')/company/name = 'Orbeon'"/>
+                <xforms:bind nodeset="/instance/d" readonly="doc('company.xml')/company/name = 'Orbeon'"/>
+                <xforms:bind nodeset="/instance/e" relevant="doc('company.xml')/company/name = 'Orbeon'"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">Orbeon</a>
+                <b/>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true"></c>
+                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"></d>
+                <e/>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline" ignore="true">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                            <xforms:bind id="a" nodeset="/instance" constraint="false()"/>
+                            <xforms:bind id="b" nodeset="/instance" constraint="false()"/>
+                            <xforms:bind id="c" nodeset="/instance" constraint="true()"/>
+                            <xforms:bind id="d" nodeset="/instance" constraint="false()"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="request"><request/></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:input name="instance"><instance/></p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+                
+            </p:config>
+        </input>
+        <output name="data">
+            <instance xxforms:invalid-bind-ids="a b d" xxforms:valid="false"/>
+        </output>
+    </test>
+    
+    <test description="Populating the instance from params" name="oxf:pipeline">
+        <input name="model">
+            <xforms:model xmlns:a="a" xmlns:b="b">
+                <xforms:instance>
+                    <instance>
+                        <a:a>A</a:a>
+                        <b:b>B</b:b>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:a="a" xmlns:b="b">
+                <p:param type="input" name="model"/>
+                <p:param type="output" name="data"/>
+                
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request">
+                        <request>
+                            <parameters>
+                                <parameter>
+                                    <name>$key</name>
+                                    <value/>
+                                </parameter>
+                            </parameters>
+                        </request>
+                    </p:input>
+                    <p:input name="filter">
+                        <params>
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/b:b"/>
+                        </params>
+                    </p:input>
+                    <p:input name="matcher-result">
+                        <result>
+                            <matches>true</matches>
+                            <group>1</group>
+                            <group/> <!-- Keep default value when match is empty -->
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+                
+            </p:config>
+        </input>
+        <output name="data">
+            <instance xmlns:a="a" xmlns:b="b">
+                <a:a xmlns:a="a">1</a:a>
+                <b:b xmlns:b="b">B</b:b>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Readonly and non-relevant controls are kept" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a>a</a>
+                        <b>b</b>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a" readonly="true()"/>
+                <xforms:bind nodeset="/instance/b" relevant="false()"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:input ref="a"/>
+                <xforms:input ref="b"/>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">a</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="false">b</b>
+            </instance>
+        </output>
+    </test>
+    
+<!--    <test description="Linking attribute in XForms model" name="oxf:pipeline" only="true">-->
+<!--        <input name="model">-->
+<!--            <xforms:model xmlns:a="a" xmlns:b="b">-->
+<!--                <xforms:instance src="oxf:/ops/unit-tests/company.xml"/>-->
+<!--            </xforms:model>-->
+<!--        </input>-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:a="a" xmlns:b="b">-->
+<!--                <p:param type="input" name="model"/>-->
+<!--                <p:param type="output" name="instance"/>-->
+<!--                -->
+<!--                <p:processor name="oxf:xforms-input">-->
+<!--                    <p:input name="model" href="#model"/>-->
+<!--                    <p:input name="request"><request/></p:input>-->
+<!--                    <p:input name="filter"><params/></p:input>-->
+<!--                    <p:input name="matcher-result"><result/></p:input>-->
+<!--                    <p:output name="data" ref="instance"/>-->
+<!--                </p:processor>-->
+<!--                -->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="instance" href="company.xml"/>-->
+<!--    </test>-->
+
+    <test description="Hidden control" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>gaga</instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group>
+                <xxforms:hidden ref="/instance"/>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>gaga</instance>
+        </output>
+    </test>
+    
+    <test description="Using doc() in dynamic XForms model" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance" calculate="doc('oxf:/ops/unit-tests/company.xml')/company/name"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">Orbeon</instance>
+        </output>
+    </test>
+    
+    <test description="Adding xxforms:invalid on elements with invalid attributes" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <instance>
+                                    <x a="1"/>
+                                    <y a="2"/>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/x" constraint="@a = '1'">
+                                <xforms:bind nodeset="@a" constraint=". = '1'"/>
+                            </xforms:bind>
+                            <xforms:bind nodeset="/instance/y" constraint="@a = '1'">
+                                <xforms:bind nodeset="@a" constraint=". = '1'"/>
+                            </xforms:bind>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>
+                <x a="1"/>
+                <y xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" a="2" xxforms:valid="false"></y>
+            </instance>
+        </output>
+    </test>
+    
+    <test description="Schema validation with multiple errors" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model">
+                        <xforms:model schema="oxf:/ops/unit-tests/form.xsd">
+                            <xforms:instance>
+                                <instance>
+                                    <a>35</a>
+                                    <b>-42</b>
+                                    <c>x</c>
+                                    <d/>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/*/d" required="true()"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" id="instance"/>
+                </p:processor>
+                <!-- Remove error message added by validator that might 
+                     change from one version to the other  -->
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#instance"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                            <xsl:template match="@xxforms:error" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"/>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>35</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">-42</b>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">x</c>
+                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"></d>
+            </instance>
+        </output>
+    </test>
+
+    <!-- Test exposes bug "Schema validation does not work on attribute" -->
+    <test description="Schema validation of attribute" name="oxf:pipeline" >
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                    xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model schema="oxf:/ops/unit-tests/form-attributes.xsd">
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <a a="-1"/>
+                            <b b="2"/>
+                            <c c="-3"/>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="/instance">
+                            <xforms:input ref="a/@a"/>
+                            <xforms:input ref="b/@b"/>
+                            <xforms:input ref="c/@c"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="html"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#html"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:for-each select="//xforms:input">
+                                <valid>
+                                    <xsl:value-of select="@xxforms:valid"/>
+                                </valid>
+                            </xsl:for-each>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result>
+                <valid>false</valid>
+                <valid>true</valid>
+                <valid>false</valid>
+            </result>
+        </output>
+    </test>
+
+    <test description="Evaluate: reference recursive expression" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-instance-recreate.xpl"/>
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance>
+                                <instance>
+                                    <a>1</a>
+                                    <b>2</b>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/a"
+                                calculate="concat(/instance/a, /instance/b)"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="view">
+                        <html>
+                            <xforms:group ref="/*"/>
+                        </html>
+                    </p:input>
+                    <p:output name="instance" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">122</a>
+                <b>2</b>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Performing twice the same validation with attributes" name="oxf:pipeline">
+        <input name="for-each">
+            <a><a/><a/></a>
+        </input>
+        <input name="xforms-model">
+            <xforms:model schema="oxf:/ops/unit-tests/form-attributes.xsd">
+                <xforms:instance>
+                    <instance>
+                        <a a="1">1</a>
+                        <b b="2">2</b>
+                        <c c="3">3</c>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="for-each" type="input"/>
+                <p:param name="xforms-model" type="input"/>
+                <p:param name="result" type="output"/>
+                <p:for-each href="#for-each" select="/a/a">
+                    <p:processor name="oxf:xforms-input">
+                        <p:input name="model" href="#xforms-model"/>
+                        <p:input name="request"><request><parameters/></request></p:input>
+                        <p:input name="filter"><params/></p:input>
+                        <p:input name="matcher-result"><result/></p:input>
+                        <p:output name="data" id="instance-1"/>
+                    </p:processor>
+                    <p:processor name="oxf:null-serializer">
+                        <p:input name="data" href="#instance-1"/>
+                    </p:processor>
+                </p:for-each>
+                <p:processor name="oxf:identity">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <dummy/>
+        </output>
+    </test>
+    
+    <test description="Insert action with validation on attribute" name="oxf:pipeline">
+        <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a b="-1"/>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a/@b" type="xs:positiveInteger" 
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:submit>
+                    <xforms:insert nodeset="a" at="last()" position="after"/>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a b="-1"/>
+                <a b="-1"/>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Using invalid-bind-ids to display different alert " name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xforms="http://www.w3.org/2002/xforms"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <data>1</data>
+                            <data>2</data>
+                            <data>3</data>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="/instance">
+                            <xforms:input ref="data"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('value', #annotated-data#xpointer(string(//xforms:input/@xxforms:value)))"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <value>1</value>
+        </output>
+    </test>
+
+    <test description="Allow appearance attribute on textarea" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:validation">
+                    <p:input name="schema" href="/org/orbeon/oxf/xml/schemas/xforms-controls.rng"/>
+                    <p:input name="config">
+                        <config>
+                            <decorate>true</decorate>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="xforms-validation.xml"/>
+                    <p:output name="data" id="validated"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#validated"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:for-each select="//v:error" xmlns:v="http://orbeon.org/oxf/xml/validation">
+                                <error line="{@line}"/>
+                            </xsl:for-each>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result>
+                <error line="5"/>
+            </result>
+        </output>
+    </test>
+
+    <!--
+        The test works, which means it throws an exception. We have no way to test that at this
+        point since we don't have the support for exceptions in XPL yet.
+    -->
+<!--    <test description="Group to throw an exception if bound to empty nodeset" name="oxf:pipeline" only="true">-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"-->
+<!--                    xmlns:xforms="http://www.w3.org/2002/xforms"-->
+<!--                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">-->
+<!--                <p:param type="output" name="annotated-data"/>-->
+<!--                <p:processor name="oxf:xforms-output">-->
+<!--                    <p:input name="model">-->
+<!--                        <xforms:model/>-->
+<!--                    </p:input>-->
+<!--                    <p:input name="instance">-->
+<!--                        <instance/>-->
+<!--                    </p:input>-->
+<!--                    <p:input name="data">-->
+<!--                        <xforms:group ref="/gaga"/>-->
+<!--                    </p:input>-->
+<!--                    <p:output name="data" ref="annotated-data"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="annotated-data">-->
+<!--            <dummy/>-->
+<!--        </output>-->
+<!--    </test>-->
+
+</group>

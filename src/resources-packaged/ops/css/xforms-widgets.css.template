@@ -1,0 +1,66 @@
+/*
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+*/
+.widget-tabs {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.widget-tab-spacer-side {
+    border-bottom: 1px solid &medium-color;;
+    width: 1.5em;
+}
+
+.widget-tab-spacer-between {
+    border-bottom: 1px solid &medium-color;;
+    width: 1em;
+}
+
+.widget-tab {
+    border-top: 1px solid &medium-color;;
+    border-left: 1px solid &medium-color;;
+    border-right: 1px solid &medium-color;;
+    border-bottom: 1px solid &xlight-color;;
+}
+
+.widget-tab-active {
+    background: &xlight-color;;
+    color: &dark-color;;
+    font-weight: bold;
+    text-align: center;
+    padding-left: 1em;
+    padding-right: 1em;
+    line-height: 1.5em;
+    white-space: nowrap;
+}
+
+.widget-tab-inactive {
+    background: &xxlight-color;;
+    color: &medium-color;;
+    font-weight: bold;
+    text-align: center;
+    padding-left: 1em;
+    padding-right: 1em;
+    line-height: 1.5em;
+    white-space: nowrap;
+}
+
+.widget-tabs-panel {
+    border-left: 1px solid &medium-color;;
+    border-right: 1px solid &medium-color;;
+    border-bottom: 1px solid &medium-color;;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+}

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Tamino" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <test description="Simple Query" name="oxf:tamino-query">
+        <input name="config">
+            <config>
+                <url>http://localhost/tamino/welcome_4_1_4</url>
+                <username>tamino</username>
+                <password>password</password>
+                <collection>encyclopedia</collection>
+            </config>
+        </input>
+        <input name="data">
+            <query>
+                /jazzMusician[@ino:id="1"]/name
+            </query>
+        </input>
+        <output name="data">
+            <name xmlns:ino="http://namespaces.softwareag.com/tamino/response2" ino:id="1">
+                <first>Charlie</first>
+                <last>Parker</last>
+            </name>
+        </output>
+    </test>
+
+    <test description="Simple XQuery" name="oxf:tamino-query">
+        <input name="config">
+            <config>
+                <url>http://localhost/tamino/welcome_4_1_4</url>
+                <username>tamino</username>
+                <password>password</password>
+                <collection>encyclopedia</collection>
+            </config>
+        </input>
+        <input name="data">
+            <xquery>
+                let $musicians := input()/jazzMusician
+                return
+                <musicians>
+                    {
+                    for $m in $musicians
+                    return $m
+                    }
+                </musicians>
+            </xquery>
+        </input>
+        <output name="data">
+            <musicians>
+                <jazzMusician ID="ParkerCharlie" type="instrumentalist">
+                    <name>
+                        <first>Charlie</first>
+                        <last>Parker</last>
+                    </name>
+                    <birthDate>1920-08-19</birthDate>
+                    <instrument>saxophone</instrument>
+                </jazzMusician>
+                <jazzMusician ID="GillespieDizzy" type="instrumentalist">
+                    <name>
+                        <first>Dizzy</first>
+                        <last>Gillespie</last>
+                    </name>
+                    <birthDate>1917-10-21</birthDate>
+                    <instrument>trumpet</instrument>
+                </jazzMusician>
+            </musicians>
+        </output>
+    </test>
+
+    <test description="Insert" name="oxf:tamino-insert">
+        <input name="config">
+            <config>
+                <url>http://localhost/tamino/welcome_4_1_4</url>
+                <username>tamino</username>
+                <password>password</password>
+                <collection>encyclopedia</collection>
+            </config>
+        </input>
+        <input name="data">
+            <jazzMusician type="instrumentalist" ID="ParkerCharlie">
+                <name>
+                    <first>Charlie</first>
+                    <last>Parker</last>
+                </name>
+                <birthDate>1920-08-19</birthDate>
+                <instrument>saxophone</instrument>
+            </jazzMusician>
+        </input>
+    </test>
+
+   <test description="Update" name="oxf:tamino-update">
+        <input name="config">
+            <config>
+                <url>http://localhost/tamino/welcome_4_1_4</url>
+                <username>tamino</username>
+                <password>password</password>
+                <collection>encyclopedia</collection>
+            </config>
+        </input>
+        <input name="data">
+            <xquery>
+            update replace input()/jazzMusician[@ID=ParkerCharlie]/name/first
+            with <first>CCC</first>
+            </xquery>
+        </input>
+    </test>
+
+</group>

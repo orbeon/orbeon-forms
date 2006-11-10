@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XInclude"
+       xmlns:p="http://www.orbeon.com/oxf/pipeline"
+       xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <test description="Inclusion with xml:base" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude1.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to xml:base="oxf:/ops/unit-tests/xinclude/xinclude-to.xml">
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
+
+    <test description="Inclusion without xml:base" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>xinclude/xinclude2.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="container"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#container"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="text/plain">This is simple body content</body>
+            </message>
+        </output>
+    </test>
+
+</group>

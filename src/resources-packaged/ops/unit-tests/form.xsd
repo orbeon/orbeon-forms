@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="instance">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="a" type="xs:positiveInteger"/>
+				<xs:element name="b" type="xs:positiveInteger"/>
+				<xs:element name="c" type="xs:positiveInteger"/>
+				<xs:element name="d" type="xs:positiveInteger"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Validation" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2003/XInclude">
+
+    <test description="From RELAX NG tutorial" name="oxf:validation">
+        <input name="schema">
+            <element name="addressBook" xmlns="http://relaxng.org/ns/structure/1.0">
+                <zeroOrMore>
+                    <element name="card">
+                        <element name="name">
+                            <attribute name="q">
+                                <text/>
+                            </attribute>
+                            <text/>
+                        </element>
+                        <element name="email">
+                            <text/>
+                        </element>
+                    </element>
+                </zeroOrMore>
+            </element>
+        </input>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data">
+            <addressBook>
+                <card>
+                    <name q="a">John Smith</name>
+                    <email>js@example.com</email>
+                </card>
+                <card>
+                    <name q="b">Fred Bloggs</name>
+                    <email>fb@example.net</email>
+                </card>
+            </addressBook>
+        </input>
+        <output name="data">
+            <addressBook>
+                <card>
+                    <name q="a">John Smith</name>
+                    <email>js@example.com</email>
+                </card>
+                <card>
+                    <name q="b">Fred Bloggs</name>
+                    <email>fb@example.net</email>
+                </card>
+            </addressBook>
+        </output>
+    </test>
+
+    <test description="W3C" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="result"/>
+                <p:processor name="oxf:validation">
+                    <p:input name="config">
+                        <config>
+                            <decorate>false</decorate>
+                        </config>
+                    </p:input>
+                    <p:input name="schema">
+                        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                            <xs:element name="book">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="title" type="xs:string"/>
+                                        <xs:element name="author" type="xs:string"/>
+                                        <xs:element name="character" minOccurs="0" maxOccurs="unbounded">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="name" type="xs:string"/>
+                                                    <xs:element name="friend-of" type="xs:string" minOccurs="0"
+                                                        maxOccurs="unbounded"/>
+                                                    <xs:element name="since" type="xs:date"/>
+                                                    <xs:element name="qualification" type="xs:string"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute name="isbn" type="xs:string"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:schema>
+                    </p:input>
+
+                    <p:input name="data">
+                        <book isbn="0836217462">
+                            <title>
+                                Being a Dog Is a Full-Time Job
+                            </title>
+                            <author>Charles M. Schulz</author>
+                            <character>
+                                <name>Snoopy</name>
+                                <friend-of>Peppermint Patty</friend-of>
+                                <since>1950-10-04</since>
+                                <qualification>
+                                    extroverted beagle
+                                </qualification>
+                            </character>
+                            <!--              <character>-->
+                            <!--                <name>Peppermint Patty</name>-->
+                            <!--                <since>1966-08-22</since>-->
+                            <!--                <qualification>bold, brash and tomboyish</qualification>-->
+                            <!--              </character>-->
+                        </book>
+                    </p:input>
+
+                    <p:output name="instance" ref="result"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+
+        <output name="result" ref="result">
+            <book isbn="0836217462">
+                <title>
+                    Being a Dog Is a Full-Time Job
+                </title>
+                <author>Charles M. Schulz</author>
+                <character>
+                    <name>Snoopy</name>
+                    <friend-of>Peppermint Patty</friend-of>
+                    <since>1950-10-04</since>
+                    <qualification>
+                        extroverted beagle
+                    </qualification>
+                </character>
+                <!--        <character>-->
+                <!--          <name>Peppermint Patty</name>-->
+                <!--          <since>1966-08-22</since>-->
+                <!--          <qualification>bold, brash and tomboyish</qualification>-->
+                <!--        </character>-->
+            </book>
+        </output>
+    </test>
+
+    <test description="Test Tamino schema on Tamino XQuery" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:validation">
+                    <p:input name="schema" href="/org/orbeon/oxf/processor/tamino/tamino-query.rng"/>
+                    <p:input name="config">
+                        <config>
+                            <decorate>true</decorate>
+                        </config>
+                    </p:input>
+                    <p:input name="data">
+                        <xquery>
+                            declare namespace
+                            tf="http://namespaces.softwareag.com/tamino/TaminoFunction" update for $pea in
+                            input()/pea where tf:getInoId($pea) = 667 do ( replace $pea/deleteDetails with
+                            <deleteDetails
+                                xmlns:ino="http://namespaces.softwareag.com/tamino/response2" xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                xmlns:tfx-xforms="http://www.teleflex.com/namespaces/tfx-xforms">
+                                <deletedFlag>true</deletedFlag>
+                                <deleteDateTime>2005-03-16T10:31:33.265Z</deleteDateTime>
+                                <deletededBy>dsinclair</deletededBy>
+                            </deleteDetails>replace $pea/lastUpdate with
+                            <lastUpdate xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
+                                xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                xmlns:tfx-xforms="http://www.teleflex.com/namespaces/tfx-xforms">
+                                <updateDateTime>2005-03-16T10:31:33.265Z</updateDateTime>
+                                <updatedBy>dsinclair</updatedBy>
+                            </lastUpdate>)
+                        </xquery>
+                    </p:input>
+                    <p:output name="data" id="validated"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#validated"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:copy-of select="//v:error" xmlns:v="http://orbeon.org/oxf/xml/validation"/>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result/>
+        </output>
+    </test>
+
+    <!-- Will work when bug 1155 is fixed
+
+        <test description="New RNG Schema" name="oxf:pipeline">
+            <input name="config">
+                <p:config>
+                    <p:param type="output" name="data"/>
+                    <p:processor name="oxf:new-validation">
+                        <p:input name="config" href="oxf:/ops/unit-tests/note.rng"/>
+                        <p:input name="data">
+                            <note>
+                                <from>Jani</from>
+                                <to>Tove</to>
+                                <body>Don't forget me this weekend</body>
+                            </note>
+                        </p:input>
+                        <p:output name="data" ref="data"/>
+                    </p:processor>
+                </p:config>
+            </input>
+            <output name="data">
+                <note>
+                    <from>Jani</from>
+                    <to>Tove</to>
+                    <body>Don't forget me this weekend</body>
+                </note>
+            </output>
+        </test>
+
+
+        <test description="New W3C Schema import" name="oxf:pipeline">
+             <input name="config">
+                 <p:config>
+                     <p:param type="output" name="data"/>
+                     <p:processor name="oxf:new-validation">
+                         <p:input name="config" href="oxf:/ops/unit-tests/chapter03env.xsd"/>
+                         <p:input name="data">
+                             <envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                 <order xmlns="http://example.org/ord"
+                                     xmlns:prod="http://example.org/prod">
+                                     <number>123ABBCC123</number>
+                                     <items>
+                                         <product xmlns="http://example.org/prod">
+                                             <number prod:id="prod557">557</number>
+                                             <name xmlns="">Short-Sleeved Linen Blouse</name>
+                                             <prod:size system="US-DRESS">10</prod:size>
+                                             <prod:color xmlns:prod="http://example.org/prod2"
+                                                 prod:value="blue"/>
+                                         </product>
+                                     </items>
+                                 </order>
+                             </envelope>
+                         </p:input>
+                         <p:output name="data" ref="data"/>
+                     </p:processor>
+                 </p:config>
+             </input>
+             <output name="data">
+                 <envelope>
+                     <order xmlns="http://example.org/ord"
+                         xmlns:prod="http://example.org/prod">
+                         <number>123ABBCC123</number>
+                         <items>
+                             <product xmlns="http://example.org/prod">
+                                 <number prod:id="prod557">557</number>
+                                 <name xmlns="">Short-Sleeved Linen Blouse</name>
+                                 <prod:size system="US-DRESS">10</prod:size>
+                                 <prod:color xmlns:prod="http://example.org/prod2"
+                                     prod:value="blue"/>
+                             </product>
+                         </items>
+                     </order>
+                 </envelope>
+             </output>
+         </test>
+     -->
+
+</group>

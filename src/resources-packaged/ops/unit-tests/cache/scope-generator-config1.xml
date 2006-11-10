@@ -1,0 +1,5 @@
+<config>
+    <key>k1</key>
+    <scope>application</scope>
+    <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+</config>

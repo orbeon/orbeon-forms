@@ -1,0 +1,61 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<claim xmlns="http://orbeon.org/oxf/examples/bizdoc/claim">
+    <insured-info>
+        <general-info>
+            <name-info>
+                <title-prefix>Dr.</title-prefix>
+                <last-name>Doe</last-name>
+                <first-name>John</first-name>
+                <title-suffix></title-suffix>
+            </name-info>
+            <address>
+                <address-detail>
+                    <street-name>N Columbus Dr.</street-name>
+                    <street-number>511</street-number>
+                    <unit-number></unit-number>
+                </address-detail>
+                <city>Chicago</city>
+                <state-province>IL</state-province>
+                <postal-code>60611</postal-code>
+                <country>USA</country>
+                <email>jdoe@acme.org</email>
+            </address>
+        </general-info>
+        <person-info>
+            <gender-code>M</gender-code>
+            <birth-date>1972-10-01</birth-date>
+            <marital-status-code>C</marital-status-code>
+            <occupation>Manager</occupation>
+        </person-info>
+        <family-info>
+            <children>
+                <child>
+                    <birth-date>2003-02-02</birth-date>
+                    <first-name>Marco</first-name>
+                </child>
+                <child>
+                    <birth-date></birth-date>
+                    <first-name></first-name>
+                </child>
+            </children>
+            <comments>No comments at this point!</comments>
+        </family-info>
+        <claim-info>
+            <accident-type>FOOT</accident-type>
+            <accident-date>2004-07-06</accident-date>
+            <rate></rate>
+        </claim-info>
+    </insured-info>
+</claim>

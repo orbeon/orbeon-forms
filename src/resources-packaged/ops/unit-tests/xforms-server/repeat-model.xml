@@ -1,0 +1,21 @@
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" >
+    <xforms:instance>
+        <form>
+            <departments>
+                <department>
+                    <employee first="f11" last="l11"/>
+                    <employee first="f12" last="l12"/>
+                </department>
+                <department>
+                    <employee first="f21" last="l21"/>
+                </department>
+                <department>
+                    <employee first="f31" last="l31"/>
+                    <employee first="f32" last="l32"/>
+                    <employee first="f33" last="l33"/>
+                    <employee first="f34" last="l34"/>
+                </department>
+            </departments>
+        </form>
+    </xforms:instance>
+</xforms:model>

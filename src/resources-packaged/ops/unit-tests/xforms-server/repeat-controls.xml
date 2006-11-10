@@ -1,0 +1,34 @@
+<controls
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events">
+<!--    <table>-->
+        <xforms:repeat nodeset="/form/departments/department" id="id123">
+            <xforms:action ev:event="DOMActivate">
+                <xforms:insert nodeset="../department" at="2" position="after"/>
+<!--                <xforms:insert nodeset="../department" at="1" position="after"/>-->
+<!--                <xforms:insert at="1" position="before"/>-->
+            </xforms:action>
+<!--            <tr>-->
+<!--                <td>-->
+<!--                    <table>-->
+                        <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert nodeset="../../department[index('id123')]/employee" at="2" position="after"/>
+
+                            </xforms:action>
+<!--                            <tr>-->
+<!--                                <td>-->
+                                    <xforms:output ref="@first" id="id125"/>
+<!--                                </td>-->
+<!--                                <td>-->
+                                    <xforms:output ref="@last" id="id126"/>
+<!--                                </td>-->
+<!--                            </tr>-->
+                        </xforms:repeat>
+<!--                    </table>-->
+<!--                </td>-->
+<!--            </tr>-->
+        </xforms:repeat>
+<!--    </table>-->
+</controls>

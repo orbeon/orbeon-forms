@@ -1,0 +1,22 @@
+<xxforms:controls xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <table>
+        <xforms:repeat nodeset="/form/departments/department" id="id123">
+            <tr>
+                <td>
+                    <table>
+                        <xforms:repeat nodeset="employee" id="id124">
+                            <tr>
+                                <td>
+                                    <xforms:output ref="@first" id="id125"/>
+                                </td>
+                                <td>
+                                    <xforms:output ref="@last" id="id126"/>
+                                </td>
+                            </tr>
+                        </xforms:repeat>
+                    </table>
+                </td>
+            </tr>
+        </xforms:repeat>
+    </table>
+</xxforms:controls>

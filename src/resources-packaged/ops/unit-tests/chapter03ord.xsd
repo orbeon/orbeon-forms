@@ -1,0 +1,36 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/ord"
+            xmlns:ord="http://example.org/ord"
+            xmlns:prod="http://example.org/prod"
+            elementFormDefault="qualified">
+
+  <xsd:import namespace="http://example.org/prod" schemaLocation="docbase/chapter03prod.xsd"/>
+  <xsd:element name="order" type="ord:OrderType"/>
+
+  <xsd:complexType name="OrderType">
+    <xsd:sequence>
+      <xsd:element name="number" type="xsd:string"/>
+      <xsd:element name="items" type="ord:ItemsType"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ItemsType">
+    <xsd:sequence>
+      <xsd:element ref="prod:product" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

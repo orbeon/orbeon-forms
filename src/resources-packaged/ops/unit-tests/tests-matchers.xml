@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Matchers" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Perl5" name="oxf:perl5-matcher">
+        <input name="data">
+            <text>/a/bc/de.fgh</text>
+        </input>
+        <input name="config">
+            <regexp>/./(.*)/([^\.]*)\.fgh</regexp>
+        </input>
+        <output name="data">
+            <result>
+                <matches>true</matches>
+                <group>bc</group>
+                <group>de</group>
+            </result>
+        </output>
+    </test>
+
+    <test description="Glob" name="oxf:glob-matcher">
+        <input name="data">
+            <text>/a/bc/de.fgh</text>
+        </input>
+        <input name="config">
+            <regexp>/?/*/de.fgh</regexp>
+        </input>
+        <output name="data">
+            <result>
+                <matches>true</matches>
+            </result>
+        </output>
+    </test>
+
+</group>

@@ -1,0 +1,219 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <xf:output ref="/equation/screen" id="1"/>
+    <xf:output ref="/equation/memory" id="2">
+        <xf:label>M:</xf:label>
+    </xf:output>
+    <xf:trigger id="3">
+        <xf:label>Clear</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/first" value="0"/>
+            <xf:setvalue ref="/equation/second" value="0"/>
+            <xf:setvalue ref="/equation/result" value="0"/>
+            <xf:setvalue ref="/equation/screen" value="0"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+            <xf:toggle ev:event="DOMActivate" case="add"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="4">
+        <xf:label>MC</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/memory" value="0"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="5">
+        <xf:label>7</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 7"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="6">
+        <xf:label>8</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 8"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="7">
+        <xf:label>9</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 9"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="8">
+        <xf:label>/</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/first" value="/equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+            <xf:toggle ev:event="DOMActivate" case="divide"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="9">
+        <xf:label>MR</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/memory"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/memory"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="10">
+        <xf:label>4</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 4"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="11">
+        <xf:label>5</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 5"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="12">
+        <xf:label>6</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 6"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="13">
+        <xf:label>*</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/first" value="/equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+            <xf:toggle ev:event="DOMActivate" case="multiply"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="14">
+        <xf:label>MS</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/memory" value="/equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="15">
+        <xf:label>1</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 1"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="16">
+        <xf:label>2</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 2"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="17">
+        <xf:label>3</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10 + 3"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="18">
+        <xf:label>-</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/first" value="/equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+            <xf:toggle ev:event="DOMActivate" case="subtract"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="19">
+        <xf:label>1/x</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screen" value="1 div /equation/screen"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="20">
+        <xf:label>M+</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/memory" value="/equation/memory + /equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="21">
+        <xf:label>0</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screenbuffer" value="/equation/screenbuffer * 10"/>
+            <xf:setvalue ref="/equation/screen" value="/equation/screenbuffer"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="22">
+        <xf:label>+/-</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/screen" value="/equation/screen * -1"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:trigger id="23">
+        <xf:label>+</xf:label>
+        <xf:action ev:event="DOMActivate">
+            <xf:setvalue ref="/equation/first" value="/equation/screen"/>
+            <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+            <xf:toggle ev:event="DOMActivate" case="add"/>
+        </xf:action>
+    </xf:trigger>
+    <xf:switch id="23a">
+        <xf:case id="add" selected="true">
+            <xf:trigger id="24">
+                <xf:label>=</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/equation/second" value="/equation/screenbuffer"/>
+                    <xf:setvalue ref="/equation/result" value="/equation/first + /equation/second"/>
+                    <xf:setvalue ref="/equation/screen" value="/equation/result"/>
+                    <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+                </xf:action>
+            </xf:trigger>
+        </xf:case>
+        <xf:case id="subtract">
+            <xf:trigger id="25">
+                <xf:label>=</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/equation/second" value="/equation/screenbuffer"/>
+                    <xf:setvalue ref="/equation/result" value="/equation/first - /equation/second"/>
+                    <xf:setvalue ref="/equation/screen" value="/equation/result"/>
+                    <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+                </xf:action>
+            </xf:trigger>
+        </xf:case>
+        <xf:case id="multiply">
+            <xf:trigger id="26">
+                <xf:label>=</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/equation/second" value="/equation/screenbuffer"/>
+                    <xf:setvalue ref="/equation/result" value="/equation/first * /equation/second"/>
+                    <xf:setvalue ref="/equation/screen" value="/equation/result"/>
+                    <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+                </xf:action>
+            </xf:trigger>
+        </xf:case>
+        <xf:case id="divide">
+            <xf:label>Hello Divide!!!</xf:label>
+            <xf:trigger id="27">
+                <xf:label>=</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/equation/second" value="/equation/screenbuffer"/>
+                    <xf:setvalue ref="/equation/result" value="/equation/first div /equation/second"/>
+                    <xf:setvalue ref="/equation/screen" value="/equation/result"/>
+                    <xf:setvalue ref="/equation/screenbuffer" value="0"/>
+                </xf:action>
+            </xf:trigger>
+        </xf:case>
+    </xf:switch>
+</controls>

@@ -142,9 +142,7 @@
                                         <div class="content" style="margin-right: 1em">
                                             <form method="GET" style="margin-bottom: 0; margin-top: 0" action="http://www.google.com/custom">
                                                 <span style="white-space: nowrap">
-                                                    <a style="color: black" href="http://www.orbeon.com/oxf/">PresentationServer Home Page</a> |
-                                                    <a style="color: black" href="http://www.orbeon.com/oxf/download">Download</a> |
-                                                    <a style="color: black" href="http://www.orbeon.com/oxf/oxf-brochure.pdf">Brochure (PDF)</a> |
+                                                    <a style="color: black" href="http://www.orbeon.com/">Orbeon Forms Home Page</a> |
                                                     <a style="color: black" href="/examples/">Showcase Application</a> |
                                                     <span style="white-space: nowrap">
                                                         Search:

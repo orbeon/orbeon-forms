@@ -1,0 +1,80 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <page id="xforms-wizard-pfc-firstname" path-info="/xforms-wizard-pfc/" default-submission="initial-instance.xml" view="step1-firstname.xhtml">
+        <action when="/form/action = 'next'" >
+            <result page="xforms-wizard-pfc-lastname" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-lastname" path-info="/xforms-wizard-pfc/lastname" view="step2-lastname.xhtml">
+        <action when="/form/action = 'previous'">
+            <result page="xforms-wizard-pfc-firstname" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+        <action when="/form/action = 'next'">
+            <result page="xforms-wizard-pfc-age" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-age" path-info="/xforms-wizard-pfc/age" view="step3-age.xhtml">
+        <action when="/form/action = 'previous'">
+            <result page="xforms-wizard-pfc-lastname" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+        <action when="/form/action = 'finish'">
+            <result page="xforms-wizard-pfc-summary" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-summary" path-info="/xforms-wizard-pfc/summary" view="step4-summary.xhtml">
+        <action when="/form/action = 'start'">
+            <result page="xforms-wizard-pfc-firstname" transform="oxf:xupdate">
+                <xu:transformations>
+                    <xu:update select="/form/action"/>
+                    <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+                </xu:transformations>
+            </result>
+        </action>
+    </page>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

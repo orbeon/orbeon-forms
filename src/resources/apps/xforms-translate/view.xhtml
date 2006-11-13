@@ -1,0 +1,147 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xhtml:head>
+        <xhtml:title>Instant Translation</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="request-instance">
+                <translation>
+                    <language-pair>en|fr</language-pair>
+                    <source/>
+                </translation>
+            </xforms:instance>
+            <xforms:instance id="response-instance">
+                <translation>
+                    <target/>
+                </translation>
+            </xforms:instance>
+            <xforms:submission ref="instance('request-instance')" id="default-submission"
+                method="post" action="/xforms-translate/post" replace="instance" instance="response-instance"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .ops-translate-wide-text {
+                display: block;
+                background: #FFFFCC;
+                height: 6em;
+            }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <p>
+            Try typing English text below and watch the second text area getting updated with the
+            French translation of your text. Then try changing the language with the dropdown list.
+        </p>
+        <xhtml:p>
+            <xforms:select1 appearance="minimal" ref="instance('request-instance')/language-pair">
+                <xforms:label class="bold">From: </xforms:label>
+                <xforms:item>
+                    <xforms:value>en|de</xforms:value>
+                    <xforms:label>English to German</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|es</xforms:value>
+                    <xforms:label>English to Spanish</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|fr</xforms:value>
+                    <xforms:label>English to French</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|it</xforms:value>
+                    <xforms:label>English to Italian</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|pt</xforms:value>
+                    <xforms:label>English to Portuguese</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|ja</xforms:value>
+                    <xforms:label>English to Japanese BETA</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|ko</xforms:value>
+                    <xforms:label>English to Korean BETA</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>en|zh-CN</xforms:value>
+                    <xforms:label>English to Chinese (Simplified) BETA</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>de|en</xforms:value>
+                    <xforms:label>German to English</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>de|fr</xforms:value>
+                    <xforms:label>German to French</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>es|en</xforms:value>
+                    <xforms:label>Spanish to English</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>fr|en</xforms:value>
+                    <xforms:label>French to English</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>fr|de</xforms:value>
+                    <xforms:label>French to German</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>it|en</xforms:value>
+                    <xforms:label>Italian to English</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>pt|en</xforms:value>
+                    <xforms:label>Portuguese to English</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>ja|en</xforms:value>
+                    <xforms:label>Japanese to English BETA</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>ko|en</xforms:value>
+                    <xforms:label>Korean to English BETA</xforms:label>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:value>zh-CN|en</xforms:value>
+                    <xforms:label>Chinese (Simplified) to English BETA</xforms:label>
+                </xforms:item>
+                <xforms:send submission="default-submission" ev:event="xforms-value-changed"/>
+            </xforms:select1>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:textarea ref="instance('request-instance')/source" appearance="xxforms:autosize" incremental="true">
+                <xforms:label class="bold">Translate text:</xforms:label>
+                <xforms:send submission="default-submission" ev:event="xforms-value-changed"/>
+            </xforms:textarea>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:output ref="instance('response-instance')/target" class="ops-translate-wide-text">
+                <xforms:label class="bold">Translation:</xforms:label>
+            </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xhtml:a href="http://www.google.com/">
+                <xhtml:img src="/apps/xforms-translate/images/powered_by_google_135x35.gif" alt="Powered By Google" border="0"/>
+            </xhtml:a>
+        </xhtml:p>
+        <p id="debug"/>
+    </xhtml:body>
+</xhtml:html>

@@ -147,28 +147,24 @@
                 </xhtml:table>
             </xhtml:div>
 
-            <xforms:group ref="instance('control-instance')/query">
-                <xhtml:fieldset>
-                    <xhtml:legend>XQuery to execute</xhtml:legend>
-                    <xforms:textarea ref="instance('query-instance')/exist:text" appearance="xxforms:autosize" incremental="true">
-                        <xforms:label></xforms:label>
-                    </xforms:textarea>
-                </xhtml:fieldset>
+            <xforms:group ref="instance('control-instance')/query" appearance="xxforms:fieldset">
+                <xforms:label>XQuery to execute</xforms:label>
+                <xforms:textarea ref="instance('query-instance')/exist:text" appearance="xxforms:autosize" incremental="true">
+                    <xforms:label></xforms:label>
+                </xforms:textarea>
             </xforms:group>
 
-            <xforms:group ref="instance('control-instance')/insert">
-                <xhtml:fieldset>
-                    <xhtml:legend>Document to insert</xhtml:legend>
-                    <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
-                        <xforms:label></xforms:label>
-                    </xforms:textarea>
-                </xhtml:fieldset>
+            <xforms:group ref="instance('control-instance')/insert" appearance="xxforms:fieldset">
+                <xforms:label>Document to insert</xforms:label>
+                <xforms:textarea ref="." appearance="xxforms:autosize" incremental="true">
+                    <xforms:label></xforms:label>
+                </xforms:textarea>
             </xforms:group>
 
-            <xhtml:fieldset>
-                <xhtml:legend>Result</xhtml:legend>
+            <xforms:group appearance="xxforms:fieldset">
+                <xforms:label>Result</xforms:label>
                 <xforms:output ref="instance('control-instance')/formatted-result" mediatype="text/html"/>
-            </xhtml:fieldset>
+            </xforms:group>
 
         </xforms:group>
     </xhtml:body>

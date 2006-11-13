@@ -1,0 +1,38 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xdt="http://www.w3.org/2005/xpath-datatypes">
+
+    <xhtml:head>
+        <xhtml:title>XForms HTML Area</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema" id="main-model">
+            <xforms:instance id="instance">
+                <instance>
+                    <html>In the Orbeon Forms HTML area, you can use different:&lt;br />&lt;ul>&lt;li>fonts like times or courrier&lt;/li>&lt;li>&lt;font size="3">sizes&lt;/font>&lt;/li>&lt;li>&lt;span style="background-color: rgb(255, 153, 0);">background colors&lt;/span> or &lt;span style="color: rgb(255, 102, 0);">text colors&lt;/span>&lt;span style="background-color: rgb(255, 153, 0);">&lt;br />&lt;/span>&lt;/li>&lt;li>font styles like &lt;span style="font-weight: bold;">bold &lt;/span>or &lt;span style="font-style: italic;">italic&lt;/span>&lt;/li>&lt;/ul></html>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:textarea mediatype="text/html" ref="/instance/html"/>
+    </xhtml:body>
+</xhtml:html>

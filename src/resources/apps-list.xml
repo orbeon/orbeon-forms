@@ -19,6 +19,19 @@
         <application id="forms" label="DMV Forms"/>
         <application id="xforms-controls" label="XForms Controls"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
+        <application id="xforms-todo" label="To-Do Lists"/>
+        <application id="xforms-translate" label="Instant Translation"/>
+    </section>
+    <section label="More XForms">
+        <application id="xforms-calculator" label="Calculator"/>
+        <application id="xforms-flickr-resize" label="Flickr Resize"/>
+        <application id="xforms-google-suggests" label="Google Suggests"/>
+        <application id="xforms-html-area" label="HTML Area"/>
+        <application id="xforms-todo" label="TODO Lists"/>
+        <application id="xforms-translate" label="Instant Translation"/>
+        <application id="xforms-upload" label="Upload Control"/>
+        <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
+        <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
     </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>

@@ -38,7 +38,7 @@
         <setvalue ref="/parameters/readonly" parameter="readonly"/>
     </page>
 
-    <page id="pdf-detail" path-info="/direct/forms/pdf-detail"
+    <page id="pdf-detail" path-info="/forms/pdf-detail"
           default-submission="detail/parameters.xml"
           view="detail/pdf-detail-view.xpl">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>
@@ -51,7 +51,7 @@
         <setvalue ref="/parameters/readonly" parameter="readonly"/>
     </page>
 
-    <page id="g325a-pdf-detail" path-info="/direct/forms/g325a/pdf-detail"
+    <page id="g325a-pdf-detail" path-info="/forms/g325a/pdf-detail"
           default-submission="detail/parameters.xml"
           view="G-325A/pdf-detail-view.xpl">
         <setvalue ref="/parameters/document-id" parameter="document-id"/>

@@ -62,7 +62,7 @@
                 <xforms:bind nodeset="xml-detail-uri"
                              calculate="concat('/exist/rest/db/ops/dmv-example/', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
                 <xforms:bind nodeset="pdf-detail-uri"
-                             calculate="concat('/direct/forms/pdf-detail?document-id=', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
+                             calculate="concat('/forms/pdf-detail?document-id=', instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id)"/>
 
                 <xforms:bind nodeset="non-empty" relevant="count(instance('documents-instance')/document-infos/document-info) > 0"/>
                 <xforms:bind nodeset="empty" relevant="count(instance('documents-instance')/document-infos/document-info) = 0"/>

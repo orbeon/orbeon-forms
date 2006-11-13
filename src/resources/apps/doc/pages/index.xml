@@ -20,36 +20,35 @@
     </header>
     <body>
         <section>
-            <title>Orbeon PresentationServer (OPS)</title>
-            <!--<img src="/images/ops30.png" style="border: 0px; float: right" width="276" height="75"/>-->
+            <title>Orbeon Forms</title>
             <p>
-                Welcome to the reference documentation for the Orbeon PresentationServer (OPS)
-                platform.
+                Welcome to the reference documentation for the Orbeon Forms platform.
             </p>
             <p>
-                <!--Form-based web applications done the right way-->
-                Orbeon PresentationServer is an <b>open source</b> platform that uses <b>standard
-                XForms</b> to make your form-based web applications more <b>user-friendly</b> and
-                <b>simpler to create</b>.
+                Orbeon Forms is an open source forms solution that handles the complexity of forms typical of the
+                enterprise or government. It is brought to standard web browsers (including Internet Explorer, Firefox,
+                Safari and Opera) thanks to Ajax technology, with no need for client-side software or plugins. Orbeon
+                Forms allows you to build fully interactive forms with features that include as-you-type validation,
+                optional and repeated sections, always up-to-date error summaries, PDF output, full
+                internationalization, and controls like auto-completion, tabs, dialogs, trees and menus.
             </p>
             <p>
-                Unlike other web application frameworks based on Java objects or scripting
-                languages, OPS is based on XML documents and XForms. This leads to an architecture
-                perfectly suited for the tasks of capturing, processing, and presenting XML data,
-                and does not require writing any Java or scripting code at all to implement a
-                dynamic presentation layer for your web application.
+                Unlike other web application frameworks based on Java objects or scripting languages, Orbeon Forms is based on
+                XML documents and XForms. This leads to an architecture perfectly suited for the tasks of capturing,
+                processing, and presenting XML data, and does not require writing any Java or scripting code at all to
+                implement a dynamic presentation layer for your web application.
             </p>
             <p>
-                OPS is built around a user-friendly Ajax-based XForms engine, which brings standard
-                W3C XForms to mainstream browsers, and the <a href="reference-xpl-pipelines">XPL
-                engine</a>, a mature, high-performance XML pipeline engine for processing XML data.
+                Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings standard W3C XForms to
+                mainstream browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
+                high-performance XML pipeline engine for processing XML data.
             </p>
         </section>
 
         <section>
             <title>Purpose of the User Guide</title>
             <p>
-                The purpose of this guide is to get you acquainted with the main components of OPS:
+                The purpose of this guide is to get you acquainted with the main components of Orbeon Forms:
             </p>
             <ul>
                 <li>
@@ -61,7 +60,7 @@
                 <li>
                     <p>
                         <a href="reference-page-flow"><b>The Page Flow Controller (PFC).</b></a>
-                        The PFC is the heart of your OPS application. It defines your application's
+                        The PFC is the heart of your Orbeon Forms application. It defines your application's
                         pages and how you navigate between them.
                     </p>
                 </li>
@@ -74,58 +73,13 @@
                 </li>
                 <li>
                     <p>
-                        <b>OPS's built-in XML components.</b> The built-in OPS XML components
+                        <b>Orbeon Forms's built-in XML components.</b> The built-in OPS XML components
                         provide services such as accessing databases, performing data
                         transformations, calling web services, and more. If you need more, you can
                         write your own XML components.
                     </p>
                 </li>
             </ul>
-            <!--
-            <p>
-                It is highly recommended to follow the <a href="OPS Tutorial.pdf">OPS
-                Tutorial</a> to get started with developing applications with OPS, and to refer to
-                the User Guide as a reference.
-            </p>
-            <note>
-                <p>
-                    The OPS Tutorial has not yet been updated to reflect the latest changes in OPS
-                    3.0.
-                </p>
-            </note>
-            -->
         </section>
-<!--
-        <section>
-            <title>Prerequisites</title>
-            <p>
-                This guide should be accessible to anyone with some experience developing simple web
-                applications, but it is helpful to understand the basics of XML, Extensible
-                Stylesheet Language Transformations (XSLT), and XForms beforehand. For more
-                information, consult the following sources as a starting point:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <a href="http://www.w3.org/XML/">XML</a>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <a href="http://www.w3.org/Style/XSL/">XSLT</a>
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <a href="http://www.w3.org/MarkUp/Forms/">XForms</a>
-                    </p>
-                </li>
-            </ul>
-            <p>
-                In addition to online resources, many books about these technologies are available
-                in printed form.
-            </p>
-        </section>
--->
     </body>
 </document>

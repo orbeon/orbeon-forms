@@ -244,14 +244,50 @@
           </manifest>
         </jar>
 
-        <!-- Build resources JAR -->
+        <!-- Build private resources JAR -->
         <jar destfile="${resources-private.jar.file}" compress="false">
             <fileset dir="${resources-packaged.dir}">
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
                 <exclude name="ops/css/*.template"/>
                 <exclude name="ops/css/*.properties"/>
+                <exclude name="ops/**/*.css"/>
+                <exclude name="ops/**/*.js"/>
+                <exclude name="ops/**/*.gif"/>
+                <exclude name="ops/**/*.png"/>
+                <exclude name="ops/**/*.jpg"/>
+                <exclude name="ops/**/*.html"/>
+                <exclude name="ops/**/*.htc"/>
+                <exclude name="ops/fckeditor/_samples/**/*.*"/>
+                <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
+                <exclude name="ops/fckeditor/_testcases/**/*.*"/>
+                <exclude name="ops/fckeditor/**/*.cfm"/>
+                <exclude name="ops/fckeditor/**/*.cfc"/>
+                <exclude name="ops/fckeditor/**/*.asp"/>
+                <exclude name="ops/fckeditor/**/*.afp"/>
+                <exclude name="ops/fckeditor/**/*.cgi"/>
+                <exclude name="ops/fckeditor/**/*.py"/>
+                <exclude name="ops/fckeditor/**/*.aspx"/>
+                <exclude name="ops/fckeditor/**/*.php"/>
+                <exclude name="ops/fckeditor/**/*.pl"/>
+                <exclude name="ops/fckeditor/**/*.lasso"/>
+            </fileset>
+        </jar>
+
+        <!-- Build public resources JAR -->
+        <jar destfile="${resources-public.jar.file}" compress="false">
+            <fileset dir="${resources-packaged.dir}">
+                <include name="ops/**/*.css"/>
+                <include name="ops/**/*.js"/>
+                <include name="ops/**/*.gif"/>
+                <include name="ops/**/*.png"/>
+                <include name="ops/**/*.jpg"/>
+                <include name="ops/**/*.html"/>
+                <include name="ops/**/*.htc"/>
                 <include name="config/theme/**"/>
+                <exclude name="ops/fckeditor/_samples/**/*.*"/>
+                <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
+                <exclude name="ops/fckeditor/_testcases/**/*.*"/>
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
@@ -274,6 +310,7 @@
 
         <copy file="${jar.file}" todir="${war.lib}"/>
         <copy file="${resources-private.jar.file}" todir="${war.lib}"/>
+        <copy file="${resources-public.jar.file}" todir="${war.lib}"/>
 
         <copy todir='${war.lib}/private' >
           <fileset refid='war.libs.private' />

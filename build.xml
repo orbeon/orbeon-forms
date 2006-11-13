@@ -452,7 +452,7 @@
             <classpath>
                 <path refid="class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>
-                <pathelement location="${resources-private.jar.file}"/>
+                <pathelement location="${resources-packaged.dir}"/>
                 <!-- FWIW tomcat 5 doesn't include this jar. -->
                 <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
             </classpath>

@@ -14,55 +14,69 @@
 
     <xsl:template match="/">
         <web-app>
-            <display-name>Orbeon PresentationServer <xsl:value-of select="$version-number"/></display-name>
+            <display-name>Orbeon Forms <xsl:value-of select="$version-number"/></display-name>
             <description>
-                Orbeon PresentationServer is an open source platform that uses standard XForms to make your form-based
-                web applications more user-friendly and simpler to create.
+                Orbeon Forms is an open source forms solution that handles the complexity of forms typical of the
+                enterprise or government. It is brought to standard web browsers (including Internet Explorer, Firefox,
+                Safari and Opera) thanks to Ajax technology, with no need for client-side software or plugins. Orbeon
+                Forms allows you to build fully interactive forms with features that include as-you-type validation,
+                optional and repeated sections, always up-to-date error summaries, PDF output, full
+                internationalization, and controls like auto-completion, tabs, dialogs, trees and menus.
             </description>
-            <xsl:comment> Initialize resource manager </xsl:comment>
+            <xsl:comment> Initialize main resource manager </xsl:comment>
             <context-param>
                 <param-name>oxf.resources.factory</param-name>
                 <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
             </context-param>
-            <xsl:comment>Web app. resource manager</xsl:comment>
-            <context-param>
-                <param-name>oxf.resources.webapp.rootdir</param-name>
-                <param-value>/WEB-INF/resources</param-value>
-            </context-param>
-            <context-param>
-                <xsl:choose>
-                    <xsl:when test="$target = 'devel'" >
-                        <param-name>oxf.resources.priority.3</param-name>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <param-name>oxf.resources.priority.1</param-name>
-                    </xsl:otherwise>
-                </xsl:choose>
-               <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
-            </context-param>
+            
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'filesystem resource manager'"/>
                 <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
-                    <context-param>
-                        <param-name>oxf.resources.filesystem.sandbox-directory</param-name>
-                        <param-value>
-                            <xsl:choose>
-                                <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/examples/web</xsl:when>
-                                <xsl:otherwise>C:/path/to/my/resources</xsl:otherwise>
-                            </xsl:choose>
-                        </param-value>
-                    </context-param>
+                    <xsl:comment> Filesystem resource managers </xsl:comment>
                     <context-param>
                         <param-name>oxf.resources.priority.1</param-name>
                         <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
                     </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory</param-name>
+                        <param-value><xsl:value-of select="$build-root"/>/src/resources</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2</param-name>
+                        <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory</param-name>
+                        <param-value><xsl:value-of select="$build-root"/>/src/resources-packaged</param-value>
+                    </context-param>
+                    <xsl:comment> Classloader resource manager </xsl:comment>
+                    <context-param>
+                        <param-name>oxf.resources.priority.3</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
                 </xsl:with-param>
             </xsl:call-template>
-            <context-param>
-               <param-name>oxf.resources.priority.2</param-name>
-               <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
-            </context-param>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'webapp resource manager'"/>
+                <xsl:with-param name="commented" select="$target = 'devel'"/>
+                <xsl:with-param name="content">
+                    <xsl:comment> Web application resource manager </xsl:comment>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1.oxf.resources.webapp.rootdir</param-name>
+                        <param-value>/WEB-INF/resources</param-value>
+                    </context-param>
+                    <xsl:comment> Classloader resource manager </xsl:comment>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:comment> OPS Class Loader </xsl:comment>
             <context-param>
@@ -108,7 +122,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.context-initialized-processor.input.config</param-name>
-                        <param-value>oxf:/context/context-initialized.xpl</param-value>
+                        <param-value>oxf:/apps/context/context-initialized.xpl</param-value>
                     </context-param>
                     <context-param>
                         <param-name>oxf.context-destroyed-processor.name</param-name>
@@ -116,7 +130,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.context-destroyed-processor.input.config</param-name>
-                        <param-value>oxf:/context/context-destroyed.xpl</param-value>
+                        <param-value>oxf:/apps/context/context-destroyed.xpl</param-value>
                     </context-param>
                 </xsl:with-param>
             </xsl:call-template>
@@ -132,7 +146,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.session-created-processor.input.config</param-name>
-                        <param-value>oxf:/context/session-created.xpl</param-value>
+                        <param-value>oxf:/apps/context/session-created.xpl</param-value>
                     </context-param>
                     <context-param>
                         <param-name>oxf.session-destroyed-processor.name</param-name>
@@ -140,7 +154,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.session-destroyed-processor.input.config</param-name>
-                        <param-value>oxf:/context/session-destroyed.xpl</param-value>
+                        <param-value>oxf:/apps/context/session-destroyed.xpl</param-value>
                     </context-param>
                 </xsl:with-param>
             </xsl:call-template>
@@ -171,7 +185,7 @@
                 <url-pattern>/xforms-jsp/*</url-pattern>
             </filter-mapping>
 
-            <xsl:comment> Set PresentationServer listeners </xsl:comment>
+            <xsl:comment> Set listeners </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -252,7 +266,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.servlet-initialized-processor.input.config</param-name>
-                    <param-value>oxf:/context/servlet-initialized.xpl</param-value>
+                    <param-value>oxf:/apps/context/servlet-initialized.xpl</param-value>
                 </init-param>
                 <xsl:comment> Set destruction listener </xsl:comment>
                 <init-param>
@@ -261,7 +275,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.servlet-destroyed-processor.input.config</param-name>
-                    <param-value>oxf:/context/servlet-destroyed.xpl</param-value>
+                    <param-value>oxf:/apps/context/servlet-destroyed.xpl</param-value>
                 </init-param>
                 <load-on-startup>1</load-on-startup>
             </servlet>

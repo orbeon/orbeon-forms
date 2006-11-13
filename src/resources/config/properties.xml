@@ -1,0 +1,76 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- Global properties -->
+    <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
+    <property as="xs:integer" name="oxf.cache.size"                                  value="384"/>
+    <property as="xs:integer" name="oxf.cache.xpath.size"                            value="1000"/>
+    <property as="xs:integer" name="oxf.cache.xforms-sessions.size"                  value="10"/>
+    <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
+
+    <!-- Processor-specific properties -->
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-memory-size"   value="10240"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
+    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
+    <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
+
+    <!--<property as="xs:boolean" processor-name="oxf:xml-converter"       name="serialize-xml-11" value="true"/>-->
+
+    <!-- Encryption of XForms hidden fields and field names -->
+    <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
+    <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
+
+    <!-- Default formatting of XForms types -->
+    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.decimal"                       value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'#,##0.00') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.integer"                       value="if (. castable as xs:integer) then format-number(xs:integer(.),'#,##0') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.float"                         value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.double"                        value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
+
+    <!-- XForms cache configuration -->
+    <property as="xs:string"  name="oxf.xforms.state-handling"                       value="session"/>
+    <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
+    <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
+    <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
+
+    <!-- Other XForms options -->
+    <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-get-all"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.optimize-local-submission"            value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"               value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.ajax.show-errors"                     value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
+
+    <!-- Rarely used global properties -->
+    <property as="xs:string" name="oxf.servlet.externalize-form-values-prefix"      value="$extnode^"/>
+
+    <!-- XPL profiling support -->
+    <!-- Currently one of org.orbeon.oxf.processor.NetworkTrace,
+                          org.orbeon.oxf.processor.StdOutTrace,
+                          org.orbeon.oxf.processor.SessionTrace -->
+    <!--<property as="xs:NCName"    name="processor.trace"    value="org.orbeon.oxf.processor.SessionTrace"/>-->
+    <!-- Host for NetworkTrace. Default is localhost. -->
+    <!--<property as="xs:NMTOKEN"    name="processor.trace.host"    value="localhost"/>-->
+    <!-- Port for NetworkTrace. Default is 9191 -->
+    <!--<property as="xs:nonNegativeInteger"    name="processor.trace.port"    value="9999"/>-->
+
+</properties>

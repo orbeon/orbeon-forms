@@ -18,7 +18,7 @@
     <!--<echoproperties/>-->
 
     <!-- set global build.root to be dir containing this file. -->
-    <dirname property='build.root' file='${ant.file}'/>
+    <dirname property="build.root" file="${ant.file}"/>
     <property name="lib.dir" location="lib"/>
 <!--    <property name='unstbl-bld-dst' value='/var/tmp/tomcat/ops-unstable/' /> -->
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
@@ -31,7 +31,6 @@
 
     <property name="src.dir" location="src"/>
     <property name="examples-src.dir" location="${src.dir}/examples"/>
-    <property name="web-examples-src.dir" location="${examples-src.dir}/web"/>
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_6_1.jar"/>
@@ -115,6 +114,7 @@
         <property name="java-src.dir" value="${src.dir}/java"/>
         <property name="cli-examples-src.dir" value="${examples-src.dir}/cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
+        <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
         <property name="test-src.dir" value="test/src"/>
 
         <property name="build.classes.dir" value="${build.dir}/classes"/>
@@ -222,7 +222,11 @@
               <include name="**/*.class"/>
               <include name="**/*.xsd"/>
           </fileset>
-          <fileset dir="${resources.dir}/oxf"/>
+          <fileset dir="${resources-packaged.dir}">
+              <include name="oxf/**/*.*"/>
+              <include name="config/*.xml"/>
+              <include name="*.xml"/>
+          </fileset>
           <zipfileset dir="descriptors/jar" prefix="META-INF" >
             <exclude name='*.MF' />
           </zipfileset>
@@ -243,7 +247,7 @@
 
         <!-- Build resources JAR -->
         <jar destfile="${resources-private.jar.file}" compress="false">
-            <fileset dir="${web-examples-src.dir}">
+            <fileset dir="${resources-packaged.dir}">
                 <include name="ops/**"/>
                 <exclude name="ops/unit-tests/**"/>
                 <exclude name="ops/css/*.template"/>
@@ -258,7 +262,7 @@
     </target>
 
     <!-- WAR -->
-    <target name="war" depends="jars,orbeon-source-files-lists">
+    <target name="war" depends="jars">
         <echo message="war.dir: ${war.dir}"/>
         <mkdir dir="${war.classes}"/>
         <copy todir="${war.classes}">
@@ -349,78 +353,18 @@
 
     <target name="orbeon-css-templates" depends="init">
         <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
-            <filtersfile file="${web-examples-src.dir}/ops/css/css-constants.properties"/>
+            <filtersfile file="${resources-packaged.dir}/ops/css/css-constants.properties"/>
         </filterset>
         <mkdir dir="${build.temp.dir}/theme"/>
-        <copy file="${web-examples-src.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
+        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${web-examples-src.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
+        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
             <filterset refid="css-filter-set"/>
         </copy>
-    </target>
-
-    <target name="orbeon-source-files-lists" depends="init">
-
-      <taskdef resource="net/sf/antcontrib/antlib.xml">
-          <classpath>
-            <fileset dir='${basedir}/tools/ant/lib' >
-                <include name='*.jar'/>
-            </fileset>
-          </classpath>
-      </taskdef>
-
-      <foreach target='make-one-source-list' param='example-descriptor' >
-        <path>
-          <fileset dir='${examples-src.dir}' >
-              <include name='**/example-descriptor.xml' />
-          </fileset>
-        </path>
-      </foreach>
-    </target>
-
-    <target name='make-one-source-list' >
-        <dirname file='${example-descriptor}' property='dir' />
-
-	    <length property='files' mode='each' >
-            <fileset dir='${dir}' >
-                <include name='**/*.x?l' />
-                <include name='**/*.xsd' />
-                <include name='**/*.rng' />
-                <include name='**/*.css' />
-                <include name='**/*.js' />
-                <include name='**/*.xhtml' />
-                <include name='**/*.java' />
-                <include name='**/*.txt' />
-                <exclude name='example-descriptor.xml' />
-                <exclude name='example-descriptor-files.xml' />
-            </fileset>
-        </length>
-
-        <tempfile property='file-list-temp' />
-
-        <echo file='${file-list-temp}' >&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;source-files&gt;
-${files}
-&lt;/source-files&gt;
-        </echo>
-        
-        <pathconvert property='file-list' >
-            <path path='${example-descriptor}' />
-            <globmapper from='${web-examples-src.dir}${file.separator}*${file.separator}example-descriptor.xml' to='${war.inf}/resources/*/example-descriptor-files.xml' />
-        </pathconvert>
-        
-        <move file='${file-list-temp}' tofile='${file-list}' >
-            <filterchain>
-                <tokenfilter>
-                    <linetokenizer/>
-                    <replacestring from='${dir}${file.separator}' to='    &lt;file name=&apos;' />
-                    <replaceregex pattern='\s:\s' replace='&apos; size=&apos;' />
-                    <replaceregex pattern='(?&lt;=\d)\z' replace='&apos;/&gt;' />
-                </tokenfilter>
-            </filterchain>
-        </move>
-        
+        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
     </target>
 
     <target name="debug-enabled" if="is.debug">
@@ -459,7 +403,7 @@ ${files}
 
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.filesystem.sandbox-directory" value="${web-examples-src.dir}"/>
+            <sysproperty key="oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
@@ -498,7 +442,7 @@ ${files}
 
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.filesystem.sandbox-directory" value="${web-examples-src.dir}"/>
+            <sysproperty key="oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
@@ -576,11 +520,11 @@ ${files}
         <mkdir dir="${build.doc.dir}/reference/theme"/>
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
             <arg value="-r"/>
-            <arg value="${web-examples-src.dir}"/>
+            <arg value="${resources.dir}"/>
             <arg value="oxf:/doc/generate-static-html.xpl"/>
         </java>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${web-examples-src.dir}/config">
+            <fileset dir="${resources.dir}/config">
                 <include name="theme/images/**"/>
                 <include name="theme/javascript/**"/>
                 <include name="theme/jscalendar/**"/>
@@ -588,12 +532,12 @@ ${files}
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${web-examples-src.dir}">
+            <fileset dir="${resources.dir}">
                 <include name="images/*.*"/>
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${web-examples-src.dir}/doc">
+            <fileset dir="${resources.dir}/doc">
                 <include name="pages/*.png"/>
                 <include name="pages/*.gif"/>
                 <include name="pages/*.pdf"/>
@@ -612,7 +556,7 @@ ${files}
         <mkdir dir="${build.doc.dir}/reference"/>
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
             <arg value="-r"/>
-            <arg value="${web-examples-src.dir}"/>
+            <arg value="${resources.dir}"/>
             <arg value="oxf:/doc/generate-single-static-html.xpl"/>
         </java>
     </target>
@@ -630,16 +574,11 @@ ${files}
         </antcall>
         <zip zipfile="${build.distrib.dir}/${project.name}.war">
             <fileset dir="${war.dir}"/>
-            <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
-                <exclude name="**/*.eps"/>
-                <exclude name="**/*.jsp"/>
-                <exclude name="**/*.cdr"/>
-                <exclude name="**/*.cpl"/>
-                <exclude name="doc/xtech-2005/**"/>
-                <exclude name="oxfmark/**"/>
-                <exclude name="struts-view/**"/>
-                <exclude name="ops/**"/>
-                <exclude name="config/theme/**"/>
+            <zipfileset dir="${resources.dir}" prefix="WEB-INF/resources">
+                <exclude name="apps/doc/**/*.eps"/>
+                <exclude name="apps/doc/**/*.jsp"/>
+                <exclude name="apps/doc/**/*.cdr"/>
+                <exclude name="apps/doc/**/*.cpl"/>
             </zipfileset>
         </zip>
     </target>
@@ -775,7 +714,7 @@ ${files}
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
     
-    <target name="post-update" depends="orbeon-source-files-lists,orbeon-css-templates">
+    <target name="post-update" depends="orbeon-css-templates">
         <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
     </target>
 
@@ -832,8 +771,8 @@ ${files}
                 <include name="**/*.css"/>
                 <include name="**/*.xsd"/>
             </fileset>
-            <fileset dir="${resources.dir}/oxf"/>
-            <fileset dir="${web-examples-src.dir}">
+            <fileset dir="${resources-packaged.dir}/oxf"/>
+            <fileset dir="${resources.dir}">
                 <include name="config/controller.xml"/>
                 <include name="config/epilogue.xpl"/>
                 <include name="config/properties.xml"/>

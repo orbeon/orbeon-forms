@@ -32,10 +32,17 @@
         <setvalue ref="/form/mediatype" parameter="mediatype"/>
     </page>
 
+    <!-- Get a list of files -->
+    <page id="get-files" path-info="/source-viewer/service/get-files"
+            default-submission="default-submission.xml"
+            model="get-files.xpl">
+        <setvalue ref="/form/application-id" parameter="application-id"/>
+    </page>
+
     <!-- Display the source for an individual file -->
     <page id="goto-source" path-info="/source-viewer/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
             default-submission="default-submission.xml"
-            view="summary-view.xhtml">
+            view="view.xhtml">
         <setvalue ref="/form/application-id" matcher-group="1"/>
         <setvalue ref="/form/source-url" matcher-group="2"/>
     </page>

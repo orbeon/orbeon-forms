@@ -23,11 +23,9 @@
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <config xsl:version="2.0">
-                <xsl:variable name="applications-list" select="doc('oxf:/apps-list.xml')" as="document-node()"/>
                 <xsl:variable name="application-id" select="/*/application-id" as="xs:string"/>
                 <xsl:variable name="mediatype" select="/*/mediatype" as="xs:string"/>
-                <xsl:variable name="application" select="$applications-list//application[@id = $application-id]" as="element()"/>
-                <xsl:variable name="url" select="concat('oxf:/', 'apps/', $application/@id, '/', string(/*/source-url))" as="xs:string"/>
+                <xsl:variable name="url" select="concat('oxf:/', 'apps/', $application-id, '/', string(/*/source-url))" as="xs:string"/>
                 <url><xsl:value-of select="$url"/></url>
                 <content-type><xsl:value-of select="$mediatype"/></content-type>
             </config>
@@ -69,7 +67,7 @@
         <p:output name="data" id="formatted-source"/>
     </p:processor>
 
-        <!-- Convert and serialize to XML -->
+    <!-- Convert and serialize to XML -->
     <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config>

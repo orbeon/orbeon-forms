@@ -28,6 +28,11 @@
             </element>
         </optional>
         <optional>
+            <element name="make-directories">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
             <element name="content-type">
                 <data type="string"/>
             </element>

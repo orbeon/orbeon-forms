@@ -48,6 +48,7 @@ public class FileSerializer extends ProcessorImpl {
     private static final boolean DEFAULT_IGNORE_DOCUMENT_ENCODING = false;
 
     private static final boolean DEFAULT_APPEND = false;
+    private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
@@ -59,6 +60,7 @@ public class FileSerializer extends ProcessorImpl {
         private String directory;
         private String file;
         private boolean append;
+        private boolean makeDirectories;
 
         private boolean cacheUseLocalCache;
 
@@ -81,6 +83,9 @@ public class FileSerializer extends ProcessorImpl {
 
             // Whether to append or not
             append = ProcessorUtils.selectBooleanValue(document, "/config/append", DEFAULT_APPEND);
+
+            // Whether to append or not
+            makeDirectories = ProcessorUtils.selectBooleanValue(document, "/config/make-directories", DEFAULT_MAKE_DIRECTORIES);
 
             // Content-type and Encoding
             requestedContentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
@@ -108,6 +113,11 @@ public class FileSerializer extends ProcessorImpl {
 
         public boolean isAppend() {
             return append;
+        }
+
+
+        public boolean isMakeDirectories() {
+            return makeDirectories;
         }
 
         public boolean isCacheUseLocalCache() {
@@ -151,7 +161,7 @@ public class FileSerializer extends ProcessorImpl {
             final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             // Get file object
-            final File file = getFile(config.getDirectory(), config.getFile(), getPropertySet());
+            final File file = getFile(config.getDirectory(), config.getFile(), config.isMakeDirectories(), getPropertySet());
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
@@ -245,7 +255,7 @@ public class FileSerializer extends ProcessorImpl {
         }
     }
 
-    public static File getFile(String configDirectory, String configFile, OXFProperties.PropertySet propertySet) {
+    public static File getFile(String configDirectory, String configFile, boolean makeDirectories, OXFProperties.PropertySet propertySet) {
         final File file;
         final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
         if (directoryProperty == null && configDirectory == null) {
@@ -254,11 +264,28 @@ public class FileSerializer extends ProcessorImpl {
         } else {
             // Base directory specified
             final File baseDirectory = (configDirectory != null) ? new File(configDirectory) : new File(directoryProperty);
+
+            // Make directories if needed
+            if (makeDirectories) {
+                if (!baseDirectory.exists()) {
+                    if (!baseDirectory.mkdirs())
+                        throw new OXFException("Directory '" + baseDirectory + "' could not be created.");
+                }
+            }
+
             if (!baseDirectory.isDirectory() || !baseDirectory.canWrite())
                 throw new OXFException("Directory '" + baseDirectory + "' is not a directory or is not writeable.");
 
             file = new File(baseDirectory, configFile);
         }
+        // Make directories if needed
+        if (makeDirectories) {
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs())
+                    throw new OXFException("Directory '" + file.getParentFile() + "' could not be created.");
+            }
+        }
+
         return file;
     }
 }

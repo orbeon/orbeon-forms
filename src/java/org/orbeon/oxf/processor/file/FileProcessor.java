@@ -75,7 +75,7 @@ public class FileProcessor extends ProcessorImpl {
             });
 
             // Get file object
-            final File file = FileSerializer.getFile(config.getDirectory(), config.getFile(), getPropertySet());
+            final File file = FileSerializer.getFile(config.getDirectory(), config.getFile(), false, getPropertySet());
 
             // Delete file if it exists
             if (file.exists() && file.canWrite()) {

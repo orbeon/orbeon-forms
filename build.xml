@@ -521,7 +521,7 @@
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
             <arg value="-r"/>
             <arg value="${resources.dir}"/>
-            <arg value="oxf:/doc/generate-static-html.xpl"/>
+            <arg value="oxf:/apps/doc/generate-static-html.xpl"/>
         </java>
         <copy todir="${build.doc.dir}/reference">
             <fileset dir="${resources.dir}/config">
@@ -557,7 +557,7 @@
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
             <arg value="-r"/>
             <arg value="${resources.dir}"/>
-            <arg value="oxf:/doc/generate-single-static-html.xpl"/>
+            <arg value="oxf:/apps/doc/generate-single-static-html.xpl"/>
         </java>
     </target>
 

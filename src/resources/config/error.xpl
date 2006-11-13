@@ -24,7 +24,7 @@
 
     <!-- Generate exception document -->
     <p:processor name="oxf:exception">
-        <p:output name="data" id="exception" debug="xxxexception"/>
+        <p:output name="data" id="exception"/>
     </p:processor>
 
     <!-- Format exception page -->

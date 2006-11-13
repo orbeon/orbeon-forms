@@ -35,10 +35,10 @@
 
     <!-- Run XForms Server -->
     <p:processor name="oxf:xforms-server">
-        <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>-->
-        <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>-->
-        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>
-        <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>
+        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
+        <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>
+        <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
+        <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
     </p:processor>
 
     <!-- Generate response -->

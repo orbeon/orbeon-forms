@@ -17,7 +17,7 @@
     
     <p:param name="source" type="input"/>
     <p:param name="language-pair" type="input"/>
-    <p:param name="data" type="output" debug="translation"/>
+    <p:param name="data" type="output"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data"><dummy/></p:input>
@@ -43,7 +43,7 @@
 
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="#google-request"/>
-        <p:output name="data" id="google-translation" debug="goole translation"/>
+        <p:output name="data" id="google-translation"/>
     </p:processor>
 
     <p:processor name="oxf:identity">

@@ -16,7 +16,7 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param type="input" name="instance" debug="xxxinst"/>
+    <p:param type="input" name="instance"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
@@ -30,7 +30,7 @@
                 <content-type>text/plain</content-type>
             </config>
         </p:input>
-        <p:output name="data" id="url-config" debug="xxxconfig"/>
+        <p:output name="data" id="url-config"/>
     </p:processor>
 
     <p:processor name="oxf:url-generator">

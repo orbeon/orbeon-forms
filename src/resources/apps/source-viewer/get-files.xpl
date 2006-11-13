@@ -15,7 +15,7 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <p:param type="input" name="instance" debug="xxxinstance"/>
+    <p:param type="input" name="instance"/>
 
     <p:processor name="oxf:xslt-2.0">
         <p:input name="data" href="#instance"/>
@@ -39,8 +39,8 @@
     </p:processor>
 
     <p:processor name="oxf:directory-scanner">
-        <p:input name="config" href="#ds-config" debug="xxxdsconfig"/>
-        <p:output name="data" id="result" debug="xxxdsoutput"/>
+        <p:input name="config" href="#ds-config"/>
+        <p:output name="data" id="result"/>
     </p:processor>
 
     <!-- Convert and serialize to XML -->

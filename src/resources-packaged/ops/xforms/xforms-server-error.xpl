@@ -22,8 +22,8 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#exception" debug="xxxerror"/>
-        <!--<p:input name="data" href="#exception"/>-->
+        <!--<p:input name="data" href="#exception" debug="xxxerror"/>-->
+        <p:input name="data" href="#exception"/>
         <p:input name="config">
             <config/>
         </p:input>

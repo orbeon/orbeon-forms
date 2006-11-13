@@ -35,7 +35,7 @@
     </test>
 
     <test description="HTML conversion" name="oxf:html-converter">
-        <input name="data" href="oxf:/examples/tutorial/hello3/view.xhtml"/>
+        <input name="data" href="converters/hello3-view.xhtml"/>
         <input name="config">
             <config>
                 <content-type>text/html</content-type>

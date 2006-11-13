@@ -443,9 +443,9 @@
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
+            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
+            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
             <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>

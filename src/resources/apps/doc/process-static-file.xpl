@@ -43,7 +43,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#xhtml-page"/>
         <p:input name="request" href="#request"/>
-        <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
+        <p:input name="config" href="oxf:/config/theme-plain.xsl"/>
         <p:output name="data" id="themed-data"/>
     </p:processor>
 

@@ -518,7 +518,11 @@
     <target name="orbeon-doc" depends="jars,orbeon-css-templates">
         <mkdir dir="${build.doc.dir}/reference"/>
         <mkdir dir="${build.doc.dir}/reference/theme"/>
-        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
+        <java classname="org.orbeon.oxf.main.OPS" fork="true" failonerror="true">
+            <classpath>
+                <path refid="class.path"/>
+                <pathelement location="${resources-private.jar.file}"/>
+            </classpath>
             <arg value="-r"/>
             <arg value="${resources.dir}"/>
             <arg value="oxf:/apps/doc/generate-static-html.xpl"/>
@@ -537,7 +541,7 @@
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${resources.dir}/doc">
+            <fileset dir="${resources.dir}/apps/doc">
                 <include name="pages/*.png"/>
                 <include name="pages/*.gif"/>
                 <include name="pages/*.pdf"/>
@@ -554,7 +558,11 @@
 
     <target name="orbeon-pdf-doc" depends="jars">
         <mkdir dir="${build.doc.dir}/reference"/>
-        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
+        <java classname="org.orbeon.oxf.main.OPS" fork="true" failonerror="true">
+            <classpath>
+                <path refid="class.path"/>
+                <pathelement location="${resources-private.jar.file}"/>
+            </classpath>
             <arg value="-r"/>
             <arg value="${resources.dir}"/>
             <arg value="oxf:/apps/doc/generate-single-static-html.xpl"/>

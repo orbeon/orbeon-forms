@@ -20,4 +20,14 @@
         <application id="xforms-controls" label="XForms Controls"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
     </section>
+    <section label="Sandboxes">
+        <application id="xforms-sandbox" label="XForms Sandbox"/>
+        <application id="sandbox-exist" label="eXist Sandbox"/>
+        <application id="sandbox-schema" label="XML Schema Sandbox"/>
+        <application id="sandbox-xpath" label="XPath Sandbox"/>
+        <application id="sandbox-xpl" label="XPL Sandbox"/>
+        <application id="sandbox-xquery" label="XQuery Sandbox"/>
+        <application id="sandbox-xslt" label="XSLT Sandbox"/>
+        <application id="sandbox-xupdate" label="XUpdate Sandbox"/>
+    </section>
 </application>

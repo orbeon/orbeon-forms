@@ -415,7 +415,8 @@ ORBEON.xforms.Controls = {
         while (true) {
             if (candidate == null) break;
             if (ORBEON.util.Dom.isElement(candidate)
-                    && ORBEON.util.Dom.hasClass(candidate, className)) break;
+                    && ORBEON.util.Dom.hasClass(candidate, className)
+                    && (candidate.htmlFor == null || candidate.htmlFor == control.id)) break;
             candidate = className == "xforms-label" ? candidate.previousSibling : candidate.nextSibling;
         }
         return candidate;

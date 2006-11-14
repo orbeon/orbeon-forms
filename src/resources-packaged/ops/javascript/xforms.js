@@ -1280,7 +1280,6 @@ ORBEON.xforms.Init = {
             values.push(select.options[optionIndex].value);
         // Initialize auto-complete input
         var noFilter = ORBEON.util.Dom.hasClass(autoComplete, "xforms-select1-open-autocomplete-nofilter");
-        ORBEON.xforms.Globals.autoCompleteLastKeyCode[autoComplete.id] = -1;
         ORBEON.xforms.Globals.autoCompleteOpen[autoComplete.id] = actb(textfield, values, noFilter);
     },
 
@@ -2322,7 +2321,7 @@ function xformsHandleResponse(o) {
                                     textfield.actb_keywords = newValues;
                                     // Reopen auto-complete if necessary
                                     var lastKeyCode = ORBEON.xforms.Globals.autoCompleteLastKeyCode[documentElement.id];
-                                    if (lastKeyCode != -1)
+                                    if (lastKeyCode != null)
                                         ORBEON.xforms.Globals.autoCompleteOpen[documentElement.id](lastKeyCode);
                                 } else if (documentElement.tagName == "SELECT") {
 

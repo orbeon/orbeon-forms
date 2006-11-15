@@ -11,8 +11,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<parameters>
-    <form-id/>
-    <document-id/>
-    <readonly/>
-</parameters>
+<address type="mailing" xmlns="http://orbeon.org/oxf/examples/dmv">
+    <street>
+        <number/>
+        <name-1/>
+        <name-2/>
+    </street>
+    <apt/>
+    <city/>
+    <state/>
+    <zip/>
+</address>

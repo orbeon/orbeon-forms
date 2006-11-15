@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<exist:query xmlns:exist="http://exist.sourceforge.net/NS/exist">
+    <exist:text>
+        xquery version "1.0";
+        declare namespace dmv="http://orbeon.org/oxf/examples/dmv";
+        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+        &lt;documents>
+            &lt;headers>
+                &lt;header>name&lt;/header>
+                &lt;header>birth-date&lt;/header>
+                &lt;header>id-number&lt;/header>
+                &lt;header>vehicle&lt;/header>
+            &lt;/headers>
+            {
+                let $collection-name := '/db/orbeon/forms/DMV-14/'
+                for $resource-name in xmldb:get-child-resources($collection-name)
+                    let $resource-date := xmldb:last-modified($collection-name, $resource-name)
+                    let $resource := doc(concat($collection-name, $resource-name))
+                    order by $resource-date descending
+                    return
+                    &lt;document>
+                        &lt;id>{$resource-name}&lt;/id>
+                        &lt;date>{$resource-date}&lt;/date>
+                        &lt;details>
+                            &lt;detail>
+                                {string(for $name in $resource//dmv:personal-information/dmv:name return concat($name/dmv:first-name, ' ',
+                                                                     $name/dmv:initial, if ($name/dmv:initial != '') then '. ' else (),
+                                                                     $name/dmv:last-name))}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string($resource//dmv:personal-information/dmv:birth-date)}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string($resource//dmv:personal-information/dmv:driver-license-number)}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string($resource//dmv:vehicle[1]/dmv:plate-number)}
+                            &lt;/detail>
+                        &lt;/details>
+                    &lt;/document>
+            }
+        &lt;/documents>
+    </exist:text>
+</exist:query>

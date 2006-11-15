@@ -1,0 +1,92 @@
+<form>
+    <personal-information>
+        <name>
+            <first/>
+            <initial/>
+            <last/>
+            <other/>
+        </name>
+        <gender/>
+        <birth>
+            <date/>
+            <city/>
+            <country/>
+        </birth>
+        <citizenship/>
+        <file-number/>
+        <ssn/>
+    </personal-information>
+    <parents-information>
+        <father>
+            <name>
+                <first/>
+                <last/>
+            </name>
+            <birth>
+                <date/>
+                <city/>
+                <country/>
+            </birth>
+            <residence>
+                <city/>
+                <country/>
+            </residence>
+        </father>
+        <mother>
+            <name>
+                <first/>
+                <last/>
+            </name>
+            <birth>
+                <date/>
+                <city/>
+                <country/>
+            </birth>
+            <residence>
+                <city/>
+                <country/>
+            </residence>
+        </mother>
+    </parents-information>
+    <marriages/><!-- TODO -->
+    <residence-information>
+        <last-five-years>
+            <residence>
+                <street/>
+                <city/>
+                <state/>
+                <country/>
+                <from/><!-- gYearMonth -->
+                <to/><!-- gYearMonth -->
+            </residence>
+        </last-five-years>
+        <last-abroad>
+            <residence>
+                <street/>
+                <city/>
+                <state/>
+                <country/>
+                <from/><!-- gYearMonth -->
+                <to/><!-- gYearMonth -->
+            </residence>
+        </last-abroad>
+    </residence-information>
+    <employment-information>
+        <last-five-years>
+            <employment>
+                <name/>
+                <address/>
+                <occupation/>
+                <from/>
+                <to/>
+            </employment>
+        </last-five-years>
+        <last-abroad>
+            <employment/><!-- TODO -->
+        </last-abroad>
+    </employment-information>
+    <connection>
+        <type/>
+        <other/>
+    </connection>
+</form>

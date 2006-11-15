@@ -22,60 +22,24 @@
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
               xmlns:exist="http://exist.sourceforge.net/NS/exist">
 
-    <xforms:action ev:event="xforms-ready">
-        <xforms:send submission="list-documents-submission"/>
-        <!--<xforms:setindex repeat="documents-repeat" index="1"/>-->
-    </xforms:action>
-
     <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('body')"/>
 
-    <xforms:instance id="dummy-instance">
-        <dummy/>
-    </xforms:instance>
-
-    <xforms:submission id="import-documents-submission" ref="instance('dummy-instance')"
-                       method="post" action="/forms/service/import-documents" replace="none"/>
+    <xforms:submission id="import-documents-submission"
+                       method="get" action="/forms/service/import-documents" replace="none"/>
 
     <xforms:instance id="list-documents-query">
-        <exist:query>
-            <exist:text>
-                xquery version "1.0";
-                declare namespace dmv="http://orbeon.org/oxf/examples/dmv";
-                declare namespace xmldb="http://exist-db.org/xquery/xmldb";
-                &lt;document-infos>
-                    {
-                        let $collection-name := '/db/ops/dmv-example/'
-                        for $resource-name in xmldb:get-child-resources($collection-name)
-                            let $resource-date := xmldb:last-modified($collection-name, $resource-name)
-                            let $resource := doc(concat($collection-name, $resource-name))
-                            order by $resource-date descending
-                            return
-                            &lt;document-info>
-                                &lt;document-id>{$resource-name}&lt;/document-id>
-                                &lt;document-date>{$resource-date}&lt;/document-date>
-                                &lt;document>
-                                    {$resource//dmv:personal-information}
-                                    {$resource//dmv:vehicle[1]}
-                                &lt;/document>
-                            &lt;/document-info>
-                        <!--for $collection-name in xmldb:get-child-collections($collection-name)-->
-                            <!--return-->
-                            <!--&lt;test>{$collection-name}&lt;/test>-->
-                    }
-                &lt;/document-infos>
-            </exist:text>
-        </exist:query>
+        <exist:query/>
     </xforms:instance>
 
     <xforms:submission id="list-documents-submission" ref="instance('list-documents-query')"
-                       method="post" action="/exist/rest/db/ops/dmv-example/" replace="instance" xxforms:instance="documents-instance" f:url-type="resource"/>
+                       method="post" action="/exist/rest/db/orbeon/forms/" replace="instance" xxforms:instance="documents-instance" f:url-type="resource"/>
 
-    <xforms:submission id="delete-document-submission" ref="instance('dummy-instance')" method="delete"  replace="none" f:url-type="resource"
-                       action="/exist/rest/db/ops/dmv-example/{{xxforms:instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id}}"/>
+    <xforms:submission id="delete-document-submission" serialize="false" method="delete" replace="none" f:url-type="resource"
+                       action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id}}"/>
 
     <!-- Load submission -->
-    <xforms:submission id="load-submission" ref="instance('dummy-instance')"
-            action="/exist/rest/db/ops/dmv-example/{{xxforms:instance('parameters-instance')/document-id}}" validate="false"
+    <xforms:submission id="load-submission" serialize="false"
+            action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('parameters-instance')/document-id}}" validate="false"
             method="get" replace="instance" xxforms:instance="document-instance" f:url-type="resource"/>
 
     <xforms:instance id="persistence-instance">
@@ -87,7 +51,7 @@
 
     <!-- Save submission -->
     <xforms:submission id="save-submission" ref="xxforms:instance('document-instance')"
-            action="/exist/rest/db/ops/dmv-example/{{xxforms:instance('parameters-instance')/document-id}}"
+            action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('parameters-instance')/document-id}}"
             method="put" replace="none" f:url-type="resource">
 
         <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('persistence-instance')/save-status">validated</xforms:setvalue>

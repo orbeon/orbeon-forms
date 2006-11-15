@@ -24,6 +24,8 @@
         <birth-date>Date de naissance</birth-date>
         <id-number>Numéro</id-number>
         <vehicle>Véhicule</vehicle>
+        <citizenship>Nationalité</citizenship>
+        <birth-place>Lieu de naissance</birth-place>
         <selected>Selectionné</selected>
         <of> de </of>
 
@@ -71,6 +73,7 @@
 
         <!-- Other controls labels -->
         <language-choice>Langue</language-choice>
+        <form-choice>Choisisez un formulaire</form-choice>
         <first-name>Prénom</first-name>
         <initial>Initiale</initial>
         <last-name>Nom</last-name>
@@ -110,7 +113,7 @@
         <county>Doit contenir seulement des lettres, '-' ou espaces, commencer avec une lettre, et avoir 14 caractères au plus.</county>
     </alerts>
     <formats>
-        <birth-date>[FNn], le [D] [MNn] [Y]</birth-date>
+        <birth-date>Le [D] [MNn] [Y]</birth-date>
         <save-datetime>[FNn], le [D] [MNn] [Y] à [H01]:[m01]:[s01] UTC</save-datetime>
     </formats>
 </resources>

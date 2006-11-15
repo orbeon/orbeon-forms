@@ -1,0 +1,55 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<exist:query xmlns:exist="http://exist.sourceforge.net/NS/exist">
+    <exist:text>
+        xquery version "1.0";
+        declare namespace xmldb="http://exist-db.org/xquery/xmldb";
+        &lt;documents>
+            &lt;headers>
+                &lt;header>name&lt;/header>
+                &lt;header>citizenship&lt;/header>
+                &lt;header>birth-date&lt;/header>
+                &lt;header>birth-place&lt;/header>
+            &lt;/headers>
+            {
+                let $collection-name := '/db/orbeon/forms/G-325A/'
+                for $resource-name in xmldb:get-child-resources($collection-name)
+                    let $resource-date := xmldb:last-modified($collection-name, $resource-name)
+                    let $resource := doc(concat($collection-name, $resource-name))
+                    order by $resource-date descending
+                    return
+                    &lt;document>
+                        &lt;id>{$resource-name}&lt;/id>
+                        &lt;date>{$resource-date}&lt;/date>
+                        &lt;details>
+                            &lt;detail>
+                                {string(for $name in $resource//personal-information/name return concat($name/first, ' ',
+                                                                     $name/initial, if ($name/initial != '') then ' ' else (),
+                                                                     $name/last))}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string($resource//personal-information/citizenship)}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string($resource//personal-information/birth/date)}
+                            &lt;/detail>
+                            &lt;detail>
+                                {string(for $birth in $resource//personal-information/birth return concat($birth/city, ', ', $birth/country))}
+                            &lt;/detail>
+                        &lt;/details>
+                    &lt;/document>
+            }
+        &lt;/documents>
+    </exist:text>
+</exist:query>

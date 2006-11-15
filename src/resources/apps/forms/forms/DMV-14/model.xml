@@ -1,0 +1,134 @@
+<xforms:model id="dmv-model" schema="oxf:/apps/forms/forms/DMV-14/schema.xsd"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:exforms="http://www.exforms.org/exf/1-0"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+      xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+    <!-- This is called when the XForms engine is ready -->
+    <xforms:action ev:event="xforms-ready">
+        <!-- Build plates instance -->
+        <xforms:insert context="instance('plates-instance')"
+                       while="count(plate) lt count(instance('document-instance')//dmv:plate-number)"
+                       nodeset="plate" origin="instance('plate-template')"/>
+        <xforms:recalculate/>
+        <xforms:refresh/>
+        <!-- Set initial focus -->
+        <xforms:setfocus control="dmv-last-name-control"/>
+        <!-- Make sure we look clean after initialization, as insertions can take place above -->
+        <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
+    </xforms:action>
+
+    <!-- Mark document as dirty in case of insertion or deletion -->
+    <xforms:setvalue ev:event="xforms-insert" ref="xxforms:instance('control-instance')/data-status">dirty</xforms:setvalue>
+    <xforms:setvalue ev:event="xforms-delete" ref="xxforms:instance('control-instance')/data-status">dirty</xforms:setvalue>
+
+    <!-- This action clears all the fields of the mailing address -->
+    <xforms:action ev:event="dmv-clear-mailing-address">
+        <xforms:setvalue while="instance('document-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"
+                         ref="instance('document-instance')//dmv:address[@type = 'mailing']//*[not(*) and . != '']"/>
+    </xforms:action>
+
+    <!-- This action clears all the fields of the vehicle address -->
+    <xforms:action ev:event="dmv-clear-vehicle-address">
+        <xforms:setvalue while="instance('document-instance')//dmv:vehicle-address//*[not(*) and . != '']"
+                         ref="instance('document-instance')//dmv:vehicle-address//*[not(*) and . != '']"/>
+    </xforms:action>
+
+    <!-- Main XForms instance -->
+    <xforms:instance id="document-instance" src="oxf:/apps/forms/forms/DMV-14/template-form.xml"/>
+
+    <xforms:bind nodeset="instance('document-instance')">
+
+        <!-- Metadata -->
+        <xforms:bind nodeset="document-date" calculate="current-dateTime()" type="xs:dateTime"/>
+        <!-- Business data -->
+        <xforms:bind nodeset="//dmv:form">
+            <!-- Uncomment this line to test read-only version -->
+            <xforms:bind nodeset="." readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>
+            <xforms:bind nodeset="dmv:personal-information">
+                <xforms:bind nodeset="dmv:birth-date" type="xs:date"/>
+                <xforms:bind nodeset="dmv:name/dmv:first-name | dmv:name/dmv:last-name" required="true()"/>
+                <xforms:bind nodeset="dmv:driver-license-number | dmv:birth-date" required="true()"/>
+            </xforms:bind>
+            <xforms:bind nodeset="dmv:address-information">
+                <xforms:bind nodeset="dmv:address">
+                    <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                    <xforms:bind nodeset="dmv:city | dmv:state | dmv:zip" required="true()"/>
+                </xforms:bind>
+            </xforms:bind>
+            <xforms:bind nodeset="dmv:vehicle-information">
+                <xforms:bind nodeset="dmv:vehicles/dmv:vehicle">
+                    <xforms:bind nodeset="dmv:plate-number | dmv:vin" required="true()"/>
+                </xforms:bind>
+                <xforms:bind nodeset="dmv:vehicle-address">
+                    <xforms:bind nodeset="dmv:street/dmv:name-1" required="true()"/>
+                    <xforms:bind nodeset="dmv:city | dmv:county" required="true()"/>
+                </xforms:bind>
+            </xforms:bind>
+        </xforms:bind>
+
+    </xforms:bind>
+
+    <!-- XForms instance containing the XML schema (for enumerations) -->
+    <xforms:instance id="schema-instance" src="oxf:/apps/forms/forms/DMV-14/schema.xsd"/>
+
+    <!-- XForms instance containing template for mailing address -->
+    <xforms:instance id="mailing-address-template" src="oxf:/apps/forms/forms/DMV-14/template-mailing-address.xml"/>
+
+    <!-- XForms instance containing template for vehicle address -->
+    <xforms:instance id="vehicle-address-template" src="oxf:/apps/forms/forms/DMV-14/template-vehicle-address.xml"/>
+
+    <!-- XForms instance for widget control information -->
+    <xforms:instance id="triggers-instance">
+        <control xmlns="">
+            <add-vehicle-trigger/>
+            <remove-vehicle-trigger/>
+            <add-mailing-address-trigger/>
+            <remove-mailing-address-trigger/>
+            <clear-mailing-address-trigger/>
+            <add-vehicle-address-trigger/>
+            <remove-vehicle-address-trigger/>
+            <clear-vehicle-address-trigger/>
+        </control>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('triggers-instance')">
+        <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) >= 3 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('document-instance')//dmv:address[@type = 'mailing']) or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('document-instance')//dmv:address[@type = 'mailing'] or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:address[@type = 'mailing']) != ''"/>
+        <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('document-instance')//dmv:vehicle-address) or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('document-instance')//dmv:vehicle-address or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:vehicle-address) != ''"/>
+    </xforms:bind>
+
+    <!-- XForms instance for license plate information -->
+    <xforms:instance id="plates-instance">
+        <plates xmlns=""/>
+    </xforms:instance>
+
+    <xforms:instance id="plate-template">
+        <plate xmlns="">
+            <character/>
+            <character/>
+            <character/>
+            <character/>
+            <character/>
+            <character/>
+            <character/>
+        </plate>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('plates-instance')">
+        <xforms:bind nodeset="plate/character"
+                     calculate="for $i in . return substring((instance('document-instance')//dmv:plate-number)[count($i/../preceding-sibling::plate) + 1], count($i/preceding-sibling::character) + 1, 1)"/>
+    </xforms:bind>
+</xforms:model>

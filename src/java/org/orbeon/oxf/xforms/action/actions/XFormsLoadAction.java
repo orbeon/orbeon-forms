@@ -34,7 +34,8 @@ public class XFormsLoadAction extends XFormsAction {
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String resource = actionElement.attributeValue("resource");
+        final String resourceAttributeValue = actionElement.attributeValue("resource");
+
         final String showAttribute;
         {
             final String rawShowAttribute = actionElement.attributeValue("show");
@@ -54,12 +55,12 @@ public class XFormsLoadAction extends XFormsAction {
 
         // "If both are present, the action has no effect."
         final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
-        if (bindingContext.isNewBind() && resource != null)
+        if (bindingContext.isNewBind() && resourceAttributeValue != null)
             return;
 
         if (bindingContext.isNewBind()) {
             // Use single-node binding
-            final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
+            final NodeInfo currentNode = bindingContext.getSingleNode();
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNode(currentNode);
                 resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite, isShowProgress);
@@ -68,9 +69,17 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
             }
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
-        } else if (resource != null) {
+        } else if (resourceAttributeValue != null) {
             // Use linking attribute
-            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resource, target, urlType, urlNorewrite, isShowProgress);
+
+            // NOP if there is an AVT but no context node
+            if (bindingContext.getSingleNode() == null && resourceAttributeValue.indexOf('{') != -1)
+                return;
+
+            // Resolve AVT
+            final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    null, xformsControls.getFunctionLibrary(), actionElement, resourceAttributeValue);
+            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resolvedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance

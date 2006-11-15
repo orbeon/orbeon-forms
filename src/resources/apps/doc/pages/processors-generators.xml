@@ -285,8 +285,8 @@
                                 <servlet-name>reports</servlet-name>
                                 <context-path>/admin</context-path>
                                 <tidy-options>
-                                    <show-warnings>true</show-warnings>
-                                    <quiet>false</quiet>
+                                    <show-warnings>false</show-warnings>
+                                    <quiet>true</quiet>
                                 </tidy-options>
                             </config>
                         </p:input>

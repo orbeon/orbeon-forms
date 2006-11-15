@@ -122,7 +122,7 @@
                             <url>http://www.cnn.com</url>
                             <content-type>text/html</content-type>
                             <tidy-options>
-                                <show-warnings>true</show-warnings>
+                                <show-warnings>false</show-warnings>
                                 <quiet>true</quiet>
                             </tidy-options>
                         </config>
@@ -138,7 +138,7 @@
                             <content-type>text/html</content-type>
                             <force-content-type>true</force-content-type>
                             <tidy-options>
-                                <show-warnings>true</show-warnings>
+                                <show-warnings>false</show-warnings>
                                 <quiet>true</quiet>
                             </tidy-options>
                         </config>

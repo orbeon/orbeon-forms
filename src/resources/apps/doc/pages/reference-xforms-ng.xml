@@ -737,7 +737,7 @@
                         <tr>
                             <td>
                                 <b>Password field</b>
-                                <img src="../apps/doc/images/reference-xforms-secret.png"/>
+                                <img src="pages/reference-xforms-secret.png"/>
                             </td>
                             <td>
                                 <xml-source border="false" show-namespaces="false">
@@ -1161,7 +1161,7 @@
                                 In this case, the node pointed to by the <code>ref</code> attribute must contain escaped HTML:
                             </p>
                             <xml-source show-namespaces="false">
-                                <xforms:instance id="resources-packaged">
+                                <xforms:instance id="resources">
                                     <resources>
                                         <help>
                                             <number>
@@ -1188,7 +1188,7 @@
                                 In this case, the resources instance contains:
                             </p>
                             <xml-source show-namespaces="false">
-                                <xforms:instance id="resources-packaged">
+                                <xforms:instance id="resources">
                                     <resources>
                                         <help>
                                             <number>
@@ -1949,10 +1949,18 @@
                         </p>
                     </li>
                 </ul>
-                <p>
-                    Note that with the "if" condition in the XPath expressions, a value which cannot be converted to
-                    the appropriate type is simply displayed as is.
-                </p>
+                <p>Note:</p>
+                <ul>
+                    <li>
+                        With the "if" condition in the XPath expressions, a value which cannot be converted to the
+                        appropriate type is simply displayed as is.
+                    </li>
+                    <li>
+                        For values of type <tt>xs:time</tt> or <tt>xs:dateTime</tt>, if you wish the time to be
+                        displayed using the current timezone instead of UTC, replace in the <tt>value</tt> attribute
+                        <tt>UTC</tt> by <tt>[ZN]</tt>.
+                    </li>
+                </ul>
             </section>
         </section>
         <a name="xforms-instance-initialization"/>
@@ -2723,7 +2731,7 @@
                         </xml-source>
                         <p>
                             This will display the result as HTML, as expected: "This is in <b>bold</b>!". If the
-                            <code>mediatype</code> is not specified, the result would be instead: "This is in 
+                            <code>mediatype</code> is not specified, the result would be instead: "This is in
                             &lt;b>bold&lt;/b>!". In the XForms instance, the HTML content must be escaped as text. On
                             the other hand, the following content will not work as expected:
                         </p>

@@ -35,11 +35,13 @@
                     <action>upload</action>
                     <file filename="" mediatype="" size=""/>
                     <sample/>
+                    <sample-trigger/>
                 </form>
             </xforms:instance>
             <xforms:bind nodeset="file" type="xs:anyURI"
                          constraint="../action = 'upload' or (../action = 'download' and (normalize-space(.) = '' or starts-with(normalize-space(.), 'http://')))"
                          required="../action = 'download'"/>
+            <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
             <xforms:instance id="samples-instance">
                 <samples xmlns=""/>
             </xforms:instance>
@@ -138,7 +140,7 @@
                                     </xforms:select1>
                                 </td>
                                 <td>
-                                    <xforms:trigger>
+                                    <xforms:trigger ref="sample-trigger">
                                         <xforms:label>Run XForms</xforms:label>
                                     </xforms:trigger>
                                 </td>

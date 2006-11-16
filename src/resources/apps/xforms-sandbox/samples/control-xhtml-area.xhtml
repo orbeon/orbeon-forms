@@ -1,0 +1,26 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
+            <xforms:instance>
+                <gaga>Some text here</gaga>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:h2>text/html texarea</xhtml:h2>
+        <xhtml:p>
+            <xforms:textarea mediatype="text/html" ref="/gaga"/>
+        </xhtml:p>
+        <xhtml:h2>text/html output</xhtml:h2>
+        <xhtml:p>
+            <xforms:output mediatype="text/html" ref="/gaga"/>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

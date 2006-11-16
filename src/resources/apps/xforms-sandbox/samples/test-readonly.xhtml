@@ -1,0 +1,40 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Test Readonly</xhtml:title>
+        <xforms:model id="mymodel">
+            <xforms:instance id="instance1" xmlns="">
+                <instance1>
+                    <first-name/>
+                </instance1>
+            </xforms:instance>
+            <xforms:instance id="instance2" xmlns="">
+                <instance2>
+                    <last-name/>
+                </instance2>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('instance1')">
+                <xforms:bind nodeset="//*" readonly="true()"/>
+            </xforms:bind>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:input ref="instance('instance1')/first-name">
+            <xforms:label>First name</xforms:label>
+        </xforms:input>
+
+        <xforms:input ref="instance('instance2')/last-name">
+            <xforms:label>Last name</xforms:label>
+        </xforms:input>
+
+    </xhtml:body>
+</xhtml:html>

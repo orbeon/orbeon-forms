@@ -29,6 +29,9 @@
     </page>
 
     <page id="sandbox" path-info="/xforms-sandbox/sandbox" view="sandbox-view.xpl"/>
+    <page id="sample" path-info="/xforms-sandbox/sample/(.+)" matcher="oxf:perl5-matcher" view="samples/${1}"/>
+
+    <page id="get-files" path-info="/xforms-sandbox/service/get-files" model="get-files.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

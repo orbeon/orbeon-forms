@@ -22,18 +22,28 @@
       xmlns:widget="http://orbeon.org/oxf/xml/widget"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>XForms Sandbox - Run XForms Everywhere!</title>
+        <title>Orbeon Forms XForms Sandbox - Run XForms Everywhere!</title>
         <xforms:model xxforms:state-handling="client">
-            <xforms:instance>
+
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="samples-submission"/>
+            </xforms:action>
+
+            <xforms:instance id="main-instance">
                 <form xmlns="">
                     <action>upload</action>
                     <file filename="" mediatype="" size=""/>
+                    <sample/>
                 </form>
             </xforms:instance>
             <xforms:bind nodeset="file" type="xs:anyURI"
                          constraint="../action = 'upload' or (../action = 'download' and (normalize-space(.) = '' or starts-with(normalize-space(.), 'http://')))"
                          required="../action = 'download'"/>
-            <xforms:submission id="main" method="post" replace="all" action="/xforms-sandbox/"/>
+            <xforms:instance id="samples-instance">
+                <samples xmlns=""/>
+            </xforms:instance>
+            <xforms:submission id="main-submission" method="post" replace="all" action="/xforms-sandbox/"/>
+            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance" action="/xforms-sandbox/service/get-files"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .widget-tab-panel { padding-top: 1em; }
@@ -43,8 +53,8 @@
     <body>
         <xforms:group ref="/form">
             <p>
-                The OPS XForms Sandbox powers XForms documents everywhere: it allows you to easily try your own XForms
-                documents, as well as XForms documents located anywhere on the web.
+                The Orbeon Forms XForms Sandbox powers XForms documents everywhere: it allows you to easily try your
+                own XForms documents, as well as XForms documents located anywhere on the web.
             </p>
             <p>
                 Just point to an XHTML + XForms document, press the "Run XForms" button, and check how the OPS XForms
@@ -73,7 +83,7 @@
                             <td>
                                 <xforms:trigger>
                                     <xforms:label>Run XForms</xforms:label>
-                                    <xforms:send ev:event="DOMActivate" submission="main"/>
+                                    <xforms:send ev:event="DOMActivate" submission="main-submission"/>
                                 </xforms:trigger>
                             </td>
                         </tr>
@@ -86,7 +96,7 @@
                         Please enter the HTTP URL of the XHTML + XForms to download from the web and run:
                     </p>
                     <xforms:group>
-                        <xforms:send ev:event="DOMActivate" submission="main"/>
+                        <xforms:send ev:event="DOMActivate" submission="main-sumission"/>
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">
@@ -94,6 +104,37 @@
                                         <xforms:label></xforms:label>
                                         <xforms:alert>Please enter a valid HTTP URL (starting with "http://")</xforms:alert>
                                     </xforms:input>
+                                </td>
+                                <td>
+                                    <xforms:trigger>
+                                        <xforms:label>Run XForms</xforms:label>
+                                    </xforms:trigger>
+                                </td>
+                            </tr>
+                        </table>
+                    </xforms:group>
+                </widget:tab>
+                <widget:tab id="samples-case">
+                    <widget:label>Run Samples</widget:label>
+                    <xforms:setvalue ev:event="xforms-select" ref="action">download</xforms:setvalue>
+                    <p>
+                        Please select an existing XForms sample from the list:
+                    </p>
+                    <xforms:group>
+                        <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/sample/{sample}"/>
+                        <table style="width: 100%">
+                            <tr>
+                                <td style="width: 100%">
+                                    <xforms:select1 ref="sample">
+                                        <xforms:item>
+                                            <xforms:label/>
+                                            <xforms:value/>
+                                        </xforms:item>
+                                        <xforms:itemset nodeset="instance('samples-instance')/file">
+                                            <xforms:label ref="@name"/>
+                                            <xforms:value ref="@name"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
                                 </td>
                                 <td>
                                     <xforms:trigger>

@@ -1,0 +1,62 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Menu Widget</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <select1>ar1</select1>
+                </instance>
+            </xforms:instance>
+            <xforms:instance id="items">
+                <items>
+                    <item label="Encyclopedia" value="en1">
+                        <item label="Science" value="sc1"/>
+                        <item label="Culture" value="cu1">
+                            <item label="Art" value="ar1"/>
+                            <item label="Craft" value="cr1"/>
+                        </item>
+                    </item>
+                    <item label="Encyclopedia" value="en2">
+                        <item label="Science" value="sc2"/>
+                        <item label="Culture" value="cu2">
+                            <item label="Art" value="ar2"/>
+                            <item label="Craft" value="cr2"/>
+                        </item>
+                    </item>
+                </items>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            Selected values:
+            <xforms:output ref="select1"/>
+        </xhtml:p>
+         <xforms:select1 ref="select1" appearance="xxforms:menu">
+            <xforms:itemset nodeset="instance('items')//item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </xforms:select1>
+    </xhtml:body>
+</xhtml:html>

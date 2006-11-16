@@ -1,0 +1,58 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Using the getValue and setValue from JavaScript</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <instance>
+                    <foo/>
+                    <bar/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="/instance/bar" calculate="/instance/foo"/>
+            <xxforms:script ev:event="xforms-ready">
+                ORBEON.xforms.Document.setValue("foo", 42);
+            </xxforms:script>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <xforms:input ref="foo" id="foo">
+                <xforms:label class="fixed-width">Value of foo:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:output ref="bar">
+                <xforms:label class="fixed-width">Value of bar:</xforms:label>
+            </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger>
+                <xforms:label>Increment foo with JavaScript</xforms:label>
+                <xxforms:script ev:event="DOMActivate">
+                    var fooValue = ORBEON.xforms.Document.getValue("foo");
+                    ORBEON.xforms.Document.setValue("foo", Number(fooValue) + 1);
+                </xxforms:script>
+            </xforms:trigger>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

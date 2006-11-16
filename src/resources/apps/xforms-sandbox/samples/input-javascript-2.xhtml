@@ -1,0 +1,71 @@
+<xhtml:html xsl:version="2.0"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:saxon="http://saxon.sf.net/">
+
+    <xsl:variable name="taminoServerDoc" select="doc('oxf:/config/tamino-server.xml')/config"/>
+
+    <xhtml:head>
+        <xhtml:script>
+            function changeValue(runEvent) {
+                var elSpan = document.getElementById('facName');
+                elSpan.value = elSpan.value == '' ? 1 : 1 + new Number(elSpan.value);
+            }
+        </xhtml:script>
+
+        <xhtml:title>Rule Hierarchy</xhtml:title>
+
+        <xforms:model id="main-model">
+            <!-- general instance -->
+            <xforms:instance id="instance">
+                <instance>
+                    <facilityName/>
+                </instance>
+            </xforms:instance>
+
+            <xforms:instance id="formatted">
+                <instance/>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('formatted')" calculate="saxon:serialize(xxforms:call-xpl ('oxf:/ops/utils/formatting/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group ref="instance('instance')">
+            <xhtml:table border="0">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:input ref="facilityName" id="facName">
+                            <xforms:label>Facility Name</xforms:label>
+                        </xforms:input><xhtml:br/>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:td colspan="2">
+                        <xhtml:a onclick="changeValue()">Click me to change value</xhtml:a>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:td colspan="2">
+                        <xforms:trigger>
+                            <xforms:label>Increment with setvalue</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="/instance/facilityName" value="if (. = '') then 1 else . + 1"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
+        </xforms:group>
+        <xhtml:p/>
+        <xhtml:p/>
+        <xhtml:p>
+            <xforms:group>
+                <xforms:label>INSTANCE: </xforms:label>
+                <xforms:output value="instance('formatted')" mediatype="text/html"/>
+            </xforms:group>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>
+

@@ -1,0 +1,111 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Trigger Appearances</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <instance>
+                    <label>Label</label>
+                    <message>Triggered</message>
+                    <help>Help</help>
+                    <hint>Hint</hint>
+                </instance>
+            </xforms:instance>
+            <xforms:submission method="post" id="submission"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:h2>Trigger</xhtml:h2>
+        <xhtml:p>
+            <xforms:trigger>
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger appearance="xxforms:image">
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+                <xxforms:img src="/images/submit.gif"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:trigger appearance="xxforms:link">
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:h2>Submit</xhtml:h2>
+        <xhtml:p>
+            <xforms:submit submission="submission">
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+            </xforms:submit>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:submit submission="submission" appearance="xxforms:image">
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+                <xxforms:img src="/images/submit.gif"/>
+            </xforms:submit>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:submit submission="submission" appearance="xxforms:link">
+                <xforms:label ref="label"/>
+                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xforms:help ref="help"/>
+                <xforms:hint ref="hint"/>
+            </xforms:submit>
+        </xhtml:p>
+        <xhtml:h2>Change</xhtml:h2>
+        <xhtml:p>
+            <xforms:input ref="label">
+                <xforms:label class="fixed-width">Label:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="message">
+                <xforms:label class="fixed-width">Message:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="help">
+                <xforms:label class="fixed-width">Help:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:input ref="hint">
+                <xforms:label class="fixed-width">Hint:</xforms:label>
+            </xforms:input>
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

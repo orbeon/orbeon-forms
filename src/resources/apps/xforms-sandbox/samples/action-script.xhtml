@@ -1,0 +1,27 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance/>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group id="group">
+            <xxforms:script ev:event="DOMActivate">
+                document.getElementById("out").innerHTML = this.id + " " + event.target.id;
+            </xxforms:script>
+            <xforms:trigger id="trigger">
+                <xforms:label>Press me</xforms:label>
+            </xforms:trigger>
+        </xforms:group>
+        <xhtml:p id="out"/>
+    </xhtml:body>
+</xhtml:html>

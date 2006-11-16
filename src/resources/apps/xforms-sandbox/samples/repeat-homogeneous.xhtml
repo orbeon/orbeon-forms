@@ -1,0 +1,103 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Repeat With Homogeneous Nodeset</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <fruits>
+                    <orange>bloody</orange>
+                    <orange>valencia</orange>
+                    <apple>green</apple>
+                    <apple>red</apple>
+                    <apple>iPod</apple>
+                    <pear>green</pear>
+                    <pear>williams</pear>
+                    <pear>yellow</pear>
+                </fruits>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <xhtml:p>Oranges:</xhtml:p>
+            <xforms:repeat nodeset="orange" id="orange">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Apples 1:</xhtml:p>
+            <xforms:repeat nodeset="apple" id="apple1">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+            <xforms:trigger>
+                <xforms:label>Add apple</xforms:label>
+                <xforms:insert nodeset="apple" at="index('apple1')" position="after" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Apples 2:</xhtml:p>
+            <xforms:repeat nodeset="apple[position() lt last()]" id="apple2">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+            <xforms:trigger>
+                <xforms:label>Add apple</xforms:label>
+                <xforms:insert nodeset="apple[position() lt last()]" at="index('apple2')" position="after" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Apples 3:</xhtml:p>
+            <xforms:repeat nodeset="apple[position() gt 1]" id="apple3">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+            <xforms:trigger>
+                <xforms:label>Add apple</xforms:label>
+                <xforms:insert nodeset="apple[position() gt 1]" at="index('apple3')" position="after" ev:event="DOMActivate"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>Pears:</xhtml:p>
+            <xforms:repeat nodeset="pear" id="pear">
+                <xhtml:div>
+                    <xforms:input ref=".">
+                        <xforms:label/>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+        </xhtml:div>
+    </xhtml:body>
+</xhtml:html>

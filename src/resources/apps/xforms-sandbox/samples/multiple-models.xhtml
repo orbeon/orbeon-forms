@@ -1,0 +1,25 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <xhtml:head>
+        <xforms:model id="first">
+            <xforms:instance id="f1" xmlns="">
+                <help>one</help>
+            </xforms:instance>
+        </xforms:model>
+        <xforms:model id="second">
+            <xforms:instance id="s1" xmlns="">
+                <help>two</help>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group>
+            <xhtml:div>
+                First model: <xforms:output model="first" ref="instance('f1')"/>
+            </xhtml:div>
+            <xhtml:div>
+                Second model: <xforms:output model="second" ref="instance('s1')"/>
+            </xhtml:div>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

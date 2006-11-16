@@ -1,0 +1,28 @@
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:widget="http://orbeon.org/oxf/xml/widget"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model id="main-model">
+            <xforms:instance>
+                <instance>
+                    <first/>
+                    <second/>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:textarea appearance="xxforms:autosize" ref="first"/>
+        <xforms:textarea ref="second"/>
+        <xforms:trigger>
+            <xforms:label>Copy</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="first" value="../second"/>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

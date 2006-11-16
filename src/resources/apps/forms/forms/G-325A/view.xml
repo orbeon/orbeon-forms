@@ -12,39 +12,42 @@
 
     <xforms:group ref="personal-information">
         <tr>
-            <th class="dmv-heading-column">
-                <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
-                <p>
-                    <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
-                </p>
+            <th>
             </th>
-            <td class="dmv-data-column">
-                <table>
+            <td>
+                <table class="g-325a-personal-information-table">
                     <tr>
-                        <td>
-                            <xforms:group ref="name">
-                                <xforms:input id="dmv-last-name-control" incremental="true" ref="last" class="dmv-last-name">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/last-name"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/last-name"/>
+                        <xforms:group ref="name">
+                            <td>
+                                <xforms:input id="g-325a-last-name-control" incremental="true" ref="last" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/last-name"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/last-name"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="first" class="dmv-first-name">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/first-name"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/first-name"/>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="first" class="g-325a-first-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/first-name"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/first-name"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="initial" xhtml:size="2" class="dmv-initial">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/initial"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/initial"/>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="initial" xhtml:size="2" class="g-325a-middle-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/middle-name"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/middle-name"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="other" class="dmv-other-names">
-                                    <xforms:label>Other</xforms:label>
-                                </xforms:input>
-                            </xforms:group>
-                        </td>
+                            </td>
+                        </xforms:group>
                     </tr>
                     <tr>
                         <td>
+                            <xforms:input incremental="true" ref="name/other" class="g-325a-other-names">
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/other-name"/>
+                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/other-name"/>
+                            </xforms:input>
+                        </td>
+                        <td>
                             <xforms:select1 ref="gender">
-                                <xforms:label>Gender</xforms:label>
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/gender"/>
                                 <xforms:item>
                                     <xforms:label>Male</xforms:label>
                                     <xforms:value>male</xforms:value>
@@ -57,32 +60,45 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <xforms:group ref="birth">
+                        <xforms:group ref="birth">
+                            <td>
                                 <xforms:input incremental="true" ref="date"
-                                              xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/birth-date"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/birth-date"/>
+                                              xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/detail/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/birth-date"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/birth-date"/>
                                 </xforms:input>
+                            </td>
+                            <td>
                                 <xforms:input incremental="true" ref="city">
-                                    <xforms:label>City</xforms:label>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                 </xforms:input>
+                            </td>
+                            <td>
                                 <xforms:input incremental="true" ref="country">
-                                    <xforms:label>Country</xforms:label>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/country"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/country"/>
                                 </xforms:input>
-                            </xforms:group>
-                        </td>
+                            </td>
+                        </xforms:group>
                     </tr>
                     <tr>
                         <td>
                             <xforms:input incremental="true" ref="citizenship">
-                                <xforms:label>Citizenship</xforms:label>
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/citizenship"/>
+                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/citizenship"/>
                             </xforms:input>
+                        </td>
+                        <td>
                             <xforms:input incremental="true" ref="file-number">
-                                <xforms:label>File number</xforms:label>
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/file-number"/>
+                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/file-number"/>
                             </xforms:input>
+                        </td>
+                        <td>
                             <xforms:input incremental="true" ref="ssn">
-                                <xforms:label>SSN</xforms:label>
+                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/ssn"/>
+                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/ssn"/>
                             </xforms:input>
                         </td>
                     </tr>
@@ -93,56 +109,82 @@
     <tr><td colspan="2" class="forms-hr"/></tr>
     <xforms:group ref="parents-information">
         <tr>
-            <th class="dmv-heading-column">
-                <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
-                <p>
-                    <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
-                </p>
+            <th>
             </th>
-            <td class="dmv-data-column">
-                <table>
+            <td>
+                <table class="g-325a-parents-table">
                     <xforms:repeat nodeset="father | mother">
                         <tr>
+                            <th>
+                                <xforms:group ref=".[name() = 'father']">
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/father" mediatype="text/html"/>
+                                </xforms:group>
+                                <xforms:group ref=".[name() = 'mother']">
+                                    <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/mother" mediatype="text/html"/>
+                                </xforms:group>
+                            </th>
+                        </tr>
+                        <tr>
                             <td>
-                                <xforms:input incremental="true" ref="name/last" class="dmv-last-name">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/last-name"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/last-name"/>
-                                </xforms:input>
-                                <xforms:input incremental="true" ref="name/first" class="dmv-first-name">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/labels/first-name"/>
-                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/first-name"/>
-                                </xforms:input>
-                                <br/>
-                                <xforms:group ref="birth">
-                                    <xforms:input incremental="true" ref="date"
-                                                  xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
-                                        <xforms:label model="resources-model" ref="instance('resources-instance')/labels/birth-date"/>
-                                        <xforms:alert model="resources-model" ref="instance('resources-instance')/alerts/birth-date"/>
-                                    </xforms:input>
-                                    <xforms:input incremental="true" ref="city">
-                                        <xforms:label>City</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input incremental="true" ref="country">
-                                        <xforms:label>Country</xforms:label>
-                                    </xforms:input>
-                                </xforms:group>
-                                <br/>
-                                <xforms:group ref="residence">
-                                    <xforms:input incremental="true" ref="city">
-                                        <xforms:label>City</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input incremental="true" ref="country">
-                                        <xforms:label>Country</xforms:label>
-                                    </xforms:input>
-                                </xforms:group>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:input incremental="true" ref="name/last" class="g-325a-last-name">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/last-name"/>
+                                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/last-name"/>
+                                            </xforms:input>
+                                        </td>
+                                        <td>
+                                            <xforms:input incremental="true" ref="name/first" class="g-325a-first-name">
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/first-name"/>
+                                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/first-name"/>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <xforms:group ref="birth">
+                                            <td>
+                                                <xforms:input incremental="true" ref="date"
+                                                          xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/detail/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/birth-date"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/birth-date"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="city">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="country">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/country"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/country"/>
+                                                </xforms:input>
+                                            </td>
+                                        </xforms:group>
+                                    </tr>
+                                    <tr>
+                                        <xforms:group ref="residence">
+                                            <td>
+                                                <xforms:input incremental="true" ref="city">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
+                                                </xforms:input>
+                                            </td>
+                                            <td>
+                                                <xforms:input incremental="true" ref="country">
+                                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/country"/>
+                                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/country"/>
+                                                </xforms:input>
+                                            </td>
+                                        </xforms:group>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                     </xforms:repeat>
-                    <tr>
-                        <td>
-
-                        </td>
-                    </tr>
+                    <tr/>
                 </table>
             </td>
         </tr>
@@ -150,69 +192,141 @@
     <tr><td colspan="2" class="forms-hr"/></tr>
     <xforms:group ref="residence-information">
         <tr>
-            <th class="dmv-heading-column">
-                <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
-                <p>
-                    <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
-                </p>
+            <th>
             </th>
-            <td class="dmv-data-column">
-                <xforms:trigger>
-                    <xforms:label>Add</xforms:label>
-                    <xforms:insert ev:event="DOMActivate" context="last-five-years" nodeset="residence" at="index('residence-repeat')" origin="instance('residence-template')"/>
-                </xforms:trigger>
-                <xforms:trigger>
-                    <xforms:label>Delete</xforms:label>
-                    <xforms:delete ev:event="DOMActivate" context="last-five-years" nodeset="residence" at="index('residence-repeat')"/>
-                </xforms:trigger>
-                <table>
+            <td>
+
+                <table class="forms-action-table">
+                    <tr>
+                        <td>
+                            <xforms:group ref="instance('triggers-instance')/remove-residence-trigger">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:delete context="instance('document-instance')/residence-information/last-five-years" nodeset="residence" at="index('residence-repeat')"/>
+                                </xforms:action>
+                                <xforms:trigger appearance="xxforms:image">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-residence"/>
+                                    <xxforms:img src="/apps/forms/images/remove.gif"/>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-residence"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </td>
+                        <td>
+                            <xforms:group ref="instance('triggers-instance')/add-residence-trigger">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert context="instance('document-instance')/residence-information/last-five-years" nodeset="residence" at="index('residence-repeat')" origin="instance('residence-template')"/>
+                                </xforms:action>
+                                <xforms:trigger appearance="xxforms:image">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-residence"/>
+                                    <xxforms:img src="/apps/forms/images/add.gif"/>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-residence"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="forms-gridtable g-325a-table">
+                    <tr>
+                        <th colspan="6">
+                            <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/residence-last" mediatype="text/html"/>
+                        </th>
+                    </tr>
+                    <tr class="g-325a-subtitle-row">
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/street"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/city"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/state"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/country"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/from"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/to"/></th>
+                    </tr>
                     <xforms:repeat nodeset="last-five-years/residence" id="residence-repeat">
                         <tr>
                             <td>
-                                <xforms:input incremental="true" ref="street" class="dmv-last-name">
-                                    <xforms:label>Street</xforms:label>
+                                <xforms:input incremental="true" ref="street" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/street"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="city" class="dmv-last-name">
-                                    <xforms:label>City</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="city" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="state" class="dmv-last-name">
-                                    <xforms:label>State</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="state" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="country" class="dmv-last-name">
-                                    <xforms:label>Country</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="country" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/country"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/country"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="from" class="dmv-last-name">
-                                    <xforms:label>From</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="from" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/from"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/from"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="to" class="dmv-last-name">
-                                    <xforms:label>To</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="to" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/to"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/to"/>
                                 </xforms:input>
                             </td>
                         </tr>
                     </xforms:repeat>
                     <tr>
-                        <td>
-                            <xforms:group ref="last-abroad/residence">
-                                <xforms:input incremental="true" ref="street" class="dmv-last-name">
-                                    <xforms:label>Street</xforms:label>
+                        <th colspan="6">
+                            <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/residence-outside" mediatype="text/html"/>
+                        </th>
+                    </tr>
+                    <tr>
+                        <xforms:group ref="last-abroad/residence">
+                            <td>
+                                <xforms:input incremental="true" ref="street" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/street"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="city" class="dmv-last-name">
-                                    <xforms:label>City</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="city" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="state" class="dmv-last-name">
-                                    <xforms:label>State</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="state" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="country" class="dmv-last-name">
-                                    <xforms:label>Country</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="country" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/country"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/country"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="from" class="dmv-last-name">
-                                    <xforms:label>From</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="from" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/from"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/from"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="to" class="dmv-last-name">
-                                    <xforms:label>To</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="to" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/to"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/to"/>
                                 </xforms:input>
-                            </xforms:group>
-                        </td>
+                            </td>
+                        </xforms:group>
                     </tr>
                 </table>
             </td>
@@ -221,45 +335,94 @@
     <tr><td colspan="2" class="forms-hr"/></tr>
     <xforms:group ref="employment-information">
         <tr>
-            <th class="dmv-heading-column">
-                <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
-                <p>
-                    <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
-                </p>
+            <th>
             </th>
-            <td class="dmv-data-column">
-             <xforms:trigger>
-                    <xforms:label>Add</xforms:label>
-                    <xforms:insert ev:event="DOMActivate" context="last-five-years" nodeset="employment" at="index('employment-repeat')" origin="instance('employment-template')"/>
-                </xforms:trigger>
-                <xforms:trigger>
-                    <xforms:label>Delete</xforms:label>
-                    <xforms:delete ev:event="DOMActivate" context="last-five-years" nodeset="employment" at="index('employment-repeat')"/>
-                </xforms:trigger>
-                <table>
+            <td>
+                <table class="forms-action-table">
+                    <tr>
+                        <td>
+                            <xforms:group ref="instance('triggers-instance')/remove-employment-trigger">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:delete context="instance('document-instance')/employment-information/last-five-years" nodeset="employment" at="index('employment-repeat')"/>
+                                </xforms:action>
+                                <xforms:trigger appearance="xxforms:image">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-employment"/>
+                                    <xxforms:img src="/apps/forms/images/remove.gif"/>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-employment"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </td>
+                        <td>
+                            <xforms:group ref="instance('triggers-instance')/add-employment-trigger">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert context="instance('document-instance')/employment-information/last-five-years" nodeset="employment" at="index('employment-repeat')" origin="instance('employment-template')"/>
+                                </xforms:action>
+                                <xforms:trigger appearance="xxforms:image">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-employment"/>
+                                    <xxforms:img src="/apps/forms/images/add.gif"/>
+                                </xforms:trigger>
+                                <xforms:trigger appearance="xxforms:link">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-employment"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                        </td>
+                    </tr>
+                </table>
+                <table class="forms-gridtable g-325a-table">
+                    <tr>
+                        <th colspan="5">
+                            <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/employment-last" mediatype="text/html"/>
+                        </th>
+                    </tr>
+                    <tr class="g-325a-subtitle-row">
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/employer-name"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/employer-address"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/occupation"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/from"/></th>
+                        <th><xforms:output model="resources-model" value="instance('resources-instance')/detail/labels/to"/></th>
+                    </tr>
                     <xforms:repeat nodeset="last-five-years/employment" id="employment-repeat">
                         <tr>
                             <td>
-                                <xforms:input incremental="true" ref="name" class="dmv-last-name">
-                                    <xforms:label>Name</xforms:label>
+                                <xforms:input incremental="true" ref="name" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/employer-name"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/employer-name"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="address" class="dmv-last-name">
-                                    <xforms:label>Address</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="address" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/employer-address"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/employer-address"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="occupation" class="dmv-last-name">
-                                    <xforms:label>Occupation</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="occupation" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/occupation"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/occupation"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="from" class="dmv-last-name">
-                                    <xforms:label>From</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="from" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/from"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/from"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="to" class="dmv-last-name">
-                                    <xforms:label>To</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="to" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/to"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/to"/>
                                 </xforms:input>
                             </td>
                         </tr>
                     </xforms:repeat>
                     <tr>
-                        <td>
+                        <th colspan="5">
+                            <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/employment-outside" mediatype="text/html"/>
+                        </th>
+                    </tr>
+                    <tr>
                             <!--<xforms:trigger>-->
                                 <!--<xforms:label>Test</xforms:label>-->
                                 <!--<xforms:action ev:event="DOMActivate">-->
@@ -268,21 +431,38 @@
                                 <!--</xforms:action>-->
                             <!--</xforms:trigger>-->
 
-                            <xforms:group ref="last-abroad/employment">
-                                <xforms:input incremental="true" ref="name" class="dmv-last-name">
-                                    <xforms:label>Name</xforms:label>
+                        <xforms:group ref="last-abroad/employment">
+                            <td>
+                                <xforms:input incremental="true" ref="name" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/employer-name"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/employer-name"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="address" class="dmv-last-name">
-                                    <xforms:label>Occupation</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="address" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/employer-address"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/employer-address"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="from" class="dmv-last-name">
-                                    <xforms:label>From</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="occupation" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/occupation"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/occupation"/>
                                 </xforms:input>
-                                <xforms:input incremental="true" ref="to" class="dmv-last-name">
-                                    <xforms:label>To</xforms:label>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="from" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/from"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/from"/>
                                 </xforms:input>
-                            </xforms:group>
-                        </td>
+                            </td>
+                            <td>
+                                <xforms:input incremental="true" ref="to" class="g-325a-last-name">
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/to"/>
+                                    <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/to"/>
+                                </xforms:input>
+                            </td>
+                        </xforms:group>
                     </tr>
                 </table>
             </td>
@@ -291,15 +471,11 @@
     <tr><td colspan="2" class="forms-hr"/></tr>
     <xforms:group ref="connection">
         <tr>
-            <th class="dmv-heading-column">
-                <xforms:output model="resources-model" value="instance('resources-instance')/titles/personal-information" mediatype="text/html"/><br/>
-                <p>
-                    <img src="/apps/forms/images/personal-information.png" alt="Personal Information"/>
-                </p>
+            <th>
             </th>
-            <td class="dmv-data-column">
+            <td>
                 <xforms:select1 ref="type">
-                    <xforms:label>Connection</xforms:label>
+                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/connection"/>
                     <xforms:item>
                         <xforms:label>Naturalization</xforms:label>
                         <xforms:value>naturalization</xforms:value>
@@ -313,9 +489,12 @@
                         <xforms:value>other</xforms:value>
                     </xforms:item>
                 </xforms:select1>
-                <xforms:input incremental="true" ref="other" class="dmv-last-name">
-                    <xforms:label>Other</xforms:label>
-                </xforms:input>
+                <xforms:group ref="instance('triggers-instance')/other-connection-group">
+                    <xforms:input incremental="true" ref="instance('document-instance')/connection/other" class="g-325a-last-name">
+                        <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/other"/>
+                        <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/other"/>
+                    </xforms:input>
+                </xforms:group>
             </td>
         </tr>
     </xforms:group>

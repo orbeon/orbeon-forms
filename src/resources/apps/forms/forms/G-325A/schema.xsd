@@ -11,7 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xs:schema targetNamespace="http://orbeon.org/oxf/examples/dmv"
+<xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     elementFormDefault="qualified"
     attributeFormDefault="unqualified">
@@ -23,7 +23,7 @@
                 <xs:element name="parents-information" type="parents-information"/>
                 <xs:element name="residence-information" type="residence-information"/>
                 <xs:element name="employment-information" type="employment-information"/>
-                <xs:element name="connection" type="employment-information"/>
+                <xs:element name="connection" type="connection"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -58,8 +58,10 @@
     </xs:complexType>
 
     <xs:complexType name="parents-information">
-        <xs:element name="father" type="parent-information"/>
-        <xs:element name="mother" type="parent-information"/>
+        <xs:sequence>
+            <xs:element name="father" type="parent-information"/>
+            <xs:element name="mother" type="parent-information"/>
+        </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="parent-information">
@@ -89,6 +91,97 @@
             <xs:element name="date" type="xs:date"/>
             <xs:element name="city" type="xs:string"/>
             <xs:element name="country" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="residence-information">
+        <xs:sequence>
+            <xs:element name="last-five-years">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="residence" type="current-residence"/>
+                        <xs:sequence minOccurs="0" maxOccurs="5">
+                            <xs:element name="residence" type="residence"/>
+                        </xs:sequence>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="last-abroad">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="residence" type="residence"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="current-residence">
+        <xs:sequence>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="xs:string"/>
+            <xs:element name="country" type="xs:string"/>
+            <xs:element name="from" type="xs:gYearMonth"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="residence">
+        <xs:sequence>
+            <xs:element name="street" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="xs:string"/>
+            <xs:element name="country" type="xs:string"/>
+            <xs:element name="from" type="xs:gYearMonth"/>
+            <xs:element name="to" type="xs:gYearMonth"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="employment-information">
+        <xs:sequence>
+            <xs:element name="last-five-years">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="employment" type="current-employment"/>
+                        <xs:sequence minOccurs="0" maxOccurs="4">
+                            <xs:element name="employment" type="employment"/>
+                        </xs:sequence>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="last-abroad">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="employment" type="employment"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="current-employment">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="occupation" type="xs:string"/>
+            <xs:element name="from" type="xs:gYearMonth"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="employment">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="occupation" type="xs:string"/>
+            <xs:element name="from" type="xs:gYearMonth"/>
+            <xs:element name="to" type="xs:gYearMonth"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="connection">
+        <xs:sequence>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="other" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

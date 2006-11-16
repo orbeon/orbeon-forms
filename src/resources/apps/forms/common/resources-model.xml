@@ -17,7 +17,6 @@
               xmlns:ev="http://www.w3.org/2001/xml-events"
               xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
               xmlns:xi="http://www.w3.org/2001/XInclude"
-              xmlns:dmv="http://orbeon.org/oxf/examples/dmv"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
               xmlns:exist="http://exist.sourceforge.net/NS/exist">
@@ -28,11 +27,11 @@
     </xforms:instance>
 
     <!-- XForms instance containing text resources -->
-    <xforms:instance id="resources-instance" src="oxf:/apps/forms/common/resources_en.xml"/>
+    <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en"/>
 
     <!-- Update language submission -->
-    <xforms:submission id="update-language-submission" ref="instance('language-instance')"
-                       action="/forms/service/resources/{{.}}" validate="false"
+    <xforms:submission id="update-language-submission" serialize="false"
+                       action="/forms/service/resources/{{xxforms:instance('parameters-instance')/form-id}}/{{instance('language-instance')}}" validate="false"
                        method="get" replace="instance" instance="resources-instance"/>
 
 </xforms:model>

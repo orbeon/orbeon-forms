@@ -41,7 +41,9 @@
             </xforms:action>
 
             <!-- Instance containing the page parameters -->
-            <xforms:instance id="parameters-instance" src="input:instance"/>
+            <xforms:instance id="parameters-instance">
+                <xi:include href="input:instance" xxi:omit-xml-base="true"/>
+            </xforms:instance>
 
             <!-- XForms instance for widget control information -->
             <xforms:instance id="control-instance">
@@ -77,11 +79,11 @@
     <body>
         <table class="forms-title-table">
             <tr>
+                <!--<td>-->
+                    <!--<img src="/apps/forms/images/dmv-logo.png" alt="DMV"/>-->
+                <!--</td>-->
                 <td>
-                    <img src="/apps/forms/images/dmv-logo.png" alt="DMV"/>
-                </td>
-                <td>
-                    <xforms:output model="resources-model" value="instance('resources-instance')/titles/detail-title"/>
+                    <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/detail-title"/>
                 </td>
             </tr>
         </table>
@@ -124,13 +126,13 @@
                                 <tr>
                                     <td>
                                         <xforms:group ref="instance('control-instance')/back-trigger">
-                                            <xforms:load ev:event="DOMActivate" resource="/forms/"/>
+                                            <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
                                             <xforms:trigger appearance="xxforms:image">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/return"/>
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
                                                 <xxforms:img src="/apps/forms/images/back.gif"/>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="xxforms:link">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/return"/>
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
                                             </xforms:trigger>
                                         </xforms:group>
                                     </td>
@@ -140,11 +142,11 @@
                                                 <xforms:send submission="save-submission"/>
                                             </xforms:action>
                                             <xforms:trigger appearance="xxforms:image">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/save-document"/>
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
                                                 <xxforms:img src="/apps/forms/images/save.gif"/>
                                             </xforms:trigger>
                                             <xforms:trigger appearance="xxforms:link">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/labels/save-document"/>
+                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
                                             </xforms:trigger>
                                         </xforms:group>
                                     </td>
@@ -172,7 +174,7 @@
                                     </td>
                                     <td id="language-choice-td">
                                         <xforms:select1 model="resources-model" ref="instance('language-instance')">
-                                            <xforms:label ref="instance('resources-instance')/labels/language-choice"/>
+                                            <xforms:label ref="instance('resources-instance')/detail/labels/language-choice"/>
                                             <xforms:item>
                                                 <xforms:label>en</xforms:label>
                                                 <xforms:value>en</xforms:value>

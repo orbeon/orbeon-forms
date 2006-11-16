@@ -35,7 +35,7 @@
                        method="post" action="/exist/rest/db/orbeon/forms/" replace="instance" xxforms:instance="documents-instance" f:url-type="resource"/>
 
     <xforms:submission id="delete-document-submission" serialize="false" method="delete" replace="none" f:url-type="resource"
-                       action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('documents-instance')/document-infos/document-info[index('documents-repeat')]/document-id}}"/>
+                       action="/exist/rest/db/orbeon/forms/{{xxforms:instance('parameters-instance')/form-id}}/{{xxforms:instance('documents-instance')/documents/document[index('documents-repeat')]/id}}"/>
 
     <!-- Load submission -->
     <xforms:submission id="load-submission" serialize="false"
@@ -56,7 +56,7 @@
 
         <xforms:setvalue ev:event="xforms-submit-serialize" ref="instance('persistence-instance')/save-status">validated</xforms:setvalue>
         <xforms:action ev:event="xforms-submit-done">
-            <xforms:setvalue ref="instance('persistence-instance')/message" value="xxforms:instance('resources-instance')/messages/save-success"/>
+            <xforms:setvalue ref="instance('persistence-instance')/message" value="xxforms:instance('resources-instance')/detail/messages/save-success"/>
             <xforms:setvalue ref="xxforms:instance('control-instance')/data-status"/>
             <xforms:setvalue ref="instance('persistence-instance')/save-status"/>
             <xforms:toggle case="ok-message"/>
@@ -64,12 +64,12 @@
         <xforms:action ev:event="xforms-submit-error">
             <xforms:action if="not(instance('persistence-instance')/save-status = 'validated')">
                 <xforms:setvalue ref="instance('persistence-instance')/message"
-                                 value="xxforms:instance('resources-instance')/messages/save-error-form"/>
+                                 value="xxforms:instance('resources-instance')/detail/messages/save-error-form"/>
                 <xforms:toggle case="validation-error-message"/>
             </xforms:action>
             <xforms:action if="instance('persistence-instance')/save-status = 'validated'">
                 <xforms:setvalue ref="instance('persistence-instance')/message"
-                                value="xxforms:instance('resources-instance')/messages/save-error-submission"/>
+                                value="xxforms:instance('resources-instance')/detail/messages/save-error-submission"/>
                 <xforms:toggle case="fatal-error-message"/>
             </xforms:action>
 

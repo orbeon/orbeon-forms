@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <personal-information>
+        <name>
+            <first>Julie</first>
+            <initial/>
+            <last>Martin</last>
+            <other/>
+        </name>
+        <gender>female</gender>
+        <birth>
+            <date>1972-07-01</date>
+            <city>Geneva</city>
+            <country>Switzerland</country>
+        </birth>
+        <citizenship>United States</citizenship>
+        <file-number/>
+        <ssn>222-22-2222</ssn>
+    </personal-information>
+    <parents-information>
+        <father>
+            <name>
+                <first>Steve</first>
+                <last>Martin</last>
+            </name>
+            <birth>
+                <date>1945-03-01</date>
+                <city>Chicago</city>
+                <country>United States</country>
+            </birth>
+            <residence>
+                <city>San Francisco</city>
+                <country>United States</country>
+            </residence>
+        </father>
+        <mother>
+            <name>
+                <first>Alicia</first>
+                <last>Durand</last>
+            </name>
+            <birth>
+                <date>1950-06-01</date>
+                <city>Geneva</city>
+                <country>Switzerland</country>
+            </birth>
+            <residence>
+                <city>San Francisco</city>
+                <country>United States</country>
+            </residence>
+        </mother>
+    </parents-information>
+    <marriages/>
+    <residence-information>
+        <last-five-years>
+            <residence>
+                <street>1000 El Camino Real</street>
+                <city>Mountain View</city>
+                <state>California</state>
+                <country>United States</country>
+                <from>2003-01</from>
+            </residence>
+            <residence>
+                <street>1 Market St</street>
+                <city>San Francisco</city>
+                <state>California</state>
+                <country>United States</country>
+                <from>2000-06</from>
+                <to>2002-12</to>
+            </residence>
+        </last-five-years>
+        <last-abroad>
+            <residence>
+                <street>(none)</street>
+                <city/>
+                <state/>
+                <country/>
+                <from/>
+                <to/>
+            </residence>
+        </last-abroad>
+    </residence-information>
+    <employment-information>
+        <last-five-years>
+            <employment>
+                <name>Sun Microsystems</name>
+                <address>123 Ocean St, Santa Clara, USA</address>
+                <occupation>Sw. engineer</occupation>
+                <from>2006-01</from>
+            </employment>
+            <employment>
+                <name>Microsoft</name>
+                <address>456 Foothill Expwy, San Carlos, USA</address>
+                <occupation>Sw. engineer</occupation>
+                <from>2002-01</from>
+                <to>2005-12</to>
+            </employment>
+        </last-five-years>
+        <last-abroad>
+            <employment>
+                <name>(none)</name>
+                <address/>
+                <occupation/>
+                <from/>
+                <to/>
+            </employment>
+        </last-abroad>
+    </employment-information>
+    <connection>
+        <type>other</type>
+        <other>I-129F</other>
+    </connection>
+</form>

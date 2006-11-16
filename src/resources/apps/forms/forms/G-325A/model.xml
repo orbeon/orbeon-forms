@@ -1,4 +1,4 @@
-<xforms:model id="g-325a-model"
+<xforms:model id="g-325a-model" schema="oxf:/apps/forms/forms/G-325A/schema.xsd"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -24,7 +24,27 @@
     <xforms:instance id="document-instance" src="oxf:/apps/forms/forms/G-325A/template-form.xml"/>
 
     <xforms:bind nodeset="instance('document-instance')">
+        <xforms:bind nodeset="." readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset=".//date" type="xs:date"/>
+    </xforms:bind>
 
+    <!-- XForms instance for widget control information -->
+    <xforms:instance id="triggers-instance">
+        <triggers xmlns="">
+            <add-residence-trigger/>
+            <remove-residence-trigger/>
+            <add-employment-trigger/>
+            <remove-employment-trigger/>
+            <other-connection-group/>
+        </triggers>
+    </xforms:instance>
+
+    <xforms:bind nodeset="instance('triggers-instance')">
+        <xforms:bind nodeset="add-residence-trigger" readonly="count(instance('document-instance')/residence-information/last-five-years/residence) >= 6 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-residence-trigger" readonly="count(instance('document-instance')/residence-information/last-five-years/residence) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="add-employment-trigger" readonly="count(instance('document-instance')/employment-information/last-five-years/employment) >= 5 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-employment-trigger" readonly="count(instance('document-instance')/employment-information/last-five-years/employment) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="other-connection-group" relevant="instance('document-instance')/connection/type = 'other'"/>
     </xforms:bind>
 
     <!-- XForms instance containing the XML schema (for enumerations) -->

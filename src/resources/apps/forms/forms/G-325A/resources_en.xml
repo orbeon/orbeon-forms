@@ -1,0 +1,88 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
+    <xsl:copy-of select="doc('../../common/resources_en.xml')/*/*"/>
+    <summary>
+        <titles>
+            <name>Name</name>
+            <birth-date>Birth Date</birth-date>
+            <citizenship>Citizenship</citizenship>
+            <birth-place>Birth Place</birth-place>
+        </titles>
+    </summary>
+    <detail>
+        <titles>
+            <detail-title>G-325A, Biographic Information</detail-title>
+            <residence-last>Applicant's residence last five years. List present address first.</residence-last>
+            <residence-outside>Applicant's last address outside the United States of more than one year.</residence-outside>
+            <employment-last>Applicant's employment last five years. (If none, so state.) List present employment first.</employment-last>
+            <employment-outside>Show below last occupation abroad if not shown above. (Include all information requested above.)</employment-outside>
+            <father>Father</father>
+            <mother>Mother</mother>
+        </titles>
+        <labels>
+            <first-name>First Name</first-name>
+            <middle-name>Middle Name</middle-name>
+            <last-name>Last Name</last-name>
+            <other-name>Other Name</other-name>
+            <birth-date>Birth Date</birth-date>
+            <gender>Gender</gender>
+            <citizenship>Citizenship</citizenship>
+            <ssn>SSN</ssn>
+            <file-number>File Number</file-number>
+
+            <street>Street and Number</street>
+            <city>City</city>
+            <state>Province or State</state>
+            <country>Country</country>
+            <from>From</from>
+            <to>To</to>
+            <employer-name>Employer Name</employer-name>
+            <employer-address>Employer Address</employer-address>
+            <occupation>Occupation</occupation>
+
+            <connection>This form is submitted in connection with an application for</connection>
+            <other>Other</other>
+
+            <add-residence>Add Residence</add-residence>
+            <remove-residence>Remove Residence</remove-residence>
+            <add-employment>Add Employment</add-employment>
+            <remove-employment>Remove Employment</remove-employment>
+        </labels>
+        <alerts>
+            <!--<first-name>First Name</first-name>-->
+            <!--<middle-name>Middle Name</middle-name>-->
+            <!--<last-name>Last Name</last-name>-->
+            <!--<other-name>Other Name</other-name>-->
+            <!--<birth-date>Birth Date</birth-date>-->
+            <!--<gender>Gender</gender>-->
+            <!--<citizenship>Citizenship</citizenship>-->
+            <!--<ssn>SSN</ssn>-->
+            <!--<file-number>File Number</file-number>-->
+
+            <!--<street>Street and Number</street>-->
+            <!--<city>City</city>-->
+            <!--<state>Province or State</state>-->
+            <!--<country>Country</country>-->
+            <from>Please enter a valid year and month in the format yyyy-mm</from>
+            <to>Please enter a valid year and month in the format yyyy-mm</to>
+            <!--<employer-name>Employer Name</employer-name>-->
+            <!--<employer-address>Employer Address</employer-address>-->
+            <!--<occupation>Occupation</occupation>-->
+        </alerts>
+        <formats>
+            <birth-date>[MNn] [D], [Y]</birth-date>
+        </formats>
+    </detail>
+</resources>

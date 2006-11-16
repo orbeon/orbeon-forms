@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<resources xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
+    <xsl:copy-of select="doc('../../common/resources_fr.xml')/*/*"/>
+    <summary>
+        <titles>
+            <name>Nom</name>
+            <birth-date>Date de naissance</birth-date>
+            <citizenship>Nationalité</citizenship>
+            <birth-place>Lieu de naissance</birth-place>
+        </titles>
+    </summary>
+    <detail>
+        <titles>
+            <detail-title>G-325A, Information Biographique</detail-title>
+            <residence-last>Résidence de l'applicant cinq dernières années. Lister l'adresse actuelle en premier.</residence-last>
+            <residence-outside>Applicant's last address outside the United States of more than one year.</residence-outside>
+            <employment-last>Applicant's employment last five years. (If none, so state.) List present employment first.</employment-last>
+            <employment-outside>Insérer ci-dessous la dernière occupation a l'étranger si pas montré ci-dessus.</employment-outside>
+            <father>Père</father>
+            <mother>Mère</mother>
+        </titles>
+        <labels>
+            <first-name>Prénom</first-name>
+            <middle-name>Deuxième nom</middle-name>
+            <last-name>Nom</last-name>
+            <other-name>Autre nom</other-name>
+            <birth-date>Date naissance</birth-date>
+            <gender>Sexe</gender>
+            <citizenship>Nationalité</citizenship>
+            <ssn>SSN</ssn>
+            <file-number>Numéro fichier</file-number>
+
+            <street>Rue et numéro</street>
+            <city>Ville</city>
+            <state>Province ou état</state>
+            <country>Pays</country>
+            <from>De</from>
+            <to>A</to>
+            <employer-name>Nom employeur</employer-name>
+            <employer-address>Adresse employeur</employer-address>
+            <occupation>Occupation</occupation>
+
+            <connection>Ce formulaire est soumis en connection avec une applicatoin pour</connection>
+            <other>Autre</other>
+
+            <add-residence>Ajouter résidence</add-residence>
+            <remove-residence>Supprimer résidence</remove-residence>
+            <add-employment>Ajouter emploi</add-employment>
+            <remove-employment>Supprimer emploi</remove-employment>
+        </labels>
+        <alerts>
+            <!--<first-name>First Name</first-name>-->
+            <!--<middle-name>Middle Name</middle-name>-->
+            <!--<last-name>Last Name</last-name>-->
+            <!--<other-name>Other Name</other-name>-->
+            <!--<birth-date>Birth Date</birth-date>-->
+            <!--<gender>Gender</gender>-->
+            <!--<citizenship>Citizenship</citizenship>-->
+            <!--<ssn>SSN</ssn>-->
+            <!--<file-number>File Number</file-number>-->
+
+            <!--<street>Street and Number</street>-->
+            <!--<city>City</city>-->
+            <!--<state>Province or State</state>-->
+            <!--<country>Country</country>-->
+            <from>Veuillez entrer une combinaison année et mois valide au format yyyy-mm</from>
+            <to>Veuillez entrer une combinaison année et mois valide au format yyyy-mm</to>
+            <!--<employer-name>Employer Name</employer-name>-->
+            <!--<employer-address>Employer Address</employer-address>-->
+            <!--<occupation>Occupation</occupation>-->
+        </alerts>
+        <formats>
+            <birth-date>Le [D] [MNn] [Y]</birth-date>
+        </formats>
+    </detail>
+</resources>

@@ -1,0 +1,72 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form xmlns="http://orbeon.org/oxf/examples/dmv">
+    <personal-information>
+        <name>
+            <first-name>Ann</first-name>
+            <initial/>
+            <last-name>Davis</last-name>
+        </name>
+        <driver-license-number>C150198</driver-license-number>
+        <birth-date>1984-01-02</birth-date>
+    </personal-information>
+    <address-information>
+        <voter-address-change>
+            <change-address/>
+        </voter-address-change>
+        <address type="residence">
+            <street>
+                <number>66</number>
+                <name-1>c/o Beth Miller</name-1>
+                <name-2>Mariposa St.</name-2>
+            </street>
+            <apt/>
+            <city>San Jose</city>
+            <state>CA</state>
+            <zip>95101</zip>
+        </address>
+        <address type="old">
+            <street>
+                <number>65</number>
+                <name-1>Mariposa St.</name-1>
+                <name-2/>
+            </street>
+            <apt/>
+            <city>San jose</city>
+            <state>CA</state>
+            <zip>95101</zip>
+        </address>
+    </address-information>
+    <vehicle-information>
+        <vehicles>
+            <vehicle>
+                <plate-number>1PJI315</plate-number>
+                <vin>1491759302756121</vin>
+                <leased/>
+            </vehicle>
+        </vehicles>
+        <leased-vehicles>
+            <company-name>Frontier Leasing</company-name>
+        </leased-vehicles>
+        <vehicle-address>
+            <street>
+                <number>10</number>
+                <name-1>Pine St.</name-1>
+                <name-2/>
+            </street>
+            <city>Sunnyvale</city>
+            <county>Santa Clara</county>
+        </vehicle-address>
+    </vehicle-information>
+</form>

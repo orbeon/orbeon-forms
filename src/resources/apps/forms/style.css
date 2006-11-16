@@ -32,8 +32,10 @@ td { vertical-align: top }
 .forms-gridtable { border-collapse: collapse; width: 95%; margin-left: 1em; margin-right: 1em }
 .forms-gridtable th { background-color: #ffcc66; text-align: center; padding: .3em; border: 1px solid #f93 }
 .forms-gridtable td { padding: .3em; border: 1px solid #f93; margin: 0; cursor: pointer; vertical-align: middle }
+.forms-gridtable .xforms-label { display: none }
 
-.forms-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-style: italic; font-family: verdana,sans-serif }
+.forms-title-table { margin-bottom: 1em }
+.forms-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-family: verdana,sans-serif }
 
 .forms-message-positive { color: green }
 .forms-message-negative { color: orange }
@@ -47,8 +49,6 @@ td { vertical-align: top }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-trigger-appearance-xxforms-image { margin-right: 0.5em}
-
-#dmv-vehicles .xforms-label { display: none }
 
 .dmv-last-name input { width: 20em }
 .dmv-driver-license-number input { width: 8em }
@@ -69,3 +69,18 @@ td { vertical-align: top }
 .dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
 .dmv-plate-span { position: relative; top: 19px; background: none }
+
+.g-325a-table input { width: 10em }
+.g-325a-table th { text-align: left }
+.g-325a-table { margin-left: 0; margin-right: 0; width: 100% }
+
+.g-325a-subtitle-row th { background: none }
+
+.g-325a-parents-table { border-collapse: collapse; width: 100%; margin-left: 0; margin-right: 0 }
+.g-325a-parents-table th { background-color: #ffcc66; text-align: left; padding: .3em; border: 1px solid #f93 }
+.g-325a-parents-table td { padding: .3em; border: 1px solid #f93; margin: 0; cursor: pointer; vertical-align: middle }
+.g-325a-parents-table td td { padding: 0; border: none; margin: 0 }
+.g-325a-parents-table .xforms-repeat-selected-item-1 { background: none }
+.g-325a-parents-table .xforms-label { display: inline-block; display: -moz-inline-box; width: 7em }
+
+.g-325a-personal-information-table .xforms-label { display: inline-block; display: -moz-inline-box; width: 7em }

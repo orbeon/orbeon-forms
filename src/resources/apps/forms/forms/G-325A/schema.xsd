@@ -21,6 +21,7 @@
             <xs:sequence>
                 <xs:element name="personal-information" type="personal-information"/>
                 <xs:element name="parents-information" type="parents-information"/>
+                <xs:element name="marriages"/>
                 <xs:element name="residence-information" type="residence-information"/>
                 <xs:element name="employment-information" type="employment-information"/>
                 <xs:element name="connection" type="connection"/>

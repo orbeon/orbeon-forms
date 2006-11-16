@@ -82,8 +82,8 @@
                 <city>Montagnier</city>
                 <state>Valais</state>
                 <country>Switzerland</country>
-                <from>2004-10</from>
-                <to>Present</to>
+                <from>2004-01</from>
+                <to>2006-11</to>
             </residence>
         </last-abroad>
     </residence-information>
@@ -112,16 +112,16 @@
         </last-five-years>
         <last-abroad>
             <employment>
-                <name>(shown above)</name>
-                <address/>
-                <occupation/>
-                <from/>
-                <to/>
+                <name>Self-employed</name>
+                <address>Place du Pont, Lausanne, Switzerland</address>
+                <occupation>Sw. consultant</occupation>
+                <from>2004-01</from>
+                <to>2006-11</to>
             </employment>
         </last-abroad>
     </employment-information>
     <connection>
         <type>naturalization</type>
-        <other>I-129F</other>
+        <other/>
     </connection>
 </form>

@@ -56,7 +56,7 @@
     <page id="resources" path-info="/forms/service/resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
             view="forms/${1}/resources_${2}.xml"/>
 
-    <!-- Update services -->
+    <!-- Import -->
     <page id="import-documents" path-info="/forms/service/import-documents">
         <action action="services/import-documents.xpl"/>
     </page>

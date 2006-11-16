@@ -30,6 +30,7 @@
                 <include>**/*.xhtml</include>
                 <include>**/*.java</include>
                 <include>**/*.txt</include>
+                <include>**/*.pdf</include>
                 <exclude>example-descriptor.xml</exclude><!-- shouldn't have any of those anymore -->
                 <exclude>example-descriptor-files.xml</exclude><!-- shouldn't have any of those anymore -->
                 <case-sensitive>false</case-sensitive>

@@ -16,6 +16,7 @@
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:exforms="http://www.exforms.org/exf/1-0"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -115,10 +116,10 @@
                     </xforms:group>
                 </widget:tab>
                 <widget:tab id="samples-case">
-                    <widget:label>Run Samples</widget:label>
+                    <widget:label>Test Samples</widget:label>
                     <xforms:setvalue ev:event="xforms-select" ref="action">download</xforms:setvalue>
                     <p>
-                        Please select an existing XForms sample from the list:
+                        Please select an existing XForms test sample from the list:
                     </p>
                     <xforms:group>
                         <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/sample/{sample}"/>
@@ -131,7 +132,7 @@
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="instance('samples-instance')/file">
-                                            <xforms:label ref="@name"/>
+                                            <xforms:label><xforms:output value="if (ends-with(@name, '.xhtml')) then substring(@name, 1, string-length(@name) - 6) else @name"/></xforms:label>
                                             <xforms:value ref="@name"/>
                                         </xforms:itemset>
                                     </xforms:select1>

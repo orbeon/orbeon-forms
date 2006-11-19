@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.generator.*;
 import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
-import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
+import org.orbeon.oxf.processor.pdf.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.processor.serializer.HttpSerializer;
@@ -125,7 +125,7 @@ public class SchemaRepository {
         // Test processor schema
         schemas.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
-        schemas.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scratchpad/pdf-template-model.rng");
+        schemas.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
 
         schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
         schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");

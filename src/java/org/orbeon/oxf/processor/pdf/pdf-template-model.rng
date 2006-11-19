@@ -1,0 +1,200 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <start>
+        <element name="config">
+            <element name="template">
+                <optional>
+                    <attribute name="show-grid">
+                        <choice>
+                            <value>true</value>
+                            <value>false</value>
+                        </choice>
+                    </attribute>
+                </optional>
+                <attribute name="href">
+                    <data type="anyURI"/>
+                </attribute>
+            </element>
+            <zeroOrMore>
+                <choice>
+                    <ref name="field"/>
+                    <ref name="group"/>
+                    <ref name="repeat"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </start>
+
+    <define name="field">
+        <element name="field">
+            <optional>
+                <attribute name="page">
+                    <choice>
+                        <data type="positiveInteger"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <attribute>
+                <choice>
+                    <name>left</name>
+                    <name>left-position</name><!-- deprecated -->
+                </choice>
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <attribute>
+                <choice>
+                    <name>top</name>
+                    <name>top-position</name><!-- deprecated -->
+                </choice>
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+            <ref name="font-attributes"/>
+            <optional>
+                <attribute name="size">
+                    <choice>
+                        <data type="positiveInteger"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <choice>
+                <attribute name="value">
+                    <data type="string"/>
+                </attribute>
+                <attribute name="ref">
+                    <data type="string"/>
+                </attribute>
+            </choice>
+        </element>
+    </define>
+
+    <define name="group">
+        <element name="group">
+            <optional>
+                <attribute name="page">
+                    <data type="positiveInteger"/>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="ref"/>
+            </optional>
+            <optional>
+                <attribute name="offset-x">
+                    <choice>
+                        <data type="float"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="offset-y">
+                    <choice>
+                        <data type="float"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <ref name="font-attributes"/>
+            <zeroOrMore>
+                <choice>
+                    <ref name="field"/>
+                    <ref name="group"/>
+                    <ref name="repeat"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="repeat">
+        <element name="repeat">
+            <optional>
+                <attribute name="page">
+                    <data type="positiveInteger"/>
+                </attribute>
+            </optional>
+            <attribute name="nodeset"/>
+            <optional>
+                <attribute name="offset-x">
+                    <choice>
+                        <data type="float"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <optional>
+                <attribute name="offset-y">
+                    <choice>
+                        <data type="float"/>
+                        <ref name="avt"/>
+                    </choice>
+                </attribute>
+            </optional>
+            <zeroOrMore>
+                <choice>
+                    <ref name="field"/>
+                    <ref name="group"/>
+                    <ref name="repeat"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="avt">
+        <data type="string">
+            <param name="pattern">.*\{.*</param>
+        </data>
+    </define>
+
+    <define name="font-attributes">
+        <optional>
+            <attribute name="font-family">
+                <choice>
+                    <data type="string"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="font-size">
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute>
+                <choice>
+                    <name>font-pitch</name>
+                    <name>spacing</name><!-- deprecated -->
+                </choice>
+                <choice>
+                    <data type="decimal"/>
+                    <ref name="avt"/>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+</grammar>

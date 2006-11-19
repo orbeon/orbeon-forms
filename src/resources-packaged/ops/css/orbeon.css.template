@@ -301,24 +301,6 @@ a:hover {
      margin-left:3px;
 }
 
-.box-header {
-    background: url('images/box-header.png') top left no-repeat;
-    text-align: center;
-    color: white;
-    font-size: x-small;
-    text-transform: uppercase;
-}
-
-.box-middle {
-    background: url('images/box-middle.png') top left repeat-y;
-    color: #666699;
-    padding: 10px;
-}
-
-.box-footer {
-    background: url('images/box-footer.png') top left no-repeat;
-}
-
 .tree-sections {
     margin-left: 0;
     padding-left: 1em;

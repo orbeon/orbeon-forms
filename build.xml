@@ -112,7 +112,7 @@
         <echo message="Building Orbeon PresentationServer ${release.number}"/>
 
         <property name="java-src.dir" value="${src.dir}/java"/>
-        <property name="cli-examples-src.dir" value="${examples-src.dir}/cli"/>
+        <property name="cli-examples-src.dir" value="${src.dir}/cli-examples"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
         <property name="test-src.dir" value="test/src"/>
@@ -284,12 +284,11 @@
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
                 <include name="ops/**/*.htc"/>
-                <include name="config/theme/**"/>
                 <exclude name="ops/fckeditor/_samples/**/*.*"/>
                 <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
                 <exclude name="ops/fckeditor/_testcases/**/*.*"/>
             </fileset>
-            <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
+            <zipfileset dir="${build.temp.dir}/theme-portal" prefix="config/theme-portal">
                 <include name="*.css"/>
             </zipfileset>
         </jar>
@@ -391,14 +390,14 @@
         <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
             <filtersfile file="${resources-packaged.dir}/ops/css/css-constants.properties"/>
         </filterset>
-        <mkdir dir="${build.temp.dir}/theme"/>
-        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
+        <mkdir dir="${build.temp.dir}/theme-portal"/>
+        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme-portal/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
+        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme-portal/xforms.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
+        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme-portal/xforms-widgets.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>
@@ -588,7 +587,7 @@
             </fileset>
         </copy>
         <copy toDir="${build.doc.dir}/reference/theme">
-            <fileset dir="${build.temp.dir}/theme">
+            <fileset dir="${build.temp.dir}/theme-portal">
                 <include name="*.css"/>
             </fileset>
         </copy>

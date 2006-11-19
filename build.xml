@@ -290,6 +290,7 @@
             </fileset>
             <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
+                <!--<exclude name="orbeon.css"/>-->
             </zipfileset>
         </jar>
 
@@ -326,6 +327,12 @@
                 <include name="xforms-jsp/**"/>
             </fileset>
         </copy>
+
+        <!--<copy todir="${war.dir}/WEB-INF/resources/config/theme">-->
+            <!--<fileset dir="${build.temp.dir}/theme">-->
+                <!--<include name="orbeon.css"/>-->
+            <!--</fileset>-->
+        <!--</copy>-->
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">

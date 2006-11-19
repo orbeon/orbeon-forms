@@ -179,7 +179,7 @@
                             <tr>
                                 <th colspan="2" style="text-align: left">
                                     <span onclick="hideShowTBody('exception-{$exception-position}')">
-                                        <img src="/images/plus.gif" border="0" alt="Toggle"/>
+                                        <img src="/config/theme/images/plus.gif" border="0" alt="Toggle"/>
                                     </span>
                                     <xsl:text> </xsl:text>
                                     <xsl:value-of select="type"/>
@@ -315,7 +315,7 @@
                 <tr>
                     <td colspan="4">
                         <span onclick="hideShowTBody('trace-{$trace-id}')">
-                            <img src="/images/plus.gif" border="0" alt="Toggle"/> More...
+                            <img src="/config/theme/images/plus.gif" border="0" alt="Toggle"/> More...
                         </span>
                     </td>
                 </tr>

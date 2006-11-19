@@ -51,6 +51,13 @@
                 Orbeon Forms 3.5 features the following changes:
             </p>
             <section>
+                <title>Orbeon PresentationServer is now Orbeon Forms</title>
+                <p>
+                    The product has been renamed Orbeon Forms. Plase refer to the <a
+                    href="/doc/home-faq#name-change">FAQ entry</a> for more information.
+                </p>
+            </section>
+            <section>
                 <title>XForms Performance</title>
                 <ul>
                     <li>

@@ -22,16 +22,14 @@
         <section>
             <title>Introduction to the Page Flow Epilogue</title>
             <p>
-                The OPS <i>page flow epilogue</i> is an <a href="reference-xpl-pipelines">XPL
-                pipeline</a> executed by the <a href="reference-page-flow">Page Flow
-                Controller</a> (PFC) in order to perform tasks common to all the pages in an OPS
-                application. Such tasks include:
+                The Orbeon Forms <i>page flow epilogue</i> is an <a href="reference-xpl-pipelines">XPL pipeline</a>
+                executed by the <a href="reference-page-flow">Page Flow Controller</a> (PFC) in order to perform tasks
+                common to all the pages in an Orbeon Forms application. Such tasks include:
             </p>
             <ul>
                 <li>
                     <p>
-                        <b>Look and feel.</b> Adding a common look and feel to all the XHTML pages
-                        in an application.
+                        <b>Look and feel.</b> Adding a common look and feel to all the XHTML pages in an application.
                     </p>
                 </li>
                 <li>
@@ -41,27 +39,24 @@
                 </li>
                 <li>
                     <p>
-                        <b>Linking common files.</b> Adding common links to external CSS
-                        stylesheets or scripts.
+                        <b>Linking common files.</b> Adding common links to external CSS stylesheets or scripts.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Document-aware formatting.</b> Formatting the document differently
-                        depending on the type of document produced by a page view, for example XHTML
-                        or XSL-FO.
+                        <b>Document-aware formatting.</b> Formatting the document differently depending on the type of
+                        document produced by a page view, for example XHTML or XSL-FO.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Client-aware formatting.</b> Producing XHTML or plain HTML depending on
-                        the user agent requesting the page, or different versions of HTML depending
-                        on different clients.
+                        <b>Client-aware formatting.</b> Producing XHTML or plain HTML depending on the user agent
+                        requesting the page, or different versions of HTML depending on different clients.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Server-side XForms processing.</b> The OPS server-side XForms engine is
+                        <b>Server-side XForms processing.</b> The Orbeon Forms server-side XForms engine is
                         hooked up in the epilogue.
                     </p>
                 </li>
@@ -73,20 +68,19 @@
                 </li>
                 <li>
                     <p>
-                        <b>Servlet and portlet support.</b> Formatting pages differently for
-                        deployment as a portlet.
+                        <b>Servlet and portlet support.</b> Formatting pages differently for deployment as a portlet.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>User-defined configuration.</b> Finally, because the epilogue is a
-                        configurable XPL pipeline, there is no limit to the tasks it can acomplish!
+                        <b>User-defined configuration.</b> Finally, because the epilogue is a configurable XPL
+                        pipeline, there is no limit to the tasks it can acomplish!
                     </p>
                 </li>
             </ul>
             <p>
-                Thanks to the page flow epilogue, it is not necessary to duplicate common behavior
-                in all the page views of a given OPS application.
+                Thanks to the page flow epilogue, it is not necessary to duplicate common behavior in all the page
+                views of a given Orbeon Forms application.
             </p>
         </section>
         <section>
@@ -95,9 +89,9 @@
                 <title>Configuration</title>
                 <p>
                     The epilogue pipeline is specified with the <a
-                    href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code>
-                    element</a> in your page flow. By default, the <i>standard epilogue</i> located
-                    under <code>oxf:/config/epilogue.xpl</code> is used.
+                    href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code> element</a> in your page
+                    flow. By default, the <i>standard epilogue</i> located under <code>oxf:/config/epilogue.xpl</code>
+                    is used.
                 </p>
             </section>
             <section>
@@ -180,7 +174,7 @@
                                 The epilogue XPL pipeline also receives on its <code>xforms-model</code> input
                                 the legacy XForms model as specified on the <code>&lt;page&gt;</code> element's
                                 <code>xforms</code> attribute. This input is for the private use of the legacy
-                                server-side XForms engine in OPS. You usually do not have to deal with it.
+                                server-side XForms engine in Orbeon Forms. You usually do not have to deal with it.
                             </p>
                         </td>
                     </tr>
@@ -211,7 +205,7 @@
                 <li>
                     <p>
                         <b>XForms processing:</b> it applies server-side XForms processing if
-                        needed. If your application does not use the OPS built-in XForms engine
+                        needed. If your application does not use the Orbeon Forms built-in XForms engine
                         at all, you can bypass XForms processing.
                     </p>
                 </li>
@@ -223,18 +217,6 @@
                         page is running in a servlet or portlet environment. If your application
                         does not use portlets at all, you can bypass this choice.
                     </p>
-                    <note>
-                        <p>
-                            With OPS 3.0, only the servlet environment is officially supported. The
-                            portlet environment is however used for the examples portal. Please also
-                            refer to this <a href="home-faq#jsr-168">FAQ entry</a>.
-                        </p>
-                        <p>
-                            This means that for your OPS applications,
-                            <code>epilogue-servlet.xpl</code> is usually the relevant file to
-                            consider.
-                        </p>
-                    </note>
                 </li>
             </ul>
         </section>
@@ -315,7 +297,7 @@
                                 </p>
                                 <ol>
                                     <li>
-                                        <p>The standard theme is applied.</p>
+                                        <p>The theme is applied.</p>
                                     </li>
                                     <li>
                                         <p>URLs are rewritten.</p>
@@ -347,7 +329,7 @@
                                 </p>
                                 <ol>
                                     <li>
-                                        <p>The standard theme is applied.</p>
+                                        <p>The theme is applied.</p>
                                     </li>
                                     <li>
                                         <p>URLs are rewritten.</p>
@@ -550,7 +532,7 @@
                         <ol>
                             <li>
                                 <p>
-                                    The standard theme is applied but an XHTML fragment enclosed in a
+                                    The theme is applied but an XHTML fragment enclosed in a
                                     <code>xhtml:div</code> element is produced instead of a
                                     full-fledged XHTML document.
                                 </p>
@@ -601,9 +583,9 @@
         <section>
             <title>XForms Processing</title>
             <p>
-                The OPS built-in <a href="reference-xforms-ng">XForms engine</a> allows you to write
+                The Orbeon Forms built-in <a href="reference-xforms-ng">XForms engine</a> allows you to write
                 not only raw XHTML, but also supports XForms 1.0. To achieve this, the XForms engine
-                rewrites XHTML + XForms into XHTML + Javascript + CSS. This transformation also
+                rewrites XHTML + XForms into XHTML + JavaScript + CSS. This transformation also
                 occurs in the epilogue, as mentioned <a href="#standard-epilogue">above</a>.
             </p>
             <p>
@@ -620,142 +602,118 @@
                 </li>
                 <li>
                     <p>
-                        The result of XForms processing is that all the elements in the XForms
-                        namespace are removed, including the XForms models you may have under
-                        <code>xhtml:head</code>.
+                        The result of XForms processing is that all the elements in the XForms namespace are removed,
+                        including the XForms models you may have under <code>xhtml:head</code>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        Instead of XForms elements, you will find XHTML elements. Those elements may
-                        use some CSS classes defined in <code>xforms.css</code>.
+                        Instead of XForms elements, you will find XHTML elements. Those elements may use some CSS
+                        classes defined in <code>xforms.css</code>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        The standard theme includes some default OPS CSS stylesheets and scripts
-                        used by the XForms engine.
+                        The theme includes some default Orbeon Forms CSS stylesheets and copies over JavaScript and
+                        CSS resources produced by the XForms engine.
                     </p>
                 </li>
             </ul>
         </section>
         <section>
-            <title>The Standard Theme</title>
+            <title>Theming</title>
             <p>
-                The standard OPS theme is found under the <code>oxf:/config/theme</code> directory.
-                The entry point of the theme is the <code>theme.xsl</code> stylesheet, called from
-                the epilogue XPL pipelines.
+                As documented above, the theme stylesheet is called only for views that generate XHTML documents. The
+                theme does not run, for example, on pseudo-HTML, XSL-FO, or plain XML documents. However, you can still
+                produce HTML documents and use a theme stylesheet, since the epilogue is able to convert XHTML to HTML.
             </p>
             <p>
-                As documented above, the standard theme is called only for views that generate XHTML
-                documents. The standard theme does not run, for example, on pseudo-HTML, XSL-FO, or
-                plain XML documents.
+                Orbeon Forms comes with two stylesheets: <code>theme-plain.xsl</code> and <code>theme-portal.xsl</code>.
+                <code>theme-plain.xsl</code> only makes minor adjustments to your page view. You can simplify it
+                further, or expand it. <code>theme-portal.xsl</code> is the theme for the built-in Orbeon Forms example
+                applications. It decorates pages views with a list of available example applications, and provides a
+                mechanism for viewing application source code.
             </p>
             <p>
-                The standard theme does the following:
+                Orbeon Forms theme resources are found under the <code>oxf:/config/theme</code> directory. They are
+                referred to, directly or indirectly (through CSS) from the <code>theme-*.xsl</code> stylesheets called
+                from the epilogue XPL pipelines. The following should be noted:
             </p>
             <ul>
                 <li>
                     <p>
-                        It copies, under <code>xhtml:head</code>, the <code>xhtml:meta</code>,
-                        <code>xhtml:link</code>, <code>xhtml:style</code>, and
-                        <code>xhtml:script</code> elements from the source XHTML document. This
-                        allows you for example to link to a particualar Javascript script on a page
-                        by page basis, instead of including the script in all the pages of your
+                        Theme stylesheets copy, under <code>xhtml:head</code>, the <code>xhtml:meta</code>,
+                        <code>xhtml:link</code>, <code>xhtml:style</code>, and <code>xhtml:script</code> elements from
+                        the source XHTML document. This allows you for example to link to a particular JavaScript
+                        script on a page by page basis, instead of including the script in all the pages of your
                         application.
                     </p>
                 </li>
                 <li>
                     <p>
-                        It adds, under <code>xhtml:head</code>, links to OPS CSS stylesheets and
-                        scripts necessary for the server-side XForms engine, in particular the
-                        following CSS stylesheets:
+                        Theme stylesheets add, under <code>xhtml:head</code>, a link to the Orbeon Forms CSS
+                        stylesheet:
                     </p>
                     <ul>
                         <li>
                             <p>
-                                <b>orbeon.css:</b> definitions proprietary to the default theme.
-                                These definitions are likely to be overridden by the user as they
-                                create their own theme.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                <b>xforms.css:</b> definitions related to XForms controls. These
-                                definitions may be changed by users if they are not happy with the
-                                defaults.
+                                <b>orbeon.css.</b> This contains definitions proprietary to the default theme. You
+                                will probably not use these in your own theme stylesheet.
                             </p>
                         </li>
                     </ul>
                 </li>
                 <li>
                     <p>
-                        It generates, under <code>xhtml:head</code>, an <code>xhtml:title</code>
-                        element, first by looking in the XHTML document if present. If not found, it
-                        looks for a <code>f:example-header</code> element (this element is used by
-                        some OPS examples). Finally, it looks for the first <code>xhtml:h1</code>
-                        element in the body of the XHTML document.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        It handles the <code>f:tabs</code> element used by some OPS examples.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        It processes the source <code>xhtml:body</code> element. This mostly results
-                        in copying the content of the source <code>xhtml:body</code>, with the
-                        following exceptions:
+                        When XForms is used, it adds indirectly, under <code>xhtml:head</code>, a link to the Orbeon
+                        Forms XForms resources, including:
                     </p>
                     <ul>
                         <li>
                             <p>
-                                 Styling is applied to some XHTML forms elements.
+                                <b>xforms.css.</b> These are definitions related to XForms controls. These
+                                definitions may be changed by users if they are not happy with the defaults.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Attribute in the XHTML namespace are copied but in no namespace.
+                                <b>xforms-widgets.css.</b> These are definitions related to XForms
+                                pseudo-controls created by the <code>xforms-widgets.xsl</code> stylesheet. These
+                                definitions may be changed by users if they are not happy with the defaults.
                             </p>
                         </li>
                         <li>
                             <p>
-                                Some special handling is performed for the body of included portlets
-                                so that URLs do not get rewritten in this case. This is useful only
-                                for the examples portal.
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                Any element within the
-                                <code>http://orbeon.org/oxf/xml/formatting</code> namespace, usually
-                                prefixed with <code>f:</code>, is handled by the included
-                                <code>formatting.xsl</code> stylesheet. This stylesheet contains
-                                some useful formatting templates, in particular to format XML and
-                                display tabs. None of the templates in this stylesheet is required
-                                for your OPS application.
+                                <b>Other XForms CSS and JavaScript resources</b>. These are usually added by the XForms
+                                engine as needed.
                             </p>
                         </li>
                     </ul>
+                </li>
+                <li>
                     <p>
-                        The categories above are implemented with sets of <code>xsl:template</code>
-                        elements. Those are clearly delimited in <code>theme.xsl</code>.
+                        Theme stylesheets generate, under <code>xhtml:head</code>, an <code>xhtml:title</code> element,
+                        first by looking in the XHTML document if present. If not found, it looks for a
+                        <code>f:example-header</code> element (this element is used by some Orbeon Forms examples).
+                        Finally, it looks for the first <code>xhtml:h1</code> element in the body of the XHTML document.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Theme stylesheets processes the source <code>xhtml:body</code> element. This mostly results in
+                        copying the content of the source <code>xhtml:body</code>, with the exception that attribute in
+                        the XHTML namespace are copied but in no namespace.
+                    </p>
+                    <p>
+                        The categories above are implemented with sets of <code>xsl:template</code> elements. Those are
+                        clearly delimited in <code>theme-*.xsl</code>.
                     </p>
                 </li>
             </ul>
             <p>
-                You can configure the standard theme at your leisure for your own application. You
-                typically get started by modifying <code>theme.xsl</code>.
+                You can configure the standard theme at your leisure for your own application. You typically get started
+                by modifying <code>theme-plain.xsl</code>.
             </p>
         </section>
-        <!--
-        <section>
-            <title></title>
-            <p>
-
-            </p>
-        </section>
-        -->
     </body>
 </document>

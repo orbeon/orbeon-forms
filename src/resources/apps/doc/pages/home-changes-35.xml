@@ -28,26 +28,27 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon PresentationServer (OPS) 3.5 M1 (Milestone 1)!
+                Welcome to Orbeon Forms 3.5 M1 (Milestone 1)!
             </p>
             <note>
                 <p>
-                    This is not a final release of OPS 3.5. The purpose of OPS 3.5 M1 is to provide an intermediate
-                    milestone version of OPS on the path to OPS 3.5.
+                    This is not a final release of Orbeon Forms 3.5. The purpose of Orbeon Forms 3.5 M1 is to provide
+                    an intermediate milestone version of Orbeon Forms on the path to Orbeon Forms 3.5.
                 </p>
             </note>
             <p>
-                OPS 3.5 M1 features many improvements over OPS 3.0.1, including XForms engine performance
-                enhancements, bug-fixes, new features and enhanced browser support.
+                Orbeon Forms 3.5 M1 features many improvements over Orbeon Forms 3.0.1, including XForms engine
+                performance enhancements, bug-fixes, new features and enhanced browser support.
             </p>
             <p>
-                This document describes changes made between OPS 3.0.1 and OPS 3.5 M1.
+                This document describes changes made between Orbeon PresentationServer (OPS) 3.0.1 and Orbeon Forms 3.5
+                M1.
             </p>
         </section>
         <section>
             <title>Changes in Version 3.5</title>
             <p>
-                OPS 3.5 features the following changes:
+                Orbeon Forms 3.5 features the following changes:
             </p>
             <section>
                 <title>XForms Performance</title>
@@ -92,9 +93,10 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for Liferay portal.</b> OPS, including XForms, now works within Liferay portal
+                            <b>Support for Liferay portal.</b> Orbeon Forms, including XForms, now works within Liferay portal
                             3.6.1 and 4.1.0. A new epilogue pipeline, <code>epilogue-portlet-liferay.xpl</code>, can
-                            now be used to deploy JSR-168 portlets into liferay, including multiple OPS portlets at the
+                            now be used to deploy JSR-168 portlets into liferay, including multiple Orbeon Forms
+                            portlets at the
                             same time.
                         </p>
                         <p>
@@ -330,6 +332,92 @@
                             <code>xxforms:maxlenght</code> and <code>xxforms:rows</code>, <code>xxforms:cols</code>.
                             [TODO: doc]
                         </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>New Examples Portal</title>
+                <p>
+                    In previous versions, the examples portal, which shows the built-in Orbeon Form example, was
+                    implemented with a custom JSR-168 container. Example applications ran in as a JSR-168 portlet.
+                    Because the portal introduced an indirection and was not particularly optimized, this led to
+                    performance issues. In addition, it was not clear to users how they could run examples outside the
+                    examples portal.
+                </p>
+                <p>
+                    In this version of Orbeon Forms:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The Orbeon JSR-168 container is removed. Applications, including all the examples, are now
+                            directly displayed without going through the portal. This means that examples now run much
+                            faster by default.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            JSR-168 support is still supported, in fact it is much improved, but Orbeon Forms no longer
+                            comes with its own portal. Use a portal such as Liferay to deploy Orbeon Forms portlets.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The examples portal layout is simply created in a theme under
+                            <code>config/theme-portal.xsl</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Example descriptors (<code>example-descriptor.xml</code>) included with each example are
+                            now removed. The Orbeon Forms source code viewer no longer uses this file and automatically
+                            gathers the list of files for each application.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Improved Applications Directory Structure</title>
+                <p>
+                    The Orbeon Forms resources (found under <code>WEB-INF/resources</code>) are now better organized:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            A single top-level <code>apps</code> directory contains all the applications deployed within
+                            Orbeon Forms. To create your own applications, simply create a subdirectory of the
+                            <code>apps</code> directory that contains a Page Flow file (<code>page-flow.xml</code>).
+                            Adding or removing applications is is simply a matter of adding or removing directories.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The only remaining top-level directory, besides the <code>apps</code> directory, is the
+                            <code>config</code> directory, which contains Orbeon Forms configuration files that you can
+                            modify according to your needs.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The contents of the private <code>ops</code> directory is moved to JAR files:
+                            <code>ops-resources-private.jar</code> and <code>ops-resources-public.jar</code>. You should
+                            rarely have to modify these resources, unless you are adding functionality to Orbeon Forms
+                            or fixing Orbeon Forms bugs.
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <code>ops-resources-private.jar</code> contains private Orbeon Forms resources.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    <code>ops-resources-public.jar</code> contains public Orbeon Forms resources. This
+                                    JAR file can be expanded in order to allow its content to be served directly by a
+                                    web server such as Apache.
+                                </p>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </section>

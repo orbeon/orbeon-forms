@@ -288,7 +288,7 @@
                 <exclude name="ops/fckeditor/editor/_source/**/*.*"/>
                 <exclude name="ops/fckeditor/_testcases/**/*.*"/>
             </fileset>
-            <zipfileset dir="${build.temp.dir}/theme-portal" prefix="config/theme-portal">
+            <zipfileset dir="${build.temp.dir}/theme" prefix="config/theme">
                 <include name="*.css"/>
             </zipfileset>
         </jar>
@@ -390,14 +390,14 @@
         <filterset id="css-filter-set" begintoken="&amp;" endtoken=";">
             <filtersfile file="${resources-packaged.dir}/ops/css/css-constants.properties"/>
         </filterset>
-        <mkdir dir="${build.temp.dir}/theme-portal"/>
-        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme-portal/orbeon.css">
+        <mkdir dir="${build.temp.dir}/theme"/>
+        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${build.temp.dir}/theme/orbeon.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme-portal/xforms.css">
+        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${build.temp.dir}/theme/xforms.css">
             <filterset refid="css-filter-set"/>
         </copy>
-        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme-portal/xforms-widgets.css">
+        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${build.temp.dir}/theme/xforms-widgets.css">
             <filterset refid="css-filter-set"/>
         </copy>
     </target>
@@ -587,7 +587,7 @@
             </fileset>
         </copy>
         <copy toDir="${build.doc.dir}/reference/theme">
-            <fileset dir="${build.temp.dir}/theme-portal">
+            <fileset dir="${build.temp.dir}/theme">
                 <include name="*.css"/>
             </fileset>
         </copy>

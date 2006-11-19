@@ -29,7 +29,7 @@
             <xhtml:head>
                 <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <xhtml:link rel="stylesheet" href="/config/theme-portal/orbeon.css" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                 <!-- Handle meta elements -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <!-- Handle user-defined links -->

@@ -665,8 +665,8 @@
                 </li>
                 <li>
                     <p>
-                        When XForms is used, it adds indirectly, under <code>xhtml:head</code>, a link to the Orbeon
-                        Forms XForms resources, including:
+                        When XForms is used, theme stylesheets indirectly add, under <code>xhtml:head</code>, a link to
+                        the Orbeon Forms XForms resources, including:
                     </p>
                     <ul>
                         <li>
@@ -704,15 +704,12 @@
                         copying the content of the source <code>xhtml:body</code>, with the exception that attribute in
                         the XHTML namespace are copied but in no namespace.
                     </p>
-                    <p>
-                        The categories above are implemented with sets of <code>xsl:template</code> elements. Those are
-                        clearly delimited in <code>theme-*.xsl</code>.
-                    </p>
                 </li>
             </ul>
             <p>
                 You can configure the standard theme at your leisure for your own application. You typically get started
-                by modifying <code>theme-plain.xsl</code>.
+                by modifying <code>theme-plain.xsl</code> and/or referring to your own stylesheet from the epilogue
+                pipeline.
             </p>
         </section>
     </body>

@@ -657,8 +657,8 @@
                     <ul>
                         <li>
                             <p>
-                                <b>orbeon.css.</b> This contains definitions proprietary to the default theme. You
-                                will probably not use these in your own theme stylesheet.
+                                <b>orbeon.css.</b> This contains definitions proprietary to the default theme. You will
+                                probably not use this CSS stylesheet in your own theme stylesheet.
                             </p>
                         </li>
                     </ul>

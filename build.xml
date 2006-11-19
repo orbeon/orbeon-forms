@@ -112,7 +112,7 @@
         <echo message="Building Orbeon PresentationServer ${release.number}"/>
 
         <property name="java-src.dir" value="${src.dir}/java"/>
-        <property name="cli-examples-src.dir" value="${src.dir}/cli-examples"/>
+        <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
         <property name="test-src.dir" value="test/src"/>
@@ -322,9 +322,9 @@
             </fileset>
         </copy>
         <copy file='${cli.jar.file}' todir='${war.inf}' />
-        <copy todir="${war.dir}" >
-            <fileset dir="${examples-src.dir}">
-                <include name="xforms-jsp/**"/>
+        <copy todir="${war.dir}/xforms-jsp" >
+            <fileset dir="${src.dir}/examples-jsp">
+                <include name="**"/>
             </fileset>
         </copy>
 
@@ -634,6 +634,9 @@
                 <exclude name="apps/doc/**/*.cdr"/>
                 <exclude name="apps/doc/**/*.cpl"/>
             </zipfileset>
+            <zipfileset dir="${build.temp.dir}/theme" prefix="WEB-INF/resources/config/theme">
+                <include name="*.css"/>
+            </zipfileset>
         </zip>
     </target>
 
@@ -647,7 +650,7 @@
             </zipfileset>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
-            <zipfileset dir="${cli-examples-src.dir}" prefix="${prefix}/cli-examples"/>
+            <zipfileset dir="${examples-cli-src.dir}" prefix="${prefix}/examples-cli"/>
         </zip>
         <!-- Fix EOL for Windows platform -->
         <delete dir="${build.temp.dir}/distrib"/>

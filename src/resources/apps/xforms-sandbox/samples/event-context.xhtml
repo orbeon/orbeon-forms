@@ -31,6 +31,9 @@
                     <dom-focus-in-target/>
                     <dom-focus-out-target/>
                     <value-changed-target/>
+                    <event-names>
+                        <event-name/>
+                    </event-names>
                     <children>
                         <child>Child 1</child>
                         <child>Child 2</child>
@@ -44,6 +47,18 @@
             <xforms:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('target')"/>
             <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('target')"/>
             <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('target')"/>
+            <xforms:action ev:event="DOMFocusIn">
+                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+            </xforms:action>
+            <xforms:action ev:event="DOMFocusOut">
+                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+            </xforms:action>
+            <xforms:action ev:event="xforms-value-changed">
+                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('event')"/>
+            </xforms:action>
             <xhtml:p>
                 <xforms:input ref="name" id="name-control">
                     <xforms:label>Name:</xforms:label>
@@ -87,6 +102,13 @@
                     <xforms:input ref="." id="child-control">
                         <xforms:label>Child:</xforms:label>
                     </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+            <xforms:repeat nodeset="event-names/event-name[position() != last()]" id="event-names-repeat">
+                <xhtml:div>
+                    <xforms:output ref="." id="event-name-control">
+                        <xforms:label>Event name:</xforms:label>
+                    </xforms:output>
                 </xhtml:div>
             </xforms:repeat>
         </xforms:group>

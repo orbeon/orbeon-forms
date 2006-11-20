@@ -73,10 +73,14 @@ public abstract class XFormsEvent {
             // Return the id of the target of the event
             final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getOriginalId() : targetObject.getEffectiveId();
             return new ListIterator(Collections.singletonList(new StringValue(originalId)));
+        } else if ("event".equals(name)) {
+            // Return the name of the event
+            return new ListIterator(Collections.singletonList(new StringValue(eventName)));
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."
             return new EmptyIterator();
         }
+        // TODO: We should add in the future: observer (id), phase (capture|default), and maybe propagate (stop|continue), defaultAction (cancel|perform)
     }
 }

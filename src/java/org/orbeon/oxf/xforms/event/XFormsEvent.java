@@ -14,10 +14,13 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.value.StringValue;
 
 import java.util.Collections;
 
@@ -66,8 +69,14 @@ public abstract class XFormsEvent {
     }
 
     public SequenceIterator getAttribute(String name) {
-        // "If the event context information does not contain the property indicated by the string argument, then an
-        // empty node-set is returned."
-        return new ListIterator(Collections.EMPTY_LIST);
+        if ("target".equals(name)) {
+            // Return the id of the target of the event
+            final String originalId = (targetObject instanceof XFormsControl) ? ((XFormsControl) targetObject).getOriginalId() : targetObject.getEffectiveId();
+            return new ListIterator(Collections.singletonList(new StringValue(originalId)));
+        } else {
+            // "If the event context information does not contain the property indicated by the string argument, then an
+            // empty node-set is returned."
+            return new EmptyIterator();
+        }
     }
 }

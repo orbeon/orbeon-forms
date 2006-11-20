@@ -42,8 +42,6 @@ public abstract class XFormsMIPEvent extends XFormsEvent {
         if ("target-ref".equals(name)) {
             // Return the node to which the control is bound
             return new ListIterator(Collections.singletonList(targetXFormsControl.getBoundNode()));
-        } else if ("target-id".equals(name)) {
-            return new ListIterator(Collections.singletonList(new StringValue(targetXFormsControl.getOriginalId())));
         } else if ("alert".equals(name)) {
             final String alert = targetXFormsControl.getAlert();
             if (alert != null)

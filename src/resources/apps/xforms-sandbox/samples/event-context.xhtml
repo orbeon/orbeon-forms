@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Event Context</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <instance>
+                    <name/>
+                    <description/>
+                    <gender/>
+                    <dom-focus-in-target/>
+                    <dom-focus-out-target/>
+                    <value-changed-target/>
+                    <children>
+                        <child>Child 1</child>
+                        <child>Child 2</child>
+                    </children>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group>
+            <xforms:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('target')"/>
+            <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('target')"/>
+            <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('target')"/>
+            <xhtml:p>
+                <xforms:input ref="name" id="name-control">
+                    <xforms:label>Name:</xforms:label>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:textarea ref="description" id="description-control">
+                    <xforms:label>Description:</xforms:label>
+                </xforms:textarea>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:select1 ref="gender" id="gender-control">
+                    <xforms:label>Gender:</xforms:label>
+                    <xforms:item>
+                        <xforms:label>M</xforms:label>
+                        <xforms:value>m</xforms:value>
+                    </xforms:item>
+                    <xforms:item>
+                        <xforms:label>F</xforms:label>
+                        <xforms:value>F</xforms:value>
+                    </xforms:item>
+                </xforms:select1>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="dom-focus-in-target" id="dom-focus-in-control">
+                    <xforms:label>DOMFocusIn:</xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="dom-focus-out-target" id="dom-focus-out-control">
+                    <xforms:label>DOMFocusOut:</xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:output ref="value-changed-target" id="value-changed-control">
+                    <xforms:label>xforms-value-changed:</xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xforms:repeat nodeset="children/child">
+                <xhtml:div>
+                    <xforms:input ref="." id="child-control">
+                        <xforms:label>Child:</xforms:label>
+                    </xforms:input>
+                </xhtml:div>
+            </xforms:repeat>
+        </xforms:group>
+
+    </xhtml:body>
+</xhtml:html>

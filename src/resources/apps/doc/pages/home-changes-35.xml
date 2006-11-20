@@ -37,12 +37,13 @@
                 </p>
             </note>
             <p>
-                Orbeon Forms 3.5 M1 features many improvements over Orbeon Forms 3.0.1, including XForms engine
-                performance enhancements, bug-fixes, new features and enhanced browser support.
+                Orbeon Forms 3.5 features many improvements over Orbeon PresentationServer (OPS) 3.0.1, including XForms
+                engine performance enhancements, enhanced browser support, and quality improvements. Orbeon Forms 3.5
+                also features a much simplified directory structure that makes it easier to get started with your own
+                Orbeon Forms applications.
             </p>
             <p>
-                This document describes changes made between Orbeon PresentationServer (OPS) 3.0.1 and Orbeon Forms 3.5
-                M1.
+                This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.
             </p>
         </section>
         <section>
@@ -427,6 +428,11 @@
                         </ul>
                     </li>
                 </ul>
+                <p>
+                    The new directory structure makes it easier to get started with your own Orbeon Forms applications.
+                    It also makes upgrading to a new version of OPS easier, since the files you are not likely to modify
+                    are packaged in JAR files that you simply replace during an upgrade.
+                </p>
             </section>
             <section>
                 <title>Other Enhancements</title>

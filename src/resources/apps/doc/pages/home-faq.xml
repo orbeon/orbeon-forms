@@ -32,63 +32,45 @@
         </section>
         <a name="general"/>
         <section>
-            <title>General Orbeon PresentationServer FAQ</title>
+            <title>General Orbeon Forms FAQ</title>
             <a name="what-is"/>
             <section added="2006-01-10" updated="2006-11-06">
                 <title>What is Orbeon Forms?</title>
                 <p>
-                    Orbeon Forms Orbeon Forms (formerly Orbeon PresentationServer (OPS)) is an open source forms
-                    solution that handles the complexity of forms typical of the enterprise or government. It is brought
-                    to standard web browsers (including Internet Explorer, Firefox, Safari and Opera) thanks to Ajax
-                    technology, with no need for client-side software or plugins. Orbeon Forms allows you to build fully
-                    interactive forms with features that include as-you-type validation, optional and repeated sections,
-                    always up-to-date error summaries, PDF output, full internationalization, and controls like
+                    Orbeon Forms (formerly Orbeon PresentationServer (OPS)) is an open source forms solution that
+                    handles the complexity of forms typical of the enterprise or government. It is brought to standard
+                    web browsers (including Internet Explorer, Firefox, Safari and Opera) thanks to Ajax technology,
+                    with no need for client-side software or plugins. Orbeon Forms allows you to build fully interactive
+                    forms with features that include as-you-type validation, optional and repeated sections, always
+                    up-to-date error summaries, PDF output, full internationalization, and controls like
                     auto-completion, tabs, dialogs, trees and menus. Orbeon Forms already supports parts of the XForms
                     1.1 specification.
                 </p>
                 <p>
-                    Unlike other web application platforms based on Java objects or scripting languages, OPS is based on
-                    XML documents and XForms. This leads to an architecture perfectly suited for the tasks of capturing,
-                    processing, and presenting XML data (in particular form data), and does not require writing any Java
-                    or scripting code at all.
+                    Unlike other web application platforms based on Java objects or scripting languages, Orbeon Forms is
+                    based on XML documents and XForms. This leads to an architecture perfectly suited for the tasks of
+                    capturing, processing, and presenting XML data (in particular form data), and does not require
+                    writing any Java, JavaScript or other scripting code at all.
                 </p>
                 <p>
-                    OPS is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to standard
-                    browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature, high-performance XML
-                    pipeline engine for processing XML data.
+                    Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings W3C XForms to
+                    standard browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
+                    high-performance XML pipeline engine for processing XML data.
                 </p>
             </section>
             <section added="2006-02-04">
-                <title>Is Orbeon PresentationServer an XForms Engine?</title>
+                <title>Is Orbeon Forms an XForms Engine?</title>
                 <p>
-                    Orbeon PresentationServer does contain an XForms engine, which we refer to as the OPS XForms engine.
-                    It also contains an XML pipeline engine running the XPL pipeline language, an application
-                    controller (the Page Flow Controller or PFC), and built-in components to perform XSLT
-                    transformations, database access, and more. Needless to say, OPS ships with examples and
-                    documentation.
+                    Orbeon Forms does contain an XForms engine, which we refer to as the Orbeon Forms XForms engine. It
+                    also contains an XML pipeline engine running the XPL pipeline language, an application controller
+                    (the Page Flow Controller or PFC), and built-in components to perform XSLT transformations,
+                    database access, and more. Needless to say, Orbeon Forms ships with examples and documentation.
                 </p>
                 <p>
-                    You are free to use OPS only for its XForms functionality, but you can also leverage more of OPS to
-                    build your application's presentation layer.
-                </p>
-            </section>
-            <!--
-            <a name="compare-model2x"/>
-            <section>
-                <title>How does OPS compare with Model 2X?</title>
-                <p>
-                    Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to Web applications.
-                    Model 2X builds on top of Model 2 and replaces the JSP layer with XML and XSLT. Model 2X was first
-                    described in an <a
-                    href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a> Orbeon
-                    published by JavaWorld in February 2002. A variant of the concept using JavaServer Faces was <a
-                    href="http://www.theserverside.com/articles/article.tss?l=BestBothWorlds">published</a> in
-                    TheServerSide in 2003. OPS can be used to implement Model 2X and much more, but the current focus of
-                    the platform remains XForms technology. For more information, please refer to the <a href=".">OPS
-                    User Guide</a>.
+                    You are free to use Orbeon Forms only for its XForms functionality, but you can also leverage more
+                    of Orbeon Forms to build your forms-based application.
                 </p>
             </section>
-            -->
             <a name="name-change"/>
             <section>
                 <title>Why did we rename Orbeon PresentationServer to Orbeon Forms?</title>
@@ -157,8 +139,8 @@
                     information about XForms direct from W3C.
                 </p>
                 <p>
-                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms
-                    is to make web forms design easier, allowing the developer to write less client-side scripting (or
+                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The main goal of XForms is
+                    to make web forms design easier, allowing the developer to write less client-side scripting (or
                     none at all), and less server-side code thanks to a feature-rich declarative approach.
                 </p>
                 <p>
@@ -175,22 +157,23 @@
                     <li>Not tied to a particular platform or language such as Java or .NET</li>
                 </ul>
                 <p>
-                    See also the OPS <a href="reference-xforms-ng#introduction">XForms Introduction</a> section.
+                    See also the Orbeon Forms <a href="reference-xforms-ng#introduction">XForms Introduction</a>
+                    section.
                 </p>
             </section>
             <a name="xforms-compliance"/>
             <section>
-                <title>How much of the XForms specification does OPS support?</title>
+                <title>How much of the XForms specification does Orbeon Forms support?</title>
                 <p>
-                    The OPS implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
-                    (Second Edition) Recommendation</a> (14 March 2006). The XForms NG engine in OPS 3.5 is close to
-                    supporting all of the XForms 1.0 specification. For more detailed information on what features are
-                    supported in the latest version of OPS, see the <a href="reference-xforms-compliance">XForms
-                    Compliance</a> section of the documentation.
+                    The Orbeon Forms implementation is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms
+                    1.0 (Second Edition) Recommendation</a> (14 March 2006). The XForms NG engine in Orbeon Forms 3.5
+                    is close to supporting all of the XForms 1.0 specification. For more detailed information on what
+                    features are supported in the latest version of Orbeon Forms, see the <a
+                    href="reference-xforms-compliance">XForms Compliance</a> section of the documentation.
                 </p>
                 <p>
-                    OPS also supports several features from XForms 1.1 (in draft as of August 2006), as well as
-                    extensions such as new widgets (autocomplete, tree, menu, etc.).
+                    Orbeon Forms also supports several features from XForms 1.1 (in draft as of August 2006), as well as
+                    extensions such as new widgets (autocomplete, tree, menu, dialog, etc.).
                 </p>
             </section>
             <a name="xforms-browsers"/>
@@ -201,7 +184,7 @@
                     web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
                 </p>
                 <p>
-                    You run XForms on the server by installing the OPS XForms engine on your server. The XForms engine
+                    You run XForms on the server by installing the Orbeon Forms XForms engine on your server. The XForms engine
                     translates your XForms pages to HTML, CSS and JavaScript that your browser understands. Your web
                     browser sees a regular Ajax application, but as a developer you write standard XForms instead of
                     JavaScript!
@@ -239,8 +222,8 @@
                     Historically, the XForms specification assumed that XForms was implemented on the client-side,
                     natively within a web browser. But as discussed <a href="#xforms-browsers">here</a>, XForms-based
                     applications can use server-side or hybrid implementations that share XForms processing between
-                    server-side code and client-side code and rely on Ajax technology. Orbeon PresentationServer
-                    features such an Ajax-based implementation.
+                    server-side code and client-side code and rely on Ajax technology. Orbeon Forms features such an
+                    Ajax-based implementation.
                 </p>
                 <p>
                     A server-side implementation of XForms translates your forms described in terms of the XForms
@@ -276,45 +259,45 @@
             <section added="2006-01-10">
                 <title>What are the XForms Classic and XForms NG engnes?</title>
                 <p>
-                    Up to version 2.8, OPS featured a pure server-side XForms engine with limited XForms functionality.
-                    With version 3.0, OPS features a much enhanced XForms engine, with support for almost the entire
-                    XForms specification, with the intent to completely support XForms 1.0 and XForms 1.1 in the future.
-                    The older XForms engine has been informally dubbed "XForms Classic", and the new XForms engine
-                    "XForms NG".
+                    Up to version 2.8, Orbeon Forms featured a pure server-side XForms engine with limited XForms
+                    functionality. With version 3.0, Orbeon Forms features a much enhanced XForms engine, with support
+                    for almost the entire XForms specification, with the intent to completely support XForms 1.0 and
+                    XForms 1.1 in the future. The older XForms engine has been informally dubbed "XForms Classic", and
+                    the new XForms engine "XForms NG".
                 </p>
                 <p>
-                    For backward compatibility reasons, the XForms Classic engine is still present in OPS 3.5. We plan
-                    over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well, therefore making
-                    XForms Classic obsolete in OPS.
+                    For backward compatibility reasons, the XForms Classic engine is still present in Orbeon Forms 3.5.
+                    We plan over time to allow XForms NG to support non-JavaScript, non-Ajax browsers as well,
+                    therefore making XForms Classic obsolete in Orbeon Forms.
                 </p>
             </section>
             <a name="xforms-classic-or-ng"/>
             <section added="2006-01-10">
                 <title>How do I know which XForms engine I am using?</title>
                 <p>
-                    If you are using OPS 2.8 or earlier, you are using XForms Classic. If you are using OPS 3.0 or
-                    later, then you may be using XForms Classic or XForms NG, but there is an easy way to tell: if a
-                    <code>&lt;page></code> entry in your page flow features an <code>xforms</code> attribute, then and
-                    only then that page is using XForms Classic. Otherwise, if the page view contains at least one
-                    XForms model under its <code>xhtml:head</code> element, then it is using XForms NG.
+                    If you are using Orbeon Forms 2.8 or earlier, you are using XForms Classic. If you are using Orbeon
+                    Forms 3.0 or later, then you may be using XForms Classic or XForms NG, but there is an easy way to
+                    tell: if a <code>&lt;page></code> entry in your page flow features an <code>xforms</code>
+                    attribute, then and only then that page is using XForms Classic. Otherwise, if the page view
+                    contains at least one XForms model under its <code>xhtml:head</code> element, then it is using
+                    XForms NG.
                 </p>
             </section>
             <a name="xforms-classic-deprecation"/>
             <section added="2006-01-10">
                 <title>Should I keep using the XForms Classic engine?</title>
                 <p>
-                    The XForms Classic engine is available only for backward compatibility. It is deprecated and may
-                    be removed in the future. If you are starting an application from scratch with OPS 3.5, we strongly
-                    advise against using XForms Classic. If you are migrating to OPS 3.5, we advise starting migrating
-                    XForms NG. You can keep your existing pages working with XForms Classic, and write new pages with
-                    XForms NG. Over time, you can migrate existing XForms Classic pages to XForms NG, making for a
-                    smooth transition.
+                    The XForms Classic engine is available only for backward compatibility. It is deprecated and may be
+                    removed in the future. If you are starting an application from scratch with Orbeon Forms 3.5, we
+                    strongly advise against using XForms Classic. If you are migrating to Orbeon Forms 3.5, we advise
+                    starting migrating XForms NG. You can keep your existing pages working with XForms Classic, and
+                    write new pages with XForms NG. Over time, you can migrate existing XForms Classic pages to XForms
+                    NG, making for a smooth transition.
                 </p>
                 <p>
-                    As of OPS 3.5, some features of XForms Classic have not yet made it into XForms NG, in particular
-                    support for browsers with very limited JavaScript functionality, and non-Ajax mode. In time, we hope
-                    to bring these features to XForms NG as well, therefore completely removing the need for XForms
-                    Classic.
+                    As of Orbeon Forms 3.5, only one feature of XForms Classic have not yet made it into XForms NG:
+                    support for browsers with very limited JavaScript functionality (non-Ajax mode). In time, we hope to
+                    bring these features to XForms NG as well, therefore completely deprecating XForms Classic.
                 </p>
             </section>
             <a name="xforms-classic-migration"/>
@@ -339,16 +322,16 @@
             <section>
                 <title>How can I perform a file upload?</title>
                 <p>
-                    Check the <a href="reference-xforms-ng#xforms-upload">XForms upload control</a>
-                    and the <a href="/goto-example/xforms-upload">XForms upload example</a>
+                    Check the <a href="reference-xforms-ng#xforms-upload">XForms upload control</a> and the <a
+                    href="/goto-example/xforms-upload">XForms upload example</a>
                 </p>
             </section>
             <a name="xforms-upload-trouble"/>
             <section added="2005-05-21">
                 <title>My XForms upload doesn't work. What can I do?</title>
                 <p>
-                    With OPS 2.8 or earlier, or if you are using XForms Classic with OPS 3.0 or later, make sure that
-                    you have the correct submission method and encoding in your XForms model:
+                    With Orbeon Forms 2.8 or earlier, or if you are using XForms Classic with Orbeon Forms 3.0 or
+                    later, make sure that you have the correct submission method and encoding in your XForms model:
                 </p>
                 <p>
                     <xml-source>
@@ -356,61 +339,62 @@
                     </xml-source>
                 </p>
                 <p>
-                    With OPS 3.0 and XForms NG, uploaded files can only be retrieved with a
-                    submission with <code>replace="all"</code>.
+                    With Orbeon Forms 3.0 and XForms NG, uploaded files can only be retrieved with a submission with
+                    <code>replace="all"</code>.
                 </p>
             </section>
             <a name="xforms-jsp-mix"/>
             <section added="2006-01-11">
                 <title>Can I mix and match XForms and JSP?</title>
                 <p>
-                    Yes, you can use JSP alongside XForms, even within the same web app. You can
-                    "call" JSP by redirecting or forwarding using the <a
-                    href="processors-other#redirect-processor">Redirect processor</a>. You can also
-                    use the Servlet Include generator to include the content produced by a JSP.
-                    Finally, you can use the Servlet Filter generator and implement JSP
-                    post-processing with OPS.
+                    Yes, you can use JSP alongside XForms, even within the same web app. You can "call" JSP by
+                    redirecting or forwarding using the <a href="processors-other#redirect-processor">Redirect
+                    processor</a>. You can also use the Servlet Include generator to include the content produced by a
+                    JSP. Finally, you can use the Servlet Filter generator and implement JSP post-processing with Orbeon
+                    Forms.
                 </p>
             </section>
             <a name="jsr-168"/>
             <section>
                 <title>Can I run XForms within JSR-168 portlets?</title>
                 <p>
-                    As of OPS 3.5, it is possible to use the OPS XForms engine within the Java Portlet (JSR-168)
-                    compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
+                    As of Orbeon Forms 3.5, it is possible to use the Orbeon Forms XForms engine within the Java Portlet
+                    (JSR-168) compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
                 </p>
                 <p>
                     To do this, use the provided <code>epilogue-portlet-liferay.xpl</code> epilogue instead of the
-                    default <code>epilogue-portlet.xpl</code>. It is expected that OPS will work within other JSR-168
-                    portals, or that only minor adjustments will be needed in such cases.
+                    default <code>epilogue-portlet.xpl</code>. It is expected that Orbeon Forms will work within other
+                    JSR-168 portals, or that only minor adjustments will be needed in such cases.
                 </p>
                 <p>
-                    The great thing about OPS and portlets is that there is very little difference if any between
-                    writing an application working in a portlet vs. a servlet. In fact, all the OPS XForms examples work
-                    unmodified as portlets. You can use some particularities of portlets, like preferences, and you have
-                    to be careful about paths to serve resources, but otherwise portlets are transparent to the
-                    developer. This contrasts with many other web platforms.
+                    The great thing about Orbeon Forms and portlets is that there is very little difference if any
+                    between writing an application working in a portlet vs. a servlet. In fact, all the Orbeon Forms
+                    XForms examples work unmodified as portlets. You can use some particularities of portlets, like
+                    preferences, and you have to be careful about paths to serve resources, but otherwise portlets are
+                    transparent to the developer. This contrasts with many other web platforms.
                 </p>
                 <p>
-                    In other words, OPS gives you the flexibility to write an application that works in standalone mode,
-                    and allows you to migrate to a portlet environment at minimal cost. This contrasts with many other
-                    web application technologies, which sometimes require you to rewrite your application entirely to
-                    fit within a portlet.
+                    In other words, Orbeon Forms gives you the flexibility to write an application that works in
+                    standalone mode, and allows you to migrate to a portlet environment at minimal cost. This contrasts
+                    with many other web application technologies, which sometimes require you to rewrite your
+                    application entirely to fit within a portlet.
                 </p>
                 <p>
-                    <i>HISTORICAL NOTE: There has been a lot of code in OPS to support JSR-168 since late 2003
-                    already. When this code was written, the JSR-168 specification was not final and no JSR-168
+                    <i>HISTORICAL NOTE: There has been a lot of code in Orbeon Forms to support JSR-168 since late
+                    2003 already. When this code was written, the JSR-168 specification was not final and no JSR-168
                     container was available. So Orbeon developped a container based on draft specifications for testing.
-                    This code was used until recently to run the OPS examples portal: examples were actually using the
-                    portlet code and running as portlets, and the examples portal is an early JSR-168 portal.</i>
+                    This code was used until recently to run the Orbeon Forms examples portal: examples were actually
+                    using the portlet code and running as portlets, and the examples portal is an early JSR-168 portal.
+                    Note that this is no longer the case with Orbeon Forms 3.5, where the example applications portal
+                    does not use JSR-168 for performance and simplicity reasons.</i>
                 </p>
             </section>
             <a name="browser-support"/>
             <section>
                 <title>What web browsers does the Ajax-based XForms engine support?</title>
                 <p>
-                    OPS 3.5's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later), and
-                    Opera (8.5 and later).
+                    Orbeon Forms 3.5's XForms engine supports Firefox (1.0.7 and later), IE 6, Safari (1.3 and later),
+                    and Opera (8.5 and later).
                 </p>
                 <p>
                     We hope to also implement support in XForms NG for non-JavaScript, non-Ajax browsers.
@@ -433,10 +417,29 @@
                     tools. However, we reckon that helping developers during the first stages of application development
                     is valuable and we would like in the future to offer such a tool, most likely web-based (and itself
                     implemented with XForms!).
-
                 </p>
                 <p>
                     If you have good experience with a visual tool, please be sure to let us know.
+                </p>
+            </section>
+            <a name="javascript-dom"/>
+            <section>
+                <title>Can I use JavaScript to modify the page DOM and add or remove XForms controls?</title>
+                <p>
+                    No, because your JavaScript code will run within the web browser. All the web browser sees is an
+                    HTML DOM (Document Object Model), which represents the HTML document produced by Orbeon Forms when
+                    it transforms XForms+XHTML into plain HTML. That DOM does not include in XForms elements.
+                </p>
+                <p>
+                    Remember, the Orbeon XForms implementation works server-side in order to support currently deployed
+                    browsers. It achieves this by sending to web browsers not XForms (which they wouldn't understand),
+                    but HTML, JavaScript, and CSS (which they do understand).
+                </p>
+                <p>
+                    If you just want to conditionally include XForms controls when the page is loaded, you can use an
+                    XSLT page view. If you want to control the showing or hiding of XForms controls after the page is
+                    loaded, you can use XForms relevance or switch/case. Currently, the only thing you can't do is
+                    dynamically add and remove trees of controls in a running XForms page.
                 </p>
             </section>
         </section>
@@ -478,7 +481,7 @@
             <section>
                 <title>What is XPL?</title>
                 <p>
-                    At the core of OPS lies a powerful XML processing engine that
+                    At the core of Orbeon Forms lies a powerful XML processing engine that
                     natively speaks the <a
                     href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XML Pipeline
                     Language (XPL)</a>. XPL is a declarative language for processing XML using a
@@ -489,7 +492,7 @@
                     validation, and sub-pipelines.
                 </p>
                 <p>
-                    The Orbeon XPL pipeline engine used in OPS is designed for
+                    The Orbeon XPL pipeline engine used in Orbeon Forms is designed for
                     low-memory consumption and supports transparent caching.
                 </p>
             </section>
@@ -498,7 +501,7 @@
                 <title>What is an XML processor?</title>
                 <p>
                     The term XML processor is commonly used to refer to XML parsers. In the context
-                    of OPS, the term
+                    of Orbeon Forms, the term
                     <i>XML processor</i> is used to refer to
                     any software component consuming and/or producing XML documents. An XML
                     processor can also simply be called an
@@ -513,7 +516,7 @@
                     an XSLT transformation on an XML document that is located on disk, and then
                     writes the result back to a another file on disk. For more details about XPL,
                     please see the <a href="reference-xpl-pipelines">XPL and Pipelines reference
-                    documentation</a>, or the <a href="/doc/pages/OPS Tutorial.pdf">OPS tutorial</a>.
+                    documentation</a>, or the <a href="/doc/pages/OPS Tutorial.pdf">Orbeon Forms tutorial</a>.
                 </p>
                 <div class="image">
                     <img width="482" height="310" src="../apps/doc/images/2-stage-pipeline.png"/>
@@ -540,7 +543,7 @@
                     on a standard XML processing language. While the deliverable of the working
                     group will certainly not be exactly XPL, we do hope that in its first version it
                     will cover a significant number of use cases currently covered by the XPL
-                    implementation found in Orbeon PresentationServer.
+                    implementation found in Orbeon Forms.
                 </p>
                 <p>
                     As of September 2006, the XML Processing Model Working Group (of which Orbeon is a member) has
@@ -557,7 +560,7 @@
             <section>
                 <title>How much of the XPointer specification does XPL support?</title>
                 <p>
-                    OPS supports a subset of <a
+                    Orbeon Forms supports a subset of <a
                     href="http://www.w3.org/TR/xptr-xpointer/">XPointer</a>. You can use the
                     XPointer <code>document#xpointer(/xpath/expression)</code> syntax to extract a
                     nodeset from a document.
@@ -588,13 +591,13 @@
             </section>
             <a name="caching"/>
             <section>
-                <title>How does caching work in OPS?</title>
+                <title>How does caching work in Orbeon Forms?</title>
                 <p>
                     Caching mechanisms should have no impact on the behavior of a system, except
                     for a gain in performance. This is also the principle followed by the
-                    OPS cache: when you develop an application with
-                    OPS, you should be able to ignore that caching takes place. This
-                    may be all you want to know about caching in OPS!
+                    Orbeon Forms cache: when you develop an application with
+                    Orbeon Forms, you should be able to ignore that caching takes place. This
+                    may be all you want to know about caching in Orbeon Forms!
                 </p>
                 <p>
                     To get a better understanding of the underlying mechanism,
@@ -634,7 +637,7 @@
                     time you generated that output, you wouldn't have to
                     actually run the transformation again: you could just reuse
                     the result you already have. This is the basic of caching in
-                    OPS.
+                    Orbeon Forms.
                 </p>
                 <p>
                     In this example, the result of the XSLT transformation is
@@ -652,23 +655,23 @@
                     Therefore, if neither the XSLT transformer's
                     <code>config</code> nor
                     <code>data</code> input has changed, the XUpdate processor can keep the
-                    same program in the OPS object cache, saving an XSLT stylesheet
+                    same program in the Orbeon Forms object cache, saving an XSLT stylesheet
                     compilation, an XSLT transformation, and an XUpdate program compilation.
                 </p>
                 <p>
                     The same mechanism applies to the XSLT transformer configuration: the compiled
-                    XSLT stylesheet can be kept in the OPS object cache. And if the
+                    XSLT stylesheet can be kept in the Orbeon Forms object cache. And if the
                     output of the XUpdate transformation is sent to an HTML serializer, the HTML
                     output could be cached as well.
                 </p>
                 <p>
-                    In general, OPS does not unnecessarily cache the XML
+                    In general, Orbeon Forms does not unnecessarily cache the XML
                     documents passed between processors. Instead, it caches the
                     result of time-consuming operations, as illustrated above.
                 </p>
                 <p>
                     Some cases are more complex than the example shown here. For
-                    example in the case of XSLT 1.0, OPS handles caching and
+                    example in the case of XSLT 1.0, Orbeon Forms handles caching and
                     dependencies related to imports, includes as well as the
                     XPath
                     <code>document()</code> function when the URL passed
@@ -682,7 +685,7 @@
                     Do debug attributes make my application slower?
                 </title>
                 <p>
-                    The OPS cache avoids executing the parts of a pipeline that do
+                    The Orbeon Forms cache avoids executing the parts of a pipeline that do
                     not need to be re-evaluated. However when the a debug attribute is set, the
                     point where the attribute is set needs to be evaluated so that meaningful data
                     can be displayed. This can cause the performance to degrade. Debug attributes
@@ -760,7 +763,7 @@
         </section>
         <a name="other"/>
         <section>
-            <title>Other Orbeon PresentationServer FAQ</title>
+            <title>Other Orbeon Forms FAQ</title>
             <a name="ie-cannot-find-server"/>
             <section added="2006-10-24">
                 <title>Why am I getting an error page "Cannot find server or DNS server error" on IE only?</title>
@@ -818,9 +821,9 @@
             </section>
             <a name="performance-numbers"/>
             <section added="2006-01-11">
-                <title>I am concerned about the performance of OPS. Can you provide performance numbers please?</title>
+                <title>I am concerned about the performance of Orbeon Forms. Can you provide performance numbers please?</title>
                 <p>
-                    We provide recommendations on how to tune OPS applications in the <a
+                    We provide recommendations on how to tune Orbeon Forms applications in the <a
                     href="integration-tuning">Performance and Tuning</a> section. Orbeon does not
                     provide performance figures at this point, due to the number of different
                     possible scenarios, the differences between hardware platforms, and the
@@ -836,14 +839,14 @@
             <a name="xslt-perf"/>
             <a name="xslt-processor"/>
             <section>
-                <title>What is the recommended XSLT transformer for OPS?</title>
+                <title>What is the recommended XSLT transformer for Orbeon Forms?</title>
                 <p>
-                    <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within OPS. It has proven
+                    <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within Orbeon Forms. It has proven
                     reliable, and supports the latest <a href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> and <a
                     href="http://www.w3.org/TR/xpath20/">XPath 2.0</a> drafts from the W3C.
                 </p>
                 <p>
-                    OPS also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
+                    Orbeon Forms also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
                 </p>
             </section>
             <a name="xslt-perf"/>
@@ -852,13 +855,13 @@
                 <p>
                     XSLT performance can vary greatly depending on the XSLT processor used. In
                     general, XSLT performance has shown perfectly adequate for all but the most
-                    performance-intensive applications. This being said, OPS
+                    performance-intensive applications. This being said, Orbeon Forms
                     minimizes the performance hit with its advanced cache, which for example caches
                     objects such as XSLT templates, therefore avoiding reparsing and revalidating
                     stylesheets unless absolutely necessary.
                 </p>
                 <p>
-                    OPS also ships with XSLTC, an XSLT compiler now part of Apache
+                    Orbeon Forms also ships with XSLTC, an XSLT compiler now part of Apache
                     Jakarta. XSLTC has shown significant performance improvements over the regular
                     Xalan implementation, at the cost of a lack of maturity.
                 </p>
@@ -919,7 +922,7 @@
             <a name="parse-xml-string"/>
             <section>
                 <title>
-                    How can I parse a string containing XML into a document that OPS can process?
+                    How can I parse a string containing XML into a document that Orbeon Forms can process?
                 </title>
 
                     <p>
@@ -1062,7 +1065,7 @@
                 </p>
                 <p>
                     This being said, our XUpdate implementation is functional and of course anybody
-                    is free to use it or contribute to it. Like the rest of OPS, it
+                    is free to use it or contribute to it. Like the rest of Orbeon Forms, it
                     is available under the LGPL license.
                 </p>
             </section>
@@ -1099,7 +1102,7 @@
                 </p>
                 <p>
                     Switching to Saxon will solve the problem. Saxon is now the default XSLT 1.0 and
-                    XSLT 2.0 processor in OPS, and will get used when using <code>oxf:xslt</code>.
+                    XSLT 2.0 processor in Orbeon Forms, and will get used when using <code>oxf:xslt</code>.
                     See the <a href="processors-xslt">XSLT documentation</a> for more information.
                 </p>
             </section>
@@ -1136,11 +1139,11 @@
             <a name="out-of-memory"/>
             <section added="2005-05-21">
                 <title>
-                    I am getting frequent Out of Memory errors with OPS. What can I do?
+                    I am getting frequent Out of Memory errors with Orbeon Forms. What can I do?
                 </title>
                 <p>
-                    Often, this is due to too many threads doing processing within OPS at the same
-                    time. There is just a lot going on in OPS when a request is processed, including
+                    Often, this is due to too many threads doing processing within Orbeon Forms at the same
+                    time. There is just a lot going on in Orbeon Forms when a request is processed, including
                     typically several XSLT transformations.
                 </p>
                 <p>
@@ -1179,9 +1182,9 @@
             </section>
             <a name="stack-traces"/>
             <section>
-                <title>OPS Java stack traces are very long. Does that mean that performance is necessarily bad?</title>
+                <title>Orbeon Forms Java stack traces are very long. Does that mean that performance is necessarily bad?</title>
                 <p>
-                    Java stack traces are indeed very long in OPS. This is due mainly to the nature
+                    Java stack traces are indeed very long in Orbeon Forms. This is due mainly to the nature
                     of XPL pipelines, which are implemented on top of the event-based SAX API.
                 </p>
                 <p>
@@ -1189,7 +1192,7 @@
                     looking at the length of a typical stack trace: you would have in addition to
                     that to look at the pattern of execution of those methods. For example, if every
                     top-level method call was going through, say, 300 levels of method calls, this
-                    would likely be an issue, but it is not the case in OPS. The bottom line is that
+                    would likely be an issue, but it is not the case in Orbeon Forms. The bottom line is that
                     no, the length of a stack trace does not directly correlate with poor
                     performance.
                 </p>
@@ -1200,7 +1203,7 @@
             </section>
             <a name="session-sharing"/>
             <section added="2006-01-11">
-                <title>Can JSP or other servlets share a session with OPS?</title>
+                <title>Can JSP or other servlets share a session with Orbeon Forms?</title>
                 <p>
                     Yes, the <a href="processors-serializers#scope-serializer">Scope serializer</a>
                     and <a href="processors-generators#scope-generator">Scope generator</a> simply
@@ -1214,18 +1217,16 @@
             <section>
                 <title>In Studio, why nothing shows up in the XPL Trace Views?</title>
                 <p>
-                    The XPL Trace facility provides information for a given page served by
-                    PresentationServer. For that page, it shows a tree of processor calls and
-                    indicates on that tree how much time has been spent on each node. This
-                    information collected by XPL Trace can be either sent to the standard output, or
-                    to Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL
-                    Trace Tree views. For this to work as expected:
+                    The XPL Trace facility provides information for a given page served by Orbeon Forms. For that page,
+                    it shows a tree of processor calls and indicates on that tree how much time has been spent on each
+                    node. This information collected by XPL Trace can be either sent to the standard output, or to
+                    Studio. When sent to Studio, it will be shown in the XPL Trace Table and XPL Trace Tree views. For
+                    this to work as expected:
                 </p>
                 <ul>
                     <li>
-                        You need to setup the port Studio listens to, from Preferences / Orbeon. That
-                        port must match the one you have setup in the PresentationServer <a
-                        href="reference-properties#trace">properties</a>.
+                        You need to setup the port Studio listens to, from Preferences / Orbeon. That port must match
+                        the one you have setup in Orbeon Forms <a href="reference-properties#trace">properties</a>.
                     </li>
                     <li>
                         After changing the port number in Studio, you might have to restart
@@ -1253,7 +1254,7 @@
                                 <code>Run | Run...</code>
                             </li>
                             <li>
-                                Either create a new J2EE Container Container for OPS launch configuration
+                                Either create a new J2EE Container Container for Orbeon Forms launch configuration
                                 or select an existing one.
                             </li>
                             <li>Select the Argguments tab.</li>
@@ -1295,7 +1296,7 @@
                         <p>
                             Make you don't have any "Address already in use" error in the Console
                             view when you start the application server. If you do, it means that you
-                            already have another application (other program, or other OPS
+                            already have another application (other program, or other Orbeon Forms
                             application maybe deployed in the same application server) using the
                             same port. On Windows, you can use <a
                             href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>

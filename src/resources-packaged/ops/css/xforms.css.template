@@ -217,6 +217,10 @@
     padding-right: 1px;
 }
 
+select.xforms-required-empty {
+    background: #fcc;
+}
+
 /* Hide input field for <xforms:input> when type is date */
 input.xforms-type-date {
     display: none;

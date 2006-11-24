@@ -84,7 +84,7 @@
             <xsl:stylesheet version="2.0"
                     xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
                     xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:import href="oxf:/config/theme/theme.xsl"/>
+                <xsl:import href="oxf:/config/theme/theme-plain.xsl"/>
                 <xsl:template match="/">
                     <!-- Try to output a title -->
                     <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">

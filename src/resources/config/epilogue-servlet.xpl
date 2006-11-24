@@ -40,6 +40,7 @@
                 <include>/request/container-type</include>
                 <include>/request/request-path</include>
                 <include>/request/headers/header[name = 'accept']</include>
+                <include>/request/parameters/parameter[starts-with(name, 'orbeon')]</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -51,7 +52,7 @@
         <p:when test="/xhtml:html">
             <!-- Apply theme -->
             <p:choose href="#request">
-                <p:when test="starts-with(/request/request-path, '/doc/')">
+                <p:when test="true() or starts-with(/request/request-path, '/doc/') or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>

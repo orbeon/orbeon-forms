@@ -523,6 +523,34 @@
                     </li>
                 </ul>
             </section>
+            <section>
+                <title>Upgrade Notes</title>
+                <p>
+                    Since the Orbeon Forms resources (found under WEB-INF/resources) have been reorganized, you will
+                    have to do a few changes when you upgrade from OPS 3.0 or 3.5 M1 to Orbeon Forms 3.5. We suggest the
+                    following:
+                </p>
+                <ul>
+                    <li>
+                        <p>First, backup everything  ;-)</p>
+                    </li>
+                    <li>
+                        <p>Rename your old <code>resources/ops</code> to <code>resources/ops.bak</code>.</p>
+                    </li>
+                    <li>
+                        <p>Rename your old <code>resources/config</code> to <code>resources/config.bak</code>.</p>
+                    </li>
+                    <li>
+                        <p>Copy the new Orbeon Forms <code>resources/config</code> directory to your <code>resources</code> directory.</p>
+                    </li>
+                    <li>
+                        <p>If you hadn't make any custom changes under the <code>config</code> directory, that should be
+                        it. Otherwise, you will need to merge those changes into the new <code>config</code> directory.
+                        Note in particular that <code>theme.xsl</code> no longer exist, and is replaced instead by
+                        <code>theme-plain.xsl</code> and <code>theme-portal.xsl</code> (referred from <code>epilogue-servlet.xpl</code>).</p>
+                    </li>
+                </ul>
+            </section>
             <ul>
                 <!--<li>-->
                     <!--<p>-->

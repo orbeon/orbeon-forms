@@ -52,7 +52,7 @@
         <p:when test="/xhtml:html">
             <!-- Apply theme -->
             <p:choose href="#request">
-                <p:when test="true() or starts-with(/request/request-path, '/doc/') or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
+                <p:when test="starts-with(/request/request-path, '/doc/') or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>

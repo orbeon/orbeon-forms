@@ -48,9 +48,9 @@ FCKConfig.AutoDetectLanguage	= true ;
 FCKConfig.DefaultLanguage		= 'en' ;
 FCKConfig.ContentLangDirection	= 'ltr' ;
 
-FCKConfig.ProcessHTMLEntities	= true ;
-FCKConfig.IncludeLatinEntities	= true ;
-FCKConfig.IncludeGreekEntities	= true ;
+FCKConfig.ProcessHTMLEntities	= false ;
+FCKConfig.IncludeLatinEntities	= false ;
+FCKConfig.IncludeGreekEntities	= false ;
 
 FCKConfig.FillEmptyBlocks	= true ;
 

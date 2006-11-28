@@ -30,19 +30,16 @@
         <section>
             <title>Scope</title>
             <p>
-                Web applications use forms to collect data from users. Orbeon PresentationServer
-                (OPS)'s form handling capabilities are based on <link
-                href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
-                href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
-                provides an introduction to XForms concepts and explains how to use XForms in your
-                OPS application.
+                Web applications use forms to collect data from users. Orbeon Forms's form handling capabilities are
+                based on <link href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
+                href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section provides an
+                introduction to XForms concepts and explains how to use XForms in your Orbeon Forms application.
             </p>
             <note>
                 <p>
-                    This document is considered a work in progress. While it does cover some
-                    generic features of XForms, it focuses before all on features specific to the
-                    OPS XForms engine. For more information about XForms, please refer to the
-                    following resources:
+                    This document is considered a work in progress. While it does cover some generic features of XForms,
+                    it focuses before all on features specific to the Orbeon Forms XForms engine. For more information
+                    about XForms, please refer to the following resources:
                 </p>
                 <ul>
                     <li>
@@ -78,9 +75,10 @@
                     As of July 2006, mainstream browsers (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not
                     support XForms natively, although XForms support in Mozilla is under way and plugins are available
                     for Internet Explorer. However you can leverage the benefits of XForms today by using an Ajax-based
-                    XForms engine like the one provided in OPS. The OPS XForms engine transparently generates HTML forms
-                    and performs the work that would be done by an XForms-compliant browser, and you can leverage XForms
-                    today within the mainstream browsers that are already deployed in the marketplace.
+                    XForms engine like the one provided in Orbeon Forms. The Orbeon Forms XForms engine transparently
+                    generates HTML forms and performs the work that would be done by an XForms-compliant browser, and
+                    you can leverage XForms today within the mainstream browsers that are already deployed in the
+                    marketplace.
                 </p>
                 <p>
                     For more information about the whys and therefores of server-side and Ajax-based XForms engines,
@@ -239,7 +237,7 @@
                     </li>
                 </ol>
                 <p>
-                    Your role as the author of an OPS application is:
+                    Your role as the author of an Orbeon Forms application is:
                 </p>
                 <ul>
                     <li>
@@ -271,26 +269,26 @@
         </section>
         <a name="xforms-getting-started"/>
         <section>
-            <title>Getting Started With the OPS XForms Engine</title>
+            <title>Getting Started With the Orbeon Forms XForms Engine</title>
             <section>
                 <title>The XForms Sandbox</title>
                 <p>
-                    The easiest way to get started with simple examples is to use the OPS XForms
-                    Sandbox. This tool allows you to upload example XForms files from your web browser
-                    and to see the results directly. You can access the XForms sandbox:
+                    The easiest way to get started with simple examples is to use the Orbeon Forms XForms Sandbox. This
+                    tool allows you to upload example XForms files from your web browser and to see the results
+                    directly. You can access the XForms sandbox:
                 </p>
                 <ul>
                     <li>
                         <p>
                             <b>Online:</b> visit <a
-                            href="http://www.orbeon.com/ops/goto-example/xforms-sandbox">this link</a>
+                            href="http://www.orbeon.com/ops/xforms-sandbox/">this link</a>
                             to access the online public XForms Sandbox.
                         </p>
                     </li>
                     <li>
                         <p>
-                            <b>Locally:</b> if this documentation is produced by your local installation
-                            of OPS, visit <a href="/goto-example/xforms-sandbox">this link</a>.
+                            <b>Locally:</b> if this documentation is produced by your local installation of Orbeon
+                            Forms, visit <a href="/xforms-sandbox/">this link</a>.
                         </p>
                     </li>
                 </ul>
@@ -304,9 +302,9 @@
             </section>
             <!--
             <section>
-                <title>Integrating XForms in OPS</title>
+                <title>Integrating XForms in Orbeon Forms</title>
                 <p>
-                    TODO: past the sandbox, how to integrate XForms with OPS: single static page,
+                    TODO: past the sandbox, how to integrate XForms with Orbeon Forms: single static page,
                     dynamic page, PFC and MVC, submissions, services, proxy mode, etc.
                 </p>
             </section>
@@ -676,8 +674,9 @@
             <a name="xforms-controls"/>
             <section>
                 <title>XForms Controls</title>
+                <a name="xforms-controls-list"/>
                 <section>
-                    <title>Controls</title>
+                    <title>Available Controls</title>
                     <p>
                         XForms controls are similar to HTML form elements: they include text fields,
                         drop down lists, checkboxes, etc. These are some differences between HTML
@@ -729,15 +728,23 @@
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:input ref="text"/>
                                 </xml-source>
+                                <p>
+                                    <code>xforms:input</code> supports the following extension attributes:
+                                </p>
+                                <ul>
+                                    <li><code>xxforms:size</code>: equivalent to the HTML <code>size</code> attribute</li>
+                                    <li><code>xxforms:maxlength</code>: equivalent to the HTML <code>maxlength</code> attribute</li>
+                                    <li><code>xxforms:autocomplete</code>: equivalent to the HTML <code>autocomplete</code> attribute</li>
+                                </ul>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <b>Password field</b>
-                                <img src="pages/reference-xforms-secret.png"/>
+                                <img src="../apps/doc/images/reference-xforms-secret.png"/>
                             </td>
                             <td>
                                 <xml-source border="false" show-namespaces="false">
@@ -745,7 +752,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -757,9 +764,16 @@
                                 <xml-source border="false" show-namespaces="false">
                                     <xforms:textarea ref="textarea"/>
                                 </xml-source>
+                                <p>
+                                    <code>xforms:textarea</code> supports the following extension attributes:
+                                </p>
+                                <ul>
+                                    <li><code>xxforms:rows</code>: equivalent to the HTML <code>rows</code> attribute</li>
+                                    <li><code>xxforms:cols</code>: equivalent to the HTML <code>cols</code> attribute</li>
+                                </ul>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -782,7 +796,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -805,7 +819,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -828,7 +842,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -848,7 +862,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-autocomplete">Auto-Complete</a>
+                                <a href="/xforms-autocomplete/">Auto-Complete</a>
                             </td>
                         </tr>
                         <tr>
@@ -873,7 +887,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -896,7 +910,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <tr>
@@ -912,7 +926,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                         <!-- TODO: show other apperances for trigger -->
@@ -980,7 +994,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-upload">Upload Control</a>
+                                <a href="/xforms-upload/">Upload Control</a>
                             </td>
                         </tr>
                         <tr>
@@ -996,7 +1010,7 @@
                                 </xml-source>
                             </td>
                             <td>
-                                <a href="../goto-example/xforms-controls">XForms Controls</a>
+                                <a href="/xforms-controls/">XForms Controls</a>
                             </td>
                         </tr>
                     </table>
@@ -1275,11 +1289,10 @@
                         <file filename="photo.jpg" mediatype="image/jpeg" size="2345">file:/C:/Tomcat/temp/upload_00000005.tmp</file>
                     </xml-source>
                     <warning>
-                        The URL stored as the value of the upload is temporary and only valid for the
-                        duration of the current request. It is only accessible from the server side, and
-                        will not be accessible from a client such as a web browser. It is not guaranteed
-                        to be a <code>file:</code> URL, only that it can be read with Presentation
-                        Server's <a href="processors-generators-url">URL generator</a>.
+                        The URL stored as the value of the upload is temporary and only valid for the duration of the
+                        current request. It is only accessible from the server side, and will not be accessible from a
+                        client such as a web browser. It is not guaranteed to be a <code>file:</code> URL, only that it
+                        can be read with Orbeon Forms's <a href="processors-generators-url">URL generator</a>.
                     </warning>
                     <p>
                         The contents of the file can be retrieved using the URL Generator. The result
@@ -1288,9 +1301,9 @@
                     </p>
                     <note>
                         <p>
-                            Using the <code>xs:anyURI</code> type allows OPS to make sure the uploaded
-                            file does not have to reside entirely in memory. This is the preferred
-                            method for uploading large files.
+                            Using the <code>xs:anyURI</code> type allows Orbeon Forms to make sure the uploaded file
+                            does not have to reside entirely in memory. This is the preferred method for uploading large
+                            files.
                         </p>
                     </note>
                     <p>
@@ -1759,8 +1772,7 @@
                 <section>
                     <title>Displaying Message with the <code>xforms:message</code> Action</title>
                     <p>
-                        The XForms message action displays a message to the user. OPS being a
-                        server-side XForms implementation. <img print-format="pdf"
+                        The XForms message action displays a message to the user. <img print-format="pdf"
                         src="../apps/doc/images/reference-xforms-message.png" style="clear: both; float: right"/>
                     </p>
                     <p>
@@ -1795,36 +1807,34 @@
             <section>
                 <title>Submission</title>
                 <p>
-                    Two properties control some aspects of XForms submission in OPS:
+                    Two properties control some aspects of XForms submission in Orbeon Forms:
                 </p>
                 <xml-source>
                     <property as="xs:boolean" name="oxf.xforms.optimize-post-all" value="true"/>
                 </xml-source>
                 <p>
-                    If set to <code>true</code> (the default), OPS optimizes submissions with
-                    <code>replace="all"</code> by sending the response of the submission directly to
-                    the web browser. This however means that submission errors cannot be caught by
-                    XForms event handlers after OPS has started connecting to the submission URL,
-                    as should be the case following XForms 1.0. If set to <code>false</code>, OPS
-                    buffers the reply so that errors can be handled as per XForms 1.0. However, this
-                    solution is less efficient.
+                    If set to <code>true</code> (the default), Orbeon Forms optimizes submissions with
+                    <code>replace="all"</code> by sending the response of the submission directly to the web browser.
+                    This however means that submission errors cannot be caught by XForms event handlers after Orbeon
+                    Forms has started connecting to the submission URL, as should be the case following XForms 1.0. If
+                    set to <code>false</code>, Orbeon Forms buffers the reply so that errors can be handled as per
+                    XForms 1.0. However, this solution is less efficient.
                 </p>
                 <xml-source>
                     <property as="xs:boolean" name="oxf.xforms.optimize-local-submission" value="true"/>
                 </xml-source>
                 <ul>
                     <li>
-                        If set to <code>true</code> (the default), OPS optimizes "local" HTTP and
-                        HTTPS submissions, i.e. submissions performed to a URL controlled by OPS
-                        itself, by directly submitting using the Java Servlet API instead of
-                        actually using the HTTP protocol for the submission.
+                        If set to <code>true</code> (the default), Orbeon Forms optimizes "local" HTTP and HTTPS
+                        submissions, i.e. submissions performed to a URL controlled by Orbeon Forms itself, by directly
+                        submitting using the Java Servlet API instead of actually using the HTTP protocol for the
+                        submission.
                     </li>
                     <li>
-                        If set to <code>false</code>, OPS always always uses the HTTP or HTTPS
-                        protocol, which is less efficient. In this case, it is possible to specify
-                        the <code>xxforms:post</code> method instead of the <code>post</code> method
-                        on the <code>xforms:submission</code> element to force an optimized local
-                        submission.
+                        If set to <code>false</code>, Orbeon Forms always always uses the HTTP or HTTPS protocol, which
+                        is less efficient. In this case, it is possible to specify the <code>xxforms:post</code> method
+                        instead of the <code>post</code> method on the <code>xforms:submission</code> element to force
+                        an optimized local submission.
                     </li>
                 </ul>
             </section>
@@ -1850,7 +1860,7 @@
                     in a user-readable format, like "January 10, 2005", "10 janvier 2005", or "10. Januar 2005".
                 </p>
                 <p>
-                    OPS provides an extension attribute, <code>xxforms:format</code>, for that purpose.
+                    Orbeon Forms provides an extension attribute, <code>xxforms:format</code>, for that purpose.
                     <code>xxforms:format</code> must contain an XPath 2.0 expression. In your XPath expression you can
                     use all the XPath 2.0 functions, including those for date manipulation (<a
                     href="http://www.w3.org/TR/2005/CR-xpath-functions-20051103/#durations-dates-times">external
@@ -1995,13 +2005,14 @@
                         <page id="..." path-info="..." model="my-page-model.xpl" view="my-page-view.xsl"/>
                     </xml-source>
                     <p>
-                        As always with OPS, the page model produces a page model document on its <code>data</code>
-                        output, and the page view can access this document on its <code>data</code> input, as shown in
-                        the following sections. The page view also has access on its <code>instance</code> input to the
-                        current XML submission, which may be an unmodified submission performed on the page (in case the
-                        page model doesn't have an <code>instance</code> output), or a submission created or modified by
-                        the page model and produced on its <code>instance</code> output. These mechanisms are described
-                        in details in the <a href="reference-page-flow#page-model-page-view">PFC documentation</a>.
+                        As always with Orbeon Forms, the page model produces a page model document on its
+                        <code>data</code> output, and the page view can access this document on its <code>data</code>
+                        input, as shown in the following sections. The page view also has access on its
+                        <code>instance</code> input to the current XML submission, which may be an unmodified submission
+                        performed on the page (in case the page model doesn't have an <code>instance</code> output), or
+                        a submission created or modified by the page model and produced on its <code>instance</code>
+                        output. These mechanisms are described in details in the <a
+                        href="reference-page-flow#page-model-page-view">PFC documentation</a>.
                     </p>
                 </section>
                 <a name="xforms-instance-initialization-xinclude"/>
@@ -2253,7 +2264,7 @@
                     dynamically.
                 </p>
                 <p>
-                    The following assumes that OPS runs in the /ops servlet context:
+                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
                 </p>
                 <table>
                     <tr>
@@ -2333,7 +2344,7 @@
                     <xforms:submission action="/submission" ref="..."/>
                 </xml-source>
                 <p>
-                    The following assumes that OPS runs in the /ops servlet context:
+                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
                 </p>
                 <table>
                     <tr>
@@ -2442,7 +2453,7 @@
                     is resolved relatively to the base URI.
                 </p>
                 <p>
-                    The following assumes that OPS runs in the <code>/ops</code> servlet context:
+                    The following assumes that Orbeon Forms runs in the <code>/ops</code> servlet context:
                 </p>
                 <table>
                     <tr>
@@ -2631,7 +2642,7 @@
                 </p>
             </section>
             <section>
-                <title>Implementing Services with OPS</title>
+                <title>Implementing Services with Orbeon Forms</title>
                 <p>
                     TODO
                 </p>
@@ -2654,9 +2665,9 @@
                 <section>
                     <title>Media Type for <code>xforms:output</code></title>
                     <p>
-                        In XForms 1.0, <code>xforms:output</code> is used to display text. However,
-                        based on a proposal in a draft version of XForms 1.1, OPS supports a
-                        <code>mediatype</code> attribute on that element.
+                        In XForms 1.0, <code>xforms:output</code> is used to display text. However, based on a proposal
+                        in a draft version of XForms 1.1, Orbeon Forms supports a <code>mediatype</code> attribute on
+                        that element.
                     </p>
                     <a name="xforms-image-mediatype"/>
                     <section>
@@ -2758,11 +2769,10 @@
                 <section>
                     <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, OPS supports an
-                        <code>origin</code> attribute on the <code>xforms:insert</code> action. This
-                        attribute allows specifying the source node to use as template. This allows
-                        storing templates separately from the node-set specified by the
-                        <code>nodeset</code> attribute. For example:
+                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports an
+                        <code>origin</code> attribute on the <code>xforms:insert</code> action. This attribute allows
+                        specifying the source node to use as template. This allows storing templates separately from the
+                        node-set specified by the <code>nodeset</code> attribute. For example:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:insert nodeset="address" at="last()" position="after" origin="instance('template-instance')"/>
@@ -2790,10 +2800,10 @@
                 <section>
                     <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, OPS supports a <code>context</code>
-                        attribute on the <code>xforms:insert</code> action. This attribute allows specifying a context
-                        for insertion, which along with the <code>origin</code> attribute allows inserting content into
-                        elements:
+                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports a
+                        <code>context</code> attribute on the <code>xforms:insert</code> action. This attribute allows
+                        specifying a context for insertion, which along with the <code>origin</code> attribute allows
+                        inserting content into elements:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:insert context="instance('main-instance')/books" nodeset="book" origin="instance('book-instance')"/>
@@ -2834,10 +2844,10 @@
                 <section>
                     <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, OPS supports the
-                        <code>validate</code> and <code>relevant</code> attributes on
-                        <code>xforms:submission</code>. For more information, please visit the
-                        <a href="http://www.w3.org/TR/2004/WD-xforms11-20041115/#submit-attribs">XForms 1.1 draft</a>.
+                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports the
+                        <code>validate</code> and <code>relevant</code> attributes on <code>xforms:submission</code>.
+                        For more information, please visit the <a
+                        href="http://www.w3.org/TR/2004/WD-xforms11-20041115/#submit-attribs">XForms 1.1 draft</a>.
                     </p>
                 </section>
             </section>
@@ -2845,7 +2855,7 @@
             <section>
                 <title>XPath Extension Functions</title>
                 <p>
-                    OPS implements some extension functions which can be used from XPath expressions
+                    Orbeon Forms implements some extension functions which can be used from XPath expressions
                     in XForms documents.
                 </p>
                 <section>
@@ -2862,7 +2872,7 @@
                 </section>
                 <a name="ops-extensions"/>
                 <section>
-                    <title>OPS Functions</title>
+                    <title>Orbeon Forms Functions</title>
                     <p>
                         The following functions are implemented:
                     </p>
@@ -3029,10 +3039,10 @@
                 <section>
                     <title>eXForms Functions</title>
                     <p>
-                        <a href="http://www.exforms.org/">eXForms</a> is a suggested set of
-                        extensions to XForms 1.0, grouped into different modules. OPS supports the
-                        <a href="http://www.exforms.org/mips.html"><code>exf:mip</code></a> module,
-                        which includes the following functions:
+                        <a href="http://www.exforms.org/">eXForms</a> is a suggested set of extensions to XForms 1.0,
+                        grouped into different modules. Orbeon Forms supports the <a
+                        href="http://www.exforms.org/mips.html"><code>exf:mip</code></a> module, which includes the
+                        following functions:
                     </p>
                     <ul>
                         <li>
@@ -3046,8 +3056,8 @@
                         </li>
                     </ul>
                     <p>
-                        OPS also supports the following from the <a href="http://exforms.org/sorting.html">sorting
-                        module</a>:
+                        Orbeon Forms also supports the following from the <a
+                        href="http://exforms.org/sorting.html">sorting module</a>:
                     </p>
                     <ul>
                         <li>
@@ -3163,8 +3173,8 @@
                                 </p>
                                 <warning>
                                     <p>
-                                        For security reasons, by default OPS prohibits client-side JavaScript from
-                                        dispatching any external events except <code>DOMActivate</code>,
+                                        For security reasons, by default Orbeon Forms prohibits client-side JavaScript
+                                        from dispatching any external events except <code>DOMActivate</code>,
                                         <code>DOMFocusIn</code> and <code>DOMFocusOut</code>. Furthermore, these events
                                         can only be dispatched to relevant and non-readonly XForms controls. In order to
                                         enable dispatching of custom events, you must first add the
@@ -3296,18 +3306,16 @@
             <section>
                 <title>Rationale</title>
                 <p>
-                    The OPS XForms engine requires keeping processing state while operating on an
-                    XForms page. Such state includes the current values of XForms instances,
-                    selected repeated elements, and more. With OPS, XForms state information can be
-                    handled in one of two ways:
+                    The Orbeon Forms XForms engine requires keeping processing state while operating on an XForms page.
+                    Such state includes the current values of XForms instances, selected repeated elements, and more.
+                    With Orbeon Forms, XForms state information can be handled in one of two ways:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            <b>Client-side:</b> in this case, static initial state information is
-                            sent along with the initial HTML page, and dynamic state is exchanged
-                            over the wire between the client browser and the OPS XForms server when
-                            necessary.
+                            <b>Client-side:</b> in this case, static initial state information is sent along with the
+                            initial HTML page, and dynamic state is exchanged over the wire between the client browser
+                            and the Orbeon Forms XForms server when necessary.
                         </p>
                         <p>
                             Benefits of the approach:
@@ -3315,9 +3323,9 @@
                         <ul>
                             <li>
                                 <p>
-                                    The OPS server is entirely stateless. It only requires memory
-                                    while processing a client request. It can be restarted without
-                                    consequence for the XForms engine.
+                                    The Orbeon Forms server is entirely stateless. It only requires memory while
+                                    processing a client request. It can be restarted without consequence for the XForms
+                                    engine.
                                 </p>
                             </li>
                             <li>
@@ -3340,14 +3348,12 @@
                             </li>
                             <li>
                                 <p>
-                                    More data circulates between the client browser and the OPS
-                                    XForms server.
+                                    More data circulates between the client browser and the Orbeon Forms XForms server.
                                 </p>
                             </li>
                         </ul>
                         <note>
-                            OPS compresses and encrypts XForms state information sent to the
-                            client.
+                            Orbeon Forms compresses and encrypts XForms state information sent to the client.
                         </note>
                     </li>
                     <li>
@@ -3369,8 +3375,8 @@
                             </li>
                             <li>
                                 <p>
-                                    Small amounts of data circulate between the client browser and
-                                    the OPS XForms server.
+                                    Small amounts of data circulate between the client browser and the Orbeon Forms
+                                    XForms server.
                                 </p>
                             </li>
                             <li>
@@ -3387,13 +3393,11 @@
                         <ul>
                             <li>
                                 <p>
-                                    The OPS XForms server needs to be stateful. It uses server
-                                    memory to store state information in a session even when no
-                                    request is being processed. The server must be configured to
-                                    determine how much state information is kept in a session, how
-                                    long session take to expire, etc. This creates additional demand
-                                    for resources on the server and complicates the task of
-                                    tuning the server.
+                                    The Orbeon Forms XForms server needs to be stateful. It uses server memory to store
+                                    state information in a session even when no request is being processed. The server
+                                    must be configured to determine how much state information is kept in a session, how
+                                    long session take to expire, etc. This creates additional demand for resources on
+                                    the server and complicates the task of tuning the server.
                                 </p>
                             </li>
                             <li>
@@ -3417,8 +3421,8 @@
                             </li>
                         </ul>
                         <note>
-                            OPS ensures that it is possible to open multiple client browser windows
-                            showing the same page within the same session.
+                            Orbeon Forms ensures that it is possible to open multiple client browser windows showing
+                            the same page within the same session.
                         </note>
                     </li>
                 </ul>
@@ -3472,7 +3476,7 @@
             <section>
                 <title>Handling the Browser's Back Button</title>
                 <p>
-                    TODO: Explain what OPS does and how different browsers behave.
+                    TODO: Explain what Orbeon Forms does and how different browsers behave.
                 </p>
             </section>
             -->
@@ -3589,16 +3593,16 @@
         <section added="2006-09-18">
             <title>Migrating from XForms Classic to XForms NG</title>
             <p>
-                Migrating from XForms Classic to XForms NG consists in telling OPS to use XForms NG, in making the
-                necessary changes to adjust your XForms model and controls (this is necessary as XForms Classic was
-                lacking in terms of compatibility with the XForms specification, and XForms NG on the contrary aims at
-                implementing XForms 1.0 and XForms 1.1 fully), and (sometimes optionally) in making some architectural
-                changes to your application:
+                Migrating from XForms Classic to XForms NG consists in telling Orbeon Forms to use XForms NG, in
+                making the necessary changes to adjust your XForms model and controls (this is necessary as XForms
+                Classic was lacking in terms of compatibility with the XForms specification, and XForms NG on the
+                contrary aims at implementing XForms 1.0 and XForms 1.1 fully), and (sometimes optionally) in making
+                some architectural changes to your application:
             </p>
             <ol>
                 <li>
                     <p>
-                        <b>Configuring OPS to use XForms NG.</b>
+                        <b>Configuring Orbeon Forms to use XForms NG.</b>
                     </p>
                     <ol>
                         <li>
@@ -3782,8 +3786,8 @@
                             <p>
                                 Because of the power of the <code>&lt;xforms:submission></code> element (which, with
                                 XForms 1.1, allows you to call any REST service), you are likely to move towards a
-                                service-oriented approach where your XForms page uses submissions that communicate
-                                with services. Such services may be external, or they may be implemented in OPS and
+                                service-oriented approach where your XForms page uses submissions that communicate with
+                                services. Such services may be external, or they may be implemented in Orbeon Forms and
                                 mapped in your page flow.
                             </p>
                         </li>

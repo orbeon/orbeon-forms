@@ -120,7 +120,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static void handleMIPClasses(StringBuffer sb, XFormsControl xformsControl) {
-        if (xformsControl != null) {// TEMP, xformsControl should not be null
+        if (xformsControl != null) {
+            // The case of a concrete control
             if (!xformsControl.isRelevant()) {
                 if (sb.length() > 0)
                     sb.append(' ');
@@ -147,6 +148,11 @@ public abstract class HandlerBase extends ElementHandlerNew {
                         sb.append(" xforms-required-filled");
                 }
             }
+        } else {
+            // Case of a non-concrete control - simply mark the control as disabled
+            if (sb.length() > 0)
+                sb.append(' ');
+            sb.append("xforms-disabled");
         }
     }
 
@@ -236,7 +242,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         return reusableAttributes;
     }
 
-    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl XFormsControl) {
+    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
 
         // Control name
         final StringBuffer sb;
@@ -301,7 +307,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
 
         // Static read-only
-        if (isStaticReadonly(XFormsControl))
+        if (isStaticReadonly(xformsControl))
             sb.append(" xforms-static");
 
         return sb;
@@ -369,7 +375,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
             // Handle alert state
             if (type.equals("alert")) {
-                if (!handlerContext.isGenerateTemplate() && !xformsControl.isValid())
+                if (!handlerContext.isGenerateTemplate() && xformsControl != null && !xformsControl.isValid())
                     classes.append(" xforms-alert-active");
                 else
                     classes.append(" xforms-alert-inactive");
@@ -377,7 +383,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
             // Handle visibility
             // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-            if (!handlerContext.isGenerateTemplate()) {
+            if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
                 if (type.equals("alert") || type.equals("label")) {
                     // Allow empty labels and alerts
                     if (!xformsControl.isRelevant())

@@ -241,7 +241,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         // Output divs information
                         {
                             final Element divsElement = dynamicStateElement.addElement("divs");
-                            XFormsServer.outputDivs(divsElement, xformsControls);
+                            XFormsServer.outputSwitchesDialogs(divsElement, xformsControls);
                         }
 
                         // Output repeat index information

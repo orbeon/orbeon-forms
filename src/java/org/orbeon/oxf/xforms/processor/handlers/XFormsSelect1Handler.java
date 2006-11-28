@@ -509,7 +509,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
             if (!handlerContext.isGenerateTemplate()) {
-                final String value = (xformsSelect1Control.getValue() == null) ? "" : xformsSelect1Control.getValue();
+                final String value = (xformsSelect1Control == null || xformsSelect1Control.getValue() == null) ? "" : xformsSelect1Control.getValue();
                 final StringBuffer sb = new StringBuffer();
                 int selectedFound = 0;
                 for (Iterator i = items.iterator(); i.hasNext();) {
@@ -541,7 +541,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     }
 
     private void outputJSONTreeInfo(XFormsValueControl xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
-        if (!handlerContext.isGenerateTemplate()) {
+        if (xformsControl != null && !handlerContext.isGenerateTemplate()) {
             // Produce a JSON fragment with hierachical information
             if (items.size() > 0) { // may be null when there is no item in the itemset
                 final String controlValue = xformsControl.getValue();

@@ -888,6 +888,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_MINIMAL_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_RESOURCES).booleanValue();
     }
 
+    public static boolean isOptimizeRelevance() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_OPTIMIZE_RELEVANCE_PROPERTY, XFormsConstants.DEFAULT_OPTIMIZE_RELEVANCE).booleanValue();
+    }
+
     public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 

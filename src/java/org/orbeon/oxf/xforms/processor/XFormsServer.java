@@ -554,7 +554,7 @@ public class XFormsServer extends ProcessorImpl {
         // Output divs information
         {
             final Element divsElement = dynamicStateElement.addElement("divs");
-            outputDivs(divsElement, containingDocument.getXFormsControls());
+            outputSwitchesDialogs(divsElement, containingDocument.getXFormsControls());
         }
 
         // Output repeat index information
@@ -611,6 +611,332 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+        if (XFormsUtils.isOptimizeRelevance())
+            newDiffControlsState(ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+        else
+            oldDiffControlsState(ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+    }
+
+    public static void newDiffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+
+        // Normalize
+        if (state1 != null && state1.size() == 0)
+            state1 = null;
+        if (state2 != null && state2.size() == 0)
+            state2 = null;
+
+        // Trivial case
+        if (state1 == null && state2 == null)
+            return;
+
+        // Only state1 can be null
+//        if (state2 == null) {
+//            throw new IllegalStateException("Illegal state when comparing controls.");
+//        }
+        // Both lists should have the same size if present, except when grouping controls become relevant/non-relevant,
+        // in which case one of the containing controls may contain 0 children
+        if (state1 != null && state2 != null && state1.size() != state2.size()) {
+            throw new IllegalStateException("Illegal state when comparing controls.");
+        }
+
+        {
+            final boolean isStaticReadonly = containingDocument.getReadonlyAppearance().equals(XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE);
+            final AttributesImpl attributesImpl = new AttributesImpl();
+            
+            final Iterator leftIterator = (state1 == null) ? null : state1.iterator();
+            final Iterator rightIterator = (state2 == null) ? null : state2.iterator();
+            final Iterator leadingIterator = (rightIterator != null) ? rightIterator : leftIterator;
+
+            while (leadingIterator.hasNext()) {
+                final XFormsControl xformsControl1 = (leftIterator == null) ? null : (XFormsControl) leftIterator.next();
+                final XFormsControl xformsControl2 = (rightIterator == null) ? null : (XFormsControl) rightIterator.next();
+
+                final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1;
+
+                // 1: Check current control
+                if (!(leadingControl instanceof XFormsRepeatControl)) {
+                    // xforms:repeat doesn't need to be handled independently, iterations do it
+
+                    // Output diffs between controlInfo1 and controlInfo2
+
+                    // Control id
+                    attributesImpl.clear();
+                    attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, leadingControl.getEffectiveId());
+
+                    final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
+                    if (xformsControl2 != null) {
+
+                        if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
+                            // Don't send anything if nothing has changed
+                            // But we force a change for controls whose values changed in the request
+                            // Also, we don't output anything for triggers in static readonly mode
+
+                            // Control children values
+                            if (!(xformsControl2 instanceof RepeatIterationControl)) {
+                                {
+                                    final String labelValue1 = (xformsControl1 == null) ? null : xformsControl1.getLabel();
+                                    final String labelValue2 = xformsControl2.getLabel();
+
+                                    if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
+                                        attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue2 != null ? labelValue2 : "");
+                                    }
+                                }
+
+                                {
+                                    final String helpValue1 = (xformsControl1 == null) ? null : xformsControl1.getHelp();
+                                    final String helpValue2 = xformsControl2.getHelp();
+
+                                    if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
+                                        attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue2 != null ? helpValue2 : "");
+                                    }
+                                }
+
+                                {
+                                    final String hintValue1 = (xformsControl1 == null) ? null : xformsControl1.getHint();
+                                    final String hintValue2 = xformsControl2.getHint();
+
+                                    if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
+                                        attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue2 != null ? hintValue2 : "");
+                                    }
+                                }
+
+                                {
+                                    final String alertValue1 = (xformsControl1 == null) ? null : xformsControl1.getAlert();
+                                    final String alertValue2 = xformsControl2.getAlert();
+
+                                    if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
+                                        attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
+                                    }
+                                }
+
+                                // Output xforms:output-specific information
+                                if (xformsControl2 instanceof XFormsOutputControl) {
+                                    final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsControl1;
+                                    final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsControl2;
+
+                                    final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediaTypeAttribute();
+                                    final String mediaTypeValue2 = outputControlInfo2.getMediaTypeAttribute();
+
+                                    if (!((mediaTypeValue1 == null && mediaTypeValue2 == null) || (mediaTypeValue1 != null && mediaTypeValue2 != null && mediaTypeValue1.equals(mediaTypeValue2)))) {
+                                        attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
+                                    }
+                                }
+                            }
+
+                            // Model item properties
+                            if (xformsControl1 == null || xformsControl1.isReadonly() != xformsControl2.isReadonly()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsControl2.isReadonly()));
+                            }
+                            if (xformsControl1 == null || xformsControl1.isRequired() != xformsControl2.isRequired()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsControl2.isRequired()));
+                            }
+                            if (xformsControl1 == null || xformsControl1.isRelevant() != xformsControl2.isRelevant()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsControl2.isRelevant()));
+                            }
+                            if (xformsControl1 == null || xformsControl1.isValid() != xformsControl2.isValid()) {
+                                attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(xformsControl2.isValid()));
+                            }
+
+                            final boolean isOutputControlWithValueAttribute = xformsControl2 instanceof XFormsOutputControl && ((XFormsOutputControl) xformsControl2).getValueAttribute() != null;
+                            if (!(xformsControl2 instanceof RepeatIterationControl) && !isOutputControlWithValueAttribute) {
+
+                                final String typeValue1 = (xformsControl1 == null) ? null : xformsControl1.getType();
+                                final String typeValue2 = xformsControl2.getType();
+
+                                if (xformsControl1 == null || !((typeValue1 == null && typeValue2 == null) || (typeValue1 != null && typeValue2 != null && typeValue1.equals(typeValue2)))) {
+                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, typeValue2 != null ? typeValue2 : "");
+                                }
+                            }
+
+                            if (!(xformsControl2 instanceof RepeatIterationControl)) {
+                                // Regular control
+
+                                // Get current value if possible for this control
+                                // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
+                                // client not to update the value, unlike with attributes which can be missing
+                                if (xformsControl2 instanceof XFormsValueControl && !(xformsControl2 instanceof XFormsUploadControl)) {
+
+                                    final XFormsValueControl xformsValueControl = (XFormsValueControl) xformsControl2;
+
+                                    // Check if a "display-value" attribute must be added
+                                    if (!isOutputControlWithValueAttribute) {
+                                        final String displayValue = xformsValueControl.getDisplayValue();
+                                        if (displayValue != null)
+                                            attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
+                                    }
+
+                                    // Create element with text value
+                                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                                    ch.text(xformsValueControl.convertToExternalValue(xformsValueControl.getValue()));
+                                    ch.endElement();
+                                } else if (!"case".equals(xformsControl2.getName())) {
+                                    // No value, just output element with no content
+                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                                }
+                            } else {
+                                // Repeat iteration
+                                final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) xformsControl2;
+                                attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
+
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
+                            }
+                        }
+
+                        // Handle itemsets
+                        if (xformsControl2 instanceof XFormsSelect1Control || xformsControl2 instanceof XFormsSelectControl) {
+                            final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsControl1;
+                            final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
+
+                            if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
+                                final Object items = xformsSelect1Control1.getItemset();
+                                if (items != null)
+                                    itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
+                            }
+
+                            if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
+                                final Object items = xformsSelect1Control2.getItemset();
+                                if (items != null)
+                                    itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
+                            }
+                        }
+                    } else {
+                        // xformsControl2 == null (&& xformsControl1 != null)
+                        // We went from an existing control to a non-relevant control
+
+                        // The only information we send is the non-relevance of the control if needed
+                        if (xformsControl1.isRelevant()) {
+                            attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                        ContentHandlerHelper.CDATA, Boolean.toString(false));
+
+                            if (!(xformsControl1 instanceof RepeatIterationControl)) {
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                            } else {
+                                final RepeatIterationControl repeatIterationInfo = (RepeatIterationControl) xformsControl1;
+                                attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
+                            }
+                        }
+                    }
+                }
+
+                // 2: Check children if any
+                if (XFormsControls.isGroupingControl(leadingControl.getName()) || leadingControl instanceof RepeatIterationControl) {
+
+                    final boolean isRepeatControl = leadingControl instanceof XFormsRepeatControl;
+//                    if (xformsControl2 != null) {
+//
+//
+//
+//                    } else {
+//                        // xformsControl2 == null (&& xformsControl1 != null)
+//                        // We went from an existing control to a non-relevant control
+//
+//                        final List children1 = xformsControl1.getChildren();
+//                        final int size1 = (children1 == null) ? 0 : children1.size();
+//
+//                        if (size1 != 0) {
+//                            // Size is decreasing, notify the client
+//                            final String repeatControlId = xformsControl1.getEffectiveId();
+//                            final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+//                            final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+//                            final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+//                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+//                                    new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1)});
+//                        }
+//                    }
+
+                    final List children1 = (xformsControl1 == null) ? null : (xformsControl1.getChildren() != null && xformsControl1.getChildren().size() == 0) ? null : xformsControl1.getChildren();
+                    final List children2 = (xformsControl2 == null) ? null : (xformsControl2.getChildren() != null && xformsControl2.getChildren().size() == 0) ? null : xformsControl2.getChildren();
+
+                    if (isRepeatControl) {
+
+                        // Repeat update
+
+                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) leadingControl;
+
+                        final int size1 = (children1 == null) ? 0 : children1.size();
+                        final int size2 = (children2 == null) ? 0 : children2.size();
+
+                        if (size1 == size2) {
+                            // No add or remove of children
+                            newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        } else if (size2 > size1) {
+                            // Size has grown
+
+                            // Copy template instructions
+                            for (int k = size1 + 1; k <= size2; k++) {
+                                outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+                            }
+
+                            // Diff the common subset
+                            newDiffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+
+                            // Issue new values for new iterations
+                            newDiffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+
+                        } else if (size2 < size1) {
+                            // Size has shrunk
+
+                            final String repeatControlId = leadingControl.getEffectiveId();
+                            final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+                            final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+                            final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+                                    new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
+
+                            // Diff the remaining subset
+                            newDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        }
+//                    } else if (isRepeatControl && xformsControl1 == null) {
+//
+//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
+//
+//                        // Handle new sub-xforms:repeat
+//
+//                        // Copy template instructions
+//                        final int size2 = children2.size();
+//                        for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
+//                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+//                        }
+//
+//                        // Issue new values for the children
+//                        newDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+//
+//                    } else if (isRepeatControl && children1 == null) {
+//
+//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
+//
+//                        // Handle repeat growing from size 0 (case of instance replacement, for example)
+//
+//                        // Copy template instructions
+//                        final int size2 = children2.size();
+//                        for (int k = 1; k <= size2; k++) {
+//                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+//                        }
+//
+//                        // Issue new values for the children
+//                        newDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    } else {
+                        // Other grouping controls
+                        newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void oldDiffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -802,7 +1128,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -812,10 +1138,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         // Issue new values for new iterations
-                        diffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -829,7 +1155,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
@@ -844,7 +1170,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                 } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
 
@@ -859,10 +1185,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 } else {
                     // Other grouping controls
-                    diffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 }
             }
         }
@@ -943,7 +1269,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputDivs(Element divsElement, XFormsControls xformsControls) {
+    public static void outputSwitchesDialogs(Element divsElement, XFormsControls xformsControls) {
         {
             final Map switchIdToSelectedCaseIdMap = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
             if (switchIdToSelectedCaseIdMap != null) {
@@ -957,7 +1283,8 @@ public class XFormsServer extends ProcessorImpl {
                     // Output selected ids
                     {
                         final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("id", selectedCaseId);
+                        divElement.addAttribute("switch-id", switchId);
+                        divElement.addAttribute("case-id", selectedCaseId);
                         divElement.addAttribute("visibility", "visible");
                     }
 
@@ -970,7 +1297,8 @@ public class XFormsServer extends ProcessorImpl {
 
                             if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
                                 final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                divElement.addAttribute("id", caseXFormsControl.getEffectiveId());
+                                divElement.addAttribute("switch-id", switchId);
+                                divElement.addAttribute("case-id", caseXFormsControl.getEffectiveId());
                                 divElement.addAttribute("visibility", "hidden");
                             }
                         }
@@ -989,7 +1317,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     {
                         final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("id", dialogId);
+                        divElement.addAttribute("dialog-id", dialogId);
                         divElement.addAttribute("visibility", visible.booleanValue() ? "visible" : "hidden");
                     }
                 }

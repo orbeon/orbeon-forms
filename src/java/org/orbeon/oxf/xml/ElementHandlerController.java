@@ -53,9 +53,9 @@ public class ElementHandlerController extends ForwardingContentHandler implement
      * matching has lower priority than URI + localname matching.
      *
      *
-     * @param handlerClassName
-     * @param uri
-     * @param localname
+     * @param handlerClassName  class name for the handler
+     * @param uri               URI of the element that triggers the handler
+     * @param localname         local name of the element that triggers the handler
      */
     public void registerHandler(String handlerClassName, String uri, String localname) {
         if (localname != null)
@@ -66,6 +66,14 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     public Object getElementHandlerContext() {
         return elementHandlerContext;
+    }
+
+    public String getParentHandlerExplodedQName() {
+        if (handlerInfos == null || handlerInfos.size() < 2)
+            return null;
+
+        final HandlerInfo parentHandlerInfo = (HandlerInfo) handlerInfos.get(handlerInfos.size() - 2);
+        return parentHandlerInfo.explodedQName;
     }
 
     public void setElementHandlerContext(Object elementHandlerContext) {
@@ -136,11 +144,11 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                         handlerInfos.push(currentHandlerInfo);
 
                     if (elementHandler.isRepeating()) {
-                        currentHandlerInfo = new HandlerInfo(level, elementHandler, attributes);
+                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler, attributes);
                         super.setContentHandler(currentHandlerInfo.saxStore);
                         isFillingUpSAXStore = true;
                     } else {
-                        currentHandlerInfo = new HandlerInfo(level, elementHandler);
+                        currentHandlerInfo = new HandlerInfo(level, explodedQName, elementHandler);
                         super.setContentHandler(elementHandler);
                         elementHandler.start(uri, localname, qName, attributes);
                     }
@@ -248,18 +256,21 @@ public class ElementHandlerController extends ForwardingContentHandler implement
 
     private static class HandlerInfo {
         public int level;
+        public String explodedQName;
         public ElementHandlerNew elementHandler;
         public Attributes attributes;
 
         public SAXStore saxStore;
 
-        public HandlerInfo(int level, ElementHandlerNew elementHandler) {
+        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler) {
             this.level = level;
+            this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
         }
 
-        public HandlerInfo(int level, ElementHandlerNew elementHandler, Attributes attributes) {
+        public HandlerInfo(int level, String explodedQName, ElementHandlerNew elementHandler, Attributes attributes) {
             this.level = level;
+            this.explodedQName = explodedQName;
             this.elementHandler = elementHandler;
             this.attributes = new AttributesImpl(attributes);
 

@@ -67,10 +67,12 @@ public class XFormsTriggerHandler extends HandlerBase {
         if (isStaticReadonly(xformsControl))
             return;
 
-        if (!handlerContext.isGenerateTemplate() && xformsControl.getLabel() == null)
+        final boolean isConcreteControl = xformsControl != null;
+
+        if (isConcreteControl && xformsControl.getLabel() == null)
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : xformsControl.getLabel();
+        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-label-value$" : isConcreteControl ? xformsControl.getLabel() : "";
 
         final QName appearance = getAppearance(elementAttributes);
 
@@ -84,7 +86,7 @@ public class XFormsTriggerHandler extends HandlerBase {
 
         // Add title attribute if not yet present and there is a hint
         if (newAttributes.getValue("title") == null) {
-            final String hintValue = (xformsControl != null) ? xformsControl.getHint() : null;
+            final String hintValue = isConcreteControl ? xformsControl.getHint() : null;
             if (hintValue != null)
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }

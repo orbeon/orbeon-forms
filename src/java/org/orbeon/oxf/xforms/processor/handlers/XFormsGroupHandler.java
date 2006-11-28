@@ -57,7 +57,7 @@ public class XFormsGroupHandler extends HandlerBase {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
         // xforms:label
-        final String labelValue = handlerContext.isGenerateTemplate() ? null : groupXFormsControl.getLabel();
+        final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
             final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
             if (isFieldsetAppearance) {

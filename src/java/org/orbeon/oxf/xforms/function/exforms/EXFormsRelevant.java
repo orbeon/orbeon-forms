@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.xforms.InstanceData;
 
-public class EXFormsRelevant  extends EXFormsMIP {
+public class EXFormsRelevant extends EXFormsMIP {
     protected boolean getResult(InstanceData instanceData) {
         return instanceData.getInheritedRelevant().get();
     }

@@ -47,6 +47,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final boolean isConcreteControl = xformsControl != null;
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
@@ -80,7 +81,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
                 handleAccessibilityAttributes(elementAttributes, newAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "textarea", textareaQName, newAttributes);
-                if (!handlerContext.isGenerateTemplate()) {
+                if (isConcreteControl) {
                     final String value = xformsControl.getValue();
                     if (value != null)
                         contentHandler.characters(value.toCharArray(), 0, value.length());
@@ -90,7 +91,7 @@ public class XFormsTextareaHandler extends XFormsValueControlHandler {
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-                if (!handlerContext.isGenerateTemplate()) {
+                if (isConcreteControl) {
                     final String value = xformsControl.getValue();
                     if (value != null) {
                         final boolean isHTMLMediaType = "text/html".equals(xformsControl.getMediatype());

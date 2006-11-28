@@ -1,0 +1,67 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Group Relevance</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="instance">
+                <instance>
+                    <current-group>1</current-group>
+                    <group>
+                        <input>Input #1</input>
+                        <repeat1a></repeat1a>
+                        <repeat1a></repeat1a>
+                    </group>
+                    <group>
+                        <input>Input #2</input>
+                        <repeat2a></repeat2a>
+                    </group>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="group" relevant="(count(preceding-sibling::group) + 1) = ../current-group"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:input ref="current-group" id="selector-input">
+            <xforms:label>Relevant group</xforms:label>
+        </xforms:input>
+        <xforms:group ref="group[1]" id="group1a">
+            <xforms:group id="group1b">
+                <xforms:input ref="input" id="input1">
+                    <xforms:label>Input 1</xforms:label>
+                </xforms:input>
+                [<xforms:repeat nodeset="repeat1a">
+                    <xforms:output value="'X'"/>
+                </xforms:repeat>]
+            </xforms:group>
+        </xforms:group>
+        <xforms:group ref="group[2]" id="group2a">
+            <xforms:group id="group2b">
+                <xforms:input ref="input" id="input2">
+                    <xforms:label>Input 2</xforms:label>
+                </xforms:input>
+                [<xforms:repeat nodeset="repeat2a">
+                    <xforms:output value="'.'"/>
+                </xforms:repeat>]
+            </xforms:group>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

@@ -248,16 +248,18 @@ public class XFormsControls {
                     for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
                         final Element divElement = (Element) i.next();
 
-                        final String id = divElement.attributeValue("id");
+                        final String dialogId = divElement.attributeValue("dialog-id");
                         final String visibilityString = divElement.attributeValue("visibility");
                         final boolean visibility = "visible".equals(visibilityString);
 
-                        if (currentControlsState.getDialogIdToVisibleMap().get(id) != null) {
+                        if (dialogId != null) {
                             // xxforms:dialog
-                            currentDialogState.showHide(id, visibility);
+                            currentDialogState.showHide(dialogId, visibility);
                         } else {
                             // xforms:switch/xforms:case
-                            currentSwitchState.initializeState(id, initialControlsState, visibility);
+                            final String switchId = divElement.attributeValue("switch-id");
+                            final String caseId = divElement.attributeValue("case-id");
+                            currentSwitchState.initializeState(switchId, caseId, initialControlsState, visibility);
                         }
                     }
                 }
@@ -1106,11 +1108,12 @@ public class XFormsControls {
      */
     public void visitAllControlsHandleRepeat(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener) {
         resetBindingContext();
-        handleControls(pipelineContext, controlElementVisitorListener, controlsDocument.getRootElement(), "");
+        final boolean isOptimizeRelevance = XFormsUtils.isOptimizeRelevance();
+        handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlsDocument.getRootElement(), "");
     }
 
     private boolean handleControls(PipelineContext pipelineContext, ControlElementVisitorListener controlElementVisitorListener,
-                                   Element container, String idPostfix) {
+                                   boolean isOptimizeRelevance, Element container, String idPostfix) {
         boolean doContinue = true;
         for (Iterator i = container.elements().iterator(); i.hasNext();) {
             final Element controlElement = (Element) i.next();
@@ -1139,9 +1142,10 @@ public class XFormsControls {
                             try {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
+                                    // TODO: handle isOptimizeRelevance()
                                     controlElementVisitorListener.startRepeatIteration(currentPosition);
                                     final String newIdPostfix = idPostfix.equals("") ? Integer.toString(currentPosition) : (idPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + currentPosition);
-                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, newIdPostfix);
+                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, newIdPostfix);
                                     controlElementVisitorListener.endRepeatIteration(currentPosition);
                                 }
                             } finally {
@@ -1162,9 +1166,16 @@ public class XFormsControls {
                 // Handle XForms grouping controls
                 pushBinding(pipelineContext, controlElement);
                 try {
+
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
-                    if (doContinue)
-                        doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix);
+                    final BindingContext currentBindingContext = getCurrentBindingContext();
+                    if (doContinue) {
+                        // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we are not bound to a node OR we are bound to a relevant node
+                        if (!isOptimizeRelevance || !currentBindingContext.isNewBind()
+                                || (currentBindingContext.getSingleNode() != null && XFormsUtils.getInstanceDataUpdateInherited(currentBindingContext.getSingleNode()).getRelevant().get())) {
+                            doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, idPostfix);
+                        }
+                    }
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
                 } finally {
                     popBinding();
@@ -1377,19 +1388,19 @@ public class XFormsControls {
         /**
          * Update switch info state for the given case id.
          */
-        public void initializeState(String caseId, ControlsState controlsState, boolean visible) {
+        public void initializeState(String switchId, String caseId, ControlsState controlsState, boolean visible) {
 
             // Find SwitchXFormsControl
-            final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(caseId);
-            if (caseControl == null)
-                throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
-            final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
-            if (switchControl == null)
-                throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
+//            final XFormsControl caseControl = (XFormsControl) controlsState.getIdToControl().get(caseId);
+//            if (caseControl == null)
+//                throw new OXFException("No XFormsControl found for case id '" + caseId + "'.");
+//            final XFormsControl switchControl = (XFormsControl) caseControl.getParent();
+//            if (switchControl == null)
+//                throw new OXFException("No XFormsSwitchControl found for case id '" + caseId + "'.");
 
             // Update currently selected case id
             if (visible) {
-                getSwitchIdToSelectedCaseIdMap().put(switchControl.getEffectiveId(), caseId);
+                getSwitchIdToSelectedCaseIdMap().put(switchId, caseId);
             }
         }
     }

@@ -42,15 +42,15 @@ public class XFormsRepeatHandler extends HandlerBase {
 
         final boolean isTopLevelRepeat = handlerContext.countParentRepeats() == 0;
         final boolean isRepeatSelected = handlerContext.isRepeatSelected() || isTopLevelRepeat;
-        final boolean isGenerateTemplate = handlerContext.isGenerateTemplate() || isTopLevelRepeat;
+        final boolean isMustGenerateTemplate = handlerContext.isGenerateTemplate() || isTopLevelRepeat;
         final int currentIteration = handlerContext.getCurrentIteration();
 
         final XFormsControls.ControlsState currentControlState = containingDocument.getXFormsControls().getCurrentControlsState();
         final Map effectiveRepeatIdToIterations = currentControlState.getEffectiveRepeatIdToIterations();
         final Map repeatIdToIndex = currentControlState.getRepeatIdToIndex();
 
-        final int currentRepeatIndex = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) repeatIdToIndex.get(repeatId)).intValue();
-        final int currentRepeatIterations = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) effectiveRepeatIdToIterations.get(effectiveId)).intValue();
+        final XFormsRepeatControl repeatControlInfo = handlerContext.isGenerateTemplate() ? null : (XFormsRepeatControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final boolean isConcreteControl = repeatControlInfo != null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
@@ -69,10 +69,12 @@ public class XFormsRepeatHandler extends HandlerBase {
         handlerContext.getController().setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
         setContentHandler(handlerContext.getController().getOutput());
 
-        if (isTopLevelRepeat || !isGenerateTemplate) {
-            // Unroll repeat
+        if (isConcreteControl && (isTopLevelRepeat || !isMustGenerateTemplate)) {
 
-            final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+            final int currentRepeatIndex = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) repeatIdToIndex.get(repeatId)).intValue();
+            final int currentRepeatIterations = (currentIteration == 0 && !isTopLevelRepeat) ? 0 : ((Integer) effectiveRepeatIdToIterations.get(effectiveId)).intValue();
+
+            // Unroll repeat
             for (int i = 1; i <= currentRepeatIterations; i++) {
                 if (i > 1) {
                     // Delimiter: between repeat entries
@@ -106,7 +108,7 @@ public class XFormsRepeatHandler extends HandlerBase {
             }
         }
 
-        if (isGenerateTemplate) {
+        if (isMustGenerateTemplate) {
             // Generate template
 
             if (!outputInterceptor.isMustGenerateFirstDelimiters()) {

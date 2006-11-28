@@ -47,6 +47,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsValueControl xformsControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsValueControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final boolean isConcreteControl = xformsControl != null;
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsControl);
@@ -57,8 +58,13 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
             if (!handlerContext.isGenerateTemplate()) {
-                isDate = isDate(xformsControl.getType());
-                typeClass = isDate ? "xforms-type-date" : "xforms-type-string";
+                if (isConcreteControl) {
+                    isDate = isDate(xformsControl.getType());
+                    typeClass = isDate ? "xforms-type-date" : "xforms-type-string";
+                } else {
+                    isDate = false;
+                    typeClass = null;
+                }
 
                 handleMIPClasses(classes, xformsControl);
             } else {
@@ -69,7 +75,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         }
 
         // Create xhtml:span
-        final boolean isReadOnly = !handlerContext.isGenerateTemplate() && xformsControl.isReadonly();
+        final boolean isReadOnly = isConcreteControl && xformsControl.isReadonly();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
@@ -83,7 +89,7 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                if (!handlerContext.isGenerateTemplate() && isDate) {
+                if (isConcreteControl && isDate) {
                     final String displayValueOrValue = xformsControl.getDisplayValueOrValue();
                     if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
                         contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
@@ -112,7 +118,8 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
 
-                    if (!handlerContext.isGenerateTemplate()) {
+                    if (isConcreteControl) {
+                        // Output value only for concrete control
                         final String value = xformsControl.getValue();
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
                     } else {
@@ -135,7 +142,8 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
                 } else {
                     // Read-only mode
-                    if (!handlerContext.isGenerateTemplate()) {
+                    if (isConcreteControl) {
+                        // Output value only for concrete control
                         final String value = xformsControl.getDisplayValueOrValue();
                         if (value != null)
                             contentHandler.characters(value.toCharArray(), 0, value.length());

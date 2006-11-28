@@ -22,10 +22,23 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.Map;
+import java.util.HashMap;
+
 /**
  * Handle xforms:output.
  */
 public class XFormsOutputHandler extends XFormsValueControlHandler {
+
+    private static final Map inlineParentsMap = new HashMap();
+    static {
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "label"), "");
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "hint"), "");
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "alert"), "");
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "help"), "");
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "message"), "");
+        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "value"), "");
+    }
 
     private Attributes elementAttributes;
 
@@ -44,11 +57,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final String effectiveId = handlerContext.getEffectiveId(elementAttributes);
         final XFormsOutputControl xformsOutputControl = handlerContext.isGenerateTemplate()
                 ? null : (XFormsOutputControl) containingDocument.getObjectById(pipelineContext, effectiveId);
+        final boolean isConcreteControl = xformsOutputControl != null;
 
-        // The "control" is allowed to be null when xforms:output is in
-        // xforms:label|xforms:hint|xforms:alert|xforms:help, because in that case currently we don't put the control in
-        // the regular hierarchy of controls
-        if (xformsOutputControl == null && !handlerContext.isGenerateTemplate())
+        // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within
+        // xforms:label|xforms:hint|xforms:alert|xforms:help|xforms:message|xforms:value, because in that case we don't
+        // put the control in the regular hierarchy of controls.
+        final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
+        if (parentHandlerName != null && inlineParentsMap.get(parentHandlerName) != null)
             return;
 
         // xforms:label
@@ -66,7 +81,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         if (!handlerContext.isGenerateTemplate()) {
 
             // Find classes to add
-            isDateOrTime = isDateOrTime(xformsOutputControl.getType());
+            isDateOrTime = isConcreteControl && isDateOrTime(xformsOutputControl.getType());
             handleMIPClasses(classes, xformsOutputControl);
 
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
@@ -91,13 +106,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 // @src="..."
                 // NOTE: If producing a template, we must point to an existing image
-                final String srcValue = (xformsOutputControl != null) ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
+                final String srcValue = isConcreteControl ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
                 // @f:url-norewrite="true"
                 final String formattingPrefix;
                 final boolean isNewPrefix;
                 {
-                    if (xformsOutputControl != null) {
+                    if (isConcreteControl) {
                         final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
                         if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
                             // No prefix is currently mapped
@@ -122,7 +137,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                     contentHandler.endPrefixMapping(formattingPrefix);
             } else if (isDateOrTime) {
                 // Display formatted value for dates
-                if (xformsOutputControl != null) {
+                if (isConcreteControl) {
                     final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                     if (displayValue != null)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());
@@ -130,13 +145,13 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             } else if (isHTMLMediaType) {
                 // HTML case
 
-                if (xformsOutputControl != null) {
+                if (isConcreteControl) {
                     final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                     XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case
-                if (xformsOutputControl != null) {
+                if (isConcreteControl) {
                     final String displayValue = xformsOutputControl.getDisplayValueOrValue();
                     if (displayValue != null && displayValue.length() > 0)
                         contentHandler.characters(displayValue.toCharArray(), 0, displayValue.length());

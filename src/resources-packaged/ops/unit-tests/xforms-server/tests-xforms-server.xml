@@ -95,10 +95,10 @@
                             </equation>
                         </instances>
                         <divs>
-                            <xxf:div id="add" visibility="visible"/>
-                            <xxf:div id="subtract" visibility="hidden"/>
-                            <xxf:div id="multiply" visibility="hidden"/>
-                            <xxf:div id="divide" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
+                            <xxf:div switch-id="23a" case-id="subtract" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="multiply" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="divide" visibility="hidden"/>
                         </divs>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -163,10 +163,10 @@
                             </equation>
                         </instances>
                         <divs>
-                            <xxf:div id="add" visibility="visible"/>
-                            <xxf:div id="subtract" visibility="hidden"/>
-                            <xxf:div id="multiply" visibility="hidden"/>
-                            <xxf:div id="divide" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
+                            <xxf:div switch-id="23a" case-id="subtract" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="multiply" visibility="hidden"/>
+                            <xxf:div switch-id="23a" case-id="divide" visibility="hidden"/>
                         </divs>
                     </dynamic-state>
                 </xxf:dynamic-state>

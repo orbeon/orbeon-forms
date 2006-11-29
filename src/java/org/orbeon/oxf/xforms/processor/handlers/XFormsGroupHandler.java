@@ -59,15 +59,16 @@ public class XFormsGroupHandler extends HandlerBase {
         // xforms:label
         final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel();
         if (labelValue != null) {
-            final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
             if (isFieldsetAppearance) {
                 // Output an xhtml:legend element
+                final AttributesImpl labelAttributes = getAttributes(attributes, null, null);
                 final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, labelAttributes);
                 contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
             } else {
                 // Output an xhtml:label element
+                final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
                 outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
             }
         }

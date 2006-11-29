@@ -327,12 +327,18 @@
                 <include name="**"/>
             </fileset>
         </copy>
+    </target>
 
-        <!--<copy todir="${war.dir}/WEB-INF/resources/config/theme">-->
-            <!--<fileset dir="${build.temp.dir}/theme">-->
-                <!--<include name="orbeon.css"/>-->
-            <!--</fileset>-->
-        <!--</copy>-->
+    <target name="dev-css-templates" depends="init">
+        <copy file="${resources-packaged.dir}/ops/css/orbeon.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/orbeon.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
+        <copy file="${resources-packaged.dir}/ops/css/xforms.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
+        <copy file="${resources-packaged.dir}/ops/css/xforms-widgets.css.template" toFile="${war.dir}/WEB-INF/resources/config/theme/xforms-widgets.css">
+            <filterset refid="css-filter-set"/>
+        </copy>
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">

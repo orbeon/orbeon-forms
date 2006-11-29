@@ -16,8 +16,8 @@
 
     <!-- Global properties -->
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
-    <property as="xs:integer" name="oxf.cache.size"                                  value="384"/>
-    <property as="xs:integer" name="oxf.cache.xpath.size"                            value="1000"/>
+    <property as="xs:integer" name="oxf.cache.size"                                  value="300"/>
+    <property as="xs:integer" name="oxf.cache.xpath.size"                            value="600"/>
     <property as="xs:integer" name="oxf.cache.xforms-sessions.size"                  value="10"/>
     <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
 

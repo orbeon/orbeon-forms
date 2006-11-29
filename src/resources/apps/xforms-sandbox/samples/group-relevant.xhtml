@@ -25,6 +25,7 @@
             <xforms:instance id="instance">
                 <instance>
                     <current-group>1</current-group>
+                    <show-trigger>yes</show-trigger>
                     <group>
                         <input>Input #1</input>
                         <repeat1a></repeat1a>
@@ -43,11 +44,20 @@
         <xforms:input ref="current-group" id="selector-input">
             <xforms:label>Relevant group</xforms:label>
         </xforms:input>
+        <xforms:input ref="show-trigger" id="show-trigger-input">
+            <xforms:label>Show trigger</xforms:label>
+        </xforms:input>
         <xforms:group ref="group[1]" id="group1a">
             <xforms:group id="group1b">
                 <xforms:input ref="input" id="input1">
                     <xforms:label>Input 1</xforms:label>
                 </xforms:input>
+                <xforms:group ref=".[../show-trigger = 'yes']">
+                    <xforms:trigger id="trigger1" appearance="xxforms:image">
+                        <xforms:label>Trigger 1</xforms:label>
+                        <xxforms:img src="/config/theme/images/plus.gif"/>
+                    </xforms:trigger>
+                </xforms:group>
                 [<xforms:repeat nodeset="repeat1a">
                     <xforms:output value="'X'"/>
                 </xforms:repeat>]
@@ -58,6 +68,12 @@
                 <xforms:input ref="input" id="input2">
                     <xforms:label>Input 2</xforms:label>
                 </xforms:input>
+                <xforms:group ref=".[../show-trigger = 'yes']">
+                    <xforms:trigger id="trigger2" appearance="xxforms:image">
+                        <xforms:label>Trigger 2</xforms:label>
+                        <xxforms:img src="/config/theme/images/plus.gif"/>
+                    </xforms:trigger>
+                </xforms:group>
                 [<xforms:repeat nodeset="repeat2a">
                     <xforms:output value="'.'"/>
                 </xforms:repeat>]

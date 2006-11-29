@@ -177,8 +177,8 @@ public class XPathCache {
                 // same expression, except for the namespace context. If we do not cache per the namespace context, then
                 // we need to restore the namespace context before using the expression.
                 if (prefixToURIMap != null) {
-                    // NOTE: Should we sort keys here, or will we always get a consistent order if we use HashMap() anyway?
-                    for (Iterator i = prefixToURIMap.entrySet().iterator(); i.hasNext();) {
+                    final Map sortedMap = new TreeMap(prefixToURIMap);// this should make sure we always get the keys in the same order
+                    for (Iterator i = sortedMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         cacheKeyString.append('|');
                         cacheKeyString.append(currentEntry.getKey());

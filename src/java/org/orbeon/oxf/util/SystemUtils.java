@@ -68,15 +68,17 @@ public class SystemUtils {
         final File[] extDirs = pathToFiles(extDirProp);
         for (int i = 0; i < extDirs.length; i++) {
             final File[] jars = extDirs[i].listFiles();
-            for (int j = 0; j < jars.length; j++) {
-                final File fil = jars[j];
-                final String fnam = fil.toString();
-                final int fnamLen = fnam.length();
-                if (fnamLen < 5) continue;
-                if (fnam.regionMatches(true, fnamLen - 4, ".jar", 0, 4)) {
-                    c.add(fil);
-                } else if (fnam.regionMatches(true, fnamLen - 4, ".zip", 0, 4)) {
-                    c.add(fil);
+            if (jars != null) { // jars can be null when java.ext.dirs points to a non-existant directory
+                for (int j = 0; j < jars.length; j++) {
+                    final File fil = jars[j];
+                    final String fnam = fil.toString();
+                    final int fnamLen = fnam.length();
+                    if (fnamLen < 5) continue;
+                    if (fnam.regionMatches(true, fnamLen - 4, ".jar", 0, 4)) {
+                        c.add(fil);
+                    } else if (fnam.regionMatches(true, fnamLen - 4, ".zip", 0, 4)) {
+                        c.add(fil);
+                    }
                 }
             }
         }

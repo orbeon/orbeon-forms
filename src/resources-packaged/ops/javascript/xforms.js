@@ -277,12 +277,22 @@ ORBEON.util.Dom = {
         }
     },
 
-    getChildElement: function(parent, position) {
+    getChildElementByIndex: function(parent, position) {
         for (var i = 0; i < parent.childNodes.length; i++) {
             var child = parent.childNodes[i];
             if (ORBEON.util.Dom.isElement(child)) {
                 if (position == 0) return child;
                 position--;
+            }
+        }
+        return null;
+    },
+
+    getChildElementByClass: function(parent, class) {
+        for (var i = 0; i < parent.childNodes.length; i++) {
+            var child = parent.childNodes[i];
+            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(parent, class)) {
+                return child;
             }
         }
         return null;
@@ -377,9 +387,9 @@ ORBEON.xforms.Controls = {
 
     getCurrentValue: function(control) {
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
-            return ORBEON.util.Dom.getChildElement(control, 1).value;
+            return ORBEON.util.Dom.getChildElementByIndex(control, 1).value;
         } if (ORBEON.util.Dom.hasClass(control, "xforms-select1-open")) {
-            return ORBEON.util.Dom.getChildElement(control, 0).value;
+            return ORBEON.util.Dom.getChildElementByIndex(control, 0).value;
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")
                 || ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-full")) {
             var inputs = control.getElementsByTagName("input");
@@ -453,7 +463,7 @@ ORBEON.xforms.Controls = {
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog
-            var labelDiv = ORBEON.util.Dom.getChildElement(control, 0);
+            var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
             ORBEON.util.Dom.setStringValue(labelDiv, message);
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-label", message);
@@ -532,9 +542,9 @@ ORBEON.xforms.Controls = {
     setFocus: function(controlId) {
         var control = document.getElementById(controlId);
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
-            ORBEON.util.Dom.getChildElement(control, 1).focus();
+            ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
-            ORBEON.util.Dom.getChildElement(ORBEON.util.Dom.getChildElement(control, 0), 0).focus();
+            ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(control, 0), 0).focus();
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }
@@ -882,7 +892,8 @@ ORBEON.xforms.Events = {
     },
 
     click: function(event) {
-        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        var originalTarget = YAHOO.util.Event.getTarget(event);
+        var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
         if (target != null) {
             // Activate hint
             ORBEON.xforms.Controls.hintActive(target, true);
@@ -917,9 +928,9 @@ ORBEON.xforms.Events = {
             if (ORBEON.util.Dom.hasClass(target, "xforms-input")) {
 
                 // Initialize calendar when needed
-                var displayField = ORBEON.util.Dom.getChildElement(target, 0);
-                var inputField = ORBEON.util.Dom.getChildElement(target, 1);
-                var showCalendar = ORBEON.util.Dom.getChildElement(target, 2);
+                var displayField = ORBEON.util.Dom.getChildElementByIndex(target, 0);
+                var inputField = ORBEON.util.Dom.getChildElementByIndex(target, 1);
+                var showCalendar = ORBEON.util.Dom.getChildElementByIndex(target, 2);
                 if (ORBEON.util.Dom.hasClass(inputField, "xforms-type-date")
                         && !ORBEON.util.Dom.hasClass(displayField, "xforms-readonly")) {
 
@@ -944,6 +955,11 @@ ORBEON.xforms.Events = {
                     // Event can be received on calendar picker span, or on the containing span
                     ORBEON.xforms.Globals.inputCalendarOnclick[target.id]();
                 }
+            }
+
+            // Click on remove icon in upload control
+            if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
+                xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-remove")), false);
             }
         }
     },
@@ -1276,8 +1292,8 @@ ORBEON.xforms.Init = {
     },
 
     _autoComplete: function(autoComplete) {
-        var textfield = ORBEON.util.Dom.getChildElement(autoComplete, 0);
-        var select = ORBEON.util.Dom.getChildElement(autoComplete, 1);
+        var textfield = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 0);
+        var select = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 1);
         // Get list of possible values from the select
         var values = new Array();
         for (var optionIndex = 1; optionIndex < select.options.length; optionIndex++)
@@ -1806,7 +1822,7 @@ ORBEON.xforms.Server = {
                                         }
 
                                         // Case of the auto-complete control
-                                        var textfield = ORBEON.util.Dom.getChildElement(documentElement, 0);
+                                        var textfield = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
                                         textfield.actb_keywords = newValues;
                                         // Reopen auto-complete if necessary
                                         var lastKeyCode = ORBEON.xforms.Globals.autoCompleteLastKeyCode[documentElement.id];
@@ -1958,7 +1974,7 @@ ORBEON.xforms.Server = {
                                                 // XForms output or "static readonly" mode
                                                 var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
                                                 if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-image")) {
-                                                    var image = ORBEON.util.Dom.getChildElement(documentElement, 0);
+                                                    var image = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
                                                     image.src = newOutputControlValue;
                                                 } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                     documentElement.innerHTML = newOutputControlValue;
@@ -1975,7 +1991,7 @@ ORBEON.xforms.Server = {
                                                 // Auto-complete
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.value = newControlValue;
-                                                    ORBEON.util.Dom.getChildElement(documentElement, 0).value = newControlValue;
+                                                    ORBEON.util.Dom.getChildElementByIndex(documentElement, 0).value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
                                                 }
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")
@@ -2001,9 +2017,9 @@ ORBEON.xforms.Server = {
                                                 }
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                 // XForms input
-                                                var displayField = ORBEON.util.Dom.getChildElement(documentElement, 0);
-                                                var inputField = ORBEON.util.Dom.getChildElement(documentElement, 1);
-                                                var datePicker = ORBEON.util.Dom.getChildElement(documentElement, 2);
+                                                var displayField = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
+                                                var inputField = ORBEON.util.Dom.getChildElementByIndex(documentElement, 1);
+                                                var datePicker = ORBEON.util.Dom.getChildElementByIndex(documentElement, 2);
 
                                                 // Change classes on control and date pick based on type
                                                 if (type == "{http://www.w3.org/2001/XMLSchema}date") {
@@ -2054,6 +2070,38 @@ ORBEON.xforms.Server = {
                                                 }
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
+                                            } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
+                                                // Upload
+
+                                                // <xxforms:control id="xforms-control-id"
+                                                //    state="empty|file"
+                                                //    filename="filename.txt" mimetype="text/plain" size="23kb"/>
+
+                                                // Get attributes from response
+                                                var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
+                                                var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
+                                                var mimetype = ORBEON.util.Dom.getAttribute(controlElement, "mimetype");
+                                                var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                                // Get elements we want to modify from the DOM
+                                                var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-file-info");
+                                                var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
+                                                var mimeTypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mimetype");
+                                                var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
+                                                // Set values in DOM
+                                                if (state == "empty") {
+                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-file")
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-empty")
+                                                }
+                                                if (state == "file") {
+                                                    ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-empty")
+                                                    ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-file")
+                                                }
+                                                if (filename != null)
+                                                    ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
+                                                if (mimetype != null)
+                                                    ORBEON.util.Dom.setStringValue(mimeTypeSpan, mimetype);
+                                                if (size != null)
+                                                    ORBEON.util.Dom.setStringValue(sizeSpan, size);
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Textarea, password
@@ -2331,12 +2379,22 @@ ORBEON.xforms.Server = {
                             case "submission": {
                                 var submissionElement = actionElement.childNodes[actionIndex];
                                 var showProcess = ORBEON.util.Dom.getAttribute(submissionElement, "show-progress");
-                                // Display loading indicator unless the server tells us not to display it
-                                if (showProcess != "false")
-                                    newDynamicStateTriggersReplace = true;
-                                newDynamicStateTriggersPost = true;
-                                ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
-                                ORBEON.xforms.Globals.requestForm.submit();
+                                var action = ORBEON.util.Dom.getAttribute(submissionElement, "action");
+                                var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
+                                if (replace == null) replace = "all";
+                                if (replace == "all") {
+                                    // Go to another page
+                                    if (showProcess != "false")
+                                        // Display loading indicator unless the server tells us not to display it
+                                        newDynamicStateTriggersReplace = true;
+                                    newDynamicStateTriggersPost = true;
+                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
+                                    ORBEON.xforms.Globals.requestForm.submit();
+                                } else {
+                                    // Submit form in the background
+                                    YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
+                                    YAHOO.util.Connect.asyncRequest("POST", action, { success: ORBEON.xforms.Server.handleResponse });
+                                }
                                 break;
                             }
 
@@ -2377,7 +2435,7 @@ ORBEON.xforms.Server = {
                                 var controlId = ORBEON.util.Dom.getAttribute(setfocusElement, "control-id");
                                 var control = document.getElementById(controlId);
                                 if (ORBEON.util.Dom.hasClass(control, "xforms-input"))
-                                    control = ORBEON.util.Dom.getChildElement(control, 1);
+                                    control = ORBEON.util.Dom.getChildElementByIndex(control, 1);
                                 ORBEON.xforms.Globals.maskFocusEvents = true;
                                 control.focus();
                                 break;

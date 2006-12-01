@@ -1,0 +1,57 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>XForms Upload with replace="instance"</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+            <xforms:instance id="instance">
+                <file filename="" mediatype="" size=""/>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:style type="text/css">
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <!--
+        <xforms:upload ref="/file" mediatype="">
+            <xforms:filename ref="@filename"/>
+            <xforms:mediatype ref="@mediatype"/>
+            <xxforms:size ref="@size"/>
+        </xforms:upload>
+        -->
+
+        <!-- The above is expected to generate: -->
+
+        <xhtml:span id="xforms-control-id" class="xforms-control xforms-upload xforms-upload-state-file">
+            <xhtml:input class="xforms-upload-select" type="file" name="xforms-control-id"/>
+            <xhtml:span class="xforms-upload-info">
+                <xhtml:span class="xforms-upload-filename">filename.txt</xhtml:span>
+                <xhtml:span class="xforms-upload-mimetype">text/plain</xhtml:span>
+                <xhtml:span class="xforms-upload-size">23kb</xhtml:span>
+                <xhtml:img class="xforms-upload-remove" src="/ops/images/xforms/remove.png" alt="Remove"/>
+            </xhtml:span>
+        </xhtml:span>
+
+        <xforms:trigger>
+            <xforms:label>Upload</xforms:label>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

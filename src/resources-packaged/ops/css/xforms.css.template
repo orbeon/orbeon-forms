@@ -217,6 +217,12 @@
     padding-right: 1px;
 }
 
+.xforms-upload-state-empty .xforms-upload-info { display: none; }
+.xforms-upload-state-file .xforms-upload-select { display: none; }
+.xforms-upload-mimetype { padding-left: .5em; font-style: italic; }
+.xforms-upload-size { padding-left: .5em; }
+.xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
+
 select.xforms-required-empty {
     background: #fcc;
 }

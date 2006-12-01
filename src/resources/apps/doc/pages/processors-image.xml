@@ -19,52 +19,55 @@
 		<title>Image Server</title>
 	</header>
 	<body>
-        <p>
-            The Image Server processor serves images stored locally or remotely (for example
-            through HTTP) to a Web browser. Only the JPEG format is supported at the moment.
-            Before sending or transforming a resource, the Image Server checks that the
-            resource is a JPEG image. The Image Server is able to perform simple
-            transformations such as scaling and cropping, in which case it also handles a cache
-            of transformed images.
-        </p>
+        <section>
+            <title>Purpose</title>
+            <p>
+                The Image Server processor serves images stored locally or remotely (for example
+                through HTTP) to a Web browser. Only the JPEG format is supported at the moment.
+                Before sending or transforming a resource, the Image Server checks that the
+                resource is a JPEG image. The Image Server is able to perform simple
+                transformations such as scaling and cropping, in which case it also handles a cache
+                of transformed images.
+            </p>
+        </section>
         <section>
             <title>Configuration</title>
             <p>
                 The <code>config</code> input must follow this Relax NG schema:
             </p>
             <xml-source>
-<element name="config"
-    xmlns="http://relaxng.org/ns/structure/1.0"
-    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
-    <interleave>
-        <element name="image-directory">
-            <text/>
-        </element>
-        <element name="default-quality">
-            <data type="float"/>
-        </element>
-        <optional>
-            <element name="use-sandbox">
-                <data type="boolean"/>
-            </element>
-        </optional>
-        <optional>
-            <element name="cache">
-                <element name="directory">
-                    <text/>
+                <element name="config"
+                    xmlns="http://relaxng.org/ns/structure/1.0"
+                    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+                    <interleave>
+                        <element name="image-directory">
+                            <text/>
+                        </element>
+                        <element name="default-quality">
+                            <data type="float"/>
+                        </element>
+                        <optional>
+                            <element name="use-sandbox">
+                                <data type="boolean"/>
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="cache">
+                                <element name="directory">
+                                    <text/>
+                                </element>
+                                <optional>
+                                    <element name="path-encoding">
+                                        <choice>
+                                            <value>flat</value>
+                                            <value>hierarchical</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                            </element>
+                        </optional>
+                    </interleave>
                 </element>
-                <optional>
-                    <element name="path-encoding">
-                        <choice>
-                            <value>flat</value>
-                            <value>hierarchical</value>
-                        </choice>
-                    </element>
-                </optional>
-            </element>
-        </optional>
-    </interleave>
-</element>
             </xml-source>
             <p>
                 This is an example of configuration:

@@ -124,6 +124,7 @@
             <xsd:attribute name="bind" type="xsd:IDREF"/>
             <xsd:attribute name="action" type="xsd:string" use="optional"/>
             <xsd:attribute name="instance" type="xsd:string" use="optional"/>
+            <xsd:attribute name="serialize" type="xsd:boolean" use="optional"/>
             <xsd:attribute name="method" use="required">
                 <xsd:simpleType>
 

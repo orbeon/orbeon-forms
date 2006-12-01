@@ -19,16 +19,16 @@
 		<title>Development</title>
 	</header>
 	<body>
+        <a name="scope"/>
 		<section>
 			<title>Scope</title>
 			<p>
-                This section is not about developing applications with PresentationServer, but about
-                developing PresentationServer itself. It is for those who want to modify the code of
-                PresentationServer. This documentation provided here is very much work in progress.
-                If you would like to contribute to the PresentationServer development and don't find
-                all the information you are looking for here, please feel free to <a
-                href="http://www.objectweb.org/wws/subrequest/ops-users">join the ops-users mailing
-                list</a> and ask your question on the list.
+                This section is not about developing applications with PresentationServer, but about developing
+                PresentationServer itself. It is for those who want to modify the code of PresentationServer. This
+                documentation provided here is very much work in progress. If you would like to contribute to the
+                PresentationServer development and don't find all the information you are looking for here, please feel
+                free to <a href="http://www.objectweb.org/wws/subrequest/ops-users">join the ops-users mailing list</a>
+                and ask your question on the list.
             </p>
 		</section>
         <a name="nightly-builds"/>
@@ -40,25 +40,22 @@
                 build</a>, which is a build of the latest PresentationServer source code.
             </p>
             <p>
-                Unlike <a
-                href="http://forge.objectweb.org/project/showfiles.php?group_id=168">released
-                versions of PresentationServer</a>, nightly builds are not tested before they are
-                made available. The only guarantee is that nightly builds will pass the
-                PresentationServer unit tests, as a build that does not pass a unit test would not
-                uploaded to nightly build directory. The PresentationServer developers are doing
-                their best not to cause any regression in nightly builds, so nightly builds can be
-                used for application development in most scenarios. So if you notice any regression
-                is a nightly build, please report it on <a
+                Unlike <a href="http://forge.objectweb.org/project/showfiles.php?group_id=168">released versions of
+                PresentationServer</a>, nightly builds are not tested before they are made available. The only guarantee
+                is that nightly builds pass the PresentationServer unit tests. A build that does not pass all the unit
+                tests is not uploaded to the nightly build directory. The Orbeon Forms developers are doing their best
+                not to cause any regression in nightly builds, so in most cases you can use nightly builds for
+                development. If you notice any regression is a nightly build, please report it on <a
                 href="http://www.objectweb.org/wws/info/ops-users">ops-users</a>.
             </p>
             <p>
-                The name "nightly builds" seems to imply that they are created only once a day. In
-                fact, nightly builds are created at all time during the day, whenever a modification
-                occurs on the code repository. So there might in fact be several nightly builds in a
-                day of development is active during that day, or no new build if nothing was checked
-                in the repository that day.
+                The name "nightly builds" seems to imply that they are created only once a day. In fact, nightly builds
+                are created at all time during the day, whenever a modification occurs on the code repository. So there
+                might in fact be several nightly builds in a day of development is active during that day, or no new
+                build if nothing was checked in the repository that day.
             </p>
         </section>
+        <a name="get-source"/>
         <section>
             <title>Getting The Source</title>
             <p>
@@ -73,6 +70,7 @@
                 project CVS page</a> under the <i>Anonymous CVS Access</i>.
             </p>
         </section>
+        <a name="build-ant"/>
         <section>
             <title>Building With Ant</title>
             <p>
@@ -102,6 +100,7 @@
                 </li>
             </ul>
         </section>
+        <a name="compile-java-ide"/>
         <section>
             <title>Compiling Java Files From Your IDE</title>
             <p>

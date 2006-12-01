@@ -15,10 +15,6 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<!DOCTYPE document [
-    <!ENTITY jboss-vers "JBoss 4.0.4">
-    <!ELEMENT document (ANY)>
-]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
         <title>Installing Orbeon PresentationServer</title>
@@ -34,16 +30,16 @@
         <section>
             <title>System Requirements</title>
             <p>
-                To install OPS you need an application server that runs on Java version 1.4.2 (or
-                later) and implements the Servlet API 2.3 (or later). OPS has been tested on the
-                following application servers:
+                To install OPS you need an application server that runs on Java version 1.4.2 (or later) and implements
+                the Servlet API 2.3 (or later). OPS has been used by various organizations on the following application
+                servers:
             </p>
             <ul>
                 <li>Apache Tomcat 5.5.20 (JDK 1.5.0)</li>
                 <li>BEA WebLogic Server 9.1 (JRockit)</li>
-                <li>IBM WebSphere 6</li>
+                <li>IBM WebSphere 5 and 6</li>
                 <li>JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)</li>
-                <li>&jboss-vers;</li>
+                <li>JBoss 4.0.4</li>
             </ul>
             <p>
                 Please contact us if you have questions about support for other application servers
@@ -523,21 +519,44 @@
         </section>
         <a name="websphere"/>
         <section>
-            <title>Installing OPS on IBM WebSphere 6</title>
+            <title>Installing OPS on IBM WebSphere 5 and 6</title>
             <ol>
                 <li>
                     <p>
                         Launch WebSphere server.
                         <ul>
                             <li>
-                                On Windows go to Control Panel, Administrative Tools, Services.
-                                Look for IBM WebSphere Application Server and make sure it is
-                                started.
+                                On Windows, running WebSphere:
+                                <ul>
+                                    <li>
+                                        From the command line, execute <code>WSAS_HOME/bin/startServer server1</code> (on
+                                        WebSphere 5).
+                                    </li>
+                                    <li>
+                                        As a service: go to Control Panel, Administrative Tools, Services, Look for IBM
+                                        WebSphere Application Server and make sure it is started.
+                                    </li>
+                                </ul>
                             </li>
                             <li>
                                 On Linux/UNIX, assuming that <code>WSAS_HOME</code> represents the
                                 location of your WebSphere installation, run
                                 <code>WSAS_HOME/profiles/default/bin/startServer.sh server1</code>.
+                            </li>
+                            <li>
+                                <p>
+                                    <i>Note:</i>
+                                    <ul>
+                                        <li>
+                                            The default heap size is likely to be <a
+                                            href="integration-tuning#jvm-heap-size">too low</a>. You can increase the
+                                            heap size from the WebSphere Administrative Console, by going to Server /
+                                            Application Servers / server1 / Process Definition / Java Virtual Machine.
+                                            There we recommend you set the Initial Heap Size and Maximum Heap Size to
+                                            the <a href="integration-tuning#jvm-heap-ms-mx">same value</a>.
+                                        </li>
+                                    </ul>
+                                </p>
                             </li>
                         </ul>
                     </p>
@@ -546,7 +565,8 @@
                     <p>
                         Log in to the administrative console.
                         <ul>
-                            <li>Got to <code>http://localhost:9060/ibm/console/</code>.</li>
+                            <li>On WebSphere 5: got to <code>http://localhost:9090/admin/</code>.</li>
+                            <li>On WebSphere 6: got to <code>http://localhost:9060/ibm/console/</code>.</li>
                             <li>The default administrator login is <code>admin</code>.</li>
                         </ul>
                     </p>
@@ -569,6 +589,22 @@
                             <li>Save the configuration.</li>
                             <li>Click on Applications / Enterprise Applications.</li>
                             <li>Select <code>ops_war</code> and click on the "start" button.</li>
+                            <li>
+                                <p>
+                                    <i>Note:</i>
+                                    <ul>
+                                        <li>
+                                            One important log file (if something goes wrong when the applicaiton starts)
+                                            is: <code>WSAS_HOME/logs/server1/SystemOut.log</code> on WebSphere 5.
+                                        </li>
+                                        <li>
+                                            The WAR file is uncompressed by WebSphere in
+                                            <code>WSAS_HOME/installedApps/NODE_NAME/ops_war.ear/ops.war</code> on
+                                            WebSphere 5, where NODE_NAME if usualy your machine name.
+                                        </li>
+                                    </ul>
+                                </p>
+                            </li>
                         </ul>
                     </p>
                 </li>
@@ -781,7 +817,7 @@
 <!--        </section>-->
         <a name="jboss"/>
         <section>
-            <title>Installing OPS on &jboss-vers;</title>
+            <title>Installing OPS on JBoss 4.0.4</title>
             <ol>
                 <li>
                     <p>

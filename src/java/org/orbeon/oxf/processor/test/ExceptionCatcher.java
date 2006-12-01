@@ -20,6 +20,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.ExceptionGenerator;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -48,7 +49,17 @@ public class ExceptionCatcher extends ProcessorImpl {
                     helper.startDocument();
                     String rootElementName = "exceptions";
                     helper.startElement(rootElementName);
-                    ExceptionGenerator.addThrowable(helper, e);
+
+                    // Find the root throwable
+                    Throwable innerMostThrowable = e; {
+                        while (true) {
+                            Throwable candidate = OXFException.getNestedException(innerMostThrowable);
+                            if (candidate == null) break;
+                            else innerMostThrowable = candidate;
+                        }
+                    }
+
+                    ExceptionGenerator.addThrowable(helper, innerMostThrowable);
                     helper.endElement();
                     helper.endDocument();
                 }

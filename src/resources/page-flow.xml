@@ -25,6 +25,7 @@
     <files path-info="*.xsd"/>
     <files path-info="*.xml" mime-type="application/xml"/>
     <files path-info="*.html" mime-type="text/html"/>
+    <files path-info="*.htm" mime-type="text/html"/>
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>
     <files path-info="*.xq" mime-type="text/plain"/>

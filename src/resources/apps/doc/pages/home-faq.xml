@@ -433,7 +433,7 @@
                     and Opera (8.5 and later).
                 </p>
                 <p>
-                    We hope to also implement support in XForms NG for non-JavaScript, non-Ajax browsers.
+                    In the future we hope to also add support in XForms NG for non-JavaScript (and non-Ajax) browsers.
                 </p>
             </section>
             <a name="graphical-designer"/>
@@ -462,9 +462,10 @@
             <section>
                 <title>Can I use JavaScript to modify the page DOM and add or remove XForms controls?</title>
                 <p>
-                    No, because your JavaScript code will run within the web browser. All the web browser sees is an
-                    HTML DOM (Document Object Model), which represents the HTML document produced by Orbeon Forms when
-                    it transforms XForms+XHTML into plain HTML. That DOM does not include in XForms elements.
+                    No, because your JavaScript code will run within the web browser, which doesn't know anything about
+                    XForms controls. All the web browser sees is an HTML DOM (Document Object Model), which represents
+                    the HTML document produced by Orbeon Forms when it transforms XForms+XHTML into plain HTML. That DOM
+                    does not include in XForms elements.
                 </p>
                 <p>
                     Remember, the Orbeon XForms implementation works server-side in order to support currently deployed
@@ -476,6 +477,25 @@
                     XSLT page view. If you want to control the showing or hiding of XForms controls after the page is
                     loaded, you can use XForms relevance or switch/case. Currently, the only thing you can't do is
                     dynamically add and remove trees of controls in a running XForms page.
+                </p>
+            </section>
+            <a name="just-xforms"/>
+            <section added="2006-12-05">
+                <title>I just want to use Orbeon Forms's XForms engine. Can I do that?</title>
+                <p>
+                    In addition to the XForms engine, Orbeon Forms comes with an <a
+                    href="/doc/reference-xpl-pipelines">XML pipeline</a> engine and a <a
+                    href="/doc/reference-page-flow">Page Flow</a> Controller (PFC). While these additional building
+                    blocks are often useful to put together your form-based applications, you may not have a need for
+                    them.
+                </p>
+                <p>
+                    The good news is that Orbeon Forms is very configurable and you are not forced to use XML pipelines
+                    or the PFC. Users have been successfuylly using the Orbeon Forms XForms engine with JSP/Struts or
+                    PHP. The bad news is that we haven't yet written as much documentation as we would want on this
+                    topic. In the meanwhile, check <a href="/doc/integration-xforms-jsp">Using XForms with JSP</a> and
+                    post your questions to the <a href="http://www.orbeon.com/forms/download">ops-users</a>
+                    mailing-list.
                 </p>
             </section>
         </section>

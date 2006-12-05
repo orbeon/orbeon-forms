@@ -129,7 +129,8 @@
                 <title>What is XForms?</title>
                 <p>
                     W3C XForms is a standard, markup-based, declarative, XML- and HTML-friendly user interface
-                    technology. XForms makes it easy to build dynamic user interfaces able to talk to XML services.
+                    technology particularly adapted to building complex forms. XForms makes it easy to build dynamic
+                    user interfaces able to talk to XML services.
                 </p>
                 <p>
                     XForms is a W3C Recommendation since October 2003, with a second edition of the 1.0 published in
@@ -178,7 +179,7 @@
             </section>
             <a name="xforms-browsers"/>
             <section added="2006-10-27">
-                <title>I hear that XForms is not well supported in web browser. This is a problem, right?</title>
+                <title>I hear that XForms is not well supported in web browsers. This is a problem, right?</title>
                 <p>
                     No, this is not a problem at all, because XForms can run on the server, in the same way that other
                     web applications technologies like PHP, ASP, JavaServer Faces or Ruby run on the server.
@@ -353,6 +354,41 @@
                     JSP. Finally, you can use the Servlet Filter generator and implement JSP post-processing with Orbeon
                     Forms.
                 </p>
+            </section>
+            <a name="xforms-jsf-mix"/>
+            <section added="2006-12-05">
+                <title>Can I mix and match XForms and JavaServer Faces?</title>
+                <p>
+                    It all depends on what you are trying to achieve with this integration. Technically, you can write a
+                    page in JSP + JSF that produces XForms, which can then be processed by the Orbeon Forms XForms
+                    engine using a Servlet filter approach. But mixing JSF components with XForms components can cause
+                    difficulties related to the way each component set handles form submissions and state. In
+                    particular:
+                </p>
+                <ul>
+                    <li><p>
+                        If you use non-AJAX JSF components, the standard JSF components (buttons, etc.) will perform
+                        HTML form submissions to the server, which then reevaluates the JSF component tree to produce an
+                        updated page that is then sent back to the client. If you do this and your page contains XForms
+                        components as well, you will lose the state of your XForms controls when the page reloads.
+                    </p></li>
+                    <li><p>
+                        If you use AJAX JSF components (we have no experience whatsoever with those), there could be
+                        conflicts due to the JavaScript libraries those components use vs. the ones we use in Orbeon
+                        Forms.
+                    </p></li>
+                </ul>
+                <p>
+                    Feel free to experiment with JSF and XForms together, but at the moment we recommend using either
+                    JSF or XForms exclusively in a given page. However you can very well use JSF for some pages, and
+                    XForms for other pages within the same application.
+                </p>
+                <note>
+                    Orbeon wrote an <a
+                    href="http://www.theserverside.com/tt/articles/article.tss?l=BestBothWorlds">article on
+                    TheServerSide</a> in 2003 on using XSLT to style JSF. This approach can still be pursued, but the
+                    XML renderkit has not been maintained and we no longer support it in Orbeon Forms.
+                </note>
             </section>
             <a name="jsr-168"/>
             <section>

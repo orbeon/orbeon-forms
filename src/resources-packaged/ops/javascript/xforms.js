@@ -288,10 +288,10 @@ ORBEON.util.Dom = {
         return null;
     },
 
-    getChildElementByClass: function(parent, class) {
+    getChildElementByClass: function(parent, clazz) {
         for (var i = 0; i < parent.childNodes.length; i++) {
             var child = parent.childNodes[i];
-            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(parent, class)) {
+            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(parent, clazz)) {
                 return child;
             }
         }
@@ -1287,7 +1287,7 @@ ORBEON.xforms.Init = {
         }
 
         // Run code sent by server
-        if (typeof xformsPageLoadedServer != "undefined")
+        if (typeof xformsPageLoadedServer != "undefined" && !ORBEON.xforms.Globals.fckEditorLoading)
             xformsPageLoadedServer();
     },
 
@@ -2093,7 +2093,7 @@ ORBEON.xforms.Server = {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
-                                                if (true) {
+                                                if (false) {
                                                     // Upload
 
                                                     // <xxforms:control id="xforms-control-id"
@@ -2964,6 +2964,7 @@ function FCKeditor_OnComplete(editorInstance) {
         ORBEON.xforms.Controls.updateHTMLAreaClasses(document.getElementById(fckEditor.InstanceName));
     } else {
         ORBEON.xforms.Globals.fckEditorLoading = false;
+        xformsPageLoadedServer();
     }
 }
 

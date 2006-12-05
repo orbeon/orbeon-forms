@@ -118,11 +118,11 @@
                     <xsl:stylesheet version="2.0" xmlns:saxon="http://saxon.sf.net/">
                         <xsl:output name="xml" method="xml" omit-xml-declaration="yes" indent="no"/>
                         <xsl:template match="/">
-                            <xhtml>
+                            <html>
                                 <body>
                                     <xsl:value-of select="saxon:serialize(/, 'xml')"/>
                                 </body>
-                            </xhtml>
+                            </html>
                         </xsl:template>
                     </xsl:stylesheet>
 

@@ -609,7 +609,7 @@ public class XFormsControls {
     public String getCurrentSingleNodeValue() {
         final NodeInfo currentSingleNode = getCurrentSingleNode();
         if (currentSingleNode != null)
-            return XFormsInstance.getValueForNode(currentSingleNode);
+            return XFormsInstance.getValueForNodeInfo(currentSingleNode);
         else
             return null;
     }

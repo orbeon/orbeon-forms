@@ -122,6 +122,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return xxfShowProgress;
     }
 
+    public String getReplace() {
+        return replace;
+    }
+
     private void extractSubmissionElement() {
         if (!submissionElementExtracted) {
 
@@ -217,7 +221,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
 
                 //noinspection UnnecessaryLocalVariable
-                final boolean isDeferredSubmission = isReplaceAll && !isHandlingOptimizedGet;
+                final boolean isDeferredSubmission = (isReplaceAll || isReplaceInstance && containingDocument.getXFormsControls().getCurrentControlsState().isHasUpload()) && !isHandlingOptimizedGet;
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 
@@ -323,47 +327,26 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             if (value.length() == 0)
                                 continue;
 
-                            final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
-
-                            final String filename = parameterElement.element("filename").getTextTrim();
-                            final String mediatype = parameterElement.element("content-type").getTextTrim();
-                            final String size = parameterElement.element("content-length").getTextTrim();
-
                             final XFormsUploadControl uploadControl
                                     = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
 
                             if (uploadControl != null)
                             { // in case of xforms:repeat, the name of the template will not match an existing control
+
+                                final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
+
+                                final String filename = parameterElement.element("filename").getTextTrim();
+                                final String mediatype = parameterElement.element("content-type").getTextTrim();
+                                final String size = parameterElement.element("content-length").getTextTrim();
+
                                 // Set value into the instance
                                 xformsControls.setBinding(pipelineContext, uploadControl);
-                                {
-                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, paramValueType);
-                                }
+                                uploadControl.setExternalValue(pipelineContext, value, paramValueType);
 
-                                // Handle filename if any
-                                if (uploadControl.getFilenameElement() != null) {
-                                    xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
-                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, filename, null);
-                                    xformsControls.popBinding();
-                                }
-
-                                // Handle mediatype if any
-                                if (uploadControl.getMediatypeElement() != null) {
-                                    xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
-                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, mediatype, null);
-                                    xformsControls.popBinding();
-                                }
-
-                                // Handle file size if any
-                                if (uploadControl.getSizeElement() != null) {
-                                    xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
-                                    final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-                                    XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, size, null);
-                                    xformsControls.popBinding();
-                                }
+                                // Handle filename, mediatype and size if necessary
+                                uploadControl.setFilename(pipelineContext, filename);
+                                uploadControl.setMediatype(pipelineContext, mediatype);
+                                uploadControl.setSize(pipelineContext, size);
                             }
                         }
                     }
@@ -724,8 +707,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return submitErrorEvent;
     }
 
-    private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String serializedInstanceString, boolean isShowProgress) {
-        final String actionString = resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
+    private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String queryString, boolean isShowProgress) {
+        final String actionString = (queryString == null) ? resolvedAction : resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + queryString;
         final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, false, isShowProgress);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;

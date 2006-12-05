@@ -76,17 +76,17 @@ public class XFormsSetvalueAction extends XFormsAction {
         final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
         if (currentNode != null) {
             // Node exists, we can try to set the value
-            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet);
+            doSetValue(pipelineContext, containingDocument, currentNode, valueToSet, null);
         } else {
             // Node doesn't exist, don't do anything
             // NOP
         }
     }
 
-    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet) {
-        final String currentValue = XFormsInstance.getValueForNode(currentNode);
+    public static boolean doSetValue(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, NodeInfo currentNode, String valueToSet, String type) {
+        final String currentValue = XFormsInstance.getValueForNodeInfo(currentNode);
         if (!currentValue.equals(valueToSet)) {// TODO: Check if we are allowed to do this optimization
-            XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, null);
+            XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
 
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
             final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel().getDeferredActionContext();

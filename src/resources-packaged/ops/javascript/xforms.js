@@ -1613,7 +1613,7 @@ ORBEON.xforms.Server = {
                 executedRequest = true;
                 YAHOO.util.Connect.setDefaultPostHeader(false);
                 YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse }, requestDocumentString);
+                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse, argument: document }, requestDocumentString);
             }
         }
 
@@ -1626,8 +1626,30 @@ ORBEON.xforms.Server = {
     },
 
     handleResponse: function(o) {
-        var responseXML = o.responseXML;
+
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
+
+        var responseXML = o.responseXML;
+
+// test
+//        var document = (window.parent.document) ? window.parent.document : window.document;
+
+
+        if (responseXML == null) {
+
+//            xformsLog(o.responseText);
+            var xmlString = o.responseText.substring(9).substring(0, o.responseText.length - 18).replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            xformsLog(xmlString);
+
+            if (document.implementation.createDocument) {
+                responseXML = (new DOMParser()).parseFromString(xmlString, "application/xml")
+            } else if (window.ActiveXObject) {
+                responseXML = new ActiveXObject("Microsoft.XMLDOM")
+                responseXML.async="false"
+                responseXML.loadXML(xmlString)
+            }
+        }
+
         if (responseXML && responseXML.documentElement
                 && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
@@ -2071,22 +2093,22 @@ ORBEON.xforms.Server = {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
-                                                if (false) {
+                                                if (true) {
                                                     // Upload
 
                                                     // <xxforms:control id="xforms-control-id"
                                                     //    state="empty|file"
-                                                    //    filename="filename.txt" mimetype="text/plain" size="23kb"/>
+                                                    //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
 
                                                     // Get attributes from response
                                                     var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
                                                     var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
-                                                    var mimetype = ORBEON.util.Dom.getAttribute(controlElement, "mimetype");
+                                                    var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                     var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                     // Get elements we want to modify from the DOM
                                                     var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-file-info");
                                                     var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
-                                                    var mimeTypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mimetype");
+                                                    var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
                                                     var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
                                                     // Set values in DOM
                                                     if (state == "empty") {
@@ -2099,8 +2121,8 @@ ORBEON.xforms.Server = {
                                                     }
                                                     if (filename != null)
                                                         ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
-                                                    if (mimetype != null)
-                                                        ORBEON.util.Dom.setStringValue(mimeTypeSpan, mimetype);
+                                                    if (mediatype != null)
+                                                        ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
                                                     if (size != null)
                                                         ORBEON.util.Dom.setStringValue(sizeSpan, size);
                                                 }
@@ -2394,8 +2416,10 @@ ORBEON.xforms.Server = {
                                     ORBEON.xforms.Globals.requestForm.submit();
                                 } else {
                                     // Submit form in the background
+                                    newDynamicStateTriggersPost = true;
+                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
                                     YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
-                                    YAHOO.util.Connect.asyncRequest("POST", action, { success: ORBEON.xforms.Server.handleResponse });
+                                    YAHOO.util.Connect.asyncRequest("POST", action, { upload: ORBEON.xforms.Server.handleResponse, argument: document });
                                 }
                                 break;
                             }

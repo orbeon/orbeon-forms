@@ -64,7 +64,7 @@ public class XFormsMessageAction extends XFormsAction {
         if (ref != null) {
             final NodeInfo currentNode = xformsControls.getCurrentSingleNode();
             if (currentNode != null)
-                message = XFormsInstance.getValueForNode(currentNode);
+                message = XFormsInstance.getValueForNodeInfo(currentNode);
         }
 
         // Try to get message from linking attribute

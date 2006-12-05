@@ -36,6 +36,9 @@
                     </files>
                 </form>
             </xforms:instance>
+            <xforms:instance id="response-instance">
+                <instance xmlns=""/>
+            </xforms:instance>
             <xforms:instance id="control-instance">
                 <control xmlns="">
                     <simple-upload-trigger/>
@@ -48,7 +51,9 @@
             <!-- Control whether the upload trigger is read-only or not -->
             <xforms:bind nodeset="instance('control-instance')/simple-upload-trigger" readonly="{if ($in-portlet) then 'true()' else 'false()'}"/>
             <!-- Main submission which uploads the files -->
-            <xforms:submission id="main-submission" method="post" replace="all" action="/xforms-upload/"/>
+            <xforms:submission id="all-submission" method="post" replace="all" action="/xforms-upload/"/>
+            <!-- Main submission which uploads the files -->
+            <xforms:submission id="instance-submission" method="post" replace="instance" action="/xforms-upload/background" instance="response-instance"/>
         </xforms:model>
     </head>
     <body>
@@ -75,6 +80,17 @@
                             <xxforms:size ref="@size"/>
                         </xforms:upload>
                     </td>
+                    <td>
+                        <xforms:output ref="@filename">
+                        <xforms:label>Filename</xforms:label>
+                    </xforms:output>
+                    <xforms:output ref="@mediatype">
+                        <xforms:label>Mediatype</xforms:label>
+                    </xforms:output>
+                    <xforms:output ref="@size">
+                        <xforms:label>Size</xforms:label>
+                    </xforms:output>
+                    </td>
                 </tr>
             </xforms:repeat>
         </table>
@@ -86,12 +102,20 @@
                 <td>
 
                     <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
-                        <xforms:label>Upload</xforms:label>
+                        <xforms:label>Upload and Show New Page</xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:setvalue ref="instance('main-instance')/action">simple-upload</xforms:setvalue>
-                            <xforms:send submission="main-submission"/>
+                            <xforms:send submission="all-submission"/>
                         </xforms:action>
                     </xforms:trigger>
+                    <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
+                        <xforms:label>Upload and Keep Same Page</xforms:label>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:setvalue ref="instance('main-instance')/action">simple-upload</xforms:setvalue>
+                            <xforms:send submission="instance-submission"/>
+                        </xforms:action>
+                    </xforms:trigger>
+
                 </td>
                 <td>
                     This works only outside of the portal.
@@ -102,7 +126,7 @@
                                 <xforms:label>here</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:setvalue ref="action">goto-simple-upload</xforms:setvalue>
-                                    <xforms:send submission="main-submission"/>
+                                    <xforms:send submission="all-submission"/>
                                 </xforms:action>
                             </xforms:trigger>
                             to try.
@@ -122,7 +146,7 @@
                         <xforms:label>Upload</xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:setvalue ref="action">db-upload</xforms:setvalue>
-                            <xforms:send submission="main-submission"/>
+                            <xforms:send submission="all-submission"/>
                         </xforms:action>
                     </xforms:trigger>
                 </td>
@@ -140,7 +164,7 @@
                         <xforms:label>Upload</xforms:label>
                         <xforms:action ev:event="DOMActivate">
                             <xforms:setvalue ref="action">ws-upload</xforms:setvalue>
-                            <xforms:send submission="main-submission"/>
+                            <xforms:send submission="all-submission"/>
                         </xforms:action>
                     </xforms:trigger>
                 </td>

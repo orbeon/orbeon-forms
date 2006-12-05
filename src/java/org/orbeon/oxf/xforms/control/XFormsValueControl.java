@@ -57,7 +57,7 @@ public abstract class XFormsValueControl extends XFormsControl {
         if (boundNode == null)
             return;
 
-        setValue(XFormsInstance.getValueForNode(boundNode));
+        setValue(XFormsInstance.getValueForNodeInfo(boundNode));
     }
 
     protected void evaluateDisplayValue(PipelineContext pipelineContext) {
@@ -69,13 +69,13 @@ public abstract class XFormsValueControl extends XFormsControl {
      *
      * @param value the new value
      */
-    public void setExternalValue(PipelineContext pipelineContext, String value) {
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
         // Set value into the instance
 
         final NodeInfo boundNode = getBoundNode();
         if (boundNode == null) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, boundNode, value);
+        XFormsSetvalueAction.doSetValue(pipelineContext, containingDocument, boundNode, value, type);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.

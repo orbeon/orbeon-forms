@@ -450,7 +450,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             if (currentBindingContext.isNewBind()) {
                 final NodeInfo currentNode = currentBindingContext.getSingleNode();
                 if (currentNode != null)
-                    result = XFormsInstance.getValueForNode(currentNode);
+                    result = XFormsInstance.getValueForNodeInfo(currentNode);
             }
 
             // Try to get value attribute

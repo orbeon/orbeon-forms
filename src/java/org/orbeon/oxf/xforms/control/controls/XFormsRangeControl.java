@@ -53,8 +53,8 @@ public class XFormsRangeControl extends XFormsValueControl {
         return step;
     }
 
-    public void setExternalValue(PipelineContext pipelineContext, String value) {
-        super.setExternalValue(pipelineContext, convertFromExternalValue(value));
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+        super.setExternalValue(pipelineContext, convertFromExternalValue(value), type);
     }
 
     private String convertFromExternalValue(String externalValue) {

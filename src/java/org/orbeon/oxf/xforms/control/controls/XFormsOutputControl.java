@@ -42,13 +42,13 @@ public class XFormsOutputControl extends XFormsValueControl {
     // Value attribute
     private String valueAttribute;
 
-    // XForms 1.1 draft mediatype attribute
-    private String mediaTypeAttribute;
+    // XForms 1.1 mediatype attribute
+    private String mediatypeAttribute;
 
     public XFormsOutputControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
-        this.mediaTypeAttribute = element.attributeValue("mediatype");
+        this.mediatypeAttribute = element.attributeValue("mediatype");
         this.valueAttribute = element.attributeValue("value");
     }
 
@@ -58,7 +58,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Get value from single-node binding
             final NodeInfo currentSingleNode = bindingContext.getSingleNode();
             if (currentSingleNode != null)
-                rawValue = XFormsInstance.getValueForNode(currentSingleNode);
+                rawValue = XFormsInstance.getValueForNodeInfo(currentSingleNode);
             else
                 rawValue = "";
         } else {
@@ -75,7 +75,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
         // Handle image mediatype if necessary
         final String updatedValue;
-        if (mediaTypeAttribute != null && mediaTypeAttribute.startsWith("image/")) {
+        if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
             if (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
                 // Rewrite URI
@@ -100,8 +100,8 @@ public class XFormsOutputControl extends XFormsValueControl {
         }
     }
 
-    public String getMediaTypeAttribute() {
-        return mediaTypeAttribute;
+    public String getMediatypeAttribute() {
+        return mediatypeAttribute;
     }
 
     public String getValueAttribute() {

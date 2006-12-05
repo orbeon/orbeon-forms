@@ -217,7 +217,7 @@ public class XFormsInstance implements XFormsEventTarget {
             instanceData.markValueChanged();
     }
 
-    public static String getValueForNode(NodeInfo currentNode) {
+    public static String getValueForNodeInfo(NodeInfo currentNode) {
 
         if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
             // Return the value of the first text node if any

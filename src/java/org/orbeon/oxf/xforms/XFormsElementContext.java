@@ -120,6 +120,6 @@ public class XFormsElementContext extends XFormsControls {
      * Returns the text value of the currently referenced node in the instance.
      */
     public String getRefValue() {
-        return XFormsInstance.getValueForNode(getCurrentBindingContext().getSingleNode());
+        return XFormsInstance.getValueForNodeInfo(getCurrentBindingContext().getSingleNode());
     }
 }

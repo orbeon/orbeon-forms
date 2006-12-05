@@ -58,6 +58,22 @@
                                     <attribute name="mediatype"/>
                                 </optional>
                                 <optional>
+                                    <attribute name="state">
+                                        <choice>
+                                            <value>empty</value>
+                                            <value>file</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="size">
+                                        <data type="nonNegativeInteger"/>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="filename"/>
+                                </optional>
+                                <optional>
                                     <attribute name="display-value"/>
                                 </optional>
                                 <ref name="model-item-properties"/>
@@ -168,6 +184,12 @@
                     <element name="xxforms:submission">
                         <attribute name="action"/>
                         <attribute name="method"/>
+                        <attribute name="replace">
+                            <choice>
+                                <value>all</value>
+                                <value>instance</value>
+                            </choice>
+                        </attribute>
                         <optional>
                             <attribute name="show-progress">
                                 <choice>

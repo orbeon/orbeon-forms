@@ -62,7 +62,7 @@ public class XFormsLoadAction extends XFormsAction {
             // Use single-node binding
             final NodeInfo currentNode = bindingContext.getSingleNode();
             if (currentNode != null) {
-                final String value = XFormsInstance.getValueForNode(currentNode);
+                final String value = XFormsInstance.getValueForNodeInfo(currentNode);
                 resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node

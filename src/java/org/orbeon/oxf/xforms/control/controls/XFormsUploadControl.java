@@ -16,8 +16,12 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.saxon.om.NodeInfo;
 
 /**
  * Represents an xforms:upload control.
@@ -28,6 +32,12 @@ public class XFormsUploadControl extends XFormsValueControl {
     private Element filenameElement;
     private Element sizeElement;
 
+    private String state;
+    private String mediatype;
+    private String size;
+    private String filename;
+
+
     public XFormsUploadControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
         mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
@@ -35,15 +45,89 @@ public class XFormsUploadControl extends XFormsValueControl {
         sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
     }
 
-    public Element getMediatypeElement() {
-        return mediatypeElement;
+
+    public void evaluate(PipelineContext pipelineContext) {
+        super.evaluate(pipelineContext);
+
+        this.state = getState(pipelineContext);
+        this.mediatype = getMediatype(pipelineContext);
+        this.size = getSize(pipelineContext);
+        this.filename  = getFilename(pipelineContext);
     }
 
-    public Element getFilenameElement() {
-        return filenameElement;
+    public String getState() {
+        return state;
     }
 
-    public Element getSizeElement() {
-        return sizeElement;
+    public String getMediatype() {
+        return mediatype;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public String getState(PipelineContext pipelineContext) {
+        final boolean isEmpty = getValue() == null || getValue().length() == 0;
+        return isEmpty ? "empty" : "file";
+    }
+
+    public String getMediatype(PipelineContext pipelineContext) {
+        if (mediatypeElement == null)
+            return null;
+        else
+            return getInfoValue(pipelineContext, mediatypeElement);
+    }
+
+    public String getFilename(PipelineContext pipelineContext) {
+        if (filenameElement == null)
+            return null;
+        else
+            return getInfoValue(pipelineContext, filenameElement);
+    }
+
+    public String getSize(PipelineContext pipelineContext) {
+        if (sizeElement == null)
+            return null;
+        else
+            return getInfoValue(pipelineContext, sizeElement);
+    }
+
+    private String getInfoValue(PipelineContext pipelineContext, Element element) {
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.setBinding(pipelineContext, this);
+        xformsControls.pushBinding(pipelineContext, element);
+        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        final String value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
+        xformsControls.popBinding();
+        return value;
+    }
+
+    public void setMediatype(PipelineContext pipelineContext, String mediatype) {
+        setInfoValue(pipelineContext, mediatypeElement, mediatype);
+    }
+
+    public void setFilename(PipelineContext pipelineContext, String filename) {
+        setInfoValue(pipelineContext, filenameElement, filename);
+    }
+
+    public void setSize(PipelineContext pipelineContext, String size) {
+        setInfoValue(pipelineContext, sizeElement, size);
+    }
+
+    private void setInfoValue(PipelineContext pipelineContext, Element element, String value) {
+        if (element == null || value == null)
+            return;
+
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.setBinding(pipelineContext, this);
+        xformsControls.pushBinding(pipelineContext, element);
+        final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
+        XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, null);
+        xformsControls.popBinding();
     }
 }

@@ -714,8 +714,8 @@ public class XFormsServer extends ProcessorImpl {
                                     final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsControl1;
                                     final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsControl2;
 
-                                    final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediaTypeAttribute();
-                                    final String mediaTypeValue2 = outputControlInfo2.getMediaTypeAttribute();
+                                    final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
+                                    final String mediaTypeValue2 = outputControlInfo2.getMediatypeAttribute();
 
                                     if (!((mediaTypeValue1 == null && mediaTypeValue2 == null) || (mediaTypeValue1 != null && mediaTypeValue2 != null && mediaTypeValue1.equals(mediaTypeValue2)))) {
                                         attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
@@ -1014,12 +1014,60 @@ public class XFormsServer extends ProcessorImpl {
                             final XFormsOutputControl outputControlInfo1 = (XFormsOutputControl) xformsControl1;
                             final XFormsOutputControl outputControlInfo2 = (XFormsOutputControl) xformsControl2;
 
-                            final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediaTypeAttribute();
-                            final String mediaTypeValue2 = outputControlInfo2.getMediaTypeAttribute();
+                            {
+                                // Mediatype
+                                final String mediatypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediatypeAttribute();
+                                final String mediatypeValue2 = outputControlInfo2.getMediatypeAttribute();
 
-                            if (!((mediaTypeValue1 == null && mediaTypeValue2 == null) || (mediaTypeValue1 != null && mediaTypeValue2 != null && mediaTypeValue1.equals(mediaTypeValue2)))) {
-                                attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
+                                if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
+                                    attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediatypeValue2 != null ? mediatypeValue2 : "");
+                                }
                             }
+                        }
+
+                        // Output xforms:upload-specific information
+                        if (xformsControl2 instanceof XFormsUploadControl) {
+                            final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsControl1;
+                            final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsControl2;
+
+
+                            {
+                                // State
+                                final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState();
+                                final String stateValue2 = uploadControlInfo2.getState();
+
+                                if (!((stateValue1 == null && stateValue2 == null) || (stateValue1 != null && stateValue2 != null && stateValue1.equals(stateValue2)))) {
+                                    attributesImpl.addAttribute("", "state", "state", ContentHandlerHelper.CDATA, stateValue2 != null ? stateValue2 : "");
+                                }
+                            }
+                            {
+                                // Mediatype
+                                final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getMediatype();
+                                final String mediatypeValue2 = uploadControlInfo2.getMediatype();
+
+                                if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
+                                    attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediatypeValue2 != null ? mediatypeValue2 : "");
+                                }
+                            }
+                            {
+                                // Filename
+                                final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename();
+                                final String filenameValue2 = uploadControlInfo2.getFilename();
+
+                                if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
+                                    attributesImpl.addAttribute("", "filename", "filename", ContentHandlerHelper.CDATA, filenameValue2 != null ? filenameValue2 : "");
+                                }
+                            }
+                            {
+                                // Size
+                                final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize();
+                                final String sizeValue2 = uploadControlInfo2.getSize();
+
+                                if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
+                                    attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");
+                                }
+                            }
+
                         }
                     }
 
@@ -1208,7 +1256,10 @@ public class XFormsServer extends ProcessorImpl {
         final String requestURL = externalContext.getRequest().getRequestURL();
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
-                new String[]{"action", requestURL, "method", "POST", "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false"});
+                new String[]{"action", requestURL, "method", "POST",
+                        "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false",
+                        "replace", activeSubmission.getReplace()
+                });
     }
 
     private void outputMessagesInfo(ContentHandlerHelper ch, List messages) {

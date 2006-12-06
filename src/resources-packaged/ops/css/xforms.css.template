@@ -2,7 +2,7 @@
     Copyright (C) 2006 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
-        GNU Lesser General Public License as published by the Free Software Foundation; either version
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -219,7 +219,7 @@
 
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
 .xforms-upload-state-file .xforms-upload-select { display: none; }
-.xforms-upload-mimetype { padding-left: .5em; font-style: italic; }
+.xforms-upload-mediatype { padding-left: .5em; font-style: italic; }
 .xforms-upload-size { padding-left: .5em; }
 .xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
 

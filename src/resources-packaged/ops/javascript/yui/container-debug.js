@@ -2,7 +2,7 @@
 Copyright (c) 2006, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
-version 0.12.0
+version: 0.12.0
 */
 
 /**
@@ -14,6 +14,8 @@ version 0.12.0
 YAHOO.util.Config = function(owner) {
 	if (owner) {
 		this.init(owner);
+	} else {
+		YAHOO.log("No owner specified for Config object", "error");
 	}
 };
 
@@ -78,7 +80,6 @@ YAHOO.util.Config.prototype.init = function(owner) {
 	* @event configChangedEvent
 	*/
 	this.configChangedEvent = new YAHOO.util.CustomEvent("configChanged");
-
 	this.queueInProgress = false;
 
 	/* Private Members */
@@ -116,6 +117,8 @@ YAHOO.util.Config.prototype.init = function(owner) {
 	* @param {value}	Object		The value of the correct type for the property
 	*/
 	var fireEvent = function( key, value ) {
+		YAHOO.log("Firing Config event: " + key + "=" + value, "info");
+
 		key = key.toLowerCase();
 
 		var property = config[key];
@@ -134,6 +137,8 @@ YAHOO.util.Config.prototype.init = function(owner) {
 	*/
 	this.addProperty = function( key, propertyObject ) {
 		key = key.toLowerCase();
+
+		YAHOO.log("Added property: " + key, "info");
 
 		config[key] = propertyObject;
 
@@ -217,6 +222,8 @@ YAHOO.util.Config.prototype.init = function(owner) {
 	this.setProperty = function(key, value, silent) {
 		key = key.toLowerCase();
 
+		YAHOO.log("setProperty: " + key + "=" + value, "info");
+
 		if (this.queueInProgress && ! silent) {
 			this.queueProperty(key,value); // Currently running through a queue...
 			return true;
@@ -249,6 +256,8 @@ YAHOO.util.Config.prototype.init = function(owner) {
 	*/
 	this.queueProperty = function(key, value) {
 		key = key.toLowerCase();
+
+		YAHOO.log("queueProperty: " + key + "=" + value, "info");
 
 		var property = config[key];
 
@@ -307,6 +316,8 @@ YAHOO.util.Config.prototype.init = function(owner) {
 					}
 				}
 			}
+
+			YAHOO.log("Config event queue: " + this.outputEventQueue(), "info");
 
 			return true;
 		} else {
@@ -490,6 +501,8 @@ YAHOO.util.Config.alreadySubscribed = function(evt, fn, obj) {
 YAHOO.widget.Module = function(el, userConfig) {
 	if (el) {
 		this.init(el, userConfig);
+	} else {
+		YAHOO.log("No element or element ID specified for Module instantiation", "error");
 	}
 };
 
@@ -557,6 +570,7 @@ YAHOO.widget.Module.CSS_FOOTER = "ft";
 YAHOO.widget.Module.RESIZE_MONITOR_SECURE_URL = "javascript:false;";
 
 YAHOO.widget.Module.prototype = {
+
 	/**
 	* The class's constructor function
 	* @property contructor
@@ -1093,6 +1107,7 @@ YAHOO.widget.Module.prototype = {
 			appendTo(appendToNode);
 		} else { // No node was passed in. If the element is not pre-marked up, this fails
 			if (! YAHOO.util.Dom.inDocument(this.element)) {
+				YAHOO.log("Render failed. Must specify appendTo node if Module isn't already in the DOM.", "error");
 				return false;
 			}
 		}
@@ -1311,6 +1326,7 @@ YAHOO.widget.Overlay.prototype.init = function(el, userConfig) {
 	}
 
 	this.initEvent.fire(YAHOO.widget.Overlay);
+
 };
 
 /**
@@ -1468,7 +1484,6 @@ YAHOO.widget.Overlay.prototype.showMacGeckoScrollbars = function() {
 */
 YAHOO.widget.Overlay.prototype.configVisible = function(type, args, obj) {
 	var visible = args[0];
-
 	var currentVis = YAHOO.util.Dom.getStyle(this.element, "visibility");
 
 	if (currentVis == "inherit") {
@@ -1673,6 +1688,8 @@ YAHOO.widget.Overlay.prototype.configXY = function(type, args, obj) {
 	x = this.cfg.getProperty("x");
 	y = this.cfg.getProperty("y");
 
+	YAHOO.log("xy: " + [x,y], "iframe");
+
 	this.cfg.refireEvent("iframe");
 	this.moveEvent.fire([x,y]);
 };
@@ -1779,6 +1796,8 @@ YAHOO.widget.Overlay.prototype.configIframe = function(type, args, obj) {
 			x = this.cfg.getProperty("x");
 			y = this.cfg.getProperty("y");
 		}
+
+		YAHOO.log("iframe positioning to: " + [x,y], "iframe");
 
 		if (! isNaN(x) && ! isNaN(y)) {
 			if (! this.iframe) {
@@ -2405,7 +2424,6 @@ YAHOO.widget.OverlayManager.prototype = {
 		}
 	},
 
-
 	/**
 	* Returns a string representation of the object.
 	* @method toString
@@ -2430,6 +2448,16 @@ YAHOO.widget.OverlayManager.prototype = {
 * @param {String}	event		Optional. The event (keydown or keyup) to listen for. Defaults automatically to keydown.
 */
 YAHOO.util.KeyListener = function(attachTo, keyData, handler, event) {
+	if (! attachTo) {
+		YAHOO.log("No attachTo element specified", "error");
+	}
+	if (! keyData) {
+		YAHOO.log("No keyData specified", "error");
+	}
+	if (! handler) {
+		YAHOO.log("No handler specified", "error");
+	}
+
 	if (! event) {
 		event = YAHOO.util.KeyListener.KEYDOWN;
 	}
@@ -2506,7 +2534,6 @@ YAHOO.util.KeyListener = function(attachTo, keyData, handler, event) {
 				}
 			} else {
 				dataItem = keyData.keys;
-
 				if (dataItem == e.charCode ) {
 					keyEvent.fire(e.charCode, e);
 				} else if (dataItem == e.keyCode) {
@@ -2607,6 +2634,8 @@ YAHOO.widget.Tooltip.CSS_TOOLTIP = "tt";
 * @param {Object}	userConfig	The configuration object literal containing the configuration that should be set for this Tooltip. See configuration documentation for more details.
 */
 YAHOO.widget.Tooltip.prototype.init = function(el, userConfig) {
+	this.logger = YAHOO.widget.Tooltip.logger;
+
 	if (document.readyState && document.readyState != "complete") {
 		var deferredInit = function() {
 			this.init(el, userConfig);
@@ -2796,6 +2825,7 @@ YAHOO.widget.Tooltip.prototype.onContextMouseOver = function(e, obj) {
 
 	if (obj.hideProcId) {
 		clearTimeout(obj.hideProcId);
+		obj.logger.log("Clearing hide timer: " + obj.hideProcId, "time");
 		obj.hideProcId = null;
 	}
 
@@ -2812,6 +2842,7 @@ YAHOO.widget.Tooltip.prototype.onContextMouseOver = function(e, obj) {
 	* @type int
 	*/
 	obj.showProcId = obj.doShow(e, context);
+	obj.logger.log("Setting show tooltip timeout: " + this.showProcId, "time");
 };
 
 /**
@@ -2830,11 +2861,13 @@ YAHOO.widget.Tooltip.prototype.onContextMouseOut = function(e, obj) {
 
 	if (obj.showProcId) {
 		clearTimeout(obj.showProcId);
+		obj.logger.log("Clearing show timer: " + obj.showProcId, "time");
 		obj.showProcId = null;
 	}
 
 	if (obj.hideProcId) {
 		clearTimeout(obj.hideProcId);
+		obj.logger.log("Clearing hide timer: " + obj.hideProcId, "time");
 		obj.hideProcId = null;
 	}
 
@@ -2868,6 +2901,7 @@ YAHOO.widget.Tooltip.prototype.doShow = function(e, context) {
 				me.cfg.refireEvent("text");
 			}
 
+			me.logger.log("Show tooltip", "time");
 			me.moveTo(me.pageX, me.pageY + yOffset);
 			if (me.cfg.getProperty("preventoverlap")) {
 				me.preventOverlap(me.pageX, me.pageY);
@@ -2877,6 +2911,7 @@ YAHOO.widget.Tooltip.prototype.doShow = function(e, context) {
 
 			me.show();
 			me.hideProcId = me.doHide();
+			me.logger.log("Hide tooltip time active: " + me.hideProcId, "time");
 		},
 	this.cfg.getProperty("showdelay"));
 };
@@ -2887,8 +2922,10 @@ YAHOO.widget.Tooltip.prototype.doShow = function(e, context) {
 */
 YAHOO.widget.Tooltip.prototype.doHide = function() {
 	var me = this;
+	me.logger.log("Setting hide tooltip timeout", "time");
 	return setTimeout(
 		function() {
+			me.logger.log("Hide tooltip", "time");
 			me.hide();
 		},
 		this.cfg.getProperty("autodismissdelay"));
@@ -2913,7 +2950,11 @@ YAHOO.widget.Tooltip.prototype.preventOverlap = function(pageX, pageY) {
 
 	var mousePoint = new YAHOO.util.Point(pageX, pageY);
 
+	this.logger.log("context " + elementRegion, "ttip");
+	this.logger.log("mouse " + mousePoint, "ttip");
+
 	if (elementRegion.contains(mousePoint)) {
+		this.logger.log("OVERLAP", "warn");
 		this.cfg.setProperty("y", (pageY-height-5));
 	}
 };
@@ -3017,7 +3058,6 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 	this.beforeShowEvent.subscribe(function() {
 		this.cfg.refireEvent("underlay");
 	}, this, true);
-
 	this.initEvent.fire(YAHOO.widget.Panel);
 };
 
@@ -3337,6 +3377,7 @@ YAHOO.widget.Panel.prototype.configzIndex = function(type, args, obj) {
 };
 
 // END BUILT-IN PROPERTY EVENT HANDLERS //
+
 
 /**
 * Builds the wrapping container around the Panel that is used for positioning the shadow and matte underlays. The container element is assigned to a  local instance variable called container, and the element is reinserted inside of it.
@@ -3736,8 +3777,7 @@ YAHOO.widget.Dialog.prototype.doSubmit = function() {
 * @method registerForm
 */
 YAHOO.widget.Dialog.prototype.registerForm = function() {
-    return;
-    var form = this.element.getElementsByTagName("FORM")[0];
+	var form = this.element.getElementsByTagName("FORM")[0];
 
 	if (! form) {
 		var formHTML = "<form name=\"frm_" + this.id + "\" action=\"\"></form>";

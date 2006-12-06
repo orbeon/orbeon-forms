@@ -1642,8 +1642,8 @@ ORBEON.xforms.Server = {
 
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
         var responseXML = o.responseXML;
-        if (responseXML == null) {
-            // If the response doesn't come already in the form of a document, try to parse the text.
+        if (!responseXML || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")) {
+            // The XML docucment does not come in o.responseXML: parse o.responseText.
             // This happens in particular when we get a response after a background upload.
             var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
             responseXML = ORBEON.util.Dom.stringToDom(xmlString);
@@ -2972,7 +2972,8 @@ function FCKeditor_OnComplete(editorInstance) {
         ORBEON.xforms.Controls.updateHTMLAreaClasses(document.getElementById(fckEditor.InstanceName));
     } else {
         ORBEON.xforms.Globals.fckEditorLoading = false;
-        xformsPageLoadedServer();
+        if (typeof xformsPageLoadedServer != "undefined")
+            xformsPageLoadedServer();
     }
 }
 

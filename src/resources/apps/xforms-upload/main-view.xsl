@@ -55,6 +55,10 @@
             <!-- Main submission which uploads the files -->
             <xforms:submission id="instance-submission" method="post" replace="instance" action="/xforms-upload/background" instance="response-instance"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: white; }
+        </xhtml:style>
+
     </head>
     <body>
         <xsl:if test="/result/message">
@@ -62,38 +66,21 @@
                 <xsl:value-of select="/result/message"/>
             </p>
         </xsl:if>
-        <table>
-            <tr>
-                <td>
-                    <xsl:text>Please select up to </xsl:text>
-                    <xforms:output value="count(files/file)"/>
-                    <xsl:if test="$uploaded"> other</xsl:if>
-                    <xsl:text> JPEG images to upload:</xsl:text>
-                </td>
-            </tr>
-            <xforms:repeat nodeset="files/file">
-                <tr>
-                    <td>
-                        <xforms:upload ref=".">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </td>
-                    <td>
-                        <xforms:output ref="@filename">
-                        <xforms:label>Filename</xforms:label>
-                    </xforms:output>
-                    <xforms:output ref="@mediatype">
-                        <xforms:label>Mediatype</xforms:label>
-                    </xforms:output>
-                    <xforms:output ref="@size">
-                        <xforms:label>Size</xforms:label>
-                    </xforms:output>
-                    </td>
-                </tr>
-            </xforms:repeat>
-        </table>
+        <xhtml:p>
+            <xsl:text>Please select up to </xsl:text>
+            <xforms:output value="count(files/file)"/>
+            <xsl:if test="$uploaded"> other</xsl:if>
+            <xsl:text> images to upload:</xsl:text>
+        </xhtml:p>
+        <xforms:repeat nodeset="files/file">
+            <xhtml:p>
+                <xforms:upload ref=".">
+                    <xforms:filename ref="@filename"/>
+                    <xforms:mediatype ref="@mediatype"/>
+                    <xxforms:size ref="@size"/>
+                </xforms:upload>
+            </xhtml:p>
+        </xforms:repeat>
         <table class="gridtable">
             <tr>
                 <th>

@@ -43,7 +43,7 @@
                          required="../action = 'download'"/>
             <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
             <xforms:instance id="samples-instance">
-                <samples xmlns=""/>
+                <directory xmlns=""/>
             </xforms:instance>
             <xforms:submission id="main-submission" method="post" replace="all" action="/xforms-sandbox/"/>
             <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance" action="/xforms-sandbox/service/get-files"/>
@@ -134,7 +134,8 @@
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="instance('samples-instance')/file">
-                                            <xforms:label><xforms:output value="if (ends-with(@name, '.xhtml')) then substring(@name, 1, string-length(@name) - 6) else @name"/></xforms:label>
+                                            <!--<xforms:label><xforms:output value="if (ends-with(@name, '.xhtml')) then substring(@name, 1, string-length(@name) - 6) else @name"/></xforms:label>-->
+                                            <xforms:label><xforms:output value="@name"/></xforms:label>
                                             <xforms:value ref="@name"/>
                                         </xforms:itemset>
                                     </xforms:select1>

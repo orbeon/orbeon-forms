@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
@@ -660,7 +661,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 // Notify the control of the value change
                 final String eventValue = concreteEvent.getNewValue();
-                valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
+                if (valueXFormsControl instanceof XFormsUploadControl) {
+                    final XFormsUploadControl uploadControl = (XFormsUploadControl) valueXFormsControl;
+                    uploadControl.setExternalValue(pipelineContext, eventValue, null, true);
+                } else {
+                    valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
+                }
             }
 
             {

@@ -18,10 +18,17 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
+
+import java.io.File;
 
 /**
  * Represents an xforms:upload control.
@@ -53,6 +60,53 @@ public class XFormsUploadControl extends XFormsValueControl {
         this.mediatype = getMediatype(pipelineContext);
         this.size = getSize(pipelineContext);
         this.filename  = getFilename(pipelineContext);
+    }
+
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type, boolean handleTemporaryFiles){
+
+        try {
+            final String newValue;
+            if (handleTemporaryFiles) {
+                final String oldValue = getValue();
+                // Try to delete temporary file if old value was temp URI and new value is different
+                if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value)) {
+                    final File file = new File(URLFactory.createURL(oldValue).toURI());
+                    if (file.exists()) {
+                        final boolean success = file.delete();
+                        if (!success)
+                            XFormsServer.logger.debug("XForms - cannot delete temporary file upon upload: " + file.getCanonicalPath());
+                        else
+                            XFormsServer.logger.debug("XForms - deleted temporary file upon upload: " + file.getCanonicalPath());
+                    }
+                }
+
+                if (ProcessorUtils.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
+                    // If we upload a new URI in the background, then don't delete the temporary file
+                    final String newPath;
+                    {
+                        final File newFile = File.createTempFile("xforms_upload_", null);
+                        newPath = newFile.getCanonicalPath();
+                        newFile.delete();
+                    }
+                    final File oldFile = new File(URLFactory.createURL(value).toURI());
+                    final File newFile = new File(newPath);
+                    final boolean success = oldFile.renameTo(newFile);
+                    if (!success)
+                        XFormsServer.logger.debug("XForms - cannot rename temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                    else
+                        XFormsServer.logger.debug("XForms - renamed temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                    newValue = newFile.toURL().toExternalForm();
+                } else {
+                    newValue = value;
+                }
+            } else {
+                newValue = value;
+            }
+
+            super.setExternalValue(pipelineContext, newValue, type);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
     }
 
     public String getState() {

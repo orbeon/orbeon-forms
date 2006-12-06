@@ -339,9 +339,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 final String mediatype = parameterElement.element("content-type").getTextTrim();
                                 final String size = parameterElement.element("content-length").getTextTrim();
 
-                                // Set value into the instance
-                                xformsControls.setBinding(pipelineContext, uploadControl);
-                                uploadControl.setExternalValue(pipelineContext, value, paramValueType);
+                                // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
+                                uploadControl.setExternalValue(pipelineContext, value, paramValueType, !isReplaceAll);
 
                                 // Handle filename, mediatype and size if necessary
                                 uploadControl.setFilename(pipelineContext, filename);

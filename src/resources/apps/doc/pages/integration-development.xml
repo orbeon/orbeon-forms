@@ -183,24 +183,5 @@
                 </li>
             </ul>
         </section>
-        <a name="yui-code-changes"/>
-        <section>
-            <title>Changes to the Yahoo! UI Library</title>
-            <ul>
-                <li>
-                    The function <code>YAHOO.widget.Dialog.prototype.registerForm</code> in <code>container.js</code>
-                    and <code>container-min.js</code> have been modified to start with <code>return;</code>. This to
-                    prevents the function from executing. The YUI dialog can submit data to a server on its own. However
-                    to do so it needs to create a form, and this form interferes with the XForms form. Also see this <a
-                    href="http://tech.groups.yahoo.com/group/ydn-javascript/message/5713">related discussion</a> in the
-                    YUI mailing list.
-                </li>
-                <li>
-                    The function <code>YAHOO.util.Connect.setHeader</code> in <code>connection.js</code> and
-                    <code>connection-min.js</code> has been modified to remove a test which returns false on Safari,
-                    while it should return true, and that does not have any impact on IE and Firefox.
-                </li>
-            </ul>
-        </section>
     </body>
 </document>

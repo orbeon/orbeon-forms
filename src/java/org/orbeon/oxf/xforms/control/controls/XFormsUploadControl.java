@@ -27,6 +27,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 
@@ -166,7 +167,14 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     public void setFilename(PipelineContext pipelineContext, String filename) {
-        setInfoValue(pipelineContext, filenameElement, filename);
+        // Depending on web browsers, the filename may contain a path or not.
+
+        // Normalize below to just the file name.
+        final String normalized = StringUtils.replace(filename, "\\", "/");
+        final int index = normalized.lastIndexOf('/');
+        final String justFileName = (index == -1) ? normalized : normalized.substring(index + 1);
+
+        setInfoValue(pipelineContext, filenameElement, justFileName);
     }
 
     public void setSize(PipelineContext pipelineContext, String size) {

@@ -291,7 +291,7 @@ ORBEON.util.Dom = {
     getChildElementByClass: function(parent, clazz) {
         for (var i = 0; i < parent.childNodes.length; i++) {
             var child = parent.childNodes[i];
-            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(parent, clazz)) {
+            if (ORBEON.util.Dom.isElement(child) && ORBEON.util.Dom.hasClass(child, clazz)) {
                 return child;
             }
         }
@@ -303,6 +303,18 @@ ORBEON.util.Dom = {
             var candidateForm = document.forms[formIndex];
             if (form == candidateForm)
                 return formIndex;
+        }
+        return null;
+    },
+
+    stringToDom: function(xmlString) {
+        if (document.implementation.createDocument) {
+            return (new DOMParser()).parseFromString(xmlString, "application/xml")
+        } else if (window.ActiveXObject) {
+            var dom  = new ActiveXObject("Microsoft.XMLDOM");
+            dom.async="false";
+            dom.loadXML(xmlString);
+            return dom;
         }
         return null;
     }
@@ -959,7 +971,7 @@ ORBEON.xforms.Events = {
 
             // Click on remove icon in upload control
             if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
-                xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-remove")), false);
+                xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", "")), false);
             }
         }
     },
@@ -1509,8 +1521,9 @@ ORBEON.xforms.Server = {
                         if (!seenControlValue[event.targetId] == true) {
                             seenControlValue[event.targetId] = true;
                             // Don't send change value if the server already knows about the value of this control
-                            if (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
-                                    && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value) {
+                            if (ORBEON.util.Dom.hasClass(document.getElementById(event.targetId), "xforms-upload") ||
+                                (ORBEON.xforms.Globals.serverValue[event.targetId] != "undefined"
+                                    && ORBEON.xforms.Globals.serverValue[event.targetId] != event.value)) {
                                 ORBEON.xforms.Globals.serverValue[event.targetId] = event.value;
                                 newEvents.unshift(event);
                             }
@@ -1628,26 +1641,12 @@ ORBEON.xforms.Server = {
     handleResponse: function(o) {
 
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
-
         var responseXML = o.responseXML;
-
-// test
-//        var document = (window.parent.document) ? window.parent.document : window.document;
-
-
         if (responseXML == null) {
-
-//            xformsLog(o.responseText);
-            var xmlString = o.responseText.substring(9).substring(0, o.responseText.length - 18).replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-            xformsLog(xmlString);
-
-            if (document.implementation.createDocument) {
-                responseXML = (new DOMParser()).parseFromString(xmlString, "application/xml")
-            } else if (window.ActiveXObject) {
-                responseXML = new ActiveXObject("Microsoft.XMLDOM")
-                responseXML.async="false"
-                responseXML.loadXML(xmlString)
-            }
+            // If the response doesn't come already in the form of a document, try to parse the text.
+            // This happens in particular when we get a response after a background upload.
+            var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         }
 
         if (responseXML && responseXML.documentElement
@@ -1987,8 +1986,9 @@ ORBEON.xforms.Server = {
                                             var documentElement = document.getElementById(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
-                                            // Save new value sent by server
-                                            ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
+                                            // Save new value sent by server (upload controls don't carry their value the same way as other controls)
+                                            if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload"))
+                                                ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
 
                                             // Update value
                                             var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
@@ -2093,7 +2093,7 @@ ORBEON.xforms.Server = {
                                                 documentElement.value = newControlValue;
                                                 documentElement.previousValue = newControlValue;
                                             } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
-                                                if (false) {
+                                                if (true) {
                                                     // Upload
 
                                                     // <xxforms:control id="xforms-control-id"
@@ -2106,7 +2106,7 @@ ORBEON.xforms.Server = {
                                                     var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
                                                     var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                     // Get elements we want to modify from the DOM
-                                                    var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-file-info");
+                                                    var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-info");
                                                     var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
                                                     var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
                                                     var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
@@ -2647,7 +2647,7 @@ function xformsFindRepeatDelimiter(repeatId, index) {
     return cursor;
 }
 
-function xformsLog(text) {
+function xformsLog(object) {
     var debugDiv = document.getElementById("xforms-debug");
     if (debugDiv == null) {
         // Figure out width and heigh of visible part of the page
@@ -2702,6 +2702,14 @@ function xformsLog(text) {
             return false;
         });
     }
+    // Convert object to text
+    text =
+        object === undefined ? "undefined"
+        : object === null ? "null"
+        : typeof object == "string" && object == "" ? "empty string"
+        : object.nodeType && object.nodeType == ORBEON.util.Dom.ELEMENT_TYPE ? "Element " + object.tagName
+        : object.nodeType && object.nodeType == ORBEON.util.Dom.TEXT_TYPE ? "Text: " + ORBEON.util.Dom.getStringValue(object)
+        : object;
     debugDiv.innerHTML += text + " | ";
 }
 

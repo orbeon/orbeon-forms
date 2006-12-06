@@ -23,8 +23,8 @@
                 <include>/request/headers/header[name = 'content-type']</include>
             </config>
         </p:input>
-        <!--<p:output name="request-headers" id="request-headers"/>-->
-        <p:output name="request-headers" id="request-headers" debug="xxxparams"/>
+        <p:output name="request-headers" id="request-headers"/>
+        <!--<p:output name="request-headers" id="request-headers" debug="xxxparams"/>-->
     </p:processor>
 
     <p:choose href="#request-headers">
@@ -50,10 +50,10 @@
 
             <!-- Run XForms Server -->
             <p:processor name="oxf:xforms-server">
-                <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>-->
-                <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>-->
-                <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>
-                <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>
+                <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
+                <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>
+                <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
+                <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
             </p:processor>
 
             <!-- Generate response -->
@@ -105,10 +105,10 @@
 
             <!-- Run XForms Server -->
             <p:processor name="oxf:xforms-server">
-                <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>-->
-                <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>-->
-                <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>
-                <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>
+                <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
+                <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>
+                <!--<p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxrequest"/>-->
+                <!--<p:output name="response" id="xml-response" schema-href="xforms-server-response.rng" debug="xxxresponse"/>-->
             </p:processor>
 
             <!-- Create XForms Server rxeponse -->
@@ -127,7 +127,8 @@
                     </xsl:stylesheet>
 
                 </p:input>
-                <p:output name="data" id="html-response" debug="xxxhtml-response"/>
+                <p:output name="data" id="html-response"/>
+                <!--<p:output name="data" id="html-response" debug="xxxhtml-response"/>-->
             </p:processor>
 
             <!-- Generate response -->

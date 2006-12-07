@@ -95,6 +95,7 @@ ORBEON.xforms.Globals = {
     formLoadingNone: [],                 // HTML element with the markup displayed when nothing is displayed
     formStaticState: [],                 // State that does not change for the life of the page
     formDynamicState: [],                // State that changes at every request
+    formServerEvents: [],                // Server events information
     formClientState: []                  // Store for information we want to keep when the page reloaded
 };
 
@@ -1246,6 +1247,8 @@ ORBEON.xforms.Init = {
                         ORBEON.xforms.Globals.formStaticState[formIndex] = element;
                     } else if (element.name.indexOf("$dynamic-state") != -1) {
                         ORBEON.xforms.Globals.formDynamicState[formIndex] = element;
+                    } else if (element.name.indexOf("$server-events") != -1) {
+                        ORBEON.xforms.Globals.formServerEvents[formIndex] = element;
                     } else if (element.name.indexOf("$client-state") != -1) {
                         ORBEON.xforms.Globals.formClientState[formIndex] = element;
                         if (element.value == "")
@@ -1626,7 +1629,7 @@ ORBEON.xforms.Server = {
                 executedRequest = true;
                 YAHOO.util.Connect.setDefaultPostHeader(false);
                 YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse, argument: document }, requestDocumentString);
+                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse }, requestDocumentString);
             }
         }
 
@@ -1655,7 +1658,6 @@ ORBEON.xforms.Server = {
             // Good: we received an XML document from the server
             var responseRoot = responseXML.documentElement;
             var newDynamicState = null;
-            var newDynamicStateTriggersPost = false;
 
             // Whether this response has triggered a load which will replace the current page.
             var newDynamicStateTriggersReplace = false;
@@ -1961,6 +1963,7 @@ ORBEON.xforms.Server = {
                     }
 
                     // Handle other actions
+                    var serverEventsIndex = -1;
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 
                         var actionName = xformsGetLocalName(actionElement.childNodes[actionIndex]);
@@ -2399,6 +2402,12 @@ ORBEON.xforms.Server = {
                                 break;
                             }
 
+                            // Server events
+                            case "server-events": {
+                                serverEventsIndex = actionIndex;
+                                break;
+                            }
+
                             // Submit form
                             case "submission": {
                                 var submissionElement = actionElement.childNodes[actionIndex];
@@ -2406,21 +2415,24 @@ ORBEON.xforms.Server = {
                                 var action = ORBEON.util.Dom.getAttribute(submissionElement, "action");
                                 var replace = ORBEON.util.Dom.getAttribute(submissionElement, "replace");
                                 if (replace == null) replace = "all";
+                                ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
+                                if (serverEventsIndex != -1) {
+                                    ORBEON.xforms.Globals.formServerEvents[formIndex].value = ORBEON.util.Dom.getStringValue(actionElement.childNodes[serverEventsIndex]);
+                                } else {
+                                    ORBEON.xforms.Globals.formServerEvents[formIndex].value = "";
+                                }
                                 if (replace == "all") {
                                     // Go to another page
                                     if (showProcess != "false")
                                         // Display loading indicator unless the server tells us not to display it
                                         newDynamicStateTriggersReplace = true;
-                                    newDynamicStateTriggersPost = true;
-                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
                                     ORBEON.xforms.Globals.requestForm.submit();
                                 } else {
                                     // Submit form in the background
-                                    newDynamicStateTriggersPost = true;
-                                    ORBEON.xforms.Globals.formDynamicState[formIndex].value = newDynamicState;
                                     YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
-                                    YAHOO.util.Connect.asyncRequest("POST", action, { upload: ORBEON.xforms.Server.handleResponse, argument: document });
+                                    YAHOO.util.Connect.asyncRequest("POST", action, { upload: ORBEON.xforms.Server.handleResponse });
                                 }
+                                ORBEON.xforms.Globals.formServerEvents[formIndex].value = "";
                                 break;
                             }
 
@@ -2482,9 +2494,7 @@ ORBEON.xforms.Server = {
             }
 
             // Store new dynamic state if that state did not trigger a post
-            if (!newDynamicStateTriggersPost) {
-                xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
-            }
+            xformsStoreInClientState(formIndex, "ajax-dynamic-state", newDynamicState);
 
             if (newDynamicStateTriggersReplace) {
                 // Display loading indicator when we go to another page.

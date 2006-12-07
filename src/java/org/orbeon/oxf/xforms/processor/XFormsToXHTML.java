@@ -310,8 +310,6 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsEngineStaticState xformsEngineStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsServer.XFormsState[] xformsState) {
-
-        boolean[] requireClientSubmission = new boolean[1];
         {
             // Create initial state, before XForms initialization
             final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
@@ -326,7 +324,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             containingDocument[0].setURIResolver(null);
 
             // This is the state after XForms initialization
-            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0], requireClientSubmission);
+            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0]);
             xformsState[0] = new XFormsServer.XFormsState(initialXFormsState.getStaticState(),
                     XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument, containingDocument[0].isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey()));
         }
@@ -334,24 +332,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Cache ContainingDocument if requested and possible
         {
             if (XFormsUtils.isCacheDocument()) {
-                if (!requireClientSubmission[0]) {
-                    // NOTE: We check on requireClientSubmission because the event is encoded
-                    // in the dynamic state. But if we stored the event separately, then we
-                    // could still cache the containing document.
-                    XFormsServerDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
-                } else {
-                    // Since we cannot cache the result, we have to get the object out of its current pool
-                    final ObjectPool objectPool = containingDocument[0].getSourceObjectPool();
-                    if (objectPool != null) {
-                        logger.debug("XForms - containing document cache: discarding non-cacheable document from pool.");
-                        try {
-                            objectPool.invalidateObject(containingDocument);
-                            containingDocument[0].setSourceObjectPool(null);
-                        } catch (Exception e1) {
-                            throw new OXFException(e1);
-                        }
-                    }
-                }
+                XFormsServerDocumentCache.instance().add(pipelineContext, xformsState[0], containingDocument[0]);
             }
         }
     }

@@ -143,6 +143,9 @@ public class XHTMLBodyHandler extends HandlerBase {
                     "type", "hidden", "name", "$dynamic-state", "value", dynamicStateString
             });
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                    "type", "hidden", "name", "$server-events", "value", ""
+            });
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$client-state", "value", ""
             });
         }

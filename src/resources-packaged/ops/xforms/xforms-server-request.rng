@@ -85,6 +85,11 @@
                     </element>
                 </zeroOrMore>
             </element>
+            <optional>
+                <element name="xxforms:server-events">
+                    <data type="string"/>
+                </element>
+            </optional>
         </element>
     </start>
 

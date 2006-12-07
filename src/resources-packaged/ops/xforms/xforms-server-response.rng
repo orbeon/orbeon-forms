@@ -181,6 +181,11 @@
                     </element>
                 </optional>
                 <optional>
+                    <element name="xxforms:server-events">
+                        <data type="string"/>
+                    </element>
+                </optional>
+                <optional>
                     <element name="xxforms:submission">
                         <attribute name="action"/>
                         <attribute name="method"/>

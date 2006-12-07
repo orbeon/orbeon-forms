@@ -23,13 +23,13 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.om.NodeInfo;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.net.URI;
 
 /**
  * Represents an xforms:upload control.
@@ -71,7 +71,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                 final String oldValue = getValue();
                 // Try to delete temporary file if old value was temp URI and new value is different
                 if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value)) {
-                    final File file = new File(URLFactory.createURL(oldValue).toURI());
+                    final File file = new File(new URI(oldValue));
                     if (file.exists()) {
                         final boolean success = file.delete();
                         if (!success)
@@ -89,7 +89,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                         newPath = newFile.getCanonicalPath();
                         newFile.delete();
                     }
-                    final File oldFile = new File(URLFactory.createURL(value).toURI());
+                    final File oldFile = new File(new URI(value));
                     final File newFile = new File(newPath);
                     final boolean success = oldFile.renameTo(newFile);
                     if (!success)

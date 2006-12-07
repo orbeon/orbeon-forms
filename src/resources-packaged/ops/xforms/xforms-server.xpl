@@ -98,6 +98,12 @@
                             </xxforms:files>
                         </xsl:if>
                         <xxforms:action/>
+                        <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
+                        <xsl:if test="not($server-events = '')">
+                            <xxforms:server-events>
+                                <xsl:value-of select="$server-events"/>
+                            </xxforms:server-events>
+                        </xsl:if>
                     </xxforms:event-request>
                 </p:input>
                 <p:output name="data" id="xml-request"/>
@@ -143,8 +149,5 @@
 
         </p:otherwise>
     </p:choose>
-
-
-
 
 </p:config>

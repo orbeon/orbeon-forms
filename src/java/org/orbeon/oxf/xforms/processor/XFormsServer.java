@@ -177,11 +177,11 @@ public class XFormsServer extends ProcessorImpl {
             } else  {
                 // If there are filesElement, then we know this was not cached
                 logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
-                containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+                containingDocument = createXFormsContainingDocument(pipelineContext, xformsState);
             }
         } else {
             // Otherwise we recreate the containing document from scratch
-            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState, filesElement);
+            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState);
         }
 
         try {
@@ -234,7 +234,7 @@ public class XFormsServer extends ProcessorImpl {
                                 lastValueChangeEventValue = value;
                             } else {
                                 // Send old event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
                                 // Remember new event
                                 lastSourceControlId = sourceControlId;
                                 lastValueChangeEventValue = value;
@@ -242,12 +242,12 @@ public class XFormsServer extends ProcessorImpl {
                         } else {
                             if (lastSourceControlId != null) {
                                 // Send old event
-                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                                executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
                                 lastSourceControlId = null;
                                 lastValueChangeEventValue = null;
                             }
                             // Send new event
-                            executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value);
+                            executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, eventName, sourceControlId, otherControlId, value, filesElement);
                         }
 
                         if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
@@ -261,7 +261,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Flush stored event if needed
                 if (lastSourceControlId != null) {
                     // Send old event
-                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue);
+                    executeExternalEventPrepareIfNecessary(pipelineContext, containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, lastSourceControlId, null, lastValueChangeEventValue, filesElement);
                 }
             }
 
@@ -290,9 +290,9 @@ public class XFormsServer extends ProcessorImpl {
      * Execute an external event while preparing containing document and controls state if an event
      * was already executed.
      */
-    private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String contextString) {
+    private void executeExternalEventPrepareIfNecessary(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
         containingDocument.startOutermostActionHandler();
-        containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, null);
+        containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, otherControlId, contextString, filesElement);
         containingDocument.endOutermostActionHandler(pipelineContext);
     }
 
@@ -348,7 +348,7 @@ public class XFormsServer extends ProcessorImpl {
                     initialContainingDocument = null;
                 } else {
                     // TODO: use cached static state if possible
-                    initialContainingDocument = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null), null);
+                    initialContainingDocument = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null));
                     initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
                 }
 
@@ -1470,8 +1470,8 @@ public class XFormsServer extends ProcessorImpl {
             ch.endElement();
     }
 
-    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState, Element filesElement) {
-        return createXFormsContainingDocument(pipelineContext, xformsState, filesElement, null, null);
+    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
+        return createXFormsContainingDocument(pipelineContext, xformsState, null, null);
     }
 
     /**
@@ -1479,13 +1479,12 @@ public class XFormsServer extends ProcessorImpl {
      *
      * @param pipelineContext           current pipeline context
      * @param xformsState               XForms state containing static and dynamic state. Static state is ignored if xformsEngineStaticState is provided.
-     * @param filesElement              file information used in case of submission
      * @param xformsEngineStaticState   XForms static state information
      * @param initializationURIResolver URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      * @return                          created XFormsContainingDocument
      */
     public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState,
-                                                                          Element filesElement, XFormsEngineStaticState xformsEngineStaticState,
+                                                                          XFormsEngineStaticState xformsEngineStaticState,
                                                                           XFormsURIResolver initializationURIResolver) {
 
         if (xformsEngineStaticState == null) {

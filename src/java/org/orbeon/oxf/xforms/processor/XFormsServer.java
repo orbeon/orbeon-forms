@@ -661,7 +661,7 @@ public class XFormsServer extends ProcessorImpl {
                 final XFormsControl leadingControl = (xformsControl2 != null) ? xformsControl2 : xformsControl1;
 
                 // 1: Check current control
-                if (!(leadingControl instanceof XFormsRepeatControl)) {
+                if (!(leadingControl instanceof XFormsRepeatControl || leadingControl instanceof XFormsCaseControl)) {
                     // xforms:repeat doesn't need to be handled independently, iterations do it
 
                     // Output diffs between controlInfo1 and controlInfo2
@@ -785,7 +785,7 @@ public class XFormsServer extends ProcessorImpl {
                                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                     ch.text(xformsValueControl.convertToExternalValue(xformsValueControl.getValue()));
                                     ch.endElement();
-                                } else if (!"case".equals(xformsControl2.getName())) {
+                                } else if (!(xformsControl2 instanceof XFormsCaseControl)) {
                                     // No value, just output element with no content
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                                 }
@@ -962,7 +962,7 @@ public class XFormsServer extends ProcessorImpl {
             final XFormsControl xformsControl2 = (XFormsControl) i.next();
 
             // 1: Check current control
-            if (!(xformsControl2 instanceof XFormsRepeatControl)) {
+            if (!(xformsControl2 instanceof XFormsRepeatControl || xformsControl2 instanceof XFormsCaseControl)) {
                 // xforms:repeat doesn't need to be handled independently, iterations do it
 
                 // Output diffs between controlInfo1 and controlInfo2
@@ -1133,7 +1133,7 @@ public class XFormsServer extends ProcessorImpl {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                             ch.text(xformsValueControl.convertToExternalValue(xformsValueControl.getValue()));
                             ch.endElement();
-                        } else if (!"case".equals(xformsControl2.getName())) {
+                        } else if (!(xformsControl2 instanceof XFormsCaseControl)) {
                             // No value, just output element with no content
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                         }

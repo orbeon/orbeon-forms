@@ -2529,6 +2529,10 @@ ORBEON.xforms.Server = {
         } catch (e) {
             // Do nothing when there is an exception.
             ORBEON.xforms.Globals.lastRequestIsError = true;
+            if (typeof console != "undefined") {
+                console.log("JavaScript error:");
+                console.log(e);
+            }
             errorMessage = "Page may be in an unstable state. Error while processing response: " + e.message;
         }
 
@@ -3083,7 +3087,6 @@ function xformsDisplayLoading() {
 if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.pageLoadedRegistered = true;
     // If the browser does not provide a console object, create one which delegates log() to xformsLog()
-    if (typeof console == "undefined") console = { log: xformsLog };
     YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
 }
 ORBEON.xforms.Globals.debugLastTime = new Date().getTime();

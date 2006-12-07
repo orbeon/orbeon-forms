@@ -498,6 +498,22 @@
                     mailing-list.
                 </p>
             </section>
+            <section added="2006-12-06">
+                <title>How do I design forms in Orbeon Forms?</title>
+                <p>
+                    Orbeon Forms does not come with a visual forms designer. You create forms by writing XHTML pages
+                    that contain embedded XForms markup.
+                </p>
+                <p>
+                    Orbeon Forms 3.5 will come with a new tutorial that explains step by step how to create your first
+                    forms. In the meanwhile, we recommend you look at the sample Orbeon Forms applications that you find
+                    under your WAR file's <code>WEB-INF/resources/apps</code> directory.
+                </p>
+                <p>
+                    Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our
+                    <a href="http://www.orbeon.com/support">support page</a> for more information.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

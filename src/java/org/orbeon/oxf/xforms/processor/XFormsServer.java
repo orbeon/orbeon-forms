@@ -673,6 +673,10 @@ public class XFormsServer extends ProcessorImpl {
                     final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(leadingControl.getEffectiveId()) != null;
                     if (xformsControl2 != null) {
 
+                        // Notify the client that this control must be static readonly in case it just appeared
+                        if (xformsControl1 == null && xformsControl2.isStaticReadonly() && xformsControl2.isRelevant())
+                            attributesImpl.addAttribute("", "static", "static", ContentHandlerHelper.CDATA, "true");
+
                         if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
                             // Don't send anything if nothing has changed
                             // But we force a change for controls whose values changed in the request

@@ -78,6 +78,14 @@
                                 </optional>
                                 <ref name="model-item-properties"/>
                                 <optional>
+                                    <attribute name="static">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
                                     <data type="string"/>
                                 </optional>
                             </element>

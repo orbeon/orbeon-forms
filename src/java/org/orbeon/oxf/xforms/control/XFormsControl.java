@@ -563,4 +563,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         xformsControls.popBinding();
         return result;
     }
+    
+    public boolean isStaticReadonly() {
+        return isReadonly()
+                && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())
+                    || XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)));
+    }
 }

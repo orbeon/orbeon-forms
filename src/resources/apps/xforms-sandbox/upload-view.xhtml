@@ -46,7 +46,7 @@
                 <directory xmlns=""/>
             </xforms:instance>
             <xforms:submission id="main-submission" method="post" replace="all" action="/xforms-sandbox/"/>
-            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance" action="/xforms-sandbox/service/get-files"/>
+            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance" action="/xforms-sandbox/service/get-files" serialize="false"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .widget-tab-panel { padding-top: 1em; }

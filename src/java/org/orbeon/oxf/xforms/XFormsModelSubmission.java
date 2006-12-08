@@ -221,13 +221,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
 
                 //noinspection UnnecessaryLocalVariable
-                final boolean isDeferredSubmission = (isReplaceAll || isReplaceInstance && containingDocument.getXFormsControls().getCurrentControlsState().isHasUpload()) && !isHandlingOptimizedGet;
+                final boolean isDeferredSubmission = (isReplaceAll || serialize && isReplaceInstance && containingDocument.getXFormsControls().getCurrentControlsState().isHasUpload()) && !isHandlingOptimizedGet;
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
-                // Get node to submit
+                // Get current node for xforms:submission
                 final Node currentNode;
                 {
                     // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.

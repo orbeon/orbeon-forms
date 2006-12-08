@@ -182,6 +182,16 @@
                     </li>
                     <li>
                         <p>
+                            <b>Upload control.</b> The upload control now works when submitting instances with
+                            <code>replace="instance"</code> or <code>replace="none"</code>. From the form user's
+                            perspective, this allows uploading files in the background. [TODO: example + doc]
+                        </p>
+                        <p>
+                            This feature was kindly sponsored by Teleflex.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
                             <b>Switch within repeat.</b> Enhanced support of <code>xforms:switch</code> within
                             <code>xforms:repeat</code>. [TODO: example]
                         </p>
@@ -236,7 +246,6 @@
                     <li>
                         <p>
                             <b>Repeated XForms actions.</b> Support for XForms 1.1 actions iterations with the
-                            <code>while</code> (and <code>exf:while</code>) attributes. [TODO: example]
                         </p>
                     </li>
                     <li>
@@ -281,6 +290,12 @@
                             <code>urlencoded-post</code> has been available. This allows in particular using the
                             HTTP POST method to access APIs such as the <a
                             href="http://www.flickr.com/services/api/">Flickr API</a>. [TODO: doc]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms 1.1 attributes.</b> Support for <code>xforms:submission</code>'s
+                            <code>serialize</code>, <code>validate</code>, and <code>relevant</code> attributes.
                         </p>
                     </li>
                 </ul>

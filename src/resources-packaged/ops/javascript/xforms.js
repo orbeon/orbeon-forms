@@ -2009,6 +2009,14 @@ ORBEON.xforms.Server = {
 //                                                        if (documentElement.style != null)// xxx
 //                                                            newDocumentElement.setAttribute("style", documentElement.style);
                                                         parentElement.replaceChild(newDocumentElement, documentElement);
+                                                        // Remove alert
+                                                        var alertElement = ORBEON.xforms.Controls._getControlLabel(newDocumentElement, "xforms-alert");
+                                                        if (alertElement != null)
+                                                            parentElement.removeChild(alertElement);
+                                                        // Remove hint
+                                                        var hintLabel = ORBEON.xforms.Events._findHint(newDocumentElement);
+                                                        if (hintLabel != null)
+                                                            parentElement.removeChild(hintLabel);
                                                         // Update document element information
                                                         documentElement = newDocumentElement;
                                                     } else {

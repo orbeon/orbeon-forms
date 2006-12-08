@@ -1,0 +1,69 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Repeat xforms:select1 Full</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <instance xmlns="">
+                    <row>
+                        <select>1</select>
+                        <textarea/>
+                    </row>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+        <xforms:trigger>
+            <xforms:label>Insert</xforms:label>
+            <xforms:insert ev:event="DOMActivate" nodeset="row"/>
+        </xforms:trigger>
+
+        <ul>
+            <table>
+                <xforms:repeat nodeset="row">
+                    <tr>
+                        <td>
+                            <xforms:select1 ref="select" appearance="full">
+                                <xforms:item>
+                                    <xforms:label>One</xforms:label>
+                                    <xforms:value>1</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Two</xforms:label>
+                                    <xforms:value>2</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>Three</xforms:label>
+                                    <xforms:value>3</xforms:value>
+                                </xforms:item>
+                            </xforms:select1>
+                            <br/>
+                            <xforms:textarea ref="textarea" appearance="xxforms:autosize"/>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </table>
+        </ul>
+    </xhtml:body>
+</xhtml:html>

@@ -92,14 +92,22 @@
     </xforms:instance>
 
     <xforms:bind nodeset="instance('triggers-instance')">
-        <xforms:bind nodeset="add-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) >= 3 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
-        <xforms:bind nodeset="remove-vehicle-trigger" readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
-        <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('document-instance')//dmv:address[@type = 'mailing']) and not(xxforms:instance('parameters-instance')/readonly = 'true')"/>
-        <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('document-instance')//dmv:address[@type = 'mailing'] and not(xxforms:instance('parameters-instance')/readonly = 'true')"/>
-        <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:address[@type = 'mailing']) != ''"/>
-        <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('document-instance')//dmv:vehicle-address) and not(xxforms:instance('parameters-instance')/readonly = 'true')"/>
-        <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('document-instance')//dmv:vehicle-address and not(xxforms:instance('parameters-instance')/readonly = 'true')"/>
-        <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:vehicle-address) != ''"/>
+        <xforms:bind nodeset="add-vehicle-trigger"
+                     readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) >= 3 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-vehicle-trigger"
+                     readonly="count(instance('document-instance')//dmv:vehicles/dmv:vehicle) &lt; 2 or xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="add-mailing-address-trigger" relevant="not(instance('document-instance')//dmv:address[@type = 'mailing']) and not(xxforms:instance('parameters-instance')/readonly = 'true')"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>
+        <xforms:bind nodeset="remove-mailing-address-trigger" relevant="instance('document-instance')//dmv:address[@type = 'mailing'] and not(xxforms:instance('parameters-instance')/readonly = 'true')"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
+        <xforms:bind nodeset="clear-mailing-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:address[@type = 'mailing']) != ''"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
+        <xforms:bind nodeset="add-vehicle-address-trigger" relevant="not(instance('document-instance')//dmv:vehicle-address) and not(xxforms:instance('parameters-instance')/readonly = 'true')"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
+        <xforms:bind nodeset="remove-vehicle-address-trigger" relevant="instance('document-instance')//dmv:vehicle-address and not(xxforms:instance('parameters-instance')/readonly = 'true')"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
+        <xforms:bind nodeset="clear-vehicle-address-trigger" relevant="normalize-space(instance('document-instance')//dmv:vehicle-address) != ''"
+                readonly="xxforms:instance('parameters-instance')/readonly = 'true'"/>/>
     </xforms:bind>
 
     <!-- XForms instance for license plate information -->

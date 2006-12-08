@@ -758,7 +758,7 @@ public class XFormsControls {
                 if (xformsControl instanceof XFormsRepeatControl)
                     result.setHasRepeat(true);
                 else if (xformsControl instanceof XFormsUploadControl)
-                    result.setHasUpload(true);
+                    result.addUploadControl((XFormsUploadControl) xformsControl);
 
                 // Make sure there are no duplicate ids
                 if (idsToXFormsControls.get(effectiveControlId) != null)
@@ -1438,7 +1438,7 @@ public class XFormsControls {
         private Map dialogIdToVisibleMap;
 
         private boolean hasRepeat;
-        private boolean hasUpload;
+        private List uploadControlsList;
 
         private boolean dirty;
 
@@ -1546,12 +1546,18 @@ public class XFormsControls {
             this.hasRepeat = hasRepeat;
         }
 
-        public boolean isHasUpload() {
-            return hasUpload;
+        public void addUploadControl(XFormsUploadControl uploadControl) {
+            if (uploadControlsList == null)
+                uploadControlsList = new ArrayList();
+            uploadControlsList.add(uploadControl);
         }
 
-        public void setHasUpload(boolean hasUpload) {
-            this.hasUpload = hasUpload;
+        public List getUploadControls() {
+            return uploadControlsList;
+        }
+
+        public boolean isHasUpload() {
+            return uploadControlsList != null && uploadControlsList.size() > 0;
         }
 
         /**

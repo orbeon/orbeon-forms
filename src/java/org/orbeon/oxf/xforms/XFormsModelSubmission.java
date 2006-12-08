@@ -220,11 +220,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
 
-                //noinspection UnnecessaryLocalVariable
-                final boolean isDeferredSubmission = (isReplaceAll || serialize && isReplaceInstance && containingDocument.getXFormsControls().getCurrentControlsState().isHasUpload()) && !isHandlingOptimizedGet;
-                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
-                isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
-
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
                 // Get current node for xforms:submission
@@ -262,6 +257,30 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtXXFormsPassword);
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+
+                // Determine if the instance to submit has one or more bound and relevant upload controls
+                boolean hasBoundRelevantUploadControl = false;
+                if (serialize) {
+                    final List uploadControls = xformsControls.getCurrentControlsState().getUploadControls();
+                    if (uploadControls != null) {
+                        for (Iterator i = uploadControls.iterator(); i.hasNext();) {
+                            final XFormsUploadControl currentControl = (XFormsUploadControl) i.next();
+                            if (currentControl.isRelevant()) {
+                                final NodeInfo boundNodeInfo = currentControl.getBoundNode();
+                                if (currentInstance ==  model.getInstanceForNode(boundNodeInfo)) {
+                                    // Found one relevant bound control
+                                    hasBoundRelevantUploadControl = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //noinspection UnnecessaryLocalVariable
+                final boolean isDeferredSubmission = (isReplaceAll || serialize && isReplaceInstance && hasBoundRelevantUploadControl) && !isHandlingOptimizedGet;
+                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+                isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 
                 // TODO: Somewhere around here, check flags and doRecalculate() if needed
 

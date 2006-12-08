@@ -1472,6 +1472,22 @@ ORBEON.xforms.Server = {
         this.cancelable = cancelable;
     },
 
+    /**
+     * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
+     * This is to prevent the UI from becoming totally unusable after an error.
+     */
+    exceptionWhenTalkingToServer: function(e, formIndex) {
+        ORBEON.xforms.Globals.lastRequestIsError = true;
+        if (typeof console != "undefined") {
+            console.log("JavaScript error:");
+            console.log(e);
+        }
+        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
+        var errorMessage = "Page may be in an unstable state. Error while processing response: " + e.message;
+        ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
+        xformsDisplayIndicator("error");
+    },
+
     fireEvents: function(events, incremental) {
         // Store the time of the first event to be sent in the queue
         var currentTime = new Date().getTime();
@@ -1627,9 +1643,14 @@ ORBEON.xforms.Server = {
 
                 // Send request
                 executedRequest = true;
-                YAHOO.util.Connect.setDefaultPostHeader(false);
-                YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-                YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse }, requestDocumentString);
+                try {
+                    YAHOO.util.Connect.setDefaultPostHeader(false);
+                    YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
+                    YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse }, requestDocumentString);
+                } catch (e) {
+                    ORBEON.xforms.Globals.requestInProgress = false;
+                    ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
+                }
             }
         }
 
@@ -1652,7 +1673,7 @@ ORBEON.xforms.Server = {
             responseXML = ORBEON.util.Dom.stringToDom(xmlString);
         }
 
-        var errorMessage;
+        var errorMessage = null;
         try {
             if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
@@ -2560,16 +2581,11 @@ ORBEON.xforms.Server = {
             }
         } catch (e) {
             // Do nothing when there is an exception.
-            ORBEON.xforms.Globals.lastRequestIsError = true;
-            if (typeof console != "undefined") {
-                console.log("JavaScript error:");
-                console.log(e);
-            }
-            errorMessage = "Page may be in an unstable state. Error while processing response: " + e.message;
+            ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
         }
 
         // Display error if there is one
-        if (ORBEON.xforms.Globals.lastRequestIsError) {
+        if (errorMessage != null) {
             var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
             ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
             xformsDisplayIndicator("error");

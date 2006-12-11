@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -27,6 +27,8 @@ import org.xml.sax.helpers.AttributesImpl;
  * Handle xforms:upload.
  */
 public class XFormsUploadHandler extends XFormsValueControlHandler {
+
+    private static final String[] XXFORMS_ATTRIBUTES_TO_COPY = { "size" };
 
     private Attributes elementAttributes;
 
@@ -63,9 +65,6 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
             }
         }
 
-        // Handle accessibility attributes
-        handleAccessibilityAttributes(elementAttributes, newAttributes);
-
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         {
             // Create enclosing xhtml:span
@@ -81,6 +80,12 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
                         handlerContext.isGenerateTemplate() ? "" : xformsControl.getValue() != null ? xformsControl.getValue() : "");
+
+                // Copy special attributes in xxforms namespace
+                copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
+
+                // Handle accessibility attributes
+                handleAccessibilityAttributes(elementAttributes, reusableAttributes);
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);

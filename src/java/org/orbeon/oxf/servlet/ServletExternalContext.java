@@ -96,7 +96,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 headerMap = new HashMap();
                 for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
-                    headerMap.put(name, nativeRequest.getHeader(name));
+                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
+                    headerMap.put(name.toLowerCase(), nativeRequest.getHeader(name));
                 }
             }
             return headerMap;
@@ -107,7 +108,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 headerValuesMap = new HashMap();
                 for (Enumeration e = nativeRequest.getHeaderNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
-                    headerValuesMap.put(name, NetUtils.stringEnumerationToArray(nativeRequest.getHeaders(name)));
+                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
+                    headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(nativeRequest.getHeaders(name)));
                 }
             }
             return headerValuesMap;

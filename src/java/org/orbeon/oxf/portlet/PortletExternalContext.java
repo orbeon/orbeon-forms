@@ -93,7 +93,8 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 headerMap = new HashMap();
                 for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
-                    headerMap.put(name, portletRequest.getProperty(name));
+                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
+                    headerMap.put(name.toLowerCase(), portletRequest.getProperty(name));
                 }
             }
             return headerMap;
@@ -105,7 +106,8 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 headerValuesMap = new HashMap();
                 for (Enumeration e = portletRequest.getPropertyNames(); e.hasMoreElements();) {
                     String name = (String) e.nextElement();
-                    headerValuesMap.put(name, NetUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
+                    // NOTE: Normalize names to lowercase to ensure consistency between servlet containers
+                    headerValuesMap.put(name.toLowerCase(), NetUtils.stringEnumerationToArray(portletRequest.getProperties(name)));
                 }
             }
             return headerValuesMap;

@@ -157,9 +157,13 @@ public class XFormsUploadControl extends XFormsValueControl {
         xformsControls.setBinding(pipelineContext, this);
         xformsControls.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-        final String value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
-        xformsControls.popBinding();
-        return value;
+        if (currentSingleNode == null) {
+            return null;
+        } else {
+            final String value = XFormsInstance.getValueForNodeInfo(currentSingleNode);
+            xformsControls.popBinding();
+            return value;
+        }
     }
 
     public void setMediatype(PipelineContext pipelineContext, String mediatype) {
@@ -189,7 +193,9 @@ public class XFormsUploadControl extends XFormsValueControl {
         xformsControls.setBinding(pipelineContext, this);
         xformsControls.pushBinding(pipelineContext, element);
         final NodeInfo currentSingleNode = xformsControls.getCurrentSingleNode();
-        XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, null);
-        xformsControls.popBinding();
+        if (currentSingleNode != null) {
+            XFormsInstance.setValueForNodeInfo(pipelineContext, currentSingleNode, value, null);
+            xformsControls.popBinding();
+        }
     }
 }

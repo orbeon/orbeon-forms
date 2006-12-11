@@ -67,7 +67,9 @@
                                 </optional>
                                 <optional>
                                     <attribute name="size">
-                                        <data type="nonNegativeInteger"/>
+                                        <optional>
+                                            <data type="nonNegativeInteger"/>
+                                        </optional>
                                     </attribute>
                                 </optional>
                                 <optional>

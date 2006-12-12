@@ -1,0 +1,92 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <head>
+        <xf:model>
+            <xf:instance xmlns="">
+                <instance>
+                    <level1 value="v1">
+                        <level2 value="v2">
+                            <level3 value="v3"/>
+                        </level2>
+                    </level1>
+                </instance>
+            </xf:instance>
+        </xf:model>
+    </head>
+    <body>
+        <div>
+            <xf:trigger>
+                <xf:label>Insert level 1</xf:label>
+                <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level1"/>
+            </xf:trigger>
+        </div>
+
+        <xf:repeat id="level1-repeat" nodeset="level1[position() &lt; last()]">
+            <fieldset>
+                <legend>Level 1</legend>
+                <div>
+                    <xf:input ref="@value"/>
+                    <xf:trigger>
+                        <xf:label>Delete</xf:label>
+                        <xf:delete ev:event="DOMActivate" nodeset="." at="index('level1-repeat')"/>
+                    </xf:trigger>
+                </div>
+                <div>
+                    <xf:trigger>
+                        <xf:label>Insert level 2</xf:label>
+                        <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level2"/>
+                    </xf:trigger>
+                </div>
+                <div>
+                    <xf:repeat id="level2-repeat" nodeset="level2[position() &lt; last()]">
+                        <fieldset>
+                            <legend>Level 2</legend>
+                            <div>
+                                <xf:input ref="@value"/>
+                                <xf:trigger>
+                                    <xf:label>Delete</xf:label>
+                                    <xf:delete ev:event="DOMActivate" nodeset="." at="index('level2-repeat')"/>
+                                </xf:trigger>
+                            </div>
+                            <div>
+                                <xf:trigger>
+                                    <xf:label>Insert level 3</xf:label>
+                                    <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level3"/>
+                                </xf:trigger>
+                            </div>
+                            <div>
+                                <xf:repeat id="level3-repeat" nodeset="level3[position() &lt; last()]">
+                                    <fieldset>
+                                        <legend>Level 3</legend>
+                                        <div>
+                                            <xf:input ref="@value"/>
+                                            <xf:trigger>
+                                                <xf:label>Delete</xf:label>
+                                                <xf:delete ev:event="DOMActivate" nodeset="." at="index('level3-repeat')"/>
+                                            </xf:trigger>
+                                        </div>
+                                    </fieldset>
+                                </xf:repeat>
+                            </div>
+                        </fieldset>
+                    </xf:repeat>
+                </div>
+            </fieldset>
+        </xf:repeat>
+    </body>
+</html>

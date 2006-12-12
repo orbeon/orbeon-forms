@@ -171,14 +171,7 @@ public class XFormsServer extends ProcessorImpl {
 
         if (XFormsUtils.isCacheDocument()) {
             // Try to obtain containing document from cache
-            if (filesElement == null) {
-                // No fileElements, this may have been cached
-                containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
-            } else  {
-                // If there are filesElement, then we know this was not cached
-                logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
-                containingDocument = createXFormsContainingDocument(pipelineContext, xformsState);
-            }
+            containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
         } else {
             // Otherwise we recreate the containing document from scratch
             containingDocument = createXFormsContainingDocument(pipelineContext, xformsState);
@@ -898,13 +891,7 @@ public class XFormsServer extends ProcessorImpl {
                         } else if (size2 < size1) {
                             // Size has shrunk
 
-                            final String repeatControlId = leadingControl.getEffectiveId();
-                            final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-                            final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
-                            final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
-
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-                                    new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
+                            outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
 
                             // Diff the remaining subset
                             newDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
@@ -1205,13 +1192,15 @@ public class XFormsServer extends ProcessorImpl {
                     } else if (size2 < size1) {
                         // Size has shrunk
 
-                        final String repeatControlId = xformsControl2.getEffectiveId();
-                        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-                        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
-                        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+//                        final String repeatControlId = xformsControl2.getEffectiveId();
+//                        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+//                        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+//                        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
 
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-                                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
+//                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+//                                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
+
+                        outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
 
                         // Diff the remaining subset
                         oldDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
@@ -1224,8 +1213,15 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Copy template instructions
                     final int size2 = children2.size();
-                    for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
-                        outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+                    if (size2 > 1) {
+                        for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+                        }
+                    } else if (size2 == 1) {
+                        // NOP, the client already has the template copied
+                    } else if (size2 == 0) {
+                        // Delete first template
+                        outputDeleteRepeatTemplate(ch, xformsControl2, 1);
                     }
 
                     // Issue new values for the children
@@ -1251,6 +1247,15 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
         }
+    }
+
+    private static void outputDeleteRepeatTemplate(ContentHandlerHelper ch, XFormsControl xformsControl2, int count) {
+        final String repeatControlId = xformsControl2.getEffectiveId();
+        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
+        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + count});
     }
 
     private static void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControlInfo, int idSuffix) {

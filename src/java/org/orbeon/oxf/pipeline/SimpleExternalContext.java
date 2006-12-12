@@ -327,6 +327,13 @@ public class SimpleExternalContext implements ExternalContext {
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Eclipse");
             return getAttributesMap();
         }
+
+
+        public void addListener(SessionListener sessionListener) {
+        }
+
+        public void removeListener(SessionListener sessionListener) {
+        }
     }
 
     protected Request request = new Request();

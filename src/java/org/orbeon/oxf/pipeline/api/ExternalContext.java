@@ -127,6 +127,13 @@ public interface ExternalContext extends WebAppExternalContext {
 
         public Map getAttributesMap();
         public Map getAttributesMap(int scope);
+
+        public void addListener(SessionListener sessionListener);
+        public void removeListener(SessionListener sessionListener);
+
+        public interface SessionListener {
+            public void sessionDestroyed();
+        }
     }
 
     public interface RequestDispatcher {

@@ -51,6 +51,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String DEFAULT_FORM_CHARSET = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
     public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
+    public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
 
     private class Request implements ExternalContext.Request {
 
@@ -718,6 +719,22 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             if (scope != Session.APPLICATION_SCOPE)
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Servlets");
             return getAttributesMap();
+        }
+
+
+        public void addListener(SessionListener sessionListener) {
+            List listeners = (List) httpSession.getAttribute(SESSION_LISTENERS);
+            if (listeners == null) {
+                listeners = new ArrayList();
+                httpSession.setAttribute(SESSION_LISTENERS, listeners);
+            }
+            listeners.add(sessionListener);
+        }
+
+        public void removeListener(SessionListener sessionListener) {
+            final List listeners = (List) httpSession.getAttribute(SESSION_LISTENERS);
+            if (listeners != null)
+                listeners.remove(sessionListener);
         }
     }
 

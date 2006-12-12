@@ -16,12 +16,16 @@ package org.orbeon.oxf.webapp;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This listener listens for HTTP session lifecycle changes.
@@ -50,6 +54,20 @@ public class OPSSessionListenerDelegate implements HttpSessionListener {
 
     public void sessionDestroyed(HttpSessionEvent event) {
         final HttpSession httpSession = event.getSession();
+
+        // Run listeners if any
+        if (httpSession != null && httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS) != null) {
+            // Iterate through listeners
+            final List listeners = (List) httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS);
+            if (listeners != null) {
+                for (Iterator i = listeners.iterator(); i.hasNext();) {
+                    final ExternalContext.Session.SessionListener currentListener = (ExternalContext.Session.SessionListener) i.next();
+                    currentListener.sessionDestroyed();
+                }
+            }
+        }
+
+        // Run processor
         final ServletContext servletContext = httpSession.getServletContext();
         try {
             InitUtils.run(servletContext, httpSession, null, logger, LOG_MESSAGE_PREFIX, "Session destroyed.", DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);

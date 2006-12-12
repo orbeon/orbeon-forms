@@ -325,6 +325,21 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
             }
             return sessionAttributesMaps[scope - 1];
         }
+
+        public void addListener(SessionListener sessionListener) {
+            List listeners = (List) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            if (listeners == null) {
+                listeners = new ArrayList();
+                portletSession.setAttribute(ServletExternalContext.SESSION_LISTENERS, listeners, PortletSession.APPLICATION_SCOPE);
+            }
+            listeners.add(sessionListener);
+        }
+
+        public void removeListener(SessionListener sessionListener) {
+            final List listeners = (List) portletSession.getAttribute(ServletExternalContext.SESSION_LISTENERS, PortletSession.APPLICATION_SCOPE);
+            if (listeners != null)
+                listeners.remove(sessionListener);
+        }
     }
 
     public abstract class BaseResponse implements Response {

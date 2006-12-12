@@ -201,5 +201,14 @@ public class ServletContextExternalContext implements ExternalContext {
                 throw new OXFException("Invalid session scope scope: only the application scope is allowed in Servlets");
             return getAttributesMap();
         }
+
+
+        public void addListener(SessionListener sessionListener) {
+            throw new UnsupportedOperationException();
+        }
+
+        public void removeListener(SessionListener sessionListener) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

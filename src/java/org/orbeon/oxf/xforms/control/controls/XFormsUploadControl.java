@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.common.OXFException;
@@ -29,6 +30,7 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -74,10 +76,13 @@ public class XFormsUploadControl extends XFormsValueControl {
                     final File file = new File(new URI(oldValue));
                     if (file.exists()) {
                         final boolean success = file.delete();
-                        if (!success)
-                            XFormsServer.logger.debug("XForms - cannot delete temporary file upon upload: " + file.getCanonicalPath());
-                        else
-                            XFormsServer.logger.debug("XForms - deleted temporary file upon upload: " + file.getCanonicalPath());
+                        try {
+                            if (!success)
+                                XFormsServer.logger.debug("XForms - cannot delete temporary file upon upload: " + file.getCanonicalPath());
+                            else
+                                XFormsServer.logger.debug("XForms - deleted temporary file upon upload: " + file.getCanonicalPath());
+                        } catch (IOException e) {
+                        }
                     }
                 }
 
@@ -92,10 +97,31 @@ public class XFormsUploadControl extends XFormsValueControl {
                     final File oldFile = new File(new URI(value));
                     final File newFile = new File(newPath);
                     final boolean success = oldFile.renameTo(newFile);
-                    if (!success)
-                        XFormsServer.logger.debug("XForms - cannot rename temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
-                    else
-                        XFormsServer.logger.debug("XForms - renamed temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                    try {
+                        if (!success)
+                            XFormsServer.logger.debug("XForms - cannot rename temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                        else
+                            XFormsServer.logger.debug("XForms - renamed temporary file upon upload: " + oldFile.getCanonicalPath() + " to " + newFile.getCanonicalPath());
+                    } catch (IOException e) {
+                    }
+                    // Try to delete the file on exit and on session termination
+                    {
+                        newFile.deleteOnExit();
+                        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                        final ExternalContext.Session session = externalContext.getSession(false);
+                        session.addListener(new ExternalContext.Session.SessionListener() {
+                            public void sessionDestroyed() {
+                                final boolean success = newFile.delete();
+                                try {
+                                    if (!success)
+                                        XFormsServer.logger.debug("XForms - cannot delete temporary file upon session destruction: " + newFile.getCanonicalPath());
+                                    else
+                                        XFormsServer.logger.debug("XForms - deleted temporary file upon session destruction: " + newFile.getCanonicalPath());
+                                } catch (IOException e) {
+                                }
+                            }
+                        });
+                    }
                     newValue = newFile.toURL().toExternalForm();
                 } else {
                     newValue = value;

@@ -873,6 +873,13 @@ public class XFormsServer extends ProcessorImpl {
 
                         if (size1 == size2) {
                             // No add or remove of children
+
+                            // Delete first template if needed
+                            if (size2 == 0 && xformsControl1 == null) {
+                                outputDeleteRepeatTemplate(ch, xformsControl2, 1);
+                            }
+
+                            // Diff children
                             newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         } else if (size2 > size1) {
                             // Size has grown
@@ -896,35 +903,6 @@ public class XFormsServer extends ProcessorImpl {
                             // Diff the remaining subset
                             newDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
-//                    } else if (isRepeatControl && xformsControl1 == null) {
-//
-//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
-//
-//                        // Handle new sub-xforms:repeat
-//
-//                        // Copy template instructions
-//                        final int size2 = children2.size();
-//                        for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
-//                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
-//                        }
-//
-//                        // Issue new values for the children
-//                        newDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
-//
-//                    } else if (isRepeatControl && children1 == null) {
-//
-//                        final XFormsRepeatControl repeatControlInfo = (XFormsRepeatControl) xformsControl2;
-//
-//                        // Handle repeat growing from size 0 (case of instance replacement, for example)
-//
-//                        // Copy template instructions
-//                        final int size2 = children2.size();
-//                        for (int k = 1; k <= size2; k++) {
-//                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
-//                        }
-//
-//                        // Issue new values for the children
-//                        newDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else {
                         // Other grouping controls
                         newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
@@ -1191,15 +1169,6 @@ public class XFormsServer extends ProcessorImpl {
 
                     } else if (size2 < size1) {
                         // Size has shrunk
-
-//                        final String repeatControlId = xformsControl2.getEffectiveId();
-//                        final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
-//                        final String templateId = (indexOfRepeatHierarchySeparator == -1) ? repeatControlId : repeatControlId.substring(0, indexOfRepeatHierarchySeparator);
-//                        final String parentIndexes = (indexOfRepeatHierarchySeparator == -1) ? "" : repeatControlId.substring(indexOfRepeatHierarchySeparator + 1);
-
-//                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
-//                                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
-
                         outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
 
                         // Diff the remaining subset

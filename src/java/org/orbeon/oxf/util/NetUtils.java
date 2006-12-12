@@ -197,6 +197,25 @@ public class NetUtils {
         return afterCharset.trim();
     }
 
+    public static Map getCharsetHeaderCharsets(String header) {
+        if (header == null)
+            return null;
+        int semicolumnIndex = header.indexOf(";");
+        final String charsets;
+        if (semicolumnIndex == -1)
+            charsets = header.trim();
+        else
+            charsets = header.substring(0, semicolumnIndex).trim();
+
+        final StringTokenizer st = new StringTokenizer(charsets, ",");
+        final Map charsetsMap = new HashMap();
+        while (st.hasMoreTokens()) {
+            charsetsMap.put(st.nextToken(), "");
+        }
+
+        return charsetsMap;
+    }
+
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;

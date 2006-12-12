@@ -725,6 +725,50 @@ public class XFormsServer extends ProcessorImpl {
                                         attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
                                     }
                                 }
+                                
+                                // Output xforms:upload-specific information
+                                if (xformsControl2 instanceof XFormsUploadControl) {
+                                    final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsControl1;
+                                    final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsControl2;
+
+                                    {
+                                        // State
+                                        final String stateValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getState();
+                                        final String stateValue2 = uploadControlInfo2.getState();
+
+                                        if (!((stateValue1 == null && stateValue2 == null) || (stateValue1 != null && stateValue2 != null && stateValue1.equals(stateValue2)))) {
+                                            attributesImpl.addAttribute("", "state", "state", ContentHandlerHelper.CDATA, stateValue2 != null ? stateValue2 : "");
+                                        }
+                                    }
+                                    {
+                                        // Mediatype
+                                        final String mediatypeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getMediatype();
+                                        final String mediatypeValue2 = uploadControlInfo2.getMediatype();
+
+                                        if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
+                                            attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediatypeValue2 != null ? mediatypeValue2 : "");
+                                        }
+                                    }
+                                    {
+                                        // Filename
+                                        final String filenameValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getFilename();
+                                        final String filenameValue2 = uploadControlInfo2.getFilename();
+
+                                        if (!((filenameValue1 == null && filenameValue2 == null) || (filenameValue1 != null && filenameValue2 != null && filenameValue1.equals(filenameValue2)))) {
+                                            attributesImpl.addAttribute("", "filename", "filename", ContentHandlerHelper.CDATA, filenameValue2 != null ? filenameValue2 : "");
+                                        }
+                                    }
+                                    {
+                                        // Size
+                                        final String sizeValue1 = (uploadControlInfo1 == null) ? null : uploadControlInfo1.getSize();
+                                        final String sizeValue2 = uploadControlInfo2.getSize();
+
+                                        if (!((sizeValue1 == null && sizeValue2 == null) || (sizeValue1 != null && sizeValue2 != null && sizeValue1.equals(sizeValue2)))) {
+                                            attributesImpl.addAttribute("", "size", "size", ContentHandlerHelper.CDATA, sizeValue2 != null ? sizeValue2 : "");
+                                        }
+                                    }
+
+                                }
                             }
 
                             // Model item properties
@@ -1005,7 +1049,6 @@ public class XFormsServer extends ProcessorImpl {
                         if (xformsControl2 instanceof XFormsUploadControl) {
                             final XFormsUploadControl uploadControlInfo1 = (XFormsUploadControl) xformsControl1;
                             final XFormsUploadControl uploadControlInfo2 = (XFormsUploadControl) xformsControl2;
-
 
                             {
                                 // State

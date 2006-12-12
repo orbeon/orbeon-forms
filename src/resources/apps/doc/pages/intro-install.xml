@@ -17,22 +17,22 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Installing Orbeon PresentationServer</title>
+        <title>Installing Orbeon Forms</title>
     </header>
     <body>
         <section>
             <title>Downloading</title>
             <p>
-            	Orbeon PresentationServer (OPS) can be downloaded from
-                <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
+            	Orbeon Forms can be downloaded from
+                <link href="http://www.orbeon.com/forms/download">http://www.orbeon.com/forms/download</link>.
             </p>
         </section>
         <section>
             <title>System Requirements</title>
             <p>
-                To install OPS you need an application server that runs on Java version 1.4.2 (or later) and implements
-                the Servlet API 2.3 (or later). OPS has been used by various organizations on the following application
-                servers:
+                To install Orbeon Forms you need an application server that runs on Java version 1.4.2 (or later) and
+                implements the Servlet API 2.3 (or later). Orbeon Forms has been used by various organizations on the
+                following application servers:
             </p>
             <ul>
                 <li>Apache Tomcat 5.5.20 (JDK 1.5.0)</li>
@@ -47,7 +47,7 @@
             </p>
         </section>
         <section>
-            <title>Installing OPS on Apache Tomcat</title>
+            <title>Installing Orbeon Forms on Apache Tomcat</title>
             <ol>
                 <li>
                     <p>
@@ -69,7 +69,7 @@
                         <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
                         <code>server/lib</code>. This way Xerces will be available to Tomcat, but it
                         won't override the version of Xerces and standard XML APIs that comes with
-                        OPS.
+                        Orbeon Forms.
                     </p>
                 </li>
                 <li>
@@ -247,7 +247,7 @@
             </ol>
         </section>
         <section>
-            <title>Installing OPS on BEA WebLogic 9.1</title>
+            <title>Installing Orbeon Forms on BEA WebLogic 9.1</title>
             <ol>
                 <li>
                     <p>
@@ -277,7 +277,7 @@
                 </li>
                 <li>
                     <p>
-                        You should now be able to access the OPS examples by pointing your browser
+                        You should now be able to access the Orbeon Forms examples by pointing your browser
                         to the address of your WebLogic server followed by the context path you
                         chose, for example: <code>http://localhost:7001/ops/</code>.
                     </p>
@@ -321,11 +321,11 @@
             </ol>
         </section>
         <section>
-            <title>Installing OPS on BEA WebLogic 7.0 and 8.1</title>
+            <title>Installing Orbeon Forms on BEA WebLogic 7.0 and 8.1</title>
             <warning>
                 <p>
-                    OPS 3.0 hasn't been tested with these versions of WebLogic, but you may want to
-                    try the following instructions for OPS 2.8.
+                    Orbeon Forms 3.0 hasn't been tested with these versions of WebLogic, but you may want to
+                    try the following instructions for Orbeon Forms 2.8.
                 </p>
             </warning>
             <ol>
@@ -362,7 +362,7 @@
                             Start WebLogic (e.g. with <code>startWebLogic.cmd</code>)
                         </li>
                         <li>
-                            Make sure you can access the OPS examples with your browser (by going
+                            Make sure you can access the Orbeon Forms examples with your browser (by going
                             to <code>http://localhost:7001/orbeon/</code>)
                         </li>
                         <li>
@@ -373,7 +373,7 @@
                             <code>&lt;WebAppComponent Name="orbeon"&gt;</code> element and add the
                             attribute: <code>ServletReloadCheckSecs="-1"</code>. This will prevent
                             WebLogic from checking if a servlet has changed in the application and
-                            will make OPS <i>much</i> faster.
+                            will make Orbeon Forms <i>much</i> faster.
                         </li>
                     </ol>
                 </li>
@@ -511,7 +511,7 @@
                 -->
                 <li>
                     <p>
-                        Once OPS is properly installed, you can start WebLogic as usual with the
+                        Once Orbeon Forms is properly installed, you can start WebLogic as usual with the
                         <code>startWeblogic.cmd</code> script (in <code>DOMAIN</code>).
                     </p>
                 </li>
@@ -519,7 +519,7 @@
         </section>
         <a name="websphere"/>
         <section>
-            <title>Installing OPS on IBM WebSphere 5 and 6</title>
+            <title>Installing Orbeon Forms on IBM WebSphere 5 and 6</title>
             <ol>
                 <li>
                     <p>
@@ -573,7 +573,7 @@
                 </li>
                 <li>
                     <p>
-                        Install and deploy OPS (<code>ops.war</code>).
+                        Install and deploy Orbeon Forms (<code>ops.war</code>).
                         <ul>
                             <li>Click on Applications / Install New Application.</li>
                             <li>
@@ -614,7 +614,7 @@
                         <ul>
                             <li>Go to <code>http://localhost:9080/ops/</code>.</li>
                             <li>
-                                You can view the log from OPS in
+                                You can view the log from Orbeon Forms in
                                 <code>WSAS_HOME/profiles/default/logs/server1/SystemOut.log</code>.
                             </li>
                             <li>
@@ -636,7 +636,7 @@
                      <ul>
                          <li><p>
                              Extract the
-                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OPS
+                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from Orbeon Forms
                              WAR file, and save it on WebSphere's directory.
                          </p></li>
 
@@ -817,7 +817,7 @@
 <!--        </section>-->
         <a name="jboss"/>
         <section>
-            <title>Installing OPS on JBoss 4.0.4</title>
+            <title>Installing Orbeon Forms on JBoss 4.0.4</title>
             <ol>
                 <li>
                     <p>
@@ -843,8 +843,8 @@
                 </li>
                 <li>
                     <p>
-                        Rename the default OPS log4j JAR file under WEB-INF/lib from <code>log4j-*.jar</code> to
-                        <code>log4j-*.jar.bak</code>. Additionally, you can remove this JAR file altogether.
+                        Rename the default Orbeon Forms log4j JAR file under WEB-INF/lib from <code>log4j-*.jar</code>
+                        to <code>log4j-*.jar.bak</code>. Additionally, you can remove this JAR file altogether.
                     </p>
                 </li>
                 <note>
@@ -920,15 +920,14 @@
         <section>
             <title>Security</title>
             <p>
-                For security reasons, you might want to run OPS under a Security Manager. Java's
-                Security Manager allows you to control the Java sandbox and which resources the
-                application can access. When installed correctly, the Security Manager can prevent
-                unauthorized code to execute malicious actions, such as deleting files on the server
-                or initializing network connections. For more information, please read the <link
-                href="http://java.sun.com/docs/books/tutorial/security1.2/">Security in Java 2 SDK
+                For security reasons, you might want to run Orbeon Forms under a Security Manager. Java's Security
+                Manager allows you to control the Java sandbox and which resources the application can access. When
+                installed correctly, the Security Manager can prevent unauthorized code to execute malicious actions,
+                such as deleting files on the server or initializing network connections. For more information, please
+                read the <link href="http://java.sun.com/docs/books/tutorial/security1.2/">Security in Java 2 SDK
                 1.2</link> tutorial and the <link
-                href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/SecurityManager.html">Security
-                Manager API</link>.
+                href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/SecurityManager.html">Security Manager
+                API</link>.
             </p>
 
             <p>
@@ -965,8 +964,8 @@
                     <li>
                         Add the following system properties to the server startup script.
                         <ul>
-                            <li><i>oxf.home</i>: Location of the OPS exploded WAR file</li>
-                            <li><i>oxf.resources</i>: Location of OPS resources directory</li>
+                            <li><i>oxf.home</i>: Location of the Orbeon Forms exploded WAR file</li>
+                            <li><i>oxf.resources</i>: Location of Orbeon Forms resources directory</li>
                         </ul>
                     </li>
                     <li>

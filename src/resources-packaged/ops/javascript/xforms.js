@@ -1483,7 +1483,7 @@ ORBEON.xforms.Server = {
             console.log(e);
         }
         var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
-        var errorMessage = "Page may be in an unstable state. Error while processing response: " + e.message;
+        var errorMessage = "Error while processing response: " + e.message;
         ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
         xformsDisplayIndicator("error");
     },
@@ -1646,7 +1646,11 @@ ORBEON.xforms.Server = {
                 try {
                     YAHOO.util.Connect.setDefaultPostHeader(false);
                     YAHOO.util.Connect.initHeader("Content-Type", "application/xml");
-                    YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, { success: ORBEON.xforms.Server.handleResponse }, requestDocumentString);
+                    var callback = {
+                        success: ORBEON.xforms.Server.handleResponse,
+                        failure: ORBEON.xforms.Server.handleFailure
+                    }
+                    YAHOO.util.Connect.asyncRequest("POST", XFORMS_SERVER_URL, callback, requestDocumentString);
                 } catch (e) {
                     ORBEON.xforms.Globals.requestInProgress = false;
                     ORBEON.xforms.Server.exceptionWhenTalkingToServer(e, formIndex);
@@ -1660,6 +1664,22 @@ ORBEON.xforms.Server = {
         if (!executedRequest && ORBEON.xforms.Globals.eventQueue.length == 0
                 && !ORBEON.xforms.Globals.lastRequestIsError)
             xformsDisplayIndicator("none");
+    },
+
+    handleFailure: function(o) {
+        ORBEON.xforms.Globals.requestInProgress = false;
+        var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
+        ORBEON.xforms.Globals.lastRequestIsError = true;
+        if (typeof console != "undefined") {
+            console.log("Communication failure:");
+            if (o.responseText !== undefined){
+                console.log(o.responseText);
+            }
+        }
+        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
+        var errorMessage = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : "");
+        ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
+        xformsDisplayIndicator("error");
     },
 
     handleResponse: function(o) {
@@ -2485,7 +2505,11 @@ ORBEON.xforms.Server = {
                                     } else {
                                         // Submit form in the background
                                         YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
-                                        YAHOO.util.Connect.asyncRequest("POST", action, { upload: ORBEON.xforms.Server.handleResponse });
+                                        var callback =  {
+                                            upload: ORBEON.xforms.Server.handleResponse,
+                                            failure: ORBEON.xforms.Server.handleFailure
+                                        }
+                                        YAHOO.util.Connect.asyncRequest("POST", action, callback);
                                     }
                                     ORBEON.xforms.Globals.formServerEvents[formIndex].value = "";
                                     break;

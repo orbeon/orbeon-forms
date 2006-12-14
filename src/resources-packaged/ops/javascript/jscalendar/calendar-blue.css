@@ -1,6 +1,6 @@
 /* The main calendar widget.  DIV containing a table. */
 
-div.calendar { position: relative; }
+div.calendar { position: relative; z-index: 10 } /* EB: FIX TO MAKE IT APPEAR OVER YUI DIALOG */
 
 .calendar, .calendar table {
   margin-top: 0;

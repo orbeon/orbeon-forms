@@ -70,7 +70,6 @@ ORBEON.xforms.Globals = {
     repeatTreeChildToParent: [],         // Describes the repeat hierarchy
     repeatIndexes: {},                   // The current index for each repeat
     repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
-    overlayManager: null,                // YUI overlay manager used to close opened menu when user clicks on document
     inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},            // Maps input id to the JSCalendar function that displays the calendar
     tooltipLibraryInitialized: false,
@@ -157,14 +156,6 @@ ORBEON.util.IEDom = {
     }
 };
 
-/**
- * General purpose methods on string
- */
-ORBEON.util.String = {
-    replace: function(text, placeholder, replacement) {
-        return text.replace(new RegExp(placeholder, "g"), replacement);
-    }
-}
 
 /**
  * The hasClass, addClass and removeClass methods use a cache of the
@@ -326,6 +317,27 @@ ORBEON.util.Dom = {
     for (var method in methodsFrom)
         ORBEON.util.Dom[method] = methodsFrom[method];
 }());
+
+/**
+ * General purpose methods on string
+ */
+ORBEON.util.String = {
+    replace: function(text, placeholder, replacement) {
+        return text.replace(new RegExp(placeholder, "g"), replacement);
+    }
+}
+
+/**
+ * Utility methods that don't in any other category
+ */
+ORBEON.util.Utils = {
+    logException: function(message, exception) {
+        if (typeof console != "undefined") {
+            console.log(message); // Normal use; do not remove
+            console.log(exception);  // Normal use; do not remove
+        }
+    }
+}
 
 /**
  * This object contains function generally designed to be called from JavaScript code
@@ -820,12 +832,6 @@ ORBEON.xforms.Events = {
         }
     },
 
-    mousedown: function(event) {
-        // Close open menus of there are any
-        if (ORBEON.xforms.Globals.overlayManager != null)
-            ORBEON.xforms.Globals.overlayManager.hideAll();
-    },
-
     resize: function(event) {
         for (var i = 0; i < ORBEON.xforms.Globals.autosizeTextareas.length; i++) {
             var textarea = ORBEON.xforms.Globals.autosizeTextareas[i];
@@ -1003,7 +1009,6 @@ ORBEON.xforms.Events = {
     menuClick: function(eventType, arguments, userObject) {
         var menu = userObject["menu"];
         var value = userObject["value"];
-        ORBEON.xforms.Globals.overlayManager.hideAll();
         xformsFireEvents([xformsCreateEventArray(menu, "xxforms-value-change-with-focus-change", value)], false);
     },
 
@@ -1076,45 +1081,6 @@ ORBEON.xforms.Init = {
         }
     },
 
-    /**
-     * Create a sub-menu attached to the given menu item. In the nameValueArray we
-     * ignore the first 3 items that correspond to the menuItem.
-     */
-    _addToMenuItem: function (menu, nameValueArray, menuItem) {
-        // Assign id to menu item
-        if (menuItem.element.id == "")
-            YAHOO.util.Dom.generateId(menuItem.element);
-        // Handle click on menu item
-        menuItem.clickEvent.subscribe(ORBEON.xforms.Events.menuClick,
-            {"menu": menu, "value": nameValueArray[1]});
-
-        // Create sub-menu if necessary
-        if (nameValueArray.length > 3) {
-            // Show submenu when mouse over menu item
-            menuItem.mouseOverEvent.subscribe(xformsOnMenuBarItemMouseOver);
-            menuItem.mouseOutEvent.subscribe(xformsOnMenuBarItemMouseOut);
-            // Create submenu
-            var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
-            //subMenu.mouseOverEvent.subscribe(onSubmenuMouseOver, subMenu, true);
-            //subMenu.mouseOutEvent.subscribe(onSubmenuMouseOut,subMenu, true);
-            // Add menu items to submenu
-            for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
-                // Extract information from the first 3 position in the array
-                var childArray = nameValueArray[arrayIndex];
-                var name = childArray[0];
-                var value = childArray[1];
-                var selected = childArray[2];
-                // Create menu item and add to menu
-                var subMenuItem = new YAHOO.widget.MenuItem(name, { url: "#" });
-                subMenu.addItem(subMenuItem);
-                // Add sub-sub menu
-                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem)
-            }
-            menuItem.cfg.setProperty("submenu", subMenu);
-            ORBEON.xforms.Globals.overlayManager.register(subMenu);
-        }
-    },
-
     _registerListerersOnFormElements: function() {
         for (var i = 0; i < document.forms.length; i++) {
             var form = document.forms[i];
@@ -1145,7 +1111,6 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
         YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
         YAHOO.util.Event.addListener(document, "keyup", ORBEON.xforms.Events.keyup);
-        YAHOO.util.Event.addListener(document, "mousedown", ORBEON.xforms.Events.mousedown);
         YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
         YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
@@ -1365,6 +1330,38 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.removeClass(tree, "xforms-initially-hidden");
     },
 
+    /**
+     * Create a sub-menu attached to the given menu item. In the nameValueArray we
+     * ignore the first 3 items that correspond to the menuItem.
+     */
+    _addToMenuItem: function (menu, nameValueArray, menuItem) {
+        // Assign id to menu item
+        if (menuItem.element.id == "")
+            YAHOO.util.Dom.generateId(menuItem.element);
+        // Handle click on menu item
+        menuItem.clickEvent.subscribe(ORBEON.xforms.Events.menuClick,
+            {"menu": menu, "value": nameValueArray[1]});
+        // Create sub-menu if necessary
+        if (nameValueArray.length > 3) {
+            // Create submenu
+            var subMenu = new YAHOO.widget.Menu(menuItem.element.id + "menu");
+            // Add menu items to submenu
+            for (var arrayIndex = 3; arrayIndex < nameValueArray.length; arrayIndex++) {
+                // Extract information from the first 3 position in the array
+                var childArray = nameValueArray[arrayIndex];
+                var name = childArray[0];
+                var value = childArray[1];
+                var selected = childArray[2];
+                // Create menu item and add to menu
+                var subMenuItem = new YAHOO.widget.MenuItem(name);
+                subMenu.addItem(subMenuItem);
+                // Add sub-sub menu
+                ORBEON.xforms.Init._addToMenuItem(menu, childArray, subMenuItem)
+            }
+            menuItem.cfg.setProperty("submenu", subMenu);
+        }
+    },
+
     _menu: function (menu) {
         // Find the divs for the tree and for the values inside the control
         var treeDiv;
@@ -1380,9 +1377,6 @@ ORBEON.xforms.Init = {
             }
         }
 
-        // Create overlay manager, if we don't have one already
-        if (ORBEON.xforms.Globals.overlayManager == null)
-            ORBEON.xforms.Globals.overlayManager = new YAHOO.widget.OverlayManager();
         // Extract menu hierarchy from HTML
         var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);
         menuString = ORBEON.util.String.replace(menuString, "\n", " ");
@@ -1391,7 +1385,11 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.setStringValue(valuesDiv, "");
         // Initialize tree
         YAHOO.util.Dom.generateId(treeDiv);
-        menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id);
+        menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id, {
+            autosubmenudisplay:true,
+            showdelay:250,
+            hidedelay:750
+        });
         for (var topLevelIndex = 0; topLevelIndex < menu.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
             var topLevelArray = menuArray[topLevelIndex];
             var menuItem = menu.xformsMenu.getItem(topLevelIndex);
@@ -1478,10 +1476,7 @@ ORBEON.xforms.Server = {
      */
     exceptionWhenTalkingToServer: function(e, formIndex) {
         ORBEON.xforms.Globals.lastRequestIsError = true;
-        if (typeof console != "undefined") {
-            console.log("JavaScript error:");
-            console.log(e);
-        }
+        ORBEON.util.Utils.logException("JavaScript error", e);
         var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
         var errorMessage = "Error while processing response: " + e.message;
         ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
@@ -1671,10 +1666,7 @@ ORBEON.xforms.Server = {
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
         ORBEON.xforms.Globals.lastRequestIsError = true;
         if (typeof console != "undefined") {
-            console.log("Communication failure:");
-            if (o.responseText !== undefined){
-                console.log(o.responseText);
-            }
+            ORBEON.util.Utils.logException("Communication failure", o);
         }
         var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
         var errorMessage = "Error while processing response: " + (o.responseText !== undefined ? o.responseText : "");
@@ -3009,38 +3001,6 @@ function xformsSelectTreeSelect() {
         }
     }
     xformsValueChanged(control);
-}
-
-function xformsOnMenuBarItemMouseOver() {
-    var oActiveItem = this.parent.activeItem;
-    // Hide any other submenus that might be visible
-    if(oActiveItem && oActiveItem != this) {
-        this.parent.clearActiveItem();
-    }
-    // Select and focus the current MenuItem instance
-    this.cfg.setProperty("selected", true);
-    this.focus();
-    // Show the submenu for this instance
-    var oSubmenu = this.cfg.getProperty("submenu");
-    if(oSubmenu) {
-        oSubmenu.show();
-    }
-}
-
-function xformsOnMenuBarItemMouseOut(eventType, arguments) {
-    this.cfg.setProperty("selected", false);
-    var oSubmenu = this.cfg.getProperty("submenu");
-    if(oSubmenu) {
-        var oEvent = arguments[0], oRelatedTarget = YAHOO.util.Event.getRelatedTarget(oEvent);
-        if(!(oRelatedTarget == oSubmenu.element
-                ||  this._oDom.isAncestor(oSubmenu.element, oRelatedTarget))) {
-            oSubmenu.hide();
-        }
-    }
-}
-
-function xformsOnDocumentMouseDown(p_oEvent) {
-    ORBEON.xforms.Globals.overlayManager.hideAll();
 }
 
 /**

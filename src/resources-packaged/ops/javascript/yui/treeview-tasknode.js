@@ -21,7 +21,7 @@ YAHOO.widget.TaskNode = function(oData, oParent, expanded, checked) {
         this.setUpCheck(checked);
     }
 
-    this.logger = new YAHOO.widget.LogWriter(this.toString());
+    //this.logger = new YAHOO.widget.LogWriter(this.toString());
 };
 
 YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
@@ -108,7 +108,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * Invoked when the user clicks the check box
      */
     checkClick: function() { 
-        this.logger.log("previous checkstate: " + this.checkState);
+        //this.logger.log("previous checkstate: " + this.checkState);
         if (this.checkState === 0) {
             this.check();
         } else {
@@ -123,7 +123,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * Override to get the check click event
      */
     onCheckClick: function() { 
-        this.logger.log("onCheckClick: " + this);
+        //this.logger.log("onCheckClick: " + this);
     },
 
     /**
@@ -133,7 +133,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         var p = this.parent;
 
         if (!p || !p.updateParent) {
-            this.logger.log("Abort udpate parent: " + this.index);
+            //this.logger.log("Abort udpate parent: " + this.index);
             return;
         }
 
@@ -186,7 +186,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
      * Check this node
      */
     check: function() { 
-        this.logger.log("check");
+        //this.logger.log("check");
         this.setCheckState(2);
         for (var i=0; i<this.children.length; ++i) {
             this.children[i].check();
@@ -209,7 +209,7 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
 
     // Overrides YAHOO.widget.TextNode
     getNodeHtml: function() { 
-        this.logger.log("Generating html");
+        //this.logger.log("Generating html");
         var sb = new Array();
 
         sb[sb.length] = '<table border="0" cellpadding="0" cellspacing="0">';

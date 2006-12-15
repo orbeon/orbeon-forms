@@ -481,7 +481,7 @@ ORBEON.xforms.Controls = {
                 || ORBEON.util.Dom.hasClass(control, "xforms-submit")) {
             if (control.tagName.toLowerCase() == "input") {
                 // Image
-                control.title = message;
+                control.alt = message;
             } else {
                 // Button and link
                 ORBEON.util.Dom.setStringValue(control, message);
@@ -1941,7 +1941,7 @@ ORBEON.xforms.Server = {
                                             }
                                         } else {
 
-                                            // Case of checkboxes / radio bottons
+                                            // Case of checkboxes / radio buttons
 
                                             // Actual values:
                                             //     <span>

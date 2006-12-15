@@ -70,8 +70,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     // Event handlers
     private final List eventHandlers;
 
-    private String avtAction; // required
-    private String resolvedAction;
+    private String avtActionOrResource; // required unless there is a nested xforms:resource element
+    private String resolvedActionOrResource;
     private String method; // required
 
     private boolean validate = true;
@@ -129,7 +129,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private void extractSubmissionElement() {
         if (!submissionElementExtracted) {
 
-            avtAction = submissionElement.attributeValue("action");
+            avtActionOrResource = submissionElement.attributeValue("resource");
+            if (avtActionOrResource == null) // @resource has precedence over @action
+                avtActionOrResource = submissionElement.attributeValue("action");
+            if (avtActionOrResource == null) {
+                // TODO: For XForms 1.1, support @resource and nested xforms:resource
+                throw new OXFException("xforms:submission: action attribute or resource attribute is missing.");
+            }
+
             method = submissionElement.attributeValue("method");
             method = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(submissionElement, "method"));
 
@@ -211,10 +218,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             XFormsSubmitErrorEvent submitErrorEvent = null;
             boolean submitDone = false;
             final long submissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
-            try {
-                // Make sure submission element info is extracted
-                extractSubmissionElement();
 
+            // Make sure submission element info is extracted
+            extractSubmissionElement();
+
+            try {
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
 
@@ -252,7 +260,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // Evaluate AVTs
                 // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
-                resolvedAction = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtAction);
+                resolvedActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtActionOrResource);
                 resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtXXFormsUsername);
                 resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, xformsControls.getCurrentSingleNode(), null, xformsControls.getFunctionLibrary(), submissionElement, avtXXFormsPassword);
 
@@ -470,7 +478,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 ConnectionResult connectionResult = null;
                 final long externalSubmissionStartTime = XFormsServer.logger.isDebugEnabled() ? System.currentTimeMillis() : 0;
                 try {
-                    if (isReplaceInstance && resolvedAction.startsWith("test:")) {
+                    if (isReplaceInstance && resolvedActionOrResource.startsWith("test:")) {
                         // Test action
 
                         if (messageBody == null)
@@ -487,7 +495,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
                         connectionResult = doOptimizedGet(pipelineContext, queryString, xxfShowProgress);
-                    } else if (!NetUtils.urlHasProtocol(resolvedAction)
+                    } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
                                         && (XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
@@ -507,7 +515,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // o Servlets cannot access resources on the same server but not in the current application
                         //   except by using absolute URLs
 
-                        final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedAction);
+                        final URI resolvedURI = XFormsUtils.resolveXMLBase(submissionElement, resolvedActionOrResource);
                         connectionResult = XFormsSubmissionUtils.doOptimized(pipelineContext, externalContext,
                                 this, method, resolvedURI.toString(), (mediatype == null) ? defaultMediatype : mediatype, isReplaceAll,
                                 messageBody, queryString);
@@ -516,7 +524,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // This is a regular remote submission going through a protocol handler
 
                         // Absolute URLs or absolute paths are allowed to a local servlet
-                        String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedAction);
+                        String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedActionOrResource);
 
                         if (request.getContainerType().equals("portlet") && "resource".equals(urlType) && !NetUtils.urlHasProtocol(resolvedURL)) {
                             // In this case, we have to prepend the complete server path
@@ -667,7 +675,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 } else {
                     // Any exception will cause an error event to be dispatched
                     if (submitErrorEvent == null)
-                        submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                        submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
 
                     submitErrorEvent.setThrowable(e);
                     containingDocument.dispatchEvent(pipelineContext, submitErrorEvent);
@@ -700,7 +708,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final DocumentInfo responseBody
                         = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
 
-                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
                 submitErrorEvent.setBodyDocument(responseBody);
             } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
                 // Text content-type
@@ -715,7 +723,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
                 final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
                 final String responseBody = NetUtils.readStreamAsString(reader);
-                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedAction);
+                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
                 submitErrorEvent.setBodyString(responseBody);
             } else {
                 // This is binary
@@ -726,7 +734,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String queryString, boolean isShowProgress) {
-        final String actionString = (queryString == null) ? resolvedAction : resolvedAction + ((resolvedAction.indexOf('?') == -1) ? "?" : "") + queryString;
+        final String actionString = (queryString == null) ? resolvedActionOrResource : resolvedActionOrResource + ((resolvedActionOrResource.indexOf('?') == -1) ? "?" : "") + queryString;
         final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, false, isShowProgress);
         final ConnectionResult connectionResult = new ConnectionResult(resultURL);
         connectionResult.dontHandleResponse = true;

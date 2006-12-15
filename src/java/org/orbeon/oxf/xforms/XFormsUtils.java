@@ -487,65 +487,66 @@ public class XFormsUtils {
                 throw new OXFException(e); // will not happen
             }
             // TODO: optimize and skip creation of Dom4j document
-            final Document bodyDocument;
+            Document bodyDocument = null;
             try {
                 final Document dom4jResult;
                 final InputStream is = new ByteArrayInputStream(valueBytes);
                 final org.w3c.dom.Document result = tidy.parseDOM(is, null);
                 dom4jResult = TransformerUtils.domToDom4jDocument(result);
-
                 // Create content document
                 final Element htmlElement = dom4jResult.getRootElement();
                 final Element bodyElement = htmlElement.element("body");
-
-                bodyDocument =  Dom4jUtils.createDocument();
-                bodyDocument.setRootElement((Element) bodyElement.detach());
-
+                if (bodyElement != null) {
+                    bodyDocument =  Dom4jUtils.createDocument();
+                    bodyDocument.setRootElement((Element) bodyElement.detach());
+                }
             } catch (Exception e) {
                 throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
             }
 
             // Stream fragment to the output
             try {
-                final Transformer identity = TransformerUtils.getIdentityTransformer();
-                identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
+                if (bodyDocument != null) {
+                    final Transformer identity = TransformerUtils.getIdentityTransformer();
+                    identity.transform(new DocumentSource(bodyDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
 
-                    private int level = 0;
+                        private int level = 0;
 
-                    public void startDocument() {
-                    }
-
-                    public void endDocument() {
-                    }
-
-                    public void startPrefixMapping(String s, String s1) {
-                    }
-
-                    public void endPrefixMapping(String s) {
-                    }
-
-                    public void setDocumentLocator(Locator locator) {
-                    }
-
-                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                        if (level > 0) {
-                            final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                            super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
+                        public void startDocument() {
                         }
 
-                        level++;
-                    }
-
-                    public void endElement(String uri, String localname, String qName) throws SAXException {
-                        level--;
-
-                        if (level > 0) {
-                            final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
-                            super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
+                        public void endDocument() {
                         }
-                    }
 
-                }));
+                        public void startPrefixMapping(String s, String s1) {
+                        }
+
+                        public void endPrefixMapping(String s) {
+                        }
+
+                        public void setDocumentLocator(Locator locator) {
+                        }
+
+                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                            if (level > 0) {
+                                final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
+                                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName, attributes);
+                            }
+
+                            level++;
+                        }
+
+                        public void endElement(String uri, String localname, String qName) throws SAXException {
+                            level--;
+
+                            if (level > 0) {
+                                final String xhtmlQName = XMLUtils.buildQName(xhtmlPrefix, localname);
+                                super.endElement(XMLConstants.XHTML_NAMESPACE_URI, localname, xhtmlQName);
+                            }
+                        }
+
+                    }));
+                }
             } catch (TransformerException e) {
                 throw new OXFException(e);
             }

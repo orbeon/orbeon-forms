@@ -32,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.util.*;
@@ -356,6 +357,15 @@ public class TransformerUtils {
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             identity.transform(nodeInfo, documentResult);
             return documentResult.getDocument();
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static void writeTinyTree(NodeInfo nodeInfo, ContentHandler contentHandler) {
+        try {
+            final Transformer identity = getIdentityTransformer();
+            identity.transform(nodeInfo, new SAXResult(contentHandler));
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

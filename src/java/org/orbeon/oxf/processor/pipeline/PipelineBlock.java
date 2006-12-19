@@ -178,7 +178,7 @@ public class PipelineBlock {
 
             // Connect XPath processor to config
             Processor xpathProcessor = new XPathProcessor();
-            xpathProcessor.setLocationData(locationData);
+            xpathProcessor.setLocationData(locationData); // TODO FIXME: I suspect locationData will always be null here because node is null!
             final String sid = locationData == null 
                              ? DOMGenerator.DefaultContext 
                              : locationData.getSystemID();

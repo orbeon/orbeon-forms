@@ -19,17 +19,20 @@ import org.dom4j.tree.DefaultText;
 import org.dom4j.tree.DefaultProcessingInstruction;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -49,15 +52,16 @@ public class XPathProcessor extends ProcessorImpl {
     }
 
     public void setLocationData(LocationData locationData) {
-        this.locationData = locationData;
+        if (locationData != null)
+            this.locationData = locationData;
     }
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
 
                Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ProcessorInput input) {
+                    public Object read(PipelineContext context, final ProcessorInput input) {
                         Document config = readInputAsDOM4J(context, INPUT_CONFIG);
 
                         // Get declared namespaces
@@ -67,7 +71,6 @@ public class XPathProcessor extends ProcessorImpl {
                             namespaces.put(namespaceElement.attributeValue("prefix"),
                                     namespaceElement.attributeValue("uri"));
                         }
-
                         return  new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
                     }
                 });
@@ -75,7 +78,8 @@ public class XPathProcessor extends ProcessorImpl {
                 DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null, new Configuration());
                 PooledXPathExpression xpath = null;
                 try {
-                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces());
+                    final String baseURI = (locationData == null) ? null : locationData.getSystemID();
+                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces(), null, null, baseURI);
                     List results = xpath.evaluate();
                     contentHandler.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
@@ -96,6 +100,15 @@ public class XPathProcessor extends ProcessorImpl {
                                     (elt, "xpath result doc", DOMGenerator.ZeroValidity, sid);
                             final ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
                             domOutput.read(context, new ForwardingContentHandler(contentHandler) {
+                                public void startDocument() {
+                                }
+
+                                public void endDocument() {
+                                }
+                            });
+                        } else if (result instanceof NodeInfo) {
+                            final NodeInfo nodeInfo = (NodeInfo) result;
+                            TransformerUtils.writeTinyTree(nodeInfo, new ForwardingContentHandler(contentHandler) {
                                 public void startDocument() {
                                 }
 
@@ -130,7 +143,7 @@ public class XPathProcessor extends ProcessorImpl {
                         }
                     }
                     contentHandler.endDocument();
-                }catch (XPathException xpe) {
+                } catch (XPathException xpe) {
                     throw new OXFException(xpe);
                 } catch (SAXException e) {
                     throw new ValidationException(e, locationData);

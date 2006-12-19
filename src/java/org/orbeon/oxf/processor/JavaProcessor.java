@@ -267,7 +267,7 @@ public class JavaProcessor extends ProcessorImpl {
                                         File toolsFile = new File(javaHomeFile.getParentFile(), "lib" + File.separator + "tools.jar");
                                         if (toolsFile.exists()) {
                                             // JAR file exists, will use it to load compiler class
-                                            classLoader = new URLClassLoader(new URL[]{toolsFile.toURL()}, JavaProcessor.class.getClassLoader());
+                                            classLoader = new URLClassLoader(new URL[]{toolsFile.toURI().toURL()}, JavaProcessor.class.getClassLoader());
                                             if (logger.isDebugEnabled())
                                                 logger.debug("Java processor using default tools.jar under " + toolsFile.toString());
                                         }
@@ -307,7 +307,7 @@ public class JavaProcessor extends ProcessorImpl {
                     logger.debug("Creating classloader for sourcepath '" + config.sourcepath + "'");
                 sourcepath = new Sourcepath();
                 sourcepath.classLoader = new URLClassLoader
-                        (new URL[]{SystemUtils.getTemporaryDirectory().toURL(), new File(config.sourcepath).toURL()},
+                        (new URL[]{SystemUtils.getTemporaryDirectory().toURI().toURL(), new File(config.sourcepath).toURI().toURL()},
                                 this.getClass().getClassLoader());
                 ObjectCache.instance().add(context, sourcepathKey, sourcepathValidity, sourcepath);
             }

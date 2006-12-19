@@ -167,7 +167,7 @@ public class OXFClassLoader extends URLClassLoader {
             if (jars != null) {
                 for (int i = 0; i < jars.length; i++) {
                     try {
-                        files.add(jars[i].toURL());
+                        files.add(jars[i].toURI().toURL());
                     } catch (MalformedURLException e) {
                         webAppExternalContext.log("Could not convert file to URL: " + jars[i].toString());
                         throw new RuntimeException(e);
@@ -182,7 +182,7 @@ public class OXFClassLoader extends URLClassLoader {
 
         if (webInfClassesDir.isDirectory()) {
             try {
-                files.add(webInfClassesDir.toURL());
+                files.add(webInfClassesDir.toURI().toURL());
             } catch (MalformedURLException e) {
                 webAppExternalContext.log("Could not convert file to URL: " + webInfClassesDir.toString());
                 throw new RuntimeException(e);

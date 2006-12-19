@@ -108,7 +108,7 @@ public class OPS {
                 // URL is considered relative to current directory
                 try {
                     // Create absolute URL, and switch to the oxf: protocol
-                    String fileURL = new URL(new File(".").toURL(), otherArgs[0]).toExternalForm();
+                    String fileURL = new URL(new File(".").toURI().toURL(), otherArgs[0]).toExternalForm();
                     configURL = "oxf:" + fileURL.substring(fileURL.indexOf(':') + 1);
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);

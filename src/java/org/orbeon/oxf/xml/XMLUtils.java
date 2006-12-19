@@ -874,12 +874,8 @@ public class XMLUtils {
                 }
             }
         }
-        try {
-            // Return a file URL
-            return ((DefaultFileItem) fileItem).getStoreLocation().toURL().toExternalForm();
-        } catch (MalformedURLException e) {
-            throw new OXFException(e);
-        }
+        // Return a file URL
+        return ((DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
     }
 
     /**

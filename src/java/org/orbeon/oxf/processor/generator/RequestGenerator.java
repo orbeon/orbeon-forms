@@ -271,11 +271,7 @@ public class RequestGenerator extends ProcessorImpl {
                 if (!fileItem.isInMemory()) {
                     // File must exist on disk since isInMemory() returns false
                     File file = defaultFileItem.getStoreLocation();
-                    try {
-                        uri = file.toURL().toExternalForm();
-                    } catch (MalformedURLException e) {
-                        throw new OXFException(e);
-                    }
+                    uri = file.toURI().toString();
                 } else {
                     // File does not exist on disk, must convert
                     try {
@@ -326,6 +322,7 @@ public class RequestGenerator extends ProcessorImpl {
         addBody(context, requestElement);
         addTextElement(requestElement, "protocol", request.getProtocol());
         addTextElement(requestElement, "remote-addr", request.getRemoteAddr());
+        // TODO: Handle this differently as it can take a long time to work
         addTextElement(requestElement, "remote-host", request.getRemoteHost());
         addTextElement(requestElement, "scheme", request.getScheme());
         addTextElement(requestElement, "server-name", request.getServerName());

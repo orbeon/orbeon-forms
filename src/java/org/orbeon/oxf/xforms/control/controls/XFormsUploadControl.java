@@ -122,7 +122,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                             }
                         });
                     }
-                    newValue = newFile.toURL().toExternalForm();
+                    newValue = newFile.toURI().toString();
                 } else {
                     newValue = value;
                 }

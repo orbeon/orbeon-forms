@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Orbeon Forms Tutorial</title>
+    </header>
+    <body>
+        <section>
+            <title>What is this?</title>
+            <p>
+                This is the Orbeon Forms tutorial for Orbeon Forms version 3.5.
+            </p>
+            <warning>
+                This tutorial is not complete yet!
+            </warning>
+        </section>
+        <section>
+            <title>A Little Bit of Background</title>
+            <section>
+                <title>What Orbeon Forms Does for You</title>
+                <p>
+                    Orbeon Forms is a solution to build and deploy web forms. For more information, please visit the
+                    Orbeon home page at <a href="http://www.orbeon.com/">http://www.orbeon.com/</a>.
+                </p>
+                <p>
+                    If you have any issue with this tutorial, please use the <code>ops-users</code> mailing-list. It is
+                    easy to subscribe at <a
+                    href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
+                </p>
+            </section>
+            <section>
+                <title>Prerequisites</title>
+                <p>
+                    To go through this tutorial, you don't need much: any reasonbly modern computer on which you can
+                    install Java 1.4.2 or later (1.5 strongly recommended) should do. You should be comfortable with
+                    installing new software on your computer, including uncompressing zip or gzip archives. You will
+                    also have to edit XML files. If you are familiar with HTML, this should not be a problem.
+                </p>
+                <p>
+                    You will <i>not</i> have to write any Java code or any scripting language code. You will <i>not</i>
+                    have to use a compiler or other complicated build tool!
+                </p>
+            </section>
+            <section>
+                <title>Principles of Orbeon Forms</title>
+                <p>
+                    Orbeon Forms has a few principles:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            You write most applications without writing Java, JavaScript, or other scripting code. (But
+                            you can if you really want.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You get instant gratification by making changes to your application and just reloading your
+                            page in your web browser. (You don't need to "compile" or "build".)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Orbeon Forms aims at "convention over configuration" and the "DRY" concept (don't repeat
+                            yourself).
+                        </p>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <title>Installing and Configuring Orbeon Forms</title>
+            <section>
+                <title>Downloading and Installing Java</title>
+                <p>
+                    Java provides the cross-platform environment in which Orbeon Forms works.
+                </p>
+                <p>
+                    If you don't have Java installed yet, download it from the Sun web site at <a
+                    href="http://java.sun.com/javase/downloads/index.jsp">http://java.sun.com/javase/downloads/index.jsp</a>.
+                    Sun provides Windows, Linux and Solaris versions. If you use a Mac, you probably have Java already
+                    installed on your machine, but if not visit <a
+                    href="http://www.apple.com/macosx/features/java/">http://www.apple.com/macosx/features/java/</a>.
+                    Then follow the instructions to install Java.
+                </p>
+            </section>
+            <section>
+                <title>Downloading and Installing Tomcat</title>
+                <p>
+                    Tomcat is the container application into which Orbeon Forms deploys. Follow these steps to download
+                    and install Tomcat if you don't have it installed yet:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Download Tomcat 5.5 from the Apache web site at <a
+                            href="http://tomcat.apache.org/download-55.cgi">http://tomcat.apache.org/download-55.cgi</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Install Tomcat as per the instructions. If you downloaded the installer version (Windows
+                            only), run the installer. If you downloaded a compressed archive, uncompress it to the
+                            location of your choice. We call the install location <code>TOMCAT_HOME</code> (on
+                            windows, this could be <code>c:/Program Files/Apache/Tomcat</code>, on a Unix system,
+                            <code>/home/jdoe/tomcat</code>, etc.).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Check that your Tomcat installation is working correctly:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Run the Tomcat startup script under <code>TOMCAT_HOME/bin</code>
+                                    (<code>startup.sh</code> or <code>startup.bat</code> depending on your platform), or
+                                    start Tomcat with the control application (Windows only).
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Open a web browser and access the following URL:
+                                </p>
+                                <xml-source>
+                                    http://localhost:8080/
+                                </xml-source>
+                                <p>
+                                    You should see the Tomcat welcome page. [TODO: screenshot]
+                                </p>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+                <note>
+                    We recommend using Tomcat for this tutorial, but Orbeon Forms can deploy into containers others
+                    than Tomcat.
+                </note>
+            </section>
+            <section>
+                <title>Downloading and Installing Orbeon Forms</title>
+                <p>
+                    Follow these steps to download and install Orbeon Forms:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Download Orbeon Forms 3.5 or later from <a
+                            href="http://www.orbeon.com/forms/download">http://www.orbeon.com/forms/download</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Uncompress the archive into a directory of your choice. We call that directory
+                            <code>ORBEON_FORMS_HOME</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Under <code>ORBEON_FORMS_HOME</code>, you will find a file called <code>ops.war</code>.
+                            This is the file to deploy into Tomcat. To do so, just copy it under
+                            <code>TOMCAT_HOME/webapps/ops</code> (alternatively, if you know what you are doing, you
+                            can uncompress it at a location of your choice and configure a context in
+                            <code>TOMCAT_HOME/conf/server.xml</code>). The <code>webapps</code> directory is already
+                            present, but the <code>ops</code> directory needs to be created.
+                        </p>
+                    </li>
+                </ol>
+            </section>
+            <section>
+                <title>Testing your setup</title>
+                <p>
+                    Make sure you restart Tomcat (run the shutdown script under <code>TOMCAT_HOME/bin</code>, and then
+                    the startup script again). Then open up with a web browser the following URL:
+                </p>
+                <xml-source>
+                    http://localhost:8080/ops/
+                </xml-source>
+                <p>
+                    You should see the Orbeon Forms welcome page. [TODO: screenshot]
+                </p>
+                <p>
+                    You can now navigate the list of sample applications listed on the left side. You can see the source
+                    code of each application directly in your web browser by selecting the "View Source Code" tab at
+                    the top of the page to open up the Orbeon Forms Source Viewer. [TODO: screenshot]
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>The Hello Application</title>
+            <section>
+                <title>Running the Hello Application</title>
+                <p>
+                    The Hello application is about the simplest XForms application you can think of. It asks for your
+                    name and displays it back. You run the Hello application by selecting the link "XForms Hello" in
+                    the list of applications. Simply enter your first name in the input field, for example "Joe". You
+                    should promptly see a message underneath saying "Hello, Joe!". [TODO: screenshot]
+                </p>
+                <p>
+                    You can directly view the source code from your web browser by selecting the "View Source Code"
+                    tab. There you see: [TODO: screenshot]
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>view.xhtml</code>: this is the XHTML and XForms code for the Hello application.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>page-flow.xml</code>: this is the page flow for the Hello application. The main task
+                            of a page flow is mapping external URLs (as typed in a web browser) with Orbeon Forms pages.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>The Source Code</title>
+                <p>
+                    You are now ready to look at the source code of the Hello application. This will give you an idea of
+                    what an Orbeon Forms application looks like. First, select <code>view.xhtml</code> to make the
+                    source code for that file appear on the right:
+                </p>
+                <xml-source show-namespaces="false">
+                    <html xmlns="http://www.w3.org/1999/xhtml"
+                          xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <head>
+                            <title>XForms Hello</title>
+                            <xforms:model>
+                                <xforms:instance>
+                                    <first-name xmlns=""/>
+                                </xforms:instance>
+                            </xforms:model>
+                        </head>
+                        <body>
+                            <p>
+                                Please enter your first name:
+                                <xforms:input ref="/first-name" incremental="true"/>
+                            </p>
+                            <p>
+                                <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
+                            </p>
+                        </body>
+                    </html>
+                </xml-source>
+                <p>
+                    The first thing you notice is that this looks very much like HTML (notice the <code>&lt;html></code>
+                    tag). Except that this is XHTML, the XML-compatible version of XHTML. There are only a few
+                    differences that matter between HTML and XHTML, in particular you must close all your tags and use
+                    quotes around attributes.
+                </p>
+                <p>
+                    Another difference with plain HTML is that there are tags that start with the string
+                    <code>xforms:</code>. Those are defined by the XForms specification from W3C. They are at the heart
+                    of Orbeon Forms and enable all the cool forms features that you see in Orbeon Forms demos.
+                </p>
+                <p>
+                    You notice an element called <code>&lt;xforms:model></code>. Because XForms follows a
+                    Model-View-Controller (MVC) approach, most XForms pages contain one or more <i>models</i> that
+                    usually encapluate other XForms markup. You place these models within the XHTML
+                    <code>&lt;head></code> tag.
+                </p>
+                <p>
+                    With XForms, you store the data captured by controls such as input fields, combo boxes, etc. as text
+                    contained within XML elements or attributes. Consider the following XML document containing a
+                    single element called <code>first-name</code>.
+                </p>
+                <xml-source>
+                    <first-name/>
+                </xml-source>
+                <p>
+                    This element is empty. Contrast with:
+                </p>
+                <xml-source>
+                    <first-name>Joe</first-name>
+                </xml-source>
+                <p>
+                    The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document is
+                    encapsulatd within an <code>&lt;xforms:instance></code> tag:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance>
+                        <first-name xmlns=""/>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    This tag defines an XForms <i>instance</i>, which is just XForms' way of calling an XML document
+                    used to store data.
+                </p>
+                <p>
+                    Now consider the remaining XForms tags in the source file: <code>&lt;xforms:input></code> and
+                    <code>&lt;xforms:output></code>. These two tags are not located under the XHTML
+                    <code>&lt;head></code>, but under <code>&lt;body></code>. They are part of the <i>view</i> of your
+                    page, in other words these tags directly help define visible controls on the page. Consider
+                    <code>&lt;xforms:input></code>:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:input ref="/first-name" incremental="true"/>
+                </xml-source>
+                <p>
+                    You guessed that this tag allows the user to <i>input</i> information.
+                    <code>&lt;xforms:input></code> is usually displayed to the user as an input field. The
+                    <code>ref</code> attribute is the magic that connects the input field to the XForms instance. it
+                    contains an <i>XPath expression</i>, which in this case just looks like a file path. In this case,
+                    <code>/first-name</code> points to the element called <code>first-name</code>, which happens to be
+                    the only element we have in the XForms instance. Using the <code>ref</code> attribute this way is
+                    called a <i>binding</i> and means two things:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            When the user enters text in the input field, the text is saved into the element called
+                            <code>first-name</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            It also goes the other way: if somehow the text content of <code>first-name</code> in the
+                            XForms instance changes, this will be automatically reflected in the input field.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Now consider <code>&lt;xforms:output></code>. As you guess from the name of the tag, this simply
+                    displays a value on screen. If you have tried running the Hello application, you have probably
+                    guessed the logic that is being implemented: if the first name entered by the user is not a blank
+                    string, then we display the "Hello" message followed by the first name and then an exclamation mark.
+                    Otherwise if the first name consists only of spaces, we just display a blank string. The idea is to
+                    avoid displaying things like "Hello !" without an actual first name.
+                </p>
+                <p>
+                    With many client-side libraries, you express this type of logic with JavaScript. With XForms, you
+                    use XPath instead. This means that you need to learn at least a few bits of the XPath syntax. While
+                    XPath may be different from what you already know (it is based on expressions and definitely
+                    targetted at XML), it is in fact a smaller language than JavaScript.
+                </p>
+                <p>
+                    So how do you hook-up the logic within <code>&lt;xforms:output></code>? Here, instead of a
+                    <code>ref</code> attribute, we use a <code>value</code> attribute. Like <code>ref</code>,
+                    <code>value</code> takes an XPath expression, but it doesn't actually create a binding to instance
+                    data: it just returns a string. The XPath is as follows:
+                </p>
+                <xml-source>
+                    if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')
+                </xml-source>
+                <p>
+                    A few things to point out:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The main expression has the form <code>if () then ... else ...</code>. (This is actually an
+                            XPath 2.0 expression, which supports the <code>if</code> construct.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>normalize-space()</code> function removes all leading and trailing space. This is
+                            a little trick to not only test whether the first name is empty, but also to test whether it
+                            contains all blank space.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Contrary to JavaScript, the equality test is expressed with a single <code>=</code> instead
+                            of <code>==</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                           The <code>concat</code> function simply concatenates strings.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Note the use of the single quote <code>'</code> around strings. This is needed because the
+                            XPath expression is put within double quotes <code>"</code> in the <code>value</code>
+                            attribute.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Orbeon Forms Resources</title>
+                <p>
+                    Under <code>TOMCAT_HOME/webapps/ops</code>, you find a <code>WEB-INF</code> directory. That
+                    directory, in turn, contains a <code>resources</code> directory. We refer to that
+                    <code>resources</code> directory as <code>RESOURCES</code> below.
+                </p>
+                <p>
+                    The <code>RESOURCES</code> directory is a very important directory. This is where your
+                    applications will live. This directory is called "resources" because it contains all the files (or
+                    resources) such as XHTML documents, XML schemas, images, CSS, etc. needed by your Orbeon Forms
+                    application.
+                </p>
+                <note>
+                    Orbeon Forms is able to store your resources pretty much anywhere you want. For convenience, by
+                    default they are available under the WAR file's <code>WEB-INF/resources</code> so you can get up
+                    and running without configuration.
+                </note>
+            </section>
+            <section>
+                <title>A Look Into the Resources Directory Structure</title>
+                <p>
+                    Under <code>RESOURCES</code>, you see the following files and directories:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>apps</code> directory: contains one sub-directory for each application currently
+                            running in Orbeon Forms. By default, it contains a series of sample applications - the ones
+                            that you see on the left side of your screen when you start Orbeon Forms.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>config</code> directory: contains several configuration files that you can modify if
+                            needed. For now, you don't need to worry about this directory.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>page-flow.xml</code> file: the top-level page flow file. You should not worry about
+                            this file just yet. Just know that by default, it is in charge of deciding which application
+                            to show depending on the URLs you enter in your web browser.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>apps-list.xml</code> file: contains the list of sample applications to display on the
+                            left side of the screen. This is not needed by your own application.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Finding the Hello Application Source Code</title>
+                <p>
+                    You find the application under <code>apps/xforms-hello</code>. That directory contains the two files
+                    that you have seen earlier through the Source Code Viewer in your web browser.
+                </p>
+                <p>
+
+                </p>
+
+                    http://localhost:8080/ops/xforms-hello/
+
+
+
+            </section>
+            <section>
+                <title></title>
+                <p>
+                    xxx
+                </p>
+            </section>
+            <section>
+                <title>xxx</title>
+                <p>
+                    xxx
+                </p>
+            </section>
+        </section>
+    </body>
+</document>

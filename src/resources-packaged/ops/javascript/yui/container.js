@@ -2995,8 +2995,14 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 	this.showMaskEvent.subscribe(function() {
 		var checkFocusable = function(el) {
 			if (el.tagName == "A" || el.tagName == "BUTTON" || el.tagName == "SELECT" || el.tagName == "INPUT" || el.tagName == "TEXTAREA" || el.tagName == "FORM") {
-				if (! YAHOO.util.Dom.isAncestor(me.element, el)) {
-					YAHOO.util.Event.addListener(el, "focus", el.blur);
+                if (! YAHOO.util.Dom.isAncestor(me.element, el)) {
+                    // Change by avernet. Discussed on:
+                    // http://www.nabble.com/Drop-down-%28select%29-in-dialog-tf2852511.html#a7982599
+                    // Previous code: YAHOO.util.Event.addListener(el, "focus", el.blur);
+                    YAHOO.util.Event.addListener(el, "focus", function(ev) {
+                        var target =  YAHOO.util.Event.getTarget(ev);
+                        if (! YAHOO.util.Dom.isAncestor(me.element, target)) el.blur();
+                    });
 					return true;
 				}
 			} else {

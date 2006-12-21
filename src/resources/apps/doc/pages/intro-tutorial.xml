@@ -396,6 +396,65 @@
                 </ul>
             </section>
             <section>
+                <title>Page Flow</title>
+                <p>
+                    If you look at your browser's URL bar when showing the example, you notice that it looks like this:
+                </p>
+                <xml-source>
+                    http://localhost:8080/ops/xforms-hello/
+                </xml-source>
+                <ul>
+                    <li>
+                        <p>
+                            The first part of the URL, <code>http://localhost:8080/</code>, is self-explanatory: it
+                            depends on what host and port your server is running.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The next part, <code>ops</code>, depends on what context you install Orbeon Forms into. By
+                            default, because the WAR file is called <code>ops.war</code>, the context is
+                            <code>ops</code>. (You could as well configure your container to use a different context, or
+                            an empty (default) context.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The last part, <code>/xforms-hello/</code>, automatically matches the name of the directory
+                            you store your application into (more on this later when you look at the source code). This
+                            causes the application's page flow (<code>page-flow.xml</code>) to run.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    So now look at <code>page-flow.xml</code> for the Hello application. It is very simple:
+                </p>
+                <xml-source show-namespaces="false">
+                    <config xmlns="http://www.orbeon.com/oxf/controller">
+                        <page path-info="*" view="view.xhtml"/>
+                        <epilogue url="oxf:/config/epilogue.xpl"/>
+                    </config>
+                </xml-source>
+                <p>
+                    The important line in this page flow is this one:
+                </p>
+                <xml-source show-namespaces="false">
+                    <page path-info="*" view="view.xhtml"/>
+                </xml-source>
+                <p>
+                    It tells Orbeon Forms that any path (notice the wildcard <code>*</code>) received by the web
+                    browser in this application will cause the page view stored in <code>view.xhtml</code> to be
+                    processed. You can check this by entering the following path in your browser:
+                </p>
+                <xml-source>
+                    http://localhost:8080/ops/xforms-hello/my-page
+                </xml-source>
+                <p>
+                    The exact same page will display! Of course, page flows make the most sense when you have more than
+                    one page in your application, which translates into more than one <code>&lt;page></code> element.
+                </p>
+            </section>
+            <section>
                 <title>Orbeon Forms Resources</title>
                 <p>
                     Under <code>TOMCAT_HOME/webapps/ops</code>, you find a <code>WEB-INF</code> directory. That
@@ -424,7 +483,8 @@
                         <p>
                             <code>apps</code> directory: contains one sub-directory for each application currently
                             running in Orbeon Forms. By default, it contains a series of sample applications - the ones
-                            that you see on the left side of your screen when you start Orbeon Forms.
+                            that you see on the left side of your screen when you start Orbeon Forms. Notice a directory
+                            called <code>xforms-hello</code>: this is the directory that contains the Hello application.
                         </p>
                     </li>
                     <li>
@@ -437,7 +497,7 @@
                         <p>
                             <code>page-flow.xml</code> file: the top-level page flow file. You should not worry about
                             this file just yet. Just know that by default, it is in charge of deciding which application
-                            to show depending on the URLs you enter in your web browser.
+                            to run depending on the application name in the URL that you enter in your web browser.
                         </p>
                     </li>
                     <li>
@@ -449,19 +509,57 @@
                 </ul>
             </section>
             <section>
-                <title>Finding the Hello Application Source Code</title>
+                <title>Playing with the Hello Application Source Code</title>
                 <p>
-                    You find the application under <code>apps/xforms-hello</code>. That directory contains the two files
-                    that you have seen earlier through the Source Code Viewer in your web browser.
+                    You find the application under <code>RESOURCES/apps/xforms-hello</code>. That directory contains
+                    the two files that you have seen earlier through the Source Code Viewer in your web browser. Again,
+                    the name <code>xforms-hello</code> is important and matches the <code>xforms-hello</code> part of
+                    the URL in your web browser: <code>http://localhost:8080/ops/xforms-hello/</code>. Now, modify
+                    <code>view.xhtml</code>:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            Open <code>view.xhtml</code> in a text editor.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Modify the string "Please enter your first name:" with "Your name here:".
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Save <code>view.xhtml</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                             Go back to the Hello application in your web browser and reload the page. You should see
+                             the new text appear: [TODO: screenshot]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Renew the experience but add some XForms. For example, add a second
+                            <code>&lt;xforms:input></code> right after the first one:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:input ref="/first-name" incremental="true"/>
+                            <xforms:input ref="/first-name" incremental="true"/>
+                        </xml-source>
+                        <p>
+                           Reload the page, and notice, as you type in an input field, how the other one udates as you
+                           type. This happens because the two fields are bound to the same instance data. The
+                           <code>incremental="true"</code> attribute allows the changes to occur as you type, instead of
+                           occurring when you focus in and out of fields.
+                        </p>
+                    </li>
+                </ul>
                 <p>
-
+                    You notice that you get instant gratifiation with Orbeon forms: just change files on disk, reload
+                    your page, and your changes are taken into account with no compilation or other complex deployment.
                 </p>
-
-                    http://localhost:8080/ops/xforms-hello/
-
-
-
             </section>
             <section>
                 <title></title>

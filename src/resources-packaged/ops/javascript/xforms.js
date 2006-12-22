@@ -2204,6 +2204,7 @@ ORBEON.xforms.Server = {
                                                         var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
                                                         // Get elements we want to modify from the DOM
                                                         var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-info");
+                                                        var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
                                                         var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
                                                         var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
                                                         // Set values in DOM

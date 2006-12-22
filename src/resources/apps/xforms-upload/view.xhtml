@@ -1,0 +1,122 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>XForms Upload</title>
+        <xforms:model>
+            <xforms:instance id="files-instance">
+                <files xmlns="">
+                    <file filename="" mediatype="" size=""/>
+                    <file filename="" mediatype="" size=""/>
+                    <file filename="" mediatype="" size=""/>
+                </files>
+            </xforms:instance>
+            <xforms:instance id="file-template">
+                <file xmlns="" filename="" mediatype="" size=""/>
+            </xforms:instance>
+            <xforms:instance id="response-instance">
+                <instance xmlns=""/>
+            </xforms:instance>
+            <xforms:instance id="control-instance">
+                <control xmlns="">
+                    <simple-upload-trigger/>
+                    <add-upload-trigger/>
+                    <remove-upload-trigger/>
+                </control>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('control-instance')">
+                <xforms:bind nodeset="add-upload-trigger" readonly="false()"/>
+                <xforms:bind nodeset="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
+            </xforms:bind>
+            <xforms:bind nodeset="instance('files-instance')">
+                <!-- Using xs:anyURI will cause the XForms engine to store a reference to
+                 a URI instead of inlining the content of the file -->
+                <xforms:bind nodeset="file" type="xs:anyURI"/>
+            </xforms:bind>
+            <!-- Main submission which uploads the files -->
+            <xforms:submission id="all-submission" method="post" replace="all" action="/xforms-upload/"/>
+            <!-- Main submission which uploads the files -->
+            <xforms:submission id="instance-submission" method="post" replace="instance" action="/xforms-upload/background" instance="response-instance"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-repeat-selected-item-1 { background-color: white }
+            .upload-action-table td { white-space: nowrap; vertical-align: middle }
+            .upload-action-table input { vertical-align: middle }
+            .upload-action-table xforms-trigger { vertical-align: middle }
+        </xhtml:style>
+
+    </head>
+    <body>
+        <p>
+            Please select files to upload:
+        </p>
+        <table class="upload-action-table">
+            <tr>
+                <td>
+                    <xforms:group ref="instance('control-instance')/add-upload-trigger">
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:insert nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
+                        </xforms:action>
+                        <xforms:trigger appearance="xxforms:image">
+                            <xforms:label>Add One</xforms:label>
+                            <xxforms:img src="/apps/xforms-upload/images/add.gif"/>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>Add One</xforms:label>
+                        </xforms:trigger>
+                    </xforms:group>
+                </td>
+                <td>
+                    <xforms:group ref="instance('control-instance')/remove-upload-trigger">
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:delete nodeset="instance('files-instance')/file" at="last()"/>
+                        </xforms:action>
+                        <xforms:trigger appearance="xxforms:image">
+                            <xforms:label>Remove One</xforms:label>
+                            <xxforms:img src="/apps/xforms-upload/images/remove.gif"/>
+                        </xforms:trigger>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>Remove One</xforms:label>
+                        </xforms:trigger>
+                    </xforms:group>
+                </td>
+            </tr>
+        </table>
+
+        <xforms:repeat nodeset="file">
+            <xhtml:p>
+                <xforms:upload ref="." xxforms:size="60">
+                    <xforms:filename ref="@filename"/>
+                    <xforms:mediatype ref="@mediatype"/>
+                    <xxforms:size ref="@size"/>
+                </xforms:upload>
+            </xhtml:p>
+        </xforms:repeat>
+
+        <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
+            <xforms:label>Upload Selected Files</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('files-instance')/action">simple-upload</xforms:setvalue>
+                <xforms:send submission="instance-submission"/>
+            </xforms:action>
+        </xforms:trigger>
+    </body>
+</html>

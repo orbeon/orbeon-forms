@@ -2328,6 +2328,10 @@ ORBEON.xforms.Server = {
                                                             var input = span.firstChild;
                                                             setReadonlyOnFormElement(input, isReadonly);
                                                         }
+                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-autocomplete")) {
+                                                        // Auto-complete field
+                                                        var input = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
+                                                        setReadonlyOnFormElement(input, isReadonly);
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea") && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                         // XForms HTML area
                                                         var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);

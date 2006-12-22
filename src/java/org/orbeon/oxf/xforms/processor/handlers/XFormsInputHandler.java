@@ -128,9 +128,8 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
                     reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
                             (inputClasses.length() > 0) ? inputClasses.toString() : "");// TODO: check whether like in the XSTL version we need to copy other classes as well
-                    if (isReadOnly) {
-                        reusableAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
-                    }
+
+                    handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
 
                     // Copy special attributes in xxforms namespace
                     copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);

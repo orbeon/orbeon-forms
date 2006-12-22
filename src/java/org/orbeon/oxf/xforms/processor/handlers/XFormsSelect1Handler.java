@@ -324,6 +324,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                                 final String value = (xformsSelect1Control == null) ? null : xformsSelect1Control.getValue();
                                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
+                                handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsSelect1Control);
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
 
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);

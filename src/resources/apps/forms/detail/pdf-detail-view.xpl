@@ -33,7 +33,6 @@
         <p:input name="request"><dummy/></p:input>
         <p:output name="response" id="document" debug="xxxdoc"/>
     </p:processor>
-
     
     <!-- Produce PDF document -->
     <p:processor name="oxf:pdf-template">

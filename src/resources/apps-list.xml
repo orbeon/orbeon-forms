@@ -30,6 +30,7 @@
         <application id="xforms-upload" label="Upload Control"/>
         <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
+        <application id="xforms-hello" label="XForms Hello (Tutorial)"/>
     </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>

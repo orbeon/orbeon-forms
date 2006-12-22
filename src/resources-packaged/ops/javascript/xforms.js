@@ -1501,12 +1501,14 @@ ORBEON.xforms.Server = {
      * This is to prevent the UI from becoming totally unusable after an error.
      */
     exceptionWhenTalkingToServer: function(e, formIndex) {
-        ORBEON.xforms.Globals.lastRequestIsError = true;
         ORBEON.util.Utils.logException("JavaScript error", e);
-        var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
-        var errorMessage = "Error while processing response: " + e.message;
-        ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
-        xformsDisplayIndicator("error");
+        if (e.message != "") {
+            ORBEON.xforms.Globals.lastRequestIsError = true;
+            var errorContainer = ORBEON.xforms.Globals.formLoadingError[formIndex];
+            var errorMessage = "Error while processing response: " + e.message;
+            ORBEON.util.Dom.setStringValue(errorContainer, errorMessage);
+            xformsDisplayIndicator("error");
+        }
     },
 
     fireEvents: function(events, incremental) {

@@ -2191,39 +2191,46 @@ ORBEON.xforms.Server = {
                                                         documentElement.value = newControlValue;
                                                         documentElement.previousValue = newControlValue;
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-upload")) {
-                                                        if (true) {
-                                                            // Upload
+                                                        // Upload
 
-                                                            // <xxforms:control id="xforms-control-id"
-                                                            //    state="empty|file"
-                                                            //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
+                                                        // <xxforms:control id="xforms-control-id"
+                                                        //    state="empty|file"
+                                                        //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
 
-                                                            // Get attributes from response
-                                                            var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
-                                                            var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
-                                                            var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
-                                                            var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                                            // Get elements we want to modify from the DOM
-                                                            var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-info");
-                                                            var fileNameSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-filename");
-                                                            var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
-                                                            var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
-                                                            // Set values in DOM
-                                                            if (state == "empty") {
-                                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-file")
-                                                                ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-empty")
-                                                            }
-                                                            if (state == "file") {
-                                                                ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-empty")
-                                                                ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-file")
-                                                            }
-                                                            if (filename != null)
-                                                                ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
-                                                            if (mediatype != null)
-                                                                ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
-                                                            if (size != null)
-                                                                ORBEON.util.Dom.setStringValue(sizeSpan, size);
+                                                        // Get attributes from response
+                                                        var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
+                                                        var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
+                                                        var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
+                                                        var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
+                                                        // Get elements we want to modify from the DOM
+                                                        var fileInfoSpan = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-info");
+                                                        var mediatypeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-mediatype");
+                                                        var sizeSpan = ORBEON.util.Dom.getChildElementByClass(fileInfoSpan, "xforms-upload-size");
+                                                        // Set values in DOM
+                                                        if (state == "empty") {
+                                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-file")
+                                                            ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-empty")
                                                         }
+                                                        if (state == "file") {
+                                                            ORBEON.util.Dom.removeClass(documentElement, "xforms-upload-state-empty")
+                                                            ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-file")
+
+                                                            // Clear upload input by replacing the control
+                                                            var inputElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-select");
+                                                            var parentElement = inputElement.parentNode;
+                                                            var newInputElement = document.createElement("input");
+                                                            ORBEON.util.Dom.addClass(newInputElement, inputElement.className);
+                                                            newInputElement.setAttribute("type", inputElement.type);
+                                                            newInputElement.setAttribute("name", inputElement.name);
+                                                            newInputElement.setAttribute("size", inputElement.size);
+                                                            parentElement.replaceChild(newInputElement, inputElement);
+                                                        }
+                                                        if (filename != null)
+                                                            ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
+                                                        if (mediatype != null)
+                                                            ORBEON.util.Dom.setStringValue(mediatypeSpan, mediatype);
+                                                        if (size != null)
+                                                            ORBEON.util.Dom.setStringValue(sizeSpan, size);
                                                     } else if (typeof(documentElement.value) == "string") {
                                                         // Textarea, password
                                                         if (xformsNormalizeEndlines(documentElement.value) != xformsNormalizeEndlines(newControlValue)) {

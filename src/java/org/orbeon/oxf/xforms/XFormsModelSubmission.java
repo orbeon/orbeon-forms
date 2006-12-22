@@ -355,8 +355,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final Element valueElement = parameterElement.element("value");
                             final String value = valueElement.getTextTrim();
 
-                            final String filename = parameterElement.element("filename").getTextTrim();
-                            final String mediatype = parameterElement.element("content-type").getTextTrim();
+                            final String filename;
+                            {
+                                final Element filenameElement = parameterElement.element("filename");
+                                filename = (filenameElement != null) ? filenameElement.getTextTrim() : "";
+                            }
+                            final String mediatype;
+                            {
+                                final Element mediatypeElement = parameterElement.element("content-type");
+                                mediatype = (mediatypeElement != null) ? mediatypeElement.getTextTrim() : "";
+                            }
                             final String size = parameterElement.element("content-length").getTextTrim();
 
                             if (size.equals("0") && filename.equals("")) {

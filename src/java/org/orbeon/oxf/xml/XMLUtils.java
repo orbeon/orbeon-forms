@@ -874,8 +874,15 @@ public class XMLUtils {
                 }
             }
         }
+        // Create file if it doesn't exist (necessary when the file size is 0)
+        final File storeLocation = ((DefaultFileItem) fileItem).getStoreLocation();
+        try {
+            storeLocation.createNewFile();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
         // Return a file URL
-        return ((DefaultFileItem) fileItem).getStoreLocation().toURI().toString();
+        return storeLocation.toURI().toString();
     }
 
     /**

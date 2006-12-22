@@ -246,7 +246,7 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private void writeFileItem(PipelineContext pipelineContext, FileItem fileItem, ContentHandler contentHandler) throws SAXException {
-        if (fileItem.getSize() > 0) {
+        if (!isFileItemEmpty(fileItem)) {
             if (useBase64(pipelineContext, fileItem)) {
                 // The content of the file is streamed to the output (xs:base64Binary)
                 InputStream fileItemInputStream = null;
@@ -489,7 +489,7 @@ public class RequestGenerator extends ProcessorImpl {
                     parameterElement.addElement("content-type").addText(fileItem.getContentType());
                 parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
 
-                if (fileItem.getSize() > 0) {
+                if (!isFileItemEmpty(fileItem)) {
                     // Create private placeholder element with parameter name as attribute
                     Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
                     fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
@@ -501,6 +501,10 @@ public class RequestGenerator extends ProcessorImpl {
                 throw new OXFException("Invalid value type.");
             }
         }
+    }
+
+    private static boolean isFileItemEmpty(FileItem fileItem) {
+        return fileItem.getSize() <= 0 && (fileItem.getName() == null || fileItem.getName().trim().equals(""));
     }
 
     protected void addBody(PipelineContext pipelineContext, Element requestElement) {

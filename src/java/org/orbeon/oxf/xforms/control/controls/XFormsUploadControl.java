@@ -224,4 +224,29 @@ public class XFormsUploadControl extends XFormsValueControl {
             xformsControls.popBinding();
         }
     }
+
+    public boolean equals(Object obj) {
+
+        if (obj == null || !(obj instanceof XFormsUploadControl))
+            return false;
+
+        if (this == obj)
+            return true;
+
+        final XFormsUploadControl other = (XFormsUploadControl) obj;
+
+        if (!((state == null && other.state == null) || (state != null && other.state != null && state.equals(other.state))))
+            return false;
+
+        if (!((mediatype == null && other.mediatype == null) || (mediatype != null && other.mediatype != null && mediatype.equals(other.mediatype))))
+            return false;
+
+        if (!((size == null && other.size == null) || (size != null && other.size != null && size.equals(other.size))))
+            return false;
+
+        if (!((filename == null && other.filename == null) || (filename != null && other.filename != null && filename.equals(other.filename))))
+            return false;
+
+        return super.equals(obj);
+    }
 }

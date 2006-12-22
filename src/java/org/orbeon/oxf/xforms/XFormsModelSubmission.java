@@ -348,23 +348,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final Element valueElement = parameterElement.element("value");
                             final String value = valueElement.getTextTrim();
 
-                            // An empty value likely means that the user did not select a file. In this case, we don't
-                            // want to override an existing value in the instance. Clearing the value in the instance
-                            // will have to be done by other means, like a "clear file" button.
-                            if (value.length() == 0)
+                            final String filename = parameterElement.element("filename").getTextTrim();
+                            final String mediatype = parameterElement.element("content-type").getTextTrim();
+                            final String size = parameterElement.element("content-length").getTextTrim();
+
+                            // Try to ignore when an upload control did not have a selected file, but to keep going if
+                            // the uploaded file was empty
+                            if (size.equals("0") && filename.equals(""))
                                 continue;
 
                             final XFormsUploadControl uploadControl
                                     = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
 
-                            if (uploadControl != null)
-                            { // in case of xforms:repeat, the name of the template will not match an existing control
+                            if (uploadControl != null) { // in case of xforms:repeat, the name of the template will not match an existing control
 
                                 final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
-
-                                final String filename = parameterElement.element("filename").getTextTrim();
-                                final String mediatype = parameterElement.element("content-type").getTextTrim();
-                                final String size = parameterElement.element("content-length").getTextTrim();
 
                                 // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
                                 uploadControl.setExternalValue(pipelineContext, value, paramValueType, !isReplaceAll);

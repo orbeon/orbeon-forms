@@ -23,6 +23,7 @@
         <title>XForms Upload</title>
         <xforms:model>
             <xforms:instance id="files-instance">
+                <!-- Start with placeholders for three files -->
                 <files xmlns="">
                     <file filename="" mediatype="" size=""/>
                     <file filename="" mediatype="" size=""/>
@@ -52,71 +53,75 @@
                 <xforms:bind nodeset="file" type="xs:anyURI"/>
             </xforms:bind>
             <!-- Main submission which uploads the files -->
-            <xforms:submission id="all-submission" method="post" replace="all" action="/xforms-upload/"/>
-            <!-- Main submission which uploads the files -->
-            <xforms:submission id="instance-submission" method="post" replace="instance" action="/xforms-upload/background" instance="response-instance"/>
+            <!--<xforms:submission id="all-submission" method="post" replace="all" action="/xforms-upload/"/>-->
+            <!-- Background submission -->
+            <xforms:submission id="background-submission" method="post" replace="instance" action="/xforms-upload/background" instance="response-instance"/>
         </xforms:model>
-        <xhtml:style type="text/css">
+        <style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: white }
             .upload-action-table td { white-space: nowrap; vertical-align: middle }
             .upload-action-table input { vertical-align: middle }
-            .upload-action-table xforms-trigger { vertical-align: middle }
-        </xhtml:style>
+            .upload-action-table .xforms-trigger { vertical-align: middle }
+        </style>
 
     </head>
     <body>
         <p>
-            Please select files to upload:
+            This sample application shows you you can use the XForms upload control, and how file upload can take place
+            in the background.
         </p>
-        <table class="upload-action-table">
+        <p>
+            Please select the files to upload:
+        </p>
+        <table>
             <tr>
                 <td>
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
-                        </xforms:action>
                         <xforms:trigger appearance="xxforms:image">
-                            <xforms:label>Add One</xforms:label>
+                            <xforms:label>Add</xforms:label>
                             <xxforms:img src="/apps/xforms-upload/images/add.gif"/>
-                        </xforms:trigger>
-                        <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>Add One</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
                 <td>
-                    <xforms:group ref="instance('control-instance')/remove-upload-trigger">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:delete nodeset="instance('files-instance')/file" at="last()"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="xxforms:image">
-                            <xforms:label>Remove One</xforms:label>
-                            <xxforms:img src="/apps/xforms-upload/images/remove.gif"/>
-                        </xforms:trigger>
+                    <xforms:group ref="instance('control-instance')/add-upload-trigger">
                         <xforms:trigger appearance="xxforms:link">
-                            <xforms:label>Remove One</xforms:label>
+                            <xforms:label>Add One</xforms:label>
+                            <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
             </tr>
+            <xforms:repeat nodeset="file" id="file-repeat">
+                <tr>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/remove-upload-trigger">
+                            <xforms:trigger appearance="xxforms:image">
+                                <xforms:label>Remove</xforms:label>
+                                <xxforms:img src="/apps/xforms-upload/images/remove.gif"/>
+                                <xforms:delete ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="index('file-repeat')"/>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </td>
+                    <td>
+                        <xforms:upload ref="." xxforms:size="60">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
+                    </td>
+                </tr>
+            </xforms:repeat>
         </table>
-
-        <xforms:repeat nodeset="file">
-            <xhtml:p>
-                <xforms:upload ref="." xxforms:size="60">
-                    <xforms:filename ref="@filename"/>
-                    <xforms:mediatype ref="@mediatype"/>
-                    <xxforms:size ref="@size"/>
-                </xforms:upload>
-            </xhtml:p>
-        </xforms:repeat>
-
-        <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
-            <xforms:label>Upload Selected Files</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('files-instance')/action">simple-upload</xforms:setvalue>
-                <xforms:send submission="instance-submission"/>
-            </xforms:action>
-        </xforms:trigger>
+        <p>
+            <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
+                <xforms:label>Upload Selected Files</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:setvalue ref="instance('files-instance')/action">simple-upload</xforms:setvalue>
+                    <xforms:send submission="background-submission"/>
+                </xforms:action>
+            </xforms:trigger>
+        </p>
     </body>
 </html>

@@ -664,6 +664,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 if (valueXFormsControl instanceof XFormsUploadControl) {
                     final XFormsUploadControl uploadControl = (XFormsUploadControl) valueXFormsControl;
                     uploadControl.setExternalValue(pipelineContext, eventValue, null, true);
+
+                    // If the value is being cleared, also clear the metadata
+                    if (eventValue.equals("")) {
+                        uploadControl.setFilename(pipelineContext, "");
+                        uploadControl.setMediatype(pipelineContext, "");
+                        uploadControl.setSize(pipelineContext, "");
+                    }
+
                 } else {
                     valueXFormsControl.setExternalValue(pipelineContext, eventValue, null);
                 }
@@ -696,63 +704,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, xformsEvent);
         }
     }
-
-//    public void dispatchExternalEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-//        final String eventName = xformsEvent.getEventName();
-//        if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
-//
-//            // This is called upon the first creation of the XForms engine only
-//
-//            // 4.2 Initialization Events
-//
-//            // 1. Dispatch xforms-model-construct to all models
-//            // 2. Dispatch xforms-model-construct-done to all models
-//            // 3. Dispatch xforms-ready to all models
-//
-//            final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
-//            for (int i = 0; i < eventsToDispatch.length; i++) {
-//                final boolean isXFormsModelConstructDone = i == 1;
-//                final boolean isXFormsReady = i == 2;
-//
-//                if (isXFormsModelConstructDone) {
-//                    // Initialize controls after all the xforms-model-construct events have been sent
-//                    xformsControls.initialize(pipelineContext, null, null);
-//                }
-//
-//                // Iterate over all the models
-//                for (Iterator j = getModels().iterator(); j.hasNext();) {
-//                    final XFormsModel currentModel = (XFormsModel) j.next();
-//
-//                    if (isXFormsReady) {
-//                        // Performed deferred updates only for xforms-ready
-//                        startOutermostActionHandler();
-//                    }
-//                    dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
-//                    if (isXFormsReady) {
-//                        // Performed deferred updates only for xforms-ready
-//                        endOutermostActionHandler(pipelineContext);
-//                    }
-//                }
-//            }
-//        } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
-//            final XXFormsInitializeStateEvent initializeStateEvent = (XXFormsInitializeStateEvent) xformsEvent;
-//
-//            // This is called whenever the state of the XForms engine needs to be rebuilt, but without going through a
-//            // full XForms initialization sequence
-//
-//            // Restore models state
-//            for (Iterator j = getModels().iterator(); j.hasNext();) {
-//                final XFormsModel currentModel = (XFormsModel) j.next();
-//                currentModel.initializeState(pipelineContext);
-//            }
-//
-//            // Restore controls
-//            xformsControls.initialize(pipelineContext, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement());
-//
-//        } else {
-//            throw new OXFException("Invalid event dispatched: " + eventName);
-//        }
-//    }
 
     /**
      * Prepare the ContainingDocumentg for a sequence of external events.

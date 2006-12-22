@@ -345,6 +345,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final Element parameterElement = (Element) i.next();
                             final String name = parameterElement.element("name").getTextTrim();
 
+                            final XFormsUploadControl uploadControl
+                                        = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
+
+                            // In case of xforms:repeat, the name of the template will not match an existing control
+                            if (uploadControl == null)
+                                continue;
+
                             final Element valueElement = parameterElement.element("value");
                             final String value = valueElement.getTextTrim();
 
@@ -352,16 +359,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final String mediatype = parameterElement.element("content-type").getTextTrim();
                             final String size = parameterElement.element("content-length").getTextTrim();
 
-                            // Try to ignore when an upload control did not have a selected file, but to keep going if
-                            // the uploaded file was empty
-                            if (size.equals("0") && filename.equals(""))
-                                continue;
-
-                            final XFormsUploadControl uploadControl
-                                    = (XFormsUploadControl) containingDocument.getObjectById(pipelineContext, name);
-
-                            if (uploadControl != null) { // in case of xforms:repeat, the name of the template will not match an existing control
-
+                            if (size.equals("0") && filename.equals("")) {
+                                // No file was selected in the UI
+                            } else {
+                                // A file was selected in the UI (note that the file may be empty)
                                 final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
 
                                 // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)

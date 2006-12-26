@@ -32,6 +32,9 @@
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
         <application id="xforms-hello" label="XForms Hello (Tutorial)"/>
     </section>
+    <section label="Persistence">
+        <application id="sql-address-book" label="SQL Address Book"/>
+    </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>
         <application id="sandbox-exist" label="eXist Sandbox"/>

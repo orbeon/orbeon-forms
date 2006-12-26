@@ -27,13 +27,24 @@
                     <yahoo>http://www.yahoo.com</yahoo>
                 </instance>
             </xforms:instance>
+            <xforms:submission method="get" action="http://search.yahoo.com/" serialize="false" id="yahoo-submission"
+                    xxforms:target="iframe"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        Go to Y! Search with:
         <xforms:trigger>
-            <xforms:label>Go to Y! Search</xforms:label>
+            <xforms:label>xforms:load</xforms:label>
             <xforms:load xxforms:target="iframe" ev:event="DOMActivate" resource="http://search.yahoo.com/" show="replace"/>
         </xforms:trigger>
+        <!--
+        Not supported (yet):
+
+        <xforms:trigger>
+            <xforms:label>xforms:submission</xforms:label>
+            <xforms:send submission="yahoo-submission" ev:event="DOMActivate"/>
+        </xforms:trigger>
+        -->
         <xhtml:div>
             <xhtml:iframe name="iframe" src="http://www.google.com/xhtml" width="400" height="400"/>
         </xhtml:div>

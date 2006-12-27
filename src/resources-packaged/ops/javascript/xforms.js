@@ -817,7 +817,8 @@ ORBEON.xforms.Events = {
         if (target != null) {
             // Input field and auto-complete: trigger DOMActive when when enter is pressed
             if (ORBEON.util.Dom.hasClass(target, "xforms-select1-open")
-                    || ORBEON.util.Dom.hasClass(target, "xforms-input")) {
+                    || ORBEON.util.Dom.hasClass(target, "xforms-input")
+                    || ORBEON.util.Dom.hasClass(target, "xforms-secret")) {
                 if (event.keyCode == 10 || event.keyCode == 13) {
                     // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
                     YAHOO.util.Event.preventDefault(event);

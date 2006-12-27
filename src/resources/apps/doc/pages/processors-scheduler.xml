@@ -101,6 +101,7 @@
                     </grammar>
                 </xml-source>
             </p>
+            <a name="starting"/>
             <section>
                 <title>Starting a Task</title>
                 <p>
@@ -183,6 +184,7 @@
                     </xml-source>
                 </p>
             </section>
+            <a name="stopping"/>
             <section>
                 <title>Stopping a Task</title>
                 <p>
@@ -192,9 +194,11 @@
                     <xml-source>
                         <p:processor name="oxf:scheduler">
                             <p:input name="config">
-                                <stop-task>
-                                    <name>myTask</name>
-                                </stop-task>
+                                <config>
+                                    <stop-task>
+                                        <name>myTask</name>
+                                    </stop-task>
+                                </config>
                             </p:input>
                         </p:processor>
                     </xml-source>

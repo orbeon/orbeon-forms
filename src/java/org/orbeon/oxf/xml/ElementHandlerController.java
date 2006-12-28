@@ -69,10 +69,10 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     }
 
     public String getParentHandlerExplodedQName() {
-        if (handlerInfos == null || handlerInfos.size() < 2)
+        if (handlerInfos == null || handlerInfos.size() < 1)
             return null;
 
-        final HandlerInfo parentHandlerInfo = (HandlerInfo) handlerInfos.get(handlerInfos.size() - 2);
+        final HandlerInfo parentHandlerInfo = (HandlerInfo) handlerInfos.get(handlerInfos.size() - 1);
         return parentHandlerInfo.explodedQName;
     }
 

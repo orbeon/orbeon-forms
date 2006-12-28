@@ -48,7 +48,7 @@ td { vertical-align: top }
 .xforms-repeat-selected-item-2 td { cursor: default;  }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
-.xforms-trigger-appearance-xxforms-image { margin-right: 0.5em}
+.xforms-trigger-appearance-minimal img { margin-right: 0.5em; vertical-align: middle; border: 0 }
 
 .dmv-last-name input { width: 20em }
 .dmv-driver-license-number input { width: 8em }

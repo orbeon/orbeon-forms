@@ -156,43 +156,35 @@
                     <tr>
                         <td>
                             <xforms:group ref="instance('triggers-instance')/remove-mailing-address-trigger">
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:delete nodeset="instance('document-instance')//dmv:address[@type = 'mailing']" at="last()"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-mailing-address"/>
-                                    <xxforms:img src="/apps/forms/images/remove.gif"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-mailing-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/remove.gif" alt="Remove Mailing Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/remove-mailing-address"/>
+                                    </xforms:label>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="instance('document-instance')//dmv:address[@type = 'mailing']" at="last()"/>
                                 </xforms:trigger>
                             </xforms:group>
 
                             <xforms:group ref="instance('triggers-instance')/clear-mailing-address-trigger">
-                                <xforms:action ev:event="DOMActivate" >
-                                    <xforms:dispatch name="dmv-clear-mailing-address" target="dmv-model"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
-                                    <xxforms:img src="/apps/forms/images/recycle-green.png"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/recycle-green.png" alt="Clear Mailing Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="dmv-clear-mailing-address" target="dmv-model"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </td>
                         <td>
                             <xforms:group ref="instance('triggers-instance')/add-mailing-address-trigger" >
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert nodeset="instance('document-instance')//dmv:address-information/dmv:address" at="last()" position="after"
-                                            origin="instance('mailing-address-template')"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-mailing-address"/>
-                                    <xxforms:img src="/apps/forms/images/add.gif"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-mailing-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/add.gif" alt="Add Mailing Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/add-mailing-address"/>
+                                    </xforms:label>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="instance('document-instance')//dmv:address-information/dmv:address"
+                                                   at="last()" position="after"
+                                                   origin="instance('mailing-address-template')"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </td>
@@ -278,12 +270,11 @@
                                         <xforms:setvalue ref="instance('document-instance')//dmv:vehicles/dmv:vehicle[index('vehicles-repeat')]/dmv:leased"/>
                                         <xforms:insert context="instance('plates-instance')" nodeset="plate" origin="instance('plate-template')"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle"/>
-                                        <xxforms:img src="/apps/forms/images/add.gif"/>
-                                    </xforms:trigger>
-                                    <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle"/>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/forms/images/add.gif" alt="Add"/>
+                                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle"/>
+                                        </xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -293,12 +284,11 @@
                                         <xforms:delete nodeset="instance('document-instance')//dmv:vehicles/dmv:vehicle" at="index('vehicles-repeat')"/>
                                         <xforms:delete context="instance('plates-instance')" nodeset="plate"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="xxforms:image">
-                                        <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle"/>
-                                        <xxforms:img src="/apps/forms/images/remove.gif"/>
-                                    </xforms:trigger>
-                                    <xforms:trigger appearance="xxforms:link">
-                                        <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle"/>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="/apps/forms/images/remove.gif" alt="Remove"/>
+                                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle"/>
+                                        </xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                             </td>
@@ -382,43 +372,34 @@
                     <tr>
                         <td>
                             <xforms:group ref="instance('triggers-instance')/remove-vehicle-address-trigger">
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:delete nodeset="instance('document-instance')//dmv:vehicle-address" at="last()"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle-address"/>
-                                    <xxforms:img src="/apps/forms/images/remove.gif"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/remove.gif" alt="Remove Vehicle Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/remove-vehicle-address"/>
+                                    </xforms:label>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="instance('document-instance')//dmv:vehicle-address" at="last()"/>
                                 </xforms:trigger>
                             </xforms:group>
-
                             <xforms:group ref="instance('triggers-instance')/clear-vehicle-address-trigger">
-                                <xforms:action ev:event="DOMActivate" >
-                                    <xforms:dispatch name="dmv-clear-vehicle-address" target="dmv-model"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
-                                    <xxforms:img src="/apps/forms/images/recycle-green.png"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/recycle-green.png" alt="Clear Vehicle Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/clear-address"/>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" name="dmv-clear-vehicle-address" target="dmv-model"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </td>
                         <td>
                             <xforms:group ref="instance('triggers-instance')/add-vehicle-address-trigger">
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert nodeset="instance('document-instance')//dmv:vehicle-information/dmv:leased-vehicles" at="last()" position="after"
-                                            origin="instance('vehicle-address-template')"/>
-                                </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle-address"/>
-                                    <xxforms:img src="/apps/forms/images/add.gif"/>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle-address"/>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/forms/images/add.gif" alt="Add Vehicle Address"/>
+                                        <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/add-vehicle-address"/>
+                                    </xforms:label>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="instance('document-instance')//dmv:vehicle-information/dmv:leased-vehicles"
+                                                   at="last()" position="after"
+                                                   origin="instance('vehicle-address-template')"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </td>

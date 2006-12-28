@@ -126,27 +126,25 @@
                                 <tr>
                                     <td>
                                         <xforms:group ref="instance('control-instance')/back-trigger">
-                                            <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
-                                            <xforms:trigger appearance="xxforms:image">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
-                                                <xxforms:img src="/apps/forms/images/back.gif"/>
-                                            </xforms:trigger>
-                                            <xforms:trigger appearance="xxforms:link">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label>
+                                                    <xhtml:img src="../../../apps/forms/images/back.gif" alt="Back"/>
+                                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
+                                                </xforms:label>
+                                                <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
                                             </xforms:trigger>
                                         </xforms:group>
                                     </td>
                                     <td>
-                                        <xforms:group ref="instance('control-instance')/save-trigger" id="testid1">
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:send submission="save-submission"/>
-                                            </xforms:action>
-                                            <xforms:trigger appearance="xxforms:image" id="testid2">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
-                                                <xxforms:img src="/apps/forms/images/save.gif"/>
-                                            </xforms:trigger>
-                                            <xforms:trigger appearance="xxforms:link" id="testid3">
-                                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
+                                        <xforms:group ref="instance('control-instance')/save-trigger">
+                                            <xforms:trigger appearance="minimal">
+                                                <xforms:label>
+                                                    <xhtml:img src="../../../apps/forms/images/save.gif" alt="Save"/>
+                                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
+                                                </xforms:label>
+                                                <xforms:action ev:event="DOMActivate">
+                                                    <xforms:send submission="save-submission"/>
+                                                </xforms:action>
                                             </xforms:trigger>
                                         </xforms:group>
                                     </td>

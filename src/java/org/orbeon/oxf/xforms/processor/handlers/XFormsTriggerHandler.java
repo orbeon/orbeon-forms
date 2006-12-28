@@ -92,8 +92,8 @@ public class XFormsTriggerHandler extends HandlerBase {
                 newAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
         }
 
-        if (appearance != null && XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance)) {
-            // Link appearance (xxforms:link)
+        if (appearance != null && (XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME.equals(appearance) || XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME.equals(appearance))) {
+            // Minimal or link appearance (xxforms:link)
 
             // TODO: probably needs f:url-norewrite="true"
             newAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "");

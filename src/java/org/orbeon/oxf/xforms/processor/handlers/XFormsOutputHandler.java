@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
@@ -22,23 +23,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
-import java.util.HashMap;
-
 /**
  * Handle xforms:output.
  */
 public class XFormsOutputHandler extends XFormsValueControlHandler {
-
-    private static final Map inlineParentsMap = new HashMap();
-    static {
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "label"), "");
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "hint"), "");
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "alert"), "");
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "help"), "");
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "message"), "");
-        inlineParentsMap.put(XMLUtils.buildExplodedQName(XFormsConstants.XFORMS_NAMESPACE_URI, "value"), "");
-    }
 
     private Attributes elementAttributes;
 
@@ -59,12 +47,20 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 ? null : (XFormsOutputControl) containingDocument.getObjectById(pipelineContext, effectiveId);
         final boolean isConcreteControl = xformsOutputControl != null;
 
-        // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within
-        // xforms:label|xforms:hint|xforms:alert|xforms:help|xforms:message|xforms:value, because in that case we don't
-        // put the control in the regular hierarchy of controls.
+        // Don't do anything when xforms:output is used as a "pseudo-control", that is when it is within a leaf control,
+        // because in that case we don't put the control in the regular hierarchy of controls.
         final String parentHandlerName = handlerContext.getController().getParentHandlerExplodedQName();
-        if (parentHandlerName != null && inlineParentsMap.get(parentHandlerName) != null)
-            return;
+        if (parentHandlerName != null) {
+            final String parentHandlerLocalname;
+            final int bracketIndex = parentHandlerName.indexOf("}");
+            if (bracketIndex != -1) {
+                parentHandlerLocalname = parentHandlerName.substring(bracketIndex + 1);
+            } else {
+                parentHandlerLocalname = parentHandlerName;
+            }
+            if (XFormsControls.isLeafControl(parentHandlerLocalname))
+                return;
+        }
 
         // xforms:label
         handleLabelHintHelpAlert(effectiveId, "label", xformsOutputControl);

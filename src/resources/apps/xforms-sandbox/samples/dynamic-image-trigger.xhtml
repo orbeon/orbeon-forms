@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xi="http://www.w3.org/2003/XInclude"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ui="http:/www.example.org/ui">
+
+    <xhtml:head>
+        <xhtml:title>Dynamic Image Trigger</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main-instance">
+                <main-instance>
+                    <button>
+                        <image>/ops/images/xforms/add.gif</image>
+                        <url>You have clicked the first trigger control</url>
+                    </button>
+                    <button>
+                        <image>/ops/images/xforms/remove.gif</image>
+                        <url>You have clicked the second trigger control</url>
+                    </button>
+                </main-instance>
+            </xforms:instance>
+        </xforms:model>
+        <xhtml:style type="text/css">
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <!-- Dynamic image via action support in xforms:output -->
+        <b>Case 1:</b> [won't work because DOMActivate is not fired on xforms:output]
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:repeat nodeset="instance('main-instance')/button">
+                        <xhtml:td width="150px">
+                            <xforms:output value="image" mediatype="image/*" xhtml:style="cursor:pointer">
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:message ref="url" level="modal"/>
+                                </xforms:action>
+                            </xforms:output>
+                        </xhtml:td>
+                    </xforms:repeat>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+        <br/>
+        <!-- Dynamic image via AVT support within xxforms:img -->
+        <b>Case 2:</b> [won't work because AVTs are not supported in xxforms:img]
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:repeat nodeset="instance('main-instance')/button">
+                        <xhtml:td>
+                            <xforms:trigger appearance="xxforms:image">
+                                <xforms:label>Image label</xforms:label>
+                                <xxforms:img src="{image}"/>
+                                <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                            </xforms:trigger>
+                        </xhtml:td>
+                    </xforms:repeat>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+        <br/>
+        <!-- Dynamic Image via mediatype support in xforms:output control within trigger's label -->
+        <b>Case 3:</b> [won't work, probably because of a bug]
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td>
+                    <xforms:repeat nodeset="instance('main-instance')/button">
+                        <xhtml:td>
+                            <xforms:trigger appearance="xxforms:link">
+                                <xforms:label><xforms:output ref="image" mediatype="image/*"/></xforms:label>
+                                <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                            </xforms:trigger>
+                        </xhtml:td>
+                    </xforms:repeat>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+        <!-- Dynamic image via text/html mediatype within label -->
+        <b>Case 4:</b> [should work!]
+        <xhtml:table>
+            <xhtml:tr>
+                <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xhtml:td>
+                        <xforms:trigger>
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xforms:repeat>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xhtml:td>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
+                            <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xforms:repeat>
+            </xhtml:tr>
+        </xhtml:table>
+
+    </xhtml:body>
+</xhtml:html>

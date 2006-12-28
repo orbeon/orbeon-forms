@@ -121,7 +121,8 @@
                     <widget:label>Test Samples</widget:label>
                     <xforms:setvalue ev:event="xforms-select" ref="action">download</xforms:setvalue>
                     <p>
-                        Please select an existing XForms test sample from the list:
+                        Please select one of the <xforms:output value="count(instance('samples-instance')/file)"/>
+                        existing XForms test samples from the list:
                     </p>
                     <xforms:group>
                         <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/sample/{sample}"/>
@@ -134,9 +135,8 @@
                                             <xforms:value/>
                                         </xforms:item>
                                         <xforms:itemset nodeset="instance('samples-instance')/file">
-                                            <!--<xforms:label><xforms:output value="if (ends-with(@name, '.xhtml')) then substring(@name, 1, string-length(@name) - 6) else @name"/></xforms:label>-->
-                                            <xforms:label><xforms:output value="@name"/></xforms:label>
-                                            <xforms:value ref="@name"/>
+                                            <xforms:label><xforms:output value="substring(@name, 1, string-length(@name) - 6)"/></xforms:label>
+                                            <xforms:value value="substring(@name, 1, string-length(@name) - 6)"/>
                                         </xforms:itemset>
                                     </xforms:select1>
                                 </td>

@@ -100,7 +100,10 @@ public class ServletContextExternalContext implements ExternalContext {
     }
 
     public String getRealPath(String path) {
-        throw new UnsupportedOperationException();
+        if (servletContext != null)
+            return servletContext.getRealPath(path);
+        else
+            return delegatingExternalContext.getRealPath(path);
     }
 
     public String getStartLoggerString() {

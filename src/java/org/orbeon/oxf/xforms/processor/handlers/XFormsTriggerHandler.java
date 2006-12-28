@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -101,7 +102,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "a");
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName, newAttributes);
-            contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+            XFormsUtils.streamHTMLFragment(contentHandler, labelValue, isConcreteControl ? xformsControl.getLocationData() : null, xhtmlPrefix);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", spanQName);
 
         } else if (appearance != null && XFormsConstants.XXFORMS_IMAGE_APPEARANCE_QNAME.equals(appearance)) {
@@ -147,7 +148,7 @@ public class XFormsTriggerHandler extends HandlerBase {
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "button");
             handleReadOnlyAttribute(newAttributes, containingDocument, xformsControl);
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName, newAttributes);
-            contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
+            XFormsUtils.streamHTMLFragment(contentHandler, labelValue, isConcreteControl ? xformsControl.getLocationData() : null, xhtmlPrefix);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "button", spanQName);
         }
 

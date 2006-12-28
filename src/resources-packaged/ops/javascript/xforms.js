@@ -509,8 +509,8 @@ ORBEON.xforms.Controls = {
                 // Image
                 control.alt = message;
             } else {
-                // Button and link
-                ORBEON.util.Dom.setStringValue(control, message);
+                // Link or button
+                control.innerHTML = message;
             }
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog

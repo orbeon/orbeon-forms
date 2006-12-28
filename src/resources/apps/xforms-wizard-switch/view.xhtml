@@ -45,6 +45,9 @@
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="xxforms:serialize(xxforms:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .wizard-td { background-color: rgb(252, 229, 182); font-size: 16pt }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('text')">
@@ -52,7 +55,7 @@
                 <xforms:case id="firstname" selected="true">
                     <xhtml:table cellpadding="3">
                         <xhtml:tr>
-                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">1</font></xhtml:td>
+                            <xhtml:td rowspan="3" class="wizard-td">1</xhtml:td>
                             <xhtml:td colspan="1"><b>Step 1 of 4</b></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
@@ -79,7 +82,7 @@
                 <xforms:case id="lastname">
                     <xhtml:table cellpadding="3">
                         <xhtml:tr>
-                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">2</font></xhtml:td>
+                            <xhtml:td rowspan="3" class="wizard-td">2</xhtml:td>
                             <xhtml:td colspan="1"><b>Step 2 of 4</b></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
@@ -107,13 +110,14 @@
                 <xforms:case id="age">
                     <xhtml:table cellpadding="3">
                         <xhtml:tr>
-                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">3</font></xhtml:td>
+                            <xhtml:td rowspan="3" class="wizard-td">3</xhtml:td>
                             <xhtml:td colspan="1"><b>Step 3 of 4</b></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
                                 <xforms:input ref="age" incremental="true">
                                     <xforms:label class="fixed-width">Age:</xforms:label>
+                                    <xforms:alert>Please enter a valid age.</xforms:alert>
                                     <xforms:action ev:event="xforms-valid">
                                         <xforms:setvalue ref="instance('control-instance')/finish/@readonly">true</xforms:setvalue>
                                     </xforms:action>
@@ -141,7 +145,7 @@
                 <xforms:case id="showinstance">
                     <xhtml:table cellpadding="3">
                         <xhtml:tr>
-                            <xhtml:td rowspan="3" style="background-color: rgb(252, 229, 182)"><font size="5">4</font></xhtml:td>
+                            <xhtml:td rowspan="3" class="wizard-td">4</xhtml:td>
                             <xhtml:td colspan="1"><b>Step 4 of 4</b></xhtml:td>
                         </xhtml:tr>
                         <xhtml:tr>

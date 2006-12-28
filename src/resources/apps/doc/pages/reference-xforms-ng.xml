@@ -953,7 +953,7 @@
                             </td>
                             <td>
                                 <xml-source border="false" show-namespaces="false">
-                                    <xforms:submit submission="main-submission" appearance="xxforms:link">
+                                    <xforms:submit submission="main-submission" appearance="minimal">
                                         <xforms:label>Submit</xforms:label>
                                     </xforms:submit>
                                 </xml-source>
@@ -969,9 +969,10 @@
                             </td>
                             <td>
                                 <xml-source border="false" show-namespaces="false">
-                                    <xforms:submit submission="main-submission" appearance="xxforms:image">
-                                        <xxforms:img src="images/submit.gif"/>
-                                        <xforms:label>Submit</xforms:label>
+                                    <xforms:submit submission="main-submission" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img src="images/submit.gif" alt="Submit"/>
+                                        </xforms:label>
                                     </xforms:submit>
                                 </xml-source>
                             </td>

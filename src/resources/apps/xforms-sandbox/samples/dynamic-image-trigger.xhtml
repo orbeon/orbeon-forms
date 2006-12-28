@@ -103,7 +103,7 @@
             <xhtml:tr>
                 <xforms:repeat nodeset="instance('main-instance')/button">
                     <xhtml:td>
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
                             <xforms:message ref="url" ev:event="DOMActivate" level="modal"/>
                         </xforms:trigger>

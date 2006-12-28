@@ -106,10 +106,10 @@
                 <xhtml:p>
                     <xhtml:i>Note:</xhtml:i> To select a list or to do, click on the list or to do description.
                 </xhtml:p>
-                <xhtml:table>
+                <xhtml:table class="todo-action-table">
                     <!-- Actions on list -->
                     <xhtml:tr>
-                        <xhtml:td class="actions-label">Current to-do list:</xhtml:td>
+                        <xhtml:th class="actions-label">Current to-do list:</xhtml:th>
                         <xhtml:td class="actions-list">
                             <!-- Edit description -->
                             <xforms:group ref="@ui:list-edit-trigger" class="actions-action" id="list-action-edit-group">
@@ -117,12 +117,8 @@
                                     <xforms:setvalue ref="/lists/list[index('list')]/@ui:mode" value="'edit'"/>
                                     <xforms:setfocus control="list-description-input"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="list-action-edit-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/edit.gif"/>
-                                    <xforms:label>Edit</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="list-action-edit-label">
-                                    <xforms:label>Edit</xforms:label>
+                                <xforms:trigger appearance="minimal" id="list-action-edit-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/edit.gif"/> Edit</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Create new list -->
@@ -132,12 +128,8 @@
                                         at="min((last(), index('list') + 1))" position="before"/>
                                     <xforms:setfocus control="list-description-input"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="list-action-new-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/add.gif"/>
-                                    <xforms:label>Add</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="list-action-new-label">
-                                    <xforms:label>New</xforms:label>
+                                <xforms:trigger appearance="minimal" id="list-action-new-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/add.gif"/> New</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Delete current list -->
@@ -147,19 +139,15 @@
                                     <xforms:setindex repeat="list"
                                         index="max((min((index('list'), count(/lists/list) - 1)), 1))"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="list-action-delete-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/remove.gif"/>
-                                    <xforms:label>Remove</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="list-action-delete-label">
-                                    <xforms:label>Delete</xforms:label>
+                                <xforms:trigger appearance="minimal" id="list-action-delete-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/remove.gif"/> Delete</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:td>
                     </xhtml:tr>
                     <!-- Actions on to do -->
                     <xhtml:tr>
-                        <xhtml:td class="actions-label">Current to do:</xhtml:td>
+                        <xhtml:th class="actions-label" rowspan="2">Current to do:</xhtml:th>
                         <xhtml:td class="actions-list">
                             <!-- Edit description -->
                             <xforms:group ref="@ui:todo-edit-trigger" class="actions-action" id="todo-action-edit-group">
@@ -167,12 +155,8 @@
                                     <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode" value="'edit'"/>
                                     <xforms:setfocus control="todo-description-input"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-edit-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/edit.gif"/>
-                                    <xforms:label>Edit</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-edit-label">
-                                    <xforms:label>Edit</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-edit-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/edit.gif"/> Edit</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Create new to do -->
@@ -182,12 +166,8 @@
                                         at="min((last(), index('todo') + 1))" position="before"/>
                                     <xforms:setfocus control="todo-description-input"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-new-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/add.gif"/>
-                                    <xforms:label>Add</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-new-label">
-                                    <xforms:label>New</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-new-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/add.gif"/> New</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Delete current to do -->
@@ -197,64 +177,48 @@
                                     <xforms:setindex repeat="todo"
                                         index="max((min((index('todo'), count(/lists/list[index('list')]/todo) - 1)), 1))"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-delete-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/remove.gif"/>
-                                    <xforms:label>Remove</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-delete-label">
-                                    <xforms:label>Delete</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-delete-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/remove.gif"/> Delete</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
+                        </xhtml:td>
+                    </xhtml:tr>
+                    <xhtml:tr>
+                        <xhtml:td>
                             <!-- Add due date -->
                             <xforms:group ref="@ui:add-due-trigger" class="actions-action" id="todo-action-add-group">
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"
                                     value="current-date()"/>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-add-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/date-add.gif"/>
-                                    <xforms:label>Add due date</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-add-label">
-                                    <xforms:label>Add due date</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-add-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/date-add.gif"/> Add due date</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Remove due date -->
                             <xforms:group ref="@ui:remove-due-trigger" class="actions-action" id="todo-action-remove-group">
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"/>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-remove-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/date-remove.gif"/>
-                                    <xforms:label>Remove due date</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-remove-label">
-                                    <xforms:label>Remove due date</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-remove-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/date-remove.gif"/> Remove due date</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Mark done -->
                             <xforms:group ref="@ui:mark-done-trigger" class="actions-action" id="todo-action-done-group">
                                 <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done" ev:event="DOMActivate">true</xforms:setvalue>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-done-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/mark-done.gif"/>
-                                    <xforms:label>Done</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-done-label">
-                                    <xforms:label>Done</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-done-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/mark-done.gif"/> Done</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                             <!-- Not done -->
                             <xforms:group ref="@ui:not-done-trigger" class="actions-action" id="todo-action-notdone-group">
                                 <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@done"/>
-                                <xforms:trigger appearance="xxforms:image" id="todo-action-notdone-image">
-                                    <xxforms:img src="/apps/xforms-todo/images/mark-undo.gif"/>
-                                    <xforms:label>Not done</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link" id="todo-action-notdone-label">
-                                    <xforms:label>Not done</xforms:label>
+                                <xforms:trigger appearance="minimal" id="todo-action-notdone-label">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/mark-undo.gif"/> Not done</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:td>
                     </xhtml:tr>
                     <!-- Actions on all lists -->
                     <xhtml:tr>
-                        <xhtml:td class="actions-label">All lists:</xhtml:td>
+                        <xhtml:th class="actions-label">All lists:</xhtml:th>
                         <xhtml:td class="actions-list">
                             <xforms:group class="actions-action">
                                 <xforms:action ev:event="DOMActivate">
@@ -262,12 +226,8 @@
                                     <xforms:setvalue ref="/lists/@ui:mode">view-xml</xforms:setvalue>
                                     <xforms:toggle case="view-xml"/>
                                 </xforms:action>
-                                <xforms:trigger appearance="xxforms:image">
-                                    <xxforms:img src="/apps/xforms-todo/images/view-xml.gif"/>
-                                    <xforms:label>View XML</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger appearance="xxforms:link">
-                                    <xforms:label>View XML</xforms:label>
+                                <xforms:trigger appearance="minimal">
+                                    <xforms:label><xhtml:img src="../apps/xforms-todo/images/view-xml.gif"/> View XML</xforms:label>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:td>
@@ -282,12 +242,8 @@
                         <xforms:setvalue ref="/lists/@ui:mode">edit</xforms:setvalue>
                         <xforms:toggle case="edit"/>
                     </xforms:action>
-                    <xforms:trigger appearance="xxforms:image">
-                        <xxforms:img src="/apps/xforms-todo/images/back.gif"/>
-                        <xforms:label>Back to editing</xforms:label>
-                    </xforms:trigger>
-                    <xforms:trigger appearance="xxforms:link">
-                        <xforms:label>Back to editing</xforms:label>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label><xhtml:img src="../apps/xforms-todo/images/back.gif"/> Back to editing</xforms:label>
                     </xforms:trigger>
                 </xforms:group>
                 <xhtml:div class="view-xml-container">
@@ -313,9 +269,8 @@
                                 </xforms:input>
                             </xforms:group>
                             <!-- Trigger to save description -->
-                            <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
-                                <xxforms:img src="/apps/xforms-todo/images/save.gif"/>
-                                <xforms:label>Save</xforms:label>
+                            <xforms:trigger appearance="minimal" ref="@ui:save-trigger">
+                                <xforms:label><xhtml:img src="../apps/xforms-todo/images/save.gif" alt="Save"/></xforms:label>
                             </xforms:trigger>
                             <!-- This catches both "enter" in the input and pressing the trigger -->
                             <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
@@ -332,17 +287,15 @@
                                 <!-- In progress icon -->
                                 <xforms:group ref="@ui:mark-done-trigger" class="todo-status">
                                     <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then 'true' else ." ev:event="DOMActivate"/>
-                                    <xforms:trigger appearance="xxforms:image">
-                                        <xxforms:img src="/apps/xforms-todo/images/status-in-progress.gif"/>
-                                        <xforms:label>In Progress</xforms:label>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label><xhtml:img src="../apps/xforms-todo/images/status-in-progress.gif" alt="In Progress"/></xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                                 <!-- Done icon -->
                                 <xforms:group ref="@ui:mark-not-done-trigger" class="todo-status">
                                     <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then '' else ." ev:event="DOMActivate"/>
-                                    <xforms:trigger appearance="xxforms:image">
-                                        <xxforms:img src="/apps/xforms-todo/images/status-done.gif"/>
-                                        <xforms:label>Done</xforms:label>
+                                    <xforms:trigger appearance="minimal">
+                                        <xforms:label><xhtml:img src="../apps/xforms-todo/images/status-done.gif" alt="Done"/></xforms:label>
                                     </xforms:trigger>
                                 </xforms:group>
                                 <!-- Position of current to do -->
@@ -361,9 +314,8 @@
                                         </xforms:input>
                                     </xforms:group>
                                     <!-- Trigger to save description -->
-                                    <xforms:trigger appearance="xxforms:image" ref="@ui:save-trigger">
-                                        <xxforms:img src="/apps/xforms-todo/images/save.gif"/>
-                                        <xforms:label>Save</xforms:label>
+                                    <xforms:trigger appearance="minimal" ref="@ui:save-trigger">
+                                        <xforms:label><xhtml:img src="../apps/xforms-todo/images/save.gif" alt="Save"/></xforms:label>
                                     </xforms:trigger>
                                     <!-- This catches both "enter" in the input and pressing the trigger -->
                                     <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>

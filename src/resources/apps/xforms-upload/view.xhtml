@@ -81,16 +81,15 @@
                 <td/>
                 <td>
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
-                        <xforms:trigger appearance="xxforms:image">
-                            <xforms:label>Add</xforms:label>
-                            <xxforms:img src="/apps/xforms-upload/images/add.gif"/>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label><xhtml:img src="../apps/xforms-upload/images/add.gif"/></xforms:label>
                             <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
                 <td>
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
-                        <xforms:trigger appearance="xxforms:link">
+                        <xforms:trigger appearance="minimal">
                             <xforms:label>Add One</xforms:label>
                             <xforms:insert ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
@@ -99,14 +98,13 @@
             </tr>
             <xforms:repeat nodeset="file" id="file-repeat">
                 <tr>
-                    <td>
+                    <td>    
                         <xforms:output value="count(preceding-sibling::file) + 1"/>
                     </td>
                     <td>
                         <xforms:group ref="instance('control-instance')/remove-upload-trigger">
-                            <xforms:trigger appearance="xxforms:image">
-                                <xforms:label>Remove</xforms:label>
-                                <xxforms:img src="/apps/xforms-upload/images/remove.gif"/>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label><xhtml:img src="../apps/xforms-upload/images/remove.gif"/></xforms:label>
                                 <xforms:delete ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="index('file-repeat')"/>
                             </xforms:trigger>
                         </xforms:group>

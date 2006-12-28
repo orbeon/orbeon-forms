@@ -109,6 +109,8 @@
     cursor: pointer;
 }
 
+.xforms-trigger-appearance-minimal img { border: 0 }
+
 .xforms-showcalendar {
     margin-left: .5em;
     background-image: url(../../ops/images/xforms/calendar.gif);

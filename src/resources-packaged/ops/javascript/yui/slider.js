@@ -1071,6 +1071,9 @@ YAHOO.extend(YAHOO.widget.SliderThumb, YAHOO.util.DD, {
     getXValue: function () {
         if (!this.available) { return 0; }
         var newOffset = this.getOffsetFromParent();
+        // avernet
+        if (isNaN(this.startOffset[0]))
+            this.startOffset = [0, 0];
         return (newOffset[0] - this.startOffset[0]);
     },
 

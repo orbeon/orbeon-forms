@@ -1322,7 +1322,7 @@ ORBEON.xforms.Init = {
         if (thumbDiv.nodeType != ELEMENT_TYPE) thumbDiv = thumbDiv.nextSibling;
         thumbDiv.id = range.id + XFORMS_SEPARATOR_1 + "thumb";
         var slider = YAHOO.widget.Slider.getHorizSlider(range.id, thumbDiv.id, 0, 200);
-        slider.onChange = ORBEON.xforms.Events.sliderValueChange;
+        slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
     },
 
     _tree: function(tree) {

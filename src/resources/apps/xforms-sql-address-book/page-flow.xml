@@ -15,12 +15,12 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <!-- XHTML+XForms page -->
-    <page path-info="/sql-address-book/" model="model.xpl" view="view.xhtml"/>
+    <page path-info="/xforms-sql-address-book/" model="model.xpl" view="view.xhtml"/>
 
     <!-- Services -->
-    <page path-info="/sql-address-book/add" model="service-add.xpl"/>
-    <page path-info="/sql-address-book/delete" model="service-delete.xpl"/>
-    <page path-info="/sql-address-book/get" view="service-get.xpl"/>
+    <page path-info="/xforms-sql-address-book/add" model="service-add.xpl"/>
+    <page path-info="/xforms-sql-address-book/delete" model="service-delete.xpl"/>
+    <page path-info="/xforms-sql-address-book/get" view="service-get.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

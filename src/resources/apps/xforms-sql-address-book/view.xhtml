@@ -41,9 +41,9 @@
                     <message>Read records</message>
                 </status>
             </xforms:instance>
-            <xforms:submission id="get-submission" ref="instance('main')" replace="instance" method="post" action="/sql-address-book/get"/>
-            <xforms:submission id="add-submission" ref="instance('add-instance')" replace="none" instance="main" method="post" action="/sql-address-book/add"/>
-            <xforms:submission id="delete-submission" ref="instance('delete-instance')" replace="none" instance="main" method="post" action="/sql-address-book/delete"/>
+            <xforms:submission id="get-submission" ref="instance('main')" replace="instance" method="post" action="/xforms-sql-address-book/get"/>
+            <xforms:submission id="add-submission" ref="instance('add-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/add"/>
+            <xforms:submission id="delete-submission" ref="instance('delete-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/delete"/>
             <xforms:send submission="get-submission" ev:event="xforms-ready"/>
         </xforms:model>
     </xhtml:head>

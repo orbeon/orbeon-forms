@@ -1,0 +1,120 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xhtml:head>
+        <xhtml:title>SQL Address Book</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="main">
+                <dummy/>
+            </xforms:instance>
+            <xforms:instance id="add-instance">
+                <form>
+                    <first/>
+                    <last/>
+                    <phone/>
+                </form>
+            </xforms:instance>
+            <xforms:instance id="delete-instance">
+                <form>
+                    <id/>
+                </form>
+            </xforms:instance>
+            <xforms:instance id="refresh-instance">
+                <form/>
+            </xforms:instance>
+            <xforms:instance id="status">
+                <status>
+                    <message>Read records</message>
+                </status>
+            </xforms:instance>
+            <xforms:submission id="get-submission" ref="instance('main')" replace="instance" method="post" action="/sql-address-book/get"/>
+            <xforms:submission id="add-submission" ref="instance('add-instance')" replace="none" instance="main" method="post" action="/sql-address-book/add"/>
+            <xforms:submission id="delete-submission" ref="instance('delete-instance')" replace="none" instance="main" method="post" action="/sql-address-book/delete"/>
+            <xforms:send submission="get-submission" ev:event="xforms-ready"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:table class="gridtable">
+            <xhtml:tr>
+                <xhtml:th>First Name</xhtml:th>
+                <xhtml:th>Last Name</xhtml:th>
+                <xhtml:th>Phone Number</xhtml:th>
+                <xhtml:th>Action</xhtml:th>
+            </xhtml:tr>
+            <xforms:repeat nodeset="friend" id="friendsRepeat">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:output ref="first"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="last"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="phone"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:trigger>
+                            <xforms:label>Remove</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="instance('delete-instance')/id" value="instance('main')/friend[index('friendsRepeat')]/id"/>
+                                <xforms:send submission="delete-submission"/>
+                                <xforms:send submission="get-submission"/>
+                                <xforms:setvalue ref="instance('status')/message">Deleted record</xforms:setvalue>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+            <xforms:group ref="instance('add-instance')">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:input ref="first"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:input ref="last"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:input ref="phone"/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:trigger>
+                            <xforms:label>Add</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:send submission="add-submission"/>
+                                <xforms:send submission="get-submission"/>
+                                <xforms:setvalue ref="instance('status')/message">Added record</xforms:setvalue>
+                                <xforms:setvalue ref="first"/>
+                                <xforms:setvalue ref="last"/>
+                                <xforms:setvalue ref="phone"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:group>
+        </xhtml:table>
+        <xhtml:p>
+            Status: <xforms:output ref="instance('status')/message"/>
+        </xhtml:p>
+        <xforms:trigger>
+            <xforms:label>Refresh</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:send submission="get-submission"/>
+                <xforms:setvalue ref="instance('status')/message">Read records</xforms:setvalue>
+            </xforms:action>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

@@ -38,17 +38,6 @@
         </p:input>
     </p:processor>
 
-    <!-- Make sure the address book table exist in the database -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="init-database.xpl"/>
-        <p:input name="required-tables">
-            <tables>
-                <table><name>oxf_address_book</name></table>
-            </tables>
-        </p:input>
-        <p:input name="init-pipeline" href="init-address-book.xpl"/>
-    </p:processor>
-
     <!-- Schedule a task -->
     <p:processor name="oxf:scheduler">
         <p:input name="config">

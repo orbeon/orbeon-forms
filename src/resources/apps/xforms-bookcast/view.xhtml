@@ -1,0 +1,230 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    <head>
+        <title>XForms Bookcast</title>
+        <xforms:model>
+
+            <!-- This is called when the XForms engine is ready -->
+            <xforms:action ev:event="xforms-ready">
+                <!-- Load list of books -->
+                <xforms:send submission="list-submission"/>
+            </xforms:action>
+
+            <!-- Instance that contains all the books -->
+            <xforms:instance id="books-instance">
+                <books xmlns="">
+                    <book>
+                        <title/>
+                        <author/>
+                        <language/>
+                        <link/>
+                        <rating/>
+                        <notes/>
+                        <!--<start-date/>-->
+                        <!--<end-date/>-->
+                    </book>
+                </books>
+            </xforms:instance>
+
+            <xforms:bind nodeset="instance('books-instance')/book">
+                <xforms:bind nodeset="title" required="true()"/>
+                <xforms:bind nodeset="author" required="true()"/>
+                <!--<xforms:bind nodeset="start-date | end-date" type="xs:date"/>-->
+            </xforms:bind>
+
+            <xforms:instance id="book-template">
+                <book xmlns="">
+                    <title/>
+                    <author/>
+                    <language/>
+                    <link/>
+                    <rating/>
+                    <notes/>
+                    <!--<start-date/>-->
+                    <!--<end-date/>-->
+                </book>
+            </xforms:instance>
+
+            <xforms:instance id="languages-instance">
+                <languages xmlns="">
+                    <language>
+                        <name>Choose one...</name>
+                        <value></value>
+                    </language>
+                    <language>
+                        <name>English</name>
+                        <value>en</value>
+                    </language>
+                    <language>
+                        <name>French</name>
+                        <value>fr</value>
+                    </language>
+                    <language>
+                        <name>Spanish</name>
+                        <value>es</value>
+                    </language>
+                </languages>
+            </xforms:instance>
+
+            <xforms:instance id="ratings-instance">
+                <ratings xmlns="">
+                    <rating>
+                        <name>None</name>
+                        <value></value>
+                    </rating>
+                    <rating>
+                        <name>1</name>
+                        <value>1</value>
+                    </rating>
+                    <rating>
+                        <name>2</name>
+                        <value>2</value>
+                    </rating>
+                    <rating>
+                        <name>3</name>
+                        <value>3</value>
+                    </rating>
+                    <rating>
+                        <name>4</name>
+                        <value>4</value>
+                    </rating>
+                    <rating>
+                        <name>5</name>
+                        <value>5</value>
+                    </rating>
+                </ratings>
+            </xforms:instance>
+
+            <!-- Submission to get the document containing all the books -->
+            <xforms:submission id="list-submission" serialize="false"
+                       method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                       replace="instance" instance="books-instance"/>
+
+            <!-- Submission to save the document containing all the books -->
+            <xforms:submission id="save-submission" ref="instance('books-instance')"
+                    action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                    method="put" replace="none"/>
+
+        </xforms:model>
+        <!-- CSS style specific to this page -->
+        <style type="text/css">
+            .xforms-label { font-weight: bold }
+            .xforms-textarea-appearance-xxforms-autosize { width: 20em; margin-bottom: 2px  }
+            .xforms-input input { width: 20em; margin-bottom: 2px }
+            .xforms-select1 { margin-bottom: 2px }
+            .xforms-select1 input { margin-bottom: 2px }
+            .xforms-select1-appearance-minimal { border: 1px solid #7f9db9; font-family: Arial,Helvetica,Geneva,sans-serif }
+            .books-table { background-color: #fce5b6 }
+            .books-table .add-td { width: 33em }
+            .books-table .form-td { width: 33em; background: white; padding: .5em }
+            .xforms-repeat-selected-item-1 .form-td { background: #ffc }
+            .books-action-table { margin-bottom: 1em }
+            .books-action-table td { white-space: nowrap; vertical-align: middle; padding-right: 1em }
+            .books-action-table .xforms-submit img { vertical-align: middle }
+            .books-action-table .xforms-trigger-appearance-minimal img { margin-right: 1em; vertical-align: middle }
+        </style>
+    </head>
+    <body>
+        <!-- This table contains the main actions for the page  -->
+        <table class="books-action-table">
+            <tr>
+                <td>
+                    <xforms:submit submission="save-submission" appearance="minimal">
+                        <xforms:label><xhtml:img src="../apps/xforms-todo/images/save.gif" alt="Save"/> Save</xforms:label>
+                    </xforms:submit>
+                </td>
+                <td>
+                    <xforms:submit submission="list-submission" appearance="minimal">
+                        <xforms:label><xhtml:img src="../apps/forms/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                    </xforms:submit>
+                </td>
+            </tr>
+        </table>
+
+        <!--  -->
+        <table class="books-table">
+            <tr>
+                <td>
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label><xhtml:img src="../apps/xforms-upload/images/add.gif"/></xforms:label>
+                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
+                    </xforms:trigger>
+                </td>
+                <td class="add-td">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label>Add One</xforms:label>
+                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
+                    </xforms:trigger>
+                </td>
+            </tr>
+            <xforms:repeat nodeset="book" id="book-repeat">
+                <tr>
+                    <td>
+                        <xforms:trigger appearance="minimal">
+                            <xforms:label><xhtml:img src="../apps/xforms-upload/images/remove.gif"/></xforms:label>
+                            <xforms:delete ev:event="DOMActivate" nodeset="instance('books-instance')/book" at="index('book-repeat')"/>
+                        </xforms:trigger>
+                    </td>
+                    <td class="form-td">
+                        <xforms:input ref="title">
+                            <xforms:label class="fixed-width">Title</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:input ref="author">
+                            <xforms:label class="fixed-width">Author</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:select1 ref="language">
+                            <xforms:label class="fixed-width">Language</xforms:label>
+                            <xforms:itemset nodeset="instance('languages-instance')/language">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                        <br/>
+                        <xforms:input ref="link">
+                            <xforms:label class="fixed-width">Link</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:select1 ref="rating" appearance="full">
+                            <xforms:label class="fixed-width">Rating</xforms:label>
+                            <xforms:itemset nodeset="instance('ratings-instance')/rating">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                        <br/>
+                        <xforms:textarea ref="notes" appearance="xxforms:autosize">
+                            <xforms:label class="fixed-width">Notes</xforms:label>
+                        </xforms:textarea>
+                        <!--<br/>-->
+                        <!--<xforms:input ref="start-date">-->
+                            <!--<xforms:label class="fixed-width">Start date</xforms:label>-->
+                        <!--</xforms:input>-->
+                        <!--<br/>-->
+                        <!--<xforms:input ref="end-date">-->
+                            <!--<xforms:label class="fixed-width">End date</xforms:label>-->
+                        <!--</xforms:input>-->
+                    </td>
+                </tr>
+            </xforms:repeat>
+        </table>
+    </body>
+</html>

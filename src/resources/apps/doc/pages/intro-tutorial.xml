@@ -15,7 +15,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
     <header>
         <title>Orbeon Forms Tutorial</title>
     </header>
@@ -23,7 +23,12 @@
         <section>
             <title>What is this?</title>
             <p>
-                This is the Orbeon Forms tutorial for Orbeon Forms version 3.5.
+                This is the tutorial for Orbeon Forms version 3.5.
+            </p>
+            <p>
+                If you have questions or issues with this tutorial, please send a message to the <code>ops-users</code>
+                mailing-list. It is easy to subscribe by following the instructions at <a
+                href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
             </p>
             <warning>
                 This tutorial is not complete yet!
@@ -37,19 +42,16 @@
                     Orbeon Forms is a solution to build and deploy web forms. For more information, please visit the
                     Orbeon home page at <a href="http://www.orbeon.com/">http://www.orbeon.com/</a>.
                 </p>
-                <p>
-                    If you have any issue with this tutorial, please use the <code>ops-users</code> mailing-list. It is
-                    easy to subscribe at <a
-                    href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
-                </p>
+
             </section>
             <section>
                 <title>Prerequisites</title>
                 <p>
                     To go through this tutorial, you don't need much: any reasonbly modern computer on which you can
-                    install Java 1.4.2 or later (1.5 strongly recommended) should do. You should be comfortable with
-                    installing new software on your computer, including uncompressing zip or gzip archives. You will
-                    also have to edit XML files. If you are familiar with HTML, this should not be a problem.
+                    install Java 1.5 (1.4.2 may work for you but 1.5 is strongly recommended) should do. You should be
+                    comfortable with installing new software on your computer, including uncompressing zip or gzip
+                    archives. You will also have to edit XML files. If you are familiar with HTML, this should not be a
+                    problem.
                 </p>
                 <p>
                     You will <i>not</i> have to write any Java code or any scripting language code. You will <i>not</i>
@@ -88,13 +90,13 @@
             <section>
                 <title>Downloading and Installing Java</title>
                 <p>
-                    Java provides the cross-platform environment in which Orbeon Forms works.
+                    Java provides the cross-platform environment in which Orbeon Forms runs.
                 </p>
                 <p>
                     If you don't have Java installed yet, download it from the Sun web site at <a
                     href="http://java.sun.com/javase/downloads/index.jsp">http://java.sun.com/javase/downloads/index.jsp</a>.
-                    Sun provides Windows, Linux and Solaris versions. If you use a Mac, you probably have Java already
-                    installed on your machine, but if not visit <a
+                    Sun provides Windows, Linux and Solaris versions. If you use a Mac with Mac OS X, you probably have
+                    Java already installed on your machine, but if not visit <a
                     href="http://www.apple.com/macosx/features/java/">http://www.apple.com/macosx/features/java/</a>.
                     Then follow the instructions to install Java.
                 </p>
@@ -148,7 +150,7 @@
                     </li>
                 </ol>
                 <note>
-                    We recommend using Tomcat for this tutorial, but Orbeon Forms can deploy into containers others
+                    We recommend using Tomcat for this tutorial, but Orbeon Forms can deploy into containers other
                     than Tomcat.
                 </note>
             </section>
@@ -174,10 +176,10 @@
                         <p>
                             Under <code>ORBEON_FORMS_HOME</code>, you will find a file called <code>ops.war</code>.
                             This is the file to deploy into Tomcat. To do so, just copy it under
-                            <code>TOMCAT_HOME/webapps/ops</code> (alternatively, if you know what you are doing, you
-                            can uncompress it at a location of your choice and configure a context in
+                            <code>TOMCAT_HOME/webapps</code> (alternatively, if you know what you are doing, you can
+                            uncompress it at a location of your choice and configure a context in
                             <code>TOMCAT_HOME/conf/server.xml</code>). The <code>webapps</code> directory is already
-                            present, but the <code>ops</code> directory needs to be created.
+                            present after you have installed Tomcat.
                         </p>
                     </li>
                 </ol>
@@ -236,7 +238,7 @@
                     what an Orbeon Forms application looks like. First, select <code>view.xhtml</code> to make the
                     source code for that file appear on the right:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="true">
                     <html xmlns="http://www.w3.org/1999/xhtml"
                           xmlns:xforms="http://www.w3.org/2002/xforms">
                         <head>
@@ -293,8 +295,8 @@
                     The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document is
                     encapsulatd within an <code>&lt;xforms:instance></code> tag:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance>
+                <xml-source show-namespaces="true">
+                    <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms">
                         <first-name xmlns=""/>
                     </xforms:instance>
                 </xml-source>
@@ -310,7 +312,7 @@
                     <code>&lt;xforms:input></code>:
                 </p>
                 <xml-source show-namespaces="false">
-                    <xforms:input ref="/first-name" incremental="true"/>
+                    <xforms:input ref="/first-name" incremental="true" xmlns:xforms="http://www.w3.org/2002/xforms"/>
                 </xml-source>
                 <p>
                     You guessed that this tag allows the user to <i>input</i> information.
@@ -370,9 +372,9 @@
                     </li>
                     <li>
                         <p>
-                            The <code>normalize-space()</code> function removes all leading and trailing space. This is
-                            a little trick to not only test whether the first name is empty, but also to test whether it
-                            contains all blank space.
+                            The <code>normalize-space()</code> function removes all leading and trailing space (and
+                            simplifies internal spaces as well). This is a little trick to not only test whether the
+                            first name is empty, but also to test whether it is an all-blank string.
                         </p>
                     </li>
                     <li>
@@ -383,7 +385,8 @@
                     </li>
                     <li>
                         <p>
-                           The <code>concat</code> function simply concatenates strings.
+                           The <code>concat</code> function concatenates all its parameters into a resulting string. It
+                           is like the JavaScript <code>+</code> operator on strings.
                         </p>
                     </li>
                     <li>
@@ -429,7 +432,7 @@
                 <p>
                     So now look at <code>page-flow.xml</code> for the Hello application. It is very simple:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="true">
                     <config xmlns="http://www.orbeon.com/oxf/controller">
                         <page path-info="*" view="view.xhtml"/>
                         <epilogue url="oxf:/config/epilogue.xpl"/>
@@ -442,15 +445,15 @@
                     <page path-info="*" view="view.xhtml"/>
                 </xml-source>
                 <p>
-                    It tells Orbeon Forms that any path (notice the wildcard <code>*</code>) received by the web
-                    browser in this application will cause the page view stored in <code>view.xhtml</code> to be
-                    processed. You can check this by entering the following path in your browser:
+                    It tells Orbeon Forms that any path (notice the wildcard <code>*</code>) sent by the web browser to
+                    this application will cause the page view stored in <code>view.xhtml</code> to be processed. You
+                    can check this by entering the following path in your browser:
                 </p>
                 <xml-source>
                     http://localhost:8080/ops/xforms-hello/my-page
                 </xml-source>
                 <p>
-                    The exact same page will display! Of course, page flows make the most sense when you have more than
+                    The exact same result will show! Of course, page flows make the most sense when you have more than
                     one page in your application, which translates into more than one <code>&lt;page></code> element.
                 </p>
             </section>
@@ -462,10 +465,9 @@
                     <code>resources</code> directory as <code>RESOURCES</code> below.
                 </p>
                 <p>
-                    The <code>RESOURCES</code> directory is a very important directory. This is where your
-                    applications will live. This directory is called "resources" because it contains all the files (or
-                    resources) such as XHTML documents, XML schemas, images, CSS, etc. needed by your Orbeon Forms
-                    application.
+                    The <code>RESOURCES</code> directory is very important: this is where your applications lives.
+                    This directory is called "resources" because it contains all the files (or resources) such as XHTML
+                    documents, XML schemas, images, CSS, etc. needed by your Orbeon Forms application.
                 </p>
                 <note>
                     Orbeon Forms is able to store your resources pretty much anywhere you want. For convenience, by
@@ -544,7 +546,7 @@
                             Renew the experience but add some XForms. For example, add a second
                             <code>&lt;xforms:input></code> right after the first one:
                         </p>
-                        <xml-source show-namespaces="false">
+                        <xml-source show-namespaces="true" xmlns:xforms="http://www.w3.org/2002/xforms">
                             <xforms:input ref="/first-name" incremental="true"/>
                             <xforms:input ref="/first-name" incremental="true"/>
                         </xml-source>
@@ -561,18 +563,570 @@
                     your page, and your changes are taken into account with no compilation or other complex deployment.
                 </p>
             </section>
+        </section>
+        <section>
+            <title>The Bookcast Application</title>
             <section>
-                <title></title>
+                <title>What is it?</title>
+                <p>
+                    The Bookcast application allows you to keep track of information about books you have read. For each
+                    book, you enter information such as title, author, language, and your own comments. The information
+                    is persisted so you can access it again. Then you can do cool things with the available data such
+                    create an Atom feed of your entries. [TODO: Screenshot]
+                </p>
+            </section>
+            <section>
+                <title>Getting Started</title>
+                <p>
+                    But first things first. Start by making a first functional page:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The first thing to do is to create a new directory for your application. Orbeon Forms
+                            already come with the complete <code>xforms-bookcast</code> application, so instead let's
+                            decice on another name, for example <code>my-bookcast</code>. Create a directory with that
+                            name as <code>RESOURCES/apps/my-bookcast</code>. For convenience, we refer to that new
+                            directory as the <code>BOOKCAST</code> directory below.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Create a <code>page-flow.xml</code> file under <code>BOOKCAST</code>:
+                        </p>
+                        <xml-source>
+                            <config xmlns="http://www.orbeon.com/oxf/controller">
+
+                                <page path-info="/my-bookcast/" view="view.xhtml"/>
+
+                                <epilogue url="oxf:/config/epilogue.xpl"/>
+
+                            </config>
+                        </xml-source>
+                        <p>
+                            This page flow is automatically called for any path that starts with
+                            <code>/ops/my-bookcast/</code>. Here, it matches on the exact path
+                            <code>/ops/my-bookcast/</code> and calls up the page view called <code>view.xhtml</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Create a skeleton for your <code>view.xhtml</code> under <code>BOOKCAST</code>:
+                        </p>
+                        <xml-source>
+                            <html xmlns="http://www.w3.org/1999/xhtml"
+                                  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                                  xmlns:xforms="http://www.w3.org/2002/xforms"
+                                  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                                  xmlns:ev="http://www.w3.org/2001/xml-events"
+                                  xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                                <head>
+                                    <title>XForms Bookcast</title>
+                                </head>
+                                <body>
+                                    <p>Hello!</p>
+                                </body>
+                            </html>
+                        </xml-source>
+                        <p>
+                            This is a very basic XHTML document. It features a title in the <code>&lt;head></code> and a
+                            "Hello!" message in the <code>&lt;body></code>/. It also declares a bunch of XML namespaces
+                            that we will need later in the document.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Now go to:
+                </p>
+                <xml-source>
+                    http://localhost:8080/ops/my-bookcast/
+                </xml-source>
+                <p>
+                    You should something like this: [TODO: screenshot]
+                </p>
+            </section>
+            <section>
+                <title>XForms Model and Instance</title>
+                <p>
+                    An XForms document that wants to do something useful needs at least one model and one instance. But
+                    first it is wise to decide how you would like to represent the information captured by your form.
+                    This is an example able to store the data of the Bookcast application:
+                </p>
+                <xml-source show-namespaces="false">
+                    <books xmlns="">
+                        <book>
+                            <title>xxx</title>
+                            <author></author>
+                            <language></language>
+                            <link></link>
+                            <rating></rating>
+                            <notes></notes>
+                        </book>
+                        <book>
+                            <title>xxx</title>
+                            <author></author>
+                            <language></language>
+                            <link></link>
+                            <rating></rating>
+                            <notes></notes>
+                        </book>
+                    </books>
+                </xml-source>
+                <p>
+                    The idea is to store all the book information in a single XML document. So under a top-level
+                    <code>&lt;books></code> element, we put as many <code>&lt;book></code> children elements as needed.
+                    You will see later how it is possible with XForms to add and remove children elements. For now, your
+                    initial instance declaration is empty and contains a single book:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="books-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <books xmlns="">
+                            <book>
+                                <title/>
+                                <author/>
+                                <language/>
+                                <link/>
+                                <rating/>
+                                <notes/>
+                                <!--<start-date/>-->
+                                <!--<end-date/>-->
+                            </book>
+                        </books>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    Notice the <code>id</code> attribute which allows other XForms contructs to refer to that particular
+                    instance.
+                </p>
+                <p>
+                    Now do the following:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Insert the instance under the <code>&lt;head></code> element.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Reload the page.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    You should still see a blank page, because so far you haven't added any visual elements!
+                </p>
+            </section>
+            <section>
+                <title>First Controls</title>
+                <p>
+                    Now it's time to add some visual controls to your page. Start with the following under the
+                    <code>&lt;body></code> element:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:group ref="book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:input ref="title">
+                            <xforms:label>Title</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:input ref="author">
+                            <xforms:label>Author</xforms:label>
+                        </xforms:input>
+                    </xforms:group>
+                </xml-source>
+                <p>
+                    Reload the page. You should seem something like this: [TODO: screenshot]
+                </p>
+                <p>
+                    After having looked at the Hello example, this should be clear, with a little novelty:
+                    <code>&lt;xforms:group></code>: this element allows grouping XForms controls together. The
+                    <code>ref="book"</code> element changes the current <i>evaluation context</i> for the nested
+                    controls, which means that they can use simpler XPath expressions: <code>ref="title"</code> instead
+                    of <code>ref="book/title"</code> and <code>ref="author"</code> instead of
+                    <code>ref="book/author"</code> (groups have other uses but you don't need to learn that now).
+                </p>
+                <p>
+                    Another thing: all XForms controls require a nested <code>&lt;xforms:label></code> element, as an
+                    effort to help accessibility. In some cases, you won't want an actual label to display next to the
+                    control: to achieve this, you can either hide the label with CSS, or use an empty label element
+                    (<code>&lt;xforms:label/></code>).
+                </p>
+            </section>
+            <section>
+                <title>Adding Constraints</title>
+                <p>
+                    Now say you want to make the title and author required data. You control this with the
+                    <code>&lt;xforms:bind></code> element in the XForms model. Add the following under
+                    <code>&lt;xforms:model></code> after your instance:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:bind nodeset="book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:bind nodeset="title" required="true()"/>
+                        <xforms:bind nodeset="author" required="true()"/>
+                    </xforms:bind>
+                </xml-source>
+                <p>
+                    Notice how, as you enter text in the title or author field, the field's background changes color to
+                    indicate that the field must be filled out: [TODO: screenshot]
+                </p>
+                <p>
+                    The above requires some explanations:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>&lt;xforms:bind></code> element is used to assign so-called <i>Model Item
+                            Properties</i> (or <i>MIPs</i>) to XForms instance nodes (typically XML elements or
+                            attributes). Such properties include whether a field is required, read-only, or visible;
+                            whether the field has to satisfy a certain constraint or be of a particular type; and
+                            whether the field is a calculated value.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Here we use the <code>required</code> attribute, which determines whether a field is, well,
+                            required, that is, whether it has to be filled out by the user.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Much like <code>&lt;xforms:group></code> in the controls, <code>&lt;xforms:bind></code>
+                            elements can be nested.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:bind></code> doesn't use a <code>ref</code> attribute to point to instance
+                            nodes, but a <code>nodeset</code> attribute, which allows pointing at more than one node
+                            using a single XPath expression.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The outer <code>&lt;xforms:bind></code> element points to the <code>&lt;book></code> element
+                            under the top-level <code>&lt;books></code> element of your instance. This happens because
+                            the evaluation context for a top-level XPath expression in an <code>&lt;xforms:bind></code>
+                            element is the root element of the first XForms instance. You could be more explicit, for
+                            example with:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:bind nodeset="/books/book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                                ...
+                            </xforms:bind>
+                        </xml-source>
+                        <p>
+                            Or with:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:bind nodeset="instance('books-instance')/book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                                ...
+                            </xforms:bind>
+                        </xml-source>
+                        <p>
+                            The latter makes it clear, with the XForms <code>instance()</code> function, that you are
+                            addressing the <code>books-instance</code> instance and not another instance, so you will
+                            probably tend to prefer that notation.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The inner <code>&lt;xforms:bind></code> elements apply the <i>required</i> MIP to the
+                            <code>&lt;title></code> and <code>&lt;author></code> elements. The <code>required</code>
+                            attribute must contain an XPath expression, which is why it contains <code>true()</code>
+                            (the way to express a Boolean "true" value in XPath) and not simply <code>true</code>.
+                            Using XPath expressions allows you to make MIPs dynamically change, so that, for example, a
+                            form field can be required or not depending on other form fields.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Note that MIPs are assigned to XML nodes, not directly to controls. But they affect the
+                            controls that are bound to those nodes. This is part of XForms's MVC philosophy.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Single Selection Controls</title>
+                <p>
+                    XForms is of course not limited to simple input controls. Add the following after the second
+                    <code>&lt;xforms:input></code> control:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:select1 ref="language" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:label>Language</xforms:label>
+                        <xforms:item>
+                            <xforms:label>Choose one...</xforms:label>
+                            <xforms:value></xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>English</xforms:label>
+                            <xforms:value>en</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>French</xforms:label>
+                            <xforms:value>fr</xforms:value>
+                        </xforms:item>
+                        <xforms:item>
+                            <xforms:label>Spanish</xforms:label>
+                            <xforms:value>es</xforms:value>
+                        </xforms:item>
+                    </xforms:select1>
+                </xml-source>
+                <p>
+                    Reload the page. You should see the following: [TODO: screenshot]
+                </p>
+                <p>
+                    You have just added a single selection control with <code>&lt;xforms:select1></code>. The name means
+                    that the user can "select one" item among several items. (XForms tends to call controls using more
+                    abstract terms, rather than giving them names such as "combo box" or "menu".) The single selection
+                    control usually appears like a drop-down menu or combo box with most XForms implementations (but you
+                    can change it's appearance as shown later).
+                </p>
+                <p>
+                    Nested within the control, you find several <code>&lt;xforms:item></code> elements. Each one
+                    creates an item in the drop-down menu. An item has to sides: the <code>&lt;xforms:label></code>
+                    element specifies the <i>label</i> that is presented to the user, and the
+                    <code>&lt;xforms:value></code> element specifies the <i>value</i> that is stored into the XForms
+                    instance when the user selects that particular item.
+                </p>
+                <p>
+                    Now XForms encourages you to store data in the model. For a selection control, this means storing
+                    the list of labels and values in an XForms instance instead of statically listing the items under
+                    the <code>&lt;xforms:select1></code> element. So let's do this! Create a new instance in the model:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="languages-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <languages xmlns="">
+                            <language>
+                                <name>Choose one...</name>
+                                <value></value>
+                            </language>
+                            <language>
+                                <name>English</name>
+                                <value>en</value>
+                            </language>
+                            <language>
+                                <name>French</name>
+                                <value>fr</value>
+                            </language>
+                            <language>
+                                <name>Spanish</name>
+                                <value>es</value>
+                            </language>
+                        </languages>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    Then modify the <code>&lt;xforms:select1></code> element as follows:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:select1 ref="language" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:label>Language</xforms:label>
+                        <xforms:itemset nodeset="instance('languages-instance')/language">
+                            <xforms:label ref="name"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xml-source>
+                <p>
+                    Notice the new <code>&lt;xforms:itemset></code> element instead of the <code>&lt;xforms:item></code>
+                    previously used. That element specifies an <i>item set</i>, which allows you to point to the list
+                    of <code>&lt;language></code> nodes in the <code>languages-instance</code> instance, and for each of
+                    those to tell the control where to find the label and the value.
+                </p>
+                <p>
+                    You often don't have to use an item set, but using them gives you the flexibility of reusing
+                    existing sets of data, dynamically changing the list of items, easing localization, etc.
+                </p>
+            </section>
+            <section>
+                <title>Adding a Text Area</title>
+                <p>
+                    Now add yet another control, a text area:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:textarea ref="notes" appearance="xxforms:autosize" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:label>Notes</xforms:label>
+                    </xforms:textarea>
+                </xml-source>
+                <p>
+                    The <code>&lt;xforms:textarea></code> element acts very much like the HTML <code>textarea</code>
+                    element. It makes sense to use it to allow entering more than one line of text.
+                </p>
+                <p>
+                    Here there is a little trick: you use the <code>appearance</code> attribute to tell Orbeon Forms to
+                    use a particular appearance for the text area control. Instead of the standard text area,
+                    <code>appearance="xxforms:autosize"</code> allows the text area to grow vertically as the user
+                    enters more text. (This is an appearance which is specific to Orbeon Forms, and you can tell that
+                    because of the <code>xxforms:</code> prefix in the appearance value.)
+                </p>
+                <p>
+                    Note that the application will capture the same data without the <code>appearance</code> attribute,
+                    it's just that the control will appear slightly differently and the user experience will be
+                    changed.
+                </p>
+            </section>
+            <section>
+                <title>Finishing-Up the Controls</title>
+                <p>
+                    To create the ratings input, add this new instance:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="ratings-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <ratings xmlns="">
+                            <rating>
+                                <name>None</name>
+                                <value></value>
+                            </rating>
+                            <rating>
+                                <name>1</name>
+                                <value>1</value>
+                            </rating>
+                            <rating>
+                                <name>2</name>
+                                <value>2</value>
+                            </rating>
+                            <rating>
+                                <name>3</name>
+                                <value>3</value>
+                            </rating>
+                            <rating>
+                                <name>4</name>
+                                <value>4</value>
+                            </rating>
+                            <rating>
+                                <name>5</name>
+                                <value>5</value>
+                            </rating>
+                        </ratings>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    And then add another <code>&lt;xforms:select1></code> control:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:select1 ref="rating" appearance="full" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:label class="fixed-width">Rating</xforms:label>
+                        <xforms:itemset nodeset="instance('ratings-instance')/rating">
+                            <xforms:label ref="name"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xml-source>
+                <p>
+                    Here again, you store the list of items as a separate instance. There is something new: the use of
+                    the <code>full</code> appearance, which displays the selection control as a list of radio buttons.
+                    This is a standard XForms appearance value, which is likely to be supported by all XForms
+                    implemementations. (You can tell that it is standard because there is no colon <code>:</code> in
+                    the appearance value.)
+                </p>
+                <p>
+                    The only missing control now is the input field bound to the <code>&lt;link></code> element. Add
+                    this, and you should have something like this in your controls:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:group ref="book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:input ref="title">
+                            <xforms:label class="fixed-width">Title</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:input ref="author">
+                            <xforms:label class="fixed-width">Author</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:select1 ref="language">
+                            <xforms:label class="fixed-width">Language</xforms:label>
+                            <xforms:itemset nodeset="instance('languages-instance')/language">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                        <br/>
+                        <xforms:input ref="link">
+                            <xforms:label class="fixed-width">Link</xforms:label>
+                        </xforms:input>
+                        <br/>
+                        <xforms:select1 ref="rating" appearance="full">
+                            <xforms:label class="fixed-width">Rating</xforms:label>
+                            <xforms:itemset nodeset="instance('ratings-instance')/rating">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                        <br/>
+                        <xforms:textarea ref="notes" appearance="xxforms:autosize">
+                            <xforms:label class="fixed-width">Notes</xforms:label>
+                        </xforms:textarea>
+                    </xforms:group>
+                </xml-source>
+                <p>
+                    By now you probably have the gist of it!
+                </p>
+            </section>
+            <section>
+                <title>Adding a Save Button</title>
+                <p>
+                    The Bookcast application now allows you to capture some data. But it is not a very useful
+                    application yet, because it doesn't do anything with it! So let's see how you can add a "Save"
+                    button that, once pressed, well, saves the data in your form.
+                </p>
+                <p>
+                    Many applications use relational databases as a persistence layer. But because Orbeon Forms and
+                    XForms use XML as their native data format, it is very appropriate to use a database that
+                    understands XML instead. Orbeon Forms comes with the eXist database that does just that.
+                </p>
+                <p>
+                    So how do you save data from XForms to a database? An important feature of XForms are submissions.
+                </p>
                 <p>
                     xxx
                 </p>
             </section>
-            <section>
-                <title>xxx</title>
-                <p>
-                    xxx
-                </p>
-            </section>
+            <!--<section>-->
+                <!--<title></title>-->
+                <!--<p>-->
+                    <!--xxx-->
+                <!--</p>-->
+            <!--</section>-->
+            <!--<section>-->
+                <!--<title></title>-->
+                <!--<p>-->
+                    <!--xxx-->
+                <!--</p>-->
+            <!--</section>-->
+            <!--<section>-->
+                <!--<title>xxx</title>-->
+                <!--<p>-->
+                    <!--xxx-->
+
+                    <!--* a note about how OF works: look at source code in browser-->
+                    <!--* show example of OF error-->
+                    <!--* note about how this relates to HTML forms-->
+                <!--</p>-->
+                <!--<ul>-->
+                    <!--<li>-->
+                        <!--<p>-->
+
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+
+                        <!--</p>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</section>-->
         </section>
     </body>
 </document>

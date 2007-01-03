@@ -110,6 +110,7 @@
 }
 
 .xforms-trigger-appearance-minimal img { border: 0 }
+.xforms-submit-appearance-minimal img { border: 0 }
 
 .xforms-showcalendar {
     margin-left: .5em;
@@ -127,11 +128,24 @@
     display: none;
 }
 
+.xforms-textarea {
+    border: 1px solid #7f9db9; font-family: Arial,Helvetica,Geneva,sans-serif
+}
+
+.xforms-secret {
+    border: 1px solid #7f9db9
+}
+
 .xforms-textarea-appearance-xxforms-autosize {
-    font-size: 11px;
     width: 100%;
     overflow: hidden;
 }
+
+.xforms-select1-appearance-full input { vertical-align: middle }
+.xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
+
+.xforms-select-appearance-full input { vertical-align: middle }
+.xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
 
 .xforms-range-background {
     position: relative;
@@ -206,7 +220,7 @@
 
 .xforms-input input {
     border: 1px solid #7f9db9;
-    padding-bottom: 3px;
+    padding-bottom: 2px;
     padding-left: 1px;
     padding-right: 1px;
 }
@@ -214,7 +228,7 @@
 .xforms-required-empty input, textarea.xforms-required-empty, input.xforms-required-empty {
     border: 1px solid #f99;
     background: #fcc;
-    padding-bottom: 3px;
+    padding-bottom: 2px;
     padding-left: 1px;
     padding-right: 1px;
 }

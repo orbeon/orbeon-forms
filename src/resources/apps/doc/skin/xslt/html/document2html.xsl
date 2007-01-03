@@ -11,7 +11,7 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:include href = "split.xsl"/>
     <xsl:include href = "oxf:/ops/utils/formatting/xml-formatting.xsl"/>
@@ -183,7 +183,7 @@
     <xsl:template match="xml-source">
         <p ><div style="margin-bottom: 1em" class="code">
             <xsl:apply-templates mode="xml-formatting">
-                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')"/>
+                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
             </xsl:apply-templates>
         </div></p>
     </xsl:template>

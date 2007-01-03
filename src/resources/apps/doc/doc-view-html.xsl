@@ -218,7 +218,7 @@
         <xhtml:p><xhtml:div style="margin-bottom: 1em; clear: right">
             <xsl:attribute name="class" select="if (@border = 'false') then 'code' else 'code bordered'"/>
             <xsl:apply-templates mode="xml-formatting">
-                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')"/>
+                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
             </xsl:apply-templates>
         </xhtml:div></xhtml:p>
     </xsl:template>

@@ -251,7 +251,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsSelect1Control);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsSelect1Control, appearance);
 
             if (isOpenSelection)
                 classes.append(" xforms-select1-open");

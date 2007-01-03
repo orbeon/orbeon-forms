@@ -243,6 +243,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
+        return getInitialClasses(controlName, controlAttributes, xformsControl, null);
+    }
+
+    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance) {
 
         // Control name
         final StringBuffer sb;
@@ -265,7 +269,9 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
         {
             // Class for appearance
-            final QName appearance = getAppearance(controlAttributes);
+            if (appearance == null)
+                appearance = getAppearance(controlAttributes);
+            
             if (appearance != null) {
                 if (sb.length() > 0)
                     sb.append(' ');

@@ -26,17 +26,13 @@
 
     <!-- Empty element -->
     <xsl:template match="*[not(node())]" name="format-empty-element" mode="xml-formatting">
-        <xsl:param name="show-namespaces" select="true()"/>
         <span class="rd">
             <xsl:text>&#160;&#160;</xsl:text>
-            <xsl:call-template name="format-empty-element-inline">
-                <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
-            </xsl:call-template>
+            <xsl:call-template name="format-empty-element-inline"/>
         </span>
     </xsl:template>
 
     <xsl:template match="*[not(node())]" name="format-empty-element-inline" mode="xml-formatting-inline">
-        <xsl:param name="show-namespaces" select="true()"/>
         <!-- Element -->
         <font color="{$symbol-color}"><xsl:text>&lt;</xsl:text></font>
         <xsl:call-template name="display-element-name">
@@ -45,24 +41,19 @@
         <xsl:call-template name="display-element-attributes">
             <xsl:with-param name="name" select="name()"/>
             <xsl:with-param name="attributes" select="@*"/>
-            <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
         </xsl:call-template>
         <font color="{$symbol-color}"><xsl:text>/&gt;</xsl:text></font>
     </xsl:template>
 
     <!-- Short text-only element -->
     <xsl:template match="*[text() and not(* | processing-instruction() | comment()) and string-length(.) &lt;= 50]" mode="xml-formatting">
-        <xsl:param name="show-namespaces" select="true()"/>
         <span class="rd">
             <xsl:text>&#160;&#160;</xsl:text>
-            <xsl:call-template name="format-short-text-element-inline">
-                <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
-            </xsl:call-template>
+            <xsl:call-template name="format-short-text-element-inline"/>
         </span>
     </xsl:template>
 
     <xsl:template match="*[text() and not(* | processing-instruction() | comment()) and string-length(.) &lt;= 50]" name="format-short-text-element-inline" mode="xml-formatting-inline">
-        <xsl:param name="show-namespaces" select="true()"/>
         <!-- Element start -->
         <font color="{$symbol-color}"><xsl:text>&lt;</xsl:text></font>
         <xsl:call-template name="display-element-name">
@@ -71,7 +62,6 @@
         <xsl:call-template name="display-element-attributes">
             <xsl:with-param name="name" select="name()"/>
             <xsl:with-param name="attributes" select="@*"/>
-            <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
         </xsl:call-template>
         <font color="{$symbol-color}"><xsl:text>&gt;</xsl:text></font>
         <!-- Nested contents -->
@@ -90,7 +80,6 @@
     <xsl:template match="*[text() and * and string-length(normalize-space(text()[1])) > 0
                            and not(descendant-or-self::comment()
                            and not(descendant-or-self::processing-instruction()))]" mode="xml-formatting">
-        <xsl:param name="show-namespaces" select="true()"/>
         <xsl:choose>
             <xsl:when test="*/node()/node()">
                 <!-- If it's too deep, do regular processing -->
@@ -100,7 +89,6 @@
                 <!-- Try cool layout -->
                 <xsl:call-template name="format-regular-element">
                     <xsl:with-param name="mode" select="'xml-formatting-inline'"/>
-                    <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
@@ -109,7 +97,6 @@
     <!-- Regular element -->
     <xsl:template match="*" name="format-regular-element" mode="xml-formatting">
         <xsl:param name="mode"/>
-        <xsl:param name="show-namespaces" select="true()"/>
         <xsl:variable name="element" select="."/>
         <xsl:variable name="name" select="name()"/>
         <span class="cd">
@@ -123,7 +110,6 @@
             <xsl:call-template name="display-element-attributes">
                 <xsl:with-param name="name" select="name()"/>
                 <xsl:with-param name="attributes" select="@*"/>
-                <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
             </xsl:call-template>
             <!-- Close element start -->
             <font color="{$symbol-color}">
@@ -133,14 +119,10 @@
             <span class="id">
                 <xsl:choose>
                     <xsl:when test="$mode = 'xml-formatting-inline'">
-                        <xsl:apply-templates mode="xml-formatting-inline">
-                            <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
-                        </xsl:apply-templates>
+                        <xsl:apply-templates mode="xml-formatting-inline"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:apply-templates mode="xml-formatting">
-                            <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
-                        </xsl:apply-templates>
+                        <xsl:apply-templates mode="xml-formatting"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </span>
@@ -158,7 +140,6 @@
 
     <xsl:template match="*" mode="xml-formatting-inline">
         <xsl:param name="mode"/>
-        <xsl:param name="show-namespaces" select="true()"/>
         <xsl:variable name="element" select="."/>
         <xsl:variable name="name" select="name()"/>
         <span class="cd">
@@ -174,9 +155,7 @@
             <!-- Close element start -->
             <font color="{$symbol-color}"><xsl:text>&gt;</xsl:text></font>
             <!-- Nested contents -->
-            <xsl:apply-templates mode="xml-formatting-inline">
-                <xsl:with-param name="show-namespaces" select="$show-namespaces"/>
-            </xsl:apply-templates>
+            <xsl:apply-templates mode="xml-formatting-inline"/>
             <!-- Close element -->
             <span class="c">
                 <font color="{$symbol-color}"><xsl:text>&lt;/</xsl:text></font>
@@ -190,7 +169,6 @@
 
     <!-- Regular text node -->
     <xsl:template match="text()" name="format-text" mode="xml-formatting">
-        <xsl:param name="show-namespaces" select="true()"/>
         <span class="c">
             <xsl:choose>
                 <xsl:when test="normalize-space(.) = ''"/>
@@ -207,12 +185,10 @@
     </xsl:template>
 
     <xsl:template match="text()" mode="xml-formatting-inline">
-        <xsl:param name="show-namespaces" select="true()"/>
         <xsl:call-template name="format-text"/>
     </xsl:template>
 
     <xsl:template match="comment" mode="xml-formatting" priority="2">
-        <xsl:param name="show-namespaces" select="true()"/>
         <span class="rd">
             <font color="{$comment-color}">
                 <xsl:text>&#160;&#160;&lt;!-- </xsl:text>
@@ -223,7 +199,6 @@
     </xsl:template>
 
     <xsl:template match="comment() | processing-instruction()" mode="xml-formatting">
-        <xsl:param name="show-namespaces" select="true()"/>
         <font color="black"><xsl:value-of select="."/></font>
     </xsl:template>
 
@@ -244,7 +219,7 @@
     <xsl:template name="display-element-attributes">
         <xsl:param name="name"/>
         <xsl:param name="attributes"/>
-        <xsl:param name="show-namespaces" select="true()"/>
+        <xsl:param name="show-namespaces" select="true()" tunnel="yes"/>
         <!-- Display attributes -->
         <xsl:for-each select="$attributes">
             <xsl:text> </xsl:text>
@@ -269,17 +244,32 @@
             </font>
         </xsl:for-each>
         <!-- Check for namespaces -->
-        <xsl:if test="$show-namespaces and contains($name, ':')">
-            <xsl:variable name="prefix" select="substring-before($name, ':')"/>
-            <xsl:variable name="same-prefix-ancestors" select="ancestor::*[starts-with(name(), concat($prefix, ':'))]"/>
-            <xsl:if test="not($same-prefix-ancestors)">
+        <xsl:if test="$show-namespaces">
+            <!-- We can't know for sure what namespaces are actually newly declared on an element, so we use instead the
+                 namespaces in scope except if the namespace was already decared on a parent element -->
+            <xsl:variable name="current-element" select="."/>
+            <xsl:variable name="namespace-nodes"
+                          select="namespace::*[name() != 'xml' and not(. = $current-element/ancestor::*/namespace::*)]"/>
+
+            <xsl:for-each select="$namespace-nodes">
                 <xsl:text> </xsl:text>
-                <font color="{$attribute-name-color}"><xsl:value-of select="concat('xmlns:', $prefix)"/></font>
-                <xsl:text>=&quot;</xsl:text>
-                <font color="{$attribute-value-color}"><xsl:value-of select="namespace-uri()"/></font>
-                <xsl:text>&quot;</xsl:text>
-            </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="name() = ''">
+                        <font color="{$attribute-name-color}">xmlns</font>
+                        <xsl:text>=&quot;</xsl:text>
+                        <font color="{$attribute-value-color}"><xsl:value-of select="."/></font>
+                        <xsl:text>&quot;</xsl:text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <font color="{$attribute-name-color}"><xsl:value-of select="concat('xmlns:', name())"/></font>
+                        <xsl:text>=&quot;</xsl:text>
+                        <font color="{$attribute-value-color}"><xsl:value-of select="."/></font>
+                        <xsl:text>&quot;</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
         </xsl:if>
+
     </xsl:template>
 
 </xsl:stylesheet>

@@ -15,9 +15,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<document>
     <header>
         <title>Introduction to the XML Pipeline Definition Language (XPL)</title>
     </header>
@@ -137,7 +135,7 @@
                 below:
             </p>
             <xml-source>
-                <p:config>
+                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">
                     <p:param type="input" name="data"/>
                     <p:param type="input" name="foo"/>
                     <p:param type="output" name="bar"/>
@@ -247,8 +245,8 @@
                 The following example feeds an XSLT processor with an inline document and an
                 external stylesheet.
             </p>
-            <xml-source>
-                <p:processor name="oxf:xslt">
+            <xml-source show-namespaces="false">
+                <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                     <p:input name="config" href="stylesheet.xsl"/>
                     <p:input name="data" schema-href="oxf:/address-book-schema.xml">
                         <address-book>
@@ -311,8 +309,8 @@
                 processors depending on a specific condition. The general syntax for this is very
                 close to XSLT:
             </p>
-            <xml-source>
-                <p:choose href="#condition-document">
+            <xml-source show-namespaces="false">
+                <p:choose href="#condition-document" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                     <p:when test="first-condition">...</p:when>
                     <p:when test="second-condition">...</p:when>
                     <p:otherwise>...</p:otherwise>
@@ -625,8 +623,8 @@
                 <p>
                     Consider the following XSLT processor instance in a pipeline:
                 </p>
-                <xml-source>
-                    <p:processor name="oxf:xslt">
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <p:input name="config" href="stylesheet.xsl"/>
                         <p:input name="data" schema-href="oxf:/address-book-schema.xml">
                             <address-book>
@@ -657,7 +655,7 @@
                     There are other ways to connect inputs, for example:
                 </p>
                 <xml-source>
-                    <p:config>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <comment> Pipeline input called "my-input" </comment>
                         <p:param name="my-input" type="input"/>
                         <comment> First XSLT transformation </comment>
@@ -695,7 +693,7 @@
                     processor output can also be connected to a pipeline output, as follows:
                 </p>
                 <xml-source>
-                    <p:config>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <comment> Pipeline input called "my-input" </comment>
                         <p:param name="my-input" type="input"/>
                         <comment> Pipeline output called "my-output" </comment>
@@ -749,8 +747,8 @@
                     processor declares an optional <code>datasource</code> input. If the
                     <code>datasource</code> input is needed by the user, it must be connected:
                 </p>
-                <xml-source>
-                    <p:processor name="oxf:sql">
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:sql" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <p:input name="datasource" href="my-datasource.xml"/>
                         <p:input name="data" href="#some-data"/>
                         <p:input name="config">
@@ -765,8 +763,8 @@
                     external datasource document, she can simply not connect the
                     <code>datasource</code> input:
                 </p>
-                <xml-source>
-                    <p:processor name="oxf:sql">
+                <xml-source show-namespaces="false">
+                    <p:processor name="oxf:sql" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <p:input name="data" href="#some-data"/>
                         <p:input name="config">
                             <config>

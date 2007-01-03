@@ -33,11 +33,8 @@
                 <xforms:send submission="countries-submission"/>
                 <xforms:setfocus control="age-input-control"/>
             </xforms:action>
-            <!-- Here we illustrate how an XForms instance can be included with XInclude -->
-            <xforms:instance id="instance">
-                <xi:include href="main-xforms-instance.xml" xxi:omit-xml-base="true"/>
-            </xforms:instance>
-            <!-- Here we illustrate how an XForms instance can be included with the @src attribute -->
+            <!-- Here we illustrate how XForms instances can be included with the @src attribute -->
+            <xforms:instance id="instance" src="oxf:/apps/xforms-controls/main-xforms-instance.xml"/>
             <xforms:instance id="resources-packaged" src="oxf:/apps/xforms-controls/resources.xml"/>
             <xforms:instance id="items">
                 <items>

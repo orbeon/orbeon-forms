@@ -14,10 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<document>
     <header>
         <title>Page Flow Controller</title>
     </header>
@@ -455,7 +452,7 @@
                     If you wish to submit an XForms instance to this page from within
                     <code>report-detail-view.xsl</code>, create an XForms submission as follows:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
                     <xforms:submission id="main" method="post" action="/report/detail"/>
                 </xml-source>
                 <p>
@@ -481,7 +478,7 @@
                         You can also directly submit to another page by specifying a different
                         action, for example:
                     </p>
-                    <xml-source>
+                    <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:submission id="main" method="post" action="/report/summary"/>
                     </xml-source>
                     <p>
@@ -572,7 +569,7 @@
                     document, as follows:
                 </p>
                 <xml-source>
-                    <null xsi:nil="true"/>
+                    <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
                 </xml-source>
             </section>
             <a name="url-extraction"/>
@@ -920,7 +917,7 @@
                                         submission, a "null" document is available instead:
                                     </p>
                                     <xml-source>
-                                        <null xsi:nil="true"/>
+                                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
                                     </xml-source>
                                 </li>
                                 <li>
@@ -931,7 +928,7 @@
                                         function. If there is no action result, a "null" document is available instead:
                                     </p>
                                     <xml-source>
-                                        <null xsi:nil="true"/>
+                                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
                                     </xml-source>
                                 </li>
                                 <li>
@@ -990,7 +987,7 @@
                     <xml-source>
                         <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">
                             <result page="detail" transform="oxf:xslt">
-                                <form xsl:version="2.0" xmlns="">
+                                <form xsl:version="2.0" xmlns="" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                                     <document-id><xsl:value-of select="doc('input:action')/document-info/document-id"/></document-id>
                                     <document><xsl:copy-of select="doc('input:action')/document-info/document/*"/></document>
                                 </form>
@@ -1228,7 +1225,7 @@
                     <page id="source" path-info="/">
                         <action>
                             <result page="destination" transform="oxf:xslt">
-                                <form xsl:version="2.0">
+                                <form xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                                     <username>orbeon</username>
                                     <blog-id>12345</blog-id>
                                 </form>

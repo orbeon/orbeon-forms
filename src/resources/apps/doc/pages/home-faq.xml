@@ -15,10 +15,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xu="http://www.xmldb.org/xupdate">
+<document>
     <header>
         <title>Orbeon Forms FAQ</title>
     </header>
@@ -335,7 +332,7 @@
                     later, make sure that you have the correct submission method and encoding in your XForms model:
                 </p>
                 <p>
-                    <xml-source>
+                    <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:submission method="post" encoding="multipart/form-data"/>
                     </xml-source>
                 </p>
@@ -645,7 +642,7 @@
                     It is possible by importing the stylesheet within another
                     stylesheet, as follows:
                 </p>
-                <xml-source show-namespaces="false">
+                <xml-source show-namespaces="true">
                     <p:processor name="oxf:xslt" xmlns:p="http://www.orbeon.com/oxf/pipeline">
                         <p:input name="data" href="..."/>
                         <p:input name="config">
@@ -1149,7 +1146,7 @@
                     instance being modified (instance of target page), the current instance, and
                     the output of the action pipeline:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false" xmlns:xu="http://www.xmldb.org/xupdate">
                     <xu:message>Instance of target page before XUpdate: <xu:copy-of select="/*"/></xu:message>
                     <xu:message>Instance of this page: <xu:copy-of select="doc('oxf:instance')/*"/></xu:message>
                     <xu:message>Action output: <xu:copy-of select="doc('oxf:action')/*"/></xu:message>
@@ -1157,7 +1154,7 @@
                 <p>
                     Then as the very last instruction in the XUpdate code, add:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false" xmlns:xu="http://www.xmldb.org/xupdate">
                     <xu:message>Instance of target page after XUpdate: <xu:copy-of select="/*"/></xu:message>
                 </xml-source>
             </section>

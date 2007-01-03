@@ -31,7 +31,7 @@
 
     <xsl:template match="f:xml-source">
         <xsl:apply-templates mode="xml-formatting">
-            <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')"/>
+            <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
         </xsl:apply-templates>
     </xsl:template>
 

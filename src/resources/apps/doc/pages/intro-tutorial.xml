@@ -1061,7 +1061,7 @@
                     </xforms:group>
                 </xml-source>
                 <p>
-                    By now you probably have the gist of it!
+                    By now you probably get the gist of it!
                 </p>
             </section>
             <section>
@@ -1077,56 +1077,473 @@
                     understands XML instead. Orbeon Forms comes with the eXist database that does just that.
                 </p>
                 <p>
-                    So how do you save data from XForms to a database? An important feature of XForms are submissions.
+                    So how do you save data from XForms to a database? An important feature of XForms is the submission.
+                    A submission allows you to read and write XML documents using HTTP and other protocols. Since the
+                    eXist database has a REST API (in other words an HTTP-friendly interface), XForms can directly talk
+                    to eXist to read and write XML documents.
                 </p>
+                <p>
+                    So look at how you create a submission that saves the <code>books-instance</code> instance into
+                    eXist:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submission id="save-submission" ref="instance('books-instance')"
+                        action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                        method="put" replace="none" xmlns:xforms="http://www.w3.org/2002/xforms"/>
+                </xml-source>
+                <p>
+                    Let's look at the details:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>&lt;xforms:submission></code> element declares a submission.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            As usual, the <code>id</code> attribute allows referring to the submission from other XForms
+                            constructs.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>ref</code> attribute specifies what piece of XML must be handled by the
+                            submission. It points to an instance node with an XPath expression. Here, we point to the
+                            whole <code>books-instance</code> instance by using the <code>instance()</code> function.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>action</code> attribute specifies to what URL the submission takes place. Here,
+                            you use an absolute path:
+                        </p>
+                        <xml-source>
+                            /exist/rest/db/orbeon/xforms-bookcast/books.xml
+                        </xml-source>
+                        <p>
+                            This path is equivalent to  using the absolute URL:
+                        </p>
+                        <xml-source>
+                            http://localhost:8080/ops/exist/rest/db/orbeon/xforms-bookcast/books.xml
+                        </xml-source>
+                        <p>
+                            (Because it is inconvenient for you to always write absolute URLs when you want to address
+                            an URL handle by Orbeon Forms, Orbeon Forms automatically resolves absolute paths against
+                            the base <code>http://localhost:8080/ops/</code>.)
+                        </p>
+                        <p>
+                            The paths starts with <code>/exist/rest/</code>, which maps to the built-in eXist database.
+                            The rest of the path (<code>/db/orbeon/xforms-bookcast/books.xml</code>) specifies the
+                            <i>collection</i> and <code>document</code> to access. Here, we decide to save the data to a
+                            document called <code>books</code> within a collection called
+                            <code>/db/orbeon/xforms-bookcast/</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>method</code> attribute specifies what HTTP method to use. Here, you use the value
+                            <code>put</code>, which translates into using the HTTP PUT method. (You may not be very
+                            familiar with the PUT method (HTML forms, for example, always use GET and POST), but PUT is
+                            getting used more and more with REST interfaces. In just a few words, PUT allows you to
+                            store a resource to a particular location on an HTTP server.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Finally, the <code>replace</code> attribute specifies what to do with the response sent by
+                            the server (here the server is the eXist database). Specifying a value of <code>none</code>
+                            tells the XForms engine to discard the content of the response from the database.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    This is great, but specifying a submission will not do anything until you <i>send</i> (execute)
+                    that submission. A simple way to do this is to use the submit control:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submit submission="save-submission" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:label>Save</xforms:label>
+                    </xforms:submit>
+                </xml-source>
+                <p>
+                    This control has a <code>submission</code> attribute which specifies what submission to send. The
+                    control typically looks like a push button, into which the specified label will appear. Pressing it
+                    will automatically send the submission specified.
+                </p>
+                <p>
+                    So go ahead:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                             Add the submit control just before the <code>&lt;xforms:group></code> element.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Add the submission to the model.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Reload the page.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Enter a book title and an author, then press the "Save" button. Your form data has been
+                            silently saved to the database. It was that easy!
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                             To check that the data is actually in the database, open up a new browser tab or window,
+                             and enter the following URL:
+                        </p>
+                        <xml-source>
+                            http://localhost:8080/ops/exist/rest/db/orbeon/xforms-bookcast/books.xml
+                        </xml-source>
+                        <p>
+                            This is the exact same URL to which your submission has done an HTTP PUT. By entering it in
+                            your browser, you tell it to do an HTTP GET instead, and the eXist database simply sends
+                            the XML document to your browser. You should see this: [TODO: screenshot]
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Try changing the book author, and pressing "Save" again. Then in your other browser tab or window,
+                    reload the eXist URL, and notice that the data has actually changed in the database.
+                </p>
+            </section>
+            <section>
+                <title>Loading the Initial Data</title>
+                <p>
+                    You can now save your data to the database, and read it back using your web browser. The missing
+                    part of course consists in allowing the application to automatically load up the data when the page
+                    is first displayed.
+                </p>
+                <p>
+                    You guessed it, one way of doing this is to use a submission:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submission id="list-submission" serialize="false"
+                       method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                       replace="instance" instance="books-instance" xmlns:xforms="http://www.w3.org/2002/xforms"/>
+                </xml-source>
+                <p>
+                    There are a few differences with <code>save-submission</code>:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>id</code> attribute is different: <code>list-submission</code>. (All the
+                            <code>id</code> attributes in a given XForms document must be different.)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>serialize="false"</code> attribute specifies that you don't want to send XML data
+                            with this submission.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>get</code> method specifies that you want to do an HTTP GET, like when you
+                            pointed your web browser at the URL to read the document from eXist.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The <code>replace="instance"</code> attribute specifies that the result of the submission
+                            has to be stored into an instance. The <code>instance="books-instance"</code> attribute
+                            specifies the identifier of the instance into which the result must be stored.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Like with <code>save-submission</code>, the submission needs to be sent to achieve something. You do
+                    this by adding the following <i>event handler</i> to the model:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:send ev:event="xforms-ready" submission="list-submission" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"/>
+                </xml-source>
+                <p>
+                    This tells the XForms engine to execute an <i>action</i> called <code>&lt;xforms:send></code> when the
+                    XForms engine is ready. This action takes an attribute called <code>submission</code>, which specifies
+                    which submission to send, here <code>list-submission</code>.
+                </p>
+                <p>
+                    Note the special attribute called <code>ev:event</code>: this attributes marks the
+                    <code>&lt;xforms:send></code> element as an <i>event handler</i>, that is an action that must respond
+                    to an event dispatched by the XForms engine. In this case, the name of the event is
+                    <code>xforms-ready</code>, which is a standard XForms event with the meaning that well, the XForms
+                    engine is ready.
+                </p>
+                <p>
+                    After adding the event handler, reload the page, and notice how the page now loads and immediately shows
+                    the data that you saved into the database.
+                </p>
+                <p>
+                    The following is an overview of what has just happened:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            You request the page of the Bookcast application with your browser.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Orbeon Forms receives the request, looks up the page flow file, finds out that
+                            <code>view.xhtml</code> must be served.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>view.xhtml</code> goes through the XForms engine, which does a few bits of magic: it goes
+                            through an initialization phase, where it creates the objects you have defined such as as model,
+                            instance, and controls.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Once this is done, the XForms engine sends the <code>xforms-ready</code> event to the model.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Because you have defined an event handler for <code>xforms-ready</code>, that handler is called.
+                            This caused the <code>&lt;xforms:send></code> action to be run and, therefore, the
+                            <code>list-submission</code> submission to be sent.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The submission performs an HTTP GET to the URL you have specified. The connection reaches the
+                            built-in eXist database, which returns the document called <code>books.xml</code>. The content
+                            of that document reaches back the XForms engine, which stores it into the
+                            <code>books-instance</code> instance.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The XForms engine updates the XForms controls bound to the instance with the values now
+                            contained in the instance. For example, the "title" and "author" input fields are now updated
+                            with the values that came from the database.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The XForms engine sends an HTML page to your web browser. You see the page with all the correct
+                            data as saved earlier into the database.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    <i>actions</i> and <i>events</i> are very important in XForms: they are the glue that allows you to
+                    react to different "things" that happen in an XForms page, whether controlled by the XForms engine or
+                    directly by the user. This is very similar to using JavaScript in a regular HTML page. In XForms, they
+                    allow you to react to the user pressing a button, entering data, etc. XForms comes with a number of
+                    standard events and configurable action that you can combine in many ways, so that in most cases you
+                    don't need to use something like JavaScript.
+                </p>
+                <p>
+                    (You may wonder what would happens the first time the <code>list-submission</code> is called if no
+                    <code>books.xml</code> document is available in the database. The answer is that the database would
+                    return an error, and the submission would throw an event called <code>xforms-submit-error</code>.
+                    But because you don't have an event handler for this event, nothing will happen, and the initial
+                    content of the <code>books-submission</code> instance is not changed and you see an empty form.)
+                </p>
+            </section>
+            <section>
+                <title>Adding More Books</title>
+                <p>
+                    Now let's see how we can enter information about more than a single book!
+                </p>
+                <p>
+                    XForms comes with a really handy construct called <code>&lt;xforms:repeat></code>. This allows you
+                    to <i>repeat</i> sections of user interface controls, based on instance data. To see how this works,
+                    first replace the group you have defined:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:group ref="book" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        ...
+                    </xforms:group>
+                </xml-source>
+                <p>
+                    with, instead, this:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:repeat nodeset="book" id="book-repeat" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        ...
+                    </xforms:repeat>
+                </xml-source>
+                <p>
+                    Reload the page, and notice that, well, nothing changes so far!
+                </p>
+                <p>
+                    This tells the XForms engine that the content of the <code>&lt;xforms:repeat></code> element must be
+                    <i>repeated</i> as many times as <code>&lt;book></code> elements are found in the instance. If you
+                    have a single <code>&lt;book></code> element, then the controls are not repeated (which is
+                    equivalent to having <code>&lt;xforms:group></code>); if you have two <code>&lt;book></code>
+                    elements, they are repeated two times, etc.
+                </p>
+                <p>
+                    The trick now is to manage to <i>add</i> a new <code>&lt;book></code> element to the
+                    <code>books-instance</code> instance. First, create a <i>template</i> for the new
+                    <code>&lt;book></code> element to insert by declaring a new instance:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance id="book-template" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <book xmlns="">
+                            <title/>
+                            <author/>
+                            <language/>
+                            <link/>
+                            <rating/>
+                            <notes/>
+                        </book>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    Then you want to copy that template to the right place in <code>books-instance</code> when the user
+                    presses a button. You do this with a new control called <code>&lt;xforms:trigger></code> and a new
+                    action called <code>&lt;xforms:insert></code>. Add the following to your controls:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:trigger appearance="minimal" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
+                        <xforms:label>Add One</xforms:label>
+                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1"
+                                       position="before" origin="instance('book-template')"/>
+                    </xforms:trigger>
+                </xml-source>
+                <p>
+                    Let's explain what the above does:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>&lt;xforms:trigger></code> element declares a button (remember, XForms likes more
+                            abstract names, but this control could have as well been called
+                            <code>&lt;xforms:button></code>). Like all XForms controls, <code>&lt;xforms:trigger></code>
+                            takes a label, which is here displayed within the button.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Once the user presses it, the button sends an event called <code>DOMActivate</code>. Don't
+                            be scared by this funny name, you will use it all the time. It just means that the user has
+                            <i>activated</i> the button, which in most cases means that the user pressed (clicked) on
+                            it.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:insert></code> is declared as an event handler with the
+                            <code>ev:event="DOMActivate"</code> attribute, so this action will run when the user presses
+                            the button.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:insert></code> takes a whole series of attributes. This may sound a little
+                            confusing at first, but that's because <code>&lt;xforms:insert></code> is in fact very
+                            powerful! In words, this is what it does here: it <i>inserts</i>
+                            (<code><code>&lt;xforms:insert></code></code>) the contents of the
+                            <code>book-template</code> instance (origin="instance('book-template')") <i>before</i>
+                            (<code>position="before"</code>) the <i>first</i> (<code>at="1"</code>) element called
+                            <code>&lt;book></code> (<code>nodeset="book"</code>) under the <code>books-instance</code>
+                            instance's root element (<code>context="instance('books-instance')"</code>).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    There you go! Make the changes above, press on the "Add One" button, and you will see a new row of
+                    controls created. [TODO: screenshot]
+                </p>
+            </section>
+            <section>
+                <title>Deleting a Book</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <!--
+            <section>
+                <title>Making Things Look Nicer</title>
+                <p>
+                    xxx how OF works: look at source code in browser -> styling
+                </p>
+            </section>
+            <section>
+                <title>Validating</title>
+                <p>
+                    xxx add simple XML schema
+                    xxx mention @constraint
+                </p>
+            </section>
+
+            xxx XForms 1.1
+
+            xxx more on Defining an XML document format
+            xxx more on eXist
+            xxx more on CRUD operations and REST
+
+            xxx + screencast!
+
+            xxx introduce Ajax: note that pages doesn't reload when you insert / delete!
+
+            xxx not only XML dbs, of course
+            xxx explain tag vs. element
+            xxx explain XML "nodes"
+            xxx what browser to use?
+            xxx show example of OF error
+            xxx note about how this relates to HTML forms
+
+            <section>
+                <title></title>
                 <p>
                     xxx
                 </p>
             </section>
+            <section>
+                <title></title>
+                <p>
+                    xxx
+                </p>
+            </section>
+            -->
             <!--<section>-->
                 <!--<title></title>-->
                 <!--<p>-->
                     <!--xxx-->
                 <!--</p>-->
             <!--</section>-->
-            <!--<section>-->
-                <!--<title></title>-->
-                <!--<p>-->
-                    <!--xxx-->
-                <!--</p>-->
-            <!--</section>-->
-            <!--<section>-->
-                <!--<title>xxx</title>-->
-                <!--<p>-->
-                    <!--xxx-->
+            <!--
+                <ul>
+                    <li>
+                        <p>
 
-                    <!--* a note about how OF works: look at source code in browser-->
-                    <!--* show example of OF error-->
-                    <!--* note about how this relates to HTML forms-->
-                <!--</p>-->
-                <!--<ul>-->
-                    <!--<li>-->
-                        <!--<p>-->
+                        </p>
+                    </li>
+                    <li>
+                        <p>
 
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
+                        </p>
+                    </li>
+                    <li>
+                        <p>
 
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
+                        </p>
+                    </li>
+                    <li>
+                        <p>
 
-                        <!--</p>-->
-                    <!--</li>-->
-                    <!--<li>-->
-                        <!--<p>-->
-
-                        <!--</p>-->
-                    <!--</li>-->
-                <!--</ul>-->
-            <!--</section>-->
+                        </p>
+                    </li>
+                </ul>
+            -->
         </section>
     </body>
 </document>

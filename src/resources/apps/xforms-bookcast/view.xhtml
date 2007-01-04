@@ -21,11 +21,8 @@
         <title>XForms Bookcast</title>
         <xforms:model>
 
-            <!-- This is called when the XForms engine is ready -->
-            <xforms:action ev:event="xforms-ready">
-                <!-- Load list of books -->
-                <xforms:send submission="list-submission"/>
-            </xforms:action>
+            <!-- Load list of books when the XForms engine is ready -->
+            <xforms:send ev:event="xforms-ready" submission="list-submission"/>
 
             <!-- Instance that contains all the books -->
             <xforms:instance id="books-instance">

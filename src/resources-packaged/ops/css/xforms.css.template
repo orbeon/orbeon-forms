@@ -55,9 +55,10 @@
     width: 16px;
     height: 16px;
     overflow: hidden;
-    text-indent: 16px;
-    padding-left: 16px;
-    line-height: 10px;
+    /* Not sure why we would need this  */
+    /*text-indent: 16px;*/
+    /*padding-left: 16px;*/
+    /*line-height: 10px;*/
     margin-left: .25em;
     vertical-align: middle;
 }
@@ -65,14 +66,15 @@
 .xforms-alert-active {
     background-image: url(../../ops/images/xforms/error.gif);
     background-repeat: no-repeat;
-    background-position: top left;
+    background-position: left center;
 }
 
 .xforms-help-image {
     display: -moz-inline-box;
     display: inline-block;
     margin-left: .2em;
-    line-height: 10px;
+    /* Not sure why we would need this  */
+    /*line-height: 10px;*/
     vertical-align: middle;
 }
 
@@ -116,7 +118,7 @@
     margin-left: .5em;
     background-image: url(../../ops/images/xforms/calendar.gif);
     background-repeat: no-repeat;
-    background-position: top left;
+    background-position: left center;
     display: -moz-inline-box;
     display: inline-block;
     width: 26px;
@@ -126,6 +128,13 @@
 
 .xforms-showcalendar-readonly {
     display: none;
+}
+
+.xforms-input input {
+    border: 1px solid #7f9db9;
+    padding-bottom: 2px;
+    padding-left: 1px;
+    padding-right: 1px;
 }
 
 .xforms-textarea {
@@ -141,6 +150,16 @@
     overflow: hidden;
 }
 
+.xforms-select1-appearance-minimal { border: 1px solid #7f9db9; font-family: Arial,Helvetica,Geneva,sans-serif }
+
+.xforms-required-empty input, textarea.xforms-required-empty, input.xforms-required-empty {
+    border: 1px solid #f99;
+    background: #fcc;
+    padding-bottom: 2px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
 .xforms-select1-appearance-full input { vertical-align: middle }
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
 
@@ -152,7 +171,7 @@
     background: url(../../ops/images/xforms/slider-horizontal-background.png) no-repeat;
     height: 26px;
     width: 218px;
-    zindex: 5;
+    z-index: 5;
 }
 
 .xforms-range-thumb {
@@ -196,7 +215,7 @@
 .xforms-debug {
     background: #fc9;
     position: absolute;
-    -moz-opacity:0.5;
+    -moz-opacity: 0.5;
     opacity: 0.5;
     filter:alpha(opacity=50);
     border: 1px solid red;
@@ -216,21 +235,6 @@
 
 .xforms-case-begin-end {
     display: none;
-}
-
-.xforms-input input {
-    border: 1px solid #7f9db9;
-    padding-bottom: 2px;
-    padding-left: 1px;
-    padding-right: 1px;
-}
-
-.xforms-required-empty input, textarea.xforms-required-empty, input.xforms-required-empty {
-    border: 1px solid #f99;
-    background: #fcc;
-    padding-bottom: 2px;
-    padding-left: 1px;
-    padding-right: 1px;
 }
 
 .xforms-upload-state-empty .xforms-upload-info { display: none; }
@@ -254,7 +258,7 @@ span.xforms-type-string {
 }
 
 a.xforms-readonly {
-    color: grey; cursor: default;
+    color: gray; cursor: default;
 }
 
 .xforms-message {

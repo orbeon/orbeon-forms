@@ -16,8 +16,7 @@
     Please contact Orbeon at info@orbeon.com for more information.
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxmlns="http://www.orbeon.com/xmlns">
+    xmlns:xforms="http://www.w3.org/2002/xforms">
 
     <header>
         <title>Changes - Version 2.2 and Earlier</title>
@@ -830,10 +829,8 @@
                     <xml-source>
                         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
                             <xforms:instance>
-                                <a:form xxmlns:a="http://www.example.com/a"
-                                           xmlns:a="http://www.example.com/a">
-                                    <b:element xxmlns:b="http://www.example.com/b/"
-                                                  xmlns:b="http://www.example.com/b/"/>
+                                <a:form xmlns:a="http://www.example.com/a">
+                                    <b:element xmlns:b="http://www.example.com/b/"/>
                                 </a:form>
                             </xforms:instance>
                         </xforms:model>
@@ -847,10 +844,10 @@
 
                     <xml-source>
                         <xforms:group ref="x:form"
-                                         xxmlns:x="http://www.example.com/a"
+                                         xmlns:x="http://www.example.com/a"
                                          xmlns:xforms="http://www.w3.org/2002/xforms">
                             <xforms:input ref="y:element"
-                                             xxmlns:y="http://www.example.com/b/"/>
+                                          xmlns:y="http://www.example.com/b/"/>
                         </xforms:group>
                     </xml-source>
 
@@ -867,7 +864,7 @@
                     <xml-source>
                         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
                             <xforms:instance>
-                                <form xxmlns="http://www.example.com/">
+                                <form xmlns="http://www.example.com/">
                                     <element/>
                                 </form>
                             </xforms:instance>
@@ -881,7 +878,7 @@
 
                     <xml-source>
                         <xforms:group ref="x:form"
-                                         xxmlns:x="http://www.example.com/"
+                                         xmlns:x="http://www.example.com/"
                                          xmlns:xforms="http://www.w3.org/2002/xforms">
                             <xforms:input ref="x:element"/>
                         </xforms:group>
@@ -927,7 +924,7 @@
                         When doing insertions of strings and XML fragments, it is possible to
                         specify a SQL type, for example:
                     </p>
-                    <xml-source>
+                    <xml-source show-namespaces="false">
 <sql:param type="oxf:xmlFragment"
               sql-type="clob"
               select="/document"
@@ -938,7 +935,7 @@
                        following statement causes the same value to be written as a SQL VARCHAR
                        type instead:
                     </p>
-                    <xml-source>
+                    <xml-source show-namespaces="false">
 <sql:param type="oxf:xmlFragment" sql-type="varchar"
               select="/document"
               xmlns:sql="http://orbeon.org/oxf/xml/sql"/>
@@ -953,7 +950,7 @@
                         set for each element in the node set, separated by the characters in the
                         separator. For example:
                     </p>
-                    <xml-source>
+                    <xml-source show-namespaces="false">
 <sql:query xmlns:sql="http://orbeon.org/oxf/xml/sql">
 select * from ps_book
  where book_id in (<sql:param

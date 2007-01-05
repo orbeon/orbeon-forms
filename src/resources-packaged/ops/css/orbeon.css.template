@@ -433,29 +433,30 @@ ul {
     padding: 10px
 }
 
-.rd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
-.cd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
-.id { margin-left: 2em; margin-top: 0; margin-bottom: 0; display: block; }
-.x { cursor: pointer; }
-.c {}
-.t {}
+.xml-cd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-rd { margin-left: 0; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-id { margin-left: 2em; margin-top: 0; margin-bottom: 0; display: block; }
+.xml-x {}
+.xml-c {}
+.xml-o {}
 
-.tinyinput { width: 5em; }
-.smallinput { width: 8em; }
+.xml-symbol { color: black }
+.xml-text { color: black }
+.xml-comment { color: gray }
+.xml-elt-name { color: blue }
+.xml-elt-prefix { color: navy }
+.xml-att-prefix{ color: green }
+.xml-att-name { color: green }
+.xml-att-value { color: orange }
 
+/* Deprecated (for XForms Classic) */
 .calendar-button {
     margin: 0 16px 3px 5px;
     padding:0;
     vertical-align: top;
 }
 
-.question {
-    font-weight: bold;
-    display: block;
-    padding-top: .2em;
-    color: &dark-color;;
-}
-
+/* This should not be here because it is too specific to particular applications */
 .fixed-width {
     display: -moz-inline-box;
     display: inline-block;

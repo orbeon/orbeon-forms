@@ -14,7 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<book software="OXF" title="PresentationServer User's Manual" copyright="Orbeon, Inc">
+<book software="Orbeon Forms" title="Orbeon Forms User Guide" copyright="Orbeon, Inc">
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
@@ -27,12 +27,9 @@
             <menu-item label="Version 2.2 and Earlier" href="home-changes-older" printed-book="false"/>
         </menu>
         <menu-item label="Installing" href="intro-install"/>
+        <menu-item label="Orbeon Forms Tutorial" href="intro-tutorial"/>
         <menu-item label="Frequently Asked Questions" href="home-faq" printed-book="false"/>
     </menu>
-    <!-- Tutorial commented out until we upgrade to a 3.0 version -->
-    <!--<menu label="Tutorial">-->
-        <!--<menu-item label="Tutorial" href="/doc/pages/OPS Tutorial.pdf" printed-book="false"/>-->
-    <!--</menu>-->
     <menu label="Core Technologies Reference">
         <menu label="XForms">
             <menu-item label="XForms Reference" href="reference-xforms-ng"/>
@@ -49,13 +46,13 @@
         </menu>
         <!--
         <menu label="Core XML Technologies">
-            <menu-item label="XML in OPS" href="reference-xml"/>
-            <menu-item label="XHTML in OPS" href="reference-xhtml"/>
-            <menu-item label="XSLT in OPS" href="reference-xslt"/>
+            <menu-item label="XML in Orbeon Forms" href="reference-xml"/>
+            <menu-item label="XHTML in Orbeon Forms" href="reference-xhtml"/>
+            <menu-item label="XSLT in Orbeon Forms" href="reference-xslt"/>
         </menu>
         -->
     </menu>
-    <menu label="OPS Technologies Reference">
+    <menu label="Other Technologies Reference">
         <menu-item label="Resource Managers" href="reference-resource-managers"/>
         <menu-item label="Properties" href="reference-properties"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>

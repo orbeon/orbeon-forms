@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -39,21 +38,9 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private String id;
     private String effectiveId;
 
-    private List items;
-    private int hierarchyLevel;
-    private Stack choicesStack;
+    private boolean hasItem;
+    private boolean hasNonStaticItem;
     private boolean hasItemset;
-
-    private Attributes itemChoicesAttributes;
-    private Attributes itemsetAttributes;
-
-    private StringBuffer labelStringBuffer;
-    private StringBuffer valueStringBuffer;
-
-    private boolean isInItem;
-    private boolean isInChoices;
-    private boolean isInLabel;
-    private boolean isInValue;
 
     public XFormsSelect1Handler() {
         super(false);
@@ -65,148 +52,23 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         effectiveId = handlerContext.getEffectiveId(elementAttributes);
 
         // Reset state, as this handler is reused
-        if (items != null) {
-            items.clear();
-            choicesStack.clear();
-        } else {
-            items = new ArrayList();
-            choicesStack = new Stack();
-        }
-        hierarchyLevel = 0;
+        hasItem = false;
+        hasNonStaticItem = false;
         hasItemset = false;
-        isInItem = isInLabel = isInValue = isInChoices = false;
 
         super.start(uri, localname, qName, attributes);
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            if ("item".equals(localname)) {
-                // xforms:item
-                itemChoicesAttributes = new AttributesImpl(attributes);
-
-                if (labelStringBuffer != null)
-                    labelStringBuffer.setLength(0);
-                else
-                    labelStringBuffer = new StringBuffer();
-
-                if (valueStringBuffer != null)
-                    valueStringBuffer.setLength(0);
-                else
-                    valueStringBuffer = new StringBuffer();
-
-                isInItem = true;
-                isInChoices = false;
-                hierarchyLevel++;
-
-            } else if ("itemset".equals(localname)) {
-                // xforms:itemset
-                itemsetAttributes = new AttributesImpl(attributes);
-                hasItemset = true; // TODO: in the future we should be able to handle multiple itemsets
-
-                if (!handlerContext.isGenerateTemplate()) {
-
-                    final XFormsSelect1Control xformsSelect1Control
-                            = (XFormsSelect1Control) containingDocument.getObjectById(pipelineContext, effectiveId);
-
-                    final List itemsetInfos = (List) xformsSelect1Control.getItemset();
-                    if (itemsetInfos != null && itemsetInfos.size() > 0) { // may be null when there is no item in the itemset
-                        final Stack nodeStack = new Stack();
-                        int level = 0;
-                        for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
-                            final XFormsSelect1Control.ItemsetInfo currentItemsetInfo = (XFormsSelect1Control.ItemsetInfo) j.next();
-                            final NodeInfo currentNodeInfo = currentItemsetInfo.getNodeInfo();
-
-                            final int newLevel = XFormsSelect1Control.getNodeLevel(currentNodeInfo, nodeStack);
-                            if (level - newLevel >= 0) {
-                                //  We are going down one or more levels
-                                for (int i = newLevel; i <= level; i++) {
-                                    nodeStack.pop();
-                                }
-                            }
-
-                            items.add(new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null), currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));
-                            nodeStack.push(currentNodeInfo);
-                            level = newLevel;
-                        }
-                    }
-                }
-
-                isInItem = false;
-                isInChoices = false;
-
-            } else if ("choices".equals(localname)) {
-                // xforms:choices
-                itemChoicesAttributes = new AttributesImpl(attributes);
-
-                // Push a null label
-                choicesStack.push(null);
-
-                if (labelStringBuffer != null)
-                    labelStringBuffer.setLength(0);
-                else
-                    labelStringBuffer = new StringBuffer();
-
-                isInItem = false;
-                isInChoices = true;
-            } else if ("label".equals(localname)) {
-                // xforms:label
-                if (isInItem || isInChoices)
-                    isInLabel = true;
-            } else if ("value".equals(localname)) {
-                // xforms:value
-                if (isInItem)
-                    isInValue = true;
+            if ("itemset".equals(localname)) {
+                hasItemset = true;
+            } else if ("item".equals(localname)) {
+                hasItem = true;
+                hasNonStaticItem = true;// TODO: we don't actually test because we need to know the children
             }
         }
         super.startElement(uri, localname, qName, attributes);
-    }
-
-    public void characters(char[] chars, int start, int length) throws SAXException {
-        if (isInLabel) {
-            labelStringBuffer.append(chars, start, length);
-        } else if (isInValue) {
-            valueStringBuffer.append(chars, start, length);
-        }
-        super.characters(chars, start, length);
-    }
-
-    public void endElement(String uri, String localname, String qName) throws SAXException {
-        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri)) {
-            if ("item".equals(localname)) {
-                // xforms:item
-                items.add(new XFormsSelect1Control.Item(false, getAttributes(itemChoicesAttributes, null, null), labelStringBuffer.toString(), valueStringBuffer.toString(), hierarchyLevel));
-                isInItem = false;
-                hierarchyLevel--;
-            } else if ("label".equals(localname)) {
-                // xforms:label
-
-                if (isInChoices) {
-                    // There was a label for the current xforms:choices
-
-                    // We only modify the hierarchy if there is a label
-                    final String choicesLabel = labelStringBuffer.toString();
-                    choicesStack.pop();
-                    choicesStack.push(choicesLabel);
-                    hierarchyLevel++;
-
-                    items.add(new XFormsSelect1Control.Item(false, getAttributes(itemChoicesAttributes, null, null), choicesLabel, null, hierarchyLevel));
-                }
-
-                isInLabel = false;
-            } else if ("value".equals(localname)) {
-                // xforms:value
-                isInValue = false;
-            } else if ("choices".equals(localname)) {
-                // xforms:choices
-
-                // Only count the hierarchy if there was a label
-                final Object choicesLabel = choicesStack.pop();
-                if (choicesLabel != null)
-                    hierarchyLevel--;
-            }
-        }
-        super.endElement(uri, localname, qName);
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
@@ -269,6 +131,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             }
         }
 
+        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset() : null;
+
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         if (!isStaticReadonly(xformsSelect1Control)) {
             if (isFull) {
@@ -277,16 +141,18 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 {
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
 
-                    int itemIndex = 0;
-                    for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
-                        final XFormsSelect1Control.Item item = (XFormsSelect1Control.Item) i.next();
-                        handleItemFull(contentHandler, xhtmlPrefix, spanQName, xformsSelect1Control, id, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                    if (items != null) {
+                        int itemIndex = 0;
+                        for (Iterator i = items.iterator(); i.hasNext(); itemIndex++) {
+                            final XFormsSelect1Control.Item item = (XFormsSelect1Control.Item) i.next();
+                            handleItemFull(contentHandler, xhtmlPrefix, spanQName, xformsSelect1Control, id, effectiveId, isMany, fullItemType, item, Integer.toString(itemIndex), itemIndex == 0);
+                        }
                     }
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
                 }
 
-                if (hasItemset) {
+                if (hasItemset || hasNonStaticItem || hasItem && xformsSelect1Control == null) {
                     // Produce template
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "xforms-select-template-" + effectiveId);
@@ -294,7 +160,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                     handleItemFull(contentHandler, xhtmlPrefix, spanQName, null, id, effectiveId, isMany, fullItemType,
-                            new XFormsSelect1Control.Item(true, getAttributes(itemsetAttributes, null, null),
+                            new XFormsSelect1Control.Item(true, Collections.EMPTY_LIST,
                                     "$xforms-template-label$", "$xforms-template-value$", 1),
                             "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
@@ -345,11 +211,13 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName, reusableAttributes);
 
                                 final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
-                                handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, new XFormsSelect1Control.Item(false, new AttributesImpl(), "", "", 1));
-                                for (Iterator i = items.iterator(); i.hasNext();) {
-                                    final XFormsSelect1Control.Item item = (XFormsSelect1Control.Item) i.next();
-                                    if (item.getValue() != null)
-                                        handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, item);
+                                handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "", "", 1));
+                                if (items != null) {
+                                    for (Iterator i = items.iterator(); i.hasNext();) {
+                                        final XFormsSelect1Control.Item item = (XFormsSelect1Control.Item) i.next();
+                                        if (item.getValue() != null)
+                                            handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, item);
+                                    }
                                 }
 
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
@@ -401,7 +269,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first");
 
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
-                            {
+                            if (items != null) {
                                 reusableAttributes.clear();
 
                                 int index = 0;
@@ -462,43 +330,45 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
                     final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
-                    int level = 0;
-                    for (Iterator j = items.iterator(); j.hasNext();) {
-                        final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
-                        final String value = currentItem.getValue();
+                    if (items != null) {
+                        int level = 0;
+                        for (Iterator j = items.iterator(); j.hasNext();) {
+                            final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
+                            final String value = currentItem.getValue();
 
-                        final int newLevel = currentItem.getLevel();
+                            final int newLevel = currentItem.getLevel();
 
-                        if (level - newLevel > 0) {
-                            //  We are going down one or more levels
-                            for (int i = newLevel; i < level; i++) {
-                                // End xhtml:optgroup
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                            if (level - newLevel > 0) {
+                                //  We are going down one or more levels
+                                for (int i = newLevel; i < level; i++) {
+                                    // End xhtml:optgroup
+                                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
+                                }
                             }
+
+                            if (value == null) {
+                                // Starting a new group
+
+                                final String label = currentItem.getLabel();
+                                final AttributesImpl optGroupAttributes = getAttributes(new AttributesImpl(), null, null);
+                                if (label != null)
+                                    optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+
+                                // Start xhtml:optgroup
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
+                            } else {
+                                // Adding a new item
+                                handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, currentItem);
+                            }
+
+                            level = newLevel;
                         }
 
-                        if (value == null) {
-                            // Starting a new group
-
-                            final String label = currentItem.getLabel();
-                            final AttributesImpl optGroupAttributes = getAttributes(currentItem.getAttributes(), null, null);
-                            if (label != null)
-                                optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
-
-                            // Start xhtml:optgroup
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
-                        } else {
-                            // Adding a new item
-                            handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, currentItem);
+                        // Close brackets
+                        for (int i = level; i > 1; i--) {
+                            // End xhtml:optgroup
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                         }
-
-                        level = newLevel;
-                    }
-
-                    // Close brackets
-                    for (int i = level; i > 1; i--) {
-                        // End xhtml:optgroup
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                     }
 
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
@@ -512,14 +382,16 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             if (!handlerContext.isGenerateTemplate()) {
                 final String value = (xformsSelect1Control == null || xformsSelect1Control.getValue() == null) ? "" : xformsSelect1Control.getValue();
                 final StringBuffer sb = new StringBuffer();
-                int selectedFound = 0;
-                for (Iterator i = items.iterator(); i.hasNext();) {
-                    final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) i.next();
-                    if (isSelected(isMany, value, currentItem.getValue())) {
-                        if (selectedFound > 0)
-                            sb.append(" - ");
-                        sb.append(currentItem.getLabel());
-                        selectedFound++;
+                if (items != null) {
+                    int selectedFound = 0;
+                    for (Iterator i = items.iterator(); i.hasNext();) {
+                        final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) i.next();
+                        if (isSelected(isMany, value, currentItem.getValue())) {
+                            if (selectedFound > 0)
+                                sb.append(" - ");
+                            sb.append(currentItem.getLabel());
+                            selectedFound++;
+                        }
                     }
                 }
 
@@ -541,9 +413,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "hint", xformsSelect1Control);
     }
 
-    private void outputJSONTreeInfo(XFormsValueControl xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
+    private void outputJSONTreeInfo(XFormsSelect1Control xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
         if (xformsControl != null && !handlerContext.isGenerateTemplate()) {
             // Produce a JSON fragment with hierachical information
+            final List items = xformsControl.getItemset();
             if (items.size() > 0) { // may be null when there is no item in the itemset
                 final String controlValue = xformsControl.getValue();
                 final StringBuffer sb = new StringBuffer();
@@ -603,7 +476,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final String itemEffectiveId = id + "-opsitem" + itemIndex + handlerContext.getIdPostfix();
 
         // xhtml:span
-        final Attributes spanAttributes = getAttributes(item.getAttributes(), null, null);
+        final Attributes spanAttributes = getAttributes(new AttributesImpl(), null, null);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
 
         // xhtml:input
@@ -649,7 +522,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                    boolean isMany, XFormsSelect1Control.Item item) throws SAXException {
 
         final String optionValue = item.getValue();
-        final AttributesImpl optionAttributes = getAttributes(item.getAttributes(), null, null);
+        final AttributesImpl optionAttributes = getAttributes(new AttributesImpl(), null, null);
 
         optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue);
 

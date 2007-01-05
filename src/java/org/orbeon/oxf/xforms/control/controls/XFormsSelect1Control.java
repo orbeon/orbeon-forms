@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
-import org.xml.sax.Attributes;
 
 import java.util.*;
 
@@ -38,7 +37,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String MENU_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_MENU_APPEARANCE_QNAME);
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
-
+    private boolean hasItemset;
     private List itemsetInfos;
 
     public XFormsSelect1Control(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
@@ -51,68 +50,12 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
-    public void evaluateItemsets(PipelineContext pipelineContext) {
+    public void evaluateItemsets(final PipelineContext pipelineContext) {
+        // When entering this method, binding must be on control
 
-        // Find itemset element if any
-        // TODO: Handle multiple itemsets, xforms:choice, and mixed xforms:item / xforms:itemset
-        final Element itemsetElement = getControlElement().element(XFormsConstants.XFORMS_ITEMSET_QNAME);
-
-        if (itemsetElement != null) {
-            final XFormsControls xformsControls = containingDocument.getXFormsControls();
-            xformsControls.pushBinding(pipelineContext, itemsetElement); // when entering this method, binding must be on control
-            {
-                final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
-
-                //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
-                itemsetInfos = new ArrayList();
-                final List currentNodeSet = currentBindingContext.getNodeset();
-                if (currentNodeSet != null) {
-                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
-
-                        // Push "artificial" binding with just current node in nodeset
-                        xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null));
-                        {
-                            // Handle children of xforms:itemset
-                            final String label;
-                            {
-                                final Element labelElement = itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME);
-                                if (labelElement == null)
-                                    throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
-
-                                label = getChildElementValue(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
-                            }
-
-                            final Element valueCopyElement;
-                            {
-                                final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                valueCopyElement = (valueElement != null)
-                                        ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
-                            }
-                            if (valueCopyElement == null)
-                                throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", getLocationData());
-
-                            final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
-                            if (valueCopyElement.getName().equals("value")) {
-                                // Handle xforms:value
-                                final String value = getChildElementValue(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
-                                if (value != null)
-                                    itemsetInfos.add(new ItemsetInfo(getEffectiveId(), label != null ? label : "", value, currentNodeInfo)); // don't allow for null label
-                            } else {
-                                // TODO: handle xforms:copy
-                            }
-                        }
-                        xformsControls.getContextStack().pop();
-                    }
-                }
-            }
-            xformsControls.popBinding();
-        }
-    }
-
-    private void buildTree(PipelineContext pipelineContext) {
-        // Here we must do the work currently done in XFormsSelect1Handler
-
-        final List items = new ArrayList();
+        hasItemset = false;
+        itemsetInfos = new ArrayList();
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
         Dom4jUtils.visitSubtree(getControlElement(), new Dom4jUtils.VisitorListener() {
 
@@ -123,47 +66,83 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 if ("item".equals(localname)) {
                     // xforms:item
 
-                    // TODO: support @ref
-                    final String label = element.element(XFormsConstants.XFORMS_LABEL_QNAME).getStringValue();
-                    final String value = element.element(XFormsConstants.XFORMS_VALUE_QNAME).getStringValue();
+                    final String label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                    final String value = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
 
-                    items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
+                    itemsetInfos.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
                 } else if ("itemset".equals(localname)) {
                     // xforms:itemset
-//                    hasItemset = true; // TODO: in the future we should be able to handle multiple itemsets
 
-                    final List itemsetInfos = (List) getItemset();
-                    if (itemsetInfos != null && itemsetInfos.size() > 0) { // may be null when there is no item in the itemset
-                        final Stack nodeStack = new Stack();
-                        int level = 0;
-                        for (Iterator j = itemsetInfos.iterator(); j.hasNext();) {
-                            final ItemsetInfo currentItemsetInfo = (ItemsetInfo) j.next();
-                            final NodeInfo currentNodeInfo = currentItemsetInfo.getNodeInfo();
+                    hasItemset = true;
+                    xformsControls.pushBinding(pipelineContext, element); // when entering this method, binding must be on control
+                    {
+                        final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
 
-                            final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
-                            if (level - newLevel >= 0) {
-                                //  We are going down one or more levels
-                                for (int i = newLevel; i <= level; i++) {
-                                    nodeStack.pop();
+                        //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
+                        final List currentNodeSet = currentBindingContext.getNodeset();
+                        if (currentNodeSet != null) {
+                            final Stack nodeStack = new Stack();
+                            for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
+
+                                // Push "artificial" binding with just current node in nodeset
+                                xformsControls.getContextStack().push(new XFormsControls.BindingContext(currentBindingContext, currentBindingContext.getModel(), xformsControls.getCurrentNodeset(), currentPosition, null, true, null));
+                                {
+                                    // Handle children of xforms:itemset
+                                    final String label;
+                                    {
+                                        final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
+                                        if (labelElement == null)
+                                            throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
+
+                                        label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                                    }
+
+                                    final Element valueCopyElement;
+                                    {
+                                        final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                        valueCopyElement = (element != null)
+                                                ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                    }
+                                    if (valueCopyElement == null)
+                                        throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", getLocationData());
+
+
+                                    final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
+                                    final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
+                                    if (hierarchyLevel - newLevel >= 0) {
+                                        //  We are going down one or more levels
+                                        for (int i = newLevel; i <= hierarchyLevel; i++) {
+                                            nodeStack.pop();
+                                        }
+                                    }
+
+                                    if (valueCopyElement.getName().equals("value")) {
+                                        // Handle xforms:value
+                                        final String value = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
+                                        if (value != null)
+                                            itemsetInfos.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                    } else {
+                                        // TODO: handle xforms:copy
+                                    }
+
+                                    nodeStack.push(currentNodeInfo);
+                                    hierarchyLevel = newLevel;
                                 }
+                                xformsControls.getContextStack().pop();
                             }
-
-                            items.add(new XFormsSelect1Control.Item(true, element.attributes(), currentItemsetInfo.getLabel(), currentItemsetInfo.getValue(), newLevel));// TODO: must filter attributes on element.attributes()
-                            nodeStack.push(currentNodeInfo);
-                            level = newLevel;
                         }
                     }
+                    xformsControls.popBinding();
 
                 } else if ("choices".equals(localname)) {
                     // xforms:choices
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        // TODO: support @ref
-                        final String label = labelElement.getStringValue();
+                        final String label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
                         hierarchyLevel++;
-                        items.add(new XFormsSelect1Control.Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
+                        itemsetInfos.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }
                 }
             }
@@ -180,6 +159,10 @@ public class XFormsSelect1Control extends XFormsValueControl {
         return itemsetInfos;
     }
 
+    public boolean hasItemset() {
+        return hasItemset;
+    }
+
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         super.performDefaultAction(pipelineContext, event);
     }
@@ -187,7 +170,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static class Item {
 
         private boolean isItemSet;
-        private Attributes attributes;
         private List attributesList;
         private String label;
         private String value;
@@ -201,20 +183,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
             this.level = level;
         }
 
-        public Item(boolean isItemSet, Attributes attributes, String label, String value, int level) {
-            this.isItemSet = isItemSet;
-            this.attributes = attributes;
-            this.label = label;
-            this.value = value;
-            this.level = level;
-        }
-
         public boolean isItemSet() {
             return isItemSet;
-        }
-
-        public Attributes getAttributes() {
-            return attributes;
         }
 
         public List getAttributesList() {
@@ -231,6 +201,21 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
         public int getLevel() {
             return level;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj == null || !(obj instanceof Item))
+                return false;
+
+            final Item other = (Item) obj;
+
+            if (!((value == null && other.value == null) || (value != null && other.value != null && value.equals(other.value))))
+                return false;
+
+            if (!((label == null && other.label == null) || (label != null && other.label != null && label.equals(other.label))))
+                return false;
+
+            return true;
         }
     }
 

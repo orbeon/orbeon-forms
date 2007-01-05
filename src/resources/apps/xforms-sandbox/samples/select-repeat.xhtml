@@ -49,18 +49,44 @@
             <xforms:instance id="selection-instance">
                 <selected>1</selected>
             </xforms:instance>
+            <xforms:instance id="ui">
+                <ui>
+                    <show-fruit-selection>false</show-fruit-selection>
+                </ui>
+            </xforms:instance>
             <xforms:bind nodeset="instance('main-instance')/fruit" relevant="@id = instance('selection-instance')"/>
             <xforms:bind nodeset="instance('main-instance')/fruit/quantity" type="xs:nonNegativeInteger"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:select1 ref="instance('selection-instance')">
-            <xforms:label>Please select a fruit: </xforms:label>
-            <xforms:itemset nodeset="instance('main-instance')/fruit">
-                <xforms:label ref="name"/>
-                <xforms:value ref="@id"/>
-            </xforms:itemset>
-        </xforms:select1>
+        <xhtml:p>
+            <xforms:select1 ref="instance('ui')/show-fruit-selection" appearance="full">
+                <xforms:label>Show fruit selection: </xforms:label>
+                <xforms:item>
+                    <xforms:label>Yes</xforms:label>
+                    <xforms:value>true</xforms:value>
+                </xforms:item>
+                <xforms:item>
+                    <xforms:label>No</xforms:label>
+                    <xforms:value>false</xforms:value>
+                </xforms:item>
+            </xforms:select1>
+        </xhtml:p>
+        <xforms:group ref=".[instance('ui')/show-fruit-selection = 'true']">
+            <xhtml:p>
+                <xforms:select1 ref="instance('selection-instance')">
+                    <xforms:label>Please select a fruit: </xforms:label>
+                    <xforms:item>
+                        <xforms:label>Select fruit</xforms:label>
+                        <xforms:value/>
+                    </xforms:item>
+                    <xforms:itemset nodeset="instance('main-instance')/fruit">
+                        <xforms:label ref="name"/>
+                        <xforms:value ref="@id"/>
+                    </xforms:itemset>
+                </xforms:select1>
+            </xhtml:p>
+        </xforms:group>
         <xhtml:table class="gridtable">
             <xhtml:tr>
                 <xhtml:th>Name</xhtml:th>

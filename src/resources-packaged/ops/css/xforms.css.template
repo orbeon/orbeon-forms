@@ -55,9 +55,10 @@
     width: 16px;
     height: 16px;
     overflow: hidden;
+    /* This is needed to hide the text of the alert! */
+    text-indent: 16px;
+    padding-left: 16px;
     /* Not sure why we would need this  */
-    /*text-indent: 16px;*/
-    /*padding-left: 16px;*/
     /*line-height: 10px;*/
     margin-left: .25em;
     vertical-align: middle;

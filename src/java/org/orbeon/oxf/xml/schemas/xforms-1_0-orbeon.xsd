@@ -94,10 +94,10 @@
             <xsd:attributeGroup ref="xforms:XML.Events"/>
             <xsd:attribute name="functions" type="xforms:QNameList" use="optional"/>
             <xsd:attribute name="schema" type="xforms:anyURIList" use="optional"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="instance">
-
         <xsd:annotation>
             <xsd:documentation>instance container.</xsd:documentation>
         </xsd:annotation>
@@ -612,6 +612,7 @@
         <xsd:complexType>
             <xsd:sequence maxOccurs="unbounded">
                 <xsd:group ref="xforms:Action"/>
+                <xsd:any namespace="##other" processContents="lax"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>

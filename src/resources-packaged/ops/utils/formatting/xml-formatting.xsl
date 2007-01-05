@@ -23,7 +23,6 @@
     <!-- Empty element -->
     <xsl:template match="*[not(node())]" name="format-empty-element" mode="xml-formatting">
         <span class="xml-rd">
-            <!--<xsl:text>&#160;&#160;</xsl:text>-->
             <xsl:call-template name="format-empty-element-inline"/>
         </span>
     </xsl:template>
@@ -44,7 +43,6 @@
     <!-- Short text-only element -->
     <xsl:template match="*[text() and not(* | processing-instruction() | comment()) and string-length(.) &lt;= 50]" mode="xml-formatting">
         <span class="xml-rd">
-            <!--<xsl:text>&#160;&#160;</xsl:text>-->
             <xsl:call-template name="format-short-text-element-inline"/>
         </span>
     </xsl:template>
@@ -96,8 +94,6 @@
         <xsl:variable name="element" select="."/>
         <xsl:variable name="name" select="name()"/>
         <span class="xml-cd">
-            <!-- Collapse -->
-            <!--<span class="xml-x">&#160;&#160;</span>-->
             <!-- Element start -->
             <span class="xml-o">
                 <span class="xml-symbol">&lt;</span>
@@ -124,7 +120,6 @@
             </span>
             <!-- Close element -->
             <span class="xml-c">
-                <!--<xsl:text>&#160;&#160;</xsl:text>-->
                 <span class="xml-symbol">&lt;/</span>
                 <xsl:call-template name="display-element-name">
                     <xsl:with-param name="name" select="name()"/>
@@ -186,12 +181,11 @@
 
     <xsl:template match="comment" mode="xml-formatting" priority="2">
         <span class="xml-rd">
-            <!--<xsl:text>&#160;&#160;</xsl:text>-->
-            <span class="xml-symbol">&lt;!-- </span>
             <span class="xml-comment">
+                <xsl:text>&lt;!-- </xsl:text>
                 <xsl:apply-templates/>
+                <xsl:text> --&gt;</xsl:text>
             </span>
-            <span class="xml-symbol"> --&gt;</span>
         </span>
     </xsl:template>
 

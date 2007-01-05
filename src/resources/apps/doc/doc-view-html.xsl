@@ -24,7 +24,7 @@
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head>
-                <xhtml:title>Orbeon PresentationServer (OPS) User Guide - <xsl:value-of select="/document/header/title"/></xhtml:title>
+                <xhtml:title>Orbeon Forms User Guide - <xsl:value-of select="/document/header/title"/></xhtml:title>
             </xhtml:head>
             <xhtml:body>
                 <xhtml:table cellpadding="0" cellspacing="0" border="0" id="main">
@@ -60,7 +60,7 @@
                     <xhtml:tr>
                         <!-- List of sections -->
                         <xhtml:td id="leftcontent" valign="top" width="1%">
-                            <xhtml:h1>OPS User Guide</xhtml:h1>
+                            <xhtml:h1>Orbeon Forms User Guide</xhtml:h1>
                             <xhtml:ul class="tree-sections">
                                 <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                             </xhtml:ul>

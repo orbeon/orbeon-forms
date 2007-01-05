@@ -62,10 +62,6 @@
             <xforms:instance id="languages-instance">
                 <languages xmlns="">
                     <language>
-                        <name>Choose one...</name>
-                        <value></value>
-                    </language>
-                    <language>
                         <name>English</name>
                         <value>en</value>
                     </language>
@@ -82,10 +78,6 @@
 
             <xforms:instance id="ratings-instance">
                 <ratings xmlns="">
-                    <rating>
-                        <name>None</name>
-                        <value></value>
-                    </rating>
                     <rating>
                         <name>1</name>
                         <value>1</value>
@@ -193,6 +185,10 @@
                         <br/>
                         <xforms:select1 ref="language">
                             <xforms:label class="books-label">Language</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Choose One...</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
                             <xforms:itemset nodeset="instance('languages-instance')/language">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>
@@ -205,6 +201,10 @@
                         <br/>
                         <xforms:select1 ref="rating" appearance="full">
                             <xforms:label class="books-label">Rating</xforms:label>
+                            <xforms:item>
+                                <xforms:label>None</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
                             <xforms:itemset nodeset="instance('ratings-instance')/rating">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>

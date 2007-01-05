@@ -31,6 +31,7 @@
         <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
         <application id="xforms-hello" label="XForms Hello (Tutorial)"/>
+        <application id="xforms-bookcast" label="XForms Bookcast (Tutorial)"/>
         <application id="xforms-sql-address-book" label="SQL Address Book"/>
     </section>
     <section label="Sandboxes">

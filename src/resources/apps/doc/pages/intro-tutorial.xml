@@ -926,10 +926,6 @@
                     <xforms:instance id="languages-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <languages xmlns="">
                             <language>
-                                <name>Choose one...</name>
-                                <value></value>
-                            </language>
-                            <language>
                                 <name>English</name>
                                 <value>en</value>
                             </language>
@@ -950,6 +946,10 @@
                 <xml-source show-namespaces="false">
                     <xforms:select1 ref="language" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:label>Language</xforms:label>
+                        <xforms:item>
+                            <xforms:label>Choose One...</xforms:label>
+                            <xforms:value/>
+                        </xforms:item>
                         <xforms:itemset nodeset="instance('languages-instance')/language">
                             <xforms:label ref="name"/>
                             <xforms:value ref="value"/>
@@ -957,10 +957,11 @@
                     </xforms:select1>
                 </xml-source>
                 <p>
-                    Notice the new <code>&lt;xforms:itemset></code> element instead of the <code>&lt;xforms:item></code>
-                    previously used. That element specifies an <i>item set</i>, which allows you to point to the list
-                    of <code>&lt;language></code> nodes in the <code>languages-instance</code> instance, and for each of
-                    those to tell the control where to find the label and the value.
+                    Notice the new <code>&lt;xforms:itemset></code> element in addition to the
+                    <code>&lt;xforms:item></code> previously used. That element specifies an <i>item set</i>, which
+                    allows you to point to the list of <code>&lt;language></code> nodes in the
+                    <code>languages-instance</code> instance, and for each of those to tell the control where to find
+                    the label and the value.
                 </p>
                 <p>
                     You often don't have to use an item set, but using them gives you the flexibility of reusing
@@ -1002,10 +1003,6 @@
                     <xforms:instance id="ratings-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <ratings xmlns="">
                             <rating>
-                                <name>None</name>
-                                <value></value>
-                            </rating>
-                            <rating>
                                 <name>1</name>
                                 <value>1</value>
                             </rating>
@@ -1034,6 +1031,10 @@
                 <xml-source show-namespaces="false">
                     <xforms:select1 ref="rating" appearance="full" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:label class="fixed-width">Rating</xforms:label>
+                        <xforms:item>
+                            <xforms:label>None</xforms:label>
+                            <xforms:value/>
+                        </xforms:item>
                         <xforms:itemset nodeset="instance('ratings-instance')/rating">
                             <xforms:label ref="name"/>
                             <xforms:value ref="value"/>
@@ -1041,11 +1042,11 @@
                     </xforms:select1>
                 </xml-source>
                 <p>
-                    Here again, you store the list of items as a separate instance. There is something new: the use of
-                    the <code>full</code> appearance, which displays the selection control as a list of radio buttons.
-                    This is a standard XForms appearance value, which is likely to be supported by all XForms
-                    implemementations. (You can tell that it is standard because there is no colon <code>:</code> in
-                    the appearance value.)
+                    Here again, you store the list of items as a separate instance, but we keep the "empty" item as an
+                    <code>&lt;xforms:item></code>. There is something new: the use of the <code>full</code> appearance,
+                    which displays the selection control as a list of radio buttons. This is a standard XForms
+                    appearance value, which is likely to be supported by all XForms implemementations. (You can tell
+                    that it is standard because there is no colon <code>:</code> in the appearance value.)
                 </p>
                 <p>
                     The only missing control now is the input field bound to the <code>&lt;link></code> element. Add
@@ -1063,6 +1064,10 @@
                         <br/>
                         <xforms:select1 ref="language">
                             <xforms:label class="fixed-width">Language</xforms:label>
+                            <xforms:item>
+                                <xforms:label>Choose One...</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
                             <xforms:itemset nodeset="instance('languages-instance')/language">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>
@@ -1075,6 +1080,10 @@
                         <br/>
                         <xforms:select1 ref="rating" appearance="full">
                             <xforms:label class="fixed-width">Rating</xforms:label>
+                            <xforms:item>
+                                <xforms:label>None</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
                             <xforms:itemset nodeset="instance('ratings-instance')/rating">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>
@@ -2020,7 +2029,12 @@
                     </p>
                 </note>
                 <p>
-                    
+                    Still with an invalid link, press the "Save" link and check the data in the database. Notice that
+                    the invalid data didn't save! This happens because the XForms engine automatically ensures that the
+                    data sent by a submission is valid before going on with the actual submission.
+                </p>
+                <p>
+                    <!--It would be nice to tell the user that saving didn't work. xxx-->
                 </p>
             </section>
             <!--

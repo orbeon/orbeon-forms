@@ -142,7 +142,6 @@ public class XHTMLHeadHandler extends HandlerBase {
             },
             // Other standard scripts
             new ResourceConfig("/ops/javascript/wz_tooltip.js", "/ops/javascript/wz_tooltip-min.js"),// TODO: move to YUI // our min version
-            new ResourceConfig("/ops/javascript/overlib_mini.js", "/ops/javascript/overlib_mini-min.js"),// TODO: move to YUI // our min version
             new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
             // XForms client
             new ResourceConfig("/ops/javascript/xforms.js", null)// our min version

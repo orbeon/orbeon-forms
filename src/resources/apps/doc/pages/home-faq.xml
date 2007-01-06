@@ -117,6 +117,16 @@
                     </li>
                 </ul>
             </section>
+            <a name="source-code"/>
+            <section added="2007-01-06">
+                <title>Where do I find the source code?</title>
+                <p>
+                    In the ObjectWeb CVS repository. <a href="http://forge.objectweb.org/scm/?group_id=168">This
+                    page</a> provides the instructions to retrieve it. You can also <a
+                    href="http://cvs.forge.objectweb.org/cgi-bin/viewcvs.cgi/ops/">browse the repository</a> with your
+                    web browser.
+                </p>
+            </section>
         </section>
         <a name="xforms"/>
         <section>

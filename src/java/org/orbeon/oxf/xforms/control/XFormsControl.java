@@ -439,47 +439,53 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             return null;
 
         // Child element becomes the new binding
-        String result = null;
         xformsControls.pushBinding(pipelineContext, childElement);
-        {
+        try {
             final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
 
             // "the order of precedence is: single node binding attributes, linking attributes, inline text."
 
             // Try to get single node binding
-            if (currentBindingContext.isNewBind()) {
-                final NodeInfo currentNode = currentBindingContext.getSingleNode();
-                if (currentNode != null)
-                    result = XFormsInstance.getValueForNodeInfo(currentNode);
+            {
+                final boolean hasRefAttribute = currentBindingContext.isNewBind();
+                if (hasRefAttribute) {
+                    final NodeInfo currentNode = currentBindingContext.getSingleNode();
+                    if (currentNode != null)
+                        return XFormsInstance.getValueForNodeInfo(currentNode);
+                    else
+                        return null;
+                }
             }
 
             // Try to get value attribute
             // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
-            if (result == null) {
+            {
                 final String valueAttribute = childElement.attributeValue("value");
-                if (valueAttribute != null) {
+                final boolean hasValueAttribute = valueAttribute != null;
+                if (hasValueAttribute) {
                     final List currentNodeset = currentBindingContext.getNodeset();
                     if (currentNodeset != null && currentNodeset.size() > 0) {
                         final String tempResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
                                 currentNodeset, currentBindingContext.getPosition(),
                                 valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
 
-                        result = (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                     } else {
-                        result = ""; 
+                        return null;
                     }
                 }
             }
 
             // Try to get linking attribute
             // NOTE: This is deprecated in XForms 1.1
-            if (result == null) {
+            {
                 final String srcAttributeValue = childElement.attributeValue("src");
-                if (srcAttributeValue != null) {
+                final boolean hasSrcAttribute = srcAttributeValue != null;
+                if (hasSrcAttribute) {
                     try {
                         // TODO: should cache this?
                         final String tempResult  = XFormsUtils.retrieveSrcValue(srcAttributeValue);
-                        result = (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                     } catch (IOException e) {
                         // Dispatch xforms-link-error to model
                         final XFormsModel currentModel = currentBindingContext.getModel();
@@ -489,8 +495,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
             }
 
             // Try to get inline value
-            if (result == null) {
-
+            {
                 final StringBuffer sb = new StringBuffer();
 
                 // Visit the subtree and serialize
@@ -556,12 +561,11 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
                     }
                 });
 
-                result = sb.toString();
+                return sb.toString();
             }
+        } finally {
+            xformsControls.popBinding();
         }
-
-        xformsControls.popBinding();
-        return result;
     }
     
     public boolean isStaticReadonly() {

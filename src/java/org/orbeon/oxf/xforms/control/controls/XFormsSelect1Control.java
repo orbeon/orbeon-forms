@@ -120,8 +120,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                                     if (valueCopyElement.getName().equals("value")) {
                                         // Handle xforms:value
                                         final String value = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
-                                        if (value != null)
-                                            itemsetInfos.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
+                                        itemsetInfos.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                     } else {
                                         // TODO: handle xforms:copy
                                     }
@@ -167,6 +166,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
         super.performDefaultAction(pipelineContext, event);
     }
 
+    /**
+     * Represents an item (xforms:item, xforms:choice, or item in itemset).
+     */
     public static class Item {
 
         private boolean isItemSet;

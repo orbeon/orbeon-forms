@@ -164,8 +164,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                     "$xforms-template-label$", "$xforms-template-value$", 1),
                             "$xforms-item-index$", true);
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-                    // TODO: in the future we should be able to handle multiple itemsets
                 }
             } else {
 
@@ -370,7 +368,6 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                         }
                     }
-
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
                 }
             }

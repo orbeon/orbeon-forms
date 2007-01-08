@@ -41,7 +41,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
         try {
             final Node cfg = readInputAsDOM4J(ctxt, INPUT_CONFIG);
 
-            for (Iterator i = XPathUtils.selectIterator(cfg, "/processors/processor | /processors/processors/processor"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectIterator(cfg, "/processors//processor"); i.hasNext();) { // support multiple nesting levels
                 Element processorElement = (Element) i.next();
 
                 // Extract processor name

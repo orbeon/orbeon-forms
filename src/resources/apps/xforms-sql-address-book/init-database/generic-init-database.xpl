@@ -26,7 +26,7 @@
             <config sourcepath="." class="ListInitializedTables"/>
         </p:input>
         <p:input name="datasource" href="/config/datasource-sql.xml"/>
-        <p:output name="data" id="found-tables" debug="found-tables"/>
+        <p:output name="data" id="found-tables"/>
     </p:processor>
 
     <!-- Create database if the tables are not found -->

@@ -21,7 +21,8 @@
     <p:processor name="oxf:xslt">
         <p:input name="config">
             <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                               xsl:version="2.0" method="get" action="/exist/rest/db/orbeon/forms/{/*/form-id}/{/*/document-id}"/>
+                               xsl:version="2.0" serialize="false"
+                               method="get" action="/exist/rest/db/orbeon/forms/{/*/form-id}/{/*/document-id}"/>
         </p:input>
         <p:input name="data" href="#instance"/>
         <p:output name="data" id="submission"/>
@@ -31,7 +32,7 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission" href="#submission"/>
         <p:input name="request"><dummy/></p:input>
-        <p:output name="response" id="document" debug="xxxdoc"/>
+        <p:output name="response" id="document"/>
     </p:processor>
     
     <!-- Produce PDF document -->

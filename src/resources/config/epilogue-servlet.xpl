@@ -24,7 +24,8 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:atom="http://www.w3.org/2005/Atom">
 
     <!-- The document produced by the page view with XForms processing performed -->
     <p:param type="input" name="xformed-data"/>
@@ -238,6 +239,30 @@
                             <value>attachment; filename=document.pdf</value>
                         </header>
                         <!-- NOTE: XSL-FO converter specifies application/pdf content-type -->
+                    </config>
+                </p:input>
+                <p:input name="data" href="#converted"/>
+            </p:processor>
+        </p:when>
+        <!-- Atom detection -->
+        <p:when test="/atom:feed">
+            <p:processor name="oxf:xml-converter">
+                <p:input name="config">
+                    <config>
+                        <encoding>utf-8</encoding>
+                        <content-type>application/atom+xml</content-type>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xformed-data"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
+                <p:input name="config">
+                    <config>
+                        <header>
+                            <name>Cache-Control</name>
+                            <value>post-check=0, pre-check=0</value>
+                        </header>
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

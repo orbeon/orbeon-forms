@@ -18,6 +18,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns="http://www.w3.org/1999/xhtml">
 
+    <xsl:output method="html" omit-xml-declaration="yes" name="html"/>
+
     <xsl:variable name="normalize-non-whitespace" select="true()"/>
 
     <!-- Empty element -->
@@ -46,6 +48,23 @@
             <xsl:call-template name="format-short-text-element-inline"/>
         </span>
     </xsl:template>
+
+    <!-- Element containing only one other element (should also check on length) -->
+    <!--<xsl:template match="*[count(*) = 1 and not(text() | processing-instruction() | comment())]" mode="xml-formatting">-->
+        <!--<xsl:variable name="attempt">-->
+            <!--<span class="xml-rd">-->
+                <!--<xsl:apply-templates select="." mode="xml-formatting-inline"/>-->
+            <!--</span>-->
+        <!--</xsl:variable>-->
+        <!--<xsl:choose>-->
+            <!--<xsl:when test="string-length(string-join($attempt/text(), '')) le 50">-->
+                <!--<xsl:copy-of select="$attempt"/>-->
+            <!--</xsl:when>-->
+            <!--<xsl:otherwise>-->
+                <!--<xsl:next-match/>-->
+            <!--</xsl:otherwise>-->
+        <!--</xsl:choose>-->
+    <!--</xsl:template>-->
 
     <xsl:template match="*[text() and not(* | processing-instruction() | comment()) and string-length(.) &lt;= 50]" name="format-short-text-element-inline" mode="xml-formatting-inline">
         <!-- Element start -->

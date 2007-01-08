@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2007 Orbeon, Inc.
   
@@ -13,15 +14,19 @@
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller">
 
+    <!-- Bookcast application's main page -->
     <page path-info="/xforms-bookcast/" view="view.xhtml"/>
 
-    <page path-info="/xforms-bookcast/summary" default-submission="parameters.xml" view="summary.xhtml">
-        <setvalue ref="/parameters/book-id" parameter="book-id"/>
-    </page>
+    <!-- Bookcast application Atom feed -->
+    <page path-info="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
 
-    <page path-info="/xforms-bookcast/detail" default-submission="parameters.xml" view="detail.xhtml">
-        <setvalue ref="/parameters/book-id" parameter="book-id"/>
-    </page>
+    <!--<page path-info="/xforms-bookcast/summary" default-submission="parameters.xml" view="summary.xhtml">-->
+        <!--<setvalue ref="/parameters/book-id" parameter="book-id"/>-->
+    <!--</page>-->
+
+    <!--<page path-info="/xforms-bookcast/detail" default-submission="parameters.xml" view="detail.xhtml">-->
+        <!--<setvalue ref="/parameters/book-id" parameter="book-id"/>-->
+    <!--</page>-->
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

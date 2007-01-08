@@ -233,6 +233,17 @@
         </xhtml:p>
     </xsl:template>
 
+    <xsl:template match="icon">
+        <img src="{@src}" alt="{@alt}">
+            <xsl:if test="@height">
+                <xsl:attribute name="height"><xsl:value-of select="@height"/></xsl:attribute>
+            </xsl:if>
+            <xsl:if test="@width">
+                <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>
+            </xsl:if>
+        </img>
+    </xsl:template>
+
     <xsl:template match="img">
         <xhtml:p class="image"><xhtml:img>
             <xsl:copy-of select="@*"/>

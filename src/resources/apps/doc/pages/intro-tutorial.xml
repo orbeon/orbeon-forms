@@ -15,7 +15,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+<document>
     <header>
         <title>Orbeon Forms Tutorial</title>
     </header>
@@ -1579,7 +1579,19 @@
             <section>
                 <title>Adding a "Revert" Button</title>
                 <p>
-                    TODO
+                    For fun, let's also add a new button to cancel your unsaved edits and reload the original data from
+                    the database. It's as easy as this:
+                </p>
+                <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
+                    <xforms:submit submission="list-submission" appearance="minimal">
+                        <xforms:label>Revert</xforms:label>
+                    </xforms:submit>
+                </xml-source>
+                <p>
+                    When you press the "Revert" button, the <code>list-submission</code> submission is called, which
+                    causes the latest saved <code>books.xml</code> document to be reloaded. The XForms engine makes sure
+                    that all the controls on the page, including repeats, automatically update to reflect the changes to
+                    the <code>books-instance</code> instance.
                 </p>
             </section>
             <section>
@@ -2034,44 +2046,340 @@
                     data sent by a submission is valid before going on with the actual submission.
                 </p>
                 <p>
-                    <!--It would be nice to tell the user that saving didn't work. xxx-->
+                    It would be nice to tell the user that saving didn't work. You can do this very easily: if a
+                    submission error occurs, the <code>&lt;xforms:submission></code> element dispaches the
+                    <code>xforms-submit-error</code> event. So let's see how you catch that event and display a message
+                    to the user:
                 </p>
-            </section>
-            <!--
-
-
-            xxx XForms 1.1
-
-            xxx more on Defining an XML document format
-            xxx more on eXist
-            xxx more on XForms?
-            xxx more on CRUD operations and REST
-            xxx add Atom feed!
-
-            xxx + screencast!
-
-            xxx not only XML dbs, of course
-            xxx explain tag vs. element
-            xxx explain XML "nodes"
-            xxx what browser to use?
-            xxx show example of OF error
-            xxx note about how this relates to HTML forms
-
-            xxx going further: XML pipelines?
-
-            <section>
-                <title></title>
+                <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
+                    <xforms:submission id="save-submission" ref="instance('books-instance')"
+                            action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
+                            method="put" replace="none">
+                        <xforms:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xforms:message>
+                    </xforms:submission>
+                </xml-source>
                 <p>
-                    xxx
+                    The <code>&lt;xforms:submission></code> element hasn't changed, except we added a nested
+                    <code>&lt;xforms:message></code> element. Besides the <code>ev:event</code> attribute, which you
+                    start to be familiar with, this element takes a <code>level</code> attribute (use "modal" in general
+                    for alerts) and message for the user.
+                </p>
+                <p>
+                    Try now making this change, enter an invalid link, and press the "Save" link: an alert message
+                    should show up! [TODO: screenshot]
                 </p>
             </section>
             <section>
-                <title></title>
+                <title>The Atom Feed</title>
                 <p>
-                    xxx
+                    Remember, the name of this application is Book<i>cast</i>, which lets suggest that we can expose the
+                    list of books as a feed of some sort. Here, you will use the Atom Syndication Format (or Atom in
+                    short). Atom is a format very much like RSS but it has been standardized by IETF and is much
+                    cleaner than RSS (note that there are at least 6 different versions of RSS). Atom is now supported
+                    by most feed readers.
                 </p>
+                <p>
+                    An atom feed looks like this (example from the Atom specification):
+                </p>
+                <xml-source>
+                    <feed xmlns="http://www.w3.org/2005/Atom">
+
+                        <title>Example Feed</title>
+                        <link href="http://example.org/"/>
+                        <updated>2003-12-13T18:30:02Z</updated>
+                        <author>
+                            <name>John Doe</name>
+                        </author>
+                        <id>urn:uuid:60a76c80-d399-11d9-b93C-0003939e0af6</id>
+
+                        <entry>
+                            <title>Atom-Powered Robots Run Amok</title>
+                            <link href="http://example.org/2003/12/13/atom03"/>
+                            <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+                            <updated>2003-12-13T18:30:02Z</updated>
+                            <summary>Some text.</summary>
+                        </entry>
+
+                    </feed>
+                </xml-source>
+                <p>
+                    It would be nice if you could use XForms to produce such a format, and in fact in theory this is
+                    possible, but Orbeon Forms currently only supports XForms embedded within XHTML. So here you will
+                    use XSLT instead. XSLT is an XML transformation language, which can also be used as an XML template
+                    language.
+                </p>
+                <p>
+                    But first, it's time to introduce the Model-View-Controller (MVC) support in the page flow.
+                    Consider the following page flow declaration:
+                </p>
+                <xml-source>
+                    <page path-info="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
+                </xml-source>
+                <p>
+                    Notice how, instead of an XHTML page view (<code>view.xhtml</code>), you now use:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            A page <i>model</i>, called <code>atom.xpl</code>. This page model has an <code>*.xpl</code>
+                            extension, which tells you that it contains an <i>XML pipeline</i>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            A page <i>view</i>, called <code>view.xsl</code>. This page view has an <code>*.xsl</code>
+                            extension, which tells you that it contains an <i>XSLT stylesheet</i>.
+                        </p>
+                    </li>
+                </ul>
             </section>
-            -->
+            <p>
+                So what's the idea page models and page view? The idea is to separate the <i>production</i> of the data
+                to display, from the <i>visual formatting</i> of that data. The page model is in charge of the former,
+                and the page view of the latter. In the case of the production of the Atom feed:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        The page model is in charge of fetching the data (the <code>books.xml</code> document) from
+                        the database.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The page view formats that data to produce a valid Atom document.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                This separation means that you can change how the data is retrieved without changing the formatting
+                part, and the other way around. The Orbeon Forms Page Flow Controller (PFC) automatically connects
+                page model and page view.
+            </p>
+            <p>
+                Consider the page model:
+            </p>
+            <xml-source>
+                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                    <p:param name="data" type="output"/>
+
+                    <comment> Execute REST submission </comment>
+                    <p:processor name="oxf:xforms-submission">
+                        <p:input name="submission">
+                            <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" serialize="false"
+                                               method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"/>
+                        </p:input>
+                        <p:input name="request"><dummy/></p:input>
+                        <p:output name="response" ref="data"/>
+                    </p:processor>
+
+                </p:config>                
+            </xml-source>
+            <p>
+                This document contains an XML pipeline described in a language called XPL (XML Pipeline Language). An
+                XML pipeline language is simply a language for describing operations to be performed on XML documents.
+                Orbeon Forms comes with an implementation of <a href="http://www.w3.org/Submission/xpl/">XPL</a>.
+                (Orbeon is currently working at W3C on the standardization of a pipeline language called <a
+                href="http://www.w3.org/TR/xproc/">XProc</a>.)
+            </p>
+            <p>
+                So what does this pipeline do? It runs a <i>processor</i> called <code>oxf:xforms:submission</code>,
+                which is handy component that allows you to perform XForm submissions from XPL. That submission
+                retrieves <code>books.xml</code> and returns it on the processor's <code>response</code> output. That
+                output in turn is sent to the <code>data</code> output of the page model pipeline.
+            </p>
+            <p>
+                Now look at the page view:
+            </p>
+            <xml-source>
+                <feed xmlns="http://www.w3.org/2005/Atom" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
+
+                    <title>Orbeon Forms Bookcast</title>
+                    <subtitle>An Orbeon Forms tutorial example</subtitle>
+                    <updated><xsl:value-of select="current-dateTime()"/></updated>
+                    <id>http://www.orbeon.com/ops/xforms-bookcast/</id>
+                    <link href="http://www.orbeon.com/"/>
+                    <generator uri="http://www.orbeon.com/ops/xforms-bookcast/" version="1.0">Orbeon Forms Bookcast</generator>
+
+                    <xsl:for-each select="/books/book">
+                        <entry>
+                            <title><xsl:value-of select="concat(author, ' - ', title)"/></title>
+                            <id>http://www.orbeon.com/ops/xforms-bookcast/<xsl:value-of select="concat(author, ' - ', title)"/>"/></id>
+                            <updated><xsl:value-of select="current-dateTime()"/></updated>
+                            <content type="xhtml" xml:lang="en">
+                                <div xmlns="http://www.w3.org/1999/xhtml">
+                                    <p>
+                                        Book information:
+                                    </p>
+                                    <table>
+                                        <tr>
+                                            <th>Title</th>
+                                            <td><xsl:value-of select="title"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Author</th>
+                                            <td><xsl:value-of select="author"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Language</th>
+                                            <td><xsl:value-of select="language"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Link</th>
+                                            <td><a href="{link}"><xsl:value-of select="link"/></a></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Rating</th>
+                                            <xsl:variable name="rating" select="if (rating castable as xs:integer) then xs:integer(rating) else 0" as="xs:integer"/>
+                                            <td><xsl:value-of select="string-join(for $i in (1 to $rating) return '*', '')"/></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Notes</th>
+                                            <td>
+                                                <xsl:for-each select="tokenize(notes, '&#x0a;')">
+                                                    <xsl:value-of select="."/>
+                                                    <xsl:if test="position() lt last()">
+                                                        <br/>
+                                                    </xsl:if>
+                                                </xsl:for-each>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </content>
+                        </entry>
+                    </xsl:for-each>
+                </feed>
+            </xml-source>
+            <p>
+                This page view is an XSLT document (notice the <code>xsl:version="2.0"</code> attribute on the root
+                element). It automatically receives on its main input the document produced by the page model. So if you
+                were to write:
+            </p>
+            <xml-source xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:value-of select="/books/book[1]/title"/>
+            </xml-source>
+            <p>
+                You would get the title of the first book from <code>books.xsl</code>.
+            </p>
+            <p>
+                Now this XSLT document does not use many XSLT constructs:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XSLT relies on XPath, like XForms. So you can reuse your knowledge of XPath when writing XSLT.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>&lt;xsl:value-of></code> outputs the text value returned by the XPath expression on the
+                        <code>select</code> attribute. It is very similar to <code>&lt;xforms:output></code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>&lt;xsl:for-each></code> iterates over the nodes returned by the XPath expression on the
+                        <code>select</code> attribute. It is very similar to <code>&lt;xforms:repeat></code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The brackets in <code>&lt;a href="{link}"></code> mean that the XPath expression
+                        <code>link</code> has to be evaluated to produce the <code>href</code> attribute.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                And that's it! You can now add the entry in <code>page-flow.xml</code>, add the two files
+                <code>atom.xpl</code> and <code>atom.xsl</code>, and point your browser to:
+            </p>
+            <xml-source>
+                http://localhost:8080/ops/my-bookcast/atom
+            </xml-source>
+            <p>
+                You should see something similar to this, depending on your browser: [TODO: screenshot]
+            </p>
+            <p>
+                You can now try to load the feed into your favorite feedreader!
+            </p>
+            <p>
+                To make things even better, add the following to <code>view.xhtml</code> under the
+                <code>&lt;head></code> element:
+            </p>
+            <xml-source>
+                <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
+            </xml-source>
+            <p>
+                With this addition, most modern browsers will display a feed icon <icon
+                src="/apps/doc/images/tutorial/feed-icon-14x14.png" alt="Feed Icon" width="14" height="14"/> or an RSS
+                icon, making the feed directly accessible from the main Bookcast page. [TODO: screenshot]
+            </p>
+        </section>
+        <section>
+            <title>What's Next</title>
+            <p>
+                So far you have seen:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        How to setup Orbeon Forms.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        How the basic Hello application is organized.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        How to build your own application that allows editing and persisting a form.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        How to create an Atom feed from form data.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                You have now covered a good part of the basics of Orbeon Forms. You can now look at the <a
+                href="/">Orbeon Forms examples</a> and the <a href="/doc/">rest of the Orbeon Forms documentation</a>!
+            </p>
+
+        <!--
+
+
+        xxx XForms 1.1
+
+        xxx more on Defining an XML document format
+        xxx more on eXist
+        xxx more on XForms?
+        xxx more on CRUD operations and REST
+
+        xxx + screencast!
+
+        xxx not only XML dbs, of course
+        xxx explain tag vs. element
+        xxx explain XML "nodes"
+        xxx what browser to use?
+        xxx show example of OF error
+        xxx note about how this relates to HTML forms
+
+        xxx going further: XML pipelines?
+
+
+        <section>
+            <title></title>
+            <p>
+                xxx
+            </p>
+        </section>
+        -->
             <!--<section>-->
                 <!--<title></title>-->
                 <!--<p>-->

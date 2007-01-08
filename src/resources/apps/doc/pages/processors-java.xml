@@ -31,26 +31,49 @@
             <ul>
                 <li>"Manually":
                     <ol>
-                        <li>Compile <code>MyProcessor.java</code>.</li>
-                        <li>Place the compiled class in
-                        <code>WEB-INF/classes</code> (or in any other location where
-                        it can be found by the classloader used to load the
-                        classes in <code>ops.jar</code>).</li>
-                        <li>Declare the new processor in
-                        <code>processors.xml</code> (i.e. mapping an URI to this new
-                        processor).</li>
-                        <li>Use the newly declared processor in an XPL (OPS Pipeline Definition Language) file using the URI
-                        declared in the <code>processors.xml</code>.</li>
+                        <li>
+                            <p>
+                                Compile <code>MyProcessor.java</code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Place the compiled class in <code>WEB-INF/classes</code> (or in any other location
+                                where it can be found by the classloader used to load the classes in
+                                <code>ops.jar</code>).
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Declare the new processor in <code>/config/custom-processors.xml</code> (i.e. mapping an
+                                URI to this new processor). The syntax of <code>/config/custom-processors.xml</code> is
+                                as described <a href="reference-processor-api#custom-processors">here</a>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Use the newly declared processor in an XPL (OPS Pipeline Definition Language) file using the URI
+                                declared in the <code>processors.xml</code>.
+                            </p>
+                        </li>
                     </ol>
                 </li>
                 <br/>
                 <li>Using the Java processor:
                     <ol>
-                        <li>Place <code>MyProcessor.java</code> with the other
-                        resources.</li>
-                        <li>Use the new processor in an XPL file through the Java
-                        processor. (We'll see below how this processor works in
-                        detail.)</li>
+                        <li>
+                            <p>
+                                Place <code>MyProcessor.java</code> with the other
+                                resources.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Use the new processor in an XPL file through the Java
+                                processor. (We'll see below how this processor works in
+                                detail.)
+                            </p>
+                        </li>
                     </ol>
                 </li>
             </ul>

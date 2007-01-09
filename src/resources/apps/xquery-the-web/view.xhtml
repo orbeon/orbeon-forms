@@ -1,0 +1,209 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting">
+
+    <xhtml:head>
+        <xhtml:title>XQuery The Web</xhtml:title>
+        <xhtml:style type="text/css">
+            .xquery-question {
+                font-weight: bold;
+                display: block;
+                padding-top: .2em;
+                color: #336;
+            }
+            .xforms-input input { width: 90% }
+            table th { white-space: nowrap }
+        </xhtml:style>
+        <xforms:model>
+            <xforms:instance>
+                <instance xmlns="">
+                    <url>http://www.orbeon.com/forms/download</url>
+                    <xquery-type>inline</xquery-type>
+                    <xquery-url/>
+                    <xquery>let $v := //div[starts-with(., 'Orbeon Forms ')]
+    return
+        &lt;p>Latest version of Orbeon Forms:
+            &lt;ul>
+                &lt;li>{string($v)}&lt;/li>
+                &lt;li>{string($v//following-sibling::div[1])}&lt;/li>
+            &lt;/ul>
+        &lt;/p></xquery>
+                    <output>xml</output>
+                    <javascript/>
+                </instance>
+            </xforms:instance>
+            <xforms:bind nodeset="javascript" readonly="false"
+                         calculate="concat('&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot; src=&quot;',
+                                           'http://www.example.org/xxx/', '/xquery-the-web/query?url=',
+                                           encode-for-uri(../url), '&amp;xquery=', encode-for-uri(../xquery), '&amp;output=javascript&quot;>')"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:img src="/apps/xquery-the-web/images/xquery-the-web.gif" alt="" style="float: right; margin: 0 0 2em 2em"/>
+        <xhtml:ul style="margin-left: 2em; padding-left: 0">
+            <xhtml:li>
+                <xhtml:span class="xquery-question">What is this service?</xhtml:span> Using XQuery, extract data from web sites,
+                recombine it, include it in your own pages, create feeds, ...
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="xquery-question">How do I use it?</xhtml:span> Enter a URL you want to extract information from,
+                enter an XQuery, and the format of the output. Use JavaScript if you want to
+                include the output of the query in your own pages.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="xquery-question">What is the format of the generated URL?</xhtml:span> This is a REST service. The
+                URL format is:
+                <xhtml:tt>xquery-the-web?output=xml|html|javascript&amp;url=...&amp;xquery=...</xhtml:tt>.
+                The form below just help you generate one of those URLs.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="xquery-question">What are the restriction for using this service?</xhtml:span> Don't make a
+                commercial use of this service. Be courteous to us and sites you are querying.
+                Be creative.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:span class="xquery-question">How can I submit feedback or ask other questions?</xhtml:span> Join and post your
+                feedback/questions on the <a
+                href="http://www.orbeon.com/forms/mailing-list">ops-users mailing list</a>.
+            </xhtml:li>
+        </xhtml:ul>
+        <xforms:group>
+            <xhtml:table class="gridtable" width="100%" style="clear: both; margin-top: 2em;">
+                <xhtml:tr>
+                    <xhtml:th width="1%">URL:</xhtml:th>
+                    <xhtml:td><xforms:input ref="url" navindex="1"/></xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>XQuery:</xhtml:th>
+                    <xhtml:td>
+                        <xforms:select1 appearance="full" ref="xquery-type" navindex="2">
+                            <xforms:item>
+                                <xforms:label>Inline</xforms:label>
+                                <xforms:value>inline</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>URL</xforms:label>
+                                <xforms:value>url</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+
+                        <xforms:group ref="xquery-type[. = 'inline']">
+                            <xforms:textarea ref="../xquery" appearance="xxforms:autosize" navindex="3"/>
+                        </xforms:group>
+                        <xforms:group ref="xquery-type[. = 'url']">
+                            <xforms:input ref="../xquery-url" navindex="4"/>
+                        </xforms:group>
+
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>Output format:</xhtml:th>
+                    <xhtml:td>
+                        <xforms:select1 ref="output" appearance="full" navindex="5">
+                            <xforms:choices>
+                                <xforms:item>
+                                    <xforms:label>XML</xforms:label>
+                                    <xforms:value>xml</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>HTML</xforms:label>
+                                    <xforms:value>html</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label>JavaScript</xforms:label>
+                                    <xforms:value>javascript</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:select1>
+                        <xhtml:br/>
+                        <xforms:group ref="output[. = 'javascript']">
+                            <xhtml:p>
+                                <xforms:input ref="../javascript" navindex="6" xxforms:rows="4"/>
+                            </xhtml:p>
+                        </xforms:group>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th/>
+                    <xhtml:td>
+                        <xforms:trigger navindex="6">
+                            <xforms:label>Run XQuery</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:load if="xquery-type = 'inline'"
+                                             resource="/xquery-the-web/query?url={encode-for-uri(url)}&amp;xquery={encode-for-uri(xquery)}&amp;output={output}"/>
+                                <xforms:load if="xquery-type != 'inline'"
+                                             resource="/xquery-the-web/query?url={encode-for-uri(url)}&amp;xquery-url={encode-for-uri(xquery-url)}&amp;output={output}"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
+        </xforms:group>
+        <!--  NOTE: This examples are old and don't appear to work.
+        <xhtml:b>Examples:</xhtml:b>
+        <xhtml:ul>
+            <xhtml:li>
+                <xhtml:b>
+                    <xhtml:a href="/apps/xquery-the-web/xquery/udell-tags.xq">View Source</xhtml:a>
+                    -
+                    <xhtml:a
+                            href="/xquery-the-web/query?url=http://weblog.infoworld.com/udell/rss.xml&amp;xquery-url=oxf:/apps/xquery-the-web/xquery/udell-tags.xq&amp;output=html">
+                        Run
+                        It
+                    </xhtml:a>
+                </xhtml:b>
+                - Gets the latest stories in
+                <a href="http://weblog.infoworld.com/udell/">Jon Udell weblog</a> and for each
+                one finds the tags assigned by users to that story on
+                <a href="http://del.icio.us/">del.icios.us</a>. It then displays those
+                tags, sorted by frequency and displays the tags that appear only
+                once with a smaller font.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:b>
+                    <xhtml:a href="/apps/xquery-the-web/xquery/technorati.xq">View Source</xhtml:a>
+                    -
+                    <xhtml:a
+                            href="/xquery-the-web/query?url=http://www.technorati.com/tag/&amp;xquery-url=oxf:/apps/xquery-the-web/xquery/technorati.xq&amp;output=html">
+                        Run
+                        It
+                    </xhtml:a>
+                </xhtml:b>
+                - Gets the <a href="http://www.technorati.com/tag/">top 5 tags</a> from
+                Technorati by popularity and for each one gets related images from <a
+                    href="http://www.google.com/imghp?hl=en&amp;tab=wi&amp;q=">Google Image Search</a>.
+            </xhtml:li>
+            <xhtml:li>
+                <xhtml:b>
+                    <xhtml:a href="/apps/xquery-the-web/xquery/blogrolling.xq">View Source</xhtml:a>
+                    -
+                    <xhtml:a
+                            href="/xquery-the-web/query?url=http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0&amp;xquery-url=oxf:/apps/xquery-the-web/xquery/blogrolling.xq&amp;output=javascript">
+                        Run
+                        It
+                    </xhtml:a>
+                </xhtml:b>
+                - Creates JavaScript that generates an HTML list to be embedded in a
+                Blogger/Blogspot <a href="http://avernet.blogspot.com/">blog</a> based on an <a
+                    href="http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0">RSS
+                feed</a> generated by <a href="http://www.blogrolling.com/">Blogrolling.com</a>.
+            </xhtml:li>
+        </xhtml:ul>
+        -->
+    </xhtml:body>
+</xhtml:html>

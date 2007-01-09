@@ -44,4 +44,7 @@
         <application id="sandbox-xslt" label="XSLT Sandbox"/>
         <application id="sandbox-xupdate" label="XUpdate Sandbox"/>
     </section>
+    <section label="Query &amp; Transformation">
+        <application id="xquery-the-web" label="XQuery the Web"/>
+    </section>
 </application>

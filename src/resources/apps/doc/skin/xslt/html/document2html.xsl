@@ -201,16 +201,18 @@
         </img>
     </xsl:template>
     <xsl:template match="img">
-        <p class="image"><img>
-            <xsl:copy-of select="@*"/>
-        </img></p>
+        <p>
+            <img class="ops-doc-image">
+                <xsl:copy-of select="@*"/>
+            </img>
+        </p>
     </xsl:template>
     <xsl:template match="code">
         <span class="codefrag"><xsl:apply-templates/></span>
     </xsl:template>
     <xsl:template match="figure">
         <div align="center">
-            <img src="{@src}" alt="{@alt}" class="figure">
+            <img src="{@src}" alt="{@alt}" class="ops-doc-figure">
                 <xsl:if test="@height">
                     <xsl:attribute name="height"><xsl:value-of select="@height"/></xsl:attribute>
                 </xsl:if>

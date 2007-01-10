@@ -364,9 +364,8 @@ a:hover {
     border-left: 0;
 }
 
-.ops-doc-section {
-    padding-left: 1em;
-}
+.ops-doc-section { padding-left: 1em }
+.ops-doc-image { border: 3px solid &light-color;; padding: 3px; margin-left: 1em }
 
 ul {
     list-style-type: square;

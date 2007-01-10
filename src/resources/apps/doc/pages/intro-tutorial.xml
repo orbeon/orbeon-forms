@@ -150,8 +150,9 @@
                                     http://localhost:8080/
                                 </xml-source>
                                 <p>
-                                    You should see the Tomcat welcome page. [TODO: screenshot]
+                                    You should see the Tomcat welcome page.
                                 </p>
+                                <img src="/apps/doc/images/tutorial/01.png"/>
                             </li>
                         </ul>
                     </li>
@@ -203,13 +204,15 @@
                     http://localhost:8080/ops/
                 </xml-source>
                 <p>
-                    You should see the Orbeon Forms welcome page. [TODO: screenshot]
+                    You should see the Orbeon Forms welcome page:
                 </p>
+                <img src="/apps/doc/images/tutorial/02.png"/>
                 <p>
                     You can now navigate the list of sample applications listed on the left side. You can see the source
                     code of each application directly in your web browser by selecting the "View Source Code" tab at
-                    the top of the page to open up the Orbeon Forms Source Viewer. [TODO: screenshot]
+                    the top of the page to open up the Orbeon Forms Source Viewer:
                 </p>
+                <img src="/apps/doc/images/tutorial/00.png"/>
             </section>
         </section>
         <section>
@@ -220,12 +223,14 @@
                     The Hello application is about the simplest XForms application you can think of. It asks for your
                     name and displays it back. You run the Hello application by selecting the link "XForms Hello" in
                     the list of applications. Simply enter your first name in the input field, for example "Joe". You
-                    should promptly see a message underneath saying "Hello, Joe!". [TODO: screenshot]
+                    should promptly see a message underneath saying "Hello, Joe!".
                 </p>
+                <img src="/apps/doc/images/tutorial/03.png"/>
                 <p>
                     You can directly view the source code from your web browser by selecting the "View Source Code"
-                    tab. There you see: [TODO: screenshot]
+                    tab. There you see:
                 </p>
+                <img src="/apps/doc/images/tutorial/04.png"/>
                 <ul>
                     <li>
                         <p>
@@ -551,8 +556,9 @@
                     <li>
                         <p>
                              Go back to the Hello application in your web browser and reload the page. You should see
-                             the new text appear: [TODO: screenshot]
+                             the new text appear:
                         </p>
+                        <img src="/apps/doc/images/tutorial/05.png"/>
                     </li>
                     <li>
                         <p>
@@ -567,8 +573,9 @@
                            Reload the page, and notice, as you type in an input field, how the other one udates as you
                            type. This happens because the two fields are bound to the same instance data. The
                            <code>incremental="true"</code> attribute allows the changes to occur as you type, instead of
-                           occurring when you focus in and out of fields.
+                           occurring when you focus in and out of fields:
                         </p>
+                        <img src="/apps/doc/images/tutorial/06.png"/>
                     </li>
                 </ul>
                 <p>
@@ -585,8 +592,9 @@
                     The Bookcast application allows you to keep track of information about books you have read. For each
                     book, you enter information such as title, author, language, and your own comments. The information
                     is persisted so you can access it again. Then you can do cool things with the available data such
-                    create an Atom feed of your entries. [TODO: Screenshot]
+                    create an Atom feed of your entries.
                 </p>
+                <img src="/apps/doc/images/tutorial/07.png"/>
             </section>
             <section>
                 <title>Getting Started</title>
@@ -655,8 +663,9 @@
                     http://localhost:8080/ops/my-bookcast/
                 </xml-source>
                 <p>
-                    You should something like this: [TODO: screenshot]
+                    You should something like this:
                 </p>
+                <img src="/apps/doc/images/tutorial/08.png"/>
                 <note>
                     <p>
                         If you get lost at some point in this tutorial, feel free to look at the reference
@@ -741,20 +750,23 @@
                     initial instance declaration is empty and contains a single book:
                 </p>
                 <xml-source show-namespaces="false">
-                    <xforms:instance id="books-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <books xmlns="">
-                            <book>
-                                <title/>
-                                <author/>
-                                <language/>
-                                <link/>
-                                <rating/>
-                                <notes/>
-                                <!--<start-date/>-->
-                                <!--<end-date/>-->
-                            </book>
-                        </books>
-                    </xforms:instance>
+                    <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <!-- TODO: xmlns="" doesn't appear -->
+                        <xforms:instance id="books-instance" xmlns="">
+                            <books xmlns="">
+                                <book>
+                                    <title/>
+                                    <author/>
+                                    <language/>
+                                    <link/>
+                                    <rating/>
+                                    <notes/>
+                                    <!--<start-date/>-->
+                                    <!--<end-date/>-->
+                                </book>
+                            </books>
+                        </xforms:instance>
+                    </xforms:model>
                 </xml-source>
                 <p>
                     Notice the <code>id</code> attribute which allows other XForms contructs to refer to that particular
@@ -766,7 +778,7 @@
                 <ul>
                     <li>
                         <p>
-                            Insert the instance under the <code>&lt;head></code> element.
+                            Insert the model and instance under the <code>&lt;head></code> element.
                         </p>
                     </li>
                     <li>
@@ -797,8 +809,9 @@
                     </xforms:group>
                 </xml-source>
                 <p>
-                    Reload the page. You should seem something like this: [TODO: screenshot]
+                    Reload the page. You should seem something like this:
                 </p>
+                <img src="/apps/doc/images/tutorial/09.png"/>
                 <p>
                     After having looked at the Hello example, this should be clear, with a little novelty:
                     <code>&lt;xforms:group></code>: this element allows grouping XForms controls together. The
@@ -829,7 +842,7 @@
                 </xml-source>
                 <p>
                     Notice how, as you enter text in the title or author field, the field's background changes color to
-                    indicate that the field must be filled out: [TODO: screenshot]
+                    indicate that the field must be filled out. [TODO: screenshot]
                 </p>
                 <p>
                     The above requires some explanations:
@@ -936,8 +949,9 @@
                     </xforms:select1>
                 </xml-source>
                 <p>
-                    Reload the page. You should see the following: [TODO: screenshot]
+                    Reload the page. You should see the following:
                 </p>
+                <img src="/apps/doc/images/tutorial/11.png"/>
                 <p>
                     You have just added a single selection control with <code>&lt;xforms:select1></code>. The name means
                     that the user can "select one" item among several items. (XForms tends to call controls using more
@@ -1065,7 +1079,7 @@
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:select1 ref="rating" appearance="full" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:label class="fixed-width">Rating</xforms:label>
+                        <xforms:label>Rating</xforms:label>
                         <xforms:item>
                             <xforms:label>None</xforms:label>
                             <xforms:value/>
@@ -1090,15 +1104,15 @@
                 <xml-source show-namespaces="false">
                     <xforms:group ref="book" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:input ref="title">
-                            <xforms:label class="fixed-width">Title</xforms:label>
+                            <xforms:label>Title</xforms:label>
                         </xforms:input>
                         <br/>
                         <xforms:input ref="author">
-                            <xforms:label class="fixed-width">Author</xforms:label>
+                            <xforms:label>Author</xforms:label>
                         </xforms:input>
                         <br/>
                         <xforms:select1 ref="language">
-                            <xforms:label class="fixed-width">Language</xforms:label>
+                            <xforms:label>Language</xforms:label>
                             <xforms:item>
                                 <xforms:label>Choose One...</xforms:label>
                                 <xforms:value/>
@@ -1110,11 +1124,11 @@
                         </xforms:select1>
                         <br/>
                         <xforms:input ref="link">
-                            <xforms:label class="fixed-width">Link</xforms:label>
+                            <xforms:label>Link</xforms:label>
                         </xforms:input>
                         <br/>
                         <xforms:select1 ref="rating" appearance="full">
-                            <xforms:label class="fixed-width">Rating</xforms:label>
+                            <xforms:label>Rating</xforms:label>
                             <xforms:item>
                                 <xforms:label>None</xforms:label>
                                 <xforms:value/>
@@ -1126,10 +1140,14 @@
                         </xforms:select1>
                         <br/>
                         <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                            <xforms:label class="fixed-width">Notes</xforms:label>
+                            <xforms:label>Notes</xforms:label>
                         </xforms:textarea>
                     </xforms:group>
                 </xml-source>
+                <p>
+                    And this is how the result should look like:
+                </p>
+                <img src="/apps/doc/images/tutorial/12.png"/>
                 <p>
                     By now you probably get the gist of it!
                 </p>
@@ -1242,7 +1260,7 @@
                     automatically sends the submission specified.
                 </p>
                 <p>
-                    So go ahead:
+                    So go ahead and:
                 </p>
                 <ul>
                     <li>
@@ -1277,8 +1295,9 @@
                         <p>
                             This is the exact same URL to which your submission has done an HTTP PUT. By entering it in
                             your browser, you tell it to do an HTTP GET instead, and the eXist database simply sends
-                            the XML document to your browser. You should see this: [TODO: screenshot]
+                            the XML document to your browser. You should see this:
                         </p>
+                        <img src="/apps/doc/images/tutorial/13.png"/>
                     </li>
                 </ul>
                 <p>
@@ -1537,8 +1556,8 @@
                 </ul>
                 <p>
                     Make the changes above, press on the "Add One" button, and you see a new row of controls created.
-                    [TODO: screenshot]
                 </p>
+                <img src="/apps/doc/images/tutorial/14.png"/>
                 <p>
                     Again the XForms engine does its magic and takes care of updating the web page automatically. You
                     also notice that the web page does not reload as it updates. This is because Orbeon Forms uses Ajax
@@ -1608,8 +1627,9 @@
                 </ul>
                 <p>
                     Now add the new trigger within <code>&lt;xforms:repeat></code> and reload the page. Try adding
-                    books, then removing them by pressing the "Revove" button. [TODO: screenshot]
+                    books, then removing them by pressing the "Remove" button.
                 </p>
+                <img src="/apps/doc/images/tutorial/15.png"/>
             </section>
             <section>
                 <title>Adding a "Revert" Button</title>
@@ -1618,7 +1638,7 @@
                     the database. It's as easy as this:
                 </p>
                 <xml-source show-namespaces="false" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events">
-                    <xforms:submit submission="list-submission" appearance="minimal">
+                    <xforms:submit submission="list-submission">
                         <xforms:label>Revert</xforms:label>
                     </xforms:submit>
                 </xml-source>
@@ -1907,7 +1927,11 @@
                     </style>
                 </xml-source>
                 <p>
-                    Reload the page, and you should see something like this: [TODO: screenshot]
+                    Reload the page, and you should see something like this:
+                </p>
+                <img src="/apps/doc/images/tutorial/16.png"/>
+                <p>
+                    A little bit of CSS does make things look a little better, doesn't it?
                 </p>
             </section>
             <section>
@@ -2101,8 +2125,9 @@
                 </p>
                 <p>
                     Try now making this change, enter an invalid link, and press the "Save" link: an alert message
-                    should show up! [TODO: screenshot]
+                    should show up!
                 </p>
+                <img src="/apps/doc/images/tutorial/17.png"/>
             </section>
             <section>
                 <title>The Atom Feed</title>
@@ -2148,7 +2173,7 @@
                     Consider the following page flow declaration:
                 </p>
                 <xml-source>
-                    <page path-info="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
+                    <page path-info="/my-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
                 </xml-source>
                 <p>
                     Notice how, instead of an XHTML page view (<code>view.xhtml</code>), you now use:
@@ -2274,7 +2299,7 @@
                                         <tr>
                                             <th>Notes</th>
                                             <td>
-                                                <xsl:for-each select="tokenize(notes, '&#x0a;')">
+                                                <xsl:for-each select="tokenize(notes, '&amp;#x0a;')">
                                                     <xsl:value-of select="."/>
                                                     <xsl:if test="position() lt last()">
                                                         <br/>
@@ -2336,11 +2361,9 @@
                 http://localhost:8080/ops/my-bookcast/atom
             </xml-source>
             <p>
-                You should see something similar to this, depending on your browser: [TODO: screenshot]
+                You should see something similar to this, depending on your browser:
             </p>
-            <p>
-                You can now try to load the feed into your favorite feedreader!
-            </p>
+            <img src="/apps/doc/images/tutorial/19.png"/>
             <p>
                 To make things even better, add the following to <code>view.xhtml</code> under the
                 <code>&lt;head></code> element:
@@ -2353,6 +2376,11 @@
                 src="/apps/doc/images/tutorial/feed-icon-14x14.png" alt="Feed Icon" width="14" height="14"/> or an RSS
                 icon, making the feed directly accessible from the main Bookcast page. [TODO: screenshot]
             </p>
+            <p>
+                You can now try to load the feed into your favorite feedreader! Here is how the Bookcast feed looks in
+                the Mozilla Thunderbird feed reader:
+            </p>
+            <img src="/apps/doc/images/tutorial/20.png"/>
         </section>
         <section>
             <title>What's Next</title>
@@ -2388,15 +2416,14 @@
 
         <!--
 
+        xxx xmlns="" missing on instances
+        xxx explain how to "reload" the page
 
-        xxx XForms 1.1
-
+        xxx more background on XForms?
+        xxx mention XForms 1.1
         xxx more on Defining an XML document format
         xxx more on eXist
-        xxx more on XForms?
         xxx more on CRUD operations and REST
-
-        xxx + screencast!
 
         xxx not only XML dbs, of course
         xxx explain tag vs. element
@@ -2405,8 +2432,7 @@
         xxx show example of OF error
         xxx note about how this relates to HTML forms
 
-        xxx going further: XML pipelines?
-
+        xxx app: add link to document in eXist (xforms:load)
 
         <section>
             <title></title>

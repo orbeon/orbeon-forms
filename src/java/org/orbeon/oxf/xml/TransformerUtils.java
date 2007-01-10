@@ -19,6 +19,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tree.TreeBuilder;
@@ -319,10 +320,16 @@ public class TransformerUtils {
         return new TransformerHandlerWrapper(transformerHandler, publicProperty, privateProperty);
     }
 
+    /**
+     * Transform an InputStream to a dom4j Document.
+     */
     public static Document readDom4j(InputStream inputStream, String systemId) {
         return readDom4j(new StreamSource(inputStream, systemId));
     }
 
+    /**
+     * Transform a SAX Source to a dom4j Document.
+     */
     public static Document readDom4j(Source source) {
         final LocationDocumentResult documentResult = new LocationDocumentResult();
         final Transformer identity;
@@ -335,10 +342,16 @@ public class TransformerUtils {
         return documentResult.getDocument();
     }
 
+    /**
+     * Transform an InputStream to a TinyTree.
+     */
     public static DocumentInfo readTinyTree(InputStream inputStream, String systemId) {
         return readTinyTree(new StreamSource(inputStream, systemId));
     }
 
+    /**
+     * Transform a SAX Source to a TinyTree.
+     */
     public static DocumentInfo readTinyTree(Source source) {
         final TreeBuilder treeBuilder = new TreeBuilder();
         final Transformer identity;
@@ -351,6 +364,9 @@ public class TransformerUtils {
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
 
+    /**
+     * Transform a TinyTree to a dom4j document.
+     */
     public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
         try {
             final Transformer identity = getIdentityTransformer();
@@ -362,10 +378,25 @@ public class TransformerUtils {
         }
     }
 
+    /**
+     * Transform a TinyTree to SAX events.
+     */
     public static void writeTinyTree(NodeInfo nodeInfo, ContentHandler contentHandler) {
         try {
             final Transformer identity = getIdentityTransformer();
             identity.transform(nodeInfo, new SAXResult(contentHandler));
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Transform a dom4j Node to SAX events.
+     */
+    public static void writeDom4j(org.dom4j.Node node, ContentHandler contentHandler) {
+        try {
+            final Transformer identity = getIdentityTransformer();
+            identity.transform(new LocationDocumentSource(node), new SAXResult(contentHandler));
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

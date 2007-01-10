@@ -130,6 +130,7 @@ public class ProcessorTest extends TestCase {
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG));
                 PipelineUtils.connect(urlGenerator, "data", xincludeProcessor, "config");
 
+                // Connect output
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(xincludeProcessor, "data", domSerializer, "data");
 

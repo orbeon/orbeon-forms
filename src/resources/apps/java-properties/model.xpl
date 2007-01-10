@@ -11,10 +11,16 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="*" view="view.xhtml"/>
+    <p:param name="data" type="output"/>
 
-    <epilogue url="oxf:/config/epilogue.xpl"/>
+    <p:processor name="oxf:java">
+        <p:input name="config">
+            <config sourcepath="." class="SystemProperties"/>
+        </p:input>
+        <p:output name="data" ref="data"/>
+    </p:processor>
 
-</config>
+</p:config>

@@ -11,9 +11,10 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="*" view="view.xhtml"/>
+    <page path-info="/java-properties/" model="model.xpl" view="view.xsl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

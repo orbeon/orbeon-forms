@@ -1663,12 +1663,12 @@
                         <tr>
                             <td>
                                 <xforms:submit submission="save-submission" appearance="minimal">
-                                    <xforms:label><figure src="../apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
+                                    <xforms:label><img src="../apps/xforms-bookcast/images/save.gif" alt="Save"/> Save</xforms:label>
                                 </xforms:submit>
                             </td>
                             <td>
                                 <xforms:submit submission="list-submission" appearance="minimal">
-                                    <xforms:label><figure src="../apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                                    <xforms:label><img src="../apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
                                 </xforms:submit>
                             </td>
                         </tr>
@@ -1699,7 +1699,7 @@
                         <tr>
                             <td>
                                 <xforms:trigger appearance="minimal">
-                                    <xforms:label><figure src="../apps/xforms-bookcast/images/add.gif"/></xforms:label>
+                                    <xforms:label><img src="../apps/xforms-bookcast/images/add.gif"/></xforms:label>
                                     <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
                                 </xforms:trigger>
                             </td>
@@ -1714,7 +1714,7 @@
                             <tr>
                                 <td>
                                     <xforms:trigger appearance="minimal">
-                                        <xforms:label><figure src="../apps/xforms-bookcast/images/remove.gif"/></xforms:label>
+                                        <xforms:label><img src="../apps/xforms-bookcast/images/remove.gif"/></xforms:label>
                                         <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="index('book-repeat')"/>
                                     </xforms:trigger>
                                 </td>

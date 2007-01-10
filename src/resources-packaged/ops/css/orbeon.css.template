@@ -470,6 +470,7 @@ ul {
     #main { border: none; }
     #leftcontent { display: none }
     #rightcontent { display: none }
+    #maincontent { border: none }
     .tabs { display: none }
     .tab { display: none }
     #cleaner { display: none }

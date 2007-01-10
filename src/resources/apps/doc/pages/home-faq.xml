@@ -265,7 +265,7 @@
             </section>
             <a name="xforms-classic-ng"/>
             <section added="2006-01-10">
-                <title>What are the XForms Classic and XForms NG engnes?</title>
+                <title>What are the XForms Classic and XForms NG engines?</title>
                 <p>
                     Up to version 2.8, Orbeon Forms featured a pure server-side XForms engine with limited XForms
                     functionality. With version 3.0, Orbeon Forms features a much enhanced XForms engine, with support

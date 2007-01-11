@@ -48,7 +48,7 @@ public class StreamInterceptor {
     private static Logger logger = LoggerFactory.createLogger(StreamInterceptor.class);
 
     private StringWriter writer;
-    private ByteArrayOutputStream byteStream;;
+    private ByteArrayOutputStream byteStream;
     private String encoding = CachedSerializer.DEFAULT_ENCODING;
     private String contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
 

@@ -209,6 +209,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return controlElement;
     }
 
+    public boolean hasLabel() {
+        return controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME) != null;
+    }
+
     /**
      * Return the control's appearance as an exploded QName.
      */

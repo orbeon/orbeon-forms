@@ -73,7 +73,7 @@ public class XFormsTriggerHandler extends HandlerBase {
         if (isConcreteControl && !xformsControl.hasLabel())
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 
-        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-template-label$" : isConcreteControl ? xformsControl.getLabel() : "";
+        final String labelValue = handlerContext.isGenerateTemplate() ? "$xforms-template-label$" : isConcreteControl ? (xformsControl.getLabel() != null ? xformsControl.getLabel() : "") : "";
 
         final QName appearance = getAppearance(elementAttributes);
 

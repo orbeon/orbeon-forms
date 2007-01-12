@@ -90,8 +90,4 @@ public class StaticExternalContext {
     public static Node decodeXML(String encodedXML) {
         return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
     }
-
-    public static String getVersion() {
-        return Version.getVersion();
-    }
 }

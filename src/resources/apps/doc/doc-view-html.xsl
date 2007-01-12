@@ -40,7 +40,7 @@
                         <xhtml:span id="navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                             <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
                                 <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a> |
-                                <xhtml:a href="../" f:url-norewrite="true">Examples</xhtml:a> |
+                                <xhtml:a href="../" f:url-norewrite="true">Example Apps</xhtml:a> |
                                 <xhtml:span style="white-space: nowrap">
                                     Search:
                                     <xhtml:input type="text" name="q" size="10" maxlength="255" value=""/>

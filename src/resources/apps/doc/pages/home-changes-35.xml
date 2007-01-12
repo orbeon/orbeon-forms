@@ -359,7 +359,7 @@
                 </ul>
             </section>
             <section>
-                <title>New Examples Portal</title>
+                <title>New Example Applications Portal</title>
                 <p>
                     In previous versions, the examples portal, which shows the built-in Orbeon Form example, was
                     implemented with a custom JSR-168 container. Example applications ran in as a JSR-168 portlet.
@@ -386,7 +386,7 @@
                     </li>
                     <li>
                         <p>
-                            The examples portal layout is simply created in a theme under
+                            The example applications portal layout is simply created in a theme under
                             <code>config/theme-portal.xsl</code>.
                         </p>
                     </li>

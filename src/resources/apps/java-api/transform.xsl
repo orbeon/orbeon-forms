@@ -27,7 +27,7 @@
             </xhtml:head>
             <xhtml:body>
                 <xhtml:p>
-                    This examples shows how a custom processor written in Java can natively execute other processors or
+                    This example shows how a custom processor written in Java can natively execute other processors or
                     pipelines. The custom processor runs an XSLT transformation, which reads a custom input passed to
                     the Java processor. The transformation applies the Orbeon Forms XML formatter to the input and
                     returns a custom output on the Java Processor.

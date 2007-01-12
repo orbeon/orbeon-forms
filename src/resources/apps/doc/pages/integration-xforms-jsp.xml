@@ -23,12 +23,11 @@
         <section>
             <title>Introduction</title>
             <p>
-                Most of the examples shipped with PresentationServer use the page flow controller
-                and are implemented using other components provided by PresentationServer. It is
-                also possible to use the XForms engine without using the page flow controller. The
-                PresentationServer web archive (WAR file) comes with examples implemented in JSP
-                files that reply on the XForms engine and we describe here how you can use just the
-                XForms engine. We illustrate our case using JSPs, but this largely applies to
+                Most of the example applications shipped with PresentationServer use the page flow controller and are
+                implemented using other components provided by PresentationServer. It is also possible to use the XForms
+                engine without using the page flow controller. The PresentationServer web archive (WAR file) comes with
+                example applications implemented in JSP files that reply on the XForms engine and we describe here how
+                you can use just the XForms engine. We illustrate our case using JSPs, but this largely applies to
                 servlets or third party web frameworks implemented as a servlet.
             </p>
         </section>

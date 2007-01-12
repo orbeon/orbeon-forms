@@ -265,12 +265,15 @@
             <a name="your-app-portal"/>
             <section>
                 <title>Do not run your code in the examples portal</title>
+                <note>
+                    <p>This applies to versions of Orbeon Forms prior to 3.5.</p>
+                </note>
                 <p>
-                    The OPS examples portal (i.e. the home page of OPS, which lists all the OPS
-                    examples), while convenient to run examples, is not implemented optimally and
-                    relies on portlets which cause overhead. The first thing to do is make sure that
-                    your code runs outside of the examples portal, i.e. that your page flow entries
-                    are present in the main page flow file (<code>resources/page-flow.xml</code>).
+                    The examples portal in OPS 3.0 (i.e. the home page of OPS, which lists all the OPS examples), while
+                    convenient to run examples, is not implemented optimally and relies on portlets which cause
+                    overhead. The first thing to do is make sure that your code runs outside of the examples portal,
+                    i.e. that your page flow entries are present in the main page flow file
+                    (<code>resources/page-flow.xml</code>).
                 </p>
             </section>
             <a name="your-app-epilogue"/>

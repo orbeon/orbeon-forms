@@ -44,7 +44,7 @@
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head>
-                <xhtml:title>Orbeon Forms Examples - <xsl:value-of select="$title"/></xhtml:title>
+                <xhtml:title>Orbeon Forms Example Applications - <xsl:value-of select="$title"/></xhtml:title>
                 <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
@@ -113,7 +113,7 @@
                     <xhtml:tr>
                         <!-- List of examples -->
                         <xhtml:td id="leftcontent" valign="top" width="1%">
-                            <h1>Examples</h1>
+                            <h1>Orbeon Forms Apps</h1>
                             <xhtml:ul class="tree-sections">
                                 <xsl:for-each select="$applications/*/section">
                                     <xhtml:li class="tree-section">

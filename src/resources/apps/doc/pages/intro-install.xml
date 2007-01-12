@@ -277,9 +277,9 @@
                 </li>
                 <li>
                     <p>
-                        You should now be able to access the Orbeon Forms examples by pointing your browser
-                        to the address of your WebLogic server followed by the context path you
-                        chose, for example: <code>http://localhost:7001/ops/</code>.
+                        You should now be able to access the Orbeon Forms example applications by pointing your browser
+                        to the address of your WebLogic server followed by the context path you chose, for example:
+                        <code>http://localhost:7001/ops/</code>.
                     </p>
                 </li>
                 <!--
@@ -362,7 +362,7 @@
                             Start WebLogic (e.g. with <code>startWebLogic.cmd</code>)
                         </li>
                         <li>
-                            Make sure you can access the Orbeon Forms examples with your browser (by going
+                            Make sure you can access the Orbeon Forms example applications with your browser (by going
                             to <code>http://localhost:7001/orbeon/</code>)
                         </li>
                         <li>
@@ -610,7 +610,7 @@
                 </li>
                 <li>
                     <p>
-                        Run and modify the examples.
+                        Run and modify the example applications.
                         <ul>
                             <li>Go to <code>http://localhost:9080/ops/</code>.</li>
                             <li>
@@ -618,14 +618,12 @@
                                 <code>WSAS_HOME/profiles/default/logs/server1/SystemOut.log</code>.
                             </li>
                             <li>
-                                You can modify the examples resources as the application sever is
-                                running and see the results of your modifications on the fly. The
-                                resources are stored under
+                                You can modify the example applications resources as the application sever is running
+                                and see the results of your modifications on the fly. The resources are stored under
                                 <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
-                                orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance,
-                                try to modify <code>examples/tutorial/hello1/view.xhtml</code>:
-                                replace "Hello World!" by your own message, and reload the page in
-                                the browser to see the result.
+                                orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance, try to modify
+                                <code>examples/tutorial/hello1/view.xhtml</code>: replace "Hello World!" by your own
+                                message, and reload the page in the browser to see the result.
                             </li>
                         </ul>
                     </p>
@@ -868,13 +866,12 @@
                 </li>
                 <li>
                     <p>
-                        Run and modify the examples.
+                        Run and modify the example applications.
                         <ul>
                             <li>Go to <code>http://localhost:8080/ops/</code></li>
                             <li>
-                                You can modify the examples resources as the application sever is
-                                running and see the results of your modifications on the fly. The
-                                resources are stored under
+                                You can modify the example applications resources as the application sever is running
+                                and see the results of your modifications on the fly. The resources are stored under
                                 <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/resources</code>.
                             </li>
                         </ul>

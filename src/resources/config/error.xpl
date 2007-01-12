@@ -28,7 +28,7 @@
     </p:processor>
 
     <!-- Format exception page -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#exception"/>
         <p:input name="config" href="error.xsl"/>
         <p:output name="data" id="document"/>

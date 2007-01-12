@@ -24,17 +24,20 @@
                 xmlns:xhtml="http://www.w3.org/1999/xhtml"
                 xmlns:saxon="http://saxon.sf.net/"
                 xmlns:f="http://orbeon.org/oxf/xml/formatting"
+                xmlns:version="java:org.orbeon.oxf.common.Version"
                 xmlns="http://www.w3.org/1999/xhtml">
 
     <!--<xsl:import href="oxf:/oxf/xslt/utils/utils.xsl"/>-->
 
     <xsl:variable name="servlet-classes" as="xs:string+" select="('org.orbeon.oxf.servlet.OPSServlet', 'org.orbeon.oxf.servlet.OXFServlet')"/>
     <xsl:variable name="portlet-classes" as="xs:string+" select="('org.orbeon.oxf.portlet.OPSPortlet', 'org.orbeon.oxf.portlet.OPSPortlet')"/>
+    <xsl:variable name="orbeon-forms-version" as="xs:string" select="version:getVersion()"/>
+    <xsl:variable name="title" as="xs:string" select="'Orbeon Forms - Error Page'"/>
 
     <xsl:template match="/">
         <html>
             <head>
-                <title>Orbeon PresentationServer (OPS) - Error Page</title>
+                <title><xsl:value-of select="$title"/></title>
             </head>
             <body>
                 <script>
@@ -48,7 +51,7 @@
                     }
                 </script>
                 <div class="maincontent">
-                    <h1>Orbeon PresentationServer (OPS) - Error Page</h1>
+                    <h1><xsl:value-of select="$title"/></h1>
                     <h2>Error Message</h2>
                     <p>
                         The following error has occurred:
@@ -277,6 +280,7 @@
                         </xsl:for-each>
                     </table>
                 </div>
+                <p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></p>
             </body>
         </html>
     </xsl:template>

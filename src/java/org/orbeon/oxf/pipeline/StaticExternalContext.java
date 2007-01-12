@@ -16,6 +16,7 @@ package org.orbeon.oxf.pipeline;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.common.Version;
 import org.dom4j.Node;
 
 import java.util.*;
@@ -88,5 +89,9 @@ public class StaticExternalContext {
 
     public static Node decodeXML(String encodedXML) {
         return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
+    }
+
+    public static String getVersion() {
+        return Version.getVersion();
     }
 }

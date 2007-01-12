@@ -17,7 +17,8 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
 
     <!-- Get generic templates from plain theme -->
     <xsl:import href="theme-plain.xsl"/>
@@ -159,6 +160,7 @@
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
+                <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="context:getVersion()"/></xhtml:p>
             </xhtml:body>
         </xhtml:html>
     </xsl:template>

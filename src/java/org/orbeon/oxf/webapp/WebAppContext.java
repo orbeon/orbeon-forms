@@ -33,7 +33,7 @@ import java.util.*;
  * When the instance is created:
  *
  * 1. Initialize a resource manager
- * 2. Initialize PresentationServer Properties
+ * 2. Initialize Orbeon Forms Properties
  * 3. Initialize logger based on properties
  * 4. Initialize the processor registry
  */
@@ -54,7 +54,7 @@ public class WebAppContext {
 
     public static WebAppContext instance() {
         if (instance == null)
-            throw new OXFException("PresentationServer WebAppContext not initialized. Make sure at least one servlet or context listener is initialized first.");
+            throw new OXFException("Orbeon Forms WebAppContext not initialized. Make sure at least one servlet or context listener is initialized first.");
         return instance;
     }
 
@@ -79,7 +79,7 @@ public class WebAppContext {
             if (initializeLogging) {
                 LoggerFactory.initBasicLogger();
             }
-            logger.info("Starting PresentationServer Release " + Version.getVersion());
+            logger.info("Starting Orbeon Forms Release " + Version.getVersion());
 
             // 1. Initialize the Resource Manager
             Map properties = new HashMap();

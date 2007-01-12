@@ -62,7 +62,7 @@ public class OPSPortletDelegate extends GenericPortlet {
     private Map contextInitParameters = null;
 
     public void init() throws PortletException {
-        // NOTE: Here we assume that an PresentationServer WebAppContext context has already
+        // NOTE: Here we assume that an Orbeon Forms WebAppContext context has already
         // been initialized. This can be done by another Servlet or Filter. The only reason we
         // cannot use the WebAppContext appears to be that it has to pass the ServletContext to
         // the resource manager, which uses in turn to read resources from the Web app classloader.

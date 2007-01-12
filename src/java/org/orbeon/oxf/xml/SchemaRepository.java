@@ -160,7 +160,7 @@ public class SchemaRepository {
     }
 
     /**
-     * Get a systemId by looking in the properties, then in the builtin PresentationServer
+     * Get a systemId by looking in the properties, then in the builtin Orbeon Forms
      * schemas. This is used only for user-defined validation.
      */
     public String getSchema(String publicId) {
@@ -175,7 +175,7 @@ public class SchemaRepository {
             }
         }
 
-        // Not defined in properties: try predefined PresentationServer schemas
+        // Not defined in properties: try predefined Orbeon Forms schemas
         String schemaFile = (String) schemas.get(publicId);
         if (schemaFile != null) {
             if (schemaFile.startsWith("/"))

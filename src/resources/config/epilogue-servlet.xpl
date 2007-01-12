@@ -62,7 +62,7 @@
                     </p:processor>
                 </p:when>
                 <p:otherwise>
-                    <p:processor name="oxf:xslt">
+                    <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
                         <p:input name="config" href="theme-portal.xsl"/>

@@ -52,12 +52,12 @@ import org.xml.sax.helpers.AttributesImpl;
  * 4. If no form/@method is supplied, force an HTTP POST
  * 5. Escape any wsrp_rewrite occurence in text not within a script or
  * SCRIPT element to wsrp_rewritewsrp_rewrite. WSRP 1.0 does not appear to
- * specify a particular escape sequence, but we use this one in PresentationServer Portal. The
- * escaped sequence is recognized by the PresentationServer Portlet and restored to the
+ * specify a particular escape sequence, but we use this one in Orbeon Forms Portal. The
+ * escaped sequence is recognized by the Orbeon Forms Portlet and restored to the
  * original sequence, so it is possible to include the string wsrp_rewrite within documents.
  * 6. Occurrences of wsrp_rewrite found within script or SCRIPT elements, as well as occurrences
  * within attributes, are left untouched. This allows them to be recognized by the
- * PresentationServer Portlet and rewritten.
+ * Orbeon Forms Portlet and rewritten.
  *
  * Known issues for portlets:
  *

@@ -157,7 +157,7 @@ public class ProcessorService {
         }
 
         // Head
-        sb.append("<html><head><title>PresentationServer Error</title>");
+        sb.append("<html><head><title>Orbeon Forms Error</title>");
         sb.append("<style>");
         Reader styleReader = null;
         try {
@@ -179,7 +179,7 @@ public class ProcessorService {
 
         // Title
         sb.append("<body>");
-        sb.append("<h1>PresentationServer Error</h1>");
+        sb.append("<h1>Orbeon Forms Error</h1>");
         sb.append("<table class=\"gridtable\">");
 
 

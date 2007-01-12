@@ -39,6 +39,8 @@
                                        else if (/xhtml:html/xhtml:body/xhtml:h1)
                                             then (/xhtml:html/xhtml:body/xhtml:h1)[1]
                                             else '[Untitled]'" as="xs:string"/>
+    <!-- Orbeon Forms version -->
+    <xsl:variable name="orbeon-forms-version" select="version:getVersion()" as="xs:string"/>
 
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
@@ -56,6 +58,8 @@
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:style"/>
                 <!-- Handle user-defined scripts -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/xhtml:script"/>
+                <!-- Orbeon Forms version -->
+                <xhtml:meta name="generator" content="Orbeon Forms {$orbeon-forms-version}"/>
             </xhtml:head>
             <xhtml:body>
                 <!-- Copy body attributes -->
@@ -160,7 +164,7 @@
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
-                <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="version:getVersion()"/></xhtml:p>
+                <xhtml:p class="ops-version">Orbeon Forms <xsl:value-of select="$orbeon-forms-version"/></xhtml:p>
             </xhtml:body>
         </xhtml:html>
     </xsl:template>

@@ -48,10 +48,10 @@
                 <title>Prerequisites</title>
                 <p>
                     To go through this tutorial, you don't need much: any reasonably modern computer on which you can
-                    install Java 1.5 (1.4.2 may work for you but 1.5 is strongly recommended) should do. You should be
-                    comfortable with installing new software on your computer, including uncompressing zip or gzip
-                    archives. You will also have to edit XML files. If you are familiar with HTML, this should not be a
-                    problem.
+                    install Java 1.5 or 1.6 should do (Java 1.4.2 may work for you but 1.5 is strongly recommended).
+                    You should be comfortable with installing new software on your computer, including uncompressing zip
+                    or gzip archives. You will also have to edit XML files. If you are familiar with HTML, this should
+                    not be a problem.
                 </p>
                 <p>
                     You will <i>not</i> have to write any Java code or any scripting language code. You will <i>not</i>
@@ -335,7 +335,7 @@
                 <p>
                     You guessed that this tag allows the user to <i>input</i> information.
                     <code>&lt;xforms:input></code> is usually displayed to the user as an input field. The
-                    <code>ref</code> attribute is the magic that connects the input field to the XForms instance. it
+                    <code>ref</code> attribute is the magic that connects the input field to the XForms instance. It
                     contains an <i>XPath expression</i>, which in this case just looks like a file path. In this case,
                     <code>/first-name</code> points to the element called <code>first-name</code>, which happens to be
                     the only element we have in the XForms instance. Using the <code>ref</code> attribute this way is
@@ -589,7 +589,8 @@
             <section>
                 <title>What is it?</title>
                 <p>
-                    The Bookcast application allows you to keep track of information about books you have read. For each
+                    In this section, you will create a more complete XForms application: the Bookcast application. The
+                    Bookcast application allows you to keep track of information about books you have read. For each
                     book, you enter information such as title, author, language, and your own comments. The information
                     is persisted so you can access it again. Then you can do cool things with the available data such
                     create an Atom feed of your entries.
@@ -1430,7 +1431,7 @@
                     </li>
                 </ul>
                 <p>
-                    <i>actions</i> and <i>events</i> are very important in XForms: they are the glue that allows you to
+                    <i>Actions</i> and <i>events</i> are very important in XForms: they are the glue that allows you to
                     react to different "things" that happen in an XForms page, whether controlled by the XForms engine or
                     directly by the user. This is very similar to using JavaScript in a regular HTML page. In XForms, they
                     allow you to react to the user pressing a button, entering data, etc. XForms comes with a number of
@@ -1441,8 +1442,8 @@
                     (You may wonder what would happen the first time the <code>list-submission</code> is called if no
                     <code>books.xml</code> document is available in the database. The answer is that the database would
                     return an error, and the submission would throw an event called <code>xforms-submit-error</code>.
-                    But because you don't have an event handler for this event, nothing happens, and the initial
-                    content of the <code>books-submission</code> instance is not changed and you see an empty form.)
+                    But because you don't have an event handler for this event, nothing happens: the initial
+                    content of the <code>books-submission</code> instance is not changed and so you see an empty form.)
                 </p>
             </section>
             <section>
@@ -2245,7 +2246,7 @@
                 href="http://www.w3.org/TR/xproc/">XProc</a>.)
             </p>
             <p>
-                So what does this pipeline do? It runs a <i>processor</i> called <code>oxf:xforms:submission</code>,
+                So what does this pipeline do? It runs a <i>processor</i> called <code>oxf:xforms-submission</code>,
                 which is handy component that allows you to perform XForms submissions from XPL. That submission
                 retrieves <code>books.xml</code> and returns it on the processor's <code>response</code> output. That
                 output in turn is sent to the <code>data</code> output of the page model pipeline.

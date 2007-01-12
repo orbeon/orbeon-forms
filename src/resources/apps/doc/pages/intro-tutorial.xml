@@ -47,7 +47,7 @@
             <section>
                 <title>Prerequisites</title>
                 <p>
-                    To go through this tutorial, you don't need much: any reasonbly modern computer on which you can
+                    To go through this tutorial, you don't need much: any reasonably modern computer on which you can
                     install Java 1.5 (1.4.2 may work for you but 1.5 is strongly recommended) should do. You should be
                     comfortable with installing new software on your computer, including uncompressing zip or gzip
                     archives. You will also have to edit XML files. If you are familiar with HTML, this should not be a
@@ -311,7 +311,7 @@
                 </xml-source>
                 <p>
                     The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document is
-                    encapsulatd within an <code>&lt;xforms:instance></code> tag:
+                    encapsulated within an <code>&lt;xforms:instance></code> tag:
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -367,7 +367,7 @@
                     With many client-side libraries, you express this type of logic with JavaScript. With XForms, you
                     use XPath instead. This means that you need to learn at least a few bits of the XPath syntax. While
                     XPath may be different from what you already know (it is based on expressions and definitely
-                    targetted at XML), it is in fact a smaller language than JavaScript.
+                    targeted at XML), it is in fact a smaller language than JavaScript.
                 </p>
                 <p>
                     So how do you hook-up the logic within <code>&lt;xforms:output></code>? Here, instead of a
@@ -570,7 +570,7 @@
                             <xforms:input ref="/first-name" incremental="true"/>
                         </xml-source>
                         <p>
-                           Reload the page, and notice, as you type in an input field, how the other one udates as you
+                           Reload the page, and notice, as you type in an input field, how the other one updates as you
                            type. This happens because the two fields are bound to the same instance data. The
                            <code>incremental="true"</code> attribute allows the changes to occur as you type, instead of
                            occurring when you focus in and out of fields:
@@ -579,7 +579,7 @@
                     </li>
                 </ul>
                 <p>
-                    You notice that you get instant gratifiation with Orbeon forms: just change files on disk, reload
+                    You notice that you get instant gratification with Orbeon forms: just change files on disk, reload
                     your page, and your changes are taken into account with no compilation or other complex deployment.
                 </p>
             </section>
@@ -606,7 +606,7 @@
                         <p>
                             The first thing to do is to create a new directory for your application. Orbeon Forms
                             already come with the complete <code>xforms-bookcast</code> application, so instead let's
-                            decice on another name, for example <code>my-bookcast</code>. Create a directory with that
+                            decide on another name, for example <code>my-bookcast</code>. Create a directory with that
                             name as <code>RESOURCES/apps/my-bookcast</code>. For convenience, we refer to that new
                             directory as the <code>BOOKCAST</code> directory below.
                         </p>
@@ -769,8 +769,8 @@
                     </xforms:model>
                 </xml-source>
                 <p>
-                    Notice the <code>id</code> attribute which allows other XForms contructs to refer to that particular
-                    instance.
+                    Notice the <code>id</code> attribute which allows other XForms constructs to refer to that
+                    particular instance.
                 </p>
                 <p>
                     Now do the following:
@@ -1094,7 +1094,7 @@
                     Here again, you store the list of items as a separate instance, but we keep the "empty" item as an
                     <code>&lt;xforms:item></code>. There is something new: the use of the <code>full</code> appearance,
                     which displays the selection control as a list of radio buttons. This is a standard XForms
-                    appearance value, which is likely to be supported by all XForms implemementations. (You can tell
+                    appearance value, which is likely to be supported by all XForms implementations. (You can tell
                     that it is standard because there is no colon <code>:</code> in the appearance value.)
                 </p>
                 <p>
@@ -1301,7 +1301,7 @@
                     </li>
                 </ul>
                 <p>
-                    Try changing the book author, and pressing "Save" again. Then in your other browser tab or window,
+                    Try changing the book author and pressing "Save" again. Then in your other browser tab or window,
                     reload the eXist URL, and notice that the data has actually changed in the database.
                 </p>
             </section>
@@ -1384,7 +1384,7 @@
                     </li>
                     <li>
                         <p>
-                            Orbeon Forms receives the request, looks up the page flow file, finds out that
+                            Orbeon Forms receives the request, looks up the page flow file, and finds out that
                             <code>view.xhtml</code> must be served.
                         </p>
                     </li>
@@ -1438,7 +1438,7 @@
                     don't need to use something like JavaScript.
                 </p>
                 <p>
-                    (You may wonder what would happens the first time the <code>list-submission</code> is called if no
+                    (You may wonder what would happen the first time the <code>list-submission</code> is called if no
                     <code>books.xml</code> document is available in the database. The answer is that the database would
                     return an error, and the submission would throw an event called <code>xforms-submit-error</code>.
                     But because you don't have an event handler for this event, nothing happens, and the initial
@@ -1536,11 +1536,11 @@
                     </li>
                     <li>
                         <p>
-                            Here we have deciced that we want to insert a new book always in first position in the page.
+                            Here we have decided that we want to insert a new book always in first position in the page.
                             The trick is to configure the insert action with the appropriate attributes.
                         </p>
                         <p>
-                            With the configuration profivded, the action <i>inserts</i>
+                            With the configuration provided, the action <i>inserts</i>
                             (<code>&lt;xforms:insert></code>) the contents of the <code>book-template</code> instance
                             (origin="instance('book-template')") <i>before</i> (<code>position="before"</code>) the
                             <i>first</i> (<code>at="1"</code>) element called <code>&lt;book></code>
@@ -2246,7 +2246,7 @@
             </p>
             <p>
                 So what does this pipeline do? It runs a <i>processor</i> called <code>oxf:xforms:submission</code>,
-                which is handy component that allows you to perform XForm submissions from XPL. That submission
+                which is handy component that allows you to perform XForms submissions from XPL. That submission
                 retrieves <code>books.xml</code> and returns it on the processor's <code>response</code> output. That
                 output in turn is sent to the <code>data</code> output of the page model pipeline.
             </p>
@@ -2377,7 +2377,7 @@
                 icon, making the feed directly accessible from the main Bookcast page. [TODO: screenshot]
             </p>
             <p>
-                You can now try to load the feed into your favorite feedreader! Here is how the Bookcast feed looks in
+                You can now try to load the feed into your favorite feed reader! Here is how the Bookcast feed looks in
                 the Mozilla Thunderbird feed reader:
             </p>
             <figure src="/apps/doc/images/tutorial/20.png"/>

@@ -127,6 +127,46 @@
                     web browser.
                 </p>
             </section>
+            <a name="oxf"/>
+            <section added="2007-01-15">
+                <title>What is "OXF"?</title>
+                <p>
+                    OXF was the name of Orbeon Forms before it was open sourced in 2004. For backward compatibility, the
+                    string "oxf" still persists in a few places, including:
+                </p>
+                <ul>
+                    <li>
+                        <p>As XML namespace prefix for built-in XPL processors.</p>
+                    </li>
+                    <li>
+                        <p>As part of built-in XML namespace URIs.</p>
+                    </li>
+                    <li>
+                        <p>As a URL scheme for accessing Orbeon Forms resources.</p>
+                    </li>
+                    <li>
+                        <p>As a prefix for property names in <code>properties.xml</code>.</p>
+                    </li>
+                    <li>
+                        <p>As a prefix for parameter names in <code>web.xml</code>.</p>
+                    </li>
+                    <li>
+                        <p>As a package name in the Java source code.</p>
+                    </li>
+                </ul>
+                <p>
+                    See also <a href="#xpl-oxf-prefix">this FAQ entry</a>.
+                </p>
+            </section>
+            <a name="ops"/>
+            <section added="2007-01-15">
+                <title>What is "OPS"?</title>
+                <p>
+                    OPS stands for Orbeon PresentationServer and was the name of the platform before it was renamed to
+                    Orbeon Forms. The string "ops" still persists in a few places, including some resource paths, and
+                    the name of the Orbeon Forms <a href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                </p>
+            </section>
         </section>
         <a name="xforms"/>
         <section>
@@ -838,6 +878,46 @@
                     output, and for instance connect it to the input of another processor. Ids are
                     similar to variable names in most programming languages.
                 </p>
+            </section>
+            <a name="xpl-oxf-prefix"/>
+            <section added="2007-01-15">
+                <title>I am confused by all those <code>oxf:</code> prefixes. What do they mean?</title>
+                <p>
+                    By default Orbeon Forms makes two uses of the string <code>oxf:</code>:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>As an XML namespace prefix in XPL.</b> The XML namespace prefix <code>oxf</code> is
+                            typically mapped to the XML namespace URI <code>http://www.orbeon.com/oxf/processors</code>.
+                            This namespace is used to resolve XML qualified names (also referred to as "QNames") that
+                            identify the built-in XML processors in XPL, such as <code>oxf:xslt</code>. These are
+                            constructs specific to XML.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>As a URL scheme.</b> The <code>oxf</code> URL scheme is used to address Orbeon Forms
+                            resources through the Orbeon Forms <a href="reference-resource-managers">Resource
+                            Manager</a>. They are part of URLs such as <code>oxf:/config/properties.xml</code>. Such
+                            URLs are supported throughout the Orbeon XForms XPL engine and XForms engine.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Having both uses in the same file may be confusing. But while you <i>have</i> to use the
+                    <code>oxf</code> scheme to access Orbeon Forms resources, you <i>don't have</i> to use the
+                    <code>oxf</code> prefix in XPL: you can use any prefix you like, for example:
+                </p>
+                <xml-source>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                           xmlns:processor="http://www.orbeon.com/oxf/processors">
+                        <p:processor name="processor:xslt">
+                           ...
+                        </p:processor>
+                        ...
+                    </p:config>
+                </xml-source>
             </section>
         </section>
         <a name="other"/>

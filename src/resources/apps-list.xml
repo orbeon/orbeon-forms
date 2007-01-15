@@ -16,7 +16,7 @@
         <application id="welcome" label="Welcome"/>
     </section>
     <section label="XForms">
-        <application id="forms" label="US Forms"/>
+        <application id="forms" label="Government Forms"/>
         <application id="xforms-controls" label="XForms Controls"/>
         <application id="xforms-sandbox" label="XForms Sandbox"/>
         <application id="xforms-todo" label="To-Do Lists"/>

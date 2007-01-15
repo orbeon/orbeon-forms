@@ -129,7 +129,7 @@
             </section>
             <a name="oxf"/>
             <section added="2007-01-15">
-                <title>What is "OXF"?</title>
+                <title>What is OXF?</title>
                 <p>
                     OXF was the name of Orbeon Forms before it was open sourced in 2004. For backward compatibility, the
                     string "oxf" still persists in a few places, including:
@@ -160,7 +160,7 @@
             </section>
             <a name="ops"/>
             <section added="2007-01-15">
-                <title>What is "OPS"?</title>
+                <title>What is OPS?</title>
                 <p>
                     OPS stands for Orbeon PresentationServer and was the name of the platform before it was renamed to
                     Orbeon Forms. The string "ops" still persists in a few places, including some resource paths, and

@@ -22,7 +22,6 @@ import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
 /**

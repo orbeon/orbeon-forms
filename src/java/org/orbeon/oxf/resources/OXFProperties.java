@@ -18,10 +18,13 @@ import org.orbeon.oxf.processor.OXFPropertiesSerializer;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.SAXException;
+import org.dom4j.DocumentException;
+
+import java.io.IOException;
 
 /**
- * This class provides access to global, configurable properties, as well as to processor-specific
- * properties. This is an example of properties file:
+ * This class provides access to global, configurable properties, as well as to processor-specific properties. This is
+ * an example of properties file:
  *
  * <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
  *             xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -35,7 +38,7 @@ public class OXFProperties {
 
     public static final String DEFAULT_PROPERTIES_URI = "oxf:/properties.xml";
 
-    private static final int RELOAD_DELAY = 5*1000;
+    private static final int RELOAD_DELAY = 5 * 1000;
 
     private static OXFProperties instance;
     private static String key = DEFAULT_PROPERTIES_URI;
@@ -67,37 +70,39 @@ public class OXFProperties {
      */
     private void update() {
         if (!initializing) {
-            Throwable thrwn = null;
-            done : try {
-            
+            Throwable throwable = null;
+            done:
+            try {
                 initializing = true;
                 final long current = System.currentTimeMillis();
 
-                if( lastUpdate + RELOAD_DELAY  >= current ) break done;
-                
-                final java.net.URL url = URLFactory.createURL( key );
+                if (lastUpdate + RELOAD_DELAY >= current) break done;
+
+                final java.net.URL url = URLFactory.createURL(key);
                 final java.net.URLConnection uc = url.openConnection();
 
-                if ( propertyStore != null && uc.getLastModified() <= lastUpdate ) break done;
+                if (propertyStore != null && uc.getLastModified() <= lastUpdate) {
+                    lastUpdate = current;
+                    break done;
+                }
 
                 final java.io.InputStream in = uc.getInputStream();
-                final org.dom4j.Document doc = Dom4jUtils.read( in );
-                propertyStore = OXFPropertiesSerializer.createPropertyStore( doc );
+                final org.dom4j.Document doc = Dom4jUtils.read(in);
+                propertyStore = OXFPropertiesSerializer.createPropertyStore(doc);
 
                 lastUpdate = current;
-            
-            } catch ( final java.io.IOException e ) {
-                thrwn = e;
-            } catch ( final SAXException e ) {
-                thrwn = e;
-            } catch ( final org.dom4j.DocumentException e ) {
-                thrwn = e;
+
+            } catch (final IOException e) {
+                throwable = e;
+            } catch (final SAXException e) {
+                throwable = e;
+            } catch (final DocumentException e) {
+                throwable = e;
             } finally {
                 initializing = false;
             }
-            if ( thrwn != null ) {
-                throw new OXFException
-                    ("Failure to initialize PresentationServer properties", thrwn );
+            if (throwable != null) {
+                throw new OXFException("Failure to initialize Orbeon Forms properties", throwable);
             }
         }
     }
@@ -109,7 +114,7 @@ public class OXFProperties {
         return propertyStore.getGlobalPropertySet();
     }
 
-    public PropertySet getPropertySet( final org.dom4j.QName processorName ) {
+    public PropertySet getPropertySet(final org.dom4j.QName processorName) {
         if (propertyStore == null)
             return null;
         update();
@@ -129,7 +134,7 @@ public class OXFProperties {
             public final org.dom4j.QName type;
             public Object value;
 
-            public TypeValue( final org.dom4j.QName typ, final Object val ) {
+            public TypeValue(final org.dom4j.QName typ, final Object val) {
                 type = typ;
                 value = val;
             }
@@ -148,7 +153,7 @@ public class OXFProperties {
         public java.util.Map getObjectMap() {
             if (size() > 0) {
                 final java.util.Map result = new java.util.HashMap();
-                for ( final java.util.Iterator i = keySet().iterator(); i.hasNext();) {
+                for (final java.util.Iterator i = keySet().iterator(); i.hasNext();) {
                     String key = (String) i.next();
                     result.put(key, getObject(key));
                 }
@@ -159,12 +164,12 @@ public class OXFProperties {
         }
 
         public void setProperty
-        ( final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
-            final Object o = OXFPropertiesSerializer.getObject( value, typ, elt );
-            properties.put(name, new TypeValue( typ, o ) );
+                (final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
+            final Object o = OXFPropertiesSerializer.getObject(value, typ, elt);
+            properties.put(name, new TypeValue(typ, o));
         }
 
-        public Object getProperty(String name, final org.dom4j.QName typ ) {
+        public Object getProperty(String name, final org.dom4j.QName typ) {
             TypeValue typeValue = (TypeValue) properties.get(name);
             if (typeValue == null)
                 return null;
@@ -185,7 +190,7 @@ public class OXFProperties {
 
             if (property instanceof String) {
                 return getString(name);
-            } else if (property instanceof java.net.URL ) {
+            } else if (property instanceof java.net.URL) {
                 return getURL(name).toExternalForm();
             } else {
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
@@ -200,7 +205,7 @@ public class OXFProperties {
                 return null;
             try {
                 return URLFactory.createURL(name);
-            } catch ( final java.net.MalformedURLException e ) {
+            } catch (final java.net.MalformedURLException e) {
                 throw new OXFException(e);
             }
         }

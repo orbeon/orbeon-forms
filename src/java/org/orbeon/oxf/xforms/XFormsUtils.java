@@ -30,6 +30,8 @@ import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xforms.mip.ReadonlyModelItemProperty;
 import org.orbeon.oxf.xforms.mip.RelevantModelItemProperty;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
+import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -407,20 +409,25 @@ public class XFormsUtils {
     // Use a Deflater pool as creating Deflaters is expensive
     final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new CachedPoolableObjetFactory());
 
+
     public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
-//        XFormsServer.logger.debug("XForms - encoding XML.");
+        //        XFormsServer.logger.debug("XForms - encoding XML.");
+
+        // The XML document as a string
+        final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
+        return encodeString(pipelineContext, xmlString, encryptionPassword);
+    }
+
+    public static String encodeString(PipelineContext pipelineContext, String stringToEncode, String encryptionPassword) {
         Deflater deflater = null;
         try {
-            // The XML document as a string
-            final String xmlString = Dom4jUtils.domToString(documentToEncode, false, false);
-
             // Compress if needed
             final byte[] gzipByteArray;
             if (isGZIPState()) {
                 deflater = (Deflater) deflaterPool.borrowObject();
                 final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 final DeflaterGZIPOutputStream gzipOutputStream = new DeflaterGZIPOutputStream(deflater, byteArrayOutputStream, 1024);
-                gzipOutputStream.write(xmlString.getBytes("utf-8"));
+                gzipOutputStream.write(stringToEncode.getBytes("utf-8"));
                 gzipOutputStream.close();
                 gzipByteArray = byteArrayOutputStream.toByteArray();
             } else {
@@ -433,7 +440,7 @@ public class XFormsUtils {
                 final String encryptedString;
                 if (gzipByteArray == null) {
                     // The data was not compressed
-                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, xmlString);
+                    encryptedString = "X1" + SecureUtils.encrypt(pipelineContext, encryptionPassword, stringToEncode);
                 } else {
                     // The data was compressed
                     encryptedString = "X2" + SecureUtils.encrypt(pipelineContext, encryptionPassword, gzipByteArray);
@@ -445,7 +452,7 @@ public class XFormsUtils {
                     // The data was not compressed
                     // NOTE: In this scenario, we take a shortcut and assume we don't even need to base64 the string
                     // as it is going to stay in memory
-                    return "X3" + xmlString;
+                    return "X3" + stringToEncode;
                 } else {
                     // The data was compressed
                     return "X4" + Base64.encode(gzipByteArray);
@@ -550,6 +557,157 @@ public class XFormsUtils {
             } catch (TransformerException e) {
                 throw new OXFException(e);
             }
+        }
+    }
+
+    /**
+     * Get the value of an element by trying single-node binding, value attribute, linking attribute, and inline value
+     * (including nested xforms:output elements).
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param containingDocument    current XFormsContainingDocument
+     * @param childElement          element to evaluate (xforms:label, etc.)
+     * @param acceptHTML            whether the result may contain HTML
+     * @return                      string containing the result of the evaluation, null if evaluation failed
+     */
+    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, Element childElement, final boolean acceptHTML) {
+
+        // NOTE: This returns an HTML string.
+
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+
+        // Check that there is a current child element
+        if (childElement == null)
+            return null;
+
+        // Child element becomes the new binding
+        xformsControls.pushBinding(pipelineContext, childElement);
+        try {
+            final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
+
+            // "the order of precedence is: single node binding attributes, linking attributes, inline text."
+
+            // Try to get single node binding
+            {
+                final boolean hasSingleNodeBinding = currentBindingContext.isNewBind();
+                if (hasSingleNodeBinding) {
+                    final NodeInfo currentNode = currentBindingContext.getSingleNode();
+                    if (currentNode != null)
+                        return XFormsInstance.getValueForNodeInfo(currentNode);
+                    else
+                        return null;
+                }
+            }
+
+            // Try to get value attribute
+            // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
+            {
+                final String valueAttribute = childElement.attributeValue("value");
+                final boolean hasValueAttribute = valueAttribute != null;
+                if (hasValueAttribute) {
+                    final List currentNodeset = currentBindingContext.getNodeset();
+                    if (currentNodeset != null && currentNodeset.size() > 0) {
+                        final String tempResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
+                                currentNodeset, currentBindingContext.getPosition(),
+                                valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+
+                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            // Try to get linking attribute
+            // NOTE: This is deprecated in XForms 1.1
+            {
+                final String srcAttributeValue = childElement.attributeValue("src");
+                final boolean hasSrcAttribute = srcAttributeValue != null;
+                if (hasSrcAttribute) {
+                    try {
+                        // TODO: should cache this?
+                        final String tempResult  = retrieveSrcValue(srcAttributeValue);
+                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
+                    } catch (IOException e) {
+                        // Dispatch xforms-link-error to model
+                        final XFormsModel currentModel = currentBindingContext.getModel();
+                        containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
+                        return null;
+                    }
+                }
+            }
+
+            // Try to get inline value
+            {
+                final StringBuffer sb = new StringBuffer();
+
+                // Visit the subtree and serialize
+
+                // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM
+                // and serialize it, which is not trivial because of the possible interleaved xforms:output's.
+                // Furthermore, we perform a very simple serialization of elements and text to simple (X)HTML, not
+                // full-fledged HTML or XML serialization.
+                Dom4jUtils.visitSubtree(childElement, new Dom4jUtils.VisitorListener() {
+
+                    public void startElement(Element element) {
+                        if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                            // This is an xforms:output
+
+                            final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
+                            xformsControls.pushBinding(pipelineContext, element);
+                            {
+                                outputControl.setBindingContext(xformsControls.getCurrentBindingContext());
+                                outputControl.evaluate(pipelineContext);
+                            }
+                            xformsControls.popBinding();
+
+                            // Escape only if the mediatype is not HTML
+                            if (acceptHTML && !"text/html".equals(outputControl.getMediatype()))
+                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
+                            else
+                                sb.append(outputControl.getDisplayValueOrValue());
+                        } else {
+                            // This is a regular element, just serialize the start tag to no namespace
+
+                            sb.append('<');
+                            sb.append(element.getName());
+                            final List attributes = element.attributes();
+                            if (attributes.size() > 0) {
+                                for (Iterator i = attributes.iterator(); i.hasNext();) {
+                                    final Attribute currentAttribute = (Attribute) i.next();
+
+                                    // Only consider attributes in no namespace
+                                    if ("".equals(currentAttribute.getNamespaceURI())) {
+                                        sb.append(' ');
+                                        sb.append(currentAttribute.getName());
+                                        sb.append("=\"");
+                                        sb.append(XMLUtils.escapeXMLMinimal(currentAttribute.getValue()));
+                                        sb.append('"');
+                                    }
+                                }
+                            }
+                            sb.append('>');
+                        }
+                    }
+
+                    public void endElement(Element element) {
+                        if (!element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+                            // This is a regular element, just serialize the end tag to no namespace
+                            sb.append("</");
+                            sb.append(element.getName());
+                            sb.append('>');
+                        }
+                    }
+
+                    public void text(Text text) {
+                        sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
+                    }
+                });
+
+                return sb.toString();
+            }
+        } finally {
+            xformsControls.popBinding();
         }
     }
 
@@ -693,34 +851,50 @@ public class XFormsUtils {
         return decodeXML(pipelineContext, encodedXML, getEncryptionKey());
     }
 
+
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+
+        // Decoded string
+        final String xmlString = decodeString(pipelineContext, encodedXML, encryptionPassword);
+
+        // Parse XML and return document
+        final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
+        XMLUtils.stringToSAX(xmlString, null, saxContentHandler, false, false);
+        return saxContentHandler.getDocument();
+    }
+
+    public static String decodeString(PipelineContext pipelineContext, String encoded) {
+        return decodeString(pipelineContext, encoded,  getEncryptionKey());
+    }
+
+    public static String decodeString(PipelineContext pipelineContext, String encoded, String encryptionPassword) {
         try {
             // Get raw text
-            String xmlString;
+            String resultString;
             {
-                final String prefix = encodedXML.substring(0, 2);
-                final String encodedString = encodedXML.substring(2);
+                final String prefix = encoded.substring(0, 2);
+                final String encodedString = encoded.substring(2);
 
-                final String xmlString1;
+                final String resultString1;
                 final byte[] gzipByteArray;
                 if (prefix.equals("X1")) {
                     // Encryption + uncompressed
-                    xmlString1 = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, encodedString);
+                    resultString1 = SecureUtils.decryptAsString(pipelineContext, encryptionPassword, encodedString);
                     gzipByteArray = null;
                 } else if (prefix.equals("X2")) {
                     // Encryption + compressed
-                    xmlString1 = null;
+                    resultString1 = null;
                     gzipByteArray = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedString);
                 } else if (prefix.equals("X3")) {
                     // No encryption + uncompressed
-                    xmlString1 = encodedString;
+                    resultString1 = encodedString;
                     gzipByteArray = null;
                 } else if (prefix.equals("X4")) {
                     // No encryption + compressed
-                    xmlString1 = null;
+                    resultString1 = null;
                     gzipByteArray = Base64.decode(encodedString);
                 } else {
-                    throw new OXFException("Invalid prefix for encoded XML string: " + prefix);
+                    throw new OXFException("Invalid prefix for encoded string: " + prefix);
                 }
 
                 // Decompress if needed
@@ -729,15 +903,13 @@ public class XFormsUtils {
                     final GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
                     final ByteArrayOutputStream binaryData = new ByteArrayOutputStream(1024);
                     NetUtils.copyStream(gzipInputStream, binaryData);
-                    xmlString = new String(binaryData.toByteArray(), "utf-8");
+                    resultString = new String(binaryData.toByteArray(), "utf-8");
                 } else {
-                    xmlString = xmlString1;
+                    resultString = resultString1;
                 }
             }
-            // Parse XML and return document
-            final LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-            XMLUtils.stringToSAX(xmlString, null, saxContentHandler, false, false);
-            return saxContentHandler.getDocument();
+            return resultString;
+
         } catch (IOException e) {
             throw new OXFException(e);
         }

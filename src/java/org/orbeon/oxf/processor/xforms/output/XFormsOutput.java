@@ -65,7 +65,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+                containingDocument.initialize(pipelineContext);
 
                 // Create evaluation context
                 final XFormsElementContext elementContext =

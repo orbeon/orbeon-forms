@@ -128,7 +128,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
-        final XFormsServer.XFormsState[] xformsState = new XFormsServer.XFormsState[1];
+        final XFormsState[] xformsState = new XFormsState[1];
         final boolean[] cachedInput = new boolean[1];
 
         // Read and try to cache the complete XForms+XHTML document with annotations
@@ -309,10 +309,10 @@ public class XFormsToXHTML extends ProcessorImpl {
     }
 
     private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsEngineStaticState xformsEngineStaticState,
-                                               XFormsContainingDocument[] containingDocument, XFormsServer.XFormsState[] xformsState) {
+                                               XFormsContainingDocument[] containingDocument, XFormsState[] xformsState) {
         {
             // Create initial state, before XForms initialization
-            final XFormsServer.XFormsState initialXFormsState = new XFormsServer.XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
+            final XFormsState initialXFormsState = new XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
 
             // Create URIResolver
             final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
@@ -324,9 +324,8 @@ public class XFormsToXHTML extends ProcessorImpl {
             containingDocument[0].setURIResolver(null);
 
             // This is the state after XForms initialization
-            final Document dynamicStateDocument = XFormsServer.createDynamicStateDocument(containingDocument[0]);
-            xformsState[0] = new XFormsServer.XFormsState(initialXFormsState.getStaticState(),
-                    XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument, containingDocument[0].isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey()));
+            xformsState[0] = new XFormsState(initialXFormsState.getStaticState(),
+                    containingDocument[0].createEncodedDynamicState(pipelineContext));
         }
 
         // Cache ContainingDocument if requested and possible
@@ -339,7 +338,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
-                                final ContentHandler contentHandler, final XFormsServer.XFormsState xformsState,
+                                final ContentHandler contentHandler, final XFormsState xformsState,
                                 final String staticStateUUID, String dynamicStateUUID) throws SAXException {
 
         final ElementHandlerController controller = new ElementHandlerController();

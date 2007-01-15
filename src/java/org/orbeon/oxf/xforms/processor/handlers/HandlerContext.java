@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
@@ -33,13 +33,13 @@ public class HandlerContext {
     private ElementHandlerController controller;
     private PipelineContext pipelineContext;
     private XFormsContainingDocument containingDocument;
-    private XFormsServer.XFormsState xformsState;
+    private XFormsState xformsState;
     private String staticStateUUID;
     private String dynamicStateUUID;
     private ExternalContext externalContext;
 
     public HandlerContext(ElementHandlerController controller, PipelineContext pipelineContext,
-                          XFormsContainingDocument containingDocument, XFormsServer.XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
+                          XFormsContainingDocument containingDocument, XFormsState xformsState, String staticStateUUID, String dynamicStateUUID, ExternalContext externalContext) {
         this.controller = controller;
         this.pipelineContext = pipelineContext;
         this.containingDocument = containingDocument;
@@ -61,7 +61,7 @@ public class HandlerContext {
         return containingDocument;
     }
 
-    public XFormsServer.XFormsState getXFormsState() {
+    public XFormsState getXFormsState() {
         return xformsState;
     }
 

@@ -31,8 +31,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -307,12 +305,7 @@ public class XFormsServer extends ProcessorImpl {
                 final String currentPageGenerationId = (requestPageGenerationId != null) ? requestPageGenerationId : UUIDUtils.createPseudoUUID();
 
                 // Create and encode dynamic state
-                final String newEncodedDynamicState;
-                {
-                    final Document dynamicStateDocument = createDynamicStateDocument(containingDocument);
-                    newEncodedDynamicState = XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument,
-                            containingDocument.isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey());
-                }
+                final String newEncodedDynamicState = containingDocument.createEncodedDynamicState(pipelineContext);
                 final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
@@ -555,59 +548,6 @@ public class XFormsServer extends ProcessorImpl {
             }
         }
         return itemsetUpdate;
-    }
-
-    public static Document createDynamicStateDocument(XFormsContainingDocument containingDocument) {
-
-        final XFormsControls.ControlsState currentControlsState = containingDocument.getXFormsControls().getCurrentControlsState();
-
-        final Document dynamicStateDocument = Dom4jUtils.createDocument();
-        final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-        // Output updated instances
-        {
-            final Element instancesElement = dynamicStateElement.addElement("instances");
-
-            for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) i.next();
-
-                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
-//                    if (currentInstance.isReadOnly())
-//                        xxx;
-
-
-                    instancesElement.add((currentInstance).getInstanceDocument().getRootElement().createCopy());
-                    // Log instance if needed
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
-                                + Dom4jUtils.domToString(currentInstance.getInstanceDocument()));
-                    }
-                }
-            }
-        }
-
-        // Output divs information
-        {
-            final Element divsElement = dynamicStateElement.addElement("divs");
-            outputSwitchesDialogs(divsElement, containingDocument.getXFormsControls());
-        }
-
-        // Output repeat index information
-        {
-            final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-            if (repeatIdToIndex.size() != 0) {
-                final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
-                for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String repeatId = (String) currentEntry.getKey();
-                    final Integer index = (Integer) currentEntry.getValue();
-                    final Element newElement = repeatIndexesElement.addElement("repeat-index");
-                    newElement.addAttribute("id", repeatId);
-                    newElement.addAttribute("index", index.toString());
-                }
-            }
-        }
-        return dynamicStateDocument;
     }
 
     public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
@@ -1348,62 +1288,6 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputSwitchesDialogs(Element divsElement, XFormsControls xformsControls) {
-        {
-            final Map switchIdToSelectedCaseIdMap = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
-            if (switchIdToSelectedCaseIdMap != null) {
-                // There are some xforms:switch/xforms:case controls
-
-                for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String switchId = (String) currentEntry.getKey();
-                    final String selectedCaseId = (String) currentEntry.getValue();
-
-                    // Output selected ids
-                    {
-                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("switch-id", switchId);
-                        divElement.addAttribute("case-id", selectedCaseId);
-                        divElement.addAttribute("visibility", "visible");
-                    }
-
-                    // Output deselected ids
-                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
-                    final List children = switchXFormsControl.getChildren();
-                    if (children != null && children.size() > 0) {
-                        for (Iterator j = children.iterator(); j.hasNext();) {
-                            final XFormsControl caseXFormsControl = (XFormsControl) j.next();
-
-                            if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
-                                final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                divElement.addAttribute("switch-id", switchId);
-                                divElement.addAttribute("case-id", caseXFormsControl.getEffectiveId());
-                                divElement.addAttribute("visibility", "hidden");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        {
-            final Map dialogIdToVisibleMap = xformsControls.getCurrentDialogState().getDialogIdToVisibleMap();
-            if (dialogIdToVisibleMap != null) {
-                // There are some xxforms:dialog controls
-                for (Iterator i = dialogIdToVisibleMap.entrySet().iterator(); i.hasNext();) {
-                    final Map.Entry currentEntry = (Map.Entry) i.next();
-                    final String dialogId = (String) currentEntry.getKey();
-                    final Boolean visible = (Boolean) currentEntry.getValue();
-
-                    {
-                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("dialog-id", dialogId);
-                        divElement.addAttribute("visibility", visible.booleanValue() ? "visible" : "hidden");
-                    }
-                }
-            }
-        }
-    }
-
     public static void diffDivs(ContentHandlerHelper ch, XFormsControls xformsControls, XFormsControls.SwitchState switchState1, XFormsControls.SwitchState switchState2,
                                 XFormsControls.DialogState dialogState1, XFormsControls.DialogState dialogState2) {
 
@@ -1496,7 +1380,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     /**
-     * Create a ContainingDocument.
+     * Create an XFormsContainingDocument.
      *
      * @param pipelineContext           current pipeline context
      * @param xformsState               XForms state containing static and dynamic state. Static state is ignored if xformsEngineStaticState is provided.
@@ -1516,93 +1400,18 @@ public class XFormsServer extends ProcessorImpl {
             logger.debug("XForms - creating new ContainingDocument (static state object provided).");
         }
 
-        final Document dynamicStateDocument;
-        {
-            final String dynamicStateString = xformsState.getDynamicState();
-            dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
-        }
-
-        // Get instances from dynamic state
-        final Element instancesElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("instances");
-
-        // Get divs from dynamic state
-        final Element divsElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("divs");
-
-        // Get repeat indexes from dynamic state
-        final Element repeatIndexesElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("repeat-indexes");
-
         // Create XForms Engine ContainingDocument
-        final XFormsContainingDocument containingDocument = new XFormsContainingDocument(xformsEngineStaticState, initializationURIResolver, repeatIndexesElement);
+        final XFormsContainingDocument containingDocument
+                = new XFormsContainingDocument(xformsEngineStaticState, initializationURIResolver);
 
-        // Get instances
-        boolean isInitializeEvent;
-        {
-            int foundInstancesCount = 0;
-            int expectedInstancesCount = 0;
-            if (instancesElement != null) {
-
-                // Iterator over all the models
-                Iterator modelIterator = containingDocument.getModels().iterator();
-
-                XFormsModel currentModel = null;
-                int currentModelInstancesCount = 0;
-                int currentCount = 0;
-
-                for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
-                    Element instanceElement = (Element) i.next();
-
-                    // Go to next model if needed
-                    if (currentCount == currentModelInstancesCount) {
-                        currentModel = (XFormsModel) modelIterator.next();
-                        currentModelInstancesCount = currentModel.getInstanceCount();
-                        currentCount = 0;
-
-                        expectedInstancesCount += currentModelInstancesCount;
-                    }
-
-                    // Create and set instance document on current model
-                    Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
-                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, null, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
-
-                    currentCount++;
-                    foundInstancesCount++;
-                }
-                // Number of instances must be zero or match number of models
-                if (foundInstancesCount != 0 && expectedInstancesCount != foundInstancesCount)
-                    throw new OXFException("Number of instances (" + foundInstancesCount + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
-            }
-            // Initialization will take place if no instances are provided
-            isInitializeEvent = foundInstancesCount == 0;
-        }
-
-        // Initialize XForms Engine
-        if (isInitializeEvent)
-            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+        // Set the document's dynamic state if provided
+        final String encodedDynamicState = xformsState.getDynamicState();
+        if (encodedDynamicState != null && !"".equals(encodedDynamicState))
+            containingDocument.restoreDynamicState(pipelineContext, encodedDynamicState);
         else
-            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement));
+            containingDocument.initialize(pipelineContext);
 
         return containingDocument;
     }
 
-    public static class XFormsState {
-        private String staticState;
-        private String dynamicState;
-
-        public XFormsState(String staticState, String dynamicState) {
-            this.staticState = staticState;
-            this.dynamicState = dynamicState;
-        }
-
-        public String getStaticState() {
-            return staticState;
-        }
-
-        public String getDynamicState() {
-            return dynamicState;
-        }
-
-        public String toString() {
-            return staticState + "|" + dynamicState;
-        }
-    }
 }

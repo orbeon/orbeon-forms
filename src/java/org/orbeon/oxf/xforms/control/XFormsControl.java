@@ -17,16 +17,12 @@ import org.dom4j.*;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.controls.RepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -312,10 +308,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.setBinding(pipelineContext, this);
 
-        this.label = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
-        this.help = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true);
-        this.hint = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true);
-        this.alert = getChildElementValue(pipelineContext, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
+        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+        this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true);
+        this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true);
+        this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
     }
 
     public XFormsEventHandlerContainer getParentContainer() {
@@ -432,146 +428,6 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         }
     }
 
-    protected String getChildElementValue(final PipelineContext pipelineContext, Element childElement, final boolean acceptHTML) {
-
-        // NOTE: This returns an HTML string.
-
-        final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-        // Check that there is a current child element
-        if (childElement == null)
-            return null;
-
-        // Child element becomes the new binding
-        xformsControls.pushBinding(pipelineContext, childElement);
-        try {
-            final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
-
-            // "the order of precedence is: single node binding attributes, linking attributes, inline text."
-
-            // Try to get single node binding
-            {
-                final boolean hasRefAttribute = currentBindingContext.isNewBind();
-                if (hasRefAttribute) {
-                    final NodeInfo currentNode = currentBindingContext.getSingleNode();
-                    if (currentNode != null)
-                        return XFormsInstance.getValueForNodeInfo(currentNode);
-                    else
-                        return null;
-                }
-            }
-
-            // Try to get value attribute
-            // NOTE: This is an extension attribute not standard in XForms 1.0 or 1.1
-            {
-                final String valueAttribute = childElement.attributeValue("value");
-                final boolean hasValueAttribute = valueAttribute != null;
-                if (hasValueAttribute) {
-                    final List currentNodeset = currentBindingContext.getNodeset();
-                    if (currentNodeset != null && currentNodeset.size() > 0) {
-                        final String tempResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
-                                currentNodeset, currentBindingContext.getPosition(),
-                                valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(childElement), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
-
-                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
-                    } else {
-                        return null;
-                    }
-                }
-            }
-
-            // Try to get linking attribute
-            // NOTE: This is deprecated in XForms 1.1
-            {
-                final String srcAttributeValue = childElement.attributeValue("src");
-                final boolean hasSrcAttribute = srcAttributeValue != null;
-                if (hasSrcAttribute) {
-                    try {
-                        // TODO: should cache this?
-                        final String tempResult  = XFormsUtils.retrieveSrcValue(srcAttributeValue);
-                        return (acceptHTML) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
-                    } catch (IOException e) {
-                        // Dispatch xforms-link-error to model
-                        final XFormsModel currentModel = currentBindingContext.getModel();
-                        containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
-                    }
-                }
-            }
-
-            // Try to get inline value
-            {
-                final StringBuffer sb = new StringBuffer();
-
-                // Visit the subtree and serialize
-
-                // NOTE: It is a litte funny to do our own serialization here, but the alternative is to build a DOM
-                // and serialize it, which is not trivial because of the possible interleaved xforms:output's.
-                // Furthermore, we perform a very simple serialization of elements and text to simple (X)HTML, not
-                // full-fledged HTML or XML serialization.
-                Dom4jUtils.visitSubtree(childElement, new Dom4jUtils.VisitorListener() {
-
-                    public void startElement(Element element) {
-                        if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                            // This is an xforms:output
-
-                            final XFormsOutputControl outputControl = new XFormsOutputControl(containingDocument, null, element, element.getName(), null);
-                            xformsControls.pushBinding(pipelineContext, element);
-                            {
-                                outputControl.setBindingContext(xformsControls.getCurrentBindingContext());
-                                outputControl.evaluate(pipelineContext);
-                            }
-                            xformsControls.popBinding();
-
-                            // Escape only if the mediatype is not HTML
-                            if (acceptHTML && !"text/html".equals(outputControl.getMediatype()))
-                                sb.append(XMLUtils.escapeXMLMinimal(outputControl.getDisplayValueOrValue()));
-                            else
-                                sb.append(outputControl.getDisplayValueOrValue());
-                        } else {
-                            // This is a regular element, just serialize the start tag to no namespace
-
-                            sb.append('<');
-                            sb.append(element.getName());
-                            final List attributes = element.attributes();
-                            if (attributes.size() > 0) {
-                                for (Iterator i = attributes.iterator(); i.hasNext();) {
-                                    final Attribute currentAttribute = (Attribute) i.next();
-
-                                    // Only consider attributes in no namespace
-                                    if ("".equals(currentAttribute.getNamespaceURI())) {
-                                        sb.append(' ');
-                                        sb.append(currentAttribute.getName());
-                                        sb.append("=\"");
-                                        sb.append(XMLUtils.escapeXMLMinimal(currentAttribute.getValue()));
-                                        sb.append('"');
-                                    }
-                                }
-                            }
-                            sb.append('>');
-                        }
-                    }
-
-                    public void endElement(Element element) {
-                        if (!element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                            // This is a regular element, just serialize the end tag to no namespace
-                            sb.append("</");
-                            sb.append(element.getName());
-                            sb.append('>');
-                        }
-                    }
-
-                    public void text(Text text) {
-                        sb.append(acceptHTML ? XMLUtils.escapeXMLMinimal(text.getStringValue()) : text.getStringValue());
-                    }
-                });
-
-                return sb.toString();
-            }
-        } finally {
-            xformsControls.popBinding();
-        }
-    }
-    
     public boolean isStaticReadonly() {
         return isReadonly()
                 && (XFormsConstants.XXFORMS_READONLY_APPEARANCE_STATIC_VALUE.equals(containingDocument.getReadonlyAppearance())

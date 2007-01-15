@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsState;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,7 +37,7 @@ public abstract class XFormsServerStateCache {
 
     protected abstract String getCacheName();
 
-    public synchronized void add(String pageGenerationId, String requestId, XFormsServer.XFormsState xformsState) {
+    public synchronized void add(String pageGenerationId, String requestId, XFormsState xformsState) {
         addOne(pageGenerationId, xformsState.getStaticState());
         addOne(requestId, xformsState.getDynamicState());
     }
@@ -79,14 +80,14 @@ public abstract class XFormsServerStateCache {
         currentCacheSize += size;
     }
 
-    public synchronized XFormsServer.XFormsState find(String pageGenerationId, String requestId) {
+    public synchronized XFormsState find(String pageGenerationId, String requestId) {
         final String staticState = findOne(pageGenerationId);
         if (staticState == null)
             return null;
         final String dynamicState = findOne(requestId);
         if (dynamicState == null)
             return null;
-        return new XFormsServer.XFormsState(staticState, dynamicState);
+        return new XFormsState(staticState, dynamicState);
     }
 
     private String findOne(String key) {

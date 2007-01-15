@@ -20,7 +20,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
 public class XFormsAnnotate extends ProcessorImpl {
@@ -59,7 +58,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+                containingDocument.initialize(pipelineContext);
 
                 // Output the instance to the specified content handler
                 model.getDefaultInstance().read(contentHandler);

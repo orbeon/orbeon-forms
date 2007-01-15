@@ -20,6 +20,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -67,7 +68,7 @@ public class XHTMLBodyHandler extends HandlerBase {
             controller.registerHandler(XXFormsDialogHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog");
         }
 
-        final XFormsServer.XFormsState xformsState = handlerContext.getXFormsState();
+        final XFormsState xformsState = handlerContext.getXFormsState();
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(uri, localname, qName, attributes);
         helper = new ContentHandlerHelper(contentHandler);

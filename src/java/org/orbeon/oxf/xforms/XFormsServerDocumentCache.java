@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SoftReferenceObjectPool;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsState;
 
 /**
  * This cache stores mappings XFormsState -> XFormsContainingDocument into a global cache.
@@ -45,7 +46,7 @@ public class XFormsServerDocumentCache {
         return instance;
     }
 
-    public synchronized void add(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState, XFormsContainingDocument containingDocument) {
+    public synchronized void add(PipelineContext pipelineContext, XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
         final Long validity = new Long(0);
         final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);
@@ -91,7 +92,7 @@ public class XFormsServerDocumentCache {
      * @param xformsState           state used to search cache
      * @return                      XFormsContainingDocument
      */
-    public XFormsContainingDocument find(PipelineContext pipelineContext, XFormsServer.XFormsState xformsState) {
+    public XFormsContainingDocument find(PipelineContext pipelineContext, XFormsState xformsState) {
 
         // NOTE: It looks save to make this non-synchronized. If we make it synchronized, we risk deadlocks (verified!)
         // when a submission occurs during createXFormsContainingDocument() and submits to the same document.
@@ -127,7 +128,7 @@ public class XFormsServerDocumentCache {
         return containingDocument;
     }
 
-    private static ObjectPool createXFormsContainingDocumentPool(XFormsServer.XFormsState xformsState) {
+    private static ObjectPool createXFormsContainingDocumentPool(XFormsState xformsState) {
         try {
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
             pool.setFactory(new CachedPoolableObjetFactory(pool, xformsState));
@@ -140,9 +141,9 @@ public class XFormsServerDocumentCache {
 
     private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
         private final ObjectPool pool;
-        private XFormsServer.XFormsState xformsState;
+        private XFormsState xformsState;
 
-        public CachedPoolableObjetFactory(ObjectPool pool, XFormsServer.XFormsState xformsState) {
+        public CachedPoolableObjetFactory(ObjectPool pool, XFormsState xformsState) {
             this.pool = pool;
             this.xformsState = xformsState;
         }

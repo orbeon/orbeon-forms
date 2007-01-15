@@ -732,8 +732,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, null, instanceContainerElement, throwable));
                                 break;
                             }
-                            instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
-                            // TODO: support DocumentInfo (easier once static state is done with TinyTree as well)
+                            if (!isReadonlyHint) {
+                                instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
+                            } else {
+                                instanceDocument = TransformerUtils.dom4jToTinyTree(Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0)));
+                            }
                             instanceSourceURI = null;
                             xxformsUsername = null;
                             xxformsPassword = null;

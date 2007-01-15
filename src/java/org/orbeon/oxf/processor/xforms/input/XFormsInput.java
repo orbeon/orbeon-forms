@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
@@ -166,7 +165,7 @@ public class XFormsInput extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+                containingDocument.initialize(pipelineContext);
 
                 if (logger.isDebugEnabled())
                     logger.debug("3) Instance with model item properties applied:\n"

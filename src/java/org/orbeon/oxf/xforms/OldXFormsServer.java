@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
+import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -97,7 +98,7 @@ public class OldXFormsServer extends ProcessorImpl {
         final Element filesElement;
         final Element actionElement;
         final XFormsContainingDocument containingDocument;
-        final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState xformsState;
+        final XFormsState xformsState;
         final String requestPageGenerationId;
         final boolean isInitializationRun;
         if (hasRequestInput) {
@@ -135,7 +136,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                     // We don't create the cache at this point as it may not be necessary
                     final XFormsServerSessionStateCache sessionStateCache = XFormsServerSessionStateCache.instance(externalContext.getSession(false), false);
-                    final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(requestPageGenerationId, requestId);
+                    final XFormsState sessionFormsState = (sessionStateCache == null) ? null : sessionStateCache.find(requestPageGenerationId, requestId);
 
                     // This is not going to be good when it happens, and we must create a caching heuristic that minimizes this
                     if (sessionFormsState == null)
@@ -145,7 +146,7 @@ public class OldXFormsServer extends ProcessorImpl {
                 } else {
                     // State comes with request
                     requestPageGenerationId = null;
-                    xformsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(staticStateString, dynamicStateString);
+                    xformsState = new XFormsState(staticStateString, dynamicStateString);
                 }
             }
 
@@ -168,7 +169,7 @@ public class OldXFormsServer extends ProcessorImpl {
             // Use static-state input provided during initialization run
 
             final Document staticStateDocument = readInputAsDOM4J(pipelineContext, INPUT_STATIC_STATE);
-            xformsState = new XFormsServer.XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
+            xformsState = new XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
             final XFormsEngineStaticState xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
 
             containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, xformsEngineStaticState, null);
@@ -241,7 +242,7 @@ public class OldXFormsServer extends ProcessorImpl {
                         // Output divs information
                         {
                             final Element divsElement = dynamicStateElement.addElement("divs");
-                            XFormsServer.outputSwitchesDialogs(divsElement, xformsControls);
+                            XFormsContainingDocument.outputSwitchesDialogs(divsElement, xformsControls);
                         }
 
                         // Output repeat index information
@@ -311,7 +312,7 @@ public class OldXFormsServer extends ProcessorImpl {
 
                         // Encode dynamic state
                         final String newEncodedDynamicState = XFormsUtils.encodeXML(pipelineContext, dynamicStateDocument);
-                        final org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState newXFormsState = new org.orbeon.oxf.xforms.processor.XFormsServer.XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
+                        final XFormsState newXFormsState = new XFormsState(xformsState.getStaticState(), newEncodedDynamicState);
 
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "dynamic-state");
                         if (containingDocument.isSessionStateHandling()) {

@@ -35,7 +35,9 @@ import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.*;
 
 /**
@@ -298,6 +300,20 @@ public class TransformerUtils {
     }
 
     /**
+     * Transform a dom4j Document into a TinyTree.
+     */
+    public static DocumentInfo dom4jToTinyTree(Document document) {
+        final TreeBuilder treeBuilder = new TreeBuilder();
+        try {
+            final Transformer identity = getIdentityTransformer();
+            identity.transform(new LocationDocumentSource(document), treeBuilder);
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
+    }
+
+    /**
      * Transform a dom4j document into a W3C DOM document
      *
      * @param   document dom4j document
@@ -332,9 +348,8 @@ public class TransformerUtils {
      */
     public static Document readDom4j(Source source) {
         final LocationDocumentResult documentResult = new LocationDocumentResult();
-        final Transformer identity;
         try {
-            identity = getIdentityTransformer();
+            final Transformer identity = getIdentityTransformer();
             identity.transform(source, documentResult);
         } catch (TransformerException e) {
             throw new OXFException(e);
@@ -354,9 +369,8 @@ public class TransformerUtils {
      */
     public static DocumentInfo readTinyTree(Source source) {
         final TreeBuilder treeBuilder = new TreeBuilder();
-        final Transformer identity;
         try {
-            identity = getIdentityTransformer();
+            final Transformer identity = getIdentityTransformer();
             identity.transform(source, treeBuilder);
         } catch (TransformerException e) {
             throw new OXFException(e);
@@ -397,6 +411,20 @@ public class TransformerUtils {
         try {
             final Transformer identity = getIdentityTransformer();
             identity.transform(new LocationDocumentSource(node), new SAXResult(contentHandler));
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Transform a TinyTree to a String.
+     */
+    public static String toString(NodeInfo nodeInfo) {
+        try {
+            final Transformer identity = getIdentityTransformer();
+            final StringWriter writer = new StringWriter();
+            identity.transform(nodeInfo, new StreamResult(writer));
+            return writer.toString();
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

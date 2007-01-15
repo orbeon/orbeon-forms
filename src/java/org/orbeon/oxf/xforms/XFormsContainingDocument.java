@@ -32,6 +32,8 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.IOException;
@@ -113,28 +115,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      *
      * @param xformsEngineStaticState
      * @param uriResolver
-     * @param repeatIndexesElement
      */
-    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, XFormsURIResolver uriResolver, Element repeatIndexesElement) {
+    public XFormsContainingDocument(XFormsEngineStaticState xformsEngineStaticState, XFormsURIResolver uriResolver) {
         // Remember static state
         this.xformsEngineStaticState = xformsEngineStaticState;
 
         // URI resolver
         this.uriResolver = uriResolver;
-
-        // Create XForms controls
-        this.xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
-
-        // Create and index models
-        for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
-            final Document modelDocument = (Document) i.next();
-            final XFormsModel model = new XFormsModel(modelDocument);
-            model.setContainingDocument(this);
-
-            this.models.add(model);
-            if (model.getEffectiveId() != null)
-                this.modelsMap.put(model.getEffectiveId(), model);
-        }
     }
 
     /**
@@ -771,55 +758,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             } catch (IOException e) {
                 throw new OXFException(e);
             }
-        } else if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
-
-            // This is called upon the first creation of the XForms engine only
-
-            // 4.2 Initialization Events
-
-            // 1. Dispatch xforms-model-construct to all models
-            // 2. Dispatch xforms-model-construct-done to all models
-            // 3. Dispatch xforms-ready to all models
-
-            final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
-            for (int i = 0; i < eventsToDispatch.length; i++) {
-                final boolean isXFormsModelConstructDone = i == 1;
-                final boolean isXFormsReady = i == 2;
-
-                if (isXFormsModelConstructDone) {
-                    // Initialize controls after all the xforms-model-construct events have been sent
-                    xformsControls.initialize(pipelineContext);
-                }
-
-                // Iterate over all the models
-                for (Iterator j = getModels().iterator(); j.hasNext();) {
-                    final XFormsModel currentModel = (XFormsModel) j.next();
-
-                    if (isXFormsReady) {
-                        // Performed deferred updates only for xforms-ready
-                        startOutermostActionHandler();
-                    }
-                    dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
-                    if (isXFormsReady) {
-                        // Performed deferred updates only for xforms-ready
-                        endOutermostActionHandler(pipelineContext);
-                    }
-                }
-            }
-        } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
-            final XXFormsInitializeStateEvent initializeStateEvent = (XXFormsInitializeStateEvent) event;
-
-            // This is called whenever the state of the XForms engine needs to be rebuilt, but without going through a
-            // full XForms initialization sequence
-
-            // Restore models state
-            for (Iterator j = getModels().iterator(); j.hasNext();) {
-                final XFormsModel currentModel = (XFormsModel) j.next();
-                currentModel.initializeState(pipelineContext);
-            }
-
-            // Restore controls
-            xformsControls.initializeState(pipelineContext, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement());
         }
     }
 
@@ -972,5 +910,265 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (actionInterpreter == null)
             actionInterpreter = new XFormsActionInterpreter(this);
         actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, actionElement);
+    }
+
+    /**
+     * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @return                      encoded dynamic state
+     */
+    public String createEncodedDynamicState(PipelineContext pipelineContext) {
+        return XFormsUtils.encodeXML(pipelineContext, createDynamicStateDocument(),
+            isSessionStateHandling() ? null : XFormsUtils.getEncryptionKey());
+    }
+
+    private Document createDynamicStateDocument() {
+
+        final XFormsControls.ControlsState currentControlsState = getXFormsControls().getCurrentControlsState();
+
+        final Document dynamicStateDocument = Dom4jUtils.createDocument();
+        final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
+        // Output updated instances
+        {
+            final Element instancesElement = dynamicStateElement.addElement("instances");
+
+            for (Iterator i = getModels().iterator(); i.hasNext();) {
+                final XFormsModel currentModel = (XFormsModel) i.next();
+
+                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                    if (true) {
+                        // New serialization
+                        // TODO: if instance is readonly, it should not be stored into the dynamic state
+                        // TODO: can we avoid storing the instance in the dynamic state if it has not changed?
+                        final String instanceString = TransformerUtils.toString(currentInstance.getInstanceDocumentInfo());
+                        final Element instanceElement = instancesElement.addElement("instance");
+                        instanceElement.addText(instanceString);
+                    } else {
+                        instancesElement.add(currentInstance.getInstanceDocument().getRootElement().createCopy());
+                    }
+
+                    // Log instance if needed
+                    if (XFormsServer.logger.isDebugEnabled()) {
+                        XFormsServer.logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
+                                + TransformerUtils.toString(currentInstance.getInstanceRootElementInfo()));
+                    }
+                }
+            }
+        }
+
+        // Output divs information
+        {
+            final Element divsElement = dynamicStateElement.addElement("divs");
+            outputSwitchesDialogs(divsElement, getXFormsControls());
+        }
+
+        // Output repeat index information
+        {
+            final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+            if (repeatIdToIndex.size() != 0) {
+                final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
+                for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String repeatId = (String) currentEntry.getKey();
+                    final Integer index = (Integer) currentEntry.getValue();
+                    final Element newElement = repeatIndexesElement.addElement("repeat-index");
+                    newElement.addAttribute("id", repeatId);
+                    newElement.addAttribute("index", index.toString());
+                }
+            }
+        }
+        return dynamicStateDocument;
+    }
+
+    public static void outputSwitchesDialogs(Element divsElement, XFormsControls xformsControls) {
+        {
+            final Map switchIdToSelectedCaseIdMap = xformsControls.getCurrentSwitchState().getSwitchIdToSelectedCaseIdMap();
+            if (switchIdToSelectedCaseIdMap != null) {
+                // There are some xforms:switch/xforms:case controls
+
+                for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String switchId = (String) currentEntry.getKey();
+                    final String selectedCaseId = (String) currentEntry.getValue();
+
+                    // Output selected ids
+                    {
+                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                        divElement.addAttribute("switch-id", switchId);
+                        divElement.addAttribute("case-id", selectedCaseId);
+                        divElement.addAttribute("visibility", "visible");
+                    }
+
+                    // Output deselected ids
+                    final XFormsControl switchXFormsControl = (XFormsControl) xformsControls.getObjectById(switchId);
+                    final List children = switchXFormsControl.getChildren();
+                    if (children != null && children.size() > 0) {
+                        for (Iterator j = children.iterator(); j.hasNext();) {
+                            final XFormsControl caseXFormsControl = (XFormsControl) j.next();
+
+                            if (!caseXFormsControl.getEffectiveId().equals(selectedCaseId)) {
+                                final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                                divElement.addAttribute("switch-id", switchId);
+                                divElement.addAttribute("case-id", caseXFormsControl.getEffectiveId());
+                                divElement.addAttribute("visibility", "hidden");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        {
+            final Map dialogIdToVisibleMap = xformsControls.getCurrentDialogState().getDialogIdToVisibleMap();
+            if (dialogIdToVisibleMap != null) {
+                // There are some xxforms:dialog controls
+                for (Iterator i = dialogIdToVisibleMap.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String dialogId = (String) currentEntry.getKey();
+                    final Boolean visible = (Boolean) currentEntry.getValue();
+
+                    {
+                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                        divElement.addAttribute("dialog-id", dialogId);
+                        divElement.addAttribute("visibility", visible.booleanValue() ? "visible" : "hidden");
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void restoreDynamicState(PipelineContext pipelineContext, String encodedDynamicState) {
+
+        // Get dynamic state document
+        final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
+
+        // Get instances from dynamic state
+        final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
+
+        // Get divs from dynamic state
+        final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
+
+        // Get repeat indexes from dynamic state
+        final Element repeatIndexesElement = dynamicStateDocument.getRootElement().element("repeat-indexes");
+
+        // Create XForms controls and models
+        createControlAndModel(repeatIndexesElement);
+
+        // Get instances
+        boolean isInitialize;
+        {
+            int foundInstancesCount = 0;
+            int expectedInstancesCount = 0;
+            if (instancesElement != null) {
+
+                // Iterator over all the models
+                final Iterator modelIterator = getModels().iterator();
+
+                XFormsModel currentModel = null;
+                int currentModelInstancesCount = 0;
+                int currentCount = 0;
+
+                for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
+                    final Element instanceElement = (Element) i.next();
+
+                    // Go to next model if needed
+                    if (currentCount == currentModelInstancesCount) {
+                        currentModel = (XFormsModel) modelIterator.next();
+                        currentModelInstancesCount = currentModel.getInstanceCount();
+                        currentCount = 0;
+
+                        expectedInstancesCount += currentModelInstancesCount;
+                    }
+
+                    // Create and set instance document on current model
+                    final Document instanceDocument;
+                    if (true) {
+                        try {
+                            instanceDocument = Dom4jUtils.parseText(instanceElement.getStringValue());
+                        } catch (Exception e) {
+                            throw new OXFException(e);
+                        }
+                    } else {
+                        instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
+                    }
+
+                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, null, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
+                    currentCount++;
+                    foundInstancesCount++;
+                }
+                // Number of instances must be zero or match number of models
+                if (foundInstancesCount != 0 && expectedInstancesCount != foundInstancesCount)
+                    throw new OXFException("Number of instances (" + foundInstancesCount
+                            + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
+            }
+            // Initialization takes place if no instances are provided
+            isInitialize = foundInstancesCount == 0;
+        }
+
+        // Restore models state
+        for (Iterator j = getModels().iterator(); j.hasNext();) {
+            final XFormsModel currentModel = (XFormsModel) j.next();
+            currentModel.initializeState(pipelineContext);
+        }
+
+        // Restore controls
+        xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement);
+    }
+
+    public void initialize(PipelineContext pipelineContext) {
+        // This is called upon the first creation of the XForms engine only
+
+        // Create XForms controls and models
+        createControlAndModel(null);
+
+        // 4.2 Initialization Events
+
+        // 1. Dispatch xforms-model-construct to all models
+        // 2. Dispatch xforms-model-construct-done to all models
+        // 3. Dispatch xforms-ready to all models
+
+        final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
+        for (int i = 0; i < eventsToDispatch.length; i++) {
+            final boolean isXFormsModelConstructDone = i == 1;
+            final boolean isXFormsReady = i == 2;
+
+            if (isXFormsModelConstructDone) {
+                // Initialize controls after all the xforms-model-construct events have been sent
+                xformsControls.initialize(pipelineContext);
+            }
+
+            // Iterate over all the models
+            for (Iterator j = getModels().iterator(); j.hasNext();) {
+                final XFormsModel currentModel = (XFormsModel) j.next();
+
+                if (isXFormsReady) {
+                    // Performed deferred updates only for xforms-ready
+                    startOutermostActionHandler();
+                }
+                dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                if (isXFormsReady) {
+                    // Performed deferred updates only for xforms-ready
+                    endOutermostActionHandler(pipelineContext);
+                }
+            }
+        }
+    }
+
+    private void createControlAndModel(Element repeatIndexesElement) {
+        // Create XForms controls
+        xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
+
+        // Create and index models
+        for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
+            final Document modelDocument = (Document) i.next();
+            final XFormsModel model = new XFormsModel(modelDocument);
+            model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument
+
+            this.models.add(model);
+            if (model.getEffectiveId() != null)
+                this.modelsMap.put(model.getEffectiveId(), model);
+        }
     }
 }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -66,8 +67,8 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 if ("item".equals(localname)) {
                     // xforms:item
 
-                    final String label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
-                    final String value = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
+                    final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                    final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
 
                     itemsetInfos.add(new Item(false, element.attributes(), label, value, hierarchyLevel + 1));// TODO: must filter attributes on element.attributes()
 
@@ -95,7 +96,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                                         if (labelElement == null)
                                             throw new ValidationException("xforms:itemset element must contain one xforms:label element.", getLocationData());
 
-                                        label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                                        label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
                                     }
 
                                     final Element valueCopyElement;
@@ -119,7 +120,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                                     if (valueCopyElement.getName().equals("value")) {
                                         // Handle xforms:value
-                                        final String value = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
+                                        final String value = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_VALUE_QNAME), false);
                                         itemsetInfos.add(new Item(true, element.attributes(), label != null ? label : "", value, newLevel));// TODO: must filter attributes on element.attributes()
                                     } else {
                                         // TODO: handle xforms:copy
@@ -139,7 +140,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                     final Element labelElement = element.element(XFormsConstants.XFORMS_LABEL_QNAME);
                     if (labelElement != null) {
-                        final String label = getChildElementValue(pipelineContext, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+                        final String label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, element.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
                         hierarchyLevel++;
                         itemsetInfos.add(new Item(false, element.attributes(), label, null, hierarchyLevel));// TODO: must filter attributes on element.attributes()
                     }

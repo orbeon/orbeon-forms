@@ -17,7 +17,6 @@
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:d="http://orbeon.org/oxf/xml/document"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -532,7 +531,7 @@
                         </models>
                     </p:input>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -960,7 +959,7 @@
                     <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1068,7 +1067,7 @@
                     </p:input>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1148,7 +1147,7 @@
                     </p:input>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1224,7 +1223,7 @@
                     </p:input>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>

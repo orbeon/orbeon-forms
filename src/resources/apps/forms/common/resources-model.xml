@@ -27,7 +27,7 @@
     </xforms:instance>
 
     <!-- XForms instance containing text resources -->
-    <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en"/>
+    <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en" xxforms:readonly="true"/>
 
     <!-- Update language submission -->
     <xforms:submission id="update-language-submission" serialize="false"

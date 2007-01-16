@@ -313,8 +313,12 @@ public class XFormsControls {
         contextStack.clear();
 
         // Push the default context
-        final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
-        contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null));
+        if (xformsModel.getInstanceCount() > 0) {
+            final List defaultNodeset = Arrays.asList(new Object[]{xformsModel.getDefaultInstance().getInstanceRootElementInfo()});
+            contextStack.push(new BindingContext(null, xformsModel, defaultNodeset, 1, null, true, null));
+        } else {
+            contextStack.push(new BindingContext(null, xformsModel, Collections.EMPTY_LIST, 0, null, true, null));
+        }
     }
 
     public XFormsContainingDocument getContainingDocument() {

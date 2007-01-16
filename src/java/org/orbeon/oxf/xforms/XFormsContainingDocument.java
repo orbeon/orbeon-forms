@@ -946,7 +946,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                         final Element instanceElement = instancesElement.addElement("instance");
                         instanceElement.addText(instanceString);
                     } else {
-                        instancesElement.add(currentInstance.getInstanceDocument().getRootElement().createCopy());
+                        final Element instanceElement = instancesElement.addElement("instance");
+                        instanceElement.add(currentInstance.getInstanceDocument().getRootElement().createCopy());
                     }
 
                     // Log instance if needed
@@ -1084,14 +1085,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     // Create and set instance document on current model
                     final Document instanceDocument;
-                    if (true) {
+                    if (instanceElement.elements().size() == 0) {
+                        // New serialization (use serialized XML)
                         try {
                             instanceDocument = Dom4jUtils.parseText(instanceElement.getStringValue());
                         } catch (Exception e) {
                             throw new OXFException(e);
                         }
                     } else {
-                        instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
+                        // Old serialization (instance is directly in the DOM)
+                        instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceElement.elements().get(0));
                     }
 
                     currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, null, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
@@ -1157,18 +1160,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     private void createControlAndModel(Element repeatIndexesElement) {
-        // Create XForms controls
-        xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
 
-        // Create and index models
-        for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
-            final Document modelDocument = (Document) i.next();
-            final XFormsModel model = new XFormsModel(modelDocument);
-            model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument
+        if (xformsEngineStaticState != null) {
+            // Create XForms controls
+            xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
 
-            this.models.add(model);
-            if (model.getEffectiveId() != null)
-                this.modelsMap.put(model.getEffectiveId(), model);
+            // Create and index models
+            for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
+                final Document modelDocument = (Document) i.next();
+                final XFormsModel model = new XFormsModel(modelDocument);
+                model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument
+
+                this.models.add(model);
+                if (model.getEffectiveId() != null)
+                    this.modelsMap.put(model.getEffectiveId(), model);
+            }
         }
     }
 }

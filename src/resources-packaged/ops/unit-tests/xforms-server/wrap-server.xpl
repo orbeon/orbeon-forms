@@ -47,14 +47,16 @@
                     <xsl:value-of select="context:encodeXML($static-state)"/>
                 </static-state>
                 <dynamic-state>
-                    <xsl:variable name="dynamic-state" as="document-node()">
-                        <xsl:document>
-                            <dynamic-state xmlns="">
-                                <xsl:copy-of select="doc('input:instances')/*"/>
-                            </dynamic-state>
-                        </xsl:document>
-                    </xsl:variable>
-                    <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                    <xsl:if test="doc('input:instances')/*/*">
+                        <xsl:variable name="dynamic-state" as="document-node()">
+                            <xsl:document>
+                                <dynamic-state xmlns="">
+                                    <xsl:copy-of select="doc('input:instances')/*"/>
+                                </dynamic-state>
+                            </xsl:document>
+                        </xsl:variable>
+                        <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                    </xsl:if>
                 </dynamic-state>
                 <action>
                     <xsl:copy-of select="doc('input:action')/*/*"/>
@@ -78,7 +80,12 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
                     <xsl:copy>
-                        <xsl:copy-of select="context:decodeXML(normalize-space(.))"/>
+                        <xsl:apply-templates select="context:decodeXML(normalize-space(.))/*"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="instances/instance">
+                    <xsl:copy>
+                        <xsl:copy-of select="saxon:parse(string(.))"/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>

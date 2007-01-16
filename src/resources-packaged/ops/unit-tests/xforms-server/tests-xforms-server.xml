@@ -65,14 +65,16 @@
                     </p:input>
                     <p:input name="instances">
                         <instances>
-                            <equation xmlns="">
-                                <screen>0</screen>
-                                <screenbuffer>0</screenbuffer>
-                                <first>0</first>
-                                <second>0</second>
-                                <memory>0</memory>
-                                <result/>
-                            </equation>
+                            <instance>
+                                <equation xmlns="">
+                                    <screen>0</screen>
+                                    <screenbuffer>0</screenbuffer>
+                                    <first>0</first>
+                                    <second>0</second>
+                                    <memory>0</memory>
+                                    <result/>
+                                </equation>
+                            </instance>
                         </instances>
                     </p:input>
                     <p:output name="response" ref="response"/>
@@ -85,14 +87,16 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <equation>
-                                <screen>7</screen>
-                                <screenbuffer>7</screenbuffer>
-                                <first>0</first>
-                                <second>0</second>
-                                <memory>0</memory>
-                                <result/>
-                            </equation>
+                            <instance>
+                                <equation>
+                                    <screen>7</screen>
+                                    <screenbuffer>7</screenbuffer>
+                                    <first>0</first>
+                                    <second>0</second>
+                                    <memory>0</memory>
+                                    <result/>
+                                </equation>
+                            </instance>
                         </instances>
                         <divs>
                             <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
@@ -141,7 +145,7 @@
                         </models>
                     </p:input>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -153,14 +157,16 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <equation>
-                                <screen>7</screen>
-                                <screenbuffer>7</screenbuffer>
-                                <first>0</first>
-                                <second>0</second>
-                                <memory>12</memory>
-                                <result/>
-                            </equation>
+                            <instance>
+                                <equation>
+                                    <screen>7</screen>
+                                    <screenbuffer>7</screenbuffer>
+                                    <first>0</first>
+                                    <second>0</second>
+                                    <memory>12</memory>
+                                    <result/>
+                                </equation>
+                            </instance>
                         </instances>
                         <divs>
                             <xxf:div switch-id="23a" case-id="add" visibility="visible"/>
@@ -538,18 +544,22 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <equation>
-                                <screen>0</screen>
-                                <screenbuffer>0</screenbuffer>
-                                <first>3.141592</first>
-                                <second>0</second>
-                                <memory>12</memory>
-                                <result/>
-                            </equation>
-                            <other-instance>
-                                <first>314</first>
-                                <second>6535</second>
-                            </other-instance>
+                            <instance>
+                                <equation>
+                                    <screen>0</screen>
+                                    <screenbuffer>0</screenbuffer>
+                                    <first>3.141592</first>
+                                    <second>0</second>
+                                    <memory>12</memory>
+                                    <result/>
+                                </equation>
+                            </instance>
+                            <instance>
+                                <other-instance>
+                                    <first>314</first>
+                                    <second>6535</second>
+                                </other-instance>
+                            </instance>
                         </instances>
                         <divs/>
                     </dynamic-state>
@@ -624,7 +634,7 @@
                         </models>
                     </p:input>
                     <p:input name="instances">
-                        <xxforms:instances/>
+                        <instances/>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -636,20 +646,24 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <equation>
-                                <screen>0</screen>
-                                <screenbuffer/>
-                                <first>3.141592</first>
-                                <second>456</second>
-                                <memory>12</memory>
-                                <result/>
-                            </equation>
-                            <other-instance>
-                                <first>2222</first>
-                                <second>456</second>
-                                <third>2222</third>
-                                <fourth>12</fourth>
-                            </other-instance>
+                            <instance>
+                                <equation>
+                                    <screen>0</screen>
+                                    <screenbuffer/>
+                                    <first>3.141592</first>
+                                    <second>456</second>
+                                    <memory>12</memory>
+                                    <result/>
+                                </equation>
+                            </instance>
+                            <instance>
+                                <other-instance>
+                                    <first>2222</first>
+                                    <second>456</second>
+                                    <third>2222</third>
+                                    <fourth>12</fourth>
+                                </other-instance>
+                            </instance>
                         </instances>
                         <divs/>
                     </dynamic-state>
@@ -957,30 +971,32 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <form>
-                                <departments>
-                                    <department>
-                                        <employee first="f11" last="l11"/>
-                                        <employee first="f12" last="l12"/>
-                                        <employee first="f12" last="l12"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f21" last="l21"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f31" last="l31"/>
-                                        <employee first="f32" last="l32"/>
-                                        <employee first="f33" last="l33"/>
-                                        <employee first="f34" last="l34"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f31" last="l31"/>
-                                        <employee first="f32" last="l32"/>
-                                        <employee first="f33" last="l33"/>
-                                        <employee first="f34" last="l34"/>
-                                    </department>
-                                </departments>
-                            </form>
+                            <instance>
+                                <form>
+                                    <departments>
+                                        <department>
+                                            <employee first="f11" last="l11"/>
+                                            <employee first="f12" last="l12"/>
+                                            <employee first="f12" last="l12"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f21" last="l21"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                    </departments>
+                                </form>
+                            </instance>
                         </instances>
                         <divs/>
                         <repeat-indexes>
@@ -1063,22 +1079,24 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <form>
-                                <departments>
-                                    <department>
-                                        <employee first="f11" last="l11"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f21" last="l21"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f31" last="l31"/>
-                                        <employee first="f32" last="l32"/>
-                                        <employee first="f33" last="l33"/>
-                                        <employee first="f34" last="l34"/>
-                                    </department>
-                                </departments>
-                            </form>
+                            <instance>
+                                <form>
+                                    <departments>
+                                        <department>
+                                            <employee first="f11" last="l11"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f21" last="l21"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                    </departments>
+                                </form>
+                            </instance>
                         </instances>
                         <divs/>
                         <repeat-indexes>
@@ -1141,23 +1159,25 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <form>
-                                <departments>
-                                    <department>
-                                        <employee first="f11" last="l11"/>
-                                        <employee first="f12" last="l12"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f21" last="l21"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f31" last="l31"/>
-                                        <employee first="f32" last="l32"/>
-                                        <employee first="f33" last="l33"/>
-                                        <employee first="f34" last="l34"/>
-                                    </department>
-                                </departments>
-                            </form>
+                            <instance>
+                                <form>
+                                    <departments>
+                                        <department>
+                                            <employee first="f11" last="l11"/>
+                                            <employee first="f12" last="l12"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f21" last="l21"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                    </departments>
+                                </form>
+                            </instance>
                         </instances>
                         <divs/>
                         <repeat-indexes>
@@ -1215,23 +1235,25 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <form>
-                                <departments>
-                                    <department>
-                                        <employee first="f11" last="l11"/>
-                                        <employee first="f12" last="l12"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f21" last="l21"/>
-                                    </department>
-                                    <department>
-                                        <employee first="f31" last="l31"/>
-                                        <employee first="f32" last="l32"/>
-                                        <employee first="f33" last="l33"/>
-                                        <employee first="f34" last="l34"/>
-                                    </department>
-                                </departments>
-                            </form>
+                            <instance>
+                                <form>
+                                    <departments>
+                                        <department>
+                                            <employee first="f11" last="l11"/>
+                                            <employee first="f12" last="l12"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f21" last="l21"/>
+                                        </department>
+                                        <department>
+                                            <employee first="f31" last="l31"/>
+                                            <employee first="f32" last="l32"/>
+                                            <employee first="f33" last="l33"/>
+                                            <employee first="f34" last="l34"/>
+                                        </department>
+                                    </departments>
+                                </form>
+                            </instance>
                         </instances>
                         <divs/>
                         <repeat-indexes>
@@ -1517,7 +1539,9 @@
                     </p:input>
                     <p:input name="instances">
                         <instances>
-                            <value>existing value</value>
+                            <instance>
+                                <value>existing value</value>
+                            </instance>
                         </instances>
                     </p:input>
                     <p:output name="response" ref="response"/>
@@ -1529,7 +1553,9 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <value>existing value</value>
+                            <instance>
+                                <value>existing value</value>
+                            </instance>
                         </instances>
                         <divs/>
                     </dynamic-state>
@@ -1670,36 +1696,40 @@
                     <p:input name="instances">
                         <instances>
                             <instance>
-                               <r1/>
-                               <r1>
-                                   <r2/>
-                                   <r2/>
-                               </r1>
-                               <r1/>
-                               <r3/>
-                               <r4/>
-                               <r4>
-                                   <r5/>
-                                   <r5/>
-                               </r4>
-                               <r4/>
-                           </instance>
-                           <instance>
-                               <r1/>
-                               <r1>
-                                   <r2/><!-- Force repeat2 from 2 to 1 -->
-                               </r1>
-                               <r1/>
-                               <!-- Force repeat3 from 1 to 0 -->
-                               <r4>
-                                   <r5/><!-- Force repeat5 from 0 to 1 -->
-                               </r4>
-                               <r4>
-                                   <r5/>
-                                   <r5/>
-                               </r4>
-                               <r4/>
-                           </instance>
+                                <instance>
+                                   <r1/>
+                                   <r1>
+                                       <r2/>
+                                       <r2/>
+                                   </r1>
+                                   <r1/>
+                                   <r3/>
+                                   <r4/>
+                                   <r4>
+                                       <r5/>
+                                       <r5/>
+                                   </r4>
+                                   <r4/>
+                               </instance>
+                            </instance>
+                            <instance>
+                               <instance>
+                                   <r1/>
+                                   <r1>
+                                       <r2/><!-- Force repeat2 from 2 to 1 -->
+                                   </r1>
+                                   <r1/>
+                                   <!-- Force repeat3 from 1 to 0 -->
+                                   <r4>
+                                       <r5/><!-- Force repeat5 from 0 to 1 -->
+                                   </r4>
+                                   <r4>
+                                       <r5/>
+                                       <r5/>
+                                   </r4>
+                                   <r4/>
+                               </instance>
+                            </instance>
                         </instances>
                     </p:input>
                     <p:output name="response" ref="response"/>
@@ -1712,34 +1742,38 @@
                     <dynamic-state>
                         <instances>
                             <instance>
-                                <r1/>
-                                <r1>
-                                    <r2/>
-                                </r1>
-                                <r1/>
-                                <r4>
-                                    <r5/>
-                                </r4>
-                                <r4>
-                                    <r5/>
-                                    <r5/>
-                                </r4>
-                                <r4/>
+                                <instance>
+                                    <r1/>
+                                    <r1>
+                                        <r2/>
+                                    </r1>
+                                    <r1/>
+                                    <r4>
+                                        <r5/>
+                                    </r4>
+                                    <r4>
+                                        <r5/>
+                                        <r5/>
+                                    </r4>
+                                    <r4/>
+                                </instance>
                             </instance>
                             <instance>
-                                <r1/>
-                                <r1>
-                                    <r2/>
-                                </r1>
-                                <r1/>
-                                <r4>
-                                    <r5/>
-                                </r4>
-                                <r4>
-                                    <r5/>
-                                    <r5/>
-                                </r4>
-                                <r4/>
+                                <instance>
+                                    <r1/>
+                                    <r1>
+                                        <r2/>
+                                    </r1>
+                                    <r1/>
+                                    <r4>
+                                        <r5/>
+                                    </r4>
+                                    <r4>
+                                        <r5/>
+                                        <r5/>
+                                    </r4>
+                                    <r4/>
+                                </instance>
                             </instance>
                         </instances>
                         <divs/>
@@ -1930,12 +1964,16 @@
                     </p:input>
                     <p:input name="instances">
                         <instances>
-                            <form>
-                                <employees/>
-                            </form>
-                            <employee>
-                                <first-name/>
-                            </employee>
+                            <instance>
+                                <form>
+                                    <employees/>
+                                </form>
+                            </instance>
+                            <instance>
+                                <employee>
+                                    <first-name/>
+                                </employee>
+                            </instance>
                         </instances>
                     </p:input>
                     <p:output name="response" ref="response"/>
@@ -1947,22 +1985,26 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <form>
-                                <employees>
-                                    <employee>
-                                        <first-name>Joe</first-name>
-                                    </employee>
-                                    <employee>
-                                        <first-name>Billy</first-name>
-                                    </employee>
-                                    <employee>
-                                        <first-name>Mary</first-name>
-                                    </employee>
-                                </employees>
-                            </form>
-                            <employee>
-                                <first-name>Billy</first-name>
-                            </employee>
+                            <instance>
+                                <form>
+                                    <employees>
+                                        <employee>
+                                            <first-name>Joe</first-name>
+                                        </employee>
+                                        <employee>
+                                            <first-name>Billy</first-name>
+                                        </employee>
+                                        <employee>
+                                            <first-name>Mary</first-name>
+                                        </employee>
+                                    </employees>
+                                </form>
+                            </instance>
+                            <instance>
+                                <employee>
+                                    <first-name>Billy</first-name>
+                                </employee>
+                            </instance>
                         </instances>
                         <divs/>
                         <repeat-indexes>

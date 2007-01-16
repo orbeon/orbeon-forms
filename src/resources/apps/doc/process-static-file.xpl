@@ -40,7 +40,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#xhtml-page"/>
         <p:input name="request" href="#request"/>
         <p:input name="config" href="oxf:/config/theme-plain.xsl"/>

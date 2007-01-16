@@ -35,7 +35,7 @@
                     <url>http://www.orbeon.com/forms/download</url>
                     <xquery-type>inline</xquery-type>
                     <xquery-url/>
-                    <xquery>let $v := //div[starts-with(., 'Orbeon Forms ')]
+                    <xquery>let $v := (//div[starts-with(., 'Orbeon Forms ')])[1]
     return
         &lt;p>Latest version of Orbeon Forms:
             &lt;ul>

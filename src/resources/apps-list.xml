@@ -11,7 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<application>
+<applications>
     <section label="Welcome">
         <application id="welcome" label="Welcome"/>
     </section>
@@ -51,4 +51,4 @@
         <application id="java-properties" label="Java Properties"/>
         <application id="java-api" label="Java API"/>
     </section>
-</application>
+</applications>

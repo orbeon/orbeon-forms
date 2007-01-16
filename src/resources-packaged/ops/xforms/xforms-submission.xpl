@@ -51,13 +51,13 @@
                 <xxforms:static-state>
                     <xsl:variable name="static-state" as="document-node()">
                         <xsl:document>
-                            <xxforms:static-state xxforms:state-handling="client">
-                                <xxforms:controls>
+                            <static-state state-handling="client">
+                                <controls>
                                     <xforms:trigger id="trigger">
                                         <xforms:send submission="default-submission" ev:event="DOMActivate"/>
                                     </xforms:trigger>
-                                </xxforms:controls>
-                                <xxforms:models>
+                                </controls>
+                                <models>
                                     <xforms:model>
                                         <xforms:instance>
                                             <xsl:copy-of select="doc('input:request')"/>
@@ -67,8 +67,8 @@
                                             <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
                                         </xforms:submission>
                                     </xforms:model>
-                                </xxforms:models>
-                            </xxforms:static-state>
+                                </models>
+                            </static-state>
                         </xsl:document>
                     </xsl:variable>
                     <xsl:value-of select="context:encodeXML($static-state)"/>
@@ -76,11 +76,13 @@
                 <xxforms:dynamic-state>
                     <xsl:variable name="dynamic-state" as="document-node()">
                         <xsl:document>
-                            <xxforms:dynamic-state>
-                                <xxforms:instances>
-                                    <xsl:copy-of select="doc('input:request')"/>
-                                </xxforms:instances>
-                            </xxforms:dynamic-state>
+                            <dynamic-state>
+                                <instances>
+                                    <instance>
+                                        <xsl:copy-of select="doc('input:request')"/>
+                                    </instance>
+                                </instances>
+                            </dynamic-state>
                         </xsl:document>
                     </xsl:variable>
                     <xsl:value-of select="context:encodeXML($dynamic-state)"/>
@@ -106,7 +108,7 @@
             <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/">
-                    <xsl:copy-of select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/*"/>
+                    <xsl:copy-of select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[1]/*"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>

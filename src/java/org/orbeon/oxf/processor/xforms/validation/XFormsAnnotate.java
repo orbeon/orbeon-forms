@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.xforms.validation;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
@@ -56,9 +55,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                 model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, null, null);
 
                 // Create and initialize XForms Engine
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.initialize(pipelineContext);
+                new XFormsContainingDocument(pipelineContext, model);
 
                 // Output the instance to the specified content handler
                 model.getDefaultInstance().read(contentHandler);

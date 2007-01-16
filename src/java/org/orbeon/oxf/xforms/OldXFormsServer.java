@@ -158,11 +158,11 @@ public class OldXFormsServer extends ProcessorImpl {
                 } else  {
                     // If there are filesElement, then we know this was not cached
                     logger.debug("XForms - containing document cache (getContainingDocument): fileElements present.");
-                    containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState);
+                    containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
                 }
             } else {
                 // Otherwise we recreate the containing document from scratch
-                containingDocument = org.orbeon.oxf.xforms.processor.XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState);
+                containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
             }
             isInitializationRun = false;
         } else {
@@ -172,7 +172,7 @@ public class OldXFormsServer extends ProcessorImpl {
             xformsState = new XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
             final XFormsEngineStaticState xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
 
-            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState, xformsEngineStaticState, null);
+            containingDocument = new XFormsContainingDocument(pipelineContext, xformsState, xformsEngineStaticState, null);
 
             filesElement = null;
             actionElement = null;

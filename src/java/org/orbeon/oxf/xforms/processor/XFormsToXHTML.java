@@ -318,7 +318,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
             // Create containing document and initialize XForms engine
-            containingDocument[0] = XFormsServer.createXFormsContainingDocument(pipelineContext, initialXFormsState, xformsEngineStaticState, uriResolver);
+            containingDocument[0] = new XFormsContainingDocument(pipelineContext, initialXFormsState, xformsEngineStaticState, uriResolver);
 
             // The URIResolver above doesn't make any sense anymore past initialization
             containingDocument[0].setURIResolver(null);

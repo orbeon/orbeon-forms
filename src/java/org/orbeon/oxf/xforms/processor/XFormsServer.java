@@ -172,7 +172,7 @@ public class XFormsServer extends ProcessorImpl {
             containingDocument = XFormsServerDocumentCache.instance().find(pipelineContext, xformsState);
         } else {
             // Otherwise we recreate the containing document from scratch
-            containingDocument = createXFormsContainingDocument(pipelineContext, xformsState);
+            containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
         }
 
         try {
@@ -334,7 +334,7 @@ public class XFormsServer extends ProcessorImpl {
                     initialContainingDocument = null;
                 } else {
                     // TODO: use cached static state if possible
-                    initialContainingDocument = createXFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null));
+                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null));
                     initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
                 }
 
@@ -1374,44 +1374,4 @@ public class XFormsServer extends ProcessorImpl {
         if (found)
             ch.endElement();
     }
-
-    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
-        return createXFormsContainingDocument(pipelineContext, xformsState, null, null);
-    }
-
-    /**
-     * Create an XFormsContainingDocument.
-     *
-     * @param pipelineContext           current pipeline context
-     * @param xformsState               XForms state containing static and dynamic state. Static state is ignored if xformsEngineStaticState is provided.
-     * @param xformsEngineStaticState   XForms static state information
-     * @param initializationURIResolver URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
-     * @return                          created XFormsContainingDocument
-     */
-    public static XFormsContainingDocument createXFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState,
-                                                                          XFormsEngineStaticState xformsEngineStaticState,
-                                                                          XFormsURIResolver initializationURIResolver) {
-
-        if (xformsEngineStaticState == null) {
-            // TODO: Handle caching of this.
-            xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
-            logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
-        } else {
-            logger.debug("XForms - creating new ContainingDocument (static state object provided).");
-        }
-
-        // Create XForms Engine ContainingDocument
-        final XFormsContainingDocument containingDocument
-                = new XFormsContainingDocument(xformsEngineStaticState, initializationURIResolver);
-
-        // Set the document's dynamic state if provided
-        final String encodedDynamicState = xformsState.getDynamicState();
-        if (encodedDynamicState != null && !"".equals(encodedDynamicState))
-            containingDocument.restoreDynamicState(pipelineContext, encodedDynamicState);
-        else
-            containingDocument.initialize(pipelineContext);
-
-        return containingDocument;
-    }
-
 }

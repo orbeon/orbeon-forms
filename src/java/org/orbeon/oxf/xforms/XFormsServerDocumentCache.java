@@ -110,7 +110,7 @@ public class XFormsServerDocumentCache {
         if (pool == null) {
             // We don't add the pool to the cache here
             XFormsServer.logger.debug("XForms - containing document cache (getContainingDocument): did not find document pool in cache.");
-            containingDocument = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState);
+            containingDocument = new XFormsContainingDocument(pipelineContext, xformsState);
         } else {
             // Get object from pool
             XFormsServer.logger.debug("XForms - containing document cache (getContainingDocument): found containing document pool in cache; getting document from pool.");
@@ -165,7 +165,7 @@ public class XFormsServerDocumentCache {
             // requires things like resolving URLs to load schemas, etc.
 
             final PipelineContext pipelineContext = StaticExternalContext.getStaticContext().getPipelineContext();
-            final XFormsContainingDocument result = XFormsServer.createXFormsContainingDocument(pipelineContext, xformsState);
+            final XFormsContainingDocument result = new XFormsContainingDocument(pipelineContext, xformsState);
             result.setSourceObjectPool(pool);
             return result;
         }

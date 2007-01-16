@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.xforms.output;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -62,9 +61,7 @@ public class XFormsOutput extends ProcessorImpl {
                 model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, null, null);
 
                 // Create and initialize XForms Engine
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.initialize(pipelineContext);
+                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(pipelineContext, model);
 
                 // Create evaluation context
                 final XFormsElementContext elementContext =

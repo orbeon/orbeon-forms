@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
@@ -163,9 +162,7 @@ public class XFormsInput extends ProcessorImpl {
                 }
 
                 // Create and initialize XForms Engine
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                final XFormsContainingDocument containingDocument = new XFormsContainingDocument(model, externalContext);
-                containingDocument.initialize(pipelineContext);
+                new XFormsContainingDocument(pipelineContext, model);
 
                 if (logger.isDebugEnabled())
                     logger.debug("3) Instance with model item properties applied:\n"

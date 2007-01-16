@@ -79,13 +79,6 @@ public class CallXSLT extends SimpleProcessor {
         final Document result = domSerializerData.getDocument(newPipelineContext); // must use same PipelineContext as start()
 
         // Serialize result to output
-//        TransformerUtils.writeDom4j(result, contentHandler);
-
-        try {
-            final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(new LocationDocumentSource(result), new SAXResult(contentHandler));
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
+        TransformerUtils.writeDom4j(result, contentHandler);
     }
 }

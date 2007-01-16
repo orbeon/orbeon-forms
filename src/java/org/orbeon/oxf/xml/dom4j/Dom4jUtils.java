@@ -102,31 +102,31 @@ public class Dom4jUtils {
     }
 
 
-    /**
+    /*
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it
      * creates work for GC (because it relies on JAXP).
      */
-    public static Document parseText(final String s) throws SAXException, DocumentException {
+    public static Document readDom4j(final String s) throws SAXException, DocumentException {
         final StringReader stringReader = new StringReader(s);
-        return read(stringReader);
+        return readDom4j(stringReader);
     }
 
-    public static Document read(final Reader reader) throws SAXException, DocumentException {
+    public static Document readDom4j(final Reader reader) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(reader);
     }
 
-    public static Document read(final Reader reader, final String uri) throws SAXException, DocumentException {
+    public static Document readDom4j(final Reader reader, final String uri) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(reader, uri);
     }
 
-    public static Document read(final InputStream inputStream) throws SAXException, DocumentException {
+    public static Document readDom4j(final InputStream inputStream) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(inputStream);
     }
 
-    public static Document read(final InputStream inputStream, final String uri) throws SAXException, DocumentException {
+    public static Document readDom4j(final InputStream inputStream, final String uri) throws SAXException, DocumentException {
         final SAXReader saxReader = createSAXReader();
         return saxReader.read(inputStream, uri);
     }

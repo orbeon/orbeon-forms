@@ -27,15 +27,16 @@ public class InstanceData {
 
     private LocationData locationData;
     private boolean generated = false;
-    private RelevantModelItemProperty relevant = new RelevantModelItemProperty();
-    private ReadonlyModelItemProperty readonly = new ReadonlyModelItemProperty();
 
-    private RequiredModelItemProperty required = new RequiredModelItemProperty();
-    private ValidModelItemProperty valid;
-    private TypeModelItemProperty type = new TypeModelItemProperty();
+    protected RelevantModelItemProperty relevant;
+    protected ReadonlyModelItemProperty readonly;
 
-    private ValidModelItemProperty valueValid = new ValidModelItemProperty();
-    private ValidModelItemProperty constraint = new ValidModelItemProperty();
+    protected RequiredModelItemProperty required;
+    protected ValidModelItemProperty valid;
+    protected TypeModelItemProperty type;
+
+    protected ValidModelItemProperty valueValid;
+    protected ValidModelItemProperty constraint;
 
     private RelevantModelItemProperty inheritedRelevant;
     private ReadonlyModelItemProperty inheritedReadonly;
@@ -56,12 +57,18 @@ public class InstanceData {
     private Map idToNodeMap;
     private List schemaErrors = null;
 
-    public InstanceData(LocationData locationData) {
-        this.locationData = locationData;
-    }
-
     public InstanceData(LocationData locationData, int id) {
-        this(locationData);
+        this.locationData = locationData;
+
+        this.relevant = new RelevantModelItemProperty();
+        this.readonly = new ReadonlyModelItemProperty();
+
+        this.required = new RequiredModelItemProperty();
+        this.type = new TypeModelItemProperty();
+
+        this.valueValid = new ValidModelItemProperty();
+        this.constraint = new ValidModelItemProperty();
+
         this.id = id;
     }
 

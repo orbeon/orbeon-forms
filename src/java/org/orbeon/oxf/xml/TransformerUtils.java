@@ -38,6 +38,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.StringReader;
 import java.util.*;
 
 /**
@@ -393,6 +394,13 @@ public class TransformerUtils {
     }
 
     /**
+     * Transform a String to a TinyTree.
+     */
+    public static DocumentInfo stringToTinyTree(String string) {
+        return readTinyTree(new StreamSource(new StringReader(string)));
+    }
+
+    /**
      * Transform a TinyTree to SAX events.
      */
     public static void writeTinyTree(NodeInfo nodeInfo, ContentHandler contentHandler) {
@@ -419,7 +427,7 @@ public class TransformerUtils {
     /**
      * Transform a TinyTree to a String.
      */
-    public static String toString(NodeInfo nodeInfo) {
+    public static String tinyTreeToString(NodeInfo nodeInfo) {
         try {
             final Transformer identity = getIdentityTransformer();
             final StringWriter writer = new StringWriter();

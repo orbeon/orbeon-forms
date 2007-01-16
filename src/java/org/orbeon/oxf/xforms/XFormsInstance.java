@@ -53,7 +53,7 @@ public class XFormsInstance implements XFormsEventTarget {
     private DocumentInfo instanceDocumentInfo;
 
     public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, String username, String password, XFormsModel model) {
-        // NOTE: We normalize the Document before setting it, so that text nodes follow the XPath constraints
+        // We normalize the Document before setting it, so that text nodes follow the XPath constraints
         this(pipelineContext, id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, model);
     }
 
@@ -75,17 +75,10 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
-     * Return the instance document.
+     * Return the instance DocumentInfo.
+     *
+     * @return  instance DocumentInfo
      */
-    public Document getInstanceDocument() {
-        if (instanceDocumentInfo instanceof DocumentWrapper) {
-            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
-            return (Document) documentWrapper.getUnderlyingNode();
-        } else {
-            return null;
-        }
-    }
-
     public DocumentInfo getInstanceDocumentInfo() {
         return instanceDocumentInfo;
     }
@@ -117,6 +110,19 @@ public class XFormsInstance implements XFormsEventTarget {
     /**
      * Set the instance document.
      *
+     * @param instanceDocument  the Document or DocumentInfo to use
+     * @param initialize        true if initial decoration (MIPs) has to be reset
+     */
+    public void setInstanceDocument(Object instanceDocument, boolean initialize) {
+        if (instanceDocument instanceof Document)
+            setInstanceDocument((Document) instanceDocument, initialize);
+        else
+            setInstanceDocumentInfo((DocumentInfo) instanceDocument, initialize);
+    }
+
+    /**
+     * Set the instance document.
+     *
      * @param instanceDocument  the Document to use
      * @param initialize        true if initial decoration (MIPs) has to be reset
      */
@@ -124,6 +130,12 @@ public class XFormsInstance implements XFormsEventTarget {
         setInstanceDocumentInfo(new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize);
     }
 
+    /**
+     * Set the instance document.
+     *
+     * @param instanceDocumentInfo  the DocumentInfo to use
+     * @param initialize            true if initial decoration (MIPs) has to be reset
+     */
     public void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
 
         this.instanceDocumentInfo = instanceDocumentInfo;
@@ -145,29 +157,13 @@ public class XFormsInstance implements XFormsEventTarget {
         }, true);
     }
 
-    /**
-     * Set a value on the instance using an element or attribute id.
-     *
-     * If a type is specified, it means that the Request generator set it, which, for now, means
-     * that it was a file upload.
-     *
-     * @deprecated legacy XForms engine
-     */
-    public void setValueForId(int id, String value, String type) {
-        final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-        setValueForNode(pipelineContext, node, value, type, instanceData);
-    }
-
     public static void setValueForNodeInfo(PipelineContext pipelineContext, NodeInfo nodeInfo, String newValue, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
 
         // Get local instance data as we are not using any inheritance here AND we are doing an update
         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
-
         final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-
         setValueForNode(pipelineContext, node, newValue, type, instanceData);
     }
 
@@ -231,25 +227,6 @@ public class XFormsInstance implements XFormsEventTarget {
         }
     }
 
-    /**
-     * Set a value on the instance using an XPath expression pointing to an element or attribute.
-     *
-     * @param pipelineContext
-     * @param refXPath
-     * @param prefixToURIMap
-     * @param value
-     *
-     * @deprecated legacy XForms engine
-     */
-    public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
-
-        final Object o = getModel().getContainingDocument().getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
-        if (o == null || !(o instanceof NodeInfo))
-            throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
-
-        setNodeInfoValue((NodeInfo) o, value, null);
-    }
-
     private void setNodeInfoValue(NodeInfo nodeInfo, String value, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Cannot set node value on read-only DOM.");
@@ -280,32 +257,6 @@ public class XFormsInstance implements XFormsEventTarget {
         }
 
         attribute.setValue(value);
-    }
-
-    /**
-     * @deprecated legacy XForms engine
-     */
-    private void setElementValue(Element element, String value, String type) {
-        // Don't do anything if value exists and dontSetIfexisting is true
-        if (type != null) {
-            // Handle value type
-            final String currentType
-                    = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME));
-            if (currentType != null && !currentType.equals(type)) {
-                // There is a different type already, do a conversion
-                value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);
-                Dom4jUtils.clearElementContent(element);
-            } else if (currentType == null) {
-                // There is no type, convert to default type
-                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
-                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsConstants.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
-            }
-            element.setText(value);
-        } else {
-            // No type, just set the value
-            element.setText(value);
-        }
     }
 
     /**
@@ -406,5 +357,74 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
         // NOP
+    }
+
+
+    /**
+     * Return the instance document.
+     *
+     * @deprecated should use getInstanceDocumentInfo()
+     */
+    public Document getInstanceDocument() {
+        if (instanceDocumentInfo instanceof DocumentWrapper) {
+            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
+            return (Document) documentWrapper.getUnderlyingNode();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set a value on the instance using an element or attribute id.
+     *
+     * If a type is specified, it means that the Request generator set it, which, for now, means
+     * that it was a file upload.
+     *
+     * @deprecated legacy XForms engine
+     */
+    public void setValueForId(int id, String value, String type) {
+        final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+        setValueForNode(pipelineContext, node, value, type, instanceData);
+    }
+
+    /**
+     * Set a value on the instance using an XPath expression pointing to an element or attribute.
+     *
+     * @deprecated legacy XForms engine
+     */
+    public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
+
+        final Object o = getModel().getContainingDocument().getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
+        if (o == null || !(o instanceof NodeInfo))
+            throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
+
+        setNodeInfoValue((NodeInfo) o, value, null);
+    }
+
+    /**
+     * @deprecated legacy XForms engine
+     */
+    private void setElementValue(Element element, String value, String type) {
+        // Don't do anything if value exists and dontSetIfexisting is true
+        if (type != null) {
+            // Handle value type
+            final String currentType
+                    = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME));
+            if (currentType != null && !currentType.equals(type)) {
+                // There is a different type already, do a conversion
+                value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);
+                Dom4jUtils.clearElementContent(element);
+            } else if (currentType == null) {
+                // There is no type, convert to default type
+                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
+                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
+                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsConstants.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
+            }
+            element.setText(value);
+        } else {
+            // No type, just set the value
+            element.setText(value);
+        }
     }
 }

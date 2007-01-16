@@ -68,6 +68,8 @@ public class XFormsUtils {
 
     private static final int BUFFER_SIZE = 1024;
 
+    private static final InstanceData READONLY_LOCAL_INSTANCE_DATA = new ReadonlyInstanceData(null, -1);
+
     /**
      * Return the local XForms instance data for the given node, null if not available.
      */
@@ -75,8 +77,7 @@ public class XFormsUtils {
         if (nodeInfo instanceof NodeWrapper) {
             return getLocalInstanceData(getNodeFromNodeInfo(nodeInfo, ""));
         } else {
-            // TODO: check how we proceed for TinyTree: should we return something anyway?
-            return null;
+            return READONLY_LOCAL_INSTANCE_DATA;
         }
     }
 
@@ -111,8 +112,7 @@ public class XFormsUtils {
         if (nodeInfo instanceof NodeWrapper) {
             return getInstanceDataUpdateInherited(getNodeFromNodeInfo(nodeInfo, ""));
         } else {
-            // TODO: check how we proceed for TinyTree: should we return something anyway?
-            return null;
+            return READONLY_LOCAL_INSTANCE_DATA;
         }
     }
 
@@ -289,32 +289,30 @@ public class XFormsUtils {
         updateAttribute(elt, qnm, currentBooleanValue, Boolean.toString(defaultValue));
     }
 
-    private static void updateAttribute(final Element elt, final QName qnam, final String currentValue, final String defaultValue) {
-        Attribute attr = elt.attribute(qnam);
-        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attr != null) {
-            elt.remove(attr);
+    private static void updateAttribute(final Element element, final QName qnam, final String currentValue, final String defaultValue) {
+        Attribute attribute = element.attribute(qnam);
+        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attribute != null) {
+            element.remove(attribute);
         } else if (currentValue != null && !currentValue.equals(defaultValue)) {
             // Add a namespace declaration if necessary
-            final String pfx = qnam.getNamespacePrefix();
-            final String qnURI = qnam.getNamespaceURI();
-            final Namespace ns = elt.getNamespaceForPrefix(pfx);
-            final String nsURI = ns == null ? null : ns.getURI();
-            if (ns == null) {
-                elt.addNamespace(pfx, qnURI);
-            } else if (!nsURI.equals(qnURI)) {
-                final LocationData locDat = getNodeLocationData(elt);
+            final String prefix = qnam.getNamespacePrefix();
+            final String uri = qnam.getNamespaceURI();
+            final Namespace namespace = element.getNamespaceForPrefix(prefix);
+            final String nsURI = namespace == null ? null : namespace.getURI();
+            if (namespace == null) {
+                element.addNamespace(prefix, uri);
+            } else if (!nsURI.equals(uri)) {
+                final LocationData locationData = getNodeLocationData(element);
                 throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
-                        + " as the prefix is already mapped to another URI", locDat);
+                        + " as the prefix is already mapped to another URI", locationData);
             }
             // Add attribute
-            if (attr == null) {
-                attr = Dom4jUtils.createAttribute(elt, qnam, currentValue);
-                final LocationData ld = (LocationData) attr.getData();
-                final InstanceData instDat = new InstanceData(ld);
-                attr.setData(instDat);
-                elt.add(attr);
+            if (attribute == null) {
+                attribute = Dom4jUtils.createAttribute(element, qnam, currentValue);
+                setInitialDecoration(attribute);
+                element.add(attribute);
             } else {
-                attr.setValue(currentValue);
+                attribute.setValue(currentValue);
             }
         }
     }

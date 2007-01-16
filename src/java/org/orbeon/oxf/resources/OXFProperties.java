@@ -87,7 +87,7 @@ public class OXFProperties {
                 }
 
                 final java.io.InputStream in = uc.getInputStream();
-                final org.dom4j.Document doc = Dom4jUtils.read(in);
+                final org.dom4j.Document doc = Dom4jUtils.readDom4j(in);
                 propertyStore = OXFPropertiesSerializer.createPropertyStore(doc);
 
                 lastUpdate = current;

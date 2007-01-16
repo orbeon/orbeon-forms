@@ -37,7 +37,9 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
+import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 
 /**
@@ -963,7 +965,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         final Document dynamicStateDocument = Dom4jUtils.createDocument();
         final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-        // Output updated instances
+        // Output instances
         {
             final Element instancesElement = dynamicStateElement.addElement("instances");
 
@@ -972,22 +974,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                 for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                    if (true) {
-                        // New serialization
-                        // TODO: if instance is readonly, it should not be stored into the dynamic state
-                        // TODO: can we avoid storing the instance in the dynamic state if it has not changed?
-                        final String instanceString = TransformerUtils.toString(currentInstance.getInstanceDocumentInfo());
-                        final Element instanceElement = instancesElement.addElement("instance");
-                        instanceElement.addText(instanceString);
-                    } else {
-                        final Element instanceElement = instancesElement.addElement("instance");
-                        instanceElement.add(currentInstance.getInstanceDocument().getRootElement().createCopy());
-                    }
+
+                    // TODO: if instance is readonly, it should not be stored into the dynamic state
+                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed?
+
+                    // NOTE: DocumentInfo may wrap an actual TinyTree or a dom4j document
+                    final String instanceString = TransformerUtils.tinyTreeToString(currentInstance.getInstanceDocumentInfo());
+                    final Element instanceElement = instancesElement.addElement("instance");
+                    if (currentInstance.isReadOnly())
+                        instanceElement.addAttribute(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, "true");
+                    instanceElement.addText(instanceString);
 
                     // Log instance if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
                         XFormsServer.logger.debug("XForms - resulting instance: model id='" + currentModel.getEffectiveId() +  "', instance id= '" + currentInstance.getEffectiveId() + "'\n"
-                                + TransformerUtils.toString(currentInstance.getInstanceRootElementInfo()));
+                                + TransformerUtils.tinyTreeToString(currentInstance.getInstanceRootElementInfo()));
                     }
                 }
             }
@@ -1117,11 +1118,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
 
                     // Create and set instance document on current model
-                    final Document instanceDocument;
+                    final Object instanceDocument;
                     if (instanceElement.elements().size() == 0) {
                         // New serialization (use serialized XML)
                         try {
-                            instanceDocument = Dom4jUtils.parseText(instanceElement.getStringValue());
+                            final String xmlString = instanceElement.getStringValue();
+                            final boolean isReadonly = "true".equals(instanceElement.attribute(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
+                            if (!isReadonly)
+                                instanceDocument = Dom4jUtils.readDom4j(xmlString);
+                            else
+                                instanceDocument = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
                         } catch (Exception e) {
                             throw new OXFException(e);
                         }

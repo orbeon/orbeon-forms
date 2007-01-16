@@ -252,7 +252,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // For now, we can't submit a read-only instance (but we could in the future)
-                    if (!(currentNodeInfo instanceof NodeWrapper))
+                    if (serialize && !(currentNodeInfo instanceof NodeWrapper))
                         throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
 
                     currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
@@ -581,10 +581,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                                         // Handling of XML media type
                                         try {
-                                            // Read stream into Document
-                                            final Document resultingInstanceDocument = Dom4jUtils.read(connectionResult.getResultInputStream());
-
                                             // Set new instance document to replace the one submitted
+
+                                            // Find instance to update
                                             final XFormsInstance replaceInstance;
                                             {
                                                 if (xxfReplaceInstanceId != null)
@@ -593,6 +592,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     replaceInstance = model.getInstance(replaceInstanceId);
                                                 else
                                                     replaceInstance = currentInstance;
+                                            }
+
+                                            // Read stream into Document
+                                            final Object resultingInstanceDocument;// Document or DocumentInfo
+                                            if (!replaceInstance.isReadOnly()) {
+                                                resultingInstanceDocument = Dom4jUtils.readDom4j(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                                            } else {
+                                                resultingInstanceDocument = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
                                             }
 
                                             if (replaceInstance == null) {

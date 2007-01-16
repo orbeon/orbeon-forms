@@ -199,7 +199,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
         try {
             // Obtain the created DOM4J document.
 //			document = TString.isEmpty( baseUri ) ? Dom4jUtils.read( inputStream ) : Dom4jUtils.read( inputStream, baseUri );
-            document = TString.isEmpty(baseUri) ? Dom4jUtils.read(inputStream) : TransformerUtils.readDom4j(inputStream, baseUri);
+            document = TString.isEmpty(baseUri) ? Dom4jUtils.readDom4j(inputStream) : TransformerUtils.readDom4j(inputStream, baseUri);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);
@@ -227,7 +227,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     public void readFrom(Reader reader, String baseUri) throws TStreamReadException {
         try {
             // Obtain the created DOM4J document.
-            document = TString.isEmpty(baseUri) ? Dom4jUtils.read(reader) : Dom4jUtils.read(reader, baseUri);
+            document = TString.isEmpty(baseUri) ? Dom4jUtils.readDom4j(reader) : Dom4jUtils.readDom4j(reader, baseUri);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);
@@ -255,7 +255,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     public void readFrom(InputStream inputStream) throws TStreamReadException {
         try {
             // Obtain the created DOM4J document.
-            document = Dom4jUtils.read(inputStream);
+            document = Dom4jUtils.readDom4j(inputStream);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);
@@ -283,7 +283,7 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
     public void readFrom(Reader reader) throws TStreamReadException {
         try {
             // Obtain the created DOM4J document.
-            document = Dom4jUtils.read(reader);
+            document = Dom4jUtils.readDom4j(reader);
             // Reset the temporay id and docname that might be given in base class if element previously has been null.
             if (element == null) {
                 super.setDocname(null);

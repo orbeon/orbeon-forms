@@ -173,8 +173,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
                         Document config = null;
                         try {
-                            config = Dom4jUtils.parseText
-                                ( "<config><include>/request/request-path</include></config>" );
+                            config = Dom4jUtils.readDom4j
+                                    ( "<config><include>/request/request-path</include></config>" );
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {
@@ -190,7 +190,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
                         Document config = null;
                         try {
-                            config = Dom4jUtils.parseText
+                            config = Dom4jUtils.readDom4j
                                     ("<config><include>/request/parameters</include></config>");
 //                                    ("<config xmlns:xs='http://www.w3.org/2001/XMLSchema' stream-type='xs:anyURI'><include>/request/parameters</include></config>");
                         } catch (DocumentException e) {

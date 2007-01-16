@@ -26,6 +26,7 @@
                 <selected>
                     <value1>sc1</value1>
                     <value2>sc1</value2>
+                    <value3>p</value3>
                 </selected>
             </xforms:instance>
             <xforms:instance id="items-instance">
@@ -45,6 +46,32 @@
                         </item>
                     </item>
                 </items>
+            </xforms:instance>
+            <xforms:instance id="flavors-instance">
+                <flavors>
+                    <flavor value="v">
+                        <label>Vanilla</label>
+                    </flavor>
+                    <flavor value="s">
+                        <label>Strawberry</label>
+                    </flavor>
+                    <flavor value="c">
+                        <label>Chocolate</label>
+                    </flavor>
+                </flavors>
+            </xforms:instance>
+            <xforms:instance id="carriers-instance">
+                <carriers>
+                    <carrier value="ups">
+                        <label>UPS</label>
+                    </carrier>
+                    <carrier value="fedex">
+                        <label>FedEx</label>
+                    </carrier>
+                    <carrier value="dhl">
+                        <label>DHL</label>
+                    </carrier>
+                </carriers>
             </xforms:instance>
         </xforms:model>
     </xhtml:head>
@@ -102,6 +129,36 @@
                 </xforms:choices>
             </xforms:select1>
             <xforms:output ref="value2">
+                <xforms:label>Value selected: </xforms:label>
+            </xforms:output>
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:select1 ref="value3" appearance="minimal">
+                <xforms:label>Select: </xforms:label>
+                <xforms:choices>
+                    <xforms:label>Flavors</xforms:label>
+                    <xforms:item>
+                        <xforms:label>Pistachio</xforms:label>
+                        <xforms:value>p</xforms:value>
+                    </xforms:item>
+                    <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:choices>
+                <xforms:choices>
+                    <xforms:label>Carriers</xforms:label>
+                    <xforms:item>
+                        <xforms:label>USPS</xforms:label>
+                        <xforms:value>usps</xforms:value>
+                    </xforms:item>
+                    <xforms:itemset nodeset="instance('carriers-instance')/carrier">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="@value"/>
+                    </xforms:itemset>
+                </xforms:choices>
+            </xforms:select1>
+            <xforms:output ref="value3">
                 <xforms:label>Value selected: </xforms:label>
             </xforms:output>
         </xhtml:p>

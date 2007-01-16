@@ -76,6 +76,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
                     // xforms:itemset
 
                     hasItemset = true;
+                    final int itemsetLevel = hierarchyLevel;
                     xformsControls.pushBinding(pipelineContext, element); // when entering this method, binding must be on control
                     {
                         final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
@@ -110,7 +111,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
 
                                     final NodeInfo currentNodeInfo = (NodeInfo) currentNodeSet.get(currentPosition - 1);
-                                    final int newLevel = getNodeLevel(currentNodeInfo, nodeStack);
+                                    final int newLevel = itemsetLevel + getNodeLevel(currentNodeInfo, nodeStack);
                                     if (hierarchyLevel - newLevel >= 0) {
                                         //  We are going down one or more levels
                                         for (int i = newLevel; i <= hierarchyLevel; i++) {

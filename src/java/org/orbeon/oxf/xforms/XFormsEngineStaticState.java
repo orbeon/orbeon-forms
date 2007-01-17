@@ -27,15 +27,20 @@ import java.util.*;
  *
  * All the information contained here must be constant, and never change as the XForms engine operates on a page. This
  * information can be shared between multiple running copies of an XForms pages.
+ *
+ * NOTE: This will have to change a bit if we move towards TinyTree to store the static state.
  */
 public class XFormsEngineStaticState {
 
     private String uuid;
     private String encodedStaticState;
+    private Document staticStateDocument;
 
     private Document controlsDocument;
     private List modelDocuments = new ArrayList();
     private Map xxformsScripts;
+
+    private Map instancesMap;
 
     private String baseURI;
     private String stateHandling;
@@ -45,8 +50,27 @@ public class XFormsEngineStaticState {
     private String containerType;
     private String containerNamespace;
 
-//    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
-    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument) {
+    /**
+     * Create static state object from an encoded version.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param encodedStaticState    encoded static state
+     */
+    public XFormsEngineStaticState(PipelineContext pipelineContext, String encodedStaticState) {
+        this(XFormsUtils.decodeXML(pipelineContext, encodedStaticState), encodedStaticState);
+    }
+
+    /**
+     * Create static state object from a Document.
+     *
+     * @param staticStateDocument   Document containing the static state
+     */
+    //    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
+    public XFormsEngineStaticState(Document staticStateDocument) {
+        this(staticStateDocument, null);
+    }
+
+    private XFormsEngineStaticState(Document staticStateDocument, String encodedStaticState) {
 
         // Remember UUID
 //        this.uuid = uuid;
@@ -107,15 +131,62 @@ public class XFormsEngineStaticState {
         if (containerNamespace == null)
             containerNamespace = "";
 
-        final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
-        encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());
+        // Extract instances if present
+        final Element instancesElement = staticStateDocument.getRootElement().element("instances");
+        if (instancesElement != null) {
+            instancesMap = new HashMap();
+
+            for (Iterator instanceIterator = instancesElement.elements("instance").iterator(); instanceIterator.hasNext();) {
+                final Element currentInstanceElement = (Element) instanceIterator.next();
+                final XFormsInstance newInstance = new XFormsInstance(currentInstanceElement);
+                instancesMap.put(newInstance.getEffectiveId(), newInstance);
+            }
+        }
+
+        this.encodedStaticState = encodedStaticState;
+        if (encodedStaticState == null)
+            this.staticStateDocument = staticStateDocument; // remember this temporarily only if the encoded state is not yet known
+    }
+
+    public void addInstance(XFormsInstance instance) {
+        if (encodedStaticState != null)
+            throw new IllegalStateException("Cannot add instances to static state after initialization.");
+
+
+        if (instancesMap == null)
+            instancesMap = new HashMap();
+
+        instancesMap.put(instance.getEffectiveId(), instance);
     }
 
     public String getUUID() {
         return uuid;
     }
 
-    public String getEncodedStaticState() {
+    public String getEncodedStaticState(PipelineContext pipelineContext) {
+
+        if (encodedStaticState == null) {
+
+            if (staticStateDocument.getRootElement().element("instances") != null)
+                throw new IllegalStateException("Element instances already present in static state.");
+
+            // Add instances to Document if needed
+            if (instancesMap != null && instancesMap.size() > 0) {
+                final Element instancesElement = staticStateDocument.getRootElement().addElement("instances");
+                for (Iterator instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+                    instancesElement.add(currentInstance.createContainerElement());
+                }
+            }
+
+            // Serialize Document
+            final boolean isStateHandlingSession = stateHandling.equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+
+            // Remember encoded state an discard Document
+            encodedStaticState = XFormsUtils.encodeXML(pipelineContext, staticStateDocument, isStateHandlingSession ? null : XFormsUtils.getEncryptionKey());
+            staticStateDocument = null;
+        }
+
         return encodedStaticState;
     }
 

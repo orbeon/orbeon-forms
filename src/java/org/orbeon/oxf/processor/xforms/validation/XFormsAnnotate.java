@@ -38,7 +38,7 @@ public class XFormsAnnotate extends ProcessorImpl {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Get XForms model
-                XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
+                XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
                         return new XFormsModel(readInputAsDOM4J(context, input));
                     }
@@ -51,8 +51,8 @@ public class XFormsAnnotate extends ProcessorImpl {
                 }
 
                 // Set annotated instance on model
-                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                model.setInstanceDocument(pipelineContext, 0, instanceDocument, null, null, null);
+                final Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                model.setInstanceDocument(instanceDocument, model.getDefaultInstanceId(), null, null, null);
 
                 // Create and initialize XForms Engine
                 new XFormsContainingDocument(pipelineContext, model);

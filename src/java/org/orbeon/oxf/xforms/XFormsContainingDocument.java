@@ -128,11 +128,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Remember static state
         this.xformsEngineStaticState = xformsEngineStaticState;
 
-        // URI resolver
+        // Remember URI resolver for initialization
         this.uriResolver = uriResolver;
 
         // Initialize the containing document
         initialize(pipelineContext);
+
+        // Clear URI resolver, since it is of no use after initialization
+        this.uriResolver = null;
     }
 
     /**
@@ -146,8 +149,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
 
         // Create static state object
-        // TODO: Handle caching of this.
-        xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
+        // TODO: Handle caching of XFormsEngineStaticState object
+        xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, xformsState.getStaticState());
 
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
@@ -982,12 +985,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     // TODO: if instance is readonly, it should not be stored into the dynamic state
                     // TODO: can we avoid storing the instance in the dynamic state if it has not changed?
 
-                    // NOTE: DocumentInfo may wrap an actual TinyTree or a dom4j document
-                    final String instanceString = TransformerUtils.tinyTreeToString(currentInstance.getInstanceDocumentInfo());
-                    final Element instanceElement = instancesElement.addElement("instance");
-                    if (currentInstance.isReadOnly())
-                        instanceElement.addAttribute(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, "true");
-                    instanceElement.addText(instanceString);
+                    instancesElement.add(currentInstance.createContainerElement());
 
                     // Log instance if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -1084,20 +1082,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Get dynamic state document
         final Document dynamicStateDocument = XFormsUtils.decodeXML(pipelineContext, encodedDynamicState);
 
-        // Get instances from dynamic state
-        final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
-
-        // Get divs from dynamic state
-        final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
-
         // Get repeat indexes from dynamic state
         final Element repeatIndexesElement = dynamicStateDocument.getRootElement().element("repeat-indexes");
 
         // Create XForms controls and models
         createControlAndModel(repeatIndexesElement);
 
-        // Get instances
+        // Extract and restore instances
         {
+            // Get instances from dynamic state
+            final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
+
             int foundInstancesCount = 0;
             int expectedInstancesCount = 0;
             if (instancesElement != null) {
@@ -1122,25 +1117,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     }
 
                     // Create and set instance document on current model
-                    final Object instanceDocument;
-                    if (instanceElement.elements().size() == 0) {
-                        // New serialization (use serialized XML)
-                        try {
-                            final String xmlString = instanceElement.getStringValue();
-                            final boolean isReadonly = "true".equals(instanceElement.attribute(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
-                            if (!isReadonly)
-                                instanceDocument = Dom4jUtils.readDom4j(xmlString);
-                            else
-                                instanceDocument = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
-                        } catch (Exception e) {
-                            throw new OXFException(e);
-                        }
-                    } else {
-                        // Old serialization (instance is directly in the DOM)
-                        instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceElement.elements().get(0));
-                    }
+                    final XFormsInstance newInstance = new XFormsInstance(instanceElement);
+                    currentModel.setInstance(newInstance);
 
-                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument, null, null, null);// TODO: this also resets the URI information for the instance. We should probably keep it and store it in the dynamic state.
                     currentCount++;
                     foundInstancesCount++;
                 }
@@ -1158,6 +1137,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Restore controls
+        final Element divsElement = dynamicStateDocument.getRootElement().element("divs");
         xformsControls.initializeState(pipelineContext, divsElement, repeatIndexesElement);
     }
 

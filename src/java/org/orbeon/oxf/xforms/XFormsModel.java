@@ -196,9 +196,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     /**
      * Return the default instance for this model, i.e. the first instance. Return null if there is
      * no instance in this model.
+     *
+     * @return  XFormsInstance or null
      */
     public XFormsInstance getDefaultInstance() {
         return (XFormsInstance) ((instances != null && instances.size() > 0) ? instances.get(0) : null);
+    }
+
+    /**
+     * Return the id of the default instance for this model. Return null if there is no isntance in this model.
+     *
+     * @return  instance id or null
+     */
+    public String getDefaultInstanceId() {
+        return (instanceIds != null && instanceIds.size() > 0) ? (String) instanceIds.get(0) : null;
     }
 
     /**
@@ -241,23 +252,24 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     }
 
     /**
-     * Set an instance document for this model. There may be multiple instance documents. Each
-     * instance document may have an associated id that identifies it.
+     * Set an instance document for this model. There may be multiple instance documents. Each instance document may
+     * have an associated id that identifies it.
      */
-    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Object instanceDocument, String instanceSourceURI, String username, String password) {
+
+    public void setInstanceDocument(Object instanceDocument, String instanceId, String instanceSourceURI, String username, String password) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
             instancesMap = new HashMap(instanceIds.size());
         }
         // Prepare and set instance
-        final String instanceId = (String) instanceIds.get(instancePosition);
+        final int instancePosition = instanceIds.indexOf(instanceId);
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(pipelineContext, instanceId, (Document) instanceDocument, instanceSourceURI, username, password, this);
+                newInstance = new XFormsInstance(instanceId, (Document) instanceDocument, instanceSourceURI, username, password);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new XFormsInstance(pipelineContext, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password, this);
+                newInstance = new XFormsInstance(instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -266,6 +278,34 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create mapping instance id -> instance
         if (instanceId != null)
             instancesMap.put(instanceId, newInstance);
+
+        // Set model on instance
+        newInstance.setModel(this);
+    }
+
+    /**
+     * Set an instance. The id of the instance must exist in the model.
+     *
+     * @param instance          XFormsInstance to set
+     */
+    public void setInstance(XFormsInstance instance) {
+        // Initialize containers if needed
+        if (instances == null) {
+            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
+            instancesMap = new HashMap(instanceIds.size());
+        }
+        // Prepare and set instance
+        final String instanceId = instance.getEffectiveId();
+        final int instancePosition = instanceIds.indexOf(instanceId);
+
+        instances.set(instancePosition, instance);
+
+        // Create mapping instance id -> instance
+        if (instanceId != null)
+            instancesMap.put(instanceId, instance);
+
+        // Set model on instance
+        instance.setModel(this);
     }
 
     /**
@@ -690,6 +730,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // 1. All XML Schemas loaded (throws xforms-link-exception)
 
             // TODO: support multiple schemas
+            // TODO: support inline schemas
             // Get schema URI
             loadSchemasIfNeeded(pipelineContext);
             // TODO: throw exception event
@@ -720,6 +761,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
                         final LocationData locationData = (LocationData) instanceContainerElement.getData();
 
+                        final String instanceId = instanceContainerElement.attributeValue("id");
                         final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
                         final String xxformsUsername;
@@ -872,13 +914,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             }
                         } else {
                             // Got a blank src attribute, just dispatch xforms-link-exception
-                            final String instanceId = instanceContainerElement.attributeValue("id");
                             final Throwable throwable = new ValidationException("Invalid blank URL specified for instance: " + instanceId, locationData);
                             containingDocument.dispatchEvent(pipelineContext, new XFormsLinkExceptionEvent(XFormsModel.this, srcAttribute, instanceContainerElement, throwable));
                             break;
                         }
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument, instanceSourceURI, xxformsUsername, xxformsPassword);
+                        setInstanceDocument(instanceDocument, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
                     }
                 }
             }

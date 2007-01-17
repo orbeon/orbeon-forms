@@ -140,6 +140,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final XFormsEngineStaticState xformsEngineStaticState;
                 {
                     final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                    // TODO: Use TinyTree instead of dom4j Document
                     final LocationDocumentResult documentResult = new LocationDocumentResult();
                     identity.setResult(documentResult);
 
@@ -160,7 +161,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
 
 //                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument, digest);
-                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
+                    xformsEngineStaticState = new XFormsEngineStaticState(staticStateDocument);
                 }
 
                 // Create document here so we can do appropriate analysis of caching dependencies
@@ -290,7 +291,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Add instance source dependencies
             for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                 final XFormsInstance currentInstance = (XFormsInstance) j.next();
-                final String instanceSourceURI = currentInstance.getInstanceSourceURI();
+                final String instanceSourceURI = currentInstance.getSourceURI();
 
                 // Add dependency
                 if (instanceSourceURI != null) {
@@ -300,7 +301,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
             }
 
-            // TODO: Add @src attributes from controls
+            // TODO: Add @src attributes from controls?
         }
 
         // Handle dependency on session id
@@ -318,11 +319,28 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create containing document and initialize XForms engine
             containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsEngineStaticState, uriResolver);
 
-            // The URIResolver above doesn't make any sense anymore past initialization
-            containingDocument[0].setURIResolver(null);
+            // Update static state with post-initialization information
+            {
+                for (Iterator modelIterator = containingDocument[0].getModels().iterator(); modelIterator.hasNext();) {
+                    final XFormsModel currentModel = (XFormsModel) modelIterator.next();
+
+                    final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
+
+                    for (Iterator instanceIterator = currentModel.getInstances().iterator(); instanceIterator.hasNext();) {
+                        final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
+
+                        if (modelHasReset || currentInstance.isReadOnly()) {
+
+                            logger.debug("XForms - adding instance to static state: " + currentInstance.getEffectiveId());
+
+                            xformsEngineStaticState.addInstance(currentInstance);
+                        }
+                    }
+                }
+            }
 
             // This is the state after XForms initialization
-            xformsState[0] = new XFormsState(xformsEngineStaticState.getEncodedStaticState(),
+            xformsState[0] = new XFormsState(xformsEngineStaticState.getEncodedStaticState(pipelineContext),
                     containingDocument[0].createEncodedDynamicState(pipelineContext));
         }
 

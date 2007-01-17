@@ -35,7 +35,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.util.Map;
+import java.io.StringReader;
 
 /**
  * Represent an XForms instance.
@@ -44,27 +46,96 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public static final String REQUEST_PORTAL_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
 
-    private PipelineContext pipelineContext;
-    private String id;
-    private String instanceSourceURI;
-    private String username;
-    private String password;
-    private XFormsModel model;
     private DocumentInfo instanceDocumentInfo;
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, String instanceSourceURI, String username, String password, XFormsModel model) {
-        // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(pipelineContext, id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, model);
+    private String id;
+    private boolean isReadonly;
+    private String sourceURI;
+    private String username;
+    private String password;
+
+    private XFormsModel model;
+
+    /**
+     * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
+     * such as id, username, URI, etc.
+     *
+     * <instance readonly="false" id="instance-id" source-uri="http://..." username="jdoe" password="password">
+     *     x7wer...
+     * </instance
+     *
+     * @param containerElement  container element
+     */
+    public XFormsInstance(Element containerElement) {
+
+        this.id = containerElement.attributeValue("id");
+        this.isReadonly = "true".equals(containerElement.attributeValue("readonly"));
+        this.sourceURI = containerElement.attributeValue("source-uri");
+        this.username = containerElement.attributeValue("username");
+        this.password = containerElement.attributeValue("password");
+
+        // Create and set instance document on current model
+        final DocumentInfo documentInfo;
+        if (containerElement.elements().size() == 0) {
+            // New serialization (use serialized XML)
+            try {
+                final String xmlString = containerElement.getStringValue();
+                if (!isReadonly)
+                    documentInfo = new DocumentWrapper(Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, new Configuration());
+                else
+                    documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        } else {
+            // Old serialization (instance is directly in the DOM)
+            final Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) containerElement.elements().get(0));
+            documentInfo = new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
+        }
+
+        setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(PipelineContext pipelineContext, String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, XFormsModel model) {
-        this.pipelineContext = pipelineContext;
+    public XFormsInstance(String id, Document instanceDocument, String instanceSourceURI, String username, String password) {
+        // We normalize the Document before setting it, so that text nodes follow the XPath constraints
+        this(id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password);
+    }
+
+    public XFormsInstance(String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
         this.id = id;
-        this.instanceSourceURI = instanceSourceURI;
+        this.sourceURI = instanceSourceURI;
         this.username = username;
         this.password = password;
-        this.model = model;
+
         setInstanceDocumentInfo(instanceDocumentInfo, true);
+    }
+
+    /**
+     * Serialize the instance into a containing Element with meta-information.
+     *
+     * @return      containing Element
+     */
+    public Element createContainerElement() {
+
+        // DocumentInfo may wrap an actual TinyTree or a dom4j document
+        final String instanceString = TransformerUtils.tinyTreeToString(getInstanceDocumentInfo());
+        final Element instanceElement = Dom4jUtils.createElement("instance");
+        if (isReadonly)
+            instanceElement.addAttribute("readonly", "true");
+
+        instanceElement.addAttribute("id", id);
+        instanceElement.addAttribute("source-uri", sourceURI);
+        instanceElement.addAttribute("username", username);
+        instanceElement.addAttribute("password", password);
+        
+        instanceElement.addText(instanceString);
+
+        return instanceElement;
+    }
+
+
+    public void setModel(XFormsModel model) {
+        this.model = model;
     }
 
     /**
@@ -91,8 +162,8 @@ public class XFormsInstance implements XFormsEventTarget {
         return (NodeInfo) XFormsUtils.getChildrenElements(instanceDocumentInfo).get(0);
     }
 
-    public String getInstanceSourceURI() {
-        return instanceSourceURI;
+    public String getSourceURI() {
+        return sourceURI;
     }
 
     public boolean isHasUsername() {
@@ -157,6 +228,14 @@ public class XFormsInstance implements XFormsEventTarget {
         }, true);
     }
 
+    /**
+     * Set a value on the instance using a NodeInfo and a value.
+     *
+     * @param pipelineContext   current PipelineContext
+     * @param nodeInfo          element or attribute NodeInfo to update
+     * @param newValue          value to set
+     * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
+     */
     public static void setValueForNodeInfo(PipelineContext pipelineContext, NodeInfo nodeInfo, String newValue, String type) {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
@@ -168,10 +247,10 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
-     * Set a value on the instance using a node and a value.
+     * Set a value on the instance using a Node and a value.
      *
      * @param pipelineContext   current PipelineContext
-     * @param node              element or attribute node to update
+     * @param node              element or attribute Node to update
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
@@ -225,38 +304,6 @@ public class XFormsInstance implements XFormsEventTarget {
         } else {
             throw new OXFException("Invalid node type: " + currentNode.getNodeKind());
         }
-    }
-
-    private void setNodeInfoValue(NodeInfo nodeInfo, String value, String type) {
-        if (!(nodeInfo instanceof NodeWrapper))
-            throw new OXFException("Cannot set node value on read-only DOM.");
-
-        final NodeWrapper nodeWrapper = (NodeWrapper) nodeInfo;
-        final Object o = nodeWrapper.getUnderlyingNode();
-
-         if (o instanceof Element) {
-            setElementValue((Element) o, value, type);
-        } else if (o instanceof Attribute) {
-            setAttributeValue((Attribute) o, value);
-        } else {
-             throw new OXFException("Invalid node class: " + o.getClass().getName());
-         }
-    }
-
-    private void setAttributeValue(Attribute attribute, String value) {
-        // Handle xsi:type if needed
-        if (XMLConstants.XSI_TYPE_QNAME.getNamespaceURI().equals(attribute.getNamespaceURI()) && !"".equals(attribute.getParent().getText())) {
-            // This is a type attribute and we already have content
-            String currentType = attribute.getParent().attributeValue(XMLConstants.XSI_TYPE_QNAME);
-            if (currentType != null && !currentType.equals(value)) { // FIXME: prefixes of type name could be different!
-                // Convert element value
-                String newValue = XFormsUtils.convertUploadTypes(pipelineContext, attribute.getParent().getText(), currentType, value);
-                attribute.getParent().clearContent();
-                attribute.getParent().addText(newValue);
-            }
-        }
-
-        attribute.setValue(value);
     }
 
     /**
@@ -382,7 +429,7 @@ public class XFormsInstance implements XFormsEventTarget {
      *
      * @deprecated legacy XForms engine
      */
-    public void setValueForId(int id, String value, String type) {
+    public void setValueForId(PipelineContext pipelineContext, int id, String value, String type) {
         final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
         final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
         setValueForNode(pipelineContext, node, value, type, instanceData);
@@ -399,13 +446,13 @@ public class XFormsInstance implements XFormsEventTarget {
         if (o == null || !(o instanceof NodeInfo))
             throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 
-        setNodeInfoValue((NodeInfo) o, value, null);
+        setNodeInfoValue(pipelineContext, (NodeInfo) o, value, null);
     }
 
     /**
      * @deprecated legacy XForms engine
      */
-    private void setElementValue(Element element, String value, String type) {
+    private void setElementValue(PipelineContext pipelineContext, Element element, String value, String type) {
         // Don't do anything if value exists and dontSetIfexisting is true
         if (type != null) {
             // Handle value type
@@ -426,5 +473,37 @@ public class XFormsInstance implements XFormsEventTarget {
             // No type, just set the value
             element.setText(value);
         }
+    }
+
+    private void setNodeInfoValue(PipelineContext pipelineContext, NodeInfo nodeInfo, String value, String type) {
+        if (!(nodeInfo instanceof NodeWrapper))
+            throw new OXFException("Cannot set node value on read-only DOM.");
+
+        final NodeWrapper nodeWrapper = (NodeWrapper) nodeInfo;
+        final Object o = nodeWrapper.getUnderlyingNode();
+
+         if (o instanceof Element) {
+            setElementValue(pipelineContext, (Element) o, value, type);
+        } else if (o instanceof Attribute) {
+            setAttributeValue(pipelineContext, (Attribute) o, value);
+        } else {
+             throw new OXFException("Invalid node class: " + o.getClass().getName());
+         }
+    }
+
+    private void setAttributeValue(PipelineContext pipelineContext, Attribute attribute, String value) {
+        // Handle xsi:type if needed
+        if (XMLConstants.XSI_TYPE_QNAME.getNamespaceURI().equals(attribute.getNamespaceURI()) && !"".equals(attribute.getParent().getText())) {
+            // This is a type attribute and we already have content
+            String currentType = attribute.getParent().attributeValue(XMLConstants.XSI_TYPE_QNAME);
+            if (currentType != null && !currentType.equals(value)) { // FIXME: prefixes of type name could be different!
+                // Convert element value
+                String newValue = XFormsUtils.convertUploadTypes(pipelineContext, attribute.getParent().getText(), currentType, value);
+                attribute.getParent().clearContent();
+                attribute.getParent().addText(newValue);
+            }
+        }
+
+        attribute.setValue(value);
     }
 }

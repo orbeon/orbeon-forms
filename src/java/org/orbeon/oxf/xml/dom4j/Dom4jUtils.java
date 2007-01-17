@@ -474,6 +474,12 @@ public class Dom4jUtils {
         return fctry.createText(txt);
     }
 
+    public static Element createElement(final String name) {
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        return fctry.createElement(name);
+    }
+
     public static Element createElement(final String qualifiedName, final String namespaceURI) {
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);

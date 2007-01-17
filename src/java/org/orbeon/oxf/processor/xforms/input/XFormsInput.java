@@ -85,7 +85,7 @@ public class XFormsInput extends ProcessorImpl {
                 XFormsInstance contextInstance = null;
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
-                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getInstanceDocument(), null, null, null);
+                    model.setInstanceDocument(contextInstance.getInstanceDocument(), model.getDefaultInstanceId(), null, null, null);
                 } else {
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
@@ -97,7 +97,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument(pipelineContext, 0, (Document) requestParameters.getInstance().clone(), null, null, null);
+                        model.setInstanceDocument((Document) requestParameters.getInstance().clone(), model.getDefaultInstanceId(), null, null, null);
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(int position, XFormsInstance localInstance) {
@@ -107,7 +107,7 @@ public class XFormsInput extends ProcessorImpl {
                                 int[] ids = requestParameters.getIds();
                                 for (int i = 0; i < ids.length; i++) {
                                     int id = ids[i];
-                                    localInstance.setValueForId(id, requestParameters.getValue(id), requestParameters.getType(id));
+                                    localInstance.setValueForId(pipelineContext, id, requestParameters.getValue(id), requestParameters.getType(id));
                                 }
 
                                 // Update instance from path info
@@ -179,17 +179,4 @@ public class XFormsInput extends ProcessorImpl {
         addOutput(name, output);
         return output;
     }
-
-//    private static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
-//        ExternalContext.Request request = getRequest(pipelineContext);
-//        ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);
-//        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null, false, null);
-//    }
-
-//    private static ExternalContext.Request getRequest(PipelineContext context) {
-//        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-//        if (externalContext == null)
-//            throw new OXFException("Missing external context");
-//        return externalContext.getRequest();
-//    }
 }

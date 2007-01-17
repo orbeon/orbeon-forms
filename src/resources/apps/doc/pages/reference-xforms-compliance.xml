@@ -29,45 +29,19 @@
         <section>
             <title>Scope</title>
             <p>
-                Orbeon PresentationServer (OPS)'s form handling is based on the <a
-                href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 (Second Edition) Recommendation</a> (14 March
-                2006). OPS 3.0's XForms NG engine is close to supporting all of the XForms 1.0 specification. This
-                section describes in details the current level of compliance of each XForms 1.0 feature. Please visit
-                the <a href="reference-xforms-ng">XForms reference documentation</a> for more information about using
-                XForms with OPS.
+                Orbeon Forms' form handling is based on the <a href="http://www.w3.org/TR/xforms/">W3C XForms 1.0
+                (Second Edition) Recommendation</a> (14 March 2006) and <a href="http://www.w3.org/TR/xforms11/">XForms
+                1.1 W3C Working Draft</a>. Orbeon Forms is close to supporting all of the XForms 1.0 specification and
+                already supports some XForms 1.1 features. This section describes in details the current level of
+                compliance of each XForms 1.0 feature. Please visit the <a href="reference-xforms-ng">XForms reference
+                documentation</a> for more information about using XForms with Orbeon Forms.
             </p>
-        </section>
-        <section>
-            <title>Note About the Use of XPath 2.0 Expressions</title>
-            <p>
-                OPS currently strictly uses an XPath 2.0 implementation instead of an XPath 1.0 implementation as
-                mandated by XForms 1.0 and XForms 1.1. The main impact of this on you is that the XForms 1.0 and 1.1
-                <code>if()</code> function is not directly available. With OPS, you have two options to write
-                conditions within XPath expressions:
-            </p>
-            <ul>
-                <li>
-                    <p>Use the <code>xxforms:if()</code> function (note the namespace prefix), which has the same
-                    semantic as the standard XForms 1.0 <code>if()</code> function:</p>
-                    <xml-source show-namespaces="false">
-                        <xforms:setvalue ref="total" value="xxforms:if(../item-price[. = ''], 0, sum(../item-price))"/>
-                    </xml-source>
-                </li>
-            </ul>
-            <ul>
-                <li>
-                    <p>Use the native XPath 2.0 <code>if... then... else</code> construct</p>
-                    <xml-source show-namespaces="false">
-                        <xforms:setvalue ref="total" value="if (../item-price[. = '']) then 0 else sum(../item-price)"/>
-                    </xml-source>
-                </li>
-            </ul>
         </section>
         <section>
             <title>Compliance Matrix</title>
             <warning>
                 <p>
-                    This section has not yet been updated for OPS 3.0.
+                    This section has not yet been updated for Orbeon Forms 3.0 and 3.5.
                 </p>
             </warning>
             <!--

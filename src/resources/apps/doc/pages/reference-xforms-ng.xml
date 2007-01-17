@@ -1852,6 +1852,37 @@
             </section>
             -->
         </section>
+        <a name="xforms-xpath"/>
+        <section>
+            <title>XPath Expressions in XForms</title>
+            <a name="xforms-xpath-20"/>
+            <section>
+                <title>Note About XPath 2.0 Expressions</title>
+                <p>
+                    Orbeon Forms uses an XPath 2.0 implementation instead of an XPath 1.0 implementation as mandated by
+                    XForms 1.0 and XForms 1.1. The main impact of this is that the XForms 1.0 and 1.1 <code>if()</code>
+                    function is not directly available. With Orbeon Forms, you have two options to write conditions
+                    within XPath expressions:
+                </p>
+                <ul>
+                    <li>
+                        <p>Use the <code>xxforms:if()</code> function (note the namespace prefix), which has the same
+                        semantic as the standard XForms 1.0 <code>if()</code> function:</p>
+                        <xml-source show-namespaces="false">
+                            <xforms:setvalue ref="total" value="xxforms:if(../item-price[. = ''], 0, sum(../item-price))"/>
+                        </xml-source>
+                    </li>
+                </ul>
+                <ul>
+                    <li>
+                        <p>Use the native XPath 2.0 <code>if... then... else</code> construct</p>
+                        <xml-source show-namespaces="false">
+                            <xforms:setvalue ref="total" value="if (../item-price[. = '']) then 0 else sum(../item-price)"/>
+                        </xml-source>
+                    </li>
+                </ul>
+            </section>
+        </section>
         <a name="xforms-formatting"/>
         <section>
             <title>Formatting</title>
@@ -2881,6 +2912,16 @@
                         The following functions are implemented:
                     </p>
                     <ul>
+                        <li>
+                            <a name="xxforms-if"/>
+                            <p>
+                                <code>xxforms:if()</code>.
+                            </p>
+                            <p>
+                                This function implements the semantic of the XForms 1.0 <code>if()</code> function.
+                                See <a href="#xforms-xpath-20">Note About XPath 2.0 Expressions</a> for more details.
+                            </p>
+                        </li>
                         <li>
                             <a name="xxforms-call-xpl"/>
                             <p>

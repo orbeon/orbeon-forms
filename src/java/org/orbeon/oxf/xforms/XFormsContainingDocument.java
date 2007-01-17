@@ -114,24 +114,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Create an XFormsContainingDocument.
+     * Create an XFormsContainingDocument from an XFormsEngineStaticState object.
      *
      * @param pipelineContext           current pipeline context
-     * @param xformsState               XForms state containing static and dynamic state. Static state is ignored if xformsEngineStaticState is provided.
-     * @param xformsEngineStaticState   optional XForms static state information
+     * @param xformsEngineStaticState   XFormsEngineStaticState
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState,
-                                    XFormsEngineStaticState xformsEngineStaticState,
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsEngineStaticState xformsEngineStaticState,
                                     XFormsURIResolver uriResolver) {
 
-        if (xformsEngineStaticState == null) {
-            // TODO: Handle caching of this.
-            xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
-            XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
-        } else {
-            XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object provided).");
-        }
+        XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object provided).");
 
         // Remember static state
         this.xformsEngineStaticState = xformsEngineStaticState;
@@ -139,22 +131,27 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // URI resolver
         this.uriResolver = uriResolver;
 
-        // Set the document's dynamic state if provided
-        final String encodedDynamicState = xformsState.getDynamicState();
-        if (encodedDynamicState != null && !"".equals(encodedDynamicState))
-            restoreDynamicState(pipelineContext, encodedDynamicState);
-        else
-            initialize(pipelineContext);
+        // Initialize the containing document
+        initialize(pipelineContext);
     }
 
     /**
-     * Create an XFormsContainingDocument.
+     * Create an XFormsContainingDocument from an XFormsState object.
      *
      * @param pipelineContext   current pipeline context
-     * @param xformsState       XForms state containing static and dynamic state
+     * @param xformsState       XFormsState containing static and dynamic state
      */
     public XFormsContainingDocument(PipelineContext pipelineContext, XFormsState xformsState) {
-        this(pipelineContext, xformsState, null, null);
+
+        XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object not provided).");
+
+        // Create static state object
+        // TODO: Handle caching of this.
+        xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, XFormsUtils.decodeXML(pipelineContext, xformsState.getStaticState()));
+
+        // Restore the containing document's dynamic state
+        final String encodedDynamicState = xformsState.getDynamicState();
+        restoreDynamicState(pipelineContext, encodedDynamicState);
     }
 
     /**
@@ -215,6 +212,13 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public XFormsControls getXFormsControls() {
         return xformsControls;
+    }
+
+    /**
+     * Return the XFormsEngineStaticState.
+     */
+    public XFormsEngineStaticState getStaticState() {
+        return xformsEngineStaticState;
     }
 
     /**

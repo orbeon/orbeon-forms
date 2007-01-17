@@ -172,7 +172,7 @@ public class OldXFormsServer extends ProcessorImpl {
             xformsState = new XFormsState(XFormsUtils.encodeXML(pipelineContext, staticStateDocument, XFormsUtils.getEncryptionKey()), "");
             final XFormsEngineStaticState xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument);
 
-            containingDocument = new XFormsContainingDocument(pipelineContext, xformsState, xformsEngineStaticState, null);
+            containingDocument = new XFormsContainingDocument(pipelineContext, xformsEngineStaticState, null);
 
             filesElement = null;
             actionElement = null;

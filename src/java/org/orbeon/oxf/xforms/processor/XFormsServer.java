@@ -333,8 +333,7 @@ public class XFormsServer extends ProcessorImpl {
                 if (!allEvents) {
                     initialContainingDocument = null;
                 } else {
-                    // TODO: use cached static state if possible
-                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, new XFormsState(xformsState.getStaticState(), null));
+                    initialContainingDocument = new XFormsContainingDocument(pipelineContext, containingDocument.getStaticState(), null);// NOTE: URIResolver is not available. What are the consequences? 
                     initialContainingDocument.getXFormsControls().rebuildCurrentControlsStateIfNeeded(pipelineContext);
                 }
 

@@ -192,6 +192,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 logger.debug("XForms - annotated document and static state not obtained from cache.");
             }
 
+            // Get static state UUID
             if (cachedInput[0]) {
                 staticStateUUID = inputDependencies.getXFormsEngineStaticState().getUUID();
             } else {
@@ -311,20 +312,17 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsEngineStaticState xformsEngineStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsState[] xformsState) {
         {
-            // Create initial state, before XForms initialization
-            final XFormsState initialXFormsState = new XFormsState(xformsEngineStaticState.getEncodedStaticState(), "");
-
             // Create URIResolver
             final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
             // Create containing document and initialize XForms engine
-            containingDocument[0] = new XFormsContainingDocument(pipelineContext, initialXFormsState, xformsEngineStaticState, uriResolver);
+            containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsEngineStaticState, uriResolver);
 
             // The URIResolver above doesn't make any sense anymore past initialization
             containingDocument[0].setURIResolver(null);
 
             // This is the state after XForms initialization
-            xformsState[0] = new XFormsState(initialXFormsState.getStaticState(),
+            xformsState[0] = new XFormsState(xformsEngineStaticState.getEncodedStaticState(),
                     containingDocument[0].createEncodedDynamicState(pipelineContext));
         }
 

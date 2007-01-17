@@ -48,7 +48,8 @@ public class XFormsInstance implements XFormsEventTarget {
 
     private DocumentInfo instanceDocumentInfo;
 
-    private String id;
+    private String instanceId;
+    private String modelId;
     private boolean isReadonly;
     private String sourceURI;
     private String username;
@@ -68,7 +69,8 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public XFormsInstance(Element containerElement) {
 
-        this.id = containerElement.attributeValue("id");
+        this.instanceId = containerElement.attributeValue("id");
+        this.modelId = containerElement.attributeValue("modelId");
         this.isReadonly = "true".equals(containerElement.attributeValue("readonly"));
         this.sourceURI = containerElement.attributeValue("source-uri");
         this.username = containerElement.attributeValue("username");
@@ -96,13 +98,15 @@ public class XFormsInstance implements XFormsEventTarget {
         setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(String id, Document instanceDocument, String instanceSourceURI, String username, String password) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(id, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password);
+        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password);
     }
 
-    public XFormsInstance(String id, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
-        this.id = id;
+    public XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
+        this.instanceId = instanceId;
+        this.modelId = modelId;
+        this.isReadonly = !(instanceDocumentInfo instanceof DocumentWrapper);
         this.sourceURI = instanceSourceURI;
         this.username = username;
         this.password = password;
@@ -123,7 +127,8 @@ public class XFormsInstance implements XFormsEventTarget {
         if (isReadonly)
             instanceElement.addAttribute("readonly", "true");
 
-        instanceElement.addAttribute("id", id);
+        instanceElement.addAttribute("id", instanceId);
+        instanceElement.addAttribute("modelId", modelId);
         instanceElement.addAttribute("source-uri", sourceURI);
         instanceElement.addAttribute("username", username);
         instanceElement.addAttribute("password", password);
@@ -152,6 +157,17 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public DocumentInfo getInstanceDocumentInfo() {
         return instanceDocumentInfo;
+    }
+
+    /**
+     * Return the id of this instance.
+     */
+    public String getEffectiveId() {
+        return instanceId;
+    }
+
+    public String getModelId() {
+        return modelId;
     }
 
     public boolean isReadOnly() {
@@ -207,8 +223,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param instanceDocumentInfo  the DocumentInfo to use
      * @param initialize            true if initial decoration (MIPs) has to be reset
      */
-    public void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
-
+    private void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
         this.instanceDocumentInfo = instanceDocumentInfo;
 
         if (initialize && instanceDocumentInfo instanceof DocumentWrapper) {
@@ -380,13 +395,6 @@ public class XFormsInstance implements XFormsEventTarget {
         });
 
         XFormsUtils.logDebugDocument("MIPs: ", result);
-    }
-
-    /**
-     * Return the id of this instance.
-     */
-    public String getEffectiveId() {
-        return id;
     }
 
     public LocationData getLocationData() {

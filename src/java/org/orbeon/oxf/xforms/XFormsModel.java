@@ -256,7 +256,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * have an associated id that identifies it.
      */
 
-    public void setInstanceDocument(Object instanceDocument, String instanceId, String instanceSourceURI, String username, String password) {
+    public void setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -267,9 +267,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final XFormsInstance newInstance;
         {
             if (instanceDocument instanceof Document)
-                newInstance = new XFormsInstance(instanceId, (Document) instanceDocument, instanceSourceURI, username, password);
+                newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new XFormsInstance(instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password);
+                newInstance = new XFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }
@@ -919,7 +919,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             break;
                         }
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
+                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
                     }
                 }
             }

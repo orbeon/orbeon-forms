@@ -982,10 +982,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) j.next();
 
-                    // TODO: if instance is readonly, it should not be stored into the dynamic state
-                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed?
+                    // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
-                    instancesElement.add(currentInstance.createContainerElement());
+                    // Don't add the instance to the dynamic state if it is readonly
+                    // TODO: must add it anyway if it has been replaced
+                    if (!currentInstance.isReadOnly())
+                        instancesElement.add(currentInstance.createContainerElement());
 
                     // Log instance if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -1090,44 +1092,35 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Extract and restore instances
         {
-            // Get instances from dynamic state
+            // Get instances from dynamic state first
             final Element instancesElement = dynamicStateDocument.getRootElement().element("instances");
-
-            int foundInstancesCount = 0;
-            int expectedInstancesCount = 0;
             if (instancesElement != null) {
-
-                // Iterator over all the models
-                final Iterator modelIterator = getModels().iterator();
-
-                XFormsModel currentModel = null;
-                int currentModelInstancesCount = 0;
-                int currentCount = 0;
-
                 for (Iterator i = instancesElement.elements().iterator(); i.hasNext();) {
                     final Element instanceElement = (Element) i.next();
 
-                    // Go to next model if needed
-                    if (currentCount == currentModelInstancesCount) {
-                        currentModel = (XFormsModel) modelIterator.next();
-                        currentModelInstancesCount = currentModel.getInstanceCount();
-                        currentCount = 0;
-
-                        expectedInstancesCount += currentModelInstancesCount;
-                    }
-
                     // Create and set instance document on current model
                     final XFormsInstance newInstance = new XFormsInstance(instanceElement);
-                    currentModel.setInstance(newInstance);
-
-                    currentCount++;
-                    foundInstancesCount++;
+                    getModel(newInstance.getModelId()).setInstance(newInstance);
                 }
-                // Number of instances must be zero or match number of models
-                if (foundInstancesCount != 0 && expectedInstancesCount != foundInstancesCount)
-                    throw new OXFException("Number of instances (" + foundInstancesCount
-                            + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
             }
+
+            // Then get instances from static state if necessary
+            final Map staticInstancesMap = xformsEngineStaticState.getInstancesMap();
+            if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
+                for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
+                    final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
+
+                    if (findInstance(currentInstance.getEffectiveId()) == null) {
+                        // Instance is not set yet, so set it
+                        getModel(currentInstance.getModelId()).setInstance(currentInstance);
+                    }
+                }
+            }
+
+            // Number of instances must be zero or match number of models
+//            if (expectedInstancesCount != foundInstancesCount)
+//                throw new OXFException("Number of instances (" + foundInstancesCount
+//                        + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
         }
 
         // Restore models state

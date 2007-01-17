@@ -152,7 +152,6 @@ public class XFormsEngineStaticState {
         if (encodedStaticState != null)
             throw new IllegalStateException("Cannot add instances to static state after initialization.");
 
-
         if (instancesMap == null)
             instancesMap = new HashMap();
 
@@ -188,6 +187,10 @@ public class XFormsEngineStaticState {
         }
 
         return encodedStaticState;
+    }
+
+    public Map getInstancesMap() {
+        return instancesMap;
     }
 
     public Document getControlsDocument() {

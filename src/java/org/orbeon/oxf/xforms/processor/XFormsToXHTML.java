@@ -156,9 +156,9 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                     // Get the results
                     final Document staticStateDocument = documentResult.getDocument();
-                    final String digest = Base64.encode(digestContentHandler.getResult());
-                    if (XFormsServer.logger.isDebugEnabled())
-                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
+//                    final String digest = Base64.encode(digestContentHandler.getResult());
+//                    if (XFormsServer.logger.isDebugEnabled())
+//                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
 
 //                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument, digest);
                     xformsEngineStaticState = new XFormsEngineStaticState(staticStateDocument);

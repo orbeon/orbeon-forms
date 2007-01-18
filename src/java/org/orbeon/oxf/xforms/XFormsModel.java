@@ -270,7 +270,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (instanceDocument instanceof Document)
                 newInstance = new XFormsInstance(modelId, instanceId, (Document) instanceDocument, instanceSourceURI, username, password);
             else if (instanceDocument instanceof DocumentInfo)
-                newInstance = new XFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password);
+                newInstance = new ReadonlyXFormsInstance(modelId, instanceId, (DocumentInfo) instanceDocument, instanceSourceURI, username, password);
             else
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
         }

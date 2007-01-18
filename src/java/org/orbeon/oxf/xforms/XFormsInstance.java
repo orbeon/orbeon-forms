@@ -57,7 +57,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
      * such as id, username, URI, etc.
      *
-     * <instance readonly="false" id="instance-id" source-uri="http://..." username="jdoe" password="password">
+     * <instance readonly="false" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
      *     x7wer...
      * </instance
      *
@@ -99,7 +99,7 @@ public class XFormsInstance implements XFormsEventTarget {
         this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password);
     }
 
-    public XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
         this.instanceId = instanceId;
         this.modelId = modelId;
         this.isReadonly = !(instanceDocumentInfo instanceof DocumentWrapper);
@@ -139,6 +139,9 @@ public class XFormsInstance implements XFormsEventTarget {
 
     /**
      * Return the model that contains this instance.
+     *
+     * @param containingDocument    XFormsContainingDocument containing this instance
+     * @return XFormsModel          XFormsModel containing this instance
      */
     public XFormsModel getModel(XFormsContainingDocument containingDocument) {
         return containingDocument.getModel(modelId);
@@ -218,13 +221,12 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param initialize            true if initial decoration (MIPs) has to be reset
      */
     private void setInstanceDocumentInfo(DocumentInfo instanceDocumentInfo, boolean initialize) {
-        this.instanceDocumentInfo = instanceDocumentInfo;
-
         if (initialize && instanceDocumentInfo instanceof DocumentWrapper) {
             // Only set annotations on Document
             final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
             XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
         }
+        this.instanceDocumentInfo = instanceDocumentInfo;
     }
 
     public void synchronizeInstanceDataEventState() {
@@ -317,7 +319,9 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
-     * Output the instance to the specified content handler
+     * Output the instance to the specified ContentHandler
+     *
+     * @param contentHandler    ContentHandler to write to
      */
     public void read(ContentHandler contentHandler) {
         try {
@@ -409,11 +413,12 @@ public class XFormsInstance implements XFormsEventTarget {
         // NOP
     }
 
-
     /**
-     * Return the instance document.
+     * Return the instance document as a dom4j Document.
      *
-     * @deprecated should use getInstanceDocumentInfo()
+     * NOTE: Should use getInstanceDocumentInfo() whenever possible.
+     *
+     * @return  instance document
      */
     public Document getInstanceDocument() {
         if (instanceDocumentInfo instanceof DocumentWrapper) {

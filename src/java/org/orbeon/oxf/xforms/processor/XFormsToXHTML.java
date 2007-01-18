@@ -335,8 +335,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         if (modelHasReset || currentInstance.isReadOnly()) {
 
                             logger.debug("XForms - adding instance to static state: " + currentInstance.getEffectiveId());
-
-                            xformsEngineStaticState.addInstance(currentInstance);
+                            xformsEngineStaticState.addInstance((ReadonlyXFormsInstance) currentInstance);
                         }
                     }
                 }

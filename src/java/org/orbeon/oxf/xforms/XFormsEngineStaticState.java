@@ -147,7 +147,7 @@ public class XFormsEngineStaticState {
 
             for (Iterator instanceIterator = instancesElement.elements("instance").iterator(); instanceIterator.hasNext();) {
                 final Element currentInstanceElement = (Element) instanceIterator.next();
-                final XFormsInstance newInstance = new XFormsInstance(currentInstanceElement);
+                final XFormsInstance newInstance = new ReadonlyXFormsInstance(currentInstanceElement);
                 instancesMap.put(newInstance.getEffectiveId(), newInstance);
             }
         }
@@ -157,7 +157,7 @@ public class XFormsEngineStaticState {
             this.staticStateDocument = staticStateDocument; // remember this temporarily only if the encoded state is not yet known
     }
 
-    public void addInstance(XFormsInstance instance) {
+    public void addInstance(ReadonlyXFormsInstance instance) {
         if (encodedStaticState != null)
             throw new IllegalStateException("Cannot add instances to static state after initialization.");
 

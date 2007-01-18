@@ -99,7 +99,7 @@
                         <p:output name="data" id="namespace"/>
                     </p:processor>
 
-                    <!-- Annotate elements in view with ids and alerts -->
+                    <!-- Annotate elements in view with ids -->
                     <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
                         <!--<p:input name="data" href="#data"/>-->

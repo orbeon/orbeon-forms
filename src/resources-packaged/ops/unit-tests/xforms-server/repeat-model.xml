@@ -1,5 +1,5 @@
-<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" >
-    <xforms:instance>
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main-model">
+    <xforms:instance id="main-instance">
         <form>
             <departments>
                 <department>

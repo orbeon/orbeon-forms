@@ -85,6 +85,7 @@
                 </xsl:template>
                 <xsl:template match="instances/instance">
                     <xsl:copy>
+                        <xsl:copy-of select="@*"/>
                         <xsl:copy-of select="saxon:parse(string(.))"/>
                     </xsl:copy>
                 </xsl:template>

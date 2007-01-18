@@ -259,7 +259,7 @@ public class XFormsServer extends ProcessorImpl {
             // Create resulting document if there is a ContentHandler
             if (contentHandler != null) {
                 outputResponse(containingDocument, allEvents, valueChangeControlIds, pipelineContext, contentHandler,
-                        staticStateUUID, externalContext, xformsState);
+                        staticStateUUID, externalContext, xformsState, false, false);
             }
         } catch (Throwable e) {
             // If an exception is caught, we need to discard the object as its state may be inconsistent
@@ -287,9 +287,9 @@ public class XFormsServer extends ProcessorImpl {
         containingDocument.endOutermostActionHandler(pipelineContext);
     }
 
-    private void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
+    public static void outputResponse(XFormsContainingDocument containingDocument, boolean allEvents, Map valueChangeControlIds,
                                 PipelineContext pipelineContext, ContentHandler contentHandler, String requestPageGenerationId,
-                                ExternalContext externalContext, XFormsState xformsState) {
+                                ExternalContext externalContext, XFormsState xformsState, boolean testOutputStaticState, boolean testOutputAllActions) {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
@@ -299,9 +299,17 @@ public class XFormsServer extends ProcessorImpl {
             contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-            // Output state
+            // Output static state (for testing)
+            if (testOutputStaticState) {
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] { "container-type", externalContext.getRequest().getContainerType() });
+                // NOTE: Should output static state the same way as XFormsToXHTML does, but it's just for tests for for now it's ok
+                ch.text(xformsState.getStaticState());
+                ch.endElement();
+            }
+
+            // Output dynamic state
             {
-                // Produce static state if needed
+                // Produce page generation id if needed
                 final String currentPageGenerationId = (requestPageGenerationId != null) ? requestPageGenerationId : UUIDUtils.createPseudoUUID();
 
                 // Create and encode dynamic state
@@ -348,12 +356,12 @@ public class XFormsServer extends ProcessorImpl {
                     if (!allEvents) {
                         // Common case
 
-                        if (xformsControls.isDirty()) {
+                        if (xformsControls.isDirty() || testOutputAllActions) {
                             // Only output changes if needed
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(ch, containingDocument,  xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
@@ -371,7 +379,7 @@ public class XFormsServer extends ProcessorImpl {
                 // Output divs information
                 {
                     if (!allEvents) {
-                        diffDivs(ch, xformsControls, xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(), xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
+                        diffDivs(ch, xformsControls, testOutputAllActions ? null : xformsControls.getInitialSwitchState(), xformsControls.getCurrentSwitchState(), xformsControls.getInitialDialogState(), xformsControls.getCurrentDialogState());
                     } else {
                         diffDivs(ch, xformsControls, initialContainingDocument.getXFormsControls().getCurrentSwitchState(), xformsControls.getCurrentSwitchState(),
                                 initialContainingDocument.getXFormsControls().getCurrentDialogState(), xformsControls.getCurrentDialogState());
@@ -384,7 +392,10 @@ public class XFormsServer extends ProcessorImpl {
                     // TODO: move index state out of ControlsState + handle diffs
 
                     if (!allEvents) {
-                        diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                        if (!testOutputAllActions)
+                            diffIndexState(ch, xformsControls.getInitialControlsState().getRepeatIdToIndex(), xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                        else
+                            testOutputInitialRepeatInfo(ch, xformsControls.getCurrentControlsState());
                     } else {
                         final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
                         final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
@@ -496,17 +507,17 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void diffIndexState(ContentHandlerHelper ch, Map initialRepeatIdToIndex, Map currentRepeatIdToIndex) {
+    private static void diffIndexState(ContentHandlerHelper ch, Map initialRepeatIdToIndex, Map currentRepeatIdToIndex) {
         if (currentRepeatIdToIndex.size() != 0) {
             boolean found = false;
-            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+            for (Iterator i = currentRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String repeatId = (String) currentEntry.getKey();
-                final Integer index = (Integer) currentEntry.getValue();
+                final Integer newIndex = (Integer) currentEntry.getValue();
 
                 // Output information if there is a difference
-                final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
-                if (!index.equals(newIndex)) {
+                final Integer oldIndex = (Integer) initialRepeatIdToIndex.get(repeatId);
+                if (!newIndex.equals(oldIndex)) {
 
                     if (!found) {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
@@ -514,11 +525,51 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
+                            new String[] {"id", repeatId, "old-index", oldIndex.toString(), "new-index", newIndex.toString()});
                 }
             }
             if (found)
                 ch.endElement();
+        }
+    }
+
+    private static void testOutputInitialRepeatInfo(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
+
+
+        final Map initialRepeatIdToIndex = controlsState.getRepeatIdToIndex();
+        final Map effectiveRepeatIdToIterations = controlsState.getEffectiveRepeatIdToIterations();
+
+        if (initialRepeatIdToIndex.size() != 0 || effectiveRepeatIdToIterations != null) {
+
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
+
+            // Output repeat index information
+
+            if (initialRepeatIdToIndex != null) {
+                for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String repeatId = (String) currentEntry.getKey();
+                    final Integer index = (Integer) currentEntry.getValue();
+
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                        new String[]{"id", repeatId, "index", index.toString()});
+                }
+            }
+
+            // Output repeat iteration information
+
+            if (effectiveRepeatIdToIterations != null) {
+                for (Iterator i = effectiveRepeatIdToIterations.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String effectiveRepeatId = (String) currentEntry.getKey();
+                    final Integer iterations = (Integer) currentEntry.getValue();
+
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
+                        new String[]{"id", effectiveRepeatId, "occurs", iterations.toString()});
+                }
+            }
+
+            ch.endElement();
         }
     }
 
@@ -1219,7 +1270,7 @@ public class XFormsServer extends ProcessorImpl {
                 new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", Integer.toString(idSuffix) });
     }
 
-    private void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
+    private static void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
         final String requestURL = externalContext.getRequest().getRequestURL();
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
@@ -1229,7 +1280,7 @@ public class XFormsServer extends ProcessorImpl {
                 });
     }
 
-    private void outputMessagesInfo(ContentHandlerHelper ch, List messages) {
+    private static void outputMessagesInfo(ContentHandlerHelper ch, List messages) {
         for (Iterator i = messages.iterator(); i.hasNext();) {
             final XFormsContainingDocument.Message message = (XFormsContainingDocument.Message) i.next();
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "message",
@@ -1258,12 +1309,12 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputFocusInfo(ContentHandlerHelper ch, String focusEffectiveControlId) {
+    private static void outputFocusInfo(ContentHandlerHelper ch, String focusEffectiveControlId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
                 new String[]{"control-id", focusEffectiveControlId});
     }
 
-    private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
+    private static void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
         if (itemsetIdToItemsetInfoMap != null && itemsetIdToItemsetInfoMap.size() > 0) {
             // There are some xforms:itemset controls
 
@@ -1297,7 +1348,7 @@ public class XFormsServer extends ProcessorImpl {
                 // There are some xforms:switch/xforms:case controls
 
                 // Obtain previous state
-                final Map switchIdToSelectedCaseIdMap1 = switchState1.getSwitchIdToSelectedCaseIdMap();
+                final Map switchIdToSelectedCaseIdMap1 = (switchState1 == null) ? new HashMap(): switchState1.getSwitchIdToSelectedCaseIdMap();
 
                 // Iterate over all the switches
                 for (Iterator i = switchIdToSelectedCaseIdMap2.entrySet().iterator(); i.hasNext();) {

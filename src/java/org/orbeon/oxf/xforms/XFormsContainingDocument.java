@@ -154,7 +154,14 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
-        restoreDynamicState(pipelineContext, encodedDynamicState);
+
+        if (encodedDynamicState == null || encodedDynamicState.equals("")) {
+            // Just for tests, we allow the dynamic state to be empty
+            initialize(pipelineContext);
+        } else {
+            // Regular case
+            restoreDynamicState(pipelineContext, encodedDynamicState);
+        }
     }
 
     /**

@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
@@ -72,7 +71,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     public ProcessorOutput createOutput(final String outputName) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XFormsToXHTML.this, outputName, INPUT_ANNOTATED_DOCUMENT) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
-                doIt(pipelineContext, contentHandler, this);
+                doIt(pipelineContext, contentHandler, this, outputName);
             }
 
             protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
@@ -122,7 +121,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         setState(context, new URIProcessorOutputImpl.URIReferencesState());
     }
 
-    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput) {
+    private void doIt(final PipelineContext pipelineContext, ContentHandler contentHandler, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -217,7 +216,10 @@ public class XFormsToXHTML extends ProcessorImpl {
             });
 
             // Output resulting document
-            outputResponse(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
+            if (outputName.equals("document"))
+                outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
+            else
+                testOutputResponseState(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
         } catch (Throwable e) {
             if (containingDocument[0] != null) {
                 // If an exception is caught, we need to discard the object as its state may be inconsistent
@@ -352,7 +354,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void outputResponse(final PipelineContext pipelineContext, final ExternalContext externalContext,
+    private void outputResponseDocument(final PipelineContext pipelineContext, final ExternalContext externalContext,
                                 final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
                                 final ContentHandler contentHandler, final XFormsState xformsState,
                                 final String staticStateUUID, String dynamicStateUUID) throws SAXException {
@@ -384,6 +386,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             }
         });
     }
+
     private static final Map exceptionXFormsElements = new HashMap();
 
     static {
@@ -395,5 +398,18 @@ public class XFormsToXHTML extends ProcessorImpl {
         exceptionXFormsElements.put("hint", "");
         exceptionXFormsElements.put("help", "");
         exceptionXFormsElements.put("alert", "");
+    }
+
+    private void testOutputResponseState(final PipelineContext pipelineContext, final ExternalContext externalContext,
+                                     final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
+                                     final ContentHandler contentHandler, final XFormsState xformsState,
+                                     final String staticStateUUID, String dynamicStateUUID) throws SAXException {
+
+        // Make sure we have up to date controls
+        final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
+
+        // Output XML response
+        XFormsServer.outputResponse(containingDocument, false, null, pipelineContext, contentHandler, staticStateUUID, externalContext, xformsState, false, true);
     }
 }

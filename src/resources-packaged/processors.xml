@@ -674,10 +674,6 @@
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
     </processor>
 
-    <processor name="oxf:old-xforms-server">
-        <class name="org.orbeon.oxf.xforms.OldXFormsServer"/>
-    </processor>
-
     <processor name="oxf:bean-generator" uri="oxf/processor/bean-generator">
         <class name="org.orbeon.oxf.processor.generator.BeanGenerator"/>
     </processor>

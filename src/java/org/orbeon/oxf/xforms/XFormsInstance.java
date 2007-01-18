@@ -70,7 +70,7 @@ public class XFormsInstance implements XFormsEventTarget {
     public XFormsInstance(Element containerElement) {
 
         this.instanceId = containerElement.attributeValue("id");
-        this.modelId = containerElement.attributeValue("modelId");
+        this.modelId = containerElement.attributeValue("model-id");
         this.isReadonly = "true".equals(containerElement.attributeValue("readonly"));
         this.sourceURI = containerElement.attributeValue("source-uri");
         this.username = containerElement.attributeValue("username");
@@ -128,10 +128,13 @@ public class XFormsInstance implements XFormsEventTarget {
             instanceElement.addAttribute("readonly", "true");
 
         instanceElement.addAttribute("id", instanceId);
-        instanceElement.addAttribute("modelId", modelId);
-        instanceElement.addAttribute("source-uri", sourceURI);
-        instanceElement.addAttribute("username", username);
-        instanceElement.addAttribute("password", password);
+        instanceElement.addAttribute("model-id", modelId);
+        if (sourceURI != null)
+            instanceElement.addAttribute("source-uri", sourceURI);
+        if (username != null)
+            instanceElement.addAttribute("username", username);
+        if (password != null)
+            instanceElement.addAttribute("password", password);
         
         instanceElement.addText(instanceString);
 

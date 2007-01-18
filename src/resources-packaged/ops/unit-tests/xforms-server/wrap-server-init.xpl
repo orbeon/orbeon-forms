@@ -19,28 +19,20 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:saxon="http://saxon.sf.net/">
 
-    <p:param name="controls" type="input"/>
-    <p:param name="models" type="input"/>
-
+    <p:param name="document" type="input"/>
     <p:param name="response" type="output"/>
 
-    <!-- Encode -->
-    <p:processor name="oxf:xslt">
-        <p:input name="data"><dummy/></p:input>
-        <p:input name="controls" href="#controls"/>
-        <p:input name="models" href="#models"/>
-        <p:input name="config">
-            <static-state xsl:version="2.0">
-                <xsl:copy-of select="doc('input:controls')/*"/>
-                <xsl:copy-of select="doc('input:models')/*"/>
-            </static-state>
-        </p:input>
-        <p:output name="data" id="static-state"/>
+    <!-- Annotate elements in view with ids -->
+    <p:processor name="oxf:xforms-document-annotator">
+        <p:input name="data" href="#document"/>
+        <p:input name="namespace"><request><container-namespace/></request></p:input>
+        <p:output name="data" id="annotated-view"/>
     </p:processor>
 
-    <!-- Run XForms Server -->
-    <p:processor name="oxf:old-xforms-server">
-        <p:input name="static-state" href="#static-state"/>
+    <!-- Native XForms Initialization -->
+    <p:processor name="oxf:xforms-to-xhtml">
+        <p:input name="annotated-document" href="#annotated-view"/>
+        <p:input name="instance"><dummy/></p:input>
         <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
     </p:processor>
 
@@ -52,7 +44,13 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
                     <xsl:copy>
-                        <xsl:copy-of select="context:decodeXML(normalize-space(.))"/>
+                        <xsl:apply-templates select="context:decodeXML(normalize-space(.))"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="instances/instance">
+                    <xsl:copy>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:copy-of select="saxon:parse(string(.))"/>
                     </xsl:copy>
                 </xsl:template>
             </xsl:stylesheet>

@@ -743,7 +743,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 // Build initial instance documents
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 final XFormsStaticState staticState = containingDocument.getStaticState();
-                final Map staticStateInstancesMap = staticState.isInitialized() ? staticState.getInstancesMap() : null;
+                final Map staticStateInstancesMap = (staticState != null && staticState.isInitialized()) ? staticState.getInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -939,7 +939,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final XFormsInstance newInstance = setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
 
                         // Update static state with instances when needed
-                        if (!staticState.isInitialized()) {
+                        if (staticState != null && !staticState.isInitialized()) {
                             final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
                             if (newInstance instanceof SharedXFormsInstance) {
                                 if (XFormsServer.logger.isDebugEnabled())

@@ -614,6 +614,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 if (replaceInstance instanceof SharedXFormsInstance) {
                                                     // The instance was shared
                                                     // Since it is updated, it can no longer be shared and a new mutable instance must be created
+
+                                                    if (XFormsServer.logger.isDebugEnabled())
+                                                        XFormsServer.logger.debug("XForms - making instance mutable: " + replaceInstance.getEffectiveId());
+
                                                     final XFormsInstance newInstance
                                                             = ((SharedXFormsInstance) replaceInstance).createMutableInstance((DocumentInfo) resultingInstanceDocument);
 
@@ -624,7 +628,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                     replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
 
                                                     // Mark all values as changed so that refresh sends appropriate events
-                                                    XFormsUtils.markAllValuesChanged(replaceInstance);
+                                                    if (!replaceInstance.isReadOnly())
+                                                        XFormsUtils.markAllValuesChanged(replaceInstance);
                                                 }
 
                                                 // Handle new instance and associated events

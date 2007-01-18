@@ -256,8 +256,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance document for this model. There may be multiple instance documents. Each instance document may
      * have an associated id that identifies it.
      */
-
-    public void setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password) {
+    public XFormsInstance setInstanceDocument(Object instanceDocument, String modelId, String instanceId, String instanceSourceURI, String username, String password) {
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -279,6 +278,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create mapping instance id -> instance
         if (instanceId != null)
             instancesMap.put(instanceId, newInstance);
+
+        return newInstance;
     }
 
     /**
@@ -739,8 +740,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 instancesMap = new HashMap(instanceIds.size());
             }
             {
-                // Build initial instance document
+                // Build initial instance documents
                 final List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+                final XFormsStaticState staticState = containingDocument.getStaticState();
+                final Map staticStateInstancesMap = staticState.isInitialized() ? staticState.getInstancesMap() : null;
                 if (instanceContainers.size() > 0) {
                     // Iterate through all instances
                     int instancePosition = 0;
@@ -762,6 +765,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             final String idAttribute = instanceContainerElement.attributeValue("id");
                             instanceId = (idAttribute != null) ? idAttribute : "";
                         }
+
+                        if (staticStateInstancesMap != null) {
+                            final XFormsInstance staticStateInstance = (XFormsInstance) staticStateInstancesMap.get(instanceId);
+                            if (staticStateInstance != null) {
+                                // The instance is already available in the static state, just use it
+
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    XFormsServer.logger.debug("XForms - using instance from static state: " + staticStateInstance.getEffectiveId());
+
+                                setInstance(staticStateInstance);
+                                continue;
+                            }
+                        }
+
                         final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
                         final String xxformsUsername;
@@ -919,7 +936,21 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                             break;
                         }
                         // Set instance and associated information if everything went well
-                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
+                        final XFormsInstance newInstance = setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword);
+
+                        // Update static state with instances when needed
+                        if (!staticState.isInitialized()) {
+                            final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
+                            if (newInstance instanceof SharedXFormsInstance) {
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    XFormsServer.logger.debug("XForms - adding read-only instance to static state: " + instanceId);
+                                staticState.addInstance((SharedXFormsInstance) newInstance);
+                            } else if (modelHasReset) {
+                                if (XFormsServer.logger.isDebugEnabled())
+                                    XFormsServer.logger.debug("XForms - adding reset instance to static state: " + instanceId);
+                                staticState.addInstance(newInstance.createSharedInstance());
+                            }
+                        }
                     }
                 }
             }

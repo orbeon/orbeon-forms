@@ -157,7 +157,6 @@ public class XFormsControls {
     public boolean isDirty() {
         return dirty;
     }
-
     
     public void markDirty() {
         this.dirty = true;

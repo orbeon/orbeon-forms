@@ -37,9 +37,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
-import javax.xml.transform.stream.StreamSource;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 /**
@@ -67,7 +65,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private DocumentXPathEvaluator documentXPathEvaluator = new DocumentXPathEvaluator();
 
     // A document contains models and controls
-    private XFormsEngineStaticState xformsEngineStaticState;
+    private XFormsStaticState xformsStaticState;
     private List models = new ArrayList();
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
@@ -117,16 +115,16 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Create an XFormsContainingDocument from an XFormsEngineStaticState object.
      *
      * @param pipelineContext           current pipeline context
-     * @param xformsEngineStaticState   XFormsEngineStaticState
+     * @param xformsStaticState   XFormsEngineStaticState
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      */
-    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsEngineStaticState xformsEngineStaticState,
+    public XFormsContainingDocument(PipelineContext pipelineContext, XFormsStaticState xformsStaticState,
                                     XFormsURIResolver uriResolver) {
 
         XFormsServer.logger.debug("XForms - creating new ContainingDocument (static state object provided).");
 
         // Remember static state
-        this.xformsEngineStaticState = xformsEngineStaticState;
+        this.xformsStaticState = xformsStaticState;
 
         // Remember URI resolver for initialization
         this.uriResolver = uriResolver;
@@ -150,7 +148,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         // Create static state object
         // TODO: Handle caching of XFormsEngineStaticState object
-        xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, xformsState.getStaticState());
+        xformsStaticState = new XFormsStaticState(pipelineContext, xformsState.getStaticState());
 
         // Restore the containing document's dynamic state
         final String encodedDynamicState = xformsState.getDynamicState();
@@ -227,68 +225,68 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Return the XFormsEngineStaticState.
      */
-    public XFormsEngineStaticState getStaticState() {
-        return xformsEngineStaticState;
+    public XFormsStaticState getStaticState() {
+        return xformsStaticState;
     }
 
     /**
      * Return a map of script id -> script text.
      */
     public Map getScripts() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getScripts();
+        return (xformsStaticState == null) ? null : xformsStaticState.getScripts();
     }
 
     /**
      * Return the document base URI.
      */
     public String getBaseURI() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getBaseURI();
+        return (xformsStaticState == null) ? null : xformsStaticState.getBaseURI();
     }
 
     /**
      * Return the container type that generate the XForms page, either "servlet" or "portlet".
      */
     public String getContainerType() {
-        return (xformsEngineStaticState == null) ? legacyContainerType : xformsEngineStaticState.getContainerType();
+        return (xformsStaticState == null) ? legacyContainerType : xformsStaticState.getContainerType();
     }
 
     /**
      * Return the container namespace that generate the XForms page. Always "" for servlets.
      */
     public String getContainerNamespace() {
-        return (xformsEngineStaticState == null) ? legacyContainerNamespace : xformsEngineStaticState.getContainerNamespace();
+        return (xformsStaticState == null) ? legacyContainerNamespace : xformsStaticState.getContainerNamespace();
     }
 
     /**
      * Return the state handling strategy for this document, either "client" or "session".
      */
     public String getStateHandling() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getStateHandling();
+        return (xformsStaticState == null) ? null : xformsStaticState.getStateHandling();
     }
 
     public boolean isSessionStateHandling() {
-        return (xformsEngineStaticState != null) && xformsEngineStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
+        return (xformsStaticState != null) && xformsStaticState.getStateHandling().equals(XFormsConstants.XXFORMS_STATE_HANDLING_SESSION_VALUE);
     }
 
     /**
      * Return whether this form is read-only or not.
      */
     public boolean isReadonly() {
-        return (xformsEngineStaticState != null) && xformsEngineStaticState.isReadonly();
+        return (xformsStaticState != null) && xformsStaticState.isReadonly();
     }
 
     /**
      * Return read-only appearance configuration attribute.
      */
     public String getReadonlyAppearance() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getReadonlyAppearance();
+        return (xformsStaticState == null) ? null : xformsStaticState.getReadonlyAppearance();
     }
 
     /**
      * Return external-events configuration attribute.
      */
     private Map getExternalEventsMap() {
-        return (xformsEngineStaticState == null) ? null : xformsEngineStaticState.getExternalEventsMap();
+        return (xformsStaticState == null) ? null : xformsStaticState.getExternalEventsMap();
     }
 
     /**
@@ -1111,7 +1109,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
 
             // Then get instances from static state if necessary
-            final Map staticInstancesMap = xformsEngineStaticState.getInstancesMap();
+            final Map staticInstancesMap = xformsStaticState.getInstancesMap();
             if (staticInstancesMap != null && staticInstancesMap.size() > 0) {
                 for (Iterator instancesIterator = staticInstancesMap.values().iterator(); instancesIterator.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
@@ -1181,12 +1179,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private void createControlAndModel(Element repeatIndexesElement) {
 
-        if (xformsEngineStaticState != null) {
+        if (xformsStaticState != null) {
             // Create XForms controls
-            xformsControls = new XFormsControls(this, xformsEngineStaticState.getControlsDocument(), repeatIndexesElement);
+            xformsControls = new XFormsControls(this, xformsStaticState.getControlsDocument(), repeatIndexesElement);
 
             // Create and index models
-            for (Iterator i = xformsEngineStaticState.getModelDocuments().iterator(); i.hasNext();) {
+            for (Iterator i = xformsStaticState.getModelDocuments().iterator(); i.hasNext();) {
                 final Document modelDocument = (Document) i.next();
                 final XFormsModel model = new XFormsModel(modelDocument);
                 model.setContainingDocument(this); // NOTE: This requires the XFormsControls to be set on XFormsContainingDocument

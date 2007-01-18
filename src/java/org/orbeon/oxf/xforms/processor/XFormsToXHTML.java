@@ -136,7 +136,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                 // Compute annotated XForms document + static state document
                 final SAXStore annotatedSAXStore;
-                final XFormsEngineStaticState xformsEngineStaticState;
+                final XFormsStaticState xformsStaticState;
                 {
                     final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
                     // TODO: Use TinyTree instead of dom4j Document
@@ -155,19 +155,20 @@ public class XFormsToXHTML extends ProcessorImpl {
 
                     // Get the results
                     final Document staticStateDocument = documentResult.getDocument();
+                    // TODO: Digest not used at this point?
 //                    final String digest = Base64.encode(digestContentHandler.getResult());
 //                    if (XFormsServer.logger.isDebugEnabled())
 //                        XFormsServer.logger.debug("XForms - created digest for static state: " + digest);
-
 //                    xformsEngineStaticState = new XFormsEngineStaticState(pipelineContext, staticStateDocument, digest);
-                    xformsEngineStaticState = new XFormsEngineStaticState(staticStateDocument);
+
+                    xformsStaticState = new XFormsStaticState(staticStateDocument);
                 }
 
                 // Create document here so we can do appropriate analysis of caching dependencies
-                createCacheContainingDocument(pipelineContext, processorOutput, xformsEngineStaticState, containingDocument, xformsState);
+                createCacheContainingDocument(pipelineContext, processorOutput, xformsStaticState, containingDocument, xformsState);
 
                 // Set caching dependencies
-                final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsEngineStaticState);
+                final InputDependencies inputDependencies = new InputDependencies(annotatedSAXStore, xformsStaticState);
                 setCachingDependencies(containingDocument[0], inputDependencies);
 
                 return inputDependencies;
@@ -186,6 +187,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Create containing document if not done yet
             final String staticStateUUID;
             if (containingDocument[0] == null) {
+                // In this case, we found the static state and more in the cache, but we must now create a new XFormsContainingDocument from this information
                 logger.debug("XForms - annotated document and static state obtained from cache; creating containing document.");
                 createCacheContainingDocument(pipelineContext, processorOutput, inputDependencies.getXFormsEngineStaticState(), containingDocument, xformsState);
             } else {
@@ -243,20 +245,20 @@ public class XFormsToXHTML extends ProcessorImpl {
     private static class InputDependencies extends URIProcessorOutputImpl.URIReferences {
 
         private SAXStore annotatedSAXStore;
-        private XFormsEngineStaticState xformsEngineStaticState;
+        private XFormsStaticState xformsStaticState;
         private boolean dependsOnSession;
 
-        public InputDependencies(SAXStore annotatedSAXStore, XFormsEngineStaticState xformsEngineStaticState) {
+        public InputDependencies(SAXStore annotatedSAXStore, XFormsStaticState xformsStaticState) {
             this.annotatedSAXStore = annotatedSAXStore;
-            this.xformsEngineStaticState = xformsEngineStaticState;
+            this.xformsStaticState = xformsStaticState;
         }
 
         public SAXStore getAnnotatedSAXStore() {
             return annotatedSAXStore;
         }
 
-        public XFormsEngineStaticState getXFormsEngineStaticState() {
-            return xformsEngineStaticState;
+        public XFormsStaticState getXFormsEngineStaticState() {
+            return xformsStaticState;
         }
 
         public boolean isDependsOnSession() {
@@ -313,38 +315,17 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
     }
 
-    private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsEngineStaticState xformsEngineStaticState,
+    private void createCacheContainingDocument(final PipelineContext pipelineContext, URIProcessorOutputImpl processorOutput, XFormsStaticState xformsStaticState,
                                                XFormsContainingDocument[] containingDocument, XFormsState[] xformsState) {
         {
             // Create URIResolver
             final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
 
             // Create containing document and initialize XForms engine
-            containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsEngineStaticState, uriResolver);
-
-            // Update static state with post-initialization information
-            {
-                for (Iterator modelIterator = containingDocument[0].getModels().iterator(); modelIterator.hasNext();) {
-                    final XFormsModel currentModel = (XFormsModel) modelIterator.next();
-
-                    final boolean modelHasReset = false;// TODO: containingDocument[0].hasReset(modelId) or xformsEngineStaticState.hasReset(modelId);
-
-                    for (Iterator instanceIterator = currentModel.getInstances().iterator(); instanceIterator.hasNext();) {
-                        final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
-
-                        if (currentInstance instanceof SharedXFormsInstance) {
-                            logger.debug("XForms - adding read-only instance to static state: " + currentInstance.getEffectiveId());
-                            xformsEngineStaticState.addInstance((SharedXFormsInstance) currentInstance);
-                        } else if (modelHasReset) {
-                            logger.debug("XForms - adding reset instance to static state: " + currentInstance.getEffectiveId());
-                            xformsEngineStaticState.addInstance(currentInstance.createSharedInstance());
-                        }
-                    }
-                }
-            }
+            containingDocument[0] = new XFormsContainingDocument(pipelineContext, xformsStaticState, uriResolver);
 
             // This is the state after XForms initialization
-            xformsState[0] = new XFormsState(xformsEngineStaticState.getEncodedStaticState(pipelineContext),
+            xformsState[0] = new XFormsState(xformsStaticState.getEncodedStaticState(pipelineContext),
                     containingDocument[0].createEncodedDynamicState(pipelineContext));
         }
 

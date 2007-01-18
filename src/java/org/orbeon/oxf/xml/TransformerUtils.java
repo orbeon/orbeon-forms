@@ -60,23 +60,6 @@ public class TransformerUtils {
 
     private static final String SAXON_INDENT_AMOUNT_PROPERTY = "{http://saxon.sf.net/}indent-spaces";
 
-//    private static Map transformerFactories = new HashMap();
-
-//    private static void createCompilerFactory() {
-//        new Runnable() {
-//            public void run() {
-//                compilerFactory = new orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl();
-//                compilerFactory.setURIResolver(uriResolver);
-//            }
-//        }.run();
-//    }
-
-//    static {
-//        // This is needed for tools like Joost who look at this property
-//        Properties properties = System.getProperties();
-//        properties.put("org.xml.sax.driver", "orbeon.apache.xerces.parsers.SAXParser");
-//    }
-
     // Class.forName is expensive, so we cache mappings
     private static Map classNameToHandlerClass = new HashMap();
 

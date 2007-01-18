@@ -220,6 +220,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 outputResponseDocument(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
             else
                 testOutputResponseState(pipelineContext, externalContext, inputDependencies.getAnnotatedSAXStore(), containingDocument[0], contentHandler, xformsState[0], staticStateUUID, dynamicStateUUID);
+
         } catch (Throwable e) {
             if (containingDocument[0] != null) {
                 // If an exception is caught, we need to discard the object as its state may be inconsistent

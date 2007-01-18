@@ -104,6 +104,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (instanceContainers.size() > 0) {
                 for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
                     final Element instanceContainer = (Element) i.next();
+                    // NOTE: There has to be an id, except for the legacy engine
                     String instanceId = instanceContainer.attributeValue("id");
                     if (instanceId == null)
                         instanceId = "";
@@ -761,7 +762,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String srcAttribute = instanceContainerElement.attributeValue("src");
                         final LocationData locationData = (LocationData) instanceContainerElement.getData();
 
-                        final String instanceId = instanceContainerElement.attributeValue("id");
+                        final String instanceId;
+                        {
+                            // NOTE: There has to be an id, except for the legacy engine
+                            final String idAttribute = instanceContainerElement.attributeValue("id");
+                            instanceId = (idAttribute != null) ? idAttribute : "";
+                        }
                         final Object instanceDocument;// Document or DocumentInfo
                         final String instanceSourceURI;
                         final String xxformsUsername;

@@ -1088,7 +1088,16 @@ public class XFormsControls {
     public int getRepeatIdIndex(String repeatId) {
         final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
         final Integer currentIndex = (Integer) repeatIdToIndex.get(repeatId);
-        return (currentIndex == null) ? -1 : currentIndex.intValue();
+
+        if (currentIndex != null) {
+            return currentIndex.intValue();
+        } else {
+            // If the controls are not initialized, then we give the caller a chance and return 0. This will make sure
+            // that index() used in a calculate MIP will return something during the recalculate at the end of
+            // xforms-model-construct, instead of throwing an exception. Ideally, we should still return -1 if there is
+            // no xforms:repeat with the id provided.
+            return (initialized) ? -1 : 0;
+        }
     }
 
     public Locator getLocator() {

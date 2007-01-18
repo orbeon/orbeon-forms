@@ -767,7 +767,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
     }
 
-    public XFormsEventHandlerContainer getParentContainer() {
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
         return null;
     }
 
@@ -827,10 +827,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final List containers = new ArrayList();
             {
                 XFormsEventHandlerContainer container
-                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
+                        = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer(this);
                 while (container != null) {
                     containers.add(container);
-                    container = container.getParentContainer();
+                    container = container.getParentContainer(this);
                 }
             }
 

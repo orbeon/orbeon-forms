@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
@@ -36,7 +35,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.util.Map;
 import java.io.StringReader;
 
 /**
@@ -54,8 +52,6 @@ public class XFormsInstance implements XFormsEventTarget {
     private String sourceURI;
     private String username;
     private String password;
-
-    private XFormsModel model;
 
     /**
      * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
@@ -141,16 +137,11 @@ public class XFormsInstance implements XFormsEventTarget {
         return instanceElement;
     }
 
-
-    public void setModel(XFormsModel model) {
-        this.model = model;
-    }
-
     /**
      * Return the model that contains this instance.
      */
-    public XFormsModel getModel() {
-        return model;
+    public XFormsModel getModel(XFormsContainingDocument containingDocument) {
+        return containingDocument.getModel(modelId);
     }
 
     /**
@@ -258,10 +249,8 @@ public class XFormsInstance implements XFormsEventTarget {
         if (!(nodeInfo instanceof NodeWrapper))
             throw new OXFException("Unable to set value of read-only instance.");
 
-        // Get local instance data as we are not using any inheritance here AND we are doing an update
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
         final Node node = (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-        setValueForNode(pipelineContext, node, newValue, type, instanceData);
+        setValueForNode(pipelineContext, node, newValue, type);
     }
 
     /**
@@ -272,7 +261,10 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param newValue          value to set
      * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type, InstanceData instanceData) {
+    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type) {
+
+        // Get local instance data as we are not using any inheritance here AND we are doing an update
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
         // Convert value based on types if possible
         if (type != null) {
@@ -409,8 +401,8 @@ public class XFormsInstance implements XFormsEventTarget {
         }
     }
 
-    public XFormsEventHandlerContainer getParentContainer() {
-        return model;
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+        return getModel(containingDocument);
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -430,91 +422,5 @@ public class XFormsInstance implements XFormsEventTarget {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Set a value on the instance using an element or attribute id.
-     *
-     * If a type is specified, it means that the Request generator set it, which, for now, means
-     * that it was a file upload.
-     *
-     * @deprecated legacy XForms engine
-     */
-    public void setValueForId(PipelineContext pipelineContext, int id, String value, String type) {
-        final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(new Integer(id));
-        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-        setValueForNode(pipelineContext, node, value, type, instanceData);
-    }
-
-    /**
-     * Set a value on the instance using an XPath expression pointing to an element or attribute.
-     *
-     * @deprecated legacy XForms engine
-     */
-    public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
-
-        final Object o = getModel().getContainingDocument().getEvaluator().evaluateSingle(pipelineContext, getInstanceDocumentInfo(), refXPath, prefixToURIMap, null, null, null);
-        if (o == null || !(o instanceof NodeInfo))
-            throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
-
-        setNodeInfoValue(pipelineContext, (NodeInfo) o, value, null);
-    }
-
-    /**
-     * @deprecated legacy XForms engine
-     */
-    private void setElementValue(PipelineContext pipelineContext, Element element, String value, String type) {
-        // Don't do anything if value exists and dontSetIfexisting is true
-        if (type != null) {
-            // Handle value type
-            final String currentType
-                    = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(element, XMLConstants.XSI_TYPE_QNAME));
-            if (currentType != null && !currentType.equals(type)) {
-                // There is a different type already, do a conversion
-                value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);
-                Dom4jUtils.clearElementContent(element);
-            } else if (currentType == null) {
-                // There is no type, convert to default type
-                if (!XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME.equals(type))
-                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsConstants.DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME);
-                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsConstants.DEFAULT_UPLOAD_TYPE_QNAME.getQualifiedName()));
-            }
-            element.setText(value);
-        } else {
-            // No type, just set the value
-            element.setText(value);
-        }
-    }
-
-    private void setNodeInfoValue(PipelineContext pipelineContext, NodeInfo nodeInfo, String value, String type) {
-        if (!(nodeInfo instanceof NodeWrapper))
-            throw new OXFException("Cannot set node value on read-only DOM.");
-
-        final NodeWrapper nodeWrapper = (NodeWrapper) nodeInfo;
-        final Object o = nodeWrapper.getUnderlyingNode();
-
-         if (o instanceof Element) {
-            setElementValue(pipelineContext, (Element) o, value, type);
-        } else if (o instanceof Attribute) {
-            setAttributeValue(pipelineContext, (Attribute) o, value);
-        } else {
-             throw new OXFException("Invalid node class: " + o.getClass().getName());
-         }
-    }
-
-    private void setAttributeValue(PipelineContext pipelineContext, Attribute attribute, String value) {
-        // Handle xsi:type if needed
-        if (XMLConstants.XSI_TYPE_QNAME.getNamespaceURI().equals(attribute.getNamespaceURI()) && !"".equals(attribute.getParent().getText())) {
-            // This is a type attribute and we already have content
-            String currentType = attribute.getParent().attributeValue(XMLConstants.XSI_TYPE_QNAME);
-            if (currentType != null && !currentType.equals(value)) { // FIXME: prefixes of type name could be different!
-                // Convert element value
-                String newValue = XFormsUtils.convertUploadTypes(pipelineContext, attribute.getParent().getText(), currentType, value);
-                attribute.getParent().clearContent();
-                attribute.getParent().addText(newValue);
-            }
-        }
-
-        attribute.setValue(value);
     }
 }

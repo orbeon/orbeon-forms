@@ -28,6 +28,14 @@ import java.util.*;
  * All the information contained here must be constant, and never change as the XForms engine operates on a page. This
  * information can be shared between multiple running copies of an XForms pages.
  *
+ * The static state may contain constant XForms intances. These may be used as:
+ *
+ * o read-only instances that don't need to be in the dynamic state
+ * o initial instances needed for xforms:reset
+ * o initial instances needed for back/reload
+ *
+ *  
+ *
  * NOTE: This will have to change a bit if we move towards TinyTree to store the static state.
  */
 public class XFormsEngineStaticState {
@@ -65,15 +73,16 @@ public class XFormsEngineStaticState {
      *
      * @param staticStateDocument   Document containing the static state
      */
-    //    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
     public XFormsEngineStaticState(Document staticStateDocument) {
         this(staticStateDocument, null);
     }
 
+//    public XFormsEngineStaticState(PipelineContext pipelineContext, Document staticStateDocument, String uuid) {
+//        this.uuid = uuid;
+
     private XFormsEngineStaticState(Document staticStateDocument, String encodedStaticState) {
 
         // Remember UUID
-//        this.uuid = uuid;
         this.uuid = UUIDUtils.createPseudoUUID();
 
         // Get controls document

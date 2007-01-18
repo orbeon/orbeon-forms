@@ -89,7 +89,7 @@ public class XFormsSetvalueAction extends XFormsAction {
             XFormsInstance.setValueForNodeInfo(pipelineContext, currentNode, valueToSet, type);
 
             final XFormsInstance modifiedInstance = containingDocument.getInstanceForNode(currentNode);
-            final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel().getDeferredActionContext();
+            final XFormsModel.DeferredActionContext deferredActionContext = modifiedInstance.getModel(containingDocument).getDeferredActionContext();
 
             // "XForms Actions that change only the value of an instance node results in setting the flags for
             // recalculate, revalidate, and refresh to true and making no change to the flag for rebuild".

@@ -279,9 +279,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create mapping instance id -> instance
         if (instanceId != null)
             instancesMap.put(instanceId, newInstance);
-
-        // Set model on instance
-        newInstance.setModel(this);
     }
 
     /**
@@ -304,9 +301,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         // Create mapping instance id -> instance
         if (instanceId != null)
             instancesMap.put(instanceId, instance);
-
-        // Set model on instance
-        instance.setModel(this);
     }
 
     /**
@@ -699,8 +693,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    public XFormsEventHandlerContainer getParentContainer() {
-        return containingDocument;
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+        return this.containingDocument;
     }
 
     /**

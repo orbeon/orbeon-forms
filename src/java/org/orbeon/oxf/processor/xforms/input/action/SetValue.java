@@ -50,8 +50,7 @@ public class SetValue implements Action {
             final Node node = (Node) XFormsUtils.getIdToNodeMap(instanceDocumentInfo).get(idInteger);
             final String newValue = value != null ? value : content == null ? "" : content;
 
-            final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-            XFormsInstance.setValueForNode(pipelineContext, node, newValue, null, instanceData);
+            XFormsInstance.setValueForNode(pipelineContext, node, newValue, null);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);
         }

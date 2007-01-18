@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+
 import java.util.List;
 
 /**
@@ -21,5 +23,5 @@ import java.util.List;
 public interface XFormsEventHandlerContainer {
     public String getEffectiveId();
     public List getEventHandlers();
-    public XFormsEventHandlerContainer getParentContainer();
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument);
 }

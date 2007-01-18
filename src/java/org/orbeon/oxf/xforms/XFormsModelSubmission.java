@@ -197,7 +197,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventHandlerContainer getParentContainer() {
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
         return model;
     }
 
@@ -609,13 +609,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             } else {
 
                                                 // Set new instance
+
+//                                                xxx
+
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
 
                                                 // Mark all values as changed so that refresh sends appropriate events
                                                 XFormsUtils.markAllValuesChanged(replaceInstance);
 
                                                 // Handle new instance and associated events
-                                                replaceInstance.getModel().handleNewInstanceDocuments(pipelineContext);
+                                                replaceInstance.getModel(containingDocument).handleNewInstanceDocuments(pipelineContext);
 
                                                 // Notify that submission is done
                                                 submitDone = true;

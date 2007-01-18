@@ -314,7 +314,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
     }
 
-    public XFormsEventHandlerContainer getParentContainer() {
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
         return parent;
     }
 

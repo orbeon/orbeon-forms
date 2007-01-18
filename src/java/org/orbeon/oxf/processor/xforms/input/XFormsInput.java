@@ -16,16 +16,16 @@ package org.orbeon.oxf.processor.xforms.input;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.ContentHandler;
 
 import java.util.Iterator;
@@ -104,10 +104,12 @@ public class XFormsInput extends ProcessorImpl {
                             if (position == 0) {
 
                                 // Update instance from request
-                                int[] ids = requestParameters.getIds();
+                                final int[] ids = requestParameters.getIds();
                                 for (int i = 0; i < ids.length; i++) {
-                                    int id = ids[i];
-                                    localInstance.setValueForId(pipelineContext, id, requestParameters.getValue(id), requestParameters.getType(id));
+                                    final int id = ids[i];
+
+                                    final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getInstanceDocumentInfo()).get(new Integer(id));
+                                    XFormsInstance.setValueForNode(pipelineContext, node, requestParameters.getValue(id), requestParameters.getType(id));
                                 }
 
                                 // Update instance from path info
@@ -130,14 +132,22 @@ public class XFormsInput extends ProcessorImpl {
 
                                     if (groupElements.size() != setValueElements.size())
                                         throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
+                                    final DocumentXPathEvaluator evaluator = new DocumentXPathEvaluator();
                                     for (Iterator setValueIterator = setValueElements.iterator(),
                                             groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
                                         final Element paramElement = (Element) setValueIterator.next();
                                         final Element groupElement = (Element) groupIterator.next();
                                         final String value = groupElement.getStringValue();
-                                        if (!"".equals(value))
-                                            localInstance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
-                                                    Dom4jUtils.getNamespaceContextNoDefault(paramElement), value);
+                                        if (!"".equals(value)) {
+
+                                            final String refXPath = paramElement.attributeValue("ref");
+                                            final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getInstanceDocumentInfo(),
+                                                    refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null);
+                                            if (o == null || !(o instanceof NodeInfo))
+                                                throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
+
+                                            XFormsInstance.setValueForNodeInfo(pipelineContext, (NodeInfo) o, value, null);
+                                        }
                                     }
                                 }
 

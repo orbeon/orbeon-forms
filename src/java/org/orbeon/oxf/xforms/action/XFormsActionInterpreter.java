@@ -141,7 +141,7 @@ public class XFormsActionInterpreter {
                 xformsControls.resetBindingContext(xformsModel);
             } else if (eventHandlerContainer instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) eventHandlerContainer;
-                final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer();
+                final XFormsModel xformsModel = (XFormsModel) submission.getParentContainer(containingDocument);
                 xformsControls.resetBindingContext(xformsModel);
                 xformsControls.pushBinding(pipelineContext, submission.getSubmissionElement());
             } else {

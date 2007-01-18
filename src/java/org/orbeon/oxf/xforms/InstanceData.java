@@ -154,7 +154,7 @@ public class InstanceData {
         return invalidBindIds;
     }
 
-    public void setInvalidBindIds(String invalidBindIds) {
+    private void setInvalidBindIds(String invalidBindIds) {
         this.invalidBindIds = invalidBindIds;
     }
 

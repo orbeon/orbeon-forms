@@ -332,10 +332,12 @@ public class XFormsToXHTML extends ProcessorImpl {
                     for (Iterator instanceIterator = currentModel.getInstances().iterator(); instanceIterator.hasNext();) {
                         final XFormsInstance currentInstance = (XFormsInstance) instanceIterator.next();
 
-                        if (modelHasReset || currentInstance.isReadOnly()) {
-
-                            logger.debug("XForms - adding instance to static state: " + currentInstance.getEffectiveId());
-                            xformsEngineStaticState.addInstance((ReadonlyXFormsInstance) currentInstance);
+                        if (currentInstance instanceof SharedXFormsInstance) {
+                            logger.debug("XForms - adding read-only instance to static state: " + currentInstance.getEffectiveId());
+                            xformsEngineStaticState.addInstance((SharedXFormsInstance) currentInstance);
+                        } else if (modelHasReset) {
+                            logger.debug("XForms - adding reset instance to static state: " + currentInstance.getEffectiveId());
+                            xformsEngineStaticState.addInstance(currentInstance.createSharedInstance());
                         }
                     }
                 }

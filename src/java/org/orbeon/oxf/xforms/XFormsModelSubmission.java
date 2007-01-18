@@ -608,17 +608,27 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
 
+                                                final XFormsModel replaceModel = replaceInstance.getModel(containingDocument);
+
                                                 // Set new instance
+                                                if (replaceInstance instanceof SharedXFormsInstance) {
+                                                    // The instance was shared
+                                                    // Since it is updated, it can no longer be shared and a new mutable instance must be created
+                                                    final XFormsInstance newInstance
+                                                            = ((SharedXFormsInstance) replaceInstance).createMutableInstance((DocumentInfo) resultingInstanceDocument);
 
-//                                                xxx
+                                                    replaceModel.setInstance(newInstance);
 
-                                                replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
+                                                } else {
+                                                    // The instance was not shared
+                                                    replaceInstance.setInstanceDocument(resultingInstanceDocument, true);
 
-                                                // Mark all values as changed so that refresh sends appropriate events
-                                                XFormsUtils.markAllValuesChanged(replaceInstance);
+                                                    // Mark all values as changed so that refresh sends appropriate events
+                                                    XFormsUtils.markAllValuesChanged(replaceInstance);
+                                                }
 
                                                 // Handle new instance and associated events
-                                                replaceInstance.getModel(containingDocument).handleNewInstanceDocuments(pipelineContext);
+                                                replaceModel.handleNewInstanceDocuments(pipelineContext);
 
                                                 // Notify that submission is done
                                                 submitDone = true;

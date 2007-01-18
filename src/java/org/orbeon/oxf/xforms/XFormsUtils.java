@@ -40,10 +40,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.om.Axis;
-import org.orbeon.saxon.om.AxisIterator;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.Attributes;
@@ -1238,7 +1235,8 @@ public class XFormsUtils {
 //        if (!(nodeInfo instanceof DocumentInfo))
 //            throw new OXFException(errorMessage);// TODO: cannot convert for now, but should!
 
-        return TransformerUtils.tinyTreeToDom4j(nodeInfo);
+        // NOTE: This conversion doesn't seem to always work
+        return TransformerUtils.tinyTreeToDom4j((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }
 
     /**

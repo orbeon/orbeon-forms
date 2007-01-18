@@ -991,9 +991,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
-                    // Don't add the instance to the dynamic state if it is readonly
-                    // TODO: must add it anyway if it has been replaced
-                    if (!currentInstance.isReadOnly())
+                    // Don't add the instance to the dynamic state if it is shared
+                    if (!(currentInstance instanceof SharedXFormsInstance))
                         instancesElement.add(currentInstance.createContainerElement());
 
                     // Log instance if needed

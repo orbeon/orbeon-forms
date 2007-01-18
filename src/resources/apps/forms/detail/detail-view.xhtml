@@ -28,7 +28,9 @@
         <title>Government Forms - Detail Page</title>
         <link rel="stylesheet" type="text/css" href="/apps/forms/style.css"/>
         <!-- Global model -->
-        <xforms:model id="common-model" xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}">
+        <xforms:model id="common-model"
+                      xxforms:readonly-appearance="{if (doc('input:instance')/*/readonly = 'true') then 'static' else 'dynamic'}"
+                      xxforms:state-handling="session">
 
             <!-- This is called when the XForms engine is ready -->
             <xforms:action ev:event="xforms-ready">

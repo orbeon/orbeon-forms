@@ -16,6 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xforms.mip.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.NodeInfo;
+
+import java.util.Map;
 
 /**
  * Read-only version of InstanceData for read-only instances.
@@ -64,11 +67,11 @@ public class ReadonlyInstanceData extends InstanceData {
     }
 
     private void throwException() {
-        throw new OXFException("Cannot set Model Item Property value on read-only instance.");
+        throw new OXFException("Cannot modify read-only instance.");
     }
 
     public void addSchemaError(final String msg, final String stringValue) {
-        throw new OXFException("Cannot validate read-only instance.");
+        throwException();
     }
 
     public void clearValidationState() {
@@ -77,5 +80,41 @@ public class ReadonlyInstanceData extends InstanceData {
 
     public void clearOtherState() {
         // NOP
+    }
+
+    public void clearInstanceDataEventState() {
+        // NOP
+    }
+
+    public void setGenerated(boolean generated) {
+        throwException();
+    }
+
+    public void setIdToNodeMap(Map idToNodeMap) {
+        throwException();
+    }
+
+    public void updateRequired(boolean value, NodeInfo nodeInfo, String modelBindId) {
+        throwException();
+    }
+
+    public void updateConstraint(boolean value, NodeInfo nodeInfo, String modelBindId) {
+        throwException();
+    }
+
+    public void updateValueValid(boolean value, NodeInfo nodeInfo, String modelBindId) {
+        throwException();
+    }
+
+    public void markValueChanged() {
+        throwException();
+    }
+
+    public void addSwitchIdToCaseId(String switchId, String caseId) {
+        throwException();
+    }
+
+    public void setSwitchIdsToCaseIds(Map switchIdsToCaseIds) {
+        throwException();
     }
 }

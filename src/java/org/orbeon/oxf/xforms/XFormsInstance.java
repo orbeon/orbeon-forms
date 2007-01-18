@@ -428,4 +428,14 @@ public class XFormsInstance implements XFormsEventTarget {
             return null;
         }
     }
+
+    /**
+     * Create a mutable version of this instance with a new instance document.
+     *
+     * @param instanceDocumentInfo  new instance document
+     * @return                      mutable XFormsInstance
+     */
+    public SharedXFormsInstance createSharedInstance() {
+        return new SharedXFormsInstance(modelId, instanceId, instanceDocumentInfo, sourceURI, username, password);
+    }
 }

@@ -21,14 +21,15 @@
 
     <xhtml:head>
         <xhtml:title>Read-Only Instance</xhtml:title>
-        <xforms:model>
+        <xforms:model xxforms:state-handling="session">
             <xforms:instance id="main-instance" xxforms:readonly="true">
                 <form>
                     <first-name>John</first-name>
                     <last-name>Doe</last-name>
                 </form>
             </xforms:instance>
-            <xforms:bind nodeset="first-name" relevant="false()"/>
+            <!-- Uncommenting the code below should cause an error -->
+            <!--<xforms:bind nodeset="first-name" relevant="false()"/>-->
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

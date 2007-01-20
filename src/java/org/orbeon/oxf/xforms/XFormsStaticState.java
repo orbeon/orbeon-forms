@@ -199,7 +199,7 @@ public class XFormsStaticState {
 
                     // Add information for all shared instances, but don't add content for globally shared instances
                     // NOTE: This strategy could be changed in the future or be configurable
-                    final boolean addContent = !currentInstance.isShared();
+                    final boolean addContent = !currentInstance.isApplicationShared();
                     instancesElement.add(currentInstance.createContainerElement(addContent));
                 }
             }

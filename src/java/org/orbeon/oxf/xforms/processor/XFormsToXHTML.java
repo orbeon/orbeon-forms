@@ -299,7 +299,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 final String instanceSourceURI = currentInstance.getSourceURI();
 
                 if (instanceSourceURI != null) {
-                    if (!currentInstance.isShared()) {
+                    if (!currentInstance.isApplicationShared()) {
                         // Add dependency only for instances that are not globally shared
                         if (logger.isDebugEnabled())
                             logger.debug("XForms - adding document cache dependency for instance: " + instanceSourceURI);
@@ -308,7 +308,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // Don't add the dependency as we don't want the instance URI to be hit
                         // For all practical purposes, globally shared instances must remain constant!
                         if (logger.isDebugEnabled())
-                            logger.debug("XForms - not adding document cache dependency for shared instance: " + instanceSourceURI);
+                            logger.debug("XForms - not adding document cache dependency for application shared instance: " + instanceSourceURI);
                     }
                 }
             }

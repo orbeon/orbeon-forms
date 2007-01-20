@@ -1130,7 +1130,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                 // Got it from cache
 
                                 if (XFormsServer.logger.isDebugEnabled())
-                                    XFormsServer.logger.debug("XForms - using instance from shared instance cache (instance from static state was not initialized): " + currentInstance.getEffectiveId());
+                                    XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + currentInstance.getEffectiveId());
 
                                 getModel(currentInstance.getModelId()).setInstance(sharedInstance);
                             } else {

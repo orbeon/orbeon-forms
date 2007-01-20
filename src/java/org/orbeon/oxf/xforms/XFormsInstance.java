@@ -47,7 +47,7 @@ public class XFormsInstance implements XFormsEventTarget {
     private String instanceId;
     private String modelId;
     private boolean readonly;
-    private boolean shared;
+    private boolean applicationShared;
     private String sourceURI;
     private String username;
     private String password;
@@ -70,7 +70,7 @@ public class XFormsInstance implements XFormsEventTarget {
         this.instanceId = containerElement.attributeValue("id");
         this.modelId = containerElement.attributeValue("model-id");
         this.readonly = "true".equals(containerElement.attributeValue("readonly"));
-        this.shared = "true".equals(containerElement.attributeValue("shared"));
+        this.applicationShared = "application".equals(containerElement.attributeValue("shared"));
         this.sourceURI = containerElement.attributeValue("source-uri");
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
@@ -114,7 +114,7 @@ public class XFormsInstance implements XFormsEventTarget {
         this.instanceId = instanceId;
         this.modelId = modelId;
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
-        this.shared = shared;
+        this.applicationShared = shared;
         this.sourceURI = instanceSourceURI;
         this.username = username;
         this.password = password;
@@ -135,8 +135,8 @@ public class XFormsInstance implements XFormsEventTarget {
 
         if (readonly)
             instanceElement.addAttribute("readonly", "true");
-        if (shared)
-            instanceElement.addAttribute("shared", "true");
+        if (applicationShared)
+            instanceElement.addAttribute("shared", "application");
 
         instanceElement.addAttribute("id", instanceId);
         instanceElement.addAttribute("model-id", modelId);
@@ -190,8 +190,8 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
 
-    public boolean isShared() {
-        return shared;
+    public boolean isApplicationShared() {
+        return applicationShared;
     }
 
     public NodeInfo getInstanceRootElementInfo() {

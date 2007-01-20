@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -47,7 +46,7 @@ public class XFormsServerSharedInstancesCache {
     public void add(PipelineContext pipelineContext, String instanceSourceURI, SharedXFormsInstance sharedXFormsInstance) {
 
         if (XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - adding shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' to cache for URI: " + instanceSourceURI);
+            XFormsServer.logger.debug("XForms - adding application shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' to cache for URI: " + instanceSourceURI);
 
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
         final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
@@ -61,7 +60,7 @@ public class XFormsServerSharedInstancesCache {
         final SharedXFormsInstance sharedXFormsInstance = (SharedXFormsInstance) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
 
         if (sharedXFormsInstance != null && XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' found in cache for URI: " + instanceSourceURI);
+            XFormsServer.logger.debug("XForms - application shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' found in cache for URI: " + instanceSourceURI);
 
         return sharedXFormsInstance;
     }

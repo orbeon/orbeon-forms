@@ -750,20 +750,33 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
 
                         final Element instanceContainerElement = (Element) i.next();
-                        final boolean isReadonlyHint = "true".equals(instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
-                        final boolean isSharedHint = "true".equals(instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME));
-
+                        final LocationData locationData = (LocationData) instanceContainerElement.getData();
                         final String instanceId;
                         {
                             // NOTE: There has to be an id, except for the legacy engine
                             final String idAttribute = instanceContainerElement.attributeValue("id");
                             instanceId = (idAttribute != null) ? idAttribute : "";
                         }
-                        final LocationData locationData = (LocationData) instanceContainerElement.getData();
 
-                        // Can't have shared instance that is not read-only
-                        if (isSharedHint && !isReadonlyHint)
-                            throw new ValidationException("xxforms:shared can be true only if xxforms:readonly is true for instance: " + instanceId, locationData);
+                        // Handle read-only hints
+                        final boolean isReadonlyHint = "true".equals(instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
+                        final boolean isApplicationSharedHint;
+                        {
+                            final String sharedAttributeValue = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
+                            isApplicationSharedHint = "application".equals(sharedAttributeValue);
+                            final boolean isDocumentSharedHint = "document".equals(sharedAttributeValue);
+
+                            if (sharedAttributeValue != null) {
+
+                                // Can't have shared hints if not read-only
+                                if (!isReadonlyHint)
+                                    throw new ValidationException("xxforms:shared can be set only if xxforms:readonly is true for instance: " + instanceId, locationData);
+
+                                // Check values if set
+                                if (!(isApplicationSharedHint || isDocumentSharedHint))
+                                    throw new ValidationException("xxforms:shared must be either of 'application' or 'document' for instance: " + instanceId, locationData);
+                            }
+                        }
 
                         // Skip processing in case somebody has already set this particular instance
                         if (instances.get(instancePosition) != null)
@@ -784,7 +797,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         // Got it from cache
 
                                         if (XFormsServer.logger.isDebugEnabled())
-                                            XFormsServer.logger.debug("XForms - using instance from shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
+                                            XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
 
                                         setInstance(sharedInstance);
                                         continue;
@@ -910,7 +923,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 }
 
                                 // Get instance from shared cache if possible
-                                if (isSharedHint) {
+                                if (isApplicationSharedHint) {
                                     final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, absoluteResolvedURLString);
                                     if (sharedXFormsInstance != null) {
                                         // Found instance from shared cache: we are done!
@@ -919,7 +932,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     }
                                 }
 
-                                if (containingDocument.getURIResolver() == null || isSharedHint) {
+                                if (containingDocument.getURIResolver() == null || isApplicationSharedHint) {
                                     // Connect directly if there is no resolver or if the instance is globally shared
 
                                     if (XFormsServer.logger.isDebugEnabled())
@@ -986,9 +999,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        final XFormsInstance newInstance = setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isSharedHint);
+                        final XFormsInstance newInstance = setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint);
 
-                        if (isSharedHint) {
+                        if (isApplicationSharedHint) {
                             // Instance is sharable but we did not get it from the cache, so store it now
                             XFormsServerSharedInstancesCache.instance().add(pipelineContext, instanceSourceURI, (SharedXFormsInstance) newInstance);
                         }

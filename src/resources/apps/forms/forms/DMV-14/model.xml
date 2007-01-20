@@ -69,7 +69,7 @@
     </xforms:bind>
 
     <!-- XForms instance containing the XML schema (for enumerations) -->
-    <xforms:instance id="schema-instance" src="oxf:/apps/forms/forms/DMV-14/schema.xsd" xxforms:readonly="true"/>
+    <xforms:instance id="schema-instance" src="oxf:/apps/forms/forms/DMV-14/schema.xsd" xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- XForms instance containing template for mailing address -->
     <xforms:instance id="mailing-address-template" src="oxf:/apps/forms/forms/DMV-14/template-mailing-address.xml"/>

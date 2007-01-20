@@ -295,7 +295,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final Document initialDocumentToSubmit;
                 if (serialize && !isDeferredSubmissionSecondPass) {
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getInstanceDocument();
+                    final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
                         initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
                         currentInstance.setInstanceDocument(initialDocumentToSubmit, false);
@@ -385,7 +385,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getInstanceDocument();
+                    final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
                         documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
                         currentInstance.setInstanceDocument(documentToSubmit, false);
@@ -784,7 +784,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
         } else {
             // Use entire instance document
-            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getInstanceDocument().getRootElement());
+            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getDocument().getRootElement());
         }
 
         if (relevant) {

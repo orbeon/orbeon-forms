@@ -142,8 +142,14 @@ public class XFormsSubmissionUtils {
                                                                    String method, final String action, String username, String password, String mediatype,
                                                                    byte[] serializedInstance, String queryString) {
 
-        // Compute submission URL
+        // Compute absolute submission URL
         final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
+        return doRegular(externalContext, method, submissionURL, username, password, mediatype, serializedInstance);
+    }
+
+    public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
+                                                                   String method, final URL submissionURL, String username, String password, String mediatype,
+                                                                   byte[] serializedInstance) {
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -213,7 +219,7 @@ public class XFormsSubmissionUtils {
                                 try {
                                     getResultInputStream().close();
                                 } catch (IOException e) {
-                                    throw new OXFException("Exception while closing input stream for action: " + action);
+                                    throw new OXFException("Exception while closing input stream for action: " + submissionURL);
                                 }
                             }
 

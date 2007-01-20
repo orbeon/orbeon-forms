@@ -23,35 +23,52 @@ import java.util.HashMap;
  */
 public class ObjectCache {
 
-    private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.cache.";
+    private static final String CACHE_PROPERTY_NAME_PREFIX = "oxf.";
     private static final String CACHE_PROPERTY_NAME_SIZE_SUFFIX = ".size";
 
     private static final int DEFAULT_SIZE = 200;
 
-    private static Cache impl = new MemoryCacheImpl(DEFAULT_SIZE);
-    private static Map impls;
+    private static Cache mainObjectCache = new MemoryCacheImpl(DEFAULT_SIZE);
+    private static Map namedObjectCaches;
 
     private ObjectCache() {}
 
     /**
      * Get the intance of the main object cache.
+     *
+     * @return instance of cache
      */
     public static Cache instance() {
-        return impl;
+        return mainObjectCache;
     }
 
     /**
      * Get the instance of the object cache specified.
+     *
+     * @param cacheName     name of the cache
+     * @return              instance of cache
      */
-    public synchronized static Cache instance(String type) {
-        if (impls == null)
-            impls = new HashMap();
-        Cache cache = (Cache) impls.get(type);
+//    public synchronized static Cache instance(String cacheName) {
+//        return instance(cacheName, DEFAULT_SIZE);
+//    }
+
+    /**
+     * Get the instance of the object cache specified.
+     *
+     * @param cacheName     name of the cache
+     * @param defaultSize   default size if size is not found in properties
+     * @return              instance of cache
+     */
+    public synchronized static Cache instance(String cacheName, int defaultSize) {
+
+        if (namedObjectCaches == null)
+            namedObjectCaches = new HashMap();
+        Cache cache = (Cache) namedObjectCaches.get(cacheName);
         if (cache == null) {
-            final String propertyName = CACHE_PROPERTY_NAME_PREFIX + type + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
-            final Integer size = OXFProperties.instance().getPropertySet().getInteger(propertyName, DEFAULT_SIZE);
+            final String propertyName = CACHE_PROPERTY_NAME_PREFIX + cacheName + CACHE_PROPERTY_NAME_SIZE_SUFFIX;
+            final Integer size = OXFProperties.instance().getPropertySet().getInteger(propertyName, defaultSize);
             cache = new MemoryCacheImpl(size.intValue());
-            impls.put(type, cache);
+            namedObjectCaches.put(cacheName, cache);
         }
         return cache;
     }

@@ -30,8 +30,11 @@ import org.orbeon.oxf.xforms.processor.XFormsState;
  */
 public class XFormsServerDocumentCache {
 
-    private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms-sessions";
-    private static final String CONTAINING_DOCUMENT_KEY_TYPE = "oxf.xforms.cache.context.containing-document";
+    private static final String XFORMS_DOCUMENT_CACHE_NAME = "xforms.cache.documents";
+    private static final int XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE = 10;
+
+    private static final Long CONSTANT_VALIDITY = new Long(0);
+    private static final String CONTAINING_DOCUMENT_KEY_TYPE = XFORMS_DOCUMENT_CACHE_NAME;
 
     private static XFormsServerDocumentCache instance = null;
 
@@ -48,17 +51,16 @@ public class XFormsServerDocumentCache {
 
     public synchronized void add(PipelineContext pipelineContext, XFormsState xformsState, XFormsContainingDocument containingDocument) {
 
-        final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);
+        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
         final String cacheKeyString = xformsState.toString();
         //logger.info("xxx KEY used when returning: " + cacheKeyString);
 
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
-        ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
+        ObjectPool destinationPool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
         if (destinationPool == null) {
             // The pool is not in cache
             destinationPool = createXFormsContainingDocumentPool(xformsState);
-            cache.add(pipelineContext, cacheKey, validity, destinationPool);
+            cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, destinationPool);
             XFormsServer.logger.debug("XForms - containing document cache (cacheContainingDocument): did not find document pool in cache; creating new pool and returning document to it.");
         } else {
             // Pool is already in cache
@@ -94,19 +96,17 @@ public class XFormsServerDocumentCache {
      */
     public XFormsContainingDocument find(PipelineContext pipelineContext, XFormsState xformsState) {
 
-        // NOTE: It looks save to make this non-synchronized. If we make it synchronized, we risk deadlocks (verified!)
+        // NOTE: It looks safe to make this non-synchronized. If we make it synchronized, we risk deadlocks (verified!)
         // when a submission occurs during createXFormsContainingDocument() and submits to the same document.
 
-        final Long validity = new Long(0);
-        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME);
+        final Cache cache = ObjectCache.instance(XFORMS_DOCUMENT_CACHE_NAME, XFORMS_DOCUMENT_CACHE_DEFAULT_SIZE);
         final String cacheKeyString = xformsState.toString();
-        //logger.info("xxx KEY used when returning: " + cacheKeyString);
 
         // Try to find pool in cache, create it if not found
         final InternalCacheKey cacheKey = new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, cacheKeyString);
 
         final XFormsContainingDocument containingDocument;
-        final ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
+        final ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
         if (pool == null) {
             // We don't add the pool to the cache here
             XFormsServer.logger.debug("XForms - containing document cache (getContainingDocument): did not find document pool in cache.");

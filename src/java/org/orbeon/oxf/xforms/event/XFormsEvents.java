@@ -20,6 +20,7 @@ public class XFormsEvents {
 
     // Custom initialization events
     public static final String XXFORMS_ALL_EVENTS_REQUIRED = "xxforms-all-events-required";
+    public static final String XXFORMS_READY = "xxforms-ready";
 
     // Other custom events
     public static final String XXFORMS_SUBMIT = "xxforms-submit";

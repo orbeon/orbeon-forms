@@ -27,7 +27,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -47,6 +46,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
 
     public static final String PORTLET_INCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet-include";
     public static final String PORTLET_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet";
+    public static final String REQUEST_PORTAL_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
 
     public PortletIncludeGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
@@ -104,7 +104,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
                     // This is the XForms instance document of the portal. It is used later on to rewrite portlet URLs.
                     Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
                     XFormsUtils.setInitialDecoration(instanceDocument);
-                    externalContext.getRequest().getAttributesMap().put(XFormsInstance.REQUEST_PORTAL_INSTANCE_DOCUMENT, instanceDocument);
+                    externalContext.getRequest().getAttributesMap().put(REQUEST_PORTAL_INSTANCE_DOCUMENT, instanceDocument);
                 }
 
                 PortletContainer portletContainer = PortletContainer.instance(externalContext, config.getPortalId());

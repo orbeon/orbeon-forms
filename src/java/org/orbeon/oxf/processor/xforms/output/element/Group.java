@@ -35,7 +35,7 @@ public class Group extends XFormsElement {
         if (isFirstGroup) {
 
             // Go through the instance and wipe out the nodes bound to a control (generated is true)
-            final Document instance = context.getCurrentInstance().getInstanceDocument();
+            final Document instance = context.getCurrentInstance().getDocument();
             
             instance.accept(new VisitorSupport() {
                 public void visit(Attribute node) {
@@ -59,7 +59,7 @@ public class Group extends XFormsElement {
             });
 
             // Encode instance in a string and put in hidden field
-            XFormsUtils.removeInstanceAttributes(context.getCurrentInstance().getInstanceDocumentInfo());
+            XFormsUtils.removeInstanceAttributes(context.getCurrentInstance().getDocumentInfo());
             String instanceString = XFormsUtils.encodeXML(context.getPipelineContext(), instance);
             sendHiddenElement(context, "$instance", instanceString);
         }

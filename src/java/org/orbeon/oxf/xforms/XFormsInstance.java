@@ -42,13 +42,12 @@ import java.io.StringReader;
  */
 public class XFormsInstance implements XFormsEventTarget {
 
-    public static final String REQUEST_PORTAL_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
-
-    private DocumentInfo instanceDocumentInfo;
+    private DocumentInfo documentInfo;
 
     private String instanceId;
     private String modelId;
-    private boolean isReadonly;
+    private boolean readonly;
+    private boolean shared;
     private String sourceURI;
     private String username;
     private String password;
@@ -57,9 +56,12 @@ public class XFormsInstance implements XFormsEventTarget {
      * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
      * such as id, username, URI, etc.
      *
-     * <instance readonly="false" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
+     * <instance readonly="false" shared="false" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
      *     x7wer...
-     * </instance
+     * </instance>
+     *
+     * The instance document may not have been set after this is completed, in case the Element did not contained a
+     * serialized document.
      *
      * @param containerElement  container element
      */
@@ -67,7 +69,8 @@ public class XFormsInstance implements XFormsEventTarget {
 
         this.instanceId = containerElement.attributeValue("id");
         this.modelId = containerElement.attributeValue("model-id");
-        this.isReadonly = "true".equals(containerElement.attributeValue("readonly"));
+        this.readonly = "true".equals(containerElement.attributeValue("readonly"));
+        this.shared = "true".equals(containerElement.attributeValue("shared"));
         this.sourceURI = containerElement.attributeValue("source-uri");
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
@@ -78,10 +81,18 @@ public class XFormsInstance implements XFormsEventTarget {
             // New serialization (use serialized XML)
             try {
                 final String xmlString = containerElement.getStringValue();
-                if (!isReadonly)
+                if (!readonly) {
                     documentInfo = new DocumentWrapper(Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, new Configuration());
-                else
-                    documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
+                } else {
+
+                    if (xmlString.length() > 0) {
+                        // Instance document is available in serialized form
+                        documentInfo = TransformerUtils.readTinyTree(new StreamSource(new StringReader(xmlString)));
+                    } else {
+                        // Instance document is not available, defer to later initialization
+                        documentInfo = null;
+                    }
+                }
             } catch (Exception e) {
                 throw new OXFException(e);
             }
@@ -94,15 +105,16 @@ public class XFormsInstance implements XFormsEventTarget {
         setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean shared) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password);
+        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, shared);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean shared) {
         this.instanceId = instanceId;
         this.modelId = modelId;
-        this.isReadonly = !(instanceDocumentInfo instanceof DocumentWrapper);
+        this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
+        this.shared = shared;
         this.sourceURI = instanceSourceURI;
         this.username = username;
         this.password = password;
@@ -113,15 +125,18 @@ public class XFormsInstance implements XFormsEventTarget {
     /**
      * Serialize the instance into a containing Element with meta-information.
      *
-     * @return      containing Element
+     * @param serialize     whether the instance document must be serialized
+     * @return              containing Element
      */
-    public Element createContainerElement() {
+    public Element createContainerElement(boolean serialize) {
 
         // DocumentInfo may wrap an actual TinyTree or a dom4j document
-        final String instanceString = TransformerUtils.tinyTreeToString(getInstanceDocumentInfo());
         final Element instanceElement = Dom4jUtils.createElement("instance");
-        if (isReadonly)
+
+        if (readonly)
             instanceElement.addAttribute("readonly", "true");
+        if (shared)
+            instanceElement.addAttribute("shared", "true");
 
         instanceElement.addAttribute("id", instanceId);
         instanceElement.addAttribute("model-id", modelId);
@@ -131,8 +146,11 @@ public class XFormsInstance implements XFormsEventTarget {
             instanceElement.addAttribute("username", username);
         if (password != null)
             instanceElement.addAttribute("password", password);
-        
-        instanceElement.addText(instanceString);
+
+        if (serialize) {
+            final String instanceString = TransformerUtils.tinyTreeToString(getDocumentInfo());
+            instanceElement.addText(instanceString);
+        }
 
         return instanceElement;
     }
@@ -152,8 +170,8 @@ public class XFormsInstance implements XFormsEventTarget {
      *
      * @return  instance DocumentInfo
      */
-    public DocumentInfo getInstanceDocumentInfo() {
-        return instanceDocumentInfo;
+    public DocumentInfo getDocumentInfo() {
+        return documentInfo;
     }
 
     /**
@@ -168,11 +186,16 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public boolean isReadOnly() {
-        return !(instanceDocumentInfo instanceof VirtualNode);
+        return !(documentInfo instanceof VirtualNode);
+    }
+
+
+    public boolean isShared() {
+        return shared;
     }
 
     public NodeInfo getInstanceRootElementInfo() {
-        return (NodeInfo) XFormsUtils.getChildrenElements(instanceDocumentInfo).get(0);
+        return (NodeInfo) XFormsUtils.getChildrenElements(documentInfo).get(0);
     }
 
     public String getSourceURI() {
@@ -226,7 +249,7 @@ public class XFormsInstance implements XFormsEventTarget {
             final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
             XFormsUtils.setInitialDecoration((Document) documentWrapper.getUnderlyingNode());
         }
-        this.instanceDocumentInfo = instanceDocumentInfo;
+        this.documentInfo = instanceDocumentInfo;
     }
 
     public void synchronizeInstanceDataEventState() {
@@ -325,18 +348,18 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public void read(ContentHandler contentHandler) {
         try {
-            if (instanceDocumentInfo instanceof DocumentWrapper) {
+            if (documentInfo instanceof DocumentWrapper) {
                 XFormsUtils.addInstanceAttributes(getInstanceRootElementInfo());
             }
 
             final Transformer identity = TransformerUtils.getIdentityTransformer();
-            identity.transform(instanceDocumentInfo, new SAXResult(contentHandler));
+            identity.transform(documentInfo, new SAXResult(contentHandler));
 
 //            LocationSAXWriter saxw = new LocationSAXWriter();
 //            saxw.setContentHandler(contentHandler);
 //            saxw.write(instanceDocument);
 
-            if (instanceDocumentInfo instanceof DocumentWrapper) {
+            if (documentInfo instanceof DocumentWrapper) {
                 XFormsUtils.removeInstanceAttributes(getInstanceRootElementInfo());
             }
 
@@ -361,7 +384,7 @@ public class XFormsInstance implements XFormsEventTarget {
 
         final Document result = Dom4jUtils.createDocument();
 
-        getInstanceDocument().accept(new VisitorSupport() {
+        getDocument().accept(new VisitorSupport() {
 
             private Element rootElement = result.addElement("mips");
             private Element currentElement;
@@ -397,11 +420,11 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public LocationData getLocationData() {
-        if (instanceDocumentInfo instanceof DocumentWrapper) {
-            final Document document = getInstanceDocument();
+        if (documentInfo instanceof DocumentWrapper) {
+            final Document document = getDocument();
             return XFormsUtils.getNodeLocationData(document.getRootElement());
         } else {
-            return new LocationData(instanceDocumentInfo.getSystemId(), instanceDocumentInfo.getLineNumber(), -1);
+            return new LocationData(documentInfo.getSystemId(), documentInfo.getLineNumber(), -1);
         }
     }
 
@@ -420,9 +443,9 @@ public class XFormsInstance implements XFormsEventTarget {
      *
      * @return  instance document
      */
-    public Document getInstanceDocument() {
-        if (instanceDocumentInfo instanceof DocumentWrapper) {
-            final DocumentWrapper documentWrapper = (DocumentWrapper) instanceDocumentInfo;
+    public Document getDocument() {
+        if (documentInfo instanceof DocumentWrapper) {
+            final DocumentWrapper documentWrapper = (DocumentWrapper) documentInfo;
             return (Document) documentWrapper.getUnderlyingNode();
         } else {
             return null;
@@ -430,12 +453,11 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     /**
-     * Create a mutable version of this instance with a new instance document.
+     * Create a shared version of this instance with the same instance document.
      *
-     * @param instanceDocumentInfo  new instance document
-     * @return                      mutable XFormsInstance
+     * @return  mutable XFormsInstance
      */
     public SharedXFormsInstance createSharedInstance() {
-        return new SharedXFormsInstance(modelId, instanceId, instanceDocumentInfo, sourceURI, username, password);
+        return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false);
     }
 }

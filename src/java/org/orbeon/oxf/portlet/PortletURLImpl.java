@@ -16,9 +16,9 @@ package org.orbeon.oxf.portlet;
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 
 import javax.portlet.*;
 import java.util.HashMap;
@@ -160,7 +160,7 @@ public class PortletURLImpl implements PortletURL {
         }
 
         // Append other container parameters
-        final Document portalXFormsInstanceDocument = (Document) portalExternalContext.getRequest().getAttributesMap().get(XFormsInstance.REQUEST_PORTAL_INSTANCE_DOCUMENT);
+        final Document portalXFormsInstanceDocument = (Document) portalExternalContext.getRequest().getAttributesMap().get(PortletIncludeGenerator.REQUEST_PORTAL_INSTANCE_DOCUMENT);
         if (portalXFormsInstanceDocument != null) {
             final String instanceString = XFormsUtils.encodeXML(portalPipelineContext, portalXFormsInstanceDocument);
             try {

@@ -85,7 +85,7 @@ public class XFormsInput extends ProcessorImpl {
                 XFormsInstance contextInstance = null;
                 if (contextInstance != null) {
                     // Instance comes from context in case of a forward
-                    model.setInstanceDocument(contextInstance.getInstanceDocument(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null);
+                    model.setInstanceDocument(contextInstance.getDocument(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false);
                 } else {
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
@@ -97,7 +97,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument((Document) requestParameters.getInstance().clone(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null);
+                        model.setInstanceDocument((Document) requestParameters.getInstance().clone(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false);
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(int position, XFormsInstance localInstance) {
@@ -108,7 +108,7 @@ public class XFormsInput extends ProcessorImpl {
                                 for (int i = 0; i < ids.length; i++) {
                                     final int id = ids[i];
 
-                                    final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getInstanceDocumentInfo()).get(new Integer(id));
+                                    final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getDocumentInfo()).get(new Integer(id));
                                     XFormsInstance.setValueForNode(pipelineContext, node, requestParameters.getValue(id), requestParameters.getType(id));
                                 }
 
@@ -141,7 +141,7 @@ public class XFormsInput extends ProcessorImpl {
                                         if (!"".equals(value)) {
 
                                             final String refXPath = paramElement.attributeValue("ref");
-                                            final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getInstanceDocumentInfo(),
+                                            final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
                                                     refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null);
                                             if (o == null || !(o instanceof NodeInfo))
                                                 throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
@@ -153,7 +153,7 @@ public class XFormsInput extends ProcessorImpl {
 
                                 if (logger.isDebugEnabled())
                                     logger.debug("1) Instance recontructed from request:\n"
-                                            + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
+                                            + Dom4jUtils.domToString(localInstance.getDocument()));
 
                                 // Run actions
                                 // TODO: this has to be done in Model
@@ -161,11 +161,11 @@ public class XFormsInput extends ProcessorImpl {
                                 for (int i = 0; i < actions.length; i++) {
                                     Action action = actions[i];
                                     action.run(pipelineContext, new ActionFunctionContext(),
-                                            requestParameters.getEncryptionKey(), localInstance.getInstanceDocumentInfo());
+                                            requestParameters.getEncryptionKey(), localInstance.getDocumentInfo());
                                 }
                                 if (logger.isDebugEnabled())
                                     logger.debug("2) Instance with actions applied:\n"
-                                            + Dom4jUtils.domToString(localInstance.getInstanceDocument()));
+                                            + Dom4jUtils.domToString(localInstance.getDocument()));
                             }
                         }
                     });
@@ -176,7 +176,7 @@ public class XFormsInput extends ProcessorImpl {
 
                 if (logger.isDebugEnabled())
                     logger.debug("3) Instance with model item properties applied:\n"
-                            + Dom4jUtils.domToString(model.getDefaultInstance().getInstanceDocument()));
+                            + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));
 
                 // Get instance from XForms model
                 XFormsInstance instance = model.getDefaultInstance();

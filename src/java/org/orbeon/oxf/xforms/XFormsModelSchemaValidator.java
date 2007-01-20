@@ -420,7 +420,7 @@ public class XFormsModelSchemaValidator {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
             final REDocumentDeclaration documentDeclaration = new REDocumentDeclaration(schemaGrammar);
             final Acceptor acceptor = documentDeclaration.createAcceptor();
-            final Element instanceRootElement = instance.getInstanceDocument().getRootElement();
+            final Element instanceRootElement = instance.getDocument().getRootElement();
             final IDConstraintChecker idConstraintChecker = new IDConstraintChecker();
 
             validateElement(instanceRootElement, acceptor, idConstraintChecker);

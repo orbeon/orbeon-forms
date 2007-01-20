@@ -34,7 +34,10 @@ import java.util.*;
  * o initial instances needed for xforms:reset
  * o initial instances needed for back/reload
  *
- * NOTE: This will have to change a bit if we move towards TinyTree to store the static state.
+ * Instances in the static state may not be initialized yet (i.e. not have the actual instance document include) in case
+ * they are shared instances.
+ *
+ * NOTE: This code will have to change a bit if we move towards TinyTree to store the static state.
  */
 public class XFormsStaticState {
 
@@ -193,7 +196,11 @@ public class XFormsStaticState {
                 final Element instancesElement = staticStateDocument.getRootElement().addElement("instances");
                 for (Iterator instancesIterator = instancesMap.values().iterator(); instancesIterator.hasNext();) {
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
-                    instancesElement.add(currentInstance.createContainerElement());
+
+                    // Add information for all shared instances, but don't add content for globally shared instances
+                    // NOTE: This strategy could be changed in the future or be configurable
+                    final boolean addContent = !currentInstance.isShared();
+                    instancesElement.add(currentInstance.createContainerElement(addContent));
                 }
             }
 

@@ -99,6 +99,11 @@ public class XFormsEventFactory {
                 return new XFormsSubmitDoneEvent(targetObject);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_READY, new Factory() {
+            public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+                return new XXFormsReadyEvent(targetObject);
+            }
+        });
         nameToClassMap.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
                 return new XXFormsValueChangeWithFocusChangeEvent(targetObject, otherTargetObject, contextString);

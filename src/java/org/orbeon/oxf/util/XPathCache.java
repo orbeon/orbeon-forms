@@ -49,7 +49,8 @@ import java.util.*;
  */
 public class XPathCache {
 
-    private static final String XPATH_CACHE_NAME = "xpath";
+    private static final String XPATH_CACHE_NAME = "cache.xpath";
+    private static final int XPATH_CACHE_DEFAULT_SIZE = 200;
 
     private static final Logger logger = LoggerFactory.createLogger(XPathCache.class);
 
@@ -162,7 +163,7 @@ public class XPathCache {
         try {
             // Find pool from cache
             final Long validity = new Long(0);
-            final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME);
+            final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME, XPATH_CACHE_DEFAULT_SIZE);
             final StringBuffer cacheKeyString = new StringBuffer(xpathExpressionString);
             {
                 if (functionLibrary != null) {// This is ok

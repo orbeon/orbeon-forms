@@ -3417,10 +3417,16 @@
                         </li>
                     </ul>
                     <p>
-                        Example:
+                        Here is how you use the attribute on <code>&lt;xforms:instance></code>:
                     </p>
                     <xml-source>
                         <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application"/>
+                    </xml-source>
+                    <p>
+                        You set the size of the shared instances cache using a property in <code>properties.xml</code>:
+                    </p>
+                    <xml-source>
+                        <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="10"/>
                     </xml-source>
                     <warning>
                         When using <code>xxforms:shared="application"</code>, be sure that the data contained in the

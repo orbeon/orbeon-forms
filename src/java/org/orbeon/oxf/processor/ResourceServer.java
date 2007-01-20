@@ -121,11 +121,9 @@ public class ResourceServer extends ProcessorImpl {
                 // Copy stream to output
                 NetUtils.copyStream(urlConnectionInputStream, response.getOutputStream());
             } finally {
-                // Make sure the connection is closed because when getting the
-                // last modified date, the stream is actually opened. When using
-                // the file: protocol, the file can be locked on disk.
-                if (urlConnection != null && "file".equalsIgnoreCase(urlConnection.getURL().getProtocol())) {
-                    if (urlConnectionInputStream != null) urlConnectionInputStream.close();
+                // Make sure the stream is closed in all cases so as to not lock the file on disk
+                if (urlConnectionInputStream != null) {
+                    urlConnectionInputStream.close();
                 }
             }
         } catch (Exception e) {

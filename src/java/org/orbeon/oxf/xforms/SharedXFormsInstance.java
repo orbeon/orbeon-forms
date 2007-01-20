@@ -33,11 +33,15 @@ public class SharedXFormsInstance extends XFormsInstance {
     }
 
     public void setInstanceDocument(Object instanceDocument, boolean initialize) {
-        throw new OXFException("Cannot set instance document on read-only instance.");
+        if (getDocumentInfo() == null) {
+            super.setInstanceDocument(instanceDocument, initialize);
+        } else {
+            throw new OXFException("Cannot set instance document on shared instance.");
+        }
     }
 
     public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        throw new OXFException("Cannot set instance document on read-only instance.");
+        throw new OXFException("Cannot set instance document on shared instance.");
     }
 
     public void synchronizeInstanceDataEventState() {

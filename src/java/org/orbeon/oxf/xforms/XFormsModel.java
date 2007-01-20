@@ -789,7 +789,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                         setInstance(sharedInstance);
                                         continue;
                                     } else {
-                                        // Instance not found in cache, will be loaded later from URI
+                                        // Instance not found in cache, will be loaded later from URI (but not from resolver as shared instances are not in the resolver)
                                         // NOP
                                     }
                                 } else {
@@ -919,8 +919,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                     }
                                 }
 
-                                if (containingDocument.getURIResolver() == null) {
-                                    // We connect directly
+                                if (containingDocument.getURIResolver() == null || isSharedHint) {
+                                    // Connect directly if there is no resolver or if the instance is globally shared
 
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - getting document from URI for: " + absoluteResolvedURLString);
@@ -982,7 +982,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                         if (XFormsServer.logger.isDebugEnabled()) {
                             final long submissionTime = System.currentTimeMillis() - startTime;
-                            XFormsServer.logger.debug("XForms - instance loading time (including handling returned body): " + submissionTime);
+                            XFormsServer.logger.debug("XForms - instance loading time for instance '" + instanceId + "' (including handling returned body): " + submissionTime);
                         }
 
                         // Set instance and associated information if everything went well

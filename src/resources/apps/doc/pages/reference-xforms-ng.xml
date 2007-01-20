@@ -3343,6 +3343,91 @@
                         </p>
                     </note>
                 </section>
+                <a name="xxforms-readonly"/>
+                <section>
+                    <title>Read-Only XForms Instances</title>
+                    <p>
+                        Orbeon Forms supports an extension attribute, <code>xxforms:readonly</code>, on XForms
+                        instances. When set to <code>true</code>, this attribute marks the instance as read-only, with
+                        the following consequences:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The instance is loaded into a smaller, more efficient, read-only data structure in
+                                memory.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Instance values <i>cannot</i> be updated, and no Model Item Properties (MIPs) can be
+                                assigned with <code>&lt;xforms:bind></code> to the instance.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                When using client-side state handling, less data may be transmitted between server and
+                                client.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Note that a read-only instance can still be replaced in its entirety during an XForms
+                                submission.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Read-only instances are particularly appropriate for loading internationalization resources,
+                        which can be large but don't change. Example:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true"/>
+                    </xml-source>
+                </section>
+                <a name="xxforms-shared"/>
+                <section>
+                    <title>Sharing of Read-Only XForms Instances</title>
+                    <p>
+                        If an XForms instance is marked as read-only and the instance is loaded through the
+                        <code>src</code> attribute, it also supports another attribute, <code>xxforms:shared</code>,
+                        which can take two values: <code>document</code> (the default if the attribute is not specified)
+                        and <code>application</code>. When <code>application</code> is specified:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The instance can be shared at the application level identified just by its source URL.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The instance is not stored into the XForms document's state, but in a global cache,
+                                therefore potentially saving memory. If, upon loading an XForms document, the instance
+                                is found in the cache, it is directly retrieved from the cache. This can save time
+                                especially if the URL can take significant time to load.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                note that the URL should refer to a constant XML document and authorization credentials
+                                such as username and password and cookies should not be relevant to access the shared
+                                data.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        Example:
+                    </p>
+                    <xml-source>
+                        <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application"/>
+                    </xml-source>
+                    <warning>
+                        When using <code>xxforms:shared="application"</code>, be sure that the data contained in the
+                        instance does not contain information that could be inadvertently shared with other XForms
+                        documents. It is recommended to use it to load localized resources or similar types of data.
+                    </warning>
+                </section>
             </section>
         </section>
         <a name="xforms-state-handling"/>

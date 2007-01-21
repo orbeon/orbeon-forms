@@ -274,8 +274,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>New functions.</b> Support for XForms 1.1 <code>digest()</code> and <code>random()</code>
-                            functions. [TODO: doc]
+                            <b>New functions.</b> Support for XForms 1.1 <code>digest()</code>, <code>random()</code>
+                            and <code>seconds-to-dateTime()</code> functions. [TODO: doc]
                         </p>
                     </li>
                     <li>

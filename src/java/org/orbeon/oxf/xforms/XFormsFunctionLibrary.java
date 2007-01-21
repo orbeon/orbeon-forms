@@ -106,6 +106,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("months", Months.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        e = register("seconds-to-dateTime", SecondsToDateTime.class, 0, 1, 1, Type.DATE_TIME_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
+
         // 7.11.1 The instance() Function
         e = register("instance", Instance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);

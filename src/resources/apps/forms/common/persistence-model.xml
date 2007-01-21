@@ -24,7 +24,7 @@
 
     <xforms:setvalue ev:event="xforms-submit-error" ref="xxforms:instance('control-instance')/error" value="event('body')"/>
 
-    <xforms:submission id="import-documents-submission"
+    <xforms:submission id="import-documents-submission" serialize="false"
                        method="get" action="/forms/service/import-documents" replace="none"/>
 
     <xforms:instance id="list-documents-query">

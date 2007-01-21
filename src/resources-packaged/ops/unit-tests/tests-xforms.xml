@@ -681,7 +681,6 @@
         </output>
     </test>
 
-
     <test description="Core Function Library" name="oxf:pipeline">
         <input name="config" href="oxf:/ops/unit-tests/xforms-instance-recreate.xpl"/>
         <input name="model">

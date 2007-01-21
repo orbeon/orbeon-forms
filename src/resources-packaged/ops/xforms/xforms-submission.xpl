@@ -58,8 +58,8 @@
                                     </xforms:trigger>
                                 </controls>
                                 <models>
-                                    <xforms:model>
-                                        <xforms:instance>
+                                    <xforms:model id="default-model">
+                                        <xforms:instance id="default-instance">
                                             <xsl:copy-of select="doc('input:request')"/>
                                         </xforms:instance>
                                         <xforms:submission id="default-submission" replace="instance">
@@ -78,7 +78,7 @@
                         <xsl:document>
                             <dynamic-state>
                                 <instances>
-                                    <instance>
+                                    <instance id="default-instance" model-id="default-model">
                                         <xsl:copy-of select="doc('input:request')"/>
                                     </instance>
                                 </instances>

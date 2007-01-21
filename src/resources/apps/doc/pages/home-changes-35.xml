@@ -59,6 +59,14 @@
                 </p>
             </section>
             <section>
+                <title>New Orbeon Forms Tutorial</title>
+                <p>
+                    A <a href="intro-tutorial">brand new tutorial</a> is available. It guides you through the Orbone
+                    Forms installation, a simple "Hello" application, and then shows how to build the "Bookcast"
+                    application, complete with handling of persistence.
+                </p>
+            </section>
+            <section>
                 <title>XForms Performance</title>
                 <ul>
                     <li>
@@ -82,6 +90,14 @@
                             <code>oxf.xforms.minimal-resources</code> allows specifying whether "minimal" versions of
                             those resources should be used when possible. See the <a
                             href="reference-xforms-ng#xforms-minimal-resources">XForms reference</a> for details.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Read-only and shared instances.</b> XForms instances can be marked as read-only and can
+                            be globally shared. See <a href="reference-xforms-ng#xxforms-readonly">Read-Only XForms
+                            Instances</a> and <a href="reference-xforms-ng#xxforms-shared">Sharing of Read-Only XForms
+                            Instances</a> for details.
                         </p>
                     </li>
                 </ul>
@@ -188,6 +204,14 @@
                         </p>
                         <p>
                             This feature was kindly sponsored by Teleflex.
+                        </p>
+                    </li>
+                  <li>
+                        <p>
+                            <b>Selection controls.</b> Support of hierarchy for single selection controls
+                            <code>xforms:select1</code> when using the <code>minimal</code> and <code>compact</code>
+                            appearances. Support for mix-and-match of <code>xforms:item</code>,
+                            <code>xforms:itemset</code> and <code>xforms:choices</code> [TODO: example]
                         </p>
                     </li>
                     <li>

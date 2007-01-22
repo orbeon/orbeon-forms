@@ -2999,7 +2999,6 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 
     this.showMaskEvent.subscribe(function() {
 
-
         var checkFocusable = function(el) {
 			if (el.tagName == "A" || el.tagName == "BUTTON" || el.tagName == "SELECT" || el.tagName == "INPUT" || el.tagName == "TEXTAREA" || el.tagName == "FORM") {
                 if (! YAHOO.util.Dom.isAncestor(me.element, el)) {

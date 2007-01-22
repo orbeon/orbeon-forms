@@ -2992,17 +2992,21 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 
 	var me = this;
 
-	this.showMaskEvent.subscribe(function() {
-		var checkFocusable = function(el) {
+    var focusListener = function(ev) {
+        var target =  YAHOO.util.Event.getTarget(ev);
+        if (! YAHOO.util.Dom.isAncestor(me.element, target)) target.blur();
+    };
+
+    this.showMaskEvent.subscribe(function() {
+
+
+        var checkFocusable = function(el) {
 			if (el.tagName == "A" || el.tagName == "BUTTON" || el.tagName == "SELECT" || el.tagName == "INPUT" || el.tagName == "TEXTAREA" || el.tagName == "FORM") {
                 if (! YAHOO.util.Dom.isAncestor(me.element, el)) {
                     // Change by avernet. Discussed on:
                     // http://www.nabble.com/Drop-down-%28select%29-in-dialog-tf2852511.html#a7982599
                     // Previous code: YAHOO.util.Event.addListener(el, "focus", el.blur);
-                    YAHOO.util.Event.addListener(el, "focus", function(ev) {
-                        var target =  YAHOO.util.Event.getTarget(ev);
-                        if (! YAHOO.util.Dom.isAncestor(me.element, target)) el.blur();
-                    });
+                    YAHOO.util.Event.addListener(el, "focus", focusListener);
 					return true;
 				}
 			} else {
@@ -3016,7 +3020,7 @@ YAHOO.widget.Panel.prototype.init = function(el, userConfig) {
 	this.hideMaskEvent.subscribe(function() {
 		for (var i=0;i<this.focusableElements.length;i++) {
 			var el2 = this.focusableElements[i];
-			YAHOO.util.Event.removeListener(el2, "focus", el2.blur);
+            YAHOO.util.Event.removeListener(el2, "focus", focusListener);
 		}
 	}, this, true);
 

@@ -36,8 +36,6 @@
                         <link/>
                         <rating/>
                         <notes/>
-                        <!--<start-date/>-->
-                        <!--<end-date/>-->
                     </book>
                 </books>
             </xforms:instance>
@@ -45,7 +43,6 @@
             <xforms:bind nodeset="instance('books-instance')/book">
                 <xforms:bind nodeset="title" required="true()"/>
                 <xforms:bind nodeset="author" required="true()"/>
-                <!--<xforms:bind nodeset="start-date | end-date" type="xs:date"/>-->
             </xforms:bind>
 
             <xforms:instance id="book-template">
@@ -56,8 +53,6 @@
                     <link/>
                     <rating/>
                     <notes/>
-                    <!--<start-date/>-->
-                    <!--<end-date/>-->
                 </book>
             </xforms:instance>
 
@@ -115,6 +110,11 @@
                 <xforms:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xforms:message>
             </xforms:submission>
 
+            <!-- Submission to load the sample data -->
+            <xforms:submission id="sample-data-submission" serialize="false"
+                       method="get" action="oxf:/apps/xforms-bookcast/sample-data.xml"
+                       replace="instance" instance="books-instance"/>
+
         </xforms:model>
         <!-- CSS style specific to this page -->
         <style type="text/css">
@@ -147,6 +147,11 @@
                 <td>
                     <xforms:submit submission="list-submission" appearance="minimal">
                         <xforms:label><img src="../apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/> Revert</xforms:label>
+                    </xforms:submit>
+                </td>
+                <td>
+                    <xforms:submit submission="sample-data-submission" appearance="minimal">
+                        <xforms:label><img src="../apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/> Load Sample Data</xforms:label>
                     </xforms:submit>
                 </td>
             </tr>
@@ -216,14 +221,6 @@
                         <xforms:textarea ref="notes" appearance="xxforms:autosize">
                             <xforms:label class="books-label">Notes</xforms:label>
                         </xforms:textarea>
-                        <!--<br/>-->
-                        <!--<xforms:input ref="start-date">-->
-                            <!--<xforms:label class="books-label">Start date</xforms:label>-->
-                        <!--</xforms:input>-->
-                        <!--<br/>-->
-                        <!--<xforms:input ref="end-date">-->
-                            <!--<xforms:label class="books-label">End date</xforms:label>-->
-                        <!--</xforms:input>-->
                     </td>
                 </tr>
             </xforms:repeat>

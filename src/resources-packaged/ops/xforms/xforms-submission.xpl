@@ -34,6 +34,7 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:saxon="http://saxon.sf.net/" 
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
@@ -108,7 +109,7 @@
             <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/">
-                    <xsl:copy-of select="context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[1]/*"/>
+                    <xsl:copy-of select="saxon:parse(context:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))/dynamic-state/instances/instance[1])"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>

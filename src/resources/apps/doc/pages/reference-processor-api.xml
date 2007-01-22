@@ -20,16 +20,16 @@
     </header>
     <body>
         <section>
-            <title>Scope</title> <p>This section documents the OPS Processor API.
+            <title>Scope</title> <p>This section documents the Orbeon Forms Processor API.
             This is a Java API that you can use to write custom processors. You can then use those
-            custom processors in your OPS applications, just like the standard
-            processors bundled with OPS.</p>
+            custom processors in your Orbeon Forms applications, just like the standard
+            processors bundled with Orbeon Forms.</p>
         </section>
         <section>
             <title>Why Write Custom Processors?</title>
 
             <p>
-                In general, OPS processors encapsulate logic to perform generic tasks
+                In general, Orbeon Forms processors encapsulate logic to perform generic tasks
                 such as executing an XSLT transformation, calling a web service or accessing a
                 database using SQL. With those processors, the developer describes the specifics of
                 a task at a high level in a declarative way.
@@ -41,7 +41,7 @@
                 using an existing processor</li>
             </ul>
             <p>
-                In those cases, it makes sense for the developer to write his own processor in
+                In those cases, it makes sense for the developer to write your own processor in
                 Java. This section goes through the essential APIs used to write processors in Java.
             </p>
             <note>
@@ -55,7 +55,7 @@
         <section>
             <title>Prerequisites</title>
             <p>
-                Writing OPS processors is expected to be done by Java developers who
+                Writing Orbeon Forms processors is expected to be done by Java developers who
                 are comfortable with the Java language as well as compiling and deploying onto
                 servlet containers or J2EE application servers. In addition, we assume that the
                 developer is comfortable with either:
@@ -148,7 +148,7 @@ public class MyProcessor extends SimpleProcessor {
 ]]></source>
                 <p>
                     In addition to the name of the input/output, one can pass an optional schema
-                    URI declared in the <link href="reference-properties">OPS
+                    URI declared in the <link href="reference-properties">Orbeon Forms
                     properties</link>. If a schema URI is specified, the corresponding input or
                     output can be <link href="processors-validation">validated</link>.
                 </p>
@@ -231,7 +231,7 @@ saxWriter.write(doc);
 ]]></source>
                 <note>
                     <p>
-                        Using the <code>LocationSAXWriter</code> provided with OPS
+                        Using the <code>LocationSAXWriter</code> provided with Orbeon Forms
                         is the preferred way to write a DOM4J document to a SAX content handler. The
                         standard JAXP API (calling <link
                         href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
@@ -253,7 +253,7 @@ transformer.transform(new DOMSource(doc), new SAXResult(contentHandler));
 ]]></source>
                     <note>
                         <p>
-                            <code>TransformerUtils</code> is a OPS class (in package
+                            <code>TransformerUtils</code> is a Orbeon Forms class (in package
                             <code>org.orbeon.oxf.xml</code>). It will create and cache the
                             appropriate transformer factory. The developer is of course free to
                             create its own factory and transformer calling directly the JAXP API.
@@ -508,7 +508,7 @@ State state = (State) getState(context);
         <section>
             <title>Using custom processors from XPL</title>
             <p>
-                In order to use a custom processor compiled and deployed within OPS (as one or more
+                In order to use a custom processor compiled and deployed within Orbeon Forms (as one or more
                 class files or JAR files), its main class (the one that implements the
                 <code>Processor</code> interface) must be mapped to an XML qualified name. You do
                 this mapping in a file called <code>custom-processors.xml</code> under the

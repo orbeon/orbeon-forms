@@ -72,6 +72,7 @@ ORBEON.xforms.Globals = {
     repeatTreeParentToAllChildren: {},   // Map from parent to array with children, used when highlight changes
     inputCalendarCreated: {},            // Maps input id to true when the calendar has been created for that input
     inputCalendarOnclick: {},            // Maps input id to the JSCalendar function that displays the calendar
+    inputCalendarCommitedValue: {},      // Maps input id to the value of JSCalendar actually selected by the user
     tooltipLibraryInitialized: false,
     changedIdsRequest: {},               // Id of controls that have been touched by user since the last response was received
     serverValue: {},                     // Values on controls known to the server
@@ -990,12 +991,15 @@ ORBEON.xforms.Events = {
                             singleClick    :    true,
                             step           :    1,
                             onUpdate       :    ORBEON.xforms.Events.calendarUpdate,
+                            onClose        :    ORBEON.xforms.Events.calendarClose,
                             electric       :    true
                         });
                         // JSCalendar sets his listener in the onclick attribute: save it so we can call it later
                         ORBEON.xforms.Globals.inputCalendarOnclick[target.id] = target.onclick;
                         target.onclick = null;
                         ORBEON.xforms.Globals.inputCalendarCreated[target.id] = true;
+                        // Save initial value
+                        ORBEON.xforms.Globals.inputCalendarCommitedValue[target.id] = ORBEON.xforms.Controls.getCurrentValue(target);
                     }
 
                     // Event can be received on calendar picker span, or on the containing span
@@ -1012,15 +1016,26 @@ ORBEON.xforms.Events = {
 
     /**
      * Send notification to XForms engine end-user clicked on day.
-     * We don't notify the server the user is just navigating through the calendar.
      */
     calendarUpdate: function(calendar) {
         if (ORBEON.util.Dom.hasClass(calendar.activeDiv, "day")) {
             var inputField = calendar.params.inputField;
             var element = inputField.parentNode;
-            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change",
-                ORBEON.xforms.Controls.getCurrentValue(element))], false);
+            var newValue = ORBEON.xforms.Controls.getCurrentValue(element);
+            ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id] = newValue;
+            xformsFireEvents([xformsCreateEventArray(element, "xxforms-value-change-with-focus-change", newValue)], false);
         }
+    },
+
+    /**
+     * Restore last value actualy selected by user in the input field, which at this point could
+     * contain a value the user just browsed to, without selecting it.
+     */
+    calendarClose: function(calendar) {
+        var inputField = calendar.params.inputField;
+        var element = inputField.parentNode;
+        inputField.value = ORBEON.xforms.Globals.inputCalendarCommitedValue[element.id];
+        calendar.hide();
     },
 
     sliderValueChange: function (offset) {

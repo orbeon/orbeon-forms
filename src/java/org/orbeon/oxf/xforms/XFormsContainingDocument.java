@@ -25,24 +25,20 @@ import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.processor.XFormsState;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.DocumentInfo;
 
 import java.io.IOException;
 import java.util.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Represents an XForms containing document.
@@ -984,7 +980,6 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // Output instances
         {
             final Element instancesElement = dynamicStateElement.addElement("instances");
-
             for (Iterator i = getModels().iterator(); i.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) i.next();
 
@@ -993,9 +988,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
 
-                    // Don't add the instance to the dynamic state if it is shared
-                    if (!(currentInstance instanceof SharedXFormsInstance))
-                        instancesElement.add(currentInstance.createContainerElement(true));
+                    if (currentInstance.isReplaced() || !(currentInstance instanceof SharedXFormsInstance)) {
+                        // Instance has been replaced, or it is not shared, so it has to go in the dynamic state
+                        instancesElement.add(currentInstance.createContainerElement(!currentInstance.isApplicationShared()));
+                    }
 
                     // Log instance if needed
                     if (XFormsServer.logger.isDebugEnabled()) {
@@ -1108,7 +1104,22 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
                     // Create and set instance document on current model
                     final XFormsInstance newInstance = new XFormsInstance(instanceElement);
-                    getModel(newInstance.getModelId()).setInstance(newInstance);
+
+                    if (newInstance.getDocumentInfo() == null) {
+                        // Instance is not initialized yet
+
+                        // This means that the instance was application shared
+                        if (!newInstance.isApplicationShared())
+                            throw new OXFException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId());
+
+                        final SharedXFormsInstance sharedInstance
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI());
+                        getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
+
+                    } else {
+                        // Instance is initialized, just use it
+                        getModel(newInstance.getModelId()).setInstance(newInstance, false);
+                    }
                 }
             }
 
@@ -1119,61 +1130,22 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     final XFormsInstance currentInstance = (XFormsInstance) instancesIterator.next();
 
                     if (findInstance(currentInstance.getEffectiveId()) == null) {
-                        // Instance is not set yet, so set it
+                        // Instance was not set from dynamic state
 
                         if (currentInstance.getDocumentInfo() == null) {
                             // Instance is not initialized yet
 
-                            // Try from shared cache first
-                            final SharedXFormsInstance sharedInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getSourceURI());
-                            if (sharedInstance != null) {
-                                // Got it from cache
+                            // This means that the instance was application shared
+                            if (!currentInstance.isApplicationShared())
+                                throw new OXFException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId());
 
-                                if (XFormsServer.logger.isDebugEnabled())
-                                    XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + currentInstance.getEffectiveId());
-
-                                getModel(currentInstance.getModelId()).setInstance(sharedInstance);
-                            } else {
-                                // Instance not found in cache, load from URI
-
-                                final String sourceURLString = currentInstance.getSourceURI();
-                                final URL sourceURL;
-                                try {
-                                    sourceURL = URLFactory.createURL(sourceURLString);
-                                } catch (MalformedURLException e) {
-                                    throw new OXFException(e);
-                                }
-
-                                if (XFormsServer.logger.isDebugEnabled())
-                                    XFormsServer.logger.debug("XForms - getting static instance from URI for: " + sourceURLString);
-
-                                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                                final XFormsModelSubmission.ConnectionResult connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
-                                        "get", sourceURL, null, null, null, null);
-
-                                // Handle connection errors
-                                if (connectionResult.resultCode != 200) {
-                                    connectionResult.close();
-                                    throw new OXFException("Got invalid return code while loading instance from URI: " + sourceURLString + ", " + connectionResult.resultCode);
-                                }
-
-                                final DocumentInfo documentInfo;
-                                try {
-                                    // Read result as XML
-                                    documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-                                } catch (Exception e) {
-                                    throw new OXFException("Got exception while loading instance from URI: " + sourceURLString, e);
-                                } finally {
-                                    // Clean-up
-                                    connectionResult.close();
-                                }
-
-                                currentInstance.setInstanceDocument(documentInfo, false);
-                                getModel(currentInstance.getModelId()).setInstance(currentInstance);
-                            }
+                            final SharedXFormsInstance sharedInstance
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI());
+                            getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                         } else {
-                            getModel(currentInstance.getModelId()).setInstance(currentInstance);
+                            // Instance is initialized, just use it
+                            getModel(currentInstance.getModelId()).setInstance(currentInstance, false);
                         }
                     }
                 }

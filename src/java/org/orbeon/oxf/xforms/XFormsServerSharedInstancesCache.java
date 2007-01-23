@@ -14,10 +14,18 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.saxon.om.DocumentInfo;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  * Cache for shared and immutable XForms instances.
@@ -54,14 +62,57 @@ public class XFormsServerSharedInstancesCache {
         cache.add(pipelineContext, cacheKey, CONSTANT_VALIDITY, sharedXFormsInstance);
     }
 
-    public SharedXFormsInstance find(PipelineContext pipelineContext, String instanceSourceURI) {
+    public synchronized SharedXFormsInstance find(PipelineContext pipelineContext, String instanceId, String modelId, String sourceURI) {
         final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
-        final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
-        final SharedXFormsInstance sharedXFormsInstance = (SharedXFormsInstance) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
+        final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, sourceURI);
+        final SharedXFormsInstance sharedInstance = (SharedXFormsInstance) cache.findValid(pipelineContext, cacheKey, CONSTANT_VALIDITY);
 
-        if (sharedXFormsInstance != null && XFormsServer.logger.isDebugEnabled())
-            XFormsServer.logger.debug("XForms - application shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' found in cache for URI: " + instanceSourceURI);
+        if (sharedInstance != null) {
+            // Instance was found
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - application shared instance with id '" + instanceId + "' found in cache for URI: " + sourceURI);
 
-        return sharedXFormsInstance;
+            // Return a copy because id, etc. can be different
+            return new SharedXFormsInstance(modelId, instanceId, sharedInstance.getDocumentInfo(),
+                        sourceURI, null, null, sharedInstance.isApplicationShared());
+        } else {
+            // Instance was not found, load from URI and add to cache
+
+            final URL sourceURL;
+            try {
+                sourceURL = URLFactory.createURL(sourceURI);
+            } catch (MalformedURLException e) {
+                throw new OXFException(e);
+            }
+
+            if (XFormsServer.logger.isDebugEnabled())
+                XFormsServer.logger.debug("XForms - loading application shared instance from URI for: " + sourceURI);
+
+            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            final XFormsModelSubmission.ConnectionResult connectionResult = XFormsSubmissionUtils.doRegular(externalContext,
+                    "get", sourceURL, null, null, null, null);
+
+            // Handle connection errors
+            if (connectionResult.resultCode != 200) {
+                connectionResult.close();
+                throw new OXFException("Got invalid return code while loading instance from URI: " + sourceURI + ", " + connectionResult.resultCode);
+            }
+
+            try {
+                // Read result as XML and create new shared instance
+                final DocumentInfo documentInfo = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                final SharedXFormsInstance newInstance = new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, null, null, true);
+
+                // Add result to cache
+                add(pipelineContext, sourceURI, newInstance);
+
+                return newInstance;
+            } catch (Exception e) {
+                throw new OXFException("Got exception while loading instance from URI: " + sourceURI, e);
+            } finally {
+                // Clean-up
+                connectionResult.close();
+            }
+        }
     }
 }

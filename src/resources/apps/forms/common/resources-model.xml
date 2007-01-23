@@ -27,11 +27,13 @@
     </xforms:instance>
 
     <!-- XForms instance containing text resources -->
-    <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en" xxforms:readonly="true" xxforms:shared="application"/>
+    <xforms:instance id="resources-instance" src="/forms/service/resources/{doc('input:instance')/*/form-id}/en"
+                     xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- Update language submission -->
     <xforms:submission id="update-language-submission" serialize="false"
                        action="/forms/service/resources/{{xxforms:instance('parameters-instance')/form-id}}/{{instance('language-instance')}}" validate="false"
-                       method="get" replace="instance" instance="resources-instance"/>
+                       method="get" replace="instance" instance="resources-instance"
+                       xxforms:readonly="true" xxforms:shared="application"/>
 
 </xforms:model>

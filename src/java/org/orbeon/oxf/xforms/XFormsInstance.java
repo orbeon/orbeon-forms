@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
@@ -51,12 +52,13 @@ public class XFormsInstance implements XFormsEventTarget {
     private String sourceURI;
     private String username;
     private String password;
+    private boolean replaced;
 
     /**
      * Create an XFormsInstance from a container element. The container contains meta-informationa about the instance,
      * such as id, username, URI, etc.
      *
-     * <instance readonly="false" shared="false" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
+     * <instance readonly="true" shared="application" id="instance-id" model-id="model-id" source-uri="http://..." username="jdoe" password="password">
      *     x7wer...
      * </instance>
      *
@@ -74,6 +76,7 @@ public class XFormsInstance implements XFormsEventTarget {
         this.sourceURI = containerElement.attributeValue("source-uri");
         this.username = containerElement.attributeValue("username");
         this.password = containerElement.attributeValue("password");
+        this.replaced = "true".equals(containerElement.attributeValue("replaced"));
 
         // Create and set instance document on current model
         final DocumentInfo documentInfo;
@@ -105,16 +108,16 @@ public class XFormsInstance implements XFormsEventTarget {
         setInstanceDocumentInfo(documentInfo, true);
     }
 
-    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean shared) {
+    public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, shared);
+        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared);
     }
 
-    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean shared) {
+    protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared) {
         this.instanceId = instanceId;
         this.modelId = modelId;
         this.readonly = !(instanceDocumentInfo instanceof DocumentWrapper);
-        this.applicationShared = shared;
+        this.applicationShared = applicationShared;
         this.sourceURI = instanceSourceURI;
         this.username = username;
         this.password = password;
@@ -146,6 +149,9 @@ public class XFormsInstance implements XFormsEventTarget {
             instanceElement.addAttribute("username", username);
         if (password != null)
             instanceElement.addAttribute("password", password);
+
+        if (replaced)
+            instanceElement.addAttribute("replaced", "true");
 
         if (serialize) {
             final String instanceString = TransformerUtils.tinyTreeToString(getDocumentInfo());
@@ -212,6 +218,15 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public String getPassword() {
         return password;
+    }
+
+
+    public boolean isReplaced() {
+        return replaced;
+    }
+
+    public void setReplaced(boolean replaced) {
+        this.replaced = replaced;
     }
 
     /**
@@ -459,5 +474,43 @@ public class XFormsInstance implements XFormsEventTarget {
      */
     public SharedXFormsInstance createSharedInstance() {
         return new SharedXFormsInstance(modelId, instanceId, documentInfo, sourceURI, username, password, false);
+    }
+
+    public static String getInstanceId(Element xformsInstanceElement) {
+        // NOTE: There has to be an id, but we return a non-null value just for the legacy engine
+        final String idAttribute = xformsInstanceElement.attributeValue("id");
+        return (idAttribute != null) ? idAttribute : "";
+    }
+
+    public static boolean isReadonlyHint(Element element) {
+         return "true".equals(element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
+    }
+
+    public static boolean isApplicationSharedHint(Element element) {
+        final String sharedAttributeValue = element.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
+        final boolean isApplicationSharedHint = "application".equals(sharedAttributeValue);
+
+        checkSharedHints(element, element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME),
+                element.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME));
+
+        return isApplicationSharedHint;
+    }
+
+    public static void checkSharedHints(Element element, String readonly, String shared) {
+        if (shared != null) {
+
+            // Can't have shared hints if not read-only
+            if (!"true".equals(readonly))
+                throw new ValidationException("xxforms:shared can be set only if xxforms:readonly is \"true\" for element: "
+                        + element.attributeValue("id"), (LocationData) element.getData());
+
+            final boolean isApplicationSharedHint = "application".equals(shared);
+            final boolean isDocumentSharedHint = "document".equals(shared);
+
+            // Check values if set
+            if (!(isApplicationSharedHint || isDocumentSharedHint))
+                throw new ValidationException("xxforms:shared must be either of \"application\" or \"document\" for element: "
+                        + element.attributeValue("id"), (LocationData) element.getData());
+        }
     }
 }

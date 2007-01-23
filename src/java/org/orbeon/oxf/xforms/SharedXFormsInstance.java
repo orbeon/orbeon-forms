@@ -28,8 +28,8 @@ public class SharedXFormsInstance extends XFormsInstance {
         super(containerElement);
     }
 
-    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean shared) {
-        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, shared);
+    public SharedXFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared) {
+        super(modelId, instanceId, instanceDocumentInfo, instanceSourceURI, username, password, applicationShared);
     }
 
     public void setInstanceDocument(Object instanceDocument, boolean initialize) {
@@ -46,15 +46,5 @@ public class SharedXFormsInstance extends XFormsInstance {
 
     public void synchronizeInstanceDataEventState() {
         // NOP
-    }
-
-    /**
-     * Create a mutable version of this instance with a new instance document.
-     *
-     * @param instanceDocumentInfo  new instance document
-     * @return                      mutable XFormsInstance
-     */
-    public XFormsInstance createMutableInstance(DocumentInfo instanceDocumentInfo) {
-        return new XFormsInstance(getModelId(), getEffectiveId(), instanceDocumentInfo, getSourceURI(), getUsername(), getPassword(), false);
     }
 }

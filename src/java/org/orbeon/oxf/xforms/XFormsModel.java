@@ -104,10 +104,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (instanceContainers.size() > 0) {
                 for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
                     final Element instanceContainer = (Element) i.next();
-                    // NOTE: There has to be an id, except for the legacy engine
-                    String instanceId = instanceContainer.attributeValue("id");
-                    if (instanceId == null)
-                        instanceId = "";
+                    final String instanceId = XFormsInstance.getInstanceId(instanceContainer);
                     instanceIds.add(instanceId);
                 }
             }
@@ -286,8 +283,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * Set an instance. The id of the instance must exist in the model.
      *
      * @param instance          XFormsInstance to set
+     * @param replaced          whether this is an instance replacement (as result of a submission)
      */
-    public void setInstance(XFormsInstance instance) {
+    public void setInstance(XFormsInstance instance, boolean replaced) {
+
+        // Mark the instance as replaced if needed
+        instance.setReplaced(replaced);
+
         // Initialize containers if needed
         if (instances == null) {
             instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -751,32 +753,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                         final Element instanceContainerElement = (Element) i.next();
                         final LocationData locationData = (LocationData) instanceContainerElement.getData();
-                        final String instanceId;
-                        {
-                            // NOTE: There has to be an id, except for the legacy engine
-                            final String idAttribute = instanceContainerElement.attributeValue("id");
-                            instanceId = (idAttribute != null) ? idAttribute : "";
-                        }
+                        final String instanceId = XFormsInstance.getInstanceId(instanceContainerElement);
 
                         // Handle read-only hints
-                        final boolean isReadonlyHint = "true".equals(instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME));
-                        final boolean isApplicationSharedHint;
-                        {
-                            final String sharedAttributeValue = instanceContainerElement.attributeValue(XFormsConstants.XXFORMS_SHARED_QNAME);
-                            isApplicationSharedHint = "application".equals(sharedAttributeValue);
-                            final boolean isDocumentSharedHint = "document".equals(sharedAttributeValue);
-
-                            if (sharedAttributeValue != null) {
-
-                                // Can't have shared hints if not read-only
-                                if (!isReadonlyHint)
-                                    throw new ValidationException("xxforms:shared can be set only if xxforms:readonly is true for instance: " + instanceId, locationData);
-
-                                // Check values if set
-                                if (!(isApplicationSharedHint || isDocumentSharedHint))
-                                    throw new ValidationException("xxforms:shared must be either of 'application' or 'document' for instance: " + instanceId, locationData);
-                            }
-                        }
+                        final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(instanceContainerElement);
+                        final boolean isApplicationSharedHint = XFormsInstance.isApplicationSharedHint(instanceContainerElement);
 
                         // Skip processing in case somebody has already set this particular instance
                         if (instances.get(instancePosition) != null)
@@ -789,31 +770,29 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 // The instance is already available in the static state
 
                                 if (staticStateInstance.getDocumentInfo() == null) {
-                                    // Instance is not initialized yet - we just got the metadata from the static state
+                                    // Instance is not initialized yet
 
-                                    // Try from shared cache first
-                                    final SharedXFormsInstance sharedInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getSourceURI());
-                                    if (sharedInstance != null) {
-                                        // Got it from cache
+                                    // This means that the instance was application shared
+                                    if (!staticStateInstance.isApplicationShared())
+                                        throw new OXFException("Non-initialized instance has to be application shared for id: " + staticStateInstance.getEffectiveId());
 
-                                        if (XFormsServer.logger.isDebugEnabled())
-                                            XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
+                                    if (XFormsServer.logger.isDebugEnabled())
+                                        XFormsServer.logger.debug("XForms - using instance from application shared instance cache (instance from static state was not initialized): " + staticStateInstance.getEffectiveId());
 
-                                        setInstance(sharedInstance);
-                                        continue;
-                                    } else {
-                                        // Instance not found in cache, will be loaded later from URI (but not from resolver as shared instances are not in the resolver)
-                                        // NOP
-                                    }
+                                    final SharedXFormsInstance sharedInstance
+                                            = XFormsServerSharedInstancesCache.instance().find(pipelineContext, staticStateInstance.getEffectiveId(), staticStateInstance.getModelId(), staticStateInstance.getSourceURI());
+                                    setInstance(sharedInstance, false);
+
                                 } else {
-                                    // Instance is initialized
+                                    // Instance is initialized, just use it
 
                                     if (XFormsServer.logger.isDebugEnabled())
                                         XFormsServer.logger.debug("XForms - using initialized instance from static state: " + staticStateInstance.getEffectiveId());
 
-                                    setInstance(staticStateInstance);
-                                    continue;
+                                    setInstance(staticStateInstance, false);
                                 }
+
+                                continue;
                             }
                         }
 
@@ -924,12 +903,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                                 // Get instance from shared cache if possible
                                 if (isApplicationSharedHint) {
-                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, absoluteResolvedURLString);
-                                    if (sharedXFormsInstance != null) {
-                                        // Found instance from shared cache: we are done!
-                                        setInstance(sharedXFormsInstance);
-                                        continue;
-                                    }
+                                    final SharedXFormsInstance sharedXFormsInstance = XFormsServerSharedInstancesCache.instance().find(pipelineContext, instanceId, modelId, absoluteResolvedURLString);
+                                    setInstance(sharedXFormsInstance, false);
+                                    continue;
                                 }
 
                                 if (containingDocument.getURIResolver() == null || isApplicationSharedHint) {
@@ -999,12 +975,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         }
 
                         // Set instance and associated information if everything went well
-                        final XFormsInstance newInstance = setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint);
-
-                        if (isApplicationSharedHint) {
-                            // Instance is sharable but we did not get it from the cache, so store it now
-                            XFormsServerSharedInstancesCache.instance().add(pipelineContext, instanceSourceURI, (SharedXFormsInstance) newInstance);
-                        }
+                        setInstanceDocument(instanceDocument, modelId, instanceId, instanceSourceURI, xxformsUsername, xxformsPassword, isApplicationSharedHint);
                     }
                 }
             }

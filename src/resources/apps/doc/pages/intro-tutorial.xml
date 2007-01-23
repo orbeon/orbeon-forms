@@ -44,15 +44,56 @@
                 <title>Prerequisites</title>
                 <p>
                     To go through this tutorial, you don't need much: any reasonably modern computer on which you can
-                    install Java 1.5 or 1.6 should do (Java 1.4.2 may work for you but 1.5 is strongly recommended).
-                    You should be comfortable with installing new software on your computer, including uncompressing zip
-                    or gzip archives. You will also have to edit XML files. If you are familiar with HTML, this should
-                    not be a problem.
+                    install Java 1.5 or 1.6 should do (Java 1.4.2 may work for you but 1.5 or 1.6 is strongly
+                    recommended). You should be comfortable with installing new software on your computer, including
+                    uncompressing zip or gzip archives. You will also have to edit XML files. If you are familiar with
+                    HTML, this should not be a problem.
                 </p>
                 <p>
-                    You will <i>not</i> have to write any Java code or any scripting language code. You will <i>not</i>
-                    have to use a compiler or other complicated build tool!
+                    You also need a reasonably recent web browser. We recommend one of the following browsers:
                 </p>
+                <ul>
+                    <li>
+                        <p>
+                            Mozilla Firefox 1.5 or 2 or greater.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Safari 2 or greater.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Opera 9 or greater.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Internet Explorer 6 or 7 or greater.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    You will <i>not</i> have to:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                             Write any Java code or any scripting language code.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Use a compiler or other complicated build tool.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Install browser plugins or any other client-side software, besides your regular web browser!
+                        </p>
+                    </li>
+                </ul>
             </section>
             <section>
                 <title>Principles of Orbeon Forms</title>
@@ -216,9 +257,9 @@
             <section>
                 <title>Running the Hello Application</title>
                 <p>
-                    The Hello application is about the simplest XForms application you can think of. It asks for your
-                    name and displays it back. You run the Hello application by selecting the link "XForms Hello" in
-                    the list of applications. Simply enter your first name in the input field, for example "Joe". You
+                    The Hello application is about the simplest Orbeon Forms application you can think of. It asks for
+                    your name and displays it back. You run the Hello application by selecting the link "XForms Hello"
+                    in the list of applications. Simply enter your first name in the input field, for example "Joe". You
                     should promptly see a message underneath saying "Hello, Joe!".
                 </p>
                 <figure src="/apps/doc/images/tutorial/03.png"/>
@@ -280,16 +321,26 @@
                 </p>
                 <p>
                     Another difference with plain HTML is that there are tags that start with the string
-                    <code>xforms:</code>. Those are defined by the XForms specification from W3C. They are at the heart
-                    of Orbeon Forms and enable all the cool forms features that you see in Orbeon Forms demos. (In order
-                    to use XForms tags that start with <code>xforms:</code>, you must add another namespace declaration
-                    on the <code>&lt;html></code> tag: <code>xmlns:xforms="http://www.w3.org/2002/xforms"</code>.)
+                    <code>xforms:</code>. Those are defined by the <a href="http://www.w3.org/TR/xforms/">XForms
+                    specification</a> from W3C. They are at the heart of Orbeon Forms and enable all the cool forms
+                    features that you see in Orbeon Forms demos. (In order to use XForms tags that start with
+                    <code>xforms:</code>, you must add another namespace declaration on the <code>&lt;html></code> tag:
+                    <code>xmlns:xforms="http://www.w3.org/2002/xforms"</code>.)
                 </p>
                 <p>
-                    You notice an element called <code>&lt;xforms:model></code>. Because XForms follows a
+                     Using XForms in Orbeon Forms means that you don't have to use HTML forms at all. The benefit is
+                     that XForms is much more powerful than HTML forms, as you will see in this tutorial.
+                </p>
+                <p>
+                    You notice a tag called <code>&lt;xforms:model></code>. Because XForms follows a
                     Model-View-Controller (MVC) approach, most XForms pages contain one or more <i>models</i> that
-                    usually encapsulate other XForms markup. You place these models within the XHTML
+                    usually encapsulate other XForms markup. You place these models under the XHTML
                     <code>&lt;head></code> tag.
+                </p>
+                <p>
+                    Note that from now on, we prefer the term <i>element</i> to the term <i>tag</i>. An element is an
+                    XML term that includes the start tag and end tag, and can have content such as other elements and
+                    text.
                 </p>
                 <p>
                     With XForms, you store the data captured by controls such as input fields, combo boxes, etc. as text
@@ -300,14 +351,14 @@
                     <first-name/>
                 </xml-source>
                 <p>
-                    This element is empty. Contrast with:
+                    The <code>first-name</code> element is <i>empty</i>. Contrast with:
                 </p>
                 <xml-source>
                     <first-name>Joe</first-name>
                 </xml-source>
                 <p>
-                    The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document is
-                    encapsulated within an <code>&lt;xforms:instance></code> tag:
+                    The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document
+                    is encapsulated within an <code>&lt;xforms:instance></code> element:
                 </p>
                 <xml-source show-namespaces="true" ignore-root-element="true">
                     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -325,21 +376,21 @@
                     you are always safe to add <code>xmlns=""</code> on the root element of that instance.
                 </p>
                 <p>
-                    This tag defines an XForms <i>instance</i>, which is just XForms' way of calling an XML document
+                    This element defines an XForms <i>instance</i>, which is just XForms' way of calling an XML document
                     used to store data.
                 </p>
                 <p>
-                    Now consider the remaining XForms tags in the source file: <code>&lt;xforms:input></code> and
-                    <code>&lt;xforms:output></code>. These two tags are not located under the XHTML
+                    Now consider the remaining XForms elements in the source file: <code>&lt;xforms:input></code> and
+                    <code>&lt;xforms:output></code>. These two elements are not located under the XHTML
                     <code>&lt;head></code>, but under <code>&lt;body></code>. They are part of the <i>view</i> of your
-                    page, in other words these tags directly help define visible controls on the page. Consider
+                    page, in other words these elements directly help define visible controls on the page. Consider
                     <code>&lt;xforms:input></code>:
                 </p>
                 <xml-source show-namespaces="false">
                     <xforms:input ref="/first-name" incremental="true" xmlns:xforms="http://www.w3.org/2002/xforms"/>
                 </xml-source>
                 <p>
-                    You guessed that this tag allows the user to <i>input</i> information.
+                    You guessed that this element allows the user to <i>input</i> information.
                     <code>&lt;xforms:input></code> is usually displayed to the user as an input field. The
                     <code>ref</code> attribute is the magic that connects the input field to the XForms instance. It
                     contains an <i>XPath expression</i>, which in this case just looks like a file path. In this case,
@@ -362,7 +413,7 @@
                     </li>
                 </ul>
                 <p>
-                    Now consider <code>&lt;xforms:output></code>. As you guess from the name of the tag, this simply
+                    Now consider <code>&lt;xforms:output></code>. As you guess from the name of the element, this simply
                     displays a value on screen. If you have tried running the Hello application, you have probably
                     guessed the logic that is being implemented: if the first name entered by the user is not a blank
                     string, then we display the "Hello" message followed by the first name and then an exclamation mark.
@@ -540,8 +591,35 @@
                     You find the application under <code>RESOURCES/apps/xforms-hello</code>. That directory contains
                     the two files that you have seen earlier through the Source Code Viewer in your web browser. Again,
                     the name <code>xforms-hello</code> is important and matches the <code>xforms-hello</code> part of
-                    the URL in your web browser: <code>http://localhost:8080/ops/xforms-hello/</code>. Now, modify
-                    <code>view.xhtml</code>:
+                    the URL in your web browser: <code>http://localhost:8080/ops/xforms-hello/</code>.
+                </p>
+                <note>
+                    <p>
+                        In this tutorial, you will often have to "reload" pages in your web browser to see the effects
+                        of your changes to XHTML or XForms markup. Because of the way Orbeon Forms handles page reloads
+                        with XForms, for consistent results we recommend that you don't simply use your browser's reload
+                        button, but instead use one of the following two ways to reload a page:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Position your text cursor on your browser's URL bar and press the "Enter" key. Browsers
+                                often have keyboard shortcuts such as <code>CTRL-L</code> or <code>CMD-L</code> to
+                                reach the URL bar.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Use your browser's "force reload" feature. This is often enabled by pressing the
+                                <code>SHIFT</code> key and pressing the "reload" button at the same time. Browsers often
+                                have keyboard shortcuts such as <code>CTRL-F5</code>, <code>CTRL-SHIFT-R</code>, or
+                                <code>CMD-SHIFT-R</code> to perform this operation.
+                            </p>
+                        </li>
+                    </ul>
+                </note>
+                <p>
+                    Now, modify <code>view.xhtml</code>:
                 </p>
                 <ul>
                     <li>
@@ -691,10 +769,10 @@
             <section>
                 <title>XForms Model and Instance</title>
                 <p>
-                    An XForms document that wants to do something useful needs at least one model and one instance. But
-                    first it is wise to decide how you would like to represent the information captured by your form.
-                    This is an example that shows a possible representation of the data of the Bookcast application
-                    (notes are borrowed from Wikipedia and are under the GNU Free Documentation License):
+                    An XForms document that wants to do something really useful needs at least one model containing one
+                    instance. But first it is wise to decide how you would like to represent the information captured by
+                    your form. This is an example that shows a possible representation of the data of the Bookcast
+                    application (notes are borrowed from Wikipedia and are under the GNU Free Documentation License):
                 </p>
                 <xml-source show-namespaces="true">
                     <books>
@@ -751,10 +829,10 @@
                     </books>
                 </xml-source>
                 <p>
-                    The idea is to store all the book information in a single XML document. So under a top-level
-                    <code>&lt;books></code> element, we put as many <code>&lt;book></code> children elements as needed.
-                    You will see later how it is possible with XForms to add and remove children elements. For now, your
-                    initial instance declaration is empty and contains a single book:
+                    As you can see, the idea is to store the information about all the books in a single XML document.
+                    So under a top-level <code>&lt;books></code> element, we put as many <code>&lt;book></code> children
+                    elements as needed. You will see later how it is possible with XForms to add and remove children
+                    elements. For now, your initial instance declaration is empty and contains a single book:
                 </p>
                 <xml-source show-namespaces="true" ignore-root-element="true">
                     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -1170,13 +1248,15 @@
                 <p>
                     Many applications use relational databases as a persistence layer. But because Orbeon Forms and
                     XForms use XML as their native data format, it is very appropriate to use a database that
-                    understands XML instead. Orbeon Forms comes with the eXist database that does just that.
+                    understands XML instead. Orbeon Forms comes with the open source <a
+                    href="http://exist.sourceforge.net/">eXist database</a> that does just that.
                 </p>
                 <p>
-                    So how do you save data from XForms to a database? An important feature of XForms is the submission.
-                    A submission allows you to read and write XML documents using HTTP and other protocols. Since the
-                    eXist database has a REST API (in other words an HTTP-friendly interface), XForms can directly talk
-                    to eXist to read and write XML documents.
+                    So how do you save data from XForms to a database? An important feature of XForms is the XForms
+                    <i>submission</i>. A submission allows you to read and write XML documents using HTTP and other
+                    protocols. Because the eXist database has a REST API (in other words an HTTP-friendly interface),
+                    XForms can directly talk to eXist to read and write XML documents and perform all the common CRUD
+                    (Create, Retrieve, Update and Delete) operations.
                 </p>
                 <p>
                     So look at how you create a submission that saves the <code>books-instance</code> instance into
@@ -1312,6 +1392,21 @@
                     Try changing the book author and pressing "Save" again. Then in your other browser tab or window,
                     reload the eXist URL, and notice that the data has actually changed in the database.
                 </p>
+                <p>
+                    Do you see how persistence is easily implemented with Orbeon Forms? No need for object-relational
+                    mapping or for manually marshalling data to and from a database: just send and retrieve XML
+                    documents representing your form data!
+                </p>
+                <note>
+                    <p>
+                        Or course, you don't have to use eXist or even an XML database with Orbeon Forms: you can in
+                        fact interface with any system you can think of with submissions. For systems that don't already
+                        have a REST API, you will need to write REST interfaces - and you can do this with your
+                        favorite language and platform, including Java, PHP, Ruby, or .NET. You can even write such
+                        services with Orbeon Forms XPL (the Orbeon Forms XML pipelines language), which feature
+                        built-in components for access to relational databases, web services, and more.
+                    </p>
+                </note>
             </section>
             <section>
                 <title>Loading the Initial Data</title>
@@ -2427,60 +2522,47 @@
 
         <!--
 
-        xxx explain how to "reload" the page
+        TODO:
 
-        xxx more background on XForms?
-        xxx mention XForms 1.1
-        xxx more on Defining an XML document format
-        xxx more on eXist
-        xxx more on CRUD operations and REST
+            o more background on XForms?
+            o mention XForms 1.1?
+            o more on Defining an XML document format
+            o more on eXist?
+            o explain better XML "nodes"?
+            o show example of OF error
 
-        xxx not only XML dbs, of course
-        xxx explain tag vs. element
-        xxx explain XML "nodes"
-        xxx what browser to use?
-        xxx show example of OF error
-        xxx note about how this relates to HTML forms
-
-        xxx app: add link to document in eXist (xforms:load)
+            o app: add link to document in eXist (xforms:load)
+            o description of "Load Sample Data" button
 
         <section>
             <title></title>
             <p>
-                xxx
+
             </p>
+            <ul>
+                <li>
+                    <p>
+
+                    </p>
+                </li>
+                <li>
+                    <p>
+
+                    </p>
+                </li>
+                <li>
+                    <p>
+
+                    </p>
+                </li>
+                <li>
+                    <p>
+
+                    </p>
+                </li>
+            </ul>
         </section>
         -->
-            <!--<section>-->
-                <!--<title></title>-->
-                <!--<p>-->
-                    <!--xxx-->
-                <!--</p>-->
-            <!--</section>-->
-            <!--
-                <ul>
-                    <li>
-                        <p>
-
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-
-                        </p>
-                    </li>
-                </ul>
-            -->
         </section>
     </body>
 </document>

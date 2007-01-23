@@ -106,8 +106,8 @@
                 <xsd:any namespace="##any" processContents="lax" minOccurs="0"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="submission">
@@ -273,7 +273,6 @@
         <xsd:complexType mixed="true">
             <xsd:group ref="xforms:UI.Inline"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
         </xsd:complexType>
@@ -574,6 +573,7 @@
     XForms Actions
     -->
     <xsd:attributeGroup name="XML.Events">
+        <xsd:attribute name="if" type="xsd:string" use="optional"/>
         <xsd:attribute ref="ev:event"/>
         <xsd:attribute ref="ev:observer"/>
 
@@ -641,7 +641,7 @@
     <xsd:element name="revalidate">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
@@ -721,8 +721,10 @@
 
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Nodeset.Binding.Attributes"/>
-            <xsd:attribute name="at" type="xforms:XPathExpression" use="required"/>
-            <xsd:attribute name="position" use="required">
+            <xsd:attribute name="at" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="origin" use="optional"/>
+            <xsd:attribute name="context" use="optional"/>
+            <xsd:attribute name="position" use="optional">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="before"/>
@@ -739,7 +741,7 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Nodeset.Binding.Attributes"/>
 
-            <xsd:attribute name="at" type="xforms:XPathExpression" use="required"/>
+            <xsd:attribute name="at" type="xforms:XPathExpression" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>

@@ -25,7 +25,7 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events" only="true">
 
     <!--
         TODO:
@@ -86,7 +86,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="main-model">                            
+                            <instance id="main-instance" model-id="main-model">
                                 <equation>
                                     <screen>7</screen>
                                     <screenbuffer>7</screenbuffer>
@@ -1480,7 +1480,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="main-model">
+                            <instance id="main-instance" model-id="main-model" replaced="true">
                                 <instance>
                                     <r1/>
                                     <r1>

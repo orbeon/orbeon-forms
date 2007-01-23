@@ -259,8 +259,13 @@
                 <p>
                     The Hello application is about the simplest Orbeon Forms application you can think of. It asks for
                     your name and displays it back. You run the Hello application by selecting the link "XForms Hello"
-                    in the list of applications. Simply enter your first name in the input field, for example "Joe". You
-                    should promptly see a message underneath saying "Hello, Joe!".
+                    in the list of applications. Here are direct links for running XForms Hello <a
+                    href="/xforms-hello/">on your local Orbeon Forms install</a> or <a
+                    href="http://www.orbeon.com/ops/xforms-hello/">online on the Orbeon web site</a>.
+                </p>
+                <p>
+                    Simply enter your first name in the input field, for example "Joe". You should promptly see a
+                    message underneath saying "Hello, Joe!".
                 </p>
                 <figure src="/apps/doc/images/tutorial/03.png"/>
                 <p>
@@ -680,6 +685,10 @@
                     create an Atom feed of your entries.
                 </p>
                 <figure src="/apps/doc/images/tutorial/07.png"/>
+                <p>
+                    You can run the final application <a href="/xforms-bookcast/">on your local Orbeon Forms install</a> or <a
+                    href="http://www.orbeon.com/ops/xforms-bookcast/">online on the Orbeon web site</a>.
+                </p>
             </section>
             <section>
                 <title>Getting Started</title>

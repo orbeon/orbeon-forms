@@ -3347,9 +3347,10 @@
                 <section>
                     <title>Read-Only XForms Instances</title>
                     <p>
-                        Orbeon Forms supports an extension attribute, <code>xxforms:readonly</code>, on XForms
-                        instances. When set to <code>true</code>, this attribute marks the instance as read-only, with
-                        the following consequences:
+                        Orbeon Forms supports an extension attribute, <code>xxforms:readonly</code>, on
+                        <code>xforms:instance</code> and <code>xforms:submission</code> elements. When set to
+                        <code>true</code>, this attribute signals that once loaded, the instance is read-only, with the
+                        following consequences:
                     </p>
                     <ul>
                         <li>
@@ -3370,13 +3371,11 @@
                                 client.
                             </p>
                         </li>
-                        <li>
-                            <p>
-                                Note that a read-only instance can still be replaced in its entirety during an XForms
-                                submission.
-                            </p>
-                        </li>
                     </ul>
+                    <p>
+                        Note that a read-only instance can still be replaced in its entirety during an XForms
+                        submission.
+                    </p>
                     <p>
                         Read-only instances are particularly appropriate for loading internationalization resources,
                         which can be large but don't change. Example:
@@ -3389,10 +3388,12 @@
                 <section>
                     <title>Sharing of Read-Only XForms Instances</title>
                     <p>
-                        If an XForms instance is marked as read-only and the instance is loaded through the
-                        <code>src</code> attribute, it also supports another attribute, <code>xxforms:shared</code>,
-                        which can take two values: <code>document</code> (the default if the attribute is not specified)
-                        and <code>application</code>. When <code>application</code> is specified:
+                        Orbeon Forms supports an extension attribute, <code>xxforms:shared</code>, on
+                        <code>xforms:instance</code> and <code>xforms:submission</code> elements. This attribute can be
+                        used only when an XForms instance is marked as read-only with
+                        <code>xxforms:readonly="true"</code>. <code>xxforms:shared</code> can take two values:
+                        <code>document</code> (the default if the attribute is not specified) and
+                        <code>application</code>. When <code>application</code> is specified:
                     </p>
                     <ul>
                         <li>
@@ -3410,9 +3411,8 @@
                         </li>
                         <li>
                             <p>
-                                note that the URL should refer to a constant XML document and authorization credentials
-                                such as username and password and cookies should not be relevant to access the shared
-                                data.
+                                The URL must refer to a constant XML document and authorization credentials such as
+                                username and password should not cause different data to be loaded.
                             </p>
                         </li>
                     </ul>
@@ -3421,6 +3421,14 @@
                     </p>
                     <xml-source>
                         <xforms:instance id="resources-instance" src="/forms/resources/en" xxforms:readonly="true" xxforms:shared="application"/>
+                    </xml-source>
+                    <p>
+                        When used on <code>xforms:submission</code>, the submission has to use
+                        <code>method="get"</code> method and <code>replace="instance"</code>:
+                    </p>
+                    <xml-source>
+                        <xforms:submission serialize="false" action="/forms/resources/fr" method="get"
+                                           replace="instance" instance="resources-instance" xxforms:readonly="true" xxforms:shared="application"/>
                     </xml-source>
                     <p>
                         You set the size of the shared instances cache using a property in <code>properties.xml</code>:

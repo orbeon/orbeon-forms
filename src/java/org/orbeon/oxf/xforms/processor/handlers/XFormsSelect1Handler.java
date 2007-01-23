@@ -328,6 +328,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
                     final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
+                    int optgroupCount = 0;
+
                     if (items != null) {
                         int level = 0;
                         for (Iterator j = items.iterator(); j.hasNext();) {
@@ -336,10 +338,13 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                             final int newLevel = currentItem.getLevel();
 
-                            if (level - newLevel > 0) {
+                            if (newLevel < level) {
                                 //  We are going down one or more levels
                                 for (int i = newLevel; i < level; i++) {
                                     // End xhtml:optgroup
+                                    optgroupCount--;
+                                    if (optgroupCount < 0)
+                                        throw new OXFException("Incorrect SAX being generated for select control with id: " + id);
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                                 }
                             }
@@ -354,6 +359,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                                 // Start xhtml:optgroup
                                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
+                                optgroupCount++;
                             } else {
                                 // Adding a new item
                                 handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, currentItem);
@@ -362,9 +368,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                             level = newLevel;
                         }
 
-                        // Close brackets
-                        for (int i = level; i > 1; i--) {
+                        // Close unclosed optgroups
+                        while (optgroupCount > 0) {
                             // End xhtml:optgroup
+                            optgroupCount--;
                             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                         }
                     }

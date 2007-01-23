@@ -36,17 +36,17 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.dom4j.NodeWrapper;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.functions.FunctionLibrary;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -240,7 +240,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
                 // Get current node for xforms:submission
-                final Node currentNode;
+                final NodeInfo currentNodeInfo;
                 {
                     // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
                     // "The default value is '/'."
@@ -250,9 +250,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     xformsControls.pushBinding(pipelineContext, refAttribute, null, null, model.getEffectiveId(), null, submissionElement,
                             Dom4jUtils.getNamespaceContextNoDefault(submissionElement));
 
-                    // Check that we have a current node and that it is pointing to a document or an element
-                    final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
+                    currentNodeInfo = xformsControls.getCurrentSingleNode();
 
+                    // Check that we have a current node and that it is pointing to a document or an element
                     if (currentNodeInfo == null)
                         throw new OXFException("Empty single-node binding on xforms:submission for submission id: " + id);
 
@@ -263,8 +263,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // For now, we can't submit a read-only instance (but we could in the future)
                     if (serialize && !(currentNodeInfo instanceof NodeWrapper))
                         throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
-
-                    currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
                 }
 
                 // Get instance containing the node to submit
@@ -300,7 +298,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Create document to submit
                     final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
-                        initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                        initialDocumentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
                         currentInstance.setInstanceDocument(initialDocumentToSubmit, false);
 
                         // Revalidate instance
@@ -342,7 +340,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Evaluate AVTs
                 // TODO FIXME: the submission element is not a control, so we shouldn't use XFormsControls.
                 {
-                    final NodeInfo currentNodeInfo = xformsControls.getCurrentSingleNode();
                     final FunctionLibrary functionLibrary = xformsControls.getFunctionLibrary();
 
                     resolvedActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtActionOrResource);
@@ -417,7 +414,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // Create document to submit
                     final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
-                        documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+                        documentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
                         currentInstance.setInstanceDocument(documentToSubmit, false);
 
                         // Revalidate instance
@@ -833,7 +830,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return connectionResult;
     }
 
-    private Document createDocumentToSubmit(final Node currentNode, final XFormsInstance currentInstance) {
+    private Document createDocumentToSubmit(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {
+
+        final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
         // "A node from the instance data is selected, based on attributes on the submission
         // element. The indicated node and all nodes for which it is an ancestor are considered for

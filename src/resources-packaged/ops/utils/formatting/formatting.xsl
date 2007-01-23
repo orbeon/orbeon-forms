@@ -30,9 +30,18 @@
     <!-- - - - - - - Nicely format XML - - - - - - -->
 
     <xsl:template match="f:xml-source">
-        <xsl:apply-templates mode="xml-formatting">
-            <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
-        </xsl:apply-templates>
+        <xsl:choose>
+            <xsl:when test="@ignore-root-element = 'true'">
+                <xsl:apply-templates mode="xml-formatting" select="*[1]/node()">
+                    <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                </xsl:apply-templates>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates mode="xml-formatting">
+                    <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                </xsl:apply-templates>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -250,7 +250,7 @@
         <!-- Check for namespaces -->
         <xsl:if test="$show-namespaces">
             <!-- We can't know for sure what namespaces are actually newly declared on an element, so we use instead the
-                 namespaces in scope except if the namespace was already decared on a parent element -->
+                 namespaces in scope except if the namespace was already decared on an ancestor element -->
             <xsl:variable name="current-element" select="."/>
             <xsl:variable name="namespace-nodes"
                           select="namespace::*[name() != 'xml' and not(. = $current-element/ancestor::*/namespace::*)]"/>

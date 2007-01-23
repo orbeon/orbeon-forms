@@ -30,9 +30,6 @@
                 mailing-list. It is easy to subscribe by following the instructions at <a
                 href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
             </p>
-            <warning>
-                This tutorial is a work in progress and not quite complete yet!
-            </warning>
         </section>
         <section>
             <title>A Little Bit of Background</title>
@@ -42,7 +39,6 @@
                     Orbeon Forms is an open source solution to build and deploy web forms. For more information, please
                     visit the Orbeon home page at <a href="http://www.orbeon.com/">http://www.orbeon.com/</a>.
                 </p>
-
             </section>
             <section>
                 <title>Prerequisites</title>
@@ -313,11 +309,21 @@
                     The element now contains the string "Joe". Notice how in <code>view.xhtml</code> the XML document is
                     encapsulated within an <code>&lt;xforms:instance></code> tag:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <first-name xmlns=""/>
-                    </xforms:instance>
+                <xml-source show-namespaces="true" ignore-root-element="true">
+                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance>
+                            <first-name xmlns=""/>
+                        </xforms:instance>
+                    </html>
                 </xml-source>
+                <p>
+                    Also notice the special <code>xmlns=""</code> namespace attribute on <code>&lt;first-name></code>:
+                    this is necessary because the root element of the XHTML document defines a default namespace with
+                    <code>xmlns="http://www.w3.org/1999/xhtml"</code>. Because we want to make it clear that the element
+                    <code>&lt;first-name></code> is not an XHTML element, but an element in no namespace, we add
+                    <code>xmlns=""</code> to that element. If your instance document must be in no particular namespace,
+                    you are always safe to add <code>xmlns=""</code> on the root element of that instance.
+                </p>
                 <p>
                     This tag defines an XForms <i>instance</i>, which is just XForms' way of calling an XML document
                     used to store data.
@@ -750,10 +756,9 @@
                     You will see later how it is possible with XForms to add and remove children elements. For now, your
                     initial instance declaration is empty and contains a single book:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <!-- TODO: xmlns="" doesn't appear -->
-                        <xforms:instance id="books-instance" xmlns="">
+                <xml-source show-namespaces="true" ignore-root-element="true">
+                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance id="books-instance">
                             <books xmlns="">
                                 <book>
                                     <title/>
@@ -762,12 +767,10 @@
                                     <link/>
                                     <rating/>
                                     <notes/>
-                                    <!--<start-date/>-->
-                                    <!--<end-date/>-->
                                 </book>
                             </books>
                         </xforms:instance>
-                    </xforms:model>
+                    </html>
                 </xml-source>
                 <p>
                     Notice the <code>id</code> attribute which allows other XForms constructs to refer to that
@@ -843,7 +846,7 @@
                 </xml-source>
                 <p>
                     Notice how, as you enter text in the title or author field, the field's background changes color to
-                    indicate that the field must be filled out. [TODO: screenshot]
+                    indicate that the field must be filled out.
                 </p>
                 <p>
                     The above requires some explanations:
@@ -972,23 +975,25 @@
                     the list of labels and values in an XForms instance instead of statically listing the items under
                     the <code>&lt;xforms:select1></code> element. So let's do this! Create a new instance in the model:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance id="languages-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <languages xmlns="">
-                            <language>
-                                <name>English</name>
-                                <value>en</value>
-                            </language>
-                            <language>
-                                <name>French</name>
-                                <value>fr</value>
-                            </language>
-                            <language>
-                                <name>Spanish</name>
-                                <value>es</value>
-                            </language>
-                        </languages>
-                    </xforms:instance>
+                <xml-source show-namespaces="true" ignore-root-element="true">
+                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance id="languages-instance">
+                            <languages xmlns="">
+                                <language>
+                                    <name>English</name>
+                                    <value>en</value>
+                                </language>
+                                <language>
+                                    <name>French</name>
+                                    <value>fr</value>
+                                </language>
+                                <language>
+                                    <name>Spanish</name>
+                                    <value>es</value>
+                                </language>
+                            </languages>
+                        </xforms:instance>
+                    </html>
                 </xml-source>
                 <p>
                     Then modify the <code>&lt;xforms:select1></code> element as follows:
@@ -1049,31 +1054,33 @@
                 <p>
                     To create the ratings input, add this new instance:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance id="ratings-instance" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <ratings xmlns="">
-                            <rating>
-                                <name>1</name>
-                                <value>1</value>
-                            </rating>
-                            <rating>
-                                <name>2</name>
-                                <value>2</value>
-                            </rating>
-                            <rating>
-                                <name>3</name>
-                                <value>3</value>
-                            </rating>
-                            <rating>
-                                <name>4</name>
-                                <value>4</value>
-                            </rating>
-                            <rating>
-                                <name>5</name>
-                                <value>5</value>
-                            </rating>
-                        </ratings>
-                    </xforms:instance>
+                <xml-source show-namespaces="true" ignore-root-element="true">
+                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance id="ratings-instance">
+                            <ratings xmlns="">
+                                <rating>
+                                    <name>1</name>
+                                    <value>1</value>
+                                </rating>
+                                <rating>
+                                    <name>2</name>
+                                    <value>2</value>
+                                </rating>
+                                <rating>
+                                    <name>3</name>
+                                    <value>3</value>
+                                </rating>
+                                <rating>
+                                    <name>4</name>
+                                    <value>4</value>
+                                </rating>
+                                <rating>
+                                    <name>5</name>
+                                    <value>5</value>
+                                </rating>
+                            </ratings>
+                        </xforms:instance>
+                    </html>
                 </xml-source>
                 <p>
                     And then add another <code>&lt;xforms:select1></code> control:
@@ -1484,17 +1491,19 @@
                     <code>books-instance</code> instance. First, create a <i>template</i> for the new
                     <code>&lt;book></code> element to insert by declaring a new instance:
                 </p>
-                <xml-source show-namespaces="false">
-                    <xforms:instance id="book-template" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <book xmlns="">
-                            <title/>
-                            <author/>
-                            <language/>
-                            <link/>
-                            <rating/>
-                            <notes/>
-                        </book>
-                    </xforms:instance>
+                <xml-source show-namespaces="true" ignore-root-element="true">
+                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance id="book-template">
+                            <book xmlns="">
+                                <title/>
+                                <author/>
+                                <language/>
+                                <link/>
+                                <rating/>
+                                <notes/>
+                            </book>
+                        </xforms:instance>
+                    </html>
                 </xml-source>
                 <p>
                     Then you want to copy that template to the right place in <code>books-instance</code> when the user
@@ -2375,7 +2384,7 @@
             <p>
                 With this addition, most modern browsers will display a feed icon <icon
                 src="/apps/doc/images/tutorial/feed-icon-14x14.png" alt="Feed Icon" width="14" height="14"/> or an RSS
-                icon, making the feed directly accessible from the main Bookcast page. [TODO: screenshot]
+                icon, making the feed directly accessible from the main Bookcast page.
             </p>
             <p>
                 You can now try to load the feed into your favorite feed reader! Here is how the Bookcast feed looks in
@@ -2418,7 +2427,6 @@
 
         <!--
 
-        xxx xmlns="" missing on instances
         xxx explain how to "reload" the page
 
         xxx more background on XForms?

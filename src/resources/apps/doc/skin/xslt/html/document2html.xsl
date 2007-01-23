@@ -181,11 +181,20 @@
         </pre>
     </xsl:template>
     <xsl:template match="xml-source">
-        <p ><div style="margin-bottom: 1em" class="code">
-            <xsl:apply-templates mode="xml-formatting">
-                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
-            </xsl:apply-templates>
-        </div></p>
+        <div style="margin-bottom: 1em" class="code">
+            <xsl:choose>
+                <xsl:when test="@ignore-root-element = 'true'">
+                    <xsl:apply-templates mode="xml-formatting" select="*[1]/node()">
+                        <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates mode="xml-formatting">
+                        <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                    </xsl:apply-templates>
+                </xsl:otherwise>
+            </xsl:choose>
+        </div>
     </xsl:template>
     <xsl:template match="anchor">
         <a name="{@id}"/>

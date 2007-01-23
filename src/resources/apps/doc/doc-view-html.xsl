@@ -215,22 +215,29 @@
     </xsl:template>
 
     <xsl:template match="xml-source">
-        <xhtml:p><xhtml:div style="margin-bottom: 1em; clear: right">
+        <xhtml:div style="margin-bottom: 1em; clear: right">
             <xsl:attribute name="class" select="if (@border = 'false') then 'code' else 'code bordered'"/>
-            <xsl:apply-templates mode="xml-formatting">
-                <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
-            </xsl:apply-templates>
-        </xhtml:div></xhtml:p>
+            <xsl:choose>
+                <xsl:when test="@ignore-root-element = 'true'">
+                    <xsl:apply-templates mode="xml-formatting" select="*[1]/node()">
+                        <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates mode="xml-formatting">
+                        <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')" tunnel="yes"/>
+                    </xsl:apply-templates>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xhtml:div>
     </xsl:template>
 
     <xsl:template match="source">
-        <xhtml:p>
-            <xhtml:div class="bordered">
-                <pre>
-                    <xsl:apply-templates/>
-                </pre>
-            </xhtml:div>
-        </xhtml:p>
+        <xhtml:div class="bordered">
+            <pre>
+                <xsl:apply-templates/>
+            </pre>
+        </xhtml:div>
     </xsl:template>
 
     <xsl:template match="icon">

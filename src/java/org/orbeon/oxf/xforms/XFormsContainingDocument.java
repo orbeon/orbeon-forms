@@ -86,6 +86,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     // Event information
     private static final Map allowedXFormsOutputExternalEvents = new HashMap();
+    private static final Map allowedXFormsUploadExternalEvents = new HashMap();
     private static final Map allowedExternalEvents = new HashMap();
     private static final Map allowedXFormsSubmissionExternalEvents = new HashMap();
     private static final Map allowedXFormsContainingDocumentExternalEvents = new HashMap();
@@ -95,6 +96,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         // External events allowed on xforms:output
         allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_IN, "");
         allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
+
+        // External events allowed on xforms:upload
+        allowedXFormsUploadExternalEvents.put(XFormsEvents.XFORMS_SELECT, "");
 
         // External events allowed on other controls
         allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);
@@ -598,6 +602,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                     // The event is not explicitly allowed: check for implicitly allowed events
                     if (xformsControl instanceof XFormsOutputControl) {
                         if (allowedXFormsOutputExternalEvents.get(eventName) == null) {
+                            return;
+                        }
+                    } else if (xformsControl instanceof XFormsUploadControl) {
+                        if (allowedXFormsUploadExternalEvents.get(eventName) == null) {
                             return;
                         }
                     } else {

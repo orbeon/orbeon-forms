@@ -94,6 +94,34 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final String enclosingElementLocalname = isHTMLMediaType ? "div" : "span";
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
+        final String formattingPrefix;
+        final boolean isNewPrefix;
+
+        if (isConcreteControl && (isImageMediatype
+                || (isConcreteControl && isHTMLMediaType && "true".equals(elementAttributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-norewrite"))))) {
+            // There is an f:url-norewrite="true" on the control, so add it
+
+            // TODO: Need better mechanism to handle this!
+            final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
+            if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
+                // No prefix is currently mapped
+                formattingPrefix = handlerContext.findNewPrefix();
+                isNewPrefix = true;
+            } else {
+                formattingPrefix = existingFormattingPrefix;
+                isNewPrefix = false;
+            }
+
+            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+        } else {
+            formattingPrefix = null;
+            isNewPrefix = false;
+        }
+
+        // Handle namespace prefix if needed
+        if (isNewPrefix)
+            contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
+
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         {
             if (isImageMediatype) {
@@ -104,33 +132,16 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 // NOTE: If producing a template, we must point to an existing image
                 final String srcValue = isConcreteControl ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
-                // @f:url-norewrite="true"
-                final String formattingPrefix;
-                final boolean isNewPrefix;
-                {
-                    if (isConcreteControl) {
-                        final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
-                        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
-                            // No prefix is currently mapped
-                            formattingPrefix = handlerContext.findNewPrefix();
-                            isNewPrefix = true;
-                        } else {
-                            formattingPrefix = existingFormattingPrefix;
-                            isNewPrefix = false;
-                        }
-                        imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
-                    } else {
-                        // In the case of a template, allow for rewriting
-                        formattingPrefix = null;
-                        isNewPrefix = false;
-                    }
+                
+                if (isConcreteControl) {
+                    // @f:url-norewrite="true"
+                    // Question: why do we not want rewriting here again?
+                    imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                 }
-                if (isNewPrefix)
-                    contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
+
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
-                if (isNewPrefix)
-                    contentHandler.endPrefixMapping(formattingPrefix);
+
             } else if (isDateOrTime) {
                 // Display formatted value for dates
                 if (isConcreteControl) {
@@ -155,6 +166,10 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
             }
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
+
+        // Handle namespace prefix if needed
+        if (isNewPrefix)
+            contentHandler.endPrefixMapping(formattingPrefix);
 
         // xforms:help
         handleLabelHintHelpAlert(effectiveId, "help", xformsOutputControl);

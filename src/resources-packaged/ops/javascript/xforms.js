@@ -1038,6 +1038,19 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * For upload controls, generate an xforms-select event when a file is selected
+     */
+    change: function(event) {
+        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
+        if (ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+            // On browsers that support both capturing and bubbling phase, only do this during bubbling phase
+            if (!event.eventPhase || (event.eventPhase && event.eventPhase == 3)) {
+                xformsFireEvents(new Array(xformsCreateEventArray(target, "xforms-select", "")), false);
+            }
+        }
+    },
+
+    /**
      * Send notification to XForms engine end-user clicked on day.
      */
     calendarUpdate: function(calendar) {
@@ -1180,6 +1193,7 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
         YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
+        YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
         YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
         YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scroll);
 

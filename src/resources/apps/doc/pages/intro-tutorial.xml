@@ -26,8 +26,8 @@
                 This is the tutorial for Orbeon Forms version 3.5.
             </p>
             <p>
-                If you have questions or issues with this tutorial, please send a message to the <code>ops-users</code>
-                mailing-list. It is easy to subscribe by following the instructions at <a
+                If you have questions, issues or suggestions related to this tutorial, please send a message to the
+                <code>ops-users</code> mailing-list. It is easy to subscribe by following the instructions at <a
                 href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
             </p>
         </section>
@@ -282,7 +282,7 @@
                     <li>
                         <p>
                             <code>page-flow.xml</code>: this is the page flow for the Hello application. The main task
-                            of a page flow is mapping external URLs (as typed in a web browser) with Orbeon Forms pages.
+                            of a page flow is mapping external URLs (as typed in a web browser) to Orbeon Forms pages.
                         </p>
                     </li>
                 </ul>
@@ -545,12 +545,12 @@
                     <code>resources</code> directory as <code>RESOURCES</code> below.
                 </p>
                 <p>
-                    The <code>RESOURCES</code> directory is very important: this is where your applications lives.
+                    The <code>RESOURCES</code> directory is very important: this is where your application lives.
                     This directory is called "resources" because it contains all the files (or resources) such as XHTML
                     documents, XML schemas, images, CSS, etc. needed by your Orbeon Forms application.
                 </p>
                 <note>
-                    Orbeon Forms is able to store your resources pretty much anywhere you want. For convenience, by
+                    Orbeon Forms supports storing your resources pretty much anywhere you want. For convenience, by
                     default they are available under the WAR file's <code>WEB-INF/resources</code> so you can get up
                     and running without configuration.
                 </note>
@@ -651,7 +651,7 @@
                     </li>
                     <li>
                         <p>
-                            Renew the experience but add some XForms. For example, add a second
+                            Repeat the experience but add some XForms. For example, add a second
                             <code>&lt;xforms:input></code> right after the first one:
                         </p>
                         <xml-source show-namespaces="true" xmlns:xforms="http://www.w3.org/2002/xforms">

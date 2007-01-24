@@ -30,6 +30,9 @@
                     <file filename="" mediatype="" size=""/>
                 </files>
             </xforms:instance>
+            <xforms:instance id="selected">
+                <selected>No file selected.</selected>
+            </xforms:instance>
             <xforms:instance id="file-template">
                 <file xmlns="" filename="" mediatype="" size=""/>
             </xforms:instance>
@@ -114,6 +117,7 @@
                             <xforms:filename ref="@filename"/>
                             <xforms:mediatype ref="@mediatype"/>
                             <xxforms:size ref="@size"/>
+                            <xforms:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file selected</xforms:setvalue>
                         </xforms:upload>
                     </td>
                     <td>
@@ -125,6 +129,9 @@
                 </tr>
             </xforms:repeat>
         </table>
+        <p>
+            <xforms:output ref="instance('selected')"/>
+        </p>
         <p>
             <xforms:trigger ref="instance('control-instance')/simple-upload-trigger">
                 <xforms:label>Upload Selected Files</xforms:label>

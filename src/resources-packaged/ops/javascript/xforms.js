@@ -21,6 +21,7 @@ var XFORMS_DELAY_BEFORE_ANY_REQUEST_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
+var XFORMS_LOADING_MIN_TOP_PADDING = 10;
 
 /**
  * Constants
@@ -90,7 +91,8 @@ ORBEON.xforms.Globals = {
 
     // Data relative to a form is stored in an array indexed by the position of the form on the page.
     // Use ORBEON.util.Dom.getFormIndex(form) to get the index of a given form on the page
-    formLoadingLoading: [],              // HTML element with the markup displayed when a request is in process
+    formLoadingLoadingElement: [],       // HTML element with the markup displayed when a request is in process
+    formLoadingLoadingInitialY: [],       // Overlay for the loading indicator
     formLoadingError: [],                // HTML element with the markup displayed when there is an error
     formLoadingNone: [],                 // HTML element with the markup displayed when nothing is displayed
     formStaticState: [],                 // State that does not change for the life of the page
@@ -666,6 +668,15 @@ ORBEON.xforms.Controls = {
         var iframe = textarea.previousSibling;
         while (iframe.nodeType != ORBEON.util.Dom.ELEMENT_TYPE) iframe = textarea.previousSibling;
         iframe.className = textarea.className;
+    },
+
+    updateLoadingPosition: function(formIndex) {
+        var element = ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex];
+        var initialY = ORBEON.xforms.Globals.formLoadingLoadingInitialY[formIndex];
+        var scrollY = document.documentElement.scrollTop || document.body.scrollTop;
+        var y = initialY;
+        if (scrollY + XFORMS_LOADING_MIN_TOP_PADDING > y) y = scrollY + XFORMS_LOADING_MIN_TOP_PADDING;
+        YAHOO.util.Dom.setY(element, y);
     }
 };
 
@@ -1015,6 +1026,18 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * Upon scrolling, adjust position of loading indicators
+     */
+    scroll: function() {
+        for (var formIndex = 0; formIndex < ORBEON.xforms.Globals.formLoadingLoadingElement.length; formIndex++) {
+            var element = ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex];
+            var initialY = ORBEON.xforms.Globals.formLoadingLoadingInitialY[formIndex];
+            if (element && element.style.display == "block")
+                ORBEON.xforms.Controls.updateLoadingPosition(formIndex);
+        }
+    },
+
+    /**
      * Send notification to XForms engine end-user clicked on day.
      */
     calendarUpdate: function(calendar) {
@@ -1149,6 +1172,7 @@ ORBEON.xforms.Init = {
             ORBEON.xforms.Init._registerListerersOnFormElements();
         }
 
+
         // Register events that bubble on document for all browsers
         YAHOO.util.Event.addListener(document, "keypress", ORBEON.xforms.Events.keypress);
         YAHOO.util.Event.addListener(document, "keydown", ORBEON.xforms.Events.keydown);
@@ -1157,6 +1181,7 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
         YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
+        YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scroll);
 
         // Initialize XForms server URL
         var scripts = document.getElementsByTagName("script");
@@ -1220,7 +1245,7 @@ ORBEON.xforms.Init = {
             if (ORBEON.util.Dom.hasClass(form, "xforms-form")) {
 
                 // Initialize loading and error indicator
-                ORBEON.xforms.Globals.formLoadingLoading[formIndex] = null;
+                ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex] = null;
                 ORBEON.xforms.Globals.formLoadingError[formIndex] = null;
                 ORBEON.xforms.Globals.formLoadingNone[formIndex] = null;
 
@@ -1229,7 +1254,10 @@ ORBEON.xforms.Init = {
                     if (xformsLoadingCount == 3) break;
                     var formChild = form.childNodes[formChildIndex];
                     if (formChild.className == "xforms-loading-loading") {
-                        ORBEON.xforms.Globals.formLoadingLoading[formIndex] = formChild;
+                        ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex] = formChild;
+                        formChild.style.display = "block";
+                        ORBEON.xforms.Globals.formLoadingLoadingInitialY[formIndex] = YAHOO.util.Dom.getY(formChild);
+                        formChild.style.display = "none";
                         xformsLoadingCount++;
                         continue;
                     }
@@ -2882,16 +2910,18 @@ function xformsDisplayIndicator(state) {
     var formIndex = ORBEON.util.Dom.getFormIndex(form);
     switch (state) {
         case "loading":
-            if (ORBEON.xforms.Globals.formLoadingLoading[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingLoading[formIndex].style.display = "block";
+            if (ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex] != null) {
+                ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex].style.display = "block";
+                ORBEON.xforms.Controls.updateLoadingPosition(formIndex);
+            }
             if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
                 ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "none";
             if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
                 ORBEON.xforms.Globals.formLoadingNone[formIndex].style.display = "block";
             break;
         case "error":
-            if (ORBEON.xforms.Globals.formLoadingLoading[formIndex] != null)
-                ORBEON.xforms.Globals.formLoadingLoading[formIndex].style.display = "none";
+            if (ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex] != null)
+                ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex].style.display = "none";
             if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
                 ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "block";
             if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)
@@ -2899,8 +2929,8 @@ function xformsDisplayIndicator(state) {
             break;
         case "none":
             if (!ORBEON.xforms.Globals.loadingOtherPage) {
-                if (ORBEON.xforms.Globals.formLoadingLoading[formIndex] != null)
-                    ORBEON.xforms.Globals.formLoadingLoading[formIndex].style.display = "none";
+                if (ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex] != null)
+                    ORBEON.xforms.Globals.formLoadingLoadingElement[formIndex].style.display = "none";
                 if (ORBEON.xforms.Globals.formLoadingError[formIndex] != null)
                     ORBEON.xforms.Globals.formLoadingError[formIndex].style.display = "none";
                 if (ORBEON.xforms.Globals.formLoadingNone[formIndex] != null)

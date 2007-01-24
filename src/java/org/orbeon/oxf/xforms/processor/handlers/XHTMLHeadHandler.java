@@ -73,6 +73,11 @@ public class XHTMLHeadHandler extends HandlerBase {
             new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
             new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
             new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
+            new ResourceConfig("/ops/javascript/yui/container_core.js", "/ops/javascript/yui/container_core-min.js") {
+                public boolean isInUse(Map appearancesMap) {
+                    return !isDialogInUse(appearancesMap);
+                }
+            },
             new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isRangeInUse(appearancesMap);
@@ -101,11 +106,6 @@ public class XHTMLHeadHandler extends HandlerBase {
             new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", null) {
                 public boolean isInUse(Map appearancesMap) {
                     return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/container_core.js", "/ops/javascript/yui/container_core-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
                 }
             },
             new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {

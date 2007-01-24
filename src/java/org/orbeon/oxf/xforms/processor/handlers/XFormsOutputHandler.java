@@ -96,9 +96,9 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final String formattingPrefix;
         final boolean isNewPrefix;
-
-        if (isConcreteControl && (isImageMediatype
-                || (isConcreteControl && isHTMLMediaType && "true".equals(elementAttributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-norewrite"))))) {
+        final boolean isImageNorewrite = isConcreteControl && isImageMediatype;
+        final boolean isHTMLNorewrite = isConcreteControl && isHTMLMediaType && "true".equals(elementAttributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-norewrite"));
+        if (isImageNorewrite || isHTMLNorewrite) {
             // There is an f:url-norewrite="true" on the control, so add it
 
             // TODO: Need better mechanism to handle this!
@@ -111,8 +111,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 formattingPrefix = existingFormattingPrefix;
                 isNewPrefix = false;
             }
-
-            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
         } else {
             formattingPrefix = null;
             isNewPrefix = false;
@@ -121,6 +119,9 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         // Handle namespace prefix if needed
         if (isNewPrefix)
             contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
+
+        if (isHTMLNorewrite)
+            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         {
@@ -133,9 +134,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 final String srcValue = isConcreteControl ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
                 
-                if (isConcreteControl) {
-                    // @f:url-norewrite="true"
-                    // Question: why do we not want rewriting here again?
+                if (isImageNorewrite) {
+                    // Add @f:url-norewrite="true" because the URL is already rewritten by XFormsOutputControl
                     imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
                 }
 

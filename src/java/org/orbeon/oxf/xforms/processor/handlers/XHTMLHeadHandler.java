@@ -108,14 +108,14 @@ public class XHTMLHeadHandler extends HandlerBase {
                     return isTreeInUse(appearancesMap);
                 }
             },
-            new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
-                }
-            },
             new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js") {
                 public boolean isInUse(Map appearancesMap) {
                     return isDialogInUse(appearancesMap);
+                }
+            },
+            new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
+                public boolean isInUse(Map appearancesMap) {
+                    return isMenuInUse(appearancesMap);
                 }
             },
             new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {

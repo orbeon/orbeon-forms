@@ -106,8 +106,8 @@ public class Dom4jUtils {
      * Replacement for DocumentHelper.parseText. DocumentHelper.parseText is not used since it
      * creates work for GC (because it relies on JAXP).
      */
-    public static Document readDom4j(final String s) throws SAXException, DocumentException {
-        final StringReader stringReader = new StringReader(s);
+    public static Document readDom4j(final String xmlString) throws SAXException, DocumentException {
+        final StringReader stringReader = new StringReader(xmlString);
         return readDom4j(stringReader);
     }
 

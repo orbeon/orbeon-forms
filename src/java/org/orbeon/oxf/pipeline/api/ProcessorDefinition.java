@@ -16,6 +16,7 @@ package org.orbeon.oxf.pipeline.api;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,6 +68,16 @@ public class ProcessorDefinition {
      */
     public void addInput(String name, Element element) {
         entries.put(name, element);
+    }
+
+    /**
+     * Add an input with the given name and TinyTree node.
+     *
+     * @param name     the name of the input, for example "config"
+     * @param nodeInfo the TinyTree node containing the XML document connected to the input
+     */
+    public void addInput(String name, NodeInfo nodeInfo) {
+        entries.put(name, nodeInfo);
     }
 
     /**

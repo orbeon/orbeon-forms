@@ -16,6 +16,7 @@ package org.orbeon.oxf.pipeline;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.Document;
 import org.orbeon.oxf.cache.CacheStatistics;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
@@ -32,6 +33,7 @@ import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -137,21 +139,37 @@ public class InitUtils {
             processor = ProcessorFactoryRegistry.lookup(processorDefinition.getUri()).createInstance(pipelineContext);
         }
         for (java.util.Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
-            String name = (String) i.next();
-            Object o = processorDefinition.getEntries().get(name);
+            final String inputName = (String) i.next();
+            final Object o = processorDefinition.getEntries().get(inputName);
 
             if (o instanceof String) {
-                String url = (String) o;
-                Processor urlGenerator = PipelineUtils.createURLGenerator(url);
-                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
+                final String url = (String) o;
+                final Processor urlGenerator = PipelineUtils.createURLGenerator(url);
+                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName);
             } else if (o instanceof Element) {
                 final Element elt = (Element) o;
                 final LocationData ld = ProcessorUtils.getElementLocationData(elt);
                 final String lsid = ld == null ? null : ld.getSystemID();
                 final String sid = lsid == null ? DOMGenerator.DefaultContext : lsid;
-                DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
+                final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
                         (elt, "init input", DOMGenerator.ZeroValidity, sid);
-                PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
+                PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName);
+            } else if (o instanceof Document) {
+                final Document document = (Document) o;
+                final LocationData locationData = ProcessorUtils.getElementLocationData(document.getRootElement());
+                final String locationDataSystemId = locationData == null ? null : locationData.getSystemID();
+                final String systemId = locationDataSystemId == null ? DOMGenerator.DefaultContext : locationDataSystemId;
+                final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
+                        (document, "init input", DOMGenerator.ZeroValidity, systemId);
+                PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName);
+            } else if (o instanceof NodeInfo) {
+                final NodeInfo nodeInfo = (NodeInfo) o;
+
+                final String nodeInfoSystemId = nodeInfo.getSystemId();
+                final String systemId = nodeInfoSystemId == null ? DOMGenerator.DefaultContext : nodeInfoSystemId;
+                final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
+                        (nodeInfo, "init input", DOMGenerator.ZeroValidity, systemId);
+                PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName);
             } else
                 throw new IllegalStateException("Incorrect type in map.");
         }

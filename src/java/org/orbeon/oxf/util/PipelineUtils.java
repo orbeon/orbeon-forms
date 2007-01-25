@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.saxon.om.NodeInfo;
 
 public class PipelineUtils {
 
@@ -37,18 +38,23 @@ public class PipelineUtils {
         input.setOutput(output);
     }
 
-    public static DOMGenerator createDOMGenerator(final Element cfg, final String id, final Object v, final String sid) {
-        final DOMGenerator ret = new DOMGenerator(cfg, id, v, sid);
+    public static DOMGenerator createDOMGenerator(final Element element, final String id, final Object v, final String sid) {
+        final DOMGenerator ret = new DOMGenerator(element, id, v, sid);
         configDOMGenerator(ret);
         return ret;
     }
 
-    public static DOMGenerator createDOMGenerator(final Document cfg, final String id, final Object v, final String sid) {
-        final DOMGenerator ret = new DOMGenerator(cfg, id, v, sid);
+    public static DOMGenerator createDOMGenerator(final Document document, final String id, final Object v, final String sid) {
+        final DOMGenerator ret = new DOMGenerator(document, id, v, sid);
         configDOMGenerator(ret);
         return ret;
     }
 
+    public static DOMGenerator createDOMGenerator(final NodeInfo nodeInfo, final String id, final Object v, final String sid) {
+        final DOMGenerator ret = new DOMGenerator(nodeInfo, id, v, sid);
+        configDOMGenerator(ret);
+        return ret;
+    }
 
     public static Processor createURLGenerator(String urlStr) {
         if (urlStr == null || urlStr.equals(""))

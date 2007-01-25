@@ -29,6 +29,8 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -95,6 +97,20 @@ public final class DOMGenerator extends ProcessorImpl {
         }
     }
 
+    private static class TinyTreeSourceFactory extends SourceFactory {
+        private final DocumentInfo documentInfo;
+
+        TinyTreeSourceFactory(final DocumentInfo documentInfo, final String systemId) {
+            super(systemId);
+            if (documentInfo == null) throw new OXFException("Document documentInfo == null");
+            this.documentInfo = documentInfo;
+        }
+
+        Source makeDOMSource() {
+            return documentInfo;
+        }
+    }
+
     private static class DocKey extends SimpleOutputCacheKey {
 
         public DocKey(final String id) {
@@ -118,6 +134,13 @@ public final class DOMGenerator extends ProcessorImpl {
         final NonLazyUserDataDocument ret = new NonLazyUserDataDocument();
         ret.setRootElement(cpy);
         return ret;
+    }
+
+    private static DocumentInfo makeCopyDoc(final NodeInfo nodeInfo) {
+        if (nodeInfo instanceof DocumentInfo)
+            return (DocumentInfo) nodeInfo;
+        else
+            return TransformerUtils.readTinyTree(nodeInfo);
     }
 
     private final SourceFactory sourceFactory;
@@ -163,6 +186,10 @@ public final class DOMGenerator extends ProcessorImpl {
     public DOMGenerator
             (final org.dom4j.Document d, final String id, Object v, final String sid) {
         this(id, v, new DOM4JSourceFactory(d, sid, true));
+    }
+
+    public DOMGenerator(final NodeInfo nodeInfo, final String id, Object v, final String sid) {
+        this(id, v, new TinyTreeSourceFactory(makeCopyDoc(nodeInfo), sid));
     }
 
     public ProcessorOutput createOutput(final String nm) {

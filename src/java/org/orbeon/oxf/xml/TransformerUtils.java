@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tree.TreeBuilder;
@@ -372,6 +373,20 @@ public class TransformerUtils {
             identity.transform(nodeInfo, documentResult);
             return documentResult.getDocument();
         } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Transform a TinyTree to a dom4j document.
+     *
+     * This version uses a temporary string as we are having issues with converting directly from TinyTree to dom4j.
+     */
+    public static Document tinyTreeToDom4j2(NodeInfo nodeInfo) {
+        try {
+            final String xmlString = TransformerUtils.tinyTreeToString(nodeInfo);
+            return Dom4jUtils.readDom4j(xmlString);
+        } catch (Exception e) {
             throw new OXFException(e);
         }
     }

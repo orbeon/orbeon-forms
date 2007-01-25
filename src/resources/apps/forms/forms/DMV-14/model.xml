@@ -72,10 +72,10 @@
     <xforms:instance id="schema-instance" src="oxf:/apps/forms/forms/DMV-14/schema.xsd" xxforms:readonly="true" xxforms:shared="application"/>
 
     <!-- XForms instance containing template for mailing address -->
-    <xforms:instance id="mailing-address-template" src="oxf:/apps/forms/forms/DMV-14/template-mailing-address.xml"/>
+    <xforms:instance id="mailing-address-template" src="oxf:/apps/forms/forms/DMV-14/template-mailing-address.xml" xxforms:readonly="true" />
 
     <!-- XForms instance containing template for vehicle address -->
-    <xforms:instance id="vehicle-address-template" src="oxf:/apps/forms/forms/DMV-14/template-vehicle-address.xml"/>
+    <xforms:instance id="vehicle-address-template" src="oxf:/apps/forms/forms/DMV-14/template-vehicle-address.xml" xxforms:readonly="true" />
 
     <!-- XForms instance for widget control information -->
     <xforms:instance id="triggers-instance">
@@ -115,7 +115,7 @@
         <plates xmlns=""/>
     </xforms:instance>
 
-    <xforms:instance id="plate-template">
+    <xforms:instance id="plate-template" xxforms:readonly="true" >
         <plate xmlns="">
             <character/>
             <character/>

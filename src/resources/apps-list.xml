@@ -22,6 +22,10 @@
         <application id="xforms-todo" label="To-Do Lists"/>
         <application id="xforms-translate" label="Instant Translation"/>
     </section>
+    <section label="XForms Tutorial Apps">
+        <application id="xforms-hello" label="XForms Hello"/>
+        <application id="xforms-bookcast" label="XForms Bookcast"/>
+    </section>
     <section label="More XForms">
         <application id="xforms-calculator" label="Calculator"/>
         <application id="xforms-flickr-resize" label="Flickr Resize"/>
@@ -30,8 +34,6 @@
         <application id="xforms-upload" label="Upload Control"/>
         <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
-        <application id="xforms-hello" label="XForms Hello (Tutorial)"/>
-        <application id="xforms-bookcast" label="XForms Bookcast (Tutorial)"/>
         <application id="xforms-sql-address-book" label="SQL Address Book"/>
     </section>
     <section label="Sandboxes">

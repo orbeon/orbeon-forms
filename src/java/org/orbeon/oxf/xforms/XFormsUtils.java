@@ -1232,11 +1232,7 @@ public class XFormsUtils {
         if (nodeInfo instanceof NodeWrapper)
             return getNodeFromNodeInfo(nodeInfo, errorMessage);
 
-//        if (!(nodeInfo instanceof DocumentInfo))
-//            throw new OXFException(errorMessage);// TODO: cannot convert for now, but should!
-
-        // NOTE: This conversion doesn't seem to always work
-        return TransformerUtils.tinyTreeToDom4j((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
+        return TransformerUtils.tinyTreeToDom4j2((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }
 
     /**

@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
 import org.dom4j.QName;
+import org.dom4j.Node;
+import org.dom4j.Element;
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
@@ -31,15 +31,14 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
-import org.orbeon.saxon.om.ListIterator;
-import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.net.URL;
@@ -72,8 +71,8 @@ public class XXFormsCallXPL extends XFormsFunction {
             // Get list of input names
             final List inputNames = new ArrayList();
             {
-                Expression inputNamesExpression = argument[1];
-                SequenceIterator i = inputNamesExpression.iterate(xpathContext);
+                final Expression inputNamesExpression = argument[1];
+                final SequenceIterator i = inputNamesExpression.iterate(xpathContext);
 
                 Item currentItem;
                 while ((currentItem = (Item) i.next()) != null) {
@@ -82,26 +81,26 @@ public class XXFormsCallXPL extends XFormsFunction {
             }
 
             // Get list of input documents
-            final List inputNodes = new ArrayList();
+            final List inputNodeInfos = new ArrayList();
             {
-                Expression inputDocumentsExpression = argument[2];
-                SequenceIterator i = inputDocumentsExpression.iterate(xpathContext);
+                final Expression inputDocumentsExpression = argument[2];
+                final SequenceIterator i = inputDocumentsExpression.iterate(xpathContext);
 
                 Item currentItem;
                 while ((currentItem = (Item) i.next()) != null) {
-                    inputNodes.add(((NodeWrapper) currentItem).getUnderlyingNode());
+                    inputNodeInfos.add(currentItem);
                 }
             }
 
-            if (inputNames.size() != inputNodes.size())
+            if (inputNames.size() != inputNodeInfos.size())
                 throw new OXFException("The length of sequence of input names (" + inputNames.size()
-                        + ") must be equal to the length of the sequence of input nodes (" + inputNodes.size() + ").");//getDisplayName()
+                        + ") must be equal to the length of the sequence of input nodes (" + inputNodeInfos.size() + ").");//getDisplayName()
 
             // Get list of output names
             final List outputNames = new ArrayList();
             {
-                Expression inputNamesExpression = argument[3];
-                SequenceIterator i = inputNamesExpression.iterate(xpathContext);
+                final Expression inputNamesExpression = argument[3];
+                final SequenceIterator i = inputNamesExpression.iterate(xpathContext);
 
                 Item currentItem;
                 while ((currentItem = (Item) i.next()) != null) {
@@ -117,24 +116,42 @@ public class XXFormsCallXPL extends XFormsFunction {
                     processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 
-                    Iterator inputNodesIterator = inputNodes.iterator();
+                    Iterator inputNodesIterator = inputNodeInfos.iterator();
                     for (Iterator i = inputNames.iterator(); i.hasNext();) {
-                        String inputName = (String) i.next();
+                        final String inputName = (String) i.next();
 
-                        Node inputNode = (Node) inputNodesIterator.next();
+                        final NodeInfo inputNodeInfo = (NodeInfo) inputNodesIterator.next();
 
-                        // For now we accept dom4j Document and Element
-                        // TODO: must support Saxon's other format (e.g. result of doc() function or contructed trees)
-                        Element rootElement;
-                        if (inputNode instanceof Document)
-                            rootElement = ((Document) inputNode).getRootElement();
-                        else if (inputNode instanceof Element && inputNode.getParent() == null)
-                            rootElement = (Element) inputNode;
-                        else if (inputNode instanceof Element)
-                            rootElement = Dom4jUtils.createDocumentCopyParentNamespaces((Element) inputNode).getRootElement();
-                        else
-                            throw new OXFException("Input node must be an instance of Document or Element");
-                        processorDefinition.addInput(inputName, rootElement);
+                        if (!(inputNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE || inputNodeInfo.getNodeKind() == org.w3c.dom.Document.DOCUMENT_NODE))
+                            throw new OXFException("Input node must be a document or element for input name: " + inputName);
+
+                        // TODO: We should be able to just pass inputNodeInfo to addInput() and avoid the conversions, but that doesn't work!
+
+                        if (inputNodeInfo instanceof NodeWrapper) {
+                            // Get reference to dom4j node
+
+                            final Element inputElement;
+                            final Node inputNode = (Node) ((NodeWrapper) inputNodeInfo).getUnderlyingNode();
+
+                            if (inputNode instanceof Document)
+                                inputElement = ((Document) inputNode).getRootElement();
+                            else if (inputNode instanceof Element && inputNode.getParent() == null)
+                                inputElement = (Element) inputNode;
+                            else if (inputNode instanceof Element)
+                                inputElement = Dom4jUtils.createDocumentCopyParentNamespaces((Element) inputNode).getRootElement();
+                            else
+                                throw new OXFException("Input node must be a document or element for input name: " + inputName);
+
+                            processorDefinition.addInput(inputName, inputElement);
+                        } else {
+                            // Copy to dom4j
+                            
+//                            final DocumentInfo inputDocumentInfo = TransformerUtils.readTinyTree(inputNodeInfo);
+//                            processorDefinition.addInput(inputName, inputDocumentInfo);
+
+                            final Document inputDocument = TransformerUtils.tinyTreeToDom4j2(inputNodeInfo);
+                            processorDefinition.addInput(inputName, inputDocument.getRootElement());
+                        }
                     }
                 }
                 processor = InitUtils.createProcessor(processorDefinition);

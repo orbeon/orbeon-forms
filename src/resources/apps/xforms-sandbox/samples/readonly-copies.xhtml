@@ -1,0 +1,76 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xhtml:title>Read-Only Copies</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:instance id="instance1">
+                <equation xmlns="">
+                    <screen>0</screen>
+                    <screenbuffer/>
+                    <first>123</first>
+                    <second>456</second>
+                    <memory>12</memory>
+                    <result/>
+                </equation>
+            </xforms:instance>
+            <xforms:instance id="instance2" xxforms:readonly="true">
+                <equation xmlns="">
+                    <screen>0</screen>
+                    <screenbuffer/>
+                    <first>123</first>
+                    <second>456</second>
+                    <memory>12</memory>
+                    <result/>
+                </equation>
+            </xforms:instance>
+            <xforms:instance id="instance3">
+                <instance xmlns=""/>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:trigger>
+            <xforms:label>Read-Write Source Value</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('instance1')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+            </xforms:action>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Read-Only Source Value</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:setvalue ref="instance('instance1')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/first"/>
+            </xforms:action>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Read-Write Source Copy</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:insert nodeset="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+            </xforms:action>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Read-Only Source Copy</xforms:label>
+            <xforms:action ev:event="DOMActivate">
+                <xforms:insert nodeset="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/second"/>
+            </xforms:action>
+        </xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

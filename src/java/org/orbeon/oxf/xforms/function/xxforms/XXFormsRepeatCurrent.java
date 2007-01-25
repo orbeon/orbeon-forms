@@ -48,21 +48,5 @@ public class XXFormsRepeatCurrent extends XFormsFunction {
 
         // Get current single node
         return xformsControls.getRepeatCurrentSingleNode(repeatId);
-
-        // Wrap and return result
-//        final Document currentDocument = currentNode.getDocument();
-//
-//        for (Iterator i = xformsControls.getContainingDocument().getModels().iterator(); i.hasNext();) {
-//            final XFormsModel currentModel = (XFormsModel) i.next();
-//            for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-//                final XFormsInstance currentInstance = (XFormsInstance) j.next();
-//                if (currentInstance.getInstanceDocument() == currentDocument) {
-//                    return currentInstance.wrapNode(currentNode);
-//                }
-//            }
-//        }
-
-        // Should not happen
-//        throw new IllegalStateException("Node not found in any XForms instance.");
     }
 }

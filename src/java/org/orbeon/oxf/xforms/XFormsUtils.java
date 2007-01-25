@@ -1202,6 +1202,24 @@ public class XFormsUtils {
     }
 
     /**
+     * Remove the container namespace prefix if possible. If the id is null, return null.
+     *
+     * @param containingDocument    current ContainingDocument
+     * @param id                    id to de-prefix
+     * @return                      de-prefixed id if possible or null
+     */
+    public static String deNamespaceId(XFormsContainingDocument containingDocument, String id) {
+        if (id == null)
+            return null;
+
+        final String containerNamespace = containingDocument.getContainerNamespace();
+        if (containerNamespace.length() > 0 && id.startsWith(containerNamespace))
+            return id.substring(containerNamespace.length());
+        else
+            return id;
+    }
+
+    /**
      * Return LocationData for a given node, null if not found.
      *
      * @param node  node containing the LocationData

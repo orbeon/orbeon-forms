@@ -177,6 +177,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:list-models
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}list-models", XXFormsListModels.class, 0, 0, 0, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+
+        // xxforms:list-instances
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}list-instances", XXFormsListInstances.class, 0, 1, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
         // Useful XSLT function
         e = register("format-date", FormatDate.class, Type.DATE, 2, 5, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.DATE_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);

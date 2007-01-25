@@ -25,7 +25,6 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="formatting.xsl"/>
-                <!--<xsl:import href="oxf:/config/theme/theme.xsl"/>-->
                 <xsl:template match="/">
                     <xsl:apply-templates select="*" mode="xml-formatting"/>
                 </xsl:template>

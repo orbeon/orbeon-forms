@@ -323,17 +323,25 @@ public class XFormsInstance implements XFormsEventTarget {
         // Set value
         final String currentValue;
         if (node instanceof Element) {
+            // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text
+            // node is replaced with one corresponding to the new value. If no child text nodes are present, a text
+            // node is created, corresponding to the new value, and appended as the first child node."
             final Element elementnode = (Element) node;
-            currentValue = elementnode.getText();
-            // Remove current content
-            Dom4jUtils.clearElementContent(elementnode);
-            // Put text node with value
-            elementnode.add(Dom4jUtils.createText(newValue));
+            currentValue = XFormsUtils.setFirstTextNodeValue(elementnode, newValue);
         } else if (node instanceof Attribute) {
+            // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
+            // value."
             final Attribute attributenode = (Attribute) node;
             currentValue = attributenode.getValue();
             attributenode.setValue(newValue);
+        } else if (node instanceof Text) {
+            // "Text nodes: The text node is replaced with a new one corresponding to the new value."
+            final Text textNode = (Text) node;
+            currentValue = textNode.getText();
+            textNode.setText(newValue);
         } else {
+
+            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             throw new OXFException("Node is not an element or attribute.");
         }
 
@@ -345,13 +353,17 @@ public class XFormsInstance implements XFormsEventTarget {
     public static String getValueForNodeInfo(NodeInfo currentNode) {
 
         if (currentNode.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-            // Return the value of the first text node if any
+            // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
+            // Otherwise, returns "" (the empty string)"
             return XFormsUtils.getFirstTextNodeValue(currentNode);
         } else if (currentNode.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+            // "Attribute nodes: returns the string-value of the node."
             return currentNode.getStringValue();
         } else if (currentNode.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+            // "Text nodes: returns the string-value of the node."
             return currentNode.getStringValue();
         } else {
+            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             throw new OXFException("Invalid node type: " + currentNode.getNodeKind());
         }
     }

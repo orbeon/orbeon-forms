@@ -1300,7 +1300,33 @@ public class XFormsUtils {
                 i.next();
             }
         }
-        // TODO: Check: if we bind to an element that doesn't have a "first text node", do we return ""?
+
+        // "Element nodes: if text child nodes are present, returns the string-value of the first text child node.
+        // Otherwise, returns "" (the empty string)"
+        
+        return "";
+    }
+
+    public static String setFirstTextNodeValue(Element element, String newValue) {
+
+        // "10.1.9 The setvalue Element: Element nodes: If the element has any child text nodes, the first text node
+        // is replaced with one corresponding to the new value. If no child text nodes are present, a text node is
+        // created, corresponding to the new value, and appended as the first child node."
+
+        for (Iterator contentIterator = element.content().iterator(); contentIterator. hasNext();) {
+            final Node currentNode = (Node) contentIterator.next();
+            if (currentNode instanceof Text) {
+                // This is the first text node, replace its value
+                final Text textNode = (Text) currentNode;
+                final String currentValue = textNode.getText();
+                textNode.setText(newValue);
+                return currentValue;
+            }
+        }
+
+        // No text node was found, create one a first child
+        if (!"".equals(newValue)) // don't create empty text nodes
+            element.content().add(0, Dom4jUtils.createText(newValue));
         return "";
     }
 

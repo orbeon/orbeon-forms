@@ -437,11 +437,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
-                // Fire xforms-submit-serialize
-                // TODO: check whether we need to dispatch xforms-submit-serialize if there is no serialization...
-                if (serialize)
+                if (serialize) {
+                    // Fire xforms-submit-serialize
+
+                    // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                    // is changed from the initial value of empty string, then the content of the submission-body
+                    // property string is used as the submission serialization. Otherwise, the submission serialization
+                    // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                    // Submission Options."
+
+                    // TODO: pass submission-body attribute
                     containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitSerializeEvent(XFormsModelSubmission.this));
-                // TODO: what follows must be executed as the default action of xforms-submit-serialize
+                    // TODO: look at result of submission-body attribute and see if submission body needs to be replaced
+                }
 
                 // Serialize
                 // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data

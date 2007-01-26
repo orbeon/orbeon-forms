@@ -473,38 +473,45 @@ public class XFormsUtils {
         }
     }
 
+    private static Document htmlStringToDocument(String value, LocationData locationData) {
+        // Create and configure Tidy instance
+        final Tidy tidy = new Tidy();
+        tidy.setShowWarnings(false);
+        tidy.setQuiet(true);
+        tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
+
+        // Parse and output to SAXResult
+        final byte[] valueBytes;
+        try {
+            valueBytes = value.getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e); // will not happen
+        }
+        Document bodyDocument = null;
+        try {
+            final Document dom4jResult;
+            final InputStream is = new ByteArrayInputStream(valueBytes);
+            final org.w3c.dom.Document result = tidy.parseDOM(is, null);
+            dom4jResult = TransformerUtils.domToDom4jDocument(result);
+            // Create content document
+            final Element htmlElement = dom4jResult.getRootElement();
+            final Element bodyElement = htmlElement.element("body");
+            if (bodyElement != null) {
+                bodyDocument =  Dom4jUtils.createDocument();
+                bodyDocument.setRootElement((Element) bodyElement.detach());
+            }
+        } catch (Exception e) {
+            throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
+        }
+
+        return bodyDocument;
+    }
+
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
         if (value != null && value.length() > 0) {
-            // Create and configure Tidy instance
-            final Tidy tidy = new Tidy();
-            tidy.setShowWarnings(false);
-            tidy.setQuiet(true);
-            tidy.setCharEncoding(TidyConfig.getTidyEncoding("utf-8"));
 
-            // Parse and output to SAXResult
-            final byte[] valueBytes;
-            try {
-                valueBytes = value.getBytes("utf-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e); // will not happen
-            }
-            // TODO: optimize and skip creation of Dom4j document
-            Document bodyDocument = null;
-            try {
-                final Document dom4jResult;
-                final InputStream is = new ByteArrayInputStream(valueBytes);
-                final org.w3c.dom.Document result = tidy.parseDOM(is, null);
-                dom4jResult = TransformerUtils.domToDom4jDocument(result);
-                // Create content document
-                final Element htmlElement = dom4jResult.getRootElement();
-                final Element bodyElement = htmlElement.element("body");
-                if (bodyElement != null) {
-                    bodyDocument =  Dom4jUtils.createDocument();
-                    bodyDocument.setRootElement((Element) bodyElement.detach());
-                }
-            } catch (Exception e) {
-                throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
-            }
+            // TODO: optimize and skip creation of Dom4j document - we should be able to just stream out the W3C DOM crated by Tidy
+            final Document bodyDocument = htmlStringToDocument(value, locationData);
 
             // Stream fragment to the output
             try {
@@ -1139,10 +1146,10 @@ public class XFormsUtils {
     }
 
     /**
-     * Resolve a URI string against an element, taking into account ancestor xml:base elements for
+     * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
      * the resolution.
      *
-     * @param element   element used to consider xml:base scope
+     * @param element   element used to start resolution
      * @param uri       URI to resolve
      * @return          resolved URI
      */
@@ -1174,6 +1181,27 @@ public class XFormsUtils {
         } catch (URISyntaxException e) {
             throw new ValidationException("Error while resolving URI: " + uri, e, (LocationData) element.getData());
         }
+    }
+
+    /**
+     * Resolve f:url-norewrite attributes on this element, taking into account ancestor f:url-norewrite attributes for
+     * the resolution.
+     *
+     * @param element   element used to start resolution
+     * @return          true if rewriting is turned off, false otherwise
+     */
+    public static boolean resolveUrlNorewrite(Element element) {
+        Element currentElement = element;
+        do {
+            final String urlNorewriteAttribute = currentElement.attributeValue(XMLConstants.FORMATTING_URL_NOREWRITE_QNAME);
+            // Return the first ancestor value found
+            if (urlNorewriteAttribute != null)
+                return "true".equals(urlNorewriteAttribute);
+            currentElement = currentElement.getParent();
+        } while(currentElement != null);
+
+        // Default is to rewrite
+        return false;
     }
 
     /**

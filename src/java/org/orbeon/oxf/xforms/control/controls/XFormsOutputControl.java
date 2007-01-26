@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -23,12 +22,14 @@ import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -45,14 +46,17 @@ public class XFormsOutputControl extends XFormsValueControl {
     // XForms 1.1 mediatype attribute
     private String mediatypeAttribute;
 
+    private boolean urlNorewrite;
+
     public XFormsOutputControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
         this.mediatypeAttribute = element.attributeValue("mediatype");
         this.valueAttribute = element.attributeValue("value");
+        this.urlNorewrite = XFormsUtils.resolveUrlNorewrite(element);
     }
 
-    protected void evaluateValue(PipelineContext pipelineContext) {
+    protected void evaluateValue(final PipelineContext pipelineContext) {
         final String rawValue;
         if (valueAttribute == null) {
             // Get value from single-node binding
@@ -77,14 +81,62 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
-            if (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI"))) {
-                // Rewrite URI
-                final URI resolvedURI = XFormsUtils.resolveXMLBase(getControlElement(), rawValue);
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                updatedValue = externalContext.getResponse().rewriteResourceURL(resolvedURI.toString(), false);
+            if (!urlNorewrite && (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI")))) {
+                // Rewrite image URI
+                updatedValue = XFormsUtils.resolveURL(containingDocument, pipelineContext, getControlElement(), false, rawValue);
             } else {
                 updatedValue = rawValue;
             }
+        } else if ("text/html".equals(mediatypeAttribute)) {
+            // In case of HTML, we may need to do some URL rewriting
+            // Check src and href attributes for now. Anything else?
+            final boolean needsRewrite = !urlNorewrite && (rawValue.indexOf("src=") != -1 || rawValue.indexOf("href=") != -1);
+            if (needsRewrite) {
+                // Rewrite URLs
+                final StringBuffer sb = new StringBuffer();
+                // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
+                XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
+
+                    public void characters(char[] chars, int start, int length) throws SAXException {
+                        sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
+                    }
+
+                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                        sb.append('<');
+                        sb.append(localname);
+                        final int attributeCount = attributes.getLength();
+                        for (int i = 0; i < attributeCount; i++) {
+
+                            final String currentName = attributes.getLocalName(i);
+                            final String currentValue = attributes.getValue(i);
+
+                            final String rewrittenValue;
+                            if ("src".equals(currentName) || "href".equals(currentName)) {
+                                rewrittenValue = XFormsUtils.resolveURL(containingDocument, pipelineContext, getControlElement(), false, currentValue);
+                            } else {
+                                rewrittenValue = currentValue;
+                            }
+
+                            sb.append(' ');
+                            sb.append(currentName);
+                            sb.append("=\"");
+                            sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
+                            sb.append('"');
+                        }
+                        sb.append('>');
+                    }
+
+                    public void endElement(String uri, String localname, String qName) throws SAXException {
+                        sb.append("</");
+                        sb.append(localname);
+                        sb.append('>');
+                    }
+                }, rawValue, getLocationData(), "xhtml");
+                updatedValue = sb.toString();
+            } else {
+                updatedValue = rawValue;
+            }
+
         } else {
             updatedValue = rawValue;
         }

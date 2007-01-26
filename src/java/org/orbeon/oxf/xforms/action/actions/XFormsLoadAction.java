@@ -45,12 +45,8 @@ public class XFormsLoadAction extends XFormsAction {
         }
         final boolean doReplace = "replace".equals(showAttribute);
         final String target = actionElement.attributeValue(XFormsConstants.XXFORMS_TARGET_QNAME);
-        final String urlType = actionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
-        final boolean urlNorewrite;
-        {
-            final String urlNorewriteAttribute = actionElement.attributeValue(new QName("url-norewrite", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
-            urlNorewrite = Boolean.valueOf(urlNorewriteAttribute).booleanValue();
-        }
+        final String urlType = actionElement.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME);
+        final boolean urlNorewrite = XFormsUtils.resolveUrlNorewrite(actionElement);
         final boolean isShowProgress = !"false".equals(actionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."

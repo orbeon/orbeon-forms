@@ -96,10 +96,8 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
         final String formattingPrefix;
         final boolean isNewPrefix;
-        final boolean isImageNorewrite = isConcreteControl && isImageMediatype;
-        final boolean isHTMLNorewrite = isConcreteControl && isHTMLMediaType && "true".equals(elementAttributes.getValue(XMLConstants.OPS_FORMATTING_URI, "url-norewrite"));
-        if (isImageNorewrite || isHTMLNorewrite) {
-            // There is an f:url-norewrite="true" on the control, so add it
+
+        if (isImageMediatype || isHTMLMediaType) {
 
             // TODO: Need better mechanism to handle this!
             final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
@@ -120,7 +118,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         if (isNewPrefix)
             contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
 
-        if (isHTMLNorewrite)
+        if (isConcreteControl && (isImageMediatype || isHTMLMediaType))
             newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
@@ -133,11 +131,6 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
                 // NOTE: If producing a template, we must point to an existing image
                 final String srcValue = isConcreteControl ? xformsOutputControl.getValue() : XFormsConstants.DUMMY_IMAGE_URI;
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue);
-                
-                if (isImageNorewrite) {
-                    // Add @f:url-norewrite="true" because the URL is already rewritten by XFormsOutputControl
-                    imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
-                }
 
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);

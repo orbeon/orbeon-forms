@@ -515,7 +515,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Get URL type
-                final String urlType = submissionElement.attributeValue(new QName("url-type", new Namespace("f", XMLConstants.OPS_FORMATTING_URI)));
+                final String urlType = submissionElement.attributeValue(XMLConstants.FORMATTING_URL_TYPE_QNAME);
                 final ExternalContext.Request request = externalContext.getRequest();
 
                 // Find instance to update

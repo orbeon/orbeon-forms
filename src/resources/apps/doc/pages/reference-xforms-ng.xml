@@ -3616,13 +3616,17 @@
                     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
                 </xml-source>
                 <p>
-                    The number of XForms documents that can be held in that document cache at a given time is
-                    configured with the following property:
+                    If the above property is set to <code>true</code>, the number of XForms documents that can be held
+                    in that document cache at a given time is configured with the following property:
                 </p>
                 <xml-source>
                     <comment> Store at most 10 documents in the cache </comment>
                     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
                 </xml-source>
+                <p>
+                    Note that this represents XForms documents in a particular state of interaction with a user, which
+                    means that if to users load the same XForms page two entries will be needed in the cache.
+                </p>
             </section>
             <!--
             <section>

@@ -18,9 +18,9 @@
     <section label="XForms">
         <application id="forms" label="Government Forms"/>
         <application id="xforms-controls" label="XForms Controls"/>
-        <application id="xforms-sandbox" label="XForms Sandbox"/>
         <application id="xforms-todo" label="To-Do Lists"/>
         <application id="xforms-translate" label="Instant Translation"/>
+        <application id="xforms-sandbox" label="XForms Sandbox"/>
     </section>
     <section label="XForms Tutorial Apps">
         <application id="xforms-hello" label="XForms Hello"/>

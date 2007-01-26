@@ -64,3 +64,29 @@
     padding-left: 2em;
     padding-right: 2em;
 }
+
+.widgets-xforms-instance-inspector {
+    display: block;
+    clear: both;
+    margin-top: 1em
+}
+
+.widgets-xforms-instance-inspector-source {
+    background-color: #eeeeee;
+    border: solid &dark-color; 1px;
+    padding: .5em;
+    line-height: 110%;
+    overflow: auto;
+    font-family: "Lucida Console", "Courier New", Courier, monospace;
+    font-size: 9pt;
+}
+
+.widgets-xforms-instance-inspector .xforms-label {
+    font-weight: bold;
+    font-style: italic;
+    margin-right: .5em
+}
+
+.widgets-xforms-instance-inspector .xforms-output {
+    margin-right: 1em
+}

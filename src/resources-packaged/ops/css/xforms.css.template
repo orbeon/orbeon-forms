@@ -167,6 +167,13 @@
 .xforms-select-appearance-full input { vertical-align: middle }
 .xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
 
+.xforms-group-appearance-xxforms-fieldset {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0;
+    padding-bottom: 0
+}
+
 .xforms-range-background {
     position: relative;
     background: url(../../ops/images/xforms/slider-horizontal-background.png) no-repeat;

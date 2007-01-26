@@ -3607,13 +3607,21 @@
                     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
                 </xml-source>
                 <p>
-                    Whether state information is kept client-side or server-side, a property
-                    controls whether the XForms engine should try to optimize state reconstruction
-                    by using a cache. This property should usually be set to <code>true</code>:
+                    Whether state information is kept client-side or server-side, a property controls whether the XForms
+                    engine should try to optimize state reconstruction by using a cache. This property should usually
+                    be set to <code>true</code>:
                 </p>
                 <xml-source>
                     <comment> This should usually be set to "true" </comment>
                     <property as="xs:boolean" name="oxf.xforms.cache.document"                       value="true"/>
+                </xml-source>
+                <p>
+                    The number of XForms documents that can be held in that document cache at a given time is
+                    configured with the following property:
+                </p>
+                <xml-source>
+                    <comment> Store at most 10 documents in the cache </comment>
+                    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
                 </xml-source>
             </section>
             <!--

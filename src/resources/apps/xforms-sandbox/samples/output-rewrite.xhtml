@@ -11,18 +11,90 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>Output Rewrite</xhtml:title>
+        <xhtml:title>XForms Output URL Rewriting</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
-                <instance/>
+                <instance>
+                    <html-value>This is an image: &lt;img src="/ops/images/xforms/help.gif"/>. Does it appear?</html-value>
+                    <html-value>This is an image: &lt;img src="/ops/ops/images/xforms/help.gif"/>. Does it appear?</html-value>
+                    <html-value>This is an image: &lt;img src="http://www.orbeon.com/ops/ops/images/xforms/help.gif"/>. Does it appear?</html-value>
+                    <image-value>/ops/images/xforms/help.gif</image-value>
+                    <image-value>/ops/ops/images/xforms/help.gif</image-value>
+                    <image-value>http://www.orbeon.com/ops/ops/images/xforms/help.gif</image-value>
+                    <path/>
+                </instance>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xforms-label { font-weight: bold; margin-right: 1em }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-        <xforms:input ref="/instance" incremental="true"/>
-        <xforms:output mediatype="text/html" value="concat('&lt;a href=''', /instance, '''&gt;Gaga&lt;/a&gt;')"/>
+
+        <xforms:input ref="path" incremental="true"/>
+        <xforms:output mediatype="text/html" value="concat('&lt;a href=''', path, '''&gt;Gaga&lt;/a&gt;')"/>
+        <xforms:output f:url-norewrite="true" mediatype="text/html" value="concat('&lt;a href=''', path, '''&gt;Gaga&lt;/a&gt;')"/>
+
+        <xhtml:hr/>
+
+        <xforms:repeat nodeset="html-value">
+            <xhtml:p>
+                <xforms:output value=".">
+                    <xforms:label>Value:</xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="text/html">
+                    <xforms:label>No f:url-norewrite:</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="text/html" f:url-norewrite="false">
+                    <xforms:label>f:url-norewrite="false":</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="text/html" f:url-norewrite="true">
+                    <xforms:label>f:url-norewrite="true":</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div f:url-norewrite="true">
+                <xforms:output ref="." mediatype="text/html">
+                    <xforms:label>f:url-norewrite="true" on parent:</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+        </xforms:repeat>
+        <xhtml:hr/>
+        <xforms:repeat nodeset="image-value">
+            <xhtml:p>
+                <xforms:output value=".">
+                    <xforms:label>Value:</xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="image/*">
+                    <xforms:label>No f:url-norewrite:</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="image/*" f:url-norewrite="false">
+                    <xforms:label>f:url-norewrite="false":</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+            <xhtml:div>
+                <xforms:output ref="." mediatype="image/*" f:url-norewrite="true">
+                    <xforms:label>f:url-norewrite="true":</xforms:label>
+                </xforms:output>
+            </xhtml:div>
+        </xforms:repeat>
     </xhtml:body>
 </xhtml:html>

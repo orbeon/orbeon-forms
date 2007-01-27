@@ -16,7 +16,6 @@
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-      xmlns:exforms="http://www.exforms.org/exf/1-0"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -34,14 +33,23 @@
                 <form xmlns="">
                     <action>upload</action>
                     <file filename="" mediatype="" size=""/>
+                    <file-selected>false</file-selected>
+                    <file-valid/>
+                    <upload-trigger/>
+                    <download-trigger/>
                     <sample/>
                     <sample-trigger/>
                 </form>
             </xforms:instance>
-            <xforms:bind nodeset="file" type="xs:anyURI"
-                         constraint="../action = 'upload' or (../action = 'download' and (normalize-space(.) = '' or starts-with(normalize-space(.), 'http://')))"
-                         required="../action = 'download'"/>
-            <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
+            <xforms:bind nodeset="instance('main-instance')">
+                <xforms:bind nodeset="file-valid" calculate="../action = 'upload' or
+                        (../action = 'download' and starts-with(normalize-space(../file), 'http://'))"/>
+                <xforms:bind nodeset="file" type="xs:anyURI"
+                             constraint="../file-valid = 'true'"/>
+                <xforms:bind nodeset="upload-trigger" readonly="../file-selected = 'false'"/>
+                <xforms:bind nodeset="download-trigger" readonly="../file-valid = 'false'"/>
+                <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
+            </xforms:bind>
             <xforms:instance id="samples-instance">
                 <directory xmlns=""/>
             </xforms:instance>
@@ -81,10 +89,11 @@
                                     <xforms:filename ref="@filename"/>
                                     <xforms:mediatype ref="@mediatype"/>
                                     <xxforms:size ref="@size"/>
+                                    <xforms:setvalue ev:event="xforms-select" ref="../file-selected">true</xforms:setvalue>
                                 </xforms:upload>
                             </td>
                             <td>
-                                <xforms:trigger>
+                                <xforms:trigger ref="upload-trigger">
                                     <xforms:label>Run XForms</xforms:label>
                                     <xforms:send ev:event="DOMActivate" submission="main-submission"/>
                                 </xforms:trigger>
@@ -103,13 +112,13 @@
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">
-                                    <xforms:input ref="file" xxforms:size="65">
+                                    <xforms:input ref="file" xxforms:size="65" incremental="true">
                                         <xforms:label></xforms:label>
                                         <xforms:alert>Please enter a valid HTTP URL (starting with "http://")</xforms:alert>
                                     </xforms:input>
                                 </td>
                                 <td>
-                                    <xforms:trigger>
+                                    <xforms:trigger ref="download-trigger">
                                         <xforms:label>Run XForms</xforms:label>
                                     </xforms:trigger>
                                 </td>

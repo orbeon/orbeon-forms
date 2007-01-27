@@ -1098,6 +1098,51 @@ ORBEON.xforms.Events = {
         var dialogId = me;
         var dialog = ORBEON.util.Dom.getElementById(dialogId);
         xformsFireEvents([xformsCreateEventArray(dialog, "xxforms-dialog-close")], false);
+    },
+
+    /**
+     * Handle click on check box for select tree.
+     */
+    treeCheckClick: function() {
+        var tree = this.tree;
+        var control = ORBEON.util.Dom.getElementById(tree.id);
+        control.value = "";
+        for (nodeIndex in tree._nodes) {
+            var node = tree._nodes[nodeIndex];
+            if (node.checked) {
+                if (control.value != "") control.value += " ";
+                control.value += node.data.value;
+            }
+        }
+        xformsValueChanged(control);
+    },
+
+    /**
+     * Handle click on label in a tree that corresponds to xforms:select.
+     */
+    treeSelectSelect: function(id, value) {
+        var control = ORBEON.util.Dom.getElementById(id);
+        var yuiTree = control.xformsTree;
+        var yuiNode = yuiTree.getNodeByProperty("value", value);
+
+        // If checked uncheck, if unchecked check
+        if (yuiNode.checked) {
+            yuiNode.uncheck();
+        } else {
+            yuiNode.check();
+        }
+
+        // Call listener on check event
+        yuiNode.onCheckClick();
+    },
+
+    /**
+     * Handle click on label in a tree that corresponds to xforms:select1.
+     */
+    treeSelect1Select: function(id, value) {
+        var control = ORBEON.util.Dom.getElementById(id);
+        control.value = value;
+        xformsValueChanged(control);
     }
 };
 
@@ -1137,17 +1182,18 @@ ORBEON.xforms.Init = {
             var value = childArray[1];
             var selected = childArray[2];
             // Create node and add to tree
-            var nodeInformation = { label: name, value: value };
+            var nodeInformation = { label: name, value: value, href: "javascript:ORBEON.xforms.Events.treeSelect"
+                + (tree.xformsAllowMultipleSelection ? "" : 1)
+                + "Select('"
+                + tree.id + "', '"
+                + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
+                + "')" };
             var childNode;
             if (tree.xformsAllowMultipleSelection) {
                 childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
-                childNode.onCheckClick = xformsSelectTreeSelect;
+                childNode.onCheckClick = ORBEON.xforms.Events.treeCheckClick;
                 if (selected) childNode.check();
             } else {
-                nodeInformation.href = "javascript:xformsSelect1TreeSelect('"
-                        + tree.id + "', '"
-                        + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
-                        + "')";
                 childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
             }
             ORBEON.xforms.Init._addToTree(tree, childArray, childNode, 3);
@@ -3077,33 +3123,6 @@ function xformsHtmlEditorChange(editorInstance) {
     // Throw value change event if the field is in incremental mode
     if (ORBEON.util.Dom.hasClass(editorInstance.LinkedField, "xforms-incremental"))
         xformsValueChanged(editorInstance.LinkedField, null);
-}
-
-/**
- * Handle selection in tree that corresponds to xforms:select, where only one item can be selected.
- */
-function xformsSelect1TreeSelect(id, value) {
-    var control = ORBEON.util.Dom.getElementById(id);
-    control.value = value;
-    xformsValueChanged(control);
-}
-
-/**
- * Handle selection in tree that corresponds to xforms:select1, where we have checkboxes and
- * multiple nodes can be selected.
- */
-function xformsSelectTreeSelect() {
-    var tree = this.tree;
-    var control = ORBEON.util.Dom.getElementById(tree.id);
-    control.value = "";
-    for (nodeIndex in tree._nodes) {
-        var node = tree._nodes[nodeIndex];
-        if (node.checked) {
-            if (control.value != "") control.value += " ";
-            control.value += node.data.value;
-        }
-    }
-    xformsValueChanged(control);
 }
 
 /**

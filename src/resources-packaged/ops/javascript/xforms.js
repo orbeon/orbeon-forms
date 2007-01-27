@@ -781,34 +781,39 @@ ORBEON.xforms.Events = {
 
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-        if (target != null && !ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
-            // When we move out from a field, we don't receive the keyup events corresponding to keypress
-            // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
-            if (ORBEON.xforms.Globals.changedIdsRequest[target.id] != null)
-                ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
+        if (target != null) {
+            if (ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
+                // For upload controls, generate an xforms-select event when a file is selected
+                xformsFireEvents(new Array(xformsCreateEventArray(target, "xforms-select", "")), false);
+            } else {
+                // When we move out from a field, we don't receive the keyup events corresponding to keypress
+                // for that field (go figure!). Se we reset here the count for keypress without keyup for that field.
+                if (ORBEON.xforms.Globals.changedIdsRequest[target.id] != null)
+                    ORBEON.xforms.Globals.changedIdsRequest[target.id] = 0;
 
-            // For select1 list, make sure we have exactly one value selected
-            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
-                if (target.value == "") {
-                    // Stop end-user from deselecting last selected value
-                    target.options[0].selected = true;
-                    //target.value = target.options[0].value;
-                } else {
-                    // Unselect options other than the first one
-                    var foundSelected = false;
-                    for (var optionIndex = 0; optionIndex < target.options.length; optionIndex++) {
-                        var option = target.options[optionIndex];
-                        if (option.selected) {
-                            if (foundSelected) option.selected = false;
-                            else foundSelected = true;
+                // For select1 list, make sure we have exactly one value selected
+                if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
+                    if (target.value == "") {
+                        // Stop end-user from deselecting last selected value
+                        target.options[0].selected = true;
+                        //target.value = target.options[0].value;
+                    } else {
+                        // Unselect options other than the first one
+                        var foundSelected = false;
+                        for (var optionIndex = 0; optionIndex < target.options.length; optionIndex++) {
+                            var option = target.options[optionIndex];
+                            if (option.selected) {
+                                if (foundSelected) option.selected = false;
+                                else foundSelected = true;
+                            }
                         }
                     }
                 }
-            }
 
-            // Fire change event
-            xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
-                ORBEON.xforms.Controls.getCurrentValue(target))], false);
+                // Fire change event
+                xformsFireEvents([xformsCreateEventArray(target, "xxforms-value-change-with-focus-change",
+                    ORBEON.xforms.Controls.getCurrentValue(target))], false);
+            }
         }
     },
 
@@ -1038,19 +1043,6 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * For upload controls, generate an xforms-select event when a file is selected
-     */
-    change: function(event) {
-        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-        if (ORBEON.util.Dom.hasClass(target, "xforms-upload")) {
-            // On browsers that support both capturing and bubbling phase, only do this during bubbling phase
-            if (!event.eventPhase || (event.eventPhase && event.eventPhase == 3)) {
-                xformsFireEvents(new Array(xformsCreateEventArray(target, "xforms-select", "")), false);
-            }
-        }
-    },
-
-    /**
      * Send notification to XForms engine end-user clicked on day.
      */
     calendarUpdate: function(calendar) {
@@ -1239,7 +1231,6 @@ ORBEON.xforms.Init = {
         YAHOO.util.Event.addListener(document, "mouseover", ORBEON.xforms.Events.mouseover);
         YAHOO.util.Event.addListener(document, "mouseout", ORBEON.xforms.Events.mouseout);
         YAHOO.util.Event.addListener(document, "click", ORBEON.xforms.Events.click);
-        YAHOO.util.Event.addListener(document, "change", ORBEON.xforms.Events.change);
         YAHOO.util.Event.addListener(window, "resize", ORBEON.xforms.Events.resize);
         YAHOO.widget.Overlay.windowScrollEvent.subscribe(ORBEON.xforms.Events.scroll);
 

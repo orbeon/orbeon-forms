@@ -320,7 +320,6 @@
                         <xsd:element ref="xforms:choices"/>
                         <xsd:element ref="xforms:item"/>
                         <xsd:element ref="xforms:itemset"/>
-
                     </xsd:choice>
                 </xsd:sequence>
             </xsd:sequence>
@@ -330,11 +329,11 @@
     <xsd:element name="value">
         <xsd:complexType mixed="true">
             <xsd:sequence>
-
                 <xsd:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
+            <xsd:attribute name="value" type="xsd:string" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="item">
@@ -407,6 +406,7 @@
             <xsd:attribute name="inputmode" type="xsd:string" use="optional"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="false"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="textarea">
@@ -451,9 +451,9 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
-
             <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="false"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:group name="List.UI.Common">

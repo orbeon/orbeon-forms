@@ -24,7 +24,6 @@
     <page path-info="/xforms-controls/" view="view.xhtml"/>
 
     <page path-info="/xforms-controls/services/update-countries" model="services/update-countries.xpl"/>
-    <page path-info="/xforms-controls/services/update-country-details" model="services/update-country-details.xpl"/>
     <page path-info="/xforms-controls/services/countries" view="services/countries.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

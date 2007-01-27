@@ -97,8 +97,6 @@
             <xforms:submission ref="instance('countries-instance')" id="countries-submission"
                 method="post" action="services/update-countries" replace="instance"/>
 
-            <xforms:submission ref="instance('country-details-instance')" id="country-details-submission"
-                method="post" action="services/update-country-details" replace="instance"/>
             <!-- Submission when country name changed -->
             <xforms:submission ref="instance('instance')" id="country-name-updated" validate="false"
                 method="post" action="services/countries" replace="instance" instance="countries-names-instance"/>
@@ -311,10 +309,12 @@
                             <xforms:label ref="name"/>
                             <xforms:value ref="us-code"/>
                         </xforms:itemset>
-                        <xforms:send submission="country-details-submission" ev:event="xforms-value-changed"/>
                     </xforms:select1>
                 </xhtml:p>
-                <xforms:output ref="instance('country-details-instance')" mediatype="text/html"/>
+                <!-- Display the flag when a country is selected -->
+                <xforms:group ref=".[country != '']">
+                    <xforms:output mediatype="text/html" value="concat('&lt;img src=&quot;/apps/xforms-controls/images/flags/', country, '-flag.gif&quot;/>')"/>
+                </xforms:group>
             </widget:tab>
         </widget:tabs>
 

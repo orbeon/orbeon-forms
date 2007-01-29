@@ -17,7 +17,7 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xhtml:img src="/apps/pfc-atm/apukwik.gif" width="314" height="232" alt="See you again!"/>
+            <xhtml:img src="/apps/pfc-atm/images/apukwik.gif" width="314" height="232" alt="See you again!"/>
         </xhtml:p>
         <xhtml:p style="margin-top: 3em">
             <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.

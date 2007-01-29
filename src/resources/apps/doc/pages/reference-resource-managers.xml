@@ -22,12 +22,11 @@
         <section>
             <title>Introduction</title>
             <p>
-                A <i>resource manager</i> is an Orbeon PresentationServer (OPS) component
-                responsible for reading and writing XML and other resources like binary and text
-                documents. A resource manager abstracts the actual mechanisms used to store
-                resources. An important benefit of using such an abstraction is that it is possible
-                to store all your application files in a sandbox which can be moved at will within a
-                filesystem or between storage mechanisms. For instance, resources can be stored:</p>
+                A <i>resource manager</i> is an Orbeon Forms component responsible for reading and writing XML and
+                other resources like binary and text documents. A resource manager abstracts the actual mechanisms used
+                to store resources. An important benefit of using such an abstraction is that it is possible to store
+                all your application files in a sandbox which can be moved at will within a filesystem or between
+                storage mechanisms. For instance, resources can be stored:</p>
             <ul>
                 <li><p>As files on disk (using your operating system's file system)</p></li>
                 <li><p>As resources within a WAR file</p></li>
@@ -36,8 +35,8 @@
             </ul>
             <p>A resource manager is both used:</p>
             <ul>
-                <li><p>Internally by OPS</p></li>
-                <li><p>By your own OPS applications through URLs with the <code>oxf:</code> protocol</p></li>
+                <li><p>Internally by Orbeon Forms</p></li>
+                <li><p>By your own Orbeon Forms applications through URLs with the <code>oxf:</code> protocol</p></li>
             </ul>
             <p>
                 This chapter describes the different types of resource managers and explains their
@@ -47,7 +46,7 @@
         <section>
             <title>General Configuration</title>
             <p>
-                A single resource manager is initialized per OPS web application. Configuration is
+                A single resource manager is initialized per Orbeon Forms web application. Configuration is
                 handled in the web application descriptor (<code>web.xml</code>) by setting a number
                 of context parameters. The first parameter indicates the resource manager factory:
             </p>
@@ -232,7 +231,7 @@
             <p>
                 The class loader resource manager can load resource from a JAR file or from a
                 directory in the classpath. This resource manager is required to load internal
-                resources for OPS.
+                resources for Orbeon Forms.
             </p>
             <section>
                 <title>Example</title>
@@ -421,7 +420,7 @@
             <p>
                 With the priority resource manager you can chain several resource managers. It is
                 crucial to be able to load resources from multiple sources since some resources are
-                bundled in the OPS JAR file. Thus, the class loader resource
+                bundled in the Orbeon Forms JAR file. Thus, the class loader resource
                 manager must always be in the priority chain. It usually has the lowest priority so
                 the application developer can override system resources.
             </p>
@@ -486,7 +485,7 @@
                 This resource manager loads XML documents from <link
                 href="http://www.intersystems.com/">InterSystems</link> Cach&#233; Object Database.
                 <link href="http://www.mgateway.tzo.com/eXtc.htm">eXtc</link> provides a W3C DOM
-                interface to Cach&#233; and allows OPS to store and retrieve XML
+                interface to Cach&#233; and allows Orbeon Forms to store and retrieve XML
                 documents. This section assumes Cach&#233; and eXtc are already installed on your
                 system.
             </p>
@@ -494,7 +493,7 @@
             <note>
                 <p>
                     To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
-                    Cach&#233; distribution into OPS <code>WEB-INF/lib</code> directory.
+                    Cach&#233; distribution into Orbeon Forms <code>WEB-INF/lib</code> directory.
                 </p>
             </note>
 
@@ -508,7 +507,7 @@
             <section>
                 <title>Importing XML Files into Cach&#233;</title>
                 <p>
-                    OPS ships with <code>CacheImport</code> to populate the
+                    Orbeon Forms ships with <code>CacheImport</code> to populate the
                     database with resource from a directory. Set your <code>CLASSPATH</code>
                     environment variable to include the following JAR files to run
                     <code>CacheImport</code>:

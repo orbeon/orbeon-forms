@@ -26,7 +26,7 @@
                 Traditionally, Web applications developers generate URLs in their Web pages
                 manually. For example, an HTML <code>&lt;a></code> element contains an
                 <code>href</code> attribute specifying the destination of a link. The default
-                OPS Page Flow Controller epilogue contains a URL rewriting
+                Orbeon Forms Page Flow Controller epilogue contains a URL rewriting
                 mechanism for HTML and XHTML documents.
             </p>
             <section>
@@ -227,7 +227,7 @@
         <section>
             <title>Working with URL Rewriting</title>
             <p>
-                In OPS, URLs come from two different sources:
+                In Orbeon Forms, URLs come from two different sources:
             </p>
             <ul>
                 <li>
@@ -343,8 +343,8 @@
                             <code>/oxf/example1/my/image.gif?scale=100</code>
                             <br/><br/>
 
-                            Note that using resource URLs relative to an OPS Portlet
-                            path (as handled by OPS) does not necessarily make sense
+                            Note that using resource URLs relative to an Orbeon Forms Portlet
+                            path (as handled by Orbeon Forms) does not necessarily make sense
                             unless you define your hierarchy of resources carefully.
                         </td>
                     </tr>

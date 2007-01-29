@@ -144,17 +144,15 @@
     <xsl:template match="/">
         <book>
             <titlepag>
-                <title>Orbeon PresentationServer User Manual version 2.8.0</title>
+                <title>Orbeon Forms User Manual version 2.8.0</title>
                 <author>Orbeon, Inc.</author>
                 <date>March 3 2005</date>
                 <abstract>
-                    Orbeon PresentationServer is the most advanced XML transformation framework
-                    built on top of proven J2EE technologies. It stands out in a crowd of existing
-                    J2EE frameworks by fully leveraging the ubiquity and the flexibility of XML.
-                    Although PresentationServer was designed primarily to develop Web
-                    applications, it can be used to build all sorts of XML applications, including
-                    Enterprise Application Integration (EAI), Content Management Systems (CMS),
-                    and more.
+                    Orbeon Forms is the most advanced XML transformation framework built on top of proven J2EE
+                    technologies. It stands out in a crowd of existing J2EE frameworks by fully leveraging the
+                    ubiquity and the flexibility of XML. Although Orbeon Forms was designed primarily to develop Web
+                    applications, it can be used to build all sorts of XML applications, including Enterprise
+                    Application Integration (EAI), Content Management Systems (CMS), and more.
                 </abstract>
             </titlepag>
             <toc/>

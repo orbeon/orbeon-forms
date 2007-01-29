@@ -187,8 +187,8 @@
                                         </xforms:repeat>
                                     </xml-source>
                                     <p>
-                                        The <a href="/goto-example/xforms-repeat">Repeating
-                                        Elements</a> example illustrates a case of nested repeat.
+                                        The <a href="/xforms-todo/">Repeating Elements</a> example illustrates a case
+                                        of nested repeat.
                                     </p>
                                 </li>
                                 <li>
@@ -220,11 +220,9 @@
                                         </ul>
                                     </p>
 
-                                    You will find a very simple example of
-                                    <code>&lt;xforms:bind></code> in the <a
-                                    href="/goto-example/xforms-text">XForms text</a> example. In
-                                    this example we check that the correct password is entered with
-                                    an XForms model that contains:
+                                    You will find a very simple example of <code>&lt;xforms:bind></code> in the <a
+                                    href="/xforms-controls/">XForms text</a> example. In this example we check that the
+                                    correct password is entered with an XForms model that contains:
 
                                     <xml-source show-namespaces="false">
                                         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -388,12 +386,10 @@
                                         which is part of the final XForms specification.
                                     </li>
                                     <li>
-                                        When multiple values are selected in a list or checkboxes
-                                        the string containing the space separated list of selected
-                                        values is stored in the element or attribute bound to the
-                                        control. Also, see the <a
-                                        href="/goto-example/xforms-selection">XForms selection</a>
-                                        example.
+                                        When multiple values are selected in a list or checkboxes the string containing
+                                        the space separated list of selected values is stored in the element or
+                                        attribute bound to the control. Also, see the <a href="/xforms-controls/">XForms
+                                        selection</a> example.
                                     </li>
                                     <li>
                                         You must use the namespace

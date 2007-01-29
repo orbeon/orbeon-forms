@@ -24,14 +24,14 @@
             <title>Overview</title>
             <ul>
                 <li><p>
-                    <b>Rationale</b> – The OPS properties are used by some processors to configure
+                    <b>Rationale</b> – The Orbeon Forms properties are used by some processors to configure
                     or customize their behavior. This section describes how the system is
                     configured, and lists all the customizable properties.
                 </p></li>
                 <li><p>
                     <b>Properties File Location</b> – The properties sub-system is initialized after
                     the <link href="reference-resource-managers">Resource Manager</link> (the
-                    properties being read like any other OPS resources). By default
+                    properties being read like any other Orbeon Forms resources). By default
                     it tries to load a file from the URL <code>oxf:/properties.xml</code>. This
                     value can be overridden in the Web application descriptor <code>web.xmxl</code>
                     with the <code>oxf.properties</code> initialization parameter:
@@ -98,7 +98,7 @@
                     </table>
                 </p>
                 <p>
-                    OPS uses the <fork
+                    Orbeon Forms uses the <fork
                     href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
                     framework. Log4J is configured with an XML file conforming to the <link
                     href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
@@ -123,7 +123,7 @@
                 <p>
                     If this property is not set, the Log4J initialization is skipped. This is
                     useful if another subsystem of your application has already initialized Log4J
-                    prior to the loading of OPS.
+                    prior to the loading of Orbeon Forms.
                 </p>
             </section>
 
@@ -134,7 +134,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Setup the size of the OPS cache</td>
+                            <td>Setup the size of the Orbeon Forms cache</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -150,7 +150,7 @@
                 </p>
 
                 <p>
-                    OPS uses an efficient caching system. OPS automatically determines what can be
+                    Orbeon Forms uses an efficient caching system. Orbeon Forms automatically determines what can be
                     cached and when to expire objects. The cache has a default size of 200, meaning
                     that it can hold 200 objects. This size is reasonable for most applications. A
                     bigger cache tends to make the application faster, but it uses more memory. To
@@ -221,7 +221,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Defines OPS processors</td>
+                            <td>Defines Orbeon Forms processors</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -234,8 +234,8 @@
                     </table>
                 </p>
                 <p>
-                    Loads a OPS prologue file, where processors are declared.
-                    OPS is bundled with a default prologue file containing all
+                    Loads a Orbeon Forms prologue file, where processors are declared.
+                    Orbeon Forms is bundled with a default prologue file containing all
                     processors. You can create processors (see the <link
                     href="reference-processor-api">processor API</link>) and declare them in a
                     custom prologue. The custom prologue doesn't replace, but completes the default
@@ -271,7 +271,7 @@
                     </table>
                 </p>
                 <p>
-                    SAX is the underlying mechanism in OPS by which processors
+                    SAX is the underlying mechanism in Orbeon Forms by which processors
                     receive and generate XML data. Given only the constraints of the SAX API, it is
                     possible for a processor to generate an invalid sequence of SAX events. Another
                     processor that receives that invalid sequence of events may or may not be able
@@ -317,7 +317,7 @@
                     </table>
                 </p>
                 <p>
-                    OPS ships with two implementations of Trace:
+                    Orbeon Forms ships with two implementations of Trace:
                 </p>
                 <ul>
                     <li>

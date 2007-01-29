@@ -622,8 +622,8 @@
                                 and see the results of your modifications on the fly. The resources are stored under
                                 <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
                                 orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance, try to modify
-                                <code>examples/tutorial/hello1/view.xhtml</code>: replace "Hello World!" by your own
-                                message, and reload the page in the browser to see the result.
+                                <code>apps/xforms-hello/view.xhtml</code>: replace "Please enter your first name:" by
+                                your own message, and reload the page in the browser to see the result.
                             </li>
                         </ul>
                     </p>

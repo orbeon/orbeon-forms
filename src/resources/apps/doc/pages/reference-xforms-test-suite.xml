@@ -29,7 +29,7 @@
         <section>
             <title>Scope</title>
             <p>
-                Orbeon PresentationServer (OPS)'s form handling is based on the <a
+                Orbeon Forms form handling is based on the <a
                 href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
                 presents the result of the XForms test suite.
             </p>

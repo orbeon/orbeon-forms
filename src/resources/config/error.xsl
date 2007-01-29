@@ -90,9 +90,9 @@
                             </p>
                         </div>
                    </div>
-                    <h2>OPS Call Stack</h2>
+                    <h2>Orbeon Forms Call Stack</h2>
                     <p>
-                        The OPS Call Stack helps you determine what sequence of OPS
+                        The Orbeon Forms Call Stack helps you determine what sequence of Orbeon Forms
                         operations have caused the error.
                     </p>
                     <table class="gridtable">
@@ -162,7 +162,7 @@
                             <xsl:otherwise>
                                 <tr>
                                     <td colspan="5">
-                                        <i>There is no OPS call stack available for this error.</i>
+                                        <i>There is no Orbeon Forms call stack available for this error.</i>
                                     </td>
                                 </tr>
                             </xsl:otherwise>
@@ -170,9 +170,9 @@
                     </table>
                     <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
                     <p>
-                        Java Exceptions are the native mechanism by which OPS reports
+                        Java Exceptions are the native mechanism by which Orbeon Forms reports
                         errors. More than one exception may be provided below but usually
-                        the first exception along with the OPS Stack Trace above provide
+                        the first exception along with the Orbeon Forms Stack Trace above provide
                         enough information to track down an issue.
                     </p>
                     <table class="gridtable" width="100%">

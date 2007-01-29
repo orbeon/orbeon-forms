@@ -23,9 +23,9 @@
         <section>
             <title>Scheduler</title>
             <p>
-                The OPS Scheduler processor allows applications to start and stop periodic tasks. A task is defined by a
-                processor and its inputs. You can start or stop a task at any time. The <code>config</code> input must
-                conform to the following schema:
+                The Orbeon Forms Scheduler processor allows applications to start and stop periodic tasks. A task is
+                defined by a processor and its inputs. You can start or stop a task at any time. The <code>config</code>
+                input must conform to the following schema:
             </p>
             <p>
                 <xml-source>

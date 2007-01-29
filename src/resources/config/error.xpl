@@ -13,8 +13,8 @@
 -->
 <!--
 
-  This pipeline is called by OPS when an exception occurs, as configured in web.xml. Developers can
-  customize this at will.
+  This pipeline is called by Orbeon Forms when an exception occurs, as configured in web.xml. Developers can customize
+  this at will.
 
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"

@@ -22,14 +22,14 @@
         <section>
             <title>Rationale</title>
             <p>
-                When OPS encounters an error, it throws two kinds of exceptions:
+                When Orbeon Forms encounters an error, it throws two kinds of exceptions:
                 <code>OXFException</code> and its subclass, <code>ValidationException</code>. They
                 both contain a nested root cause, and <code>ValidationException</code> contains
                 document location information.
             </p>
             <p>
-                When an exception is thrown, OPS displays a default error page containing the root
-                cause and location information if available, as well as a detailed OPS stack trace.
+                When an exception is thrown, Orbeon Forms displays a default error page containing the root
+                cause and location information if available, as well as a detailed Orbeon Forms stack trace.
                 However, the application developer can display a different page by specifying a
                 processor to be executed upon error. This processor could be, for example, a
                 pipeline logging the error and displaying a nice error page to the user.
@@ -56,7 +56,7 @@
                     <servlet>
                         <servlet-name>oxf</servlet-name>
                         <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                        <comment>The error processor that OXFServlet must execute</comment>
+                        <comment>The error processor that OPSServlet must execute</comment>
                         <init-param>
                             <param-name>oxf.error-processor.name</param-name>
                             <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -91,7 +91,7 @@
                 <xsl:template match="/">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <head>
-                            <title>OPS - Custom Error Page</title>
+                            <title>Orbeon Forms - Custom Error Page</title>
                         </head>
                         <body>
                             <h1>An error occured:</h1>

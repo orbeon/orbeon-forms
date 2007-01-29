@@ -31,22 +31,22 @@
         </section>
         <a name="ops-xinclude"/>
         <section>
-            <title>Note About XInclude in Orbeon PresentationServer</title>
+            <title>Note About XInclude in Orbeon Forms</title>
             <p>
-                By default, XInclude processing is not automatic in OPS, and must be enabled
+                By default, XInclude processing is not automatic in Orbeon Forms, and must be enabled
                 explicitly, except in a few cases described below.
             </p>
             <section>
                 <title>Explicit XInclude Handling</title>
                 <p>
-                    There are two ways to use XInclude explicitly in OPS:
+                    There are two ways to use XInclude explicitly in Orbeon Forms:
                 </p>
                 <ul>
                     <li>
                         <p>
-                            <b>At parsing time.</b> The XML parser included with OPS is able to
+                            <b>At parsing time.</b> The XML parser included with Orbeon Forms is able to
                             process XInclude instructions when an XML file is being parsed (i.e.
-                            loaded) into OPS. This is usually controlled with the <a
+                            loaded) into Orbeon Forms. This is usually controlled with the <a
                             href="processors-generators-url#xml-mode">URL generator</a>. Example:
                         </p>
                         <xml-source show-namespaces="false">
@@ -84,12 +84,12 @@
                         The correct namespace to use for XInclude 1.0 is <code>http://www.w3.org/2001/XInclude</code>
                         (that is, with a <code>2001</code> in
                         it). However, when including at parsing time, the version of the Xerces XML
-                        parser included with OPS incorrectly requires a URI with <code>2003</code>. This only occurs
+                        parser included with Orbeon Forms incorrectly requires a URI with <code>2003</code>. This only occurs
                         when XInclude is explicitly processed at parsing time but not when the XInclude processor is
-                        used explicitly or implicitly (by the PFC). With the current version of OPS, you must use
+                        used explicitly or implicitly (by the PFC). With the current version of Orbeon Forms, you must use
                         <code>http://www.w3.org/2003/XInclude</code> when including at parsing time, but
                         <code>http://www.w3.org/2001/XInclude</code> when including with the XInclude processor. This
-                        will be fixed in a future version of OPS.
+                        will be fixed in a future version of Orbeon Forms.
                     </p>
                 </note>
             </section>

@@ -89,7 +89,7 @@
                 <xsl:template match="/">
                     <document>
                         <header>
-                            <title>The Orbeon PresentationServer (OPS) Book</title>
+                            <title>The Orbeon Forms Book</title>
                         </header>
                         <body>
                             <xsl:apply-templates select="/document/*"/>

@@ -23,10 +23,10 @@
 			<title>Scope</title>
 			<p>
                 This section explains the structure of the standard WAR distributed with
-                OPS and how this WAR integrates with the application server (or
+                Orbeon Forms and how this WAR integrates with the application server (or
                 Servlet container). This information is useful if you need to repackage Presentation
                 Server. For instance, if you want to build an EAR file, or if you need to deploy
-                more complex OPS applications containing Servlets, Servlet Filters,
+                more complex Orbeon Forms applications containing Servlets, Servlet Filters,
                 Portlets, and Servlet context listeners.
             </p>
 		</section>
@@ -41,7 +41,7 @@
 					<td>
 						<code>WEB-INF/lib/ops.jar</code>
 					</td>
-					<td>JAR file with all the OPS classes.</td>
+					<td>JAR file with all the Orbeon Forms classes.</td>
 				</tr>
 				<tr>
 					<td>
@@ -49,7 +49,7 @@
 					</td>
 					<td>
                         All the other JAR files in the <code>WEB-INF/lib</code> directory are used
-                        either by the OPS core engine, or one of the Presentation
+                        either by the Orbeon Forms core engine, or one of the Presentation
                         Server processors.
                     </td>
 				</tr>
@@ -59,7 +59,7 @@
 					</td>
 					<td>
                         The standard descriptor for this WAR file. It declares
-                        <code>OXFServlet</code> as the default Servlet and passes some basic
+                        <code>OPSServlet</code> as the default Servlet and passes some basic
                         configuration parameters to this Servlet.
                     </td>
 				</tr>
@@ -68,10 +68,9 @@
 						<code>WEB-INF/portlet.xml</code>
 					</td>
 					<td>
-                        The standard portlet descriptor for this WAR file is required if you use
-                        portlets. It typically declares instances of <code>OXFPortlet</code>. For
-                        more information, see <a href="integration-portlets">Writing Portlets With
-                        OPS</a>.
+                        The standard portlet descriptor for this WAR file is required if you use portlets. It typically
+                        declares instances of <code>OPSPortlet</code>. For more information, see <a
+                        href="integration-portlets">Writing Portlets With Orbeon Forms</a>.
                     </td>
 				</tr>
 				<tr>
@@ -99,19 +98,19 @@
 						<code>WEB-INF/resources/*</code>
 					</td>
 					<td>
-                        Contains the resources for the OPS example application.
+                        Contains the resources for the Orbeon Forms example application.
                         Most of the files in this directory will be replaced when you build your own
-                        OPS web applications. In particular, this directory
-                        contains <code>properties.xml</code>, the main OPS
+                        Orbeon Forms web applications. In particular, this directory
+                        contains <code>properties.xml</code>, the main Orbeon Forms
                         configuration file.
                     </td>
 				</tr>
 			</table>
 		</section>
 		<section>
-			<title>OPS Initialization</title>
+			<title>Orbeon Forms Initialization</title>
             <p>
-                The following figure illustrates the initialization of a simple OPS
+                The following figure illustrates the initialization of a simple Orbeon Forms
                 deployment in a J2EE application server:
             </p>
 			<img print-format="pdf" src="../apps/doc/images/integration-packaging-bootstrap.png" width="593" height="581"/>
@@ -146,19 +145,19 @@
 				</li>
 				<li>
 					<p>
-                        The <code>web.xml</code> file configures the <code>OXFServlet</code> with a
-                        minimal set of parameters. Those parameters tell <code>OXFServlet</code>:
+                        The <code>web.xml</code> file configures the <code>OPSServlet</code> with a
+                        minimal set of parameters. Those parameters tell <code>OPSServlet</code>:
                     </p>
 					<ul>
 						<li>
                             What resource manager has to be used, and how this resource manager is
-                            configured. In the default WAR bundled in the OPS
-                            distribution, OPS loads resources from the
+                            configured. In the default WAR bundled in the Orbeon Forms
+                            distribution, Orbeon Forms loads resources from the
                             <code>WEB-INF/resources</code> directory inside the WAR. If it can't
                             find a resource in this directory, it will try to look for it inside
                             <code>ops.jar</code>. Only static resources that are part of
-                            OPS are stored in <code>ops.jar</code> (as opposed to
-                            OPS applications). The <link
+                            Orbeon Forms are stored in <code>ops.jar</code> (as opposed to
+                            Orbeon Forms applications). The <link
                             href="reference-resource-managers">Resource Managers</link> section
                             explains in detail how resource managers work.
                         </li>
@@ -173,18 +172,18 @@
 				</li>
 				<li>
 					<p>
-                        OPS is configured through an XML file,
+                        Orbeon Forms is configured through an XML file,
                         <code>properties.xml</code>, stored with the resources. The exact name and
                         path of this file is specified within <code>web.xml</code>.
                         <code>properties.xml</code> may declare the main processor to be executed by
-                        <code>OXFServlet</code>, as well as optional inputs of this processor.
+                        <code>OPSServlet</code>, as well as optional inputs of this processor.
                         Alternatively, the main processor can be declared directly within
                         <code>web.xml</code>, which is the recommended approach. By default, the
                         Page Flow Controller is used as the main processor. If the configuration is
                         done in <code>web.xml</code>:
                     </p>
 					<xml-source>
-<comment>The main processor that OXFServlet must execute</comment>
+<comment>The main processor that OPSServlet must execute</comment>
 <context-param>
     <param-name>oxf.main-processor.name</param-name>
     <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
@@ -200,7 +199,7 @@
                     </p>
 					<xml-source>
 <properties>
-    <comment>The main processor that OXFServlet must execute</comment>
+    <comment>The main processor that OPSServlet must execute</comment>
     <property as="xs:QName" name="oxf.main-processor.main" value="oxf:page-flow"/>
     <comment>The Page Flow Controller configuration file</comment>
     <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
@@ -208,7 +207,7 @@
 					</xml-source>
                     <p>
                         For more information about the properties file, see
-                        <link href="reference-properties">OPS
+                        <link href="reference-properties">Orbeon Forms
                         Properties</link>.
                     </p>
 				</li>
@@ -242,20 +241,20 @@
                 </p>
                 <p>
                     In the simplest web application deployment scenario, as shown in the example
-                    above, only one OPS Servlet needs to be configured. In more
-                    complex scenarios, it is possible to deploy multiple OPS
-                    Servlets, Servlet filters, and Portlets, as well as one OPS
+                    above, only one Orbeon Forms Servlet needs to be configured. In more
+                    complex scenarios, it is possible to deploy multiple Orbeon Forms
+                    Servlets, Servlet filters, and Portlets, as well as one Orbeon Forms
                     Servlet context listener, within the same Web or Portlet Application. The
                     following figure illustrates this:
                 </p>
                 <img print-format="pdf" src="../apps/doc/images/integration-portlets-deployment.png" width="522" height="234"/>
                 <p>
-                    Additional non-OPS components can obviously be deployed within
+                    Additional non-Orbeon Forms components can obviously be deployed within
                     the same Web or Portlet Application.
                 </p>
             </section>
             <section>
-                <title>OPS Servlet, OPS Servlet Filter, and OPS Portlet</title>
+                <title>Orbeon Forms Servlet, Orbeon Forms Servlet Filter, and Orbeon Forms Portlet</title>
                 <p>
                     These components can each have their own main processor. The main processor for
                     such components is looked up in the following locations, in this order:
@@ -268,7 +267,7 @@
                             <servlet>
                                 <servlet-name>oxf</servlet-name>
                                 <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                                <comment>The main processor that OXFServlet must execute</comment>
+                                <comment>The main processor that OPSServlet must execute</comment>
                                 <init-param>
                                     <param-name>oxf.main-processor.name</param-name>
                                     <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
@@ -285,7 +284,7 @@
                         <code>properties.xml</code>, for example:
 					    <xml-source>
                             <properties>
-                                <comment>The main processor that OXFServlet must execute</comment>
+                                <comment>The main processor that OPSServlet must execute</comment>
                                 <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
                                 <comment>The Page Flow Controller configuration file</comment>
                                 <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
@@ -295,7 +294,7 @@
                     <li>
                         The context parameters in <code>web.xml</code>
 					    <xml-source>
-                            <comment>The main processor that OXFServlet must execute</comment>
+                            <comment>The main processor that OPSServlet must execute</comment>
                             <context-param>
                                 <param-name>oxf.main-processor.name</param-name>
                                 <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
@@ -324,7 +323,7 @@
                 <title>Definition</title>
                 <p>
                     In case an error is encoutered during the execution or the main processor,
-                    OPS tries to execute an error processor. The error processor is
+                    Orbeon Forms tries to execute an error processor. The error processor is
                     typically a pipeline that produces a page showing the exception that was
                     encountered. For more information, please refer to the <a
                     href="reference-error-pipeline">Error Pipeline</a> documentation.
@@ -346,7 +345,7 @@
                             <servlet>
                                 <servlet-name>oxf</servlet-name>
                                 <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
-                                <comment>The error processor that OXFServlet must execute</comment>
+                                <comment>The error processor that OPSServlet must execute</comment>
                                 <init-param>
                                     <param-name>oxf.error-processor.name</param-name>
                                     <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
@@ -363,7 +362,7 @@
                         <code>properties.xml</code>, for example:
                         <xml-source>
                             <properties>
-                                <comment>The error processor that OXFServlet must execute</comment>
+                                <comment>The error processor that OPSServlet must execute</comment>
                                 <property as="xs:QName" name="oxf.error-processor.name" value="oxf:pipeline"/>
                                 <comment>The Page Flow Controller configuration file</comment>
                                 <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/config/error.xpl"/>
@@ -373,7 +372,7 @@
                     <li>
                         The context parameters in <code>web.xml</code>
                         <xml-source>
-                            <comment>The error processor that OXFServlet must execute</comment>
+                            <comment>The error processor that OPSServlet must execute</comment>
                             <context-param>
                                 <param-name>oxf.error-processor.name</param-name>
                                 <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>

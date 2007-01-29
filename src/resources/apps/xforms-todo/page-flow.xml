@@ -15,7 +15,6 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page path-info="/xforms-todo/" view="view.xhtml"/>
-    <page path-info="/xforms-todo/format-instance" view="format-instance.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

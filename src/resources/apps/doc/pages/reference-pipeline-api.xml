@@ -68,9 +68,9 @@ if (logger.isInfoEnabled())
 ResourceManagerWrapper.init(props);]]></source>
             </section>
             <section>
-                <title>Initialize OPS Properties</title>
+                <title>Initialize Orbeon Forms Properties</title>
                 <p>
-                    This initializes the OPS properties with the default properties file bundled in
+                    This initializes the Orbeon Forms properties with the default properties file bundled in
                     the Orbeon JAR file.
                 </p>
                 <source><![CDATA[

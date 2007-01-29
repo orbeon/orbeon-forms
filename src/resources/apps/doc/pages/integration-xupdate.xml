@@ -17,24 +17,24 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Using the OPS XUpdate Engine in Java</title>
+        <title>Using the Orbeon Forms XUpdate Engine in Java</title>
     </header>
     <body>
         <section>
             <title>Scope</title>
 
-            <p>OPS applications use the <link href="processors-xupdate">XUpdate
-            processor</link> to perform XUpdate transformations. The OPS XUpdate
+            <p>Orbeon Forms applications use the <link href="processors-xupdate">XUpdate
+            processor</link> to perform XUpdate transformations. The Orbeon Forms XUpdate
             engine implements the JAXP API that can be used directly by Java programs for
             experimentation purposes. This section describes the JAXP interface exposed by the
-            OPS XUpdate engine. We assume here that you are familiar with the basics
+            Orbeon Forms XUpdate engine. We assume here that you are familiar with the basics
             of the JAXP APIs.</p>
         </section>
         <section>
             <title>API</title>
 
             <p>Note: The JAXP methods described in this section are the only ones supported by
-            OPS.</p>
+            Orbeon Forms.</p>
 
             <section>
                 <title>Creating a Templates</title>
@@ -79,7 +79,7 @@
             your classpath:</p>
 
             <ul>
-                <li>OPS: <code>ops.jar</code></li>
+                <li>Orbeon Forms: <code>ops.jar</code></li>
                 <li>dom4j: <code>dom4j-1_4.jar</code></li>
                 <li>Jaxen: <code>jaxen-1_1-beta-1-dev.jar</code></li>
                 <li>SAXPath: <code>saxpath-dev_orbeon.jar</code></li>
@@ -90,7 +90,7 @@
             <p> To get those JAR files:</p>
             <ol>
                 <li><link href="http://www.orbeon.com/oxf/download">Download
-                OPS</link></li>
+                Orbeon Forms</link></li>
 
                 <li>Extract ops.war from the ZIP archive.</li>
 

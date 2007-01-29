@@ -21,7 +21,7 @@
 	<body>
 		<section>
 			<title>Classification</title>
-			<p>OPS provides EJB support in two different
+			<p>Orbeon Forms provides EJB support in two different
             areas:</p>
 			<ul>
 				<li>Calling existing EJBs</li>
@@ -68,7 +68,7 @@
                     remote server).</li>
 				</ul>
 				<p>
-                    With Processor EJB Encapsulation, OPS processors can benefit
+                    With Processor EJB Encapsulation, Orbeon Forms processors can benefit
                     from the same advantages provided to EJB components by the application server.
                 </p>
 			</section>
@@ -116,7 +116,7 @@
                 processor must be able to lookup the name
                 <code>java:comp/env/ejb/oxf/proxy</code>. Typically
                 for Web applications, this pipeline will be called
-                from the OXFServlet which is deployed in a
+                from the OPSServlet which is deployed in a
                 WAR. In that case, the WAR's web.xml will have to
                 declare an EJB reference:</p>
 				<xml-source>

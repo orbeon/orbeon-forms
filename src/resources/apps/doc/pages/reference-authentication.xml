@@ -22,11 +22,10 @@
         <section>
             <title>Introduction</title>
             <p>
-                Most Web applications require some sort of authentication, either just to access an
-                "administrative" section, or for the whole application. OPS Web
-                applications use the standard authentication mechanism provided by your J2EE
-                application server. This section provides an overview of the standard J2EE
-                authentication mechanism.
+                Most Web applications require some sort of authentication, either just to access an "administrative"
+                section, or for the whole application. Orbeon Forms Web applications use the standard authentication
+                mechanism provided by your J2EE application server. This section provides an overview of the standard
+                J2EE authentication mechanism.
             </p>
         </section>
         <section>

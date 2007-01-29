@@ -32,11 +32,11 @@
             </p>
         </section>
         <section>
-            <title>Namespace Usage in OPS</title>
+            <title>Namespace Usage in Orbeon Forms</title>
             <p>
-                The number of XML namespaces used in OPS is quite large, and it is easy for
+                The number of XML namespaces used in Orbeon Forms is quite large, and it is easy for
                 developers to lose track of which is which. The table below summarizes the usage of
-                XML namespaces in OPS, with links to the relevant documentation and specifications.
+                XML namespaces in Orbeon Forms, with links to the relevant documentation and specifications.
             </p>
             <p>
                 <table>
@@ -64,33 +64,33 @@
                         <td>http://www.orbeon.com/oxf/processors</td>
                         <td>oxf</td>
                         <td>
-                            Standard OPS processors referred from XPL programs
+                            Standard Orbeon Forms processors referred from XPL programs
                         </td>
                         <td>
                             <code>oxf:http-serializer</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <i>OPS processors documentation</i>
+                            <i>Orbeon Forms processors documentation</i>
                         </td>
                     </tr>
                     <tr>
                         <td>http://orbeon.org/oxf/xml/xforms</td>
                         <td>xxforms</td>
                         <td>
-                            OPS extensions to XForms
+                            Orbeon Forms extensions to XForms
                         </td>
                         <td>
                             <code>xxforms:appearance</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">Orbeon Forms XForms Reference</a>
                         </td>
                     </tr>
                     <tr>
                         <td>http://orbeon.org/oxf/xml/xinclude</td>
                         <td>xxi</td>
                         <td>
-                            OPS extensions to XInclude
+                            Orbeon Forms extensions to XInclude
                         </td>
                         <td>
                             <code>xxi:omit-xml-base</code>
@@ -103,7 +103,7 @@
                         <td>http://orbeon.org/oxf/xml/formatting</td>
                         <td>f</td>
                         <td>
-                            OPS view formatting
+                            Orbeon Forms view formatting
                         </td>
                         <td>
                             <code>f:xml-source</code>
@@ -114,7 +114,7 @@
                         <td>http://orbeon.org/oxf/xml/portlet</td>
                         <td>portlet</td>
                         <td>
-                            OPS portlet tagging
+                            Orbeon Forms portlet tagging
                         </td>
                         <td>
                             <code>portlet:is-portlet-content</code>
@@ -125,7 +125,7 @@
                         <td>http://www.orbeon.com/xslt-function</td>
                         <td>function</td>
                         <td>
-                            OPS XSLT functions
+                            Orbeon Forms XSLT functions
                         </td>
                         <td>
                             <code>function:evaluate</code>
@@ -225,12 +225,12 @@
                                     The correct namespace to use for XInclude 1.0 is <code>http://www.w3.org/2001/XInclude</code>
                                     (that is, with a <code>2001</code> in
                                     it). However, when including at parsing time, the version of the Xerces XML
-                                    parser included with OPS incorrectly requires a URI with <code>2003</code>. This only occurs
+                                    parser included with Orbeon Forms incorrectly requires a URI with <code>2003</code>. This only occurs
                                     when XInclude is explicitly processed at parsing time but not when the XInclude processor is
-                                    used explicitly or implicitly (by the PFC). With the current version of OPS, you must use
+                                    used explicitly or implicitly (by the PFC). With the current version of Orbeon Forms, you must use
                                     <code>http://www.w3.org/2003/XInclude</code> when including at parsing time, but
                                     <code>http://www.w3.org/2001/XInclude</code> when including with the XInclude processor. This
-                                    will be fixed in a future version of OPS.
+                                    will be fixed in a future version of Orbeon Forms.
                                 </p>
                             </note>
                         </td>
@@ -342,7 +342,7 @@
                             <code>xu:modifications</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <a href="/doc/reference-page-flow">OPS Page Flow</a>
+                            <a href="/doc/reference-page-flow">Orbeon Forms Page Flow</a>
                         </td>
                     </tr>
                     <tr>
@@ -357,7 +357,7 @@
                         <td style="white-space: nowrap">
                             <a href="http://www.w3.org/TR/2003/REC-xforms-20031014/">XForms 1.0</a>
                             <br/>
-                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">Orbeon Forms XForms Reference</a>
                         </td>
                     </tr>
                     <tr>
@@ -370,7 +370,7 @@
                             <code>ev:event</code>
                         </td>
                         <td style="white-space: nowrap">
-                            <a href="/doc/reference-xforms-ng">OPS XForms Reference</a>
+                            <a href="/doc/reference-xforms-ng">Orbeon Forms XForms Reference</a>
                         </td>
                     </tr>
                     <tr>

@@ -26,9 +26,9 @@
             <section>
                 <title>XForms Upload</title>
                 <p>
-                    The XForms Upload control has been fixed. It comes with an <a
-                    href="/goto-example/xforms-upload">example</a> and is documented in the <a
-                    href="/doc/reference-xforms-ng#upload">XForms reference documentation</a>.
+                    The XForms Upload control has been fixed. It comes with an <a href="/xforms-upload/">example</a>
+                    and is documented in the <a href="/doc/reference-xforms-ng#upload">XForms reference
+                    documentation</a>.
                 </p>
             </section>
             <section>
@@ -43,14 +43,11 @@
             <section>
                 <title>Itemset Support</title>
                 <p>
-                    The XForms element <code>&lt;itemset></code> is now supported. You can use it
-                    in conjunction with XForms selection controls
-                    (<code>&lt;xforms:select</code> and <code>&lt;xforms:select1></code>) when
-                    you want the list of items the end-user has to pick from to come from the
-                    instance, instead of being listed in view. For more details, see the <a
-                    href=" reference-xforms-ng#xforms-controls">XForms controls</a> documentation
-                    and the <a href="../goto-example/xforms-selection">Selection Controls</a>
-                    example.
+                    The XForms element <code>&lt;itemset></code> is now supported. You can use it in conjunction with
+                    XForms selection controls (<code>&lt;xforms:select</code> and <code>&lt;xforms:select1></code>) when
+                    you want the list of items the end-user has to pick from to come from the instance, instead of being
+                    listed in view. For more details, see the <a href=" reference-xforms-ng#xforms-controls">XForms
+                    controls</a> documentation and the <a href="/xforms-controls/">XFormsControls</a> example.
                 </p>
             </section>
             <section>
@@ -125,19 +122,16 @@
             <section>
                 <title>Binary Mode</title>
                 <p>
-                    The <a href="processors-generators-url">URL generator</a> now
-                    supports streaming binary files encoded with Base64. The <a
-                    href="/goto-example/xforms-upload">XForms Upload example</a>, among others,
+                    The <a href="processors-generators-url">URL generator</a> now supports streaming binary files
+                    encoded with Base64. The <a href="/xforms-upload/">XForms Upload example</a>, among others,
                     illustrates this capability.
                 </p>
             </section>
             <section>
                 <title>Text Mode</title>
                 <p>
-                    The <a href="processors-generators-url">URL generator</a> now
-                    supports reading text files. The <a
-                    href="/goto-example/employees">Employees example</a> illustrates this
-                    capability.
+                    The <a href="processors-generators-url">URL generator</a> now supports reading text files. The <a
+                    href="/employees/">Employees example</a> illustrates this capability.
                 </p>
             </section>
             <section>
@@ -184,12 +178,11 @@
             <section>
                 <title>HTTP Serializer</title>
                 <p>
-                    A new serializer, the <a href="processors-serializers-http">HTTP
-                    serializer</a>, supports decoding of binary or text data, and sending the
-                    resulting stream to an HTTP client. The <a
-                    href="/goto-example/xforms-upload">XForms Upload example</a> illustrates
-                    this capability. The HTTP serializer can be used for example in conjunction
-                    with <a href="processors-converters">converters</a> and the URL generator.
+                    A new serializer, the <a href="processors-serializers-http">HTTP serializer</a>, supports decoding
+                    of binary or text data, and sending the resulting stream to an HTTP client. The <a
+                    href="/xforms-upload/">XForms Upload example</a> illustrates this capability. The HTTP serializer
+                    can be used for example in conjunction with <a href="processors-converters">converters</a> and the
+                    URL generator.
                 </p>
                 <p>
                     The <a href="processors-serializers-http">HTTP serializer</a>
@@ -236,8 +229,8 @@
             <section>
                 <title>New "Employees" Example</title>
                 <p>
-                    The new <a href="/goto-example/employees">Employees example application</a>
-                    illustrates the following aspects of OPS:
+                    The new <a href="/employees/">Employees example application</a> illustrates the following aspects
+                    of OPS:
                 </p>
                 <ul>
                     <li>CRUD operations, paging and sorting with a SQL backend</li>

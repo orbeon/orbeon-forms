@@ -22,17 +22,17 @@
         <section>
             <title>Introduction</title>
             <p>
-                You can use OPS to build standalone command-line applications running pipelines. Use
+                You can use Orbeon Forms to build standalone command-line applications running pipelines. Use
                 cases include: creating a hardcopy of a web site, importing or exporting XML data to
                 and from a relational database, testing pipelines, automating repetitive operations
-                on XML files (selection, transformation, aggregation, etc.). OPS becomes your "XML
+                on XML files (selection, transformation, aggregation, etc.). Orbeon Forms becomes your "XML
                 toolbox".
             </p>
         </section>
         <section>
             <title>Command Line Interface</title>
             <p>
-                OPS ships with a command line interface (CLI). The easiest way to run it is to use
+                Orbeon Forms ships with a command line interface (CLI). The easiest way to run it is to use
                 the executable <code>cli-ops.jar</code> file and pass it a pipeline file:
             </p>
             <source>java -jar cli-ops.jar pipeline.xpl</source>
@@ -59,7 +59,7 @@
             </p>
             <note>
                 <p>
-                    OPS's jar file (<code>cli-ops.jar</code>) is executable via the <code>java
+                    Orbeon Forms's jar file (<code>cli-ops.jar</code>) is executable via the <code>java
                     -jar</code> mechanism. However, it depends on a number of libraries that must be
                     in the 'lib' directory beneath the directory containing
                     <code>cli-ops.jar</code>. It is recommended to expand the WAR file, and refer
@@ -71,7 +71,7 @@
         <section>
             <title>Examples</title>
             <p>
-                OPS comes with simple examples of command-line applications under the
+                Orbeon Forms comes with simple examples of command-line applications under the
                 <code>src/examples/cli</code> directory. To run those examples, from a command
                 prompt, enter either one of the subdirectories and run the <code>java</code> command
                 following the explanations above, for example, from the <code>simple</code>

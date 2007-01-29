@@ -46,12 +46,11 @@
             <ul>
                 <li>
                     <p>
-                        The new <a href="/goto-example/forms">DMV Forms</a> example (see also the <a
-                        href="/forms">standalone version</a>) shows how to implement web forms the
-                        right way with XForms, services and OPS. This example is based on a
-                        real-life form (a California Department of Motor Vehicles form) and
-                        illustrates data capture, validation, calling up services, repeating
-                        sections, generating PDF, page navigation, and localization.
+                        The new <a href="/forms/">DMV Forms</a> example (see also the <a href="/forms">standalone
+                        version</a>) shows how to implement web forms the right way with XForms, services and OPS. This
+                        example is based on a real-life form (a California Department of Motor Vehicles form) and
+                        illustrates data capture, validation, calling up services, repeating sections, generating PDF,
+                        page navigation, and localization.
                     </p>
                 </li>
                 <li>
@@ -189,13 +188,11 @@
                 <section>
                     <title>New Features</title>
                     <p>
-                        The OPS XForms engine introduces a big step towards supporting all of the XForms
-                        1.0 specification. The main changes are described below. Please also visit the
-                        new XForms examples, in particular the <a
-                        href="/goto-example/xforms-controls">XForms Controls</a>, the <a
-                        href="/goto-example/bizdoc2">BizDoc NG</a> example, and the <a
-                        href="/goto-example/xforms-sandbox">XForms Sandbox</a> example. XForms
-                        improvements in OPS 3.0 include but are not limited to:
+                        The OPS XForms engine introduces a big step towards supporting all of the XForms 1.0
+                        specification. The main changes are described below. Please also visit the new XForms examples,
+                        in particular the <a href="/xforms-controls/">XForms Controls</a>, the <a
+                        href="/goto-example/bizdoc2">BizDoc NG</a> example, and the <a href="/xforms-sandbox/">XForms
+                        Sandbox</a> example. XForms improvements in OPS 3.0 include but are not limited to:
                     </p>
                     <ul>
                         <li>
@@ -291,10 +288,9 @@
                         </li>
                         <li>
                             <p>
-                                <b>XForms sandbox.</b> The new <a
-                                href="/goto-example/xforms-sandbox">XForms Sandbox</a> example allows
-                                you to easily try your own XForms examples. Just write and XHTML +
-                                XForms example, upload it, and watch the results!
+                                <b>XForms sandbox.</b> The new <a href="/xforms-sandbox/">XForms Sandbox</a> example
+                                allows you to easily try your own XForms examples. Just write and XHTML + XForms
+                                example, upload it, and watch the results!
                             </p>
                         </li>
                         <li>
@@ -635,12 +631,11 @@
                         </li>
                         <li>
                             <p>
-                                <b>Shorter page flows.</b> Because of the enhanced XForms support, in
-                                particular, the XForms switch module and support for
-                                <code>application/xml</code> submissions, page flows are typically shorter
-                                to write. Compare for example the <a href="/goto-example/bizdoc">BizDoc
-                                Classic</a> example with the <a href="/goto-example/bizdoc2">BizDoc NG</a>
-                                example.
+                                <b>Shorter page flows.</b> Because of the enhanced XForms support, in particular, the
+                                XForms switch module and support for <code>application/xml</code> submissions, page
+                                flows are typically shorter to write. Compare for example the <a
+                                href="/goto-example/bizdoc">BizDoc Classic</a> example with the <a
+                                href="/goto-example/bizdoc2">BizDoc NG</a> example.
                             </p>
                         </li>
                         <!--
@@ -1155,8 +1150,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>OPS Blog example.</b> This <a href="/goto-example/blog">new example</a>
-                            illustrates many of the capabilities of OPS, including:
+                            <b>OPS Blog example.</b> This <a href="/xforms-blog/">new example</a> illustrates many of
+                            the capabilities of OPS, including:
                         </p>
                         <ul>
                             <li>Implementing XML-RPC services</li>

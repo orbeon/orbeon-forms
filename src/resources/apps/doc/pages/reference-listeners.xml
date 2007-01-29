@@ -23,7 +23,7 @@
         <section>
             <title>Servlet Context Listener</title>
             <p>
-                The OPS Servlet Context Listener allows configuring one processor to be called when
+                The Orbeon Forms Servlet Context Listener allows configuring one processor to be called when
                 the Servlet context is initialized, and one to be called when the Servlet context
                 is destroyed. These processors are looked up in the following locations, in this
                 order:
@@ -73,7 +73,7 @@
                 the HTTP serializer. You do however have access to the Application context.
             </p>
             <p>
-                For the OPS Servlet Context Listener to be called, you need to
+                For the Orbeon Forms Servlet Context Listener to be called, you need to
                 configure the following listener in your <code>web.xml</code>:
             </p>
             <xml-source>
@@ -103,7 +103,7 @@
         <section>
             <title>Session Listener</title>
             <p>
-                The OPS Session Listener allows configuring one processor to be called when the
+                The Orbeon Forms Session Listener allows configuring one processor to be called when the
                 Session is created, and one to be called when the Session is destroyed. These
                 processors are looked up in the following locations, in this order:
             </p>
@@ -152,7 +152,7 @@
                 any HTTP serializers. You have access to the Application and Session contexts.
             </p>
             <p>
-                For the OPS Session Listener to be called, you need to configure the following
+                For the Orbeon Forms Session Listener to be called, you need to configure the following
                 listener in your <code>web.xml</code>:
             </p>
             <xml-source>

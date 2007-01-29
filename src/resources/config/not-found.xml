@@ -13,10 +13,10 @@
 -->
 <html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>Orbeon PresentationServer - Page Not Found</title>
+        <title>Orbeon Forms - Page Not Found</title>
     </head>
     <body>
-        <h1>Orbeon PresentationServer - Page Not Found</h1>
+        <h1>Orbeon Forms - Page Not Found</h1>
         <p>
             We are sorry, but the resource you have requested is not available on this server.
         </p>

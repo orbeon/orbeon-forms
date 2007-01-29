@@ -55,7 +55,7 @@
                 <p>
                     The larger the heap, the faster your application will be get. This for two
                     reasons: first, the JVM garbage collector works more efficiently with a larger
-                    heap, and second, this enables you to increase the size of the OPS cache (more
+                    heap, and second, this enables you to increase the size of the Orbeon Forms cache (more
                     on this later) which will also improve the performance of your application.
                     However, don't use a heap size so large that it would cause swapping, as this
                     would then drastically reduce the performance of your application.
@@ -94,7 +94,7 @@
                     enabled by default.
                 </p>
                 <p>
-                    To do this, after you have installed your OPS application, stop WebLogic, and
+                    To do this, after you have installed your Orbeon Forms application, stop WebLogic, and
                     open the <code>config.xml</code> file in an editor. Look for the
                     <code>&lt;WebAppComponent Name="orbeon"></code> element and add the attribute:
                     <code>ServletReloadCheckSecs="-1"</code>.
@@ -146,31 +146,31 @@
             </section>
         </section>
         <section>
-            <title>Tunning OPS</title>
+            <title>Tunning Orbeon Forms</title>
             <a name="ops-cache"/>
             <section>
-                <title>Tune the OPS cache size</title>
+                <title>Tune the Orbeon Forms cache size</title>
                 <p>
                     One way to increase the performance of your application is to increase the size
-                    of the OPS cache. You setup the size of the OPS cache with the <a
+                    of the Orbeon Forms cache. You setup the size of the Orbeon Forms cache with the <a
                     href="reference-properties#cache-size">oxf.cache.size</a> property. Due to
-                    limitations of the JVM, you cannot set the size of the OPS cache in MB. Instead,
-                    the value you specify the maximum number of objects that OPS can store in cache.
+                    limitations of the JVM, you cannot set the size of the Orbeon Forms cache in MB. Instead,
+                    the value you specify the maximum number of objects that Orbeon Forms can store in cache.
                     As the size of each object stored in cache is different and the average size of
                     those objects can change widely depending on your application, we can't give you
                     an equivalence between number of objects and memory used. Instead, we recommend
-                    you follow the suggestions below to tune your OPS cache size.
+                    you follow the suggestions below to tune your Orbeon Forms cache size.
                 </p>
                 <p>
-                    First keep the default value for the OPS cache size and follow the suggestions
+                    First keep the default value for the Orbeon Forms cache size and follow the suggestions
                     above to set your heap size. Then, adding the <code>-verbosegc</code> parameter,
                     monitor how the heap usage varies under typical load. In particular, pay a close
                     attention to how much memory is freed by a full GC done when the memory used
                     gets close the heap size. Note that a full GC will <i>not</i> get rid of
-                    objects in the OPS cache. So assuming your heap size is 2GB, if after getting
+                    objects in the Orbeon Forms cache. So assuming your heap size is 2GB, if after getting
                     close to 2GB a full GC brings back the heap usage to 0.5GB, as the cached
                     objects are included in those 0.5GB, it means you can and should to increase the
-                    size of your OPS cache.
+                    size of your Orbeon Forms cache.
                 </p>
                 <p>
                     However, you should not increase the size to a point where a full GC can only
@@ -224,7 +224,7 @@
                     database such as the open source <a
                     href="http://exist.sourceforge.net/">eXist</a> database, and delegate complex
                     queries to the database: this should be more efficient than continually
-                    retrieving large XML documents and processing them in OPS.
+                    retrieving large XML documents and processing them in Orbeon Forms.
                </p>
             </section>
             <a name="your-app-xslt"/>
@@ -245,7 +245,7 @@
             <section>
                 <title>Enable XPL profiling</title>
                 <p>
-                    XPL profiling has been introduced with OPS 3.0 to give you detailed information
+                    XPL profiling has been introduced with Orbeon Forms 3.0 to give you detailed information
                     on how much time is being spent in each processor involved to generate a web
                     page. When enabled, for each HTTP request, the XPL profiler will output a tree
                     with all the processor calls. Each node of the tree represents the execution of
@@ -269,7 +269,7 @@
                     <p>This applies to versions of Orbeon Forms prior to 3.5.</p>
                 </note>
                 <p>
-                    The examples portal in OPS 3.0 (i.e. the home page of OPS, which lists all the OPS examples), while
+                    The examples portal in Orbeon Forms 3.0 (i.e. the home page of Orbeon Forms, which lists all the Orbeon Forms examples), while
                     convenient to run examples, is not implemented optimally and relies on portlets which cause
                     overhead. The first thing to do is make sure that your code runs outside of the examples portal,
                     i.e. that your page flow entries are present in the main page flow file
@@ -280,7 +280,7 @@
             <section>
                 <title>Customize the standard epilogue</title>
                 <p>
-                    The <a href="reference-epilogue">standard OPS epilogue</a> can be optimized for
+                    The <a href="reference-epilogue">standard Orbeon Forms epilogue</a> can be optimized for
                     your own needs. For example, if you do not use <a
                     href="#xforms-classic-ng">XForms Classic</a>, you can remove the test for the
                     XForms classic engine; if you do not use "widgets", you can remove the inclusion
@@ -301,9 +301,9 @@
             </section>
             <a name="your-app-static-files"/>
             <section>
-                <title>Don't serve your static files through OPS</title>
+                <title>Don't serve your static files through Orbeon Forms</title>
                 <p>
-                    It is overkill to serve static files such as static images through OPS, which
+                    It is overkill to serve static files such as static images through Orbeon Forms, which
                     is optimized to run XPL pipelines. Instead, use your servlet container's
                     facilities for serving static files, or even better, use a simple web server
                     such as <a href="http://httpd.apache.org/">Apache Server</a>.

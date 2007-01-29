@@ -23,10 +23,10 @@
 		<section>
 			<title>Scope</title>
 			<p>
-                This section is not about developing applications with PresentationServer, but about developing
-                PresentationServer itself. It is for those who want to modify the code of PresentationServer. This
+                This section is not about developing applications with Orbeon Forms, but about developing
+                Orbeon Forms itself. It is for those who want to modify the code of Orbeon Forms. This
                 documentation provided here is very much work in progress. If you would like to contribute to the
-                PresentationServer development and don't find all the information you are looking for here, please feel
+                Orbeon Forms development and don't find all the information you are looking for here, please feel
                 free to <a href="http://www.objectweb.org/wws/subrequest/ops-users">join the ops-users mailing list</a>
                 and ask your question on the list.
             </p>
@@ -37,12 +37,12 @@
             <p>
                 At any time you can <a
                 href="http://forge.objectweb.org/nightlybuilds/ops/ops/">download a nightly
-                build</a>, which is a build of the latest PresentationServer source code.
+                build</a>, which is a build of the latest Orbeon Forms source code.
             </p>
             <p>
                 Unlike <a href="http://forge.objectweb.org/project/showfiles.php?group_id=168">released versions of
-                PresentationServer</a>, nightly builds are not tested before they are made available. The only guarantee
-                is that nightly builds pass the PresentationServer unit tests. A build that does not pass all the unit
+                Orbeon Forms</a>, nightly builds are not tested before they are made available. The only guarantee
+                is that nightly builds pass the Orbeon Forms unit tests. A build that does not pass all the unit
                 tests is not uploaded to the nightly build directory. The Orbeon Forms developers are doing their best
                 not to cause any regression in nightly builds, so in most cases you can use nightly builds for
                 development. If you notice any regression is a nightly build, please report it on <a
@@ -60,11 +60,11 @@
             <title>Getting The Source</title>
             <p>
                 First note that if your main reason for getting the source is to have a build of
-                PresentationServer with the latest code, we recommend that you instead download a
+                Orbeon Forms with the latest code, we recommend that you instead download a
                 nightly build (see above).
             </p>
             <p>
-                The source code of PresentationServer is available on the CVS repository hosted by
+                The source code of Orbeon Forms is available on the CVS repository hosted by
                 ObjectWeb. To checkout the source code on your local machine, follow the
                 instructions provided on <a href="http://forge.objectweb.org/scm/?group_id=168">the
                 project CVS page</a> under the <i>Anonymous CVS Access</i>.
@@ -74,17 +74,17 @@
         <section>
             <title>Building With Ant</title>
             <p>
-                We build PresentationServer with Ant. The Ant configuration file (build.xml) is
+                We build Orbeon Forms with Ant. The Ant configuration file (build.xml) is
                 located at the root of the source directory. You can start Ant from the command
                 line. If you are using an IDE like Eclipse or IntelliJ, you can also use the
-                builtin Ant support provided by your IDE. The PresentationServer build.xml defines
+                builtin Ant support provided by your IDE. The Orbeon Forms build.xml defines
                 a number of targets, but only a few are used frequently:
             </p>
             <ul>
                 <li>
-                    <p><b>orbeon-war</b>: Build PresentationServer and creates an exploded war file in the
+                    <p><b>orbeon-war</b>: Build Orbeon Forms and creates an exploded war file in the
                     directory <tt>build/ops-war</tt>. To test your modifications to the
-                    PresentationServer code, you will typically run a Tomcat with a context pointing
+                    Orbeon Forms code, you will typically run a Tomcat with a context pointing
                     to that directory. That context, defined in Tomcat's server.xml will typically
                     look like:</p>
 
@@ -157,7 +157,7 @@
                         </li>
                         <li>
                             Point your IDE to the jar files in the <code>lib</code> directory, as
-                            the PresentationServer code has dependencies on those libraries.
+                            the Orbeon Forms code has dependencies on those libraries.
                         </li>
                         <li>
                             Setup your IDE to compile the files in <code>src/java</code> with the

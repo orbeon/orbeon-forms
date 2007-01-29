@@ -118,7 +118,7 @@
         <menu-item label="Packaging and Deployment" href="integration-packaging"/>
         <menu-item label="Performance and Tuning" href="integration-tuning"/>
         <menu-item label="XForms w/ JSP (experimental)" href="integration-xforms-jsp"/>
-<!--        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>-->
+        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>
         <menu-item label="EJB Support" href="integration-ejb"/>
         <menu-item label="Development" href="integration-development"/>
 <!--        <menu-item label="Struts Support" href="model2x-struts"/>-->
@@ -130,6 +130,6 @@
     <!--<menu label="Obsolete">-->
         <!--<menu-item label="XForms Internal" href="internals-xforms" printed-book="false"/>-->
         <!--<menu-item label="XUpdate JAXP Support" href="integration-xupdate" printed-book="false"/>-->
-<!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
+<!--        <menu-item label="Orbeon Forms with JSF" href="model2x-jsf"/>-->
     <!--</menu>-->
 </book>

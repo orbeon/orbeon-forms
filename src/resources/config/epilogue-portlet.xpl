@@ -12,10 +12,9 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <!--
-    The epilogue is run after all page views. This is the part of the epilogue called to handle OPS
-    applications running in a portlet container. It is typically used to perform tasks that need to
-    be done for all views, for example applying a common theme, serializing the pages to HTML or
-    XML, etc.
+    The epilogue is run after all page views. This is the part of the epilogue called to handle Orbeon Forms
+    applications running in a portlet container. It is typically used to perform tasks that need to be done for all
+    views, for example applying a common theme, serializing the pages to HTML or XML, etc.
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

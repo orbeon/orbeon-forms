@@ -31,7 +31,7 @@
                 relational database.
             </p>
             <p>
-                OPS provides processors to integrate with Tamino XML Server databases as well as databases that support
+                Orbeon Forms provides processors to integrate with Tamino XML Server databases as well as databases that support
                 the XML:DB API, such as <a href="http://exist.sourceforge.net/">eXist</a>.
             </p>
             <note>
@@ -63,7 +63,7 @@
                     </li>
                     <li>
                         The XML:DB API is a Java API, which you can call from XPL using the XML:DB processors provided
-                        by PresentationServer.
+                        by Orbeon Forms.
                     </li>
                 </ul>
                 <a name="rest"/>
@@ -287,8 +287,8 @@
             <title>Tamino XML Server 4.1</title>
             <p>
                 Software AG's <a href="http://www.softwareag.com/tamino/">Tamino</a> provides a
-                complete XML storage solution. OPS allows you to easily store, query, update, and
-                delete documents in Tamino. The following sections describe the four OPS processors
+                complete XML storage solution. Orbeon Forms allows you to easily store, query, update, and
+                delete documents in Tamino. The following sections describe the four Orbeon Forms processors
                 for Tamino.
             </p>
             <section>
@@ -298,11 +298,9 @@
                     database connection, collection and how it is handled.
                 </p>
                 <p>
-                    The configuration of the Tamino processors can be done in two ways: either
-                    system-wide via the <link href="reference-properties">OPS
-                    Properties</link>, or locally for a specific instance of the processor through
-                    the <code>config</code> input. The local configuration takes precedence if
-                    available.
+                    The configuration of the Tamino processors can be done in two ways: either system-wide via the <link
+                    href="reference-properties">Properties</link>, or locally for a specific instance of the processor
+                    through the <code>config</code> input. The local configuration takes precedence if available.
                 </p>
                 <note>
                     <p>
@@ -441,9 +439,8 @@
                 <section>
                     <title>System-Wide Configuration</title>
                     <p>
-                        The Tamino processors can be configured in the <link
-                        href="reference-properties">OPS properties file</link>, allowing all
-                        instances to share the same configuration. The following processor
+                        The Tamino processors can be configured in the <link href="reference-properties">properties
+                        file</link>, allowing all instances to share the same configuration. The following processor
                         properties are allowed:
                     </p>
                     <table>
@@ -741,7 +738,7 @@
             <section>
                 <title>Transactions</title>
                 <p>
-                    OPS initiates a transaction for every HTTP request, and commits
+                    Orbeon Forms initiates a transaction for every HTTP request, and commits
                     the transaction when the pipeline is executed normally. If an exception occurs
                     in the pipeline, the transaction in rolled back.
                 </p>

@@ -22,7 +22,7 @@
         <section>
             <title>Rationale</title>
             <p>
-                OPS comes with a number of pre-built processors. However, in some
+                Orbeon Forms comes with a number of pre-built processors. However, in some
                 cases, it makes sense for the developer to write a new processor in Java. For the
                 purpose of this discussion, let's assume that the processor is implemented in a file
                 called <code>MyProcessor.java</code>. Custom processors can essentially be deployed
@@ -52,7 +52,7 @@
                         </li>
                         <li>
                             <p>
-                                Use the newly declared processor in an XPL (OPS Pipeline Definition Language) file using the URI
+                                Use the newly declared processor in an XPL (Orbeon Forms Pipeline Definition Language) file using the URI
                                 declared in the <code>processors.xml</code>.
                             </p>
                         </li>
@@ -200,7 +200,7 @@
         <section>
             <title>Compilation Class Path</title>
             <p>
-                Before invoking the Java compiler, OPS builds a classpath using two
+                Before invoking the Java compiler, Orbeon Forms builds a classpath using two
                 <link href="reference-properties#java-processor">properties</link>. The following
                 list summaries the complete classpath order.
 
@@ -226,7 +226,7 @@
                     </li>
                     <li>
                         All the JAR and ZIP files under the <code>WEB-INF/lib</code> directory, if
-                        found and OPS runs in an application server.
+                        found and Orbeon Forms runs in an application server.
                     </li>
                     <li>
                         If the <code>WEB-INF/lib</code> directory is not found, all the JAR and ZIP

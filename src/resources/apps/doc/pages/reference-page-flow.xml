@@ -23,7 +23,7 @@
             <title>Introduction to the Page Flow Controller</title>
             <img print-format="pdf" src="../apps/doc/images/reference-controller-oxf-app.png" style="float: right; margin-left: 1em"/>
             <p>
-                The OPS Page Flow Controller (PFC) is the heart of your OPS web application. It
+                The Orbeon Forms Page Flow Controller (PFC) is the heart of your Orbeon Forms web application. It
                 dispatches incoming user requests to individual pages built out of models and views,
                 following the model / view / controller (MVC) architecture.
             </p>
@@ -67,8 +67,8 @@
             <note>
                 <p>
                     By default, the PFC is configured in <code>web.xml</code> as the main processor
-                    for the OPS servlet and portlet. However, you are not required to use the PFC
-                    with OPS: you can define your own main processor for servlets and portlets, as
+                    for the Orbeon Forms servlet and portlet. However, you are not required to use the PFC
+                    with Orbeon Forms: you can define your own main processor for servlets and portlets, as
                     documented in <a href="integration-packaging#main-processor">Packaging and
                     Deployment</a>. For most web applications, the PFC should be used.
                 </p>
@@ -81,7 +81,7 @@
                 <title>Page Flow Configuration</title>
                 <p>
                     A page flow is usually defined in a file called <code>page-flow.xml</code>
-                    stored at the root of your OPS resources. This XML file has a root element
+                    stored at the root of your Orbeon Forms resources. This XML file has a root element
                     called <code>&lt;config&gt;</code>, which has to be within the
                     <code>http://www.orbeon.com/oxf/controller</code> namespace. All the XML
                     elements in a page flow have to be in that namespace unless stated otherwise.
@@ -145,7 +145,7 @@
                 <p>
                     For a particular web application, what usually matters in order to identify a
                     particular page is the path within the URL under the context
-                    path, here <code>/report/detail</code>. Therefore, in an OPS page flow, each
+                    path, here <code>/report/detail</code>. Therefore, in an Orbeon Forms page flow, each
                     page is identified with a unique path information. You declare a minimal page
                     like this:
                 </p>
@@ -168,7 +168,7 @@
             <section>
                 <title>Simple Pages</title>
                 <p>
-                    Creating a static page with OPS is quite easy: just add a <code>view</code>
+                    Creating a static page with Orbeon Forms is quite easy: just add a <code>view</code>
                     attribute on a <code>&lt;page&gt;</code> element which points to an XHTML file:
                 </p>
                 <xml-source>
@@ -176,7 +176,7 @@
                 </xml-source>
                 <p>
                     Here, using the <code>oxf:</code> protocol means that the file is searched
-                    through the OPS <a href="reference-resource-managers">resource manager</a>
+                    through the Orbeon Forms <a href="reference-resource-managers">resource manager</a>
                     sandbox. It is also possible to use relative paths, for example:
                 </p>
                 <xml-source>
@@ -263,7 +263,7 @@
                         <p>
                             <b>The controller</b> is responsible for dispatching a request from a client
                             such as a web browser to the appropriate page model and view and connecting
-                            the model with the view. In OPS, the controller is the PFC itself, which is
+                            the model with the view. In Orbeon Forms, the controller is the PFC itself, which is
                             configured with a page flow.
                         </p>
                     </li>
@@ -398,7 +398,7 @@
                     how it is presented.
                 </p>
                 <p>
-                    The OPS PFC uses the concept of <i>XML submission</i> to provide page
+                    The Orbeon Forms PFC uses the concept of <i>XML submission</i> to provide page
                     configurability. To the model and view of a given page, an XML submission is
                     simply an XML document whose content is available as an <a
                     href="reference-xpl-pipelines">XPL pipeline</a> or an XSLT input called
@@ -410,7 +410,7 @@
                 <ul>
                     <li>
                         <p>
-                            <b>Internal XForms submission.</b> The built-in OPS XForms engine uses
+                            <b>Internal XForms submission.</b> The built-in Orbeon Forms XForms engine uses
                             an HTTP POST XForms submission to submit an XForms instance.
                         </p>
                     </li>
@@ -442,7 +442,7 @@
             <section>
                 <title>Internal XForms Submission</title>
                 <p>
-                    The most common case of XML submission in OPS is submission from the built-in
+                    The most common case of XML submission in Orbeon Forms is submission from the built-in
                     XForms engine. Assume you have a page defined as follows:
                 </p>
                 <xml-source>
@@ -499,11 +499,10 @@
                 <xml-source>
                     <page path-info="/xmlrpc" model="xmlrpc.xpl"/>
                 </xml-source>
-                <p>
-                    The <a href="/goto-example/blog">Blog</a> and <a
-                    href="/goto-example/employees">Employees</a> examples illustrate the
-                    implementation of XML-RPC and web services handlers using this mechanism.
-                </p>
+                <!--<p>-->
+                    <!--The <a href="/xforms-blog/">Blog</a> example illustrates the-->
+                    <!--implementation of XML-RPC and web services handlers using this mechanism.-->
+                <!--</p>-->
             </section>
             <a name="default-submission"/>
             <section>
@@ -565,7 +564,7 @@
                     </li>
                 </ul>
                 <p>
-                    If no submission has taken place, the XML submission document is an OPS "null"
+                    If no submission has taken place, the XML submission document is an Orbeon Forms "null"
                     document, as follows:
                 </p>
                 <xml-source>
@@ -705,13 +704,11 @@
                 <img print-format="pdf" src="../apps/doc/images/reference-controller-navigation.png"
                     style="float: right; margin-left: 1em"/>
                 <p>
-                    The site logic or page flow describes the conditions that trigger the
-                    navigation from one page to the other. It also describes how arguments are
-                    passed from one page to the other. In a simple web application simulating an
-                    ATM, as illustrated by the <a href="/goto-example/atm">ATM example</a> the
-                    navigation logic could look like the one described in the diagram on the right.
-                    In this diagram, the square boxes represent pages and diamond-shaped boxes
-                    represent actions performed by the end-user.
+                    The site logic or page flow describes the conditions that trigger the navigation from one page to
+                    the other. It also describes how arguments are passed from one page to the other. In a simple web
+                    application simulating an ATM, as illustrated by the <a href="/atm/">ATM example</a> the navigation
+                    logic could look like the one described in the diagram on the right. In this diagram, the square
+                    boxes represent pages and diamond-shaped boxes represent actions performed by the end-user.
                 </p>
                 <p>
                     With the PFC, page flow is expressed declaratively and externally to the pages.
@@ -1010,17 +1007,17 @@
                 <ul>
                     <li>
                         <p>
-                            The simple <a href="/goto-example/atm">ATM</a> example.
+                            The simple <a href="/atm/">ATM</a> example.
                         </p>
                     </li>
                     <li>
                         <p>
-                            The <a href="/goto-example/xforms-wizard-pfc">Wizard With PFC</a> example.
+                            The <a href="/xforms-wizard-/pfc">Wizard With PFC</a> example.
                         </p>
                     </li>
                 </ul>
                 <p>
-                    Also see the <a href="/doc/pages/OPS Tutorial.pdf">OPS Tutorial</a>.
+                    Also see the <a href="intro-tutorial">Orbeon Forms Tutorial</a>.
                 </p>
             </section>
             <a name="internal-xml-submissions"/>
@@ -1075,7 +1072,7 @@
                     <p>
                         A third instance passing option, <code>redirect-exit-portal</code>, behaves
                         like the <code>redirect</code> method but sends a redirection which exits
-                        the portal, if any. This is mainly useful for the OPS examples portal.
+                        the portal, if any. This is mainly useful for the Orbeon Forms examples portal.
                     </p>
                 </note>
                 <p>
@@ -1151,7 +1148,7 @@
                         <td>
                             In this case, an additional <code>matcher</code> attribute must be specified on the
                             <code>&lt;page&gt;</code> element. The <code>matcher</code> argument points to a matcher
-                            processor qualified name. Two matcher processors are provided with OPS: the Perl5 matcher
+                            processor qualified name. Two matcher processors are provided with Orbeon Forms: the Perl5 matcher
                             (<code>oxf:perl5-matcher</code>) and the Glob matcher (<code>oxf:glob-matcher</code>). The
                             Perl5 matcher accepts <link href="http://www.perl.com/doc/manual/html/pod/perlre.html">Perl
                             regular expressions</link> and the Glob matcher accepts <link
@@ -1179,7 +1176,7 @@
                 <p>
                     When using a matcher that allows for groups, the part of the path matched by those groups can be
                     extracted as documented above with the <code>&lt;setvalue&gt;</code> element. Note that the only
-                    matcher bundled with OPS that accepts groups is the Perl5 matcher, referenced with
+                    matcher bundled with Orbeon Forms that accepts groups is the Perl5 matcher, referenced with
                     <code>oxf:perl5-matcher</code>.
                 </p>
             </section>
@@ -1314,7 +1311,7 @@
                 <p>
                     You tell the PFC what files to serve directly with one or more
                     <code>&lt;files&gt;</code> elements in the page flow. The example below shows
-                    the configuration used by the OPS examples:
+                    the configuration used by the Orbeon Forms examples:
                 </p>
                 <xml-source>
                     <config>

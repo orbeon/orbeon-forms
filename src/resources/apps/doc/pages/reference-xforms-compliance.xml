@@ -199,7 +199,7 @@
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#module-extension">3.5 The XForms Extension Module</a></td>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-extension">3.5.1 The extension Element</a></td>
                     <td>
-                        The <code>&lt;extension></code> element can be used by a host language. OPS
+                        The <code>&lt;extension></code> element can be used by a host language. Orbeon Forms
                         does not have any constraint on the host language and since no language
                         leverages this element, its use is forbidden at this point. To adhere more
                         closely to specification, the <code>&lt;extension></code> element should be
@@ -240,7 +240,7 @@
                             display the text field.
                         </p>
                         <p>
-                            Without events (in the current version of OPS), you attach to the combo
+                            Without events (in the current version of Orbeon Forms), you attach to the combo
                             box JavaScript that submits the form when the selected value changes. On
                             the server-side the instance gets updated, the <code>relevant</code>
                             model item property evaluated and accordingly the text field is
@@ -260,7 +260,7 @@
                         The specification indicates that an XForms engine must support
                         all XML Schema datatypes except for <code>xsd:duration</code>,
                         <code>xsd:ENTITY</code>, <code>xsd:ENTITIES</code>, and
-                        <code>xsd:NOTATION</code>. OPS supports all
+                        <code>xsd:NOTATION</code>. Orbeon Forms supports all
                         XML Schema datatypes, including those.
 
                         <p>[RFE <a href="http://tinyurl.com/49wje">1078077</a>]</p>
@@ -295,7 +295,7 @@
                     <td rowspan="7"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-xformsconstraints">6.1 Model Item Property Definitions</a></td>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-type">6.1.1 The type Property</a></td>
                     <td>
-                        In OPS no error is triggered if the same model item
+                        In Orbeon Forms no error is triggered if the same model item
                         property is set twice on the same node. Also the inheritance rules for
                         model item properties are not supported. This applies to all the model item
                         properties (section 6.1).
@@ -321,7 +321,7 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-required">6.1.3 The required Property</a></td>
                     <td>
-                        OPS does check that required elements do not have a
+                        Orbeon Forms does check that required elements do not have a
                         <code>xsi:nil="true"</code> attribute.
 
                         <p>[RFE <a href="http://tinyurl.com/6m4kq">1078528</a>]</p>
@@ -380,12 +380,12 @@
                     <td rowspan="2">
                         <p>
                             Exposing the instance with the DOM interface is not mandated by the
-                            specification. In OPS the instance is not exposed through
+                            specification. In Orbeon Forms the instance is not exposed through
                             the DOM API, consequently the <code>hasFeature</code> method and all the
                             instance data methods cannot be used.
                         </p>
                         <p>
-                            In OPS, the model item properties computed by the XForms
+                            In Orbeon Forms, the model item properties computed by the XForms
                             engine (validity, type, ...) for the content of an element are exposed
                             to the user through attributes in the <code>http://orbeon.org/oxf/xml/xforms</code>
                             namespace, usually using the prefix <code>xxforms</code>.
@@ -455,7 +455,7 @@
                         2.0 <code>if</code> statement instead of the function. In case you want
                         to use the XForms function, it is available under the
                         name <code>xfif</code>. We are not planning to support the XForms
-                        <code>if</code> function in future versions of OPS, as
+                        <code>if</code> function in future versions of Orbeon Forms, as
                         the future versions of the XForms specification are expected to use XPath 2.0
                         and consequently to deprecate the <code>if</code> function.
                     </td>
@@ -486,7 +486,7 @@
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice7.html#fn-index">7.8.5 The index() Function</a></td>
                     <td>
                         The argument of the <code>index</code> function references and id defined on a
-                        <code>&lt;xforms:repeat></code> element. With OPS, it
+                        <code>&lt;xforms:repeat></code> element. With Orbeon Forms, it
                         is only valid to call the <code>index</code> function with an id
                         referencing a <code>&lt;xforms:repeat></code> element that is an
                         ancestor of the element from where the <code>index</code> function
@@ -600,7 +600,7 @@
                         specification, you should only bind this control to
                         datatypes <code>xs:anyURI</code>, <code>xs:base64Binary</code>,
                         or <code>xs:hexBinay</code>, or types derived by restriction from them.
-                        OPS does not enforce this constraint.
+                        Orbeon Forms does not enforce this constraint.
 
                         <p>
                             [RFE <a href="http://tinyurl.com/4kfof">1078715</a>]<br/>
@@ -630,7 +630,7 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-submit">8.1.9 The submit Element</a></td>
                     <td>
-                        OPS does not mandate the presence of the
+                        Orbeon Forms does not mandate the presence of the
                         <code>submission</code> attribute.
 
                         <p>[RFE <a href="http://tinyurl.com/6urpm">1078726</a>]</p>
@@ -666,7 +666,7 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-common-choices-value">8.2.3 The value Element</a></td>
                     <td>
-                        OPS does not enforce that the value is valid according
+                        Orbeon Forms does not enforce that the value is valid according
                         to the datatype bound to the selection control.
 
                         <p>[RFE <a href="http://tinyurl.com/4zt4n">1080092</a>]</p>
@@ -740,7 +740,7 @@
                     <td>
                         Using attributes instead of elements to create repeating structures is
                         not supported. Note that this is useful only when the host language does
-                        not permit XForms elements, which does not happen in OPS.
+                        not permit XForms elements, which does not happen in Orbeon Forms.
 
                         <p>[RFE <a href="http://tinyurl.com/5ye2o">1080102</a>]</p>
                     </td>
@@ -886,8 +886,8 @@
                     <td rowspan="7">
                         <p>
                             The <code>serialization</code> and <code>method</code> attributes are
-                            supported in OPS but their semantic is different than
-                            the one described in the specification. In OPS your back
+                            supported in Orbeon Forms but their semantic is different than
+                            the one described in the specification. In Orbeon Forms your back
                             end code always receives the instance data as XML (in general as the
                             input to a pipeline), regardless of the encoding or method used between
                             the Web browser and the server. However you might want to set one or

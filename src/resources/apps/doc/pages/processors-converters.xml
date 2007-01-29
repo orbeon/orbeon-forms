@@ -41,7 +41,7 @@
             <title>Standard Converters</title>
             <p>
                 The standard converters convert XML infosets (the XML documents that circulate in
-                OPS pipelines) into text according to standard output methods
+                Orbeon Forms pipelines) into text according to standard output methods
                 defined by the XSLT specification. They convert to the following formats:
             </p>
             <ul>
@@ -338,9 +338,9 @@
         <section>
             <title>XLS Converters</title>
             <p>
-                OPS ships with the <link
+                Orbeon Forms ships with the <link
                 href="http://jakarta.apache.org/poi/">POI</link> library which allows import and
-                export of Microsoft Excel documents. OPS uses an Excel file
+                export of Microsoft Excel documents. Orbeon Forms uses an Excel file
                 template to define the layout of the spreadsheet. You define cells that will contain
                 the values with a special markup.
             </p>

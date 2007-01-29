@@ -246,7 +246,7 @@
                     <p>
                         By default, the <code>xs</code> and <code>oxf</code> prefixes must be
                         declared, as is customary in XML. For backward compatiblity with versions of
-                        OPS where the prefixes did not have to be declared, set the
+                        Orbeon Forms where the prefixes did not have to be declared, set the
                         <code>legacy-implicit-prefixes</code> property as follows:
                     </p>
                     <xml-source>
@@ -798,7 +798,7 @@ select first_name, last_name
                     on <code>sql:param</code>: <code>sql-type</code>. By default, text is written
                     using the JDBC setString() method. In case the data must be stored in the
                     database as a Character Large OBject (CLOB) or other database-specific types,
-                    it is necessary to tell OPS that a different API must be used. For example, to
+                    it is necessary to tell Orbeon Forms that a different API must be used. For example, to
                     write a string into a CLOB:
                 </p>
                 <xml-source>
@@ -967,7 +967,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
                 <note>
                     <p>
-                        Base64-encoded binary documents are widely used in OPS, in
+                        Base64-encoded binary documents are widely used in Orbeon Forms, in
                         particular in the following cases:
                     </p>
                     <ul>
@@ -1395,7 +1395,7 @@ select level1.value v1, level2.value v2, level3.value v3
         <section>
             <title>Transactions Management</title>
             <p>
-                OPS executes each HTTP request in its own transaction. If a request fails for any
+                Orbeon Forms executes each HTTP request in its own transaction. If a request fails for any
                 reason, the SQL Processor rolls back the transaction. The transaction is committed
                 only when the pipeline execution in complete.
             </p>

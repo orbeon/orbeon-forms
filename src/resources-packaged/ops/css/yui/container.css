@@ -148,11 +148,11 @@ Version 0.11.0
 }
 
 .panel .close.nonsecure {
-	background-image:url(http://us.i1.yimg.com/us.yimg.com/i/nt/ic/ut/alt3/close12_1.gif);
+	background-image:url(../../images/yui/container/close12_1.gif);
 }
 
 .panel .close.secure {
-	background-image:url(https://a248.e.akamai.net/sec.yimg.com/i/nt/ic/ut/alt3/close12_1.gif);
+	background-image:url(../../images/yui/container/close12_1.gif);
 }
 
 .panel .ft {

@@ -487,6 +487,36 @@
                 </p>
             </section>
             <section>
+                <title>New Government Forms Sample Application</title>
+                <p>
+                    Previous versions of Orbeon Forms came with the "BizDoc" and then the "DMV Forms" sample
+                    applications. Orbeon Forms 3.5 comes with the <a href="/forms/">Government Forms</a> application,
+                    which shows how you can handle complex forms with Orbeon Forms. In particular:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Create, save, update, and delete forms persisted in an XML database.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Perform as-you-type validation and display an up-to-date error summary.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Produce read-only, XML or PDF versions of your forms.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Handle internationalization and change language on the fly.  
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
                 <title>Other Enhancements</title>
                 <ul>
                     <li>

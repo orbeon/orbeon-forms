@@ -132,6 +132,7 @@
                 </li>
             </ul>
         </section>
+        <a name="portlet-configuration"/>
         <section>
             <title>Configuration</title>
             <p>
@@ -189,6 +190,7 @@
                 example illustrates how to use the XML Serializer instead.
             </p>
         </section>
+        <a name="portlet-preferences"/>
         <section>
             <title>Preferences</title>
             <p>
@@ -239,6 +241,7 @@
                 [TODO]
             </p>
         </section>
+        <a name="portlet-security"/>
         <section>
             <title>Security</title>
             <p>
@@ -246,8 +249,8 @@
                 href="reference-authentication#request-security-processor">Request Security processor</a> provides
                 security information like in the case of Servlets.
             </p>
-
         </section>
+        <a name="portlet-deployment"/>
         <section>
             <title>Deployment</title>
             <p>
@@ -269,54 +272,51 @@
                 Page Flow Controller is always optional, but its use is typical.
             </p>
         </section>
+        <a name="portlet-limitations"/>
         <section>
         <title>Limitations of Orbeon Forms Portlets</title>
             <p>
-                The Orbeon Forms Portlet developer should be aware of the following
-                limitations:
+                The Orbeon Forms Portlet developer should be aware of the following limitations:
             </p>
             <ul>
                 <li>
-                    <b>Redirection.</b> In the Page Flow Controller, pages that are the target
-                    of a portlet render URL cannot end with a redirection. This in particular
-                    applies to the default portlet page ("/"). Developers have to make sure that
-                    a page exists for "/" that produces content and does not end in a redirect.
-                    Other pages can end with redirects by making sure that they are targeted by
-                    action URLs (<a href="reference-url-rewriting">by default</a>, only the
-                    target of HTML or XHTML form submissions generate action URLs).
+                    <b>Redirection.</b> In the Page Flow Controller, pages that are the target of a portlet render URL
+                    cannot end with a redirection. This in particular applies to the default portlet page ("/").
+                    Developers have to make sure that a page exists for "/" that produces content and does not end in a
+                    redirect. Other pages can end with redirects by making sure that they are targeted by action URLs
+                    (<a href="reference-url-rewriting">by default</a>, only the target of HTML or XHTML form submissions
+                    generate action URLs).
                 </li>
                 <li>
-                    <b>Portlet Mode and Window State hints.</b> It is currently not possible to
-                    set a portlet mode or window state hint in a URL.
+                    <b>Portlet Mode and Window State hints.</b> It is currently not possible to set a portlet mode or
+                    window state hint in a URL.
                 </li>
                 <li>
-                    <b>Content Type Hints.</b> It is not possible for an Orbeon Forms
-                    Portlet to know which content types are supported by the portal.
+                    <b>Content Type Hints.</b> It is not possible for an Orbeon Forms Portlet to know which content
+                    types are supported by the portal.
                 </li>
                 <li>
-                    <b>Preferences.</b> It is currently not possible to modify portlet
-                    preferences or store them from within a portlet.
+                    <b>Preferences.</b> It is currently not possible to modify portlet preferences or store them from
+                    within a portlet.
                 </li>
                 <li>
-                    <b>XML Fragments.</b> The Orbeon Forms Portlet currently must
-                    generate XML fragments containing a root node. This is rarely an issue, as a
-                    fragment can for example be embedded within an XHTML <code>&lt;div></code>
-                    element.
+                    <b>XML Fragments.</b> The Orbeon Forms Portlet currently must generate XML fragments containing a
+                    root node. This is rarely an issue, as a fragment can for example be embedded within an XHTML
+                    <code>&lt;div></code> element.
                 </li>
                 <li>
-                    <b>Struts integration.</b> Currently, Struts does not natively support
-                    operations within a Java portlet.
+                    <b>Struts integration.</b> Currently, Struts does not natively support operations within a Java
+                    portlet.
                 </li>
                 <li>
-                    <b>JavaServer Faces integration.</b> JSF currently does not natively
-                    support operations within a Java portlet.
+                    <b>JavaServer Faces integration.</b> JSF currently does not natively support operations within a
+                    Java portlet.
                 </li>
             </ul>
             <p>
-                In addition, and this is by design of the API, Java portlets cannot directly
-                serve resources such as images, CSS stylesheets, standalone JavaScript files,
-                etc. Those resources have to be served by a Servlet. Portlets therefore cannot
-                directly serve resources using:
+                In addition, and this is by design of the API, Java portlets cannot directly serve resources such as
+                images, CSS stylesheets, standalone JavaScript files, etc. Those resources have to be served by a
+                Servlet. Portlets therefore cannot directly serve resources using:
             </p>
             <ul>
                 <li>The Chart processor</li>
@@ -327,8 +327,7 @@
                 <li>Or any processor serving resources</li>
             </ul>
             <p>
-                Orbeon Forms Portlets can however refer to resources served by the
-                Orbeon Forms Servlet.
+                Orbeon Forms Portlets can however refer to resources served by the Orbeon Forms Servlet.
             </p>
         </section>
     </body>

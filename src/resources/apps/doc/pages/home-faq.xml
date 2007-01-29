@@ -155,7 +155,7 @@
                     </li>
                 </ul>
                 <p>
-                    See also <a href="#xpl-oxf-prefix">this FAQ entry</a>.
+                    See also <a href="#xpl-oxf-prefix">I am confused by all those oxf: prefixes. What do they mean?</a>.
                 </p>
             </section>
             <a name="ops"/>
@@ -163,8 +163,9 @@
                 <title>What is OPS?</title>
                 <p>
                     OPS stands for Orbeon PresentationServer and was the name of the platform before it was renamed to
-                    Orbeon Forms. The string "ops" still persists in a few places, including some resource paths, and
-                    the name of the Orbeon Forms <a href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+                    Orbeon Forms in November 2006. The string "ops" still persists in a few places, including some
+                    resource paths, and the name of the Orbeon Forms <a
+                    href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
                 </p>
             </section>
         </section>

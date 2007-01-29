@@ -59,6 +59,9 @@
                         href="http://www.amazon.com/gp/product/0321154991/">Amazon</a>).
                     </li>
                 </ul>
+                <p>
+                    We also recommend that you follow the <a href="intro-tutorial">Orbeon Forms Tutorial</a> first!
+                </p>
             </note>
         </section>
         <a name="introduction"/>
@@ -724,6 +727,7 @@
                         </tr>
                         <tr>
                             <td>
+                                <a name="xforms-input-control"/>
                                 <b>Text field</b>
                                 <img src="../apps/doc/images/reference-xforms-input.png"/>
                             </td>
@@ -746,6 +750,7 @@
                         </tr>
                         <tr>
                             <td>
+                                <a name="xforms-secret-control"/>
                                 <b>Password field</b>
                                 <img src="../apps/doc/images/reference-xforms-secret.png"/>
                             </td>
@@ -760,6 +765,7 @@
                         </tr>
                         <tr>
                             <td>
+                                <a name="xforms-textarea-control"/>
                                 <b>Text area</b>
                                 <img src="../apps/doc/images/reference-xforms-textarea.png"/>
                             </td>

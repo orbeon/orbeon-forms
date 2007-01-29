@@ -34,6 +34,7 @@
         <application id="xforms-upload" label="Upload Control"/>
         <!--<application id="xforms-wizard-pfc" label="Wizard w/ PFC"/>-->
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
+        <application id="xforms-cart" label="Shopping Cart"/>
         <application id="xforms-sql-address-book" label="SQL Address Book"/>
     </section>
     <section label="Sandboxes">

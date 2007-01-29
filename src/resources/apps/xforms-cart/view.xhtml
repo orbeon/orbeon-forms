@@ -1,0 +1,65 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xforms="http://www.w3.org/2002/xforms">
+
+    <xhtml:head>
+        <xhtml:title>Accessing the Session - Shopping Cart</xhtml:title>
+        <xforms:model id="main-model">
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="get"/>
+            </xforms:action>
+            <xforms:instance id="item">
+                <item/>
+            </xforms:instance>
+            <xforms:instance id="cart">
+                <cart/>
+            </xforms:instance>
+            <xforms:submission id="get" action="/xforms-cart/get" method="get" serialize="false" replace="instance" instance="cart"/>
+            <xforms:submission id="add" action="/xforms-cart/add" ref="instance('item')" method="post" replace="none"/>
+            <xforms:submission id="clear" action="/xforms-cart/clear" ref="instance('item')" method="post" replace="none"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            <xforms:group>
+                <xforms:input ref="instance('item')">
+                    <xforms:label>Enter an item:</xforms:label>
+                </xforms:input>
+                <xforms:trigger>
+                    <xforms:label>Add to cart</xforms:label>
+                </xforms:trigger>
+                <xforms:action ev:event="DOMActivate" if="normalize-space(instance('item')) != ''">
+                    <xforms:send submission="add"/>
+                    <xforms:send submission="get"/>
+                    <xforms:setvalue ref="instance('item')"/>
+                </xforms:action>
+            </xforms:group>
+            <xforms:trigger>
+                <xforms:label>Empty cart</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:send submission="clear"/>
+                    <xforms:send submission="get"/>
+                    <xforms:setvalue ref="instance('item')"/>
+                </xforms:action>
+            </xforms:trigger>
+        </xhtml:p>
+        <xhtml:ol>
+            <xforms:repeat nodeset="instance('cart')/item" id="main-repeat">
+                <xhtml:li><xforms:output ref="."/></xhtml:li>
+            </xforms:repeat>
+        </xhtml:ol>
+    </xhtml:body>
+</xhtml:html>

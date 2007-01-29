@@ -16,7 +16,7 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param name="data" type="input"/>
-    <p:param name="instance" type="input"/>
+    <p:param name="instance" type="input" debug="xxxxx"/>
     <p:param name="data" type="output"/>
 
     <!-- Create URL generator configuration and generate data from the URL -->
@@ -24,7 +24,7 @@
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <config xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                <url><xsl:value-of select="/*/file"/></url>
+                <url><xsl:value-of select="if (/*/action = 'upload') then /*/file[1] else /*/file[2]"/></url>
                 <content-type>application/xml</content-type>
                 <force-content-type>true</force-content-type>
                 <cache-control>

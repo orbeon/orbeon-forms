@@ -32,22 +32,23 @@
             <xforms:instance id="main-instance">
                 <form xmlns="">
                     <action>upload</action>
-                    <file filename="" mediatype="" size=""/>
-                    <file-selected>false</file-selected>
-                    <file-valid/>
+
+                    <file filename="" mediatype="" size="" selected="false"/>
+                    <file filename="" mediatype="" size="" valid=""/>
+                    <sample/>
+
                     <upload-trigger/>
                     <download-trigger/>
-                    <sample/>
                     <sample-trigger/>
                 </form>
             </xforms:instance>
             <xforms:bind nodeset="instance('main-instance')">
-                <xforms:bind nodeset="file-valid" calculate="../action = 'upload' or
-                        (../action = 'download' and starts-with(normalize-space(../file), 'http://'))"/>
-                <xforms:bind nodeset="file" type="xs:anyURI"
-                             constraint="../file-valid = 'true'"/>
-                <xforms:bind nodeset="upload-trigger" readonly="../file-selected = 'false'"/>
-                <xforms:bind nodeset="download-trigger" readonly="../file-valid = 'false'"/>
+                <xforms:bind nodeset="file[2]/@valid" calculate="../../action = 'upload' or
+                        (../../action = 'download' and starts-with(normalize-space(..), 'http://'))"/>
+                <xforms:bind nodeset="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
+                
+                <xforms:bind nodeset="upload-trigger" readonly="../file[1]/@selected = 'false'"/>
+                <xforms:bind nodeset="download-trigger" readonly="../file[2]/@valid = 'false'"/>
                 <xforms:bind nodeset="sample-trigger" readonly="../sample = ''"/>
             </xforms:bind>
             <xforms:instance id="samples-instance">
@@ -84,12 +85,12 @@
                     <table style="width: 100%">
                         <tr>
                             <td style="width: 100%">
-                                <xforms:upload ref="file" xxforms:size="45">
+                                <xforms:upload ref="file[1]" xxforms:size="45">
                                     <xforms:label></xforms:label>
                                     <xforms:filename ref="@filename"/>
                                     <xforms:mediatype ref="@mediatype"/>
                                     <xxforms:size ref="@size"/>
-                                    <xforms:setvalue ev:event="xforms-select" ref="../file-selected">true</xforms:setvalue>
+                                    <xforms:setvalue ev:event="xforms-select" ref="@selected">true</xforms:setvalue>
                                 </xforms:upload>
                             </td>
                             <td>
@@ -112,7 +113,7 @@
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">
-                                    <xforms:input ref="file" xxforms:size="65" incremental="true">
+                                    <xforms:input ref="file[2]" xxforms:size="65" incremental="true">
                                         <xforms:label></xforms:label>
                                         <xforms:alert>Please enter a valid HTTP URL (starting with "http://")</xforms:alert>
                                     </xforms:input>

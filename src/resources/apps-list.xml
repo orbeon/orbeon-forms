@@ -50,6 +50,9 @@
     <section label="Query &amp; Transformation">
         <application id="xquery-the-web" label="XQuery the Web"/>
     </section>
+    <section label="Page Flow">
+        <application id="pfc-atm" label="ATM Page Flow"/>
+    </section>
     <section label="Integrating with Java">
         <application id="java-properties" label="Java Properties"/>
         <application id="java-api" label="Java API"/>

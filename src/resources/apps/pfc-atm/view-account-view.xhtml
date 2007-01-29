@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xhtml:head>
+        <xhtml:title>View Account</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="balance-instance">
+                <xi:include href="input:data"/>
+            </xforms:instance>
+            <xforms:instance id="withdraw-instance">
+                <amount/>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('withdraw-instance')" constraint="number(.) > 0"/>
+            <xforms:submission id="main-submission" ref="instance('withdraw-instance')" method="post"
+                               action="/pfc-atm/atm-view-account"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group>
+            <xhtml:p>
+                <xforms:output ref="instance('balance-instance')">
+                    <xforms:label>The current balance is: </xforms:label>
+                </xforms:output>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:group>
+                    <xforms:input ref="instance('withdraw-instance')">
+                        <xforms:label>Amount to withdraw: </xforms:label>
+                        <xforms:alert>Amount must be a positive number</xforms:alert>
+                    </xforms:input>
+                    <xforms:trigger>
+                        <xforms:label>Withdraw</xforms:label>
+                    </xforms:trigger>
+                    <xforms:send ev:event="DOMActivate" submission="main-submission"/>
+                </xforms:group>
+            </xhtml:p>
+        </xforms:group>
+        <xhtml:p style="margin-top: 3em">
+            <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

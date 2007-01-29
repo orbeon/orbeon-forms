@@ -1,0 +1,46 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <xhtml:head>
+        <xhtml:title>Anything Else</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <anything-else/>
+            </xforms:instance>
+            <xforms:submission id="main-submission" method="post" action="/pfc-atm/atm-anything-else"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+            Would you like anything else?
+        </xhtml:p>
+        <xhtml:p>
+            <xforms:submit submission="main-submission">
+                <xforms:label>Yes</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref=".">yes</xforms:setvalue>
+            </xforms:submit>
+            <xforms:submit submission="main-submission">
+                <xforms:label>No</xforms:label>
+                <xforms:setvalue ev:event="DOMActivate" ref=".">no</xforms:setvalue>
+            </xforms:submit>
+        </xhtml:p>
+        <xhtml:p style="margin-top: 3em">
+            <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.
+        </xhtml:p>
+    </xhtml:body>
+</xhtml:html>

@@ -1,0 +1,50 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller" 
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page path-info="/pfc-atm/" view="enter-pin-view.xhtml">
+        <action when="/form/action = 'submit'" action="enter-pin-action.xsl">
+            <result when="/valid = 'true'" page="view-account"/>
+        </action>
+    </page>
+
+    <page id="view-account" path-info="/pfc-atm/atm-view-account"
+          model="view-account-model.xpl" view="view-account-view.xhtml">
+        <action when="/amount != ''" action="view-account-action.xpl">
+            <result when="/success = 'true'" page="anything-else"/>
+            <result when="/success = 'false'" page="low-balance"/>
+        </action>
+    </page>
+
+    <page id="low-balance" path-info="/pfc-atm/atm-low-balance" view="low-balance-view.xhtml">
+        <action when="/action = 'ok'">
+            <result page="view-account"/>
+        </action>
+    </page>
+
+    <page id="anything-else" path-info="/pfc-atm/atm-anything-else" view="anything-else-view.xhtml">
+        <action when="/anything-else = 'yes'">
+            <result page="view-account"/>
+        </action>
+        <action when="/anything-else = 'no'">
+            <result page="see-you-again"/>
+        </action>
+    </page>
+
+    <page id="see-you-again" path-info="/pfc-atm/atm-see-you-again" view="see-you-again-view.xml"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

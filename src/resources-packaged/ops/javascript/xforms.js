@@ -554,14 +554,16 @@ ORBEON.xforms.Controls = {
     setRelevant: function(control, isRelevant) {
         var elementsToUpdate = [ control,
             ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
-            ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"),
             ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert")
         ];
-        // Also show help if there is a message attached
-        if (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "") {
+        // Also show help if message is not empty
+        if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "")) {
             elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"));
             elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"));
         }
+        // Also show hint if message is not empty
+        if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
+            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"));
         for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
             var element = elementsToUpdate[elementIndex];
             if (element != null) {
@@ -580,9 +582,17 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Controls._setMessage(control, "xforms-alert", message);
     },
 
+    getHintMessage: function(control) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+            return control.title;
+        } else {
+            var hintElement = ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint");
+            return hintElement == null ? "" : ORBEON.util.Dom.getStringValue(hintElement);
+        }
+    },
+
     setHintMessage: function(control, message) {
-        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")
-                || ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
+        if (ORBEON.util.Dom.hasClass(control, "xforms-trigger")) {
             control.title = message;
         } else {
             ORBEON.xforms.Controls._setMessage(control, "xforms-hint", message);

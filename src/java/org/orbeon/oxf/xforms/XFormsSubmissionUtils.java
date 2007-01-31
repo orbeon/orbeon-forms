@@ -177,7 +177,7 @@ public class XFormsSubmissionUtils {
                         }
                     }
                     if (hasRequestBody) {
-                        urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
+                        urlConnection.setRequestProperty("Content-type", (mediatype != null) ? mediatype : "application/xml");
                     }
 
                     // Forward cookies for session handling
@@ -199,7 +199,7 @@ public class XFormsSubmissionUtils {
                         final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
                         if (authorizationHeader != null) {
                             XFormsServer.logger.debug("XForms - forwarding authorization header: " + authorizationHeader);
-                            urlConnection.setRequestProperty("authorization", authorizationHeader);
+                            urlConnection.setRequestProperty("Authorization", authorizationHeader);
                         }
                     }
 

@@ -97,8 +97,11 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
                 XFormsUtils.streamHTMLFragment(new ForwardingContentHandler() {
 
+                    private boolean isStartElement;
+
                     public void characters(char[] chars, int start, int length) throws SAXException {
                         sb.append(XMLUtils.escapeXMLMinimal(new String(chars, start, length)));// NOTE: not efficient to create a new String here
+                        isStartElement = false;
                     }
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -124,12 +127,17 @@ public class XFormsOutputControl extends XFormsValueControl {
                             sb.append('"');
                         }
                         sb.append('>');
+                        isStartElement = true;
                     }
 
                     public void endElement(String uri, String localname, String qName) throws SAXException {
-                        sb.append("</");
-                        sb.append(localname);
-                        sb.append('>');
+                        if (!isStartElement) {
+                            // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.)
+                            sb.append("</");
+                            sb.append(localname);
+                            sb.append('>');
+                        }
+                        isStartElement = false;
                     }
                 }, rawValue, getLocationData(), "xhtml");
                 updatedValue = sb.toString();

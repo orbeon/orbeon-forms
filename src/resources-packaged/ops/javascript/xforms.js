@@ -2177,6 +2177,7 @@ ORBEON.xforms.Server = {
                                                 var documentElementClasses = documentElement.className.split(" ");
 
                                                 // Save new value sent by server (upload controls don't carry their value the same way as other controls)
+                                                var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
                                                 if (!ORBEON.util.Dom.hasClass(documentElement, "xforms-upload"))
                                                     ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
 
@@ -2294,7 +2295,12 @@ ORBEON.xforms.Server = {
                                                             && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
                                                         // HTML area
                                                         var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
-                                                        if (xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)) {
+                                                        var doUpdate =
+                                                                // Update ionly if the new value is different than the value already have in the HTML area
+                                                                xformsNormalizeEndlines(htmlEditor.GetXHTML()) != xformsNormalizeEndlines(newControlValue)
+                                                                // Also update only if the value in the HTML area is the same now as it was when we sent it to the server
+                                                                && htmlEditor.GetXHTML() == previousServerValue;
+                                                        if (doUpdate) {
                                                             // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
                                                             // as we loose our listeners after using the later
                                                             htmlEditor.EditorDocument.body.innerHTML = newControlValue;

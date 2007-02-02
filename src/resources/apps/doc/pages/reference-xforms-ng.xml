@@ -2696,6 +2696,57 @@
             </section>
             -->
         </section>
+        <a name="readonly-mode"/>
+        <section>
+            <title>Read-Only Mode</title>
+            <section>
+                <title>Making an Entire Instance Read-Only</title>
+                <p>
+                    You often want to present a form without allowing the user to enter data. An easy solution is to use
+                    the <code>readonly</code> MIP in the model. By making for example the root element of an instance
+                    read-only, all the controls bound to any node of that instance will appear read-only (because the
+                    read-only property is inherited in an instance):
+                </p>
+                <xml-source>
+                    <xforms:instance id="my-form">
+                        <form>
+                            ...
+                        </form>
+                    </xforms:instance>
+                    <xforms:bind nodeset="instance('my-form')" readonly="true()"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>Static Appearance for Read-Only Mode</title>
+                <p>
+                    Sometimes, read-only controls don't appear very nicely in web browsers. For example, a combo box
+                    will appear grayed out. It maybe be hard to read, and there is not much point showing a combo box
+                    since the user can't interact with it. Furthermore, with some browsers, like IE 6 and earlier, it
+                    is not even possible to make disabled controls appear nicer with CSS. In order to make read-only
+                    versions of forms look nicer, Orbeon Forms supports a special extention attribute that allows you
+                    to produce a "static" appearance for read-only controls. You enable this on your first XForms model:
+                </p>
+                <xml-source>
+                    <xforms:model xxforms:readonly-appearance="static">
+                        ...
+                    </xforms:model>
+                </xml-source>
+                <p>
+                    The attribute takes one of two vales: <code>static</code> or <code>dynamic</code> (the default).
+                    When using the value <code>static</code>, read-only controls do not produce disabled HTML form
+                    controls. This has one major limitation: you can't switch a control back to being read-write once
+                    it is displayed as read-only.
+                </p>
+                <p>
+                    You can also set the <code>xxforms:readonly-appearance</code> attribute directly on individual
+                    XForms controls.
+                </p>
+                <p>
+                    See the <a href="/forms/">Government Forms</a> sample application's <i>View Read-Only</i> option for
+                    an example of this feature in action.
+                </p>
+            </section>
+        </section>
         <a name="extensions"/>
         <section>
             <title>Extensions</title>
@@ -3687,69 +3738,92 @@
             </xml-source>
         </section>
         <a name="xforms-debugging"/>
-        <section added="2006-10-21">
+        <section>
             <title>Debugging XForms Pages</title>
-            <p>
-                When a fatal error occurs, the XForms engine throws a Java exception which either results in an error
-                page in your web browser (when the error occurrs during page initialization) or in an error message at
-                the top of the displayed XForms page (when the error occurs during an Ajax request after the page is
-                loaded). The main Java exception is also logged on the server. Often, this provides enough information
-                to the developer to figure out what went wrong. When this is not sufficient, the best tool available is
-                the XForms engine logging facility. To enable it, make sure you uncomment the following lines in
-                <code>config/log4j.xml</code>:
-            </p>
-            <xml-source>
-                <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
-                    <priority value="debug"/>
-                </category>
-                <category name="org.orbeon.oxf.xforms.processor.XFormsModelSubmission">
-                    <priority value="debug"/>
-                </category>
-            </xml-source>
-            <note>
+            <a name="xforms-logging"/>
+            <section added="2006-10-21">
+                <title>Enabling XForms Logging</title>
                 <p>
-                    You must restart your Servlet container for those changes to be taken into account.
+                    When a fatal error occurs, the XForms engine throws a Java exception which either results in an error
+                    page in your web browser (when the error occurrs during page initialization) or in an error message at
+                    the top of the displayed XForms page (when the error occurs during an Ajax request after the page is
+                    loaded). The main Java exception is also logged on the server. Often, this provides enough information
+                    to the developer to figure out what went wrong. When this is not sufficient, the best tool available is
+                    the XForms engine logging facility. To enable it, make sure you uncomment the following lines in
+                    <code>config/log4j.xml</code>:
                 </p>
-            </note>
-            <p>
-                This setting enables verbose logging of the XForms engine's operations, in particular:
-            </p>
-            <ul>
-                <li>
+                <xml-source>
+                    <category name="org.orbeon.oxf.xforms.processor.XFormsServer">
+                        <priority value="debug"/>
+                    </category>
+                    <category name="org.orbeon.oxf.xforms.processor.XFormsModelSubmission">
+                        <priority value="debug"/>
+                    </category>
+                </xml-source>
+                <note>
                     <p>
-                        Dispatching of events.
+                        You must restart your Servlet container for those changes to be taken into account.
                     </p>
-                </li>
-                <li>
-                    <p>
-                        Execution of actions.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Loading of instances.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Execution of submissions.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        Resulting XForms instances.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        XForms cache-related operations.
-                    </p>
-                </li>
-            </ul>
-            <p>
-                The following figure shows a sample XForms logging session in Orbeon Studio:
-            </p>
-            <img src="../apps/doc/images/reference-xforms-logging.png" style="clear: both; margin-left: 1em "/>
+                </note>
+                <p>
+                    This setting enables verbose logging of the XForms engine's operations, in particular:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Dispatching of events.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Execution of actions.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Loading of instances.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Execution of submissions.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Resulting XForms instances.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            XForms cache-related operations.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The following figure shows a sample XForms logging session in Orbeon Studio:
+                </p>
+                <img src="../apps/doc/images/reference-xforms-logging.png" style="clear: both; margin-left: 1em; border: 1px solid black"/>
+            </section>
+            <a name="xforms-instance-inspector"/>
+            <section>
+                <title>The Instance Inspector</title>
+                <p>
+                    The Instance Inspector allows you to visualize all the instances of your XForms page. You enable it
+                    by adding the following within your XForms page:
+                </p>
+                <xml-source>
+                    <widget:xforms-instance-inspector xmlns:widget="http://orbeon.org/oxf/xml/widget"/>
+                </xml-source>
+                <p>
+                    This is an example of how the Instance Inspector looks like in  your page:
+                </p>
+                <img src="../apps/doc/images/instance-inspector.png"/>
+                <p>
+                    You can select which model and instand to view, and decide whether to see plain XML or formatted
+                    XML.
+                </p>
+            </section>
         </section>
         <a name="xforms-classic-migration"/>
         <section added="2006-09-18">

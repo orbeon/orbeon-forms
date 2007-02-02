@@ -79,9 +79,10 @@
                     </li>
                     <li>
                         <p>
-                            <b>Server-side performance improvements.</b> [TODO: details] <!--, including in the
-                            following scenarios: [TODO: explain caching, serving static XForms,--> <!--XPath cache,
-                            document cache, etc.]-->
+                            <b>Server-side performance improvements.</b> New caches have been added to improve
+                            server-side performance, including a separate XPath cache and an XForms document cache. In
+                            addition, the number of XPath expressions executed as you interact with a form has been
+                            reduced.
                         </p>
                     </li>
                     <li>
@@ -139,7 +140,9 @@
                             <code>xxforms:readonly-appearance</code> attribute. With
                             <code>xxforms:readonly-appearance="static"</code>, read-only controls take a static
                             appearance appropriate for read-only rendition of forms in HTML. See <a
-                            href="/forms/">Government Forms</a> for an example. [TODO: doc]
+                            href="/forms/">Government Forms</a> sample application's <i>View Read-Only</i> option for
+                            an example, as well as the <a href="reference-xforms-ng#readonly-mode">Read-Only Mode</a>
+                            documentation.
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Esprit.</i>
@@ -149,7 +152,8 @@
                         <p>
                             <b>Improved PDF generation.</b> The PDF Template processor has been improved to facilitate
                             the creation of PDF versions of forms based on PDF templates. The processor now supports
-                            groups, repetitions, and XPath 2.0. [TODO]
+                            groups, repetitions, and XPath 2.0. See <a href="/forms/">Government Forms</a> sample
+                            application's <i>View PDF</i> option for an example [TODO]
                         </p>
                     </li>
                 </ul>
@@ -361,7 +365,6 @@
                     <li>
                         <p>
                             <b><code>xxforms:evaluate()</code> extension function.</b> The <a
-                            href="reference-xforms-ng#xxforms-evaluate"><code>xxforms:evaluate()</code></a> and <a
                             href="reference-xforms-ng#xxforms-serialize"><code>xxforms:serialize()</code></a> XPath
                             functions allow you to respectively evaluate dynamic XPath expressions and serialize XML
                             documents.
@@ -393,6 +396,14 @@
                         </p>
                     </li>
                 </ul>
+            </section>
+            <section>
+                <title>XForms Instance Inspector</title>
+                <p>
+                    The new <a href="reference-xforms-ng#xforms-instance-inspector">Instance Inspector</a> allows you
+                    to visualize all the instances of your XForms page.
+                </p>
+                <img src="../apps/doc/images/instance-inspector.png"/>
             </section>
             <section>
                 <title>New Example Applications Portal</title>

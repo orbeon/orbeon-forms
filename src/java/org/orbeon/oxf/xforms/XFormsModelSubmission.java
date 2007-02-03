@@ -644,9 +644,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             // We only get one header value per name
                                             final String headerValue = (String) currentEntry.getValue();
 
-                                            // We don't pass the Transfer-Encoding header, as the request body is already decoded for us.
-                                            // For instance, passing along the Transfer-Encoding causes a problem if the server sends us chunked data
-                                            // and we send it in the response not chunked but saying in the header that it is chunked.
+                                            /**
+                                             * Filtering the Transfer-Encoding header
+                                             *
+                                             * We don't pass the Transfer-Encoding header, as the request body is
+                                             * already decoded for us. Passing along the Transfer-Encoding causes a
+                                             * problem if the server sends us chunked data and we send it in the
+                                             * response not chunked but saying in the header that it is chunked.
+                                             *
+                                             * Non-filtering of Content-Encoding header
+                                             *
+                                             * The Content-Encoding has the potential of causing the same problem as
+                                             * the Transfer-Encoding header. It could be an issue if we get data with
+                                             * Content-Encoding: gzip, but pass it along uncompressed but still
+                                             * include the Content-Encoding: gzip. However this does not happen, as
+                                             * the request we send does not contain a Accept-Encoding: gzip,deflate. So
+                                             * filtering the Content-Encoding header is safe here.
+                                             */
                                             if (headerName != null && headerValue != null && !"transfer-encoding".equals(headerName.toLowerCase())) {
                                                 response.addHeader(headerName, headerValue);
                                             }

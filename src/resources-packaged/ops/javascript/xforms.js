@@ -42,6 +42,11 @@ var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");
 var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 
+// These variables are not set by default, but if set will be used by this code:
+//
+//     FCK_CUSTOM_CONFIG
+//     USER_LANGUAGE
+
 /* * * * * * Utility functions * * * * * */
 
 ORBEON = {};
@@ -1558,6 +1563,18 @@ ORBEON.xforms.Init = {
             ORBEON.xforms.Globals.htmlAreaNames.push(htmlArea.name);
         fckEditor.BasePath = BASE_URL + "/ops/fckeditor/";
         fckEditor.ToolbarSet = "OPS";
+
+        // Change the language of the FCK Editor for its spellchecker, based on the USER_LANGUAGE variable
+        var type_check = typeof USER_LANGUAGE;
+        if (type_check != 'undefined') {
+	        fckEditor.Config["AutoDetectLanguage"] = false;
+    	    fckEditor.Config["DefaultLanguage"] = (USER_LANGUAGE != '') ? USER_LANGUAGE : 'en';
+    	}
+        // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable 
+    	type_check = typeof FCK_CUSTOM_CONFIG;
+    	if (type_check != 'undefined')
+    		fckEditor.Config["CustomConfigurationsPath"] = FCK_CUSTOM_CONFIG;
+
         if (ORBEON.xforms.Globals.fckEditorLoading) {
             ORBEON.xforms.Globals.fckEditorsToLoad.push(fckEditor);
         } else {

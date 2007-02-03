@@ -641,10 +641,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                         for (Iterator i = connectionResult.resultHeaders.entrySet().iterator(); i.hasNext();) {
                                             final Map.Entry currentEntry = (Map.Entry) i.next();
                                             final String headerName = (String) currentEntry.getKey();
+                                            // We only get one header value per name
                                             final String headerValue = (String) currentEntry.getValue();
 
-                                            // NOTE: We only get one header value per name
-                                            if (headerName != null && headerValue != null) {
+                                            // We don't pass the Transfer-Encoding header, as the request body is already decoded for us.
+                                            // For instance, passing along the Transfer-Encoding causes a problem if the server sends us chunked data
+                                            // and we send it in the response not chunked but saying in the header that it is chunked.
+                                            if (headerName != null && headerValue != null && !"transfer-encoding".equals(headerName.toLowerCase())) {
                                                 response.addHeader(headerName, headerValue);
                                             }
                                         }

@@ -66,7 +66,8 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public String getHeader(String clazz) {
-        return null;//TODO
+        final String[] values = ((String[]) request.getHeaderValuesMap().get(clazz));
+        return values == null ? null : values[0];
     }
 
     public Enumeration getHeaderNames() {

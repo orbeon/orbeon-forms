@@ -67,19 +67,31 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     }
 
     private void initializeHeaders(ExternalContext.Request request) {
-        // TODO: The Servlet spec mandates JSESSIONID as cookie name; we should only forward this cookie
+        /**
+         * We don't want to pass all the headers. For instance passing the Referer or Content-Length would be wrong. So
+         * we only pass 2 headers:
+         *
+         * Cookie: In particular for the JSESSIONID. We want the page to be able to know who the user is.
+         *
+         * Authorization: If we don't pass this header, when the destination page makes a query to a service it won't be
+         * able to pass the Authorization header, which in certain cases leads to a 401. Why in some cases passing just
+         * the JSESSIONID cookie is enough while in other cases this leads to a 401 is unclear.
+         */
         {
             this.headerMap = new HashMap();
-            final Object header = request.getHeaderMap().get("cookie");
-            if (header != null)
-                headerMap.put("cookie", header);
+            final Map requestHeaderMap = request.getHeaderMap();
+            final Object cookie = requestHeaderMap.get("cookie");
+            if (cookie != null) headerMap.put("cookie", cookie);
+            final Object authorization = requestHeaderMap.get("authorization");
+            if (authorization != null) headerMap.put("authorization", authorization);
         }
-
         {
             this.headerValuesMap = new HashMap();
-            final Object headerValues = request.getHeaderValuesMap().get("cookie");
-            if (headerValues != null)
-                headerValuesMap.put("cookie", headerValues);
+            Map requestHeaderValuesMap = request.getHeaderValuesMap();
+            final Object cookie = requestHeaderValuesMap.get("cookie");
+            if (cookie != null) headerValuesMap.put("cookie", cookie);
+            final Object authorization = requestHeaderValuesMap.get("authorization");
+            if (authorization != null) headerValuesMap.put("authorization", authorization);
         }
     }
 

@@ -466,6 +466,7 @@ public class XFormsControls {
         }
 
         // Handle nodeset
+        final boolean isNewBind;
         final List newNodeset;
         {
             if (bindId != null) {
@@ -474,6 +475,7 @@ public class XFormsControls {
                 if (modelBind == null)
                     throw new OXFException("Cannot find bind for id: " + bindId);
                 newNodeset = newModel.getBindNodeset(pipelineContext, modelBind);
+                isNewBind = true;
             } else if (ref != null || nodeset != null) {
 
                 // Check whether there is an optional context
@@ -520,6 +522,7 @@ public class XFormsControls {
                 if (nodeset != null && context != null) {
                     popBinding();
                 }
+                isNewBind = true;
             } else if (isNewModel) {
                 // Only the model has changed
                 final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
@@ -528,14 +531,15 @@ public class XFormsControls {
                 } else {
                     newNodeset = Collections.EMPTY_LIST;
                 }
+                isNewBind = false;
             } else {
                 // No change to current nodeset
                 newNodeset = currentBindingContext.getNodeset();
+                isNewBind = false;
             }
         }
 
         // Push new context
-        final boolean isNewBind = newNodeset != currentBindingContext.getNodeset();// TODO: this is used only in one place later; check
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
         contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, isNewBind ? 1 : currentBindingContext.getPosition(), id, isNewBind, bindingElement));
     }

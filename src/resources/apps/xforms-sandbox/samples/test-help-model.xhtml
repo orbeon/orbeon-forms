@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:widget="http://orbeon.org/oxf/xml/widget"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xhtml:head>
+        <xforms:model id="data-model">
+            <xforms:instance id="data-instance">
+                <data>
+                <objectivesSummary>
+                    <rating>1</rating>
+                    <rating2>2</rating2>
+                </objectivesSummary>
+                </data>
+            </xforms:instance>
+
+        </xforms:model>
+
+        <xforms:model id="resources-model">
+            <xforms:instance id="resources-instance">
+                <resources>
+                <labels>
+                    <rating>rating</rating>
+                </labels>
+                <help>
+                  <rating xml:lang="en">
+                    <div>
+                        <ul>
+                            <li>Message</li>
+                        </ul>
+                    </div>
+                  </rating>
+                </help>
+                </resources>
+            </xforms:instance>
+
+            <xforms:instance id="ratings-resources">
+                <pmpRatingsDisplay>
+                </pmpRatingsDisplay>
+            </xforms:instance>
+
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+
+
+        <xforms:select1 ref="objectivesSummary/rating" class="labeled-select1">
+            <xforms:label model="resources-model" ref="labels/rating"/>
+            <xforms:help model="resources-model">                            <!-- this help does not appear -->
+                <xforms:output model="resources-model" mediatype="text/html" value="xxforms:serialize(xxforms:instance('resources-instance')/help/rating/*, 'html')"/>
+            </xforms:help>
+
+            <!-- do not allow n/a in this rating select1, since N/A is last we can use position() != last() -->
+            <xforms:itemset model="resources-model" nodeset="instance('ratings-resources')/rating[position() != last()]">
+                <xforms:label ref="display/name"/>
+                <xforms:value ref="ratingId"/>
+            </xforms:itemset>
+        </xforms:select1>
+
+        <xforms:select1 ref="objectivesSummary/rating2" class="labeled-select1">
+            <xforms:label model="resources-model" ref="labels/rating"/>
+            <xforms:help>            <!-- this help appears -->
+                <xforms:output model="resources-model" mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/rating/*, 'html')"/>
+            </xforms:help>
+
+            <!-- do not allow n/a in this rating select1, since N/A is last we can use position() != last() -->
+            <xforms:itemset model="resources-model" nodeset="instance('ratings-resources')/rating[position() != last()]">
+                <xforms:label ref="display/name"/>
+                <xforms:value ref="ratingId"/>
+            </xforms:itemset>
+        </xforms:select1>
+
+    </xhtml:body>
+</xhtml:html>

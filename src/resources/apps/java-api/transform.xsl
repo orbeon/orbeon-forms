@@ -32,7 +32,7 @@
                     the Java processor. The transformation applies the Orbeon Forms XML formatter to the input and
                     returns a custom output on the Java Processor.
                 </xhtml:p>
-                <xhtml:div>
+                <xhtml:div class="ops-source">
                     <xsl:apply-templates mode="xml-formatting"/>
                 </xhtml:div>
             </xhtml:body>

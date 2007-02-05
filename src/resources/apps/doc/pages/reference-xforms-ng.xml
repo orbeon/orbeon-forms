@@ -1780,7 +1780,7 @@
                 </section>
                 <a name="xforms-message"/>
                 <section>
-                    <title>Displaying Message with the <code>xforms:message</code> Action</title>
+                    <title>Displaying Messages with the <code>xforms:message</code> Action</title>
                     <p>
                         The XForms message action displays a message to the user. <img print-format="pdf"
                         src="../apps/doc/images/reference-xforms-message.png" style="clear: both; float: right"/>
@@ -2211,9 +2211,9 @@
             </p>
         </section>
         -->
-        <a name="xforms-relative-paths"/>
+        <a name="xforms-urls"/>
         <section>
-            <title>Relative Paths</title>
+            <title>URLs in XForms</title>
             <section>
                 <title>Rationale</title>
                 <p>

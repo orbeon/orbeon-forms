@@ -343,6 +343,20 @@ ORBEON.util.Dom = {
             return dom;
         }
         return null;
+    },
+
+    clearUploadControl: function(uploadElement) {
+
+        var inputElement = ORBEON.util.Dom.getChildElementByClass(uploadElement, "xforms-upload-select");
+        var parentElement = inputElement.parentNode;
+        var newInputElement = document.createElement("input");
+        ORBEON.util.Dom.addClass(newInputElement, inputElement.className);
+        newInputElement.setAttribute("type", inputElement.type);
+        newInputElement.setAttribute("name", inputElement.name);
+        newInputElement.setAttribute("size", inputElement.size);
+        parentElement.replaceChild(newInputElement, inputElement);
+
+        return null;
     }
 };
 
@@ -1842,6 +1856,18 @@ ORBEON.xforms.Server = {
         xformsDisplayIndicator("error");
     },
 
+    handleUploadResponse: function(o) {
+        // Clear all the upload fields (currently we submit all of them, but in the future, should clear only the ones that have been submitted)
+        var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
+        for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
+            var uploadElement = uploadElements[uploadIndex];
+            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates 
+                ORBEON.util.Dom.clearUploadControl(uploadElement);
+        }
+
+        ORBEON.xforms.Server.handleResponse(o);
+    },
+
     handleResponse: function(o) {
 
         var formIndex = ORBEON.util.Dom.getFormIndex(ORBEON.xforms.Globals.requestForm);
@@ -2364,14 +2390,7 @@ ORBEON.xforms.Server = {
                                                             ORBEON.util.Dom.addClass(documentElement, "xforms-upload-state-file")
 
                                                             // Clear upload input by replacing the control
-                                                            var inputElement = ORBEON.util.Dom.getChildElementByClass(documentElement, "xforms-upload-select");
-                                                            var parentElement = inputElement.parentNode;
-                                                            var newInputElement = document.createElement("input");
-                                                            ORBEON.util.Dom.addClass(newInputElement, inputElement.className);
-                                                            newInputElement.setAttribute("type", inputElement.type);
-                                                            newInputElement.setAttribute("name", inputElement.name);
-                                                            newInputElement.setAttribute("size", inputElement.size);
-                                                            parentElement.replaceChild(newInputElement, inputElement);
+                                                            ORBEON.util.Dom.clearUploadControl(documentElement);
                                                         }
                                                         if (filename != null)
                                                             ORBEON.util.Dom.setStringValue(fileNameSpan, filename);
@@ -2658,6 +2677,7 @@ ORBEON.xforms.Server = {
 
                                 // Server events
                                 case "server-events": {
+                                    // If there is a "submission" element, this must always come first
                                     serverEventsIndex = actionIndex;
                                     break;
                                 }
@@ -2685,7 +2705,7 @@ ORBEON.xforms.Server = {
                                         // Submit form in the background
                                         YAHOO.util.Connect.setForm(ORBEON.xforms.Globals.requestForm, true, true);
                                         var callback =  {
-                                            upload: ORBEON.xforms.Server.handleResponse,
+                                            upload: ORBEON.xforms.Server.handleUploadResponse,
                                             failure: ORBEON.xforms.Server.handleFailure
                                         }
                                         YAHOO.util.Connect.asyncRequest("POST", action, callback);
@@ -2764,6 +2784,9 @@ ORBEON.xforms.Server = {
                     ORBEON.xforms.Globals.loadingOtherPage = true;
                 }
                 ORBEON.xforms.Globals.lastRequestIsError = false;
+
+                // Hack for instance inspector - need to see how to do this better
+//                sourceResize();
 
             } else if (responseXML && responseXML.documentElement
                     && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {

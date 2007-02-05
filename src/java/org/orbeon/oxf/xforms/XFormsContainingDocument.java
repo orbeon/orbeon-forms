@@ -98,7 +98,9 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         allowedXFormsOutputExternalEvents.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, "");
 
         // External events allowed on xforms:upload
+        allowedXFormsUploadExternalEvents.putAll(allowedXFormsOutputExternalEvents);
         allowedXFormsUploadExternalEvents.put(XFormsEvents.XFORMS_SELECT, "");
+        allowedXFormsUploadExternalEvents.put(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, "");
 
         // External events allowed on other controls
         allowedExternalEvents.putAll(allowedXFormsOutputExternalEvents);

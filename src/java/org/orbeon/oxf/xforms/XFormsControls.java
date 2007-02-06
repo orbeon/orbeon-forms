@@ -467,6 +467,7 @@ public class XFormsControls {
 
         // Handle nodeset
         final boolean isNewBind;
+        final int newPosition;
         final List newNodeset;
         {
             if (bindId != null) {
@@ -476,6 +477,7 @@ public class XFormsControls {
                     throw new OXFException("Cannot find bind for id: " + bindId);
                 newNodeset = newModel.getBindNodeset(pipelineContext, modelBind);
                 isNewBind = true;
+                newPosition = 1;
             } else if (ref != null || nodeset != null) {
 
                 // Check whether there is an optional context
@@ -523,25 +525,29 @@ public class XFormsControls {
                     popBinding();
                 }
                 isNewBind = true;
+                newPosition = 1;
             } else if (isNewModel) {
                 // Only the model has changed
                 final NodeInfo currentSingleNodeForModel = getCurrentSingleNode(newModel.getEffectiveId());
                 if (currentSingleNodeForModel != null) {
                     newNodeset = Collections.singletonList(currentSingleNodeForModel);
+                    newPosition = 1;
                 } else {
                     newNodeset = Collections.EMPTY_LIST;
+                    newPosition = -1;// this is not a valid position and nobody should use the node-set anyway
                 }
                 isNewBind = false;
             } else {
                 // No change to current nodeset
                 newNodeset = currentBindingContext.getNodeset();
                 isNewBind = false;
+                newPosition = currentBindingContext.getPosition();
             }
         }
 
         // Push new context
         final String id = (bindingElement == null) ? null : bindingElement.attributeValue("id");
-        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, isNewBind ? 1 : currentBindingContext.getPosition(), id, isNewBind, bindingElement));
+        contextStack.push(new BindingContext(currentBindingContext, newModel, newNodeset, newPosition, id, isNewBind, bindingElement));
     }
 
     /**

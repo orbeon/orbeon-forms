@@ -212,7 +212,8 @@
                                       value="xxforms:serialize(xxforms:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', ., 'data')/*, 'html')"/>
                     </xforms:group>
                     <xforms:group ref=".[instance('orbeon-xforms-instance-inspector-instance')/mode = 'plain']">
-                        <xforms:output value="xxforms:serialize(., 'html')"/>
+                        <xforms:output mediatype="text/html"
+                                       value="replace(replace(replace(replace(xxforms:serialize(., 'xml'), '&amp;', '&amp;amp;'), '&lt;', '&amp;lt;'), '&#x0a;', '&lt;br>'), ' ', '&#160;')"/>
                     </xforms:group>
                 </xforms:group>
             </div>

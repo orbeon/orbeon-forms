@@ -365,6 +365,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         final String stringResult = containingDocument.getEvaluator().evaluateAsString(pipelineContext, nodeInfo, modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
                             xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
 
+                        // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
                         XFormsInstance.setValueForNodeInfo(pipelineContext, nodeInfo, stringResult, null);
 
                     } catch (Exception e) {
@@ -541,7 +542,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     instanceData.getType().set(requiredTypeFingerprint);
 
                     // Try to perform casting
-                    final String nodeStringValue = nodeInfo.getStringValue().trim();
+                    final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo).trim();
                     if (XFormsUtils.getLocalInstanceData(nodeInfo).getRequired().get() || nodeStringValue.length() != 0) {
                         StringValue stringValue = new StringValue(nodeStringValue);
                         XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());

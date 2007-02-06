@@ -60,6 +60,7 @@ public class InstanceData {
     public InstanceData(LocationData locationData, int id) {
         this.locationData = locationData;
 
+        // TODO: Do not create all these ojbects here, but do it lazily
         this.relevant = new RelevantModelItemProperty();
         this.readonly = new ReadonlyModelItemProperty();
 
@@ -241,16 +242,16 @@ public class InstanceData {
     }
 
     public void updateRequired(boolean value, NodeInfo nodeInfo, String modelBindId) {
-        required.set(value, nodeInfo.getStringValue());
+        required.set(value, XFormsInstance.getValueForNodeInfo(nodeInfo));
     }
 
     public void updateConstraint(boolean value, NodeInfo nodeInfo, String modelBindId) {
-        constraint.set(value, nodeInfo.getStringValue());
+        constraint.set(value, XFormsInstance.getValueForNodeInfo(nodeInfo));
     }
 
     public void updateValueValid(boolean value, NodeInfo nodeInfo, String modelBindId) {
         if (!value) {
-            valueValid.set(value, nodeInfo.getStringValue());
+            valueValid.set(value, XFormsInstance.getValueForNodeInfo(nodeInfo));
 
             if (modelBindId != null)
                 setInvalidBindIds(getInvalidBindIds() == null ? modelBindId : getInvalidBindIds() + " " + modelBindId);

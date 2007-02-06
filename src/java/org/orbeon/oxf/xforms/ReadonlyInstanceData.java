@@ -24,41 +24,47 @@ import java.util.Map;
  * Read-only version of InstanceData for read-only instances.
  */
 public class ReadonlyInstanceData extends InstanceData {
+
+    private static final RelevantModelItemProperty CONSTANT_RELEVANT_MIP =  new RelevantModelItemProperty() {
+        public void set(boolean value) {
+            throwException();
+        }
+    };
+
+    private static final ReadonlyModelItemProperty CONSTANT_READONLY_MIP = new ReadonlyModelItemProperty() {
+        public void set(boolean value) {
+            throwException();
+        }
+    };
+
+    private static final RequiredModelItemProperty CONSTANT_REQUIRED_MIP = new RequiredModelItemProperty() {
+        public void set(boolean value) {
+
+        }
+    };
+
+    private static final TypeModelItemProperty CONSTANT_TYPE_MIP = new TypeModelItemProperty() {
+        public void set(int value) {
+            throwException();
+        }
+    };
+
+    private static final ValidModelItemProperty CONSTANT_VALID_MIP = new ValidModelItemProperty() {
+        public void set(boolean value) {
+            throwException();
+        }
+    };
+
     public ReadonlyInstanceData(LocationData locationData, int id) {
         super(locationData, id);
 
-        this.relevant = new RelevantModelItemProperty() {
-            public void set(boolean value) {
-                throwException();
-            }
-        };
-        this.readonly = new ReadonlyModelItemProperty() {
-            public void set(boolean value) {
-                throwException();
-            }
-        };
+        this.relevant = CONSTANT_RELEVANT_MIP;
+        this.readonly = CONSTANT_READONLY_MIP;
+        this.required = CONSTANT_REQUIRED_MIP;
+        this.type = CONSTANT_TYPE_MIP;
 
-        this.required = new RequiredModelItemProperty() {
-            public void set(boolean value) {
-
-            }
-        };
-        this.type = new TypeModelItemProperty() {
-            public void set(int value) {
-                throwException();
-            }
-        };
-
-        this.valueValid = new ValidModelItemProperty() {
-            public void set(boolean value) {
-                throwException();
-            }
-        };
-        this.constraint = new ValidModelItemProperty() {
-            public void set(boolean value) {
-                throwException();
-            }
-        };
+        this.valueValid = CONSTANT_VALID_MIP;
+        this.constraint = CONSTANT_VALID_MIP;
 
         setInheritedReadonly(new ReadonlyModelItemProperty());
         getInheritedReadonly().set(false);
@@ -66,7 +72,7 @@ public class ReadonlyInstanceData extends InstanceData {
         getInheritedRelevant().set(true);
     }
 
-    private void throwException() {
+    private static void throwException() {
         throw new OXFException("Cannot modify read-only instance.");
     }
 

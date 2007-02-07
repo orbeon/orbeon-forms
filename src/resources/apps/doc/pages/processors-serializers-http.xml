@@ -25,23 +25,21 @@
         <section>
             <title>Scope</title>
             <p>
-                Serializers are processors with no XML output. A serializer, just like any
-                processor, can access files, connect to databases, and take actions depending on
-                its inputs.
+                Serializers are processors with no XML output. A serializer, just like any processor, can access files,
+                connect to databases, and take actions depending on its inputs.
             </p>
             <p>
-                The HTTP serializer supports decoding binary or text data encapsulated in XML
-                documents and sending it into an HTTP response. Typically, this means sending data
-                back to a client web browser. This can be done in a Servlet environment or a Portlet
-                environment.
+                The HTTP serializer supports decoding <a href="reference-formats">binary or text data</a> encapsulated
+                in XML documents and sending it into an HTTP response. Typically, this means sending data back to a
+                client web browser. This can be done in a Servlet environment or a Portlet environment.
              </p>
         </section>
         <section>
             <title>Configuration</title>
             <p>
-                The configuration consists of the following optional elements.
+                The configuration consists of the following optional elements:
             </p>
-            <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+            <table>
                 <tr>
                     <th>Element Name</th>
                     <th>Type</th>

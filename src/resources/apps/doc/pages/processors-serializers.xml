@@ -169,7 +169,7 @@
                 </tr>
             </table>
             <p>
-                Here is how you can serialize a document produced by a pipeline to a file on disk:
+                Here is how you serialize a document produced by a pipeline to a file on disk:
             </p>
             <xml-source>
                 <comment> Convert a document to serialized XML </comment>
@@ -199,6 +199,30 @@
                 Note the use of the <a href="processors-converters#xml-converter">XML converter</a> processor, which
                 serializes the XML document produced by the pipeline to a textual representation of XML.
             </p>
+            <p>
+                Here is how you can copy a file specified with a URL from one location to the other, by using the URL
+                generator and the File serializer:
+            </p>
+            <xml-source>
+                <comment> Read original file </comment>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>file:/my-image.jpg</url>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="image-data"/>
+                </p:processor>
+                <comment> Write to another file </comment>
+                <p:processor name="oxf:file-serializer">
+                    <p:input name="config">
+                        <config>
+                            <file>/my-copied-image.jpg</file>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#image-data"/>
+                </p:processor>
+            </xml-source>
             <p>
                 The File serializer is most useful in a <link href="integration-command-line">command-line
                 application</link>, but can be used in web applications as well.

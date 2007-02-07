@@ -31,6 +31,7 @@
                 href="http://www.orbeon.com/forms/mailing-list">http://www.orbeon.com/forms/mailing-list</a>.
             </p>
         </section>
+        <a name="background"/>
         <section>
             <title>A Little Bit of Background</title>
             <section>
@@ -129,8 +130,10 @@
                 </ul>
             </section>
         </section>
+        <a name="installing"/>
         <section>
             <title>Installing and Configuring Orbeon Forms</title>
+            <a name="installing-java"/>
             <section>
                 <title>Downloading and Installing Java</title>
                 <p>
@@ -145,6 +148,7 @@
                     Then follow the instructions to install Java.
                 </p>
             </section>
+            <a name="installing-tomcat"/>
             <section>
                 <title>Downloading and Installing Apache Tomcat</title>
                 <p>
@@ -201,6 +205,7 @@
                     </p>
                 </note>
             </section>
+            <a name="installing-orbeon-forms"/>
             <section>
                 <title>Downloading and Installing Orbeon Forms</title>
                 <p>
@@ -231,6 +236,7 @@
                     </li>
                 </ol>
             </section>
+            <a name="testing-setup"/>
             <section>
                 <title>Testing your setup</title>
                 <p>
@@ -252,8 +258,10 @@
                 <figure src="/apps/doc/images/tutorial/00.png"/>
             </section>
         </section>
+        <a name="hello-application"/>
         <section>
             <title>The Hello Application</title>
+            <a name="running-hello"/>
             <section>
                 <title>Running the Hello Application</title>
                 <p>
@@ -287,6 +295,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="hello-source-code"/>
             <section>
                 <title>The Source Code</title>
                 <p>
@@ -478,6 +487,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="hello-page-flow"/>
             <section>
                 <title>Page Flow</title>
                 <p>
@@ -537,6 +547,7 @@
                     page in your application, which translates into more than one <code>&lt;page></code> element.
                 </p>
             </section>
+            <a name="orbeon-forms-resources"/>
             <section>
                 <title>Orbeon Forms Resources</title>
                 <p>
@@ -555,6 +566,7 @@
                     and running without configuration.
                 </note>
             </section>
+            <a name="directory-structure"/>
             <section>
                 <title>A Look Into the Resources Directory Structure</title>
                 <p>
@@ -590,6 +602,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="playing-with-source-code"/>
             <section>
                 <title>Playing with the Hello Application Source Code</title>
                 <p>
@@ -673,6 +686,7 @@
                 </p>
             </section>
         </section>
+        <a name="bookcast-application"/>
         <section>
             <title>The Bookcast Application</title>
             <section>
@@ -690,6 +704,7 @@
                     href="http://www.orbeon.com/ops/xforms-bookcast/">online on the Orbeon web site</a>.
                 </p>
             </section>
+            <a name="bookcast-getting-started"/>
             <section>
                 <title>Getting Started</title>
                 <p>
@@ -775,6 +790,7 @@
                     </ul>
                 </note>
             </section>
+            <a name="bookcast-model-instance"/>
             <section>
                 <title>XForms Model and Instance</title>
                 <p>
@@ -882,6 +898,7 @@
                     You should still see a blank page, because so far you haven't added any visual elements!
                 </p>
             </section>
+            <a name="bookcast-first-controls"/>
             <section>
                 <title>First Controls</title>
                 <p>
@@ -918,6 +935,7 @@
                     (<code>&lt;xforms:label/></code>).
                 </p>
             </section>
+            <a name="bookcast-adding-constraints"/>
             <section>
                 <title>Adding Constraints</title>
                 <p>
@@ -1012,6 +1030,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="bookcast-single-selection-controls"/>
             <section>
                 <title>Single Selection Controls</title>
                 <p>
@@ -1110,6 +1129,7 @@
                     existing sets of data, dynamically changing the list of items, easing localization, etc.
                 </p>
             </section>
+            <a name="bookcast-textarea"/>
             <section>
                 <title>Adding a Text Area</title>
                 <p>
@@ -1136,6 +1156,7 @@
                     just that the control appears slightly differently and the user experience is changed.
                 </p>
             </section>
+            <a name="bookcast-finishing-controls"/>
             <section>
                 <title>Finishing-Up the Controls</title>
                 <p>
@@ -1247,6 +1268,7 @@
                     By now you probably get the gist of it!
                 </p>
             </section>
+            <a name="bookcast-save-button"/>
             <section>
                 <title>Adding a "Save" Button</title>
                 <p>
@@ -1417,6 +1439,7 @@
                     </p>
                 </note>
             </section>
+            <a name="bookcast-loading-initial-data"/>
             <section>
                 <title>Loading the Initial Data</title>
                 <p>
@@ -1557,6 +1580,7 @@
                     content of the <code>books-submission</code> instance is not changed and so you see an empty form.)
                 </p>
             </section>
+            <a name="bookcast-adding-books"/>
             <section>
                 <title>Adding More Books</title>
                 <p>
@@ -1680,6 +1704,7 @@
                     the page. These update are directly done to the HTML Document Object Model (DOM) without reload.
                 </p>
             </section>
+            <a name="bookcast-deleting-book"/>
             <section>
                 <title>Deleting a Book</title>
                 <p>
@@ -1745,6 +1770,7 @@
                 </p>
                 <figure src="/apps/doc/images/tutorial/15.png"/>
             </section>
+            <a name="bookcast-revert-button"/>
             <section>
                 <title>Adding a "Revert" Button</title>
                 <p>
@@ -1763,6 +1789,7 @@
                     the <code>books-instance</code> instance.
                 </p>
             </section>
+            <a name="making-things-look-nicer"/>
             <section>
                 <title>Making Things Look Nicer</title>
                 <p>
@@ -2048,6 +2075,7 @@
                     A little bit of CSS does make things look a little better, doesn't it?
                 </p>
             </section>
+            <a name="bookcast-validation"/>
             <section>
                 <title>Adding Validation</title>
                 <p>
@@ -2243,6 +2271,7 @@
                 </p>
                 <figure src="/apps/doc/images/tutorial/17.png"/>
             </section>
+            <a name="bookcast-atom-feed"/>
             <section>
                 <title>The Atom Feed</title>
                 <p>
@@ -2496,6 +2525,7 @@
             </p>
             <figure src="/apps/doc/images/tutorial/20.png"/>
         </section>
+        <a name="bookcast-next"/>
         <section>
             <title>What's Next</title>
             <p>

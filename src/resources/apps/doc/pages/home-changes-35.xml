@@ -46,11 +46,13 @@
                 This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.
             </p>
         </section>
+        <a name="changes-35"/>
         <section>
             <title>Changes in Version 3.5</title>
             <p>
                 Orbeon Forms 3.5 features the following changes:
             </p>
+            <a name="name-change"/>
             <section>
                 <title>Orbeon PresentationServer is now Orbeon Forms</title>
                 <p>
@@ -58,6 +60,7 @@
                     href="/doc/home-faq#name-change">FAQ entry</a> for more information.
                 </p>
             </section>
+            <a name="xforms-tutorial"/>
             <section>
                 <title>New Orbeon Forms Tutorial</title>
                 <p>
@@ -67,6 +70,7 @@
                     persistence and production of an Atom feed.
                 </p>
             </section>
+            <a name="xforms-performance"/>
             <section>
                 <title>XForms Performance</title>
                 <ul>
@@ -104,6 +108,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-platform-support"/>
             <section>
                 <title>XForms Platform Support</title>
                 <ul>
@@ -131,6 +136,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-printable-formats"/>
             <section>
                 <title>XForms Printable Formats</title>
                 <ul>
@@ -158,6 +164,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-controls-enhancements"/>
             <section>
                 <title>XForms Controls Enhancements</title>
                 <ul>
@@ -258,6 +265,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-11-features"/>
             <section>
                 <title>XForms 1.1 Features</title>
                 <ul>
@@ -294,6 +302,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-submission-enhancements"/>
             <section>
                 <title>XForms Submission Enhancements</title>
                 <ul>
@@ -335,6 +344,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-extensions"/>
             <section>
                 <title>XForms Extensions</title>
                 <ul>
@@ -397,6 +407,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-instance-inspector"/>
             <section>
                 <title>XForms Instance Inspector</title>
                 <p>
@@ -405,6 +416,7 @@
                 </p>
                 <img src="../apps/doc/images/instance-inspector.png"/>
             </section>
+            <a name="new-example-applications-portal"/>
             <section>
                 <title>New Example Applications Portal</title>
                 <p>
@@ -447,6 +459,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="improved-directory-structure"/>
             <section>
                 <title>Improved Applications Directory Structure</title>
                 <p>
@@ -497,6 +510,7 @@
                     to modify are packaged in JAR files that you simply replace during an upgrade.
                 </p>
             </section>
+            <a name="government-forms"/>
             <section>
                 <title>New Government Forms Sample Application</title>
                 <p>
@@ -527,6 +541,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="other-enhancements"/>
             <section>
                 <title>Other Enhancements</title>
                 <ul>
@@ -581,6 +596,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="library-upgrades"/>
             <section>
                 <title>Library Upgrades</title>
                 <ul>
@@ -609,6 +625,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="bug-fixes"/>
             <section>
                 <title>Bug-Fixes</title>
                 <ul>
@@ -618,6 +635,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="upgrade-notes"/>
             <section>
                 <title>Upgrade Notes</title>
                 <p>

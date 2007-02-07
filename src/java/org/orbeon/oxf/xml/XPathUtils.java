@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml;
 
 import org.dom4j.InvalidXPathException;
+import org.dom4j.Element;
 import org.jaxen.*;
 import org.jaxen.dom.DOMXPath;
 import org.orbeon.oxf.common.OXFException;
@@ -495,7 +496,7 @@ public class XPathUtils {
         if (selectedNode == null)
             return null;
         org.dom4j.Document resultDocument = new NonLazyUserDataDocument();
-        resultDocument.add(selectedNode);
+        resultDocument.add((((Element) selectedNode).createCopy()));
         return resultDocument;
     }
 

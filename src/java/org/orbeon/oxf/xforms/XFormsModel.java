@@ -345,8 +345,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             final ModelBind modelBind = (ModelBind) i.next();
             // But only consider top-level binds, as children are handled recursively
             if (modelBind.getParent() == null) {
+                final XFormsInstance defaultInstance = getDefaultInstance();
+                if (defaultInstance == null)
+                    throw new ValidationException("No default instance found for xforms:bind element with id: " + modelBind.getId(), modelBind.getLocationData());
+                
                 try {
-                    modelBind.setCurrentNodeInfo(getDefaultInstance().getInstanceRootElementInfo());
+                    modelBind.setCurrentNodeInfo(defaultInstance.getInstanceRootElementInfo());
                     bindRunner.applyBind(modelBind);
                 } catch (final Exception e) {
                     throw new ValidationException(e, modelBind.getLocationData());
@@ -621,7 +625,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         final List nodeset = new ArrayList();
 
         // Find the root node
-        nodeset.add(getDefaultInstance().getInstanceRootElementInfo());
+        final XFormsInstance defaultInstance = getDefaultInstance();
+        if (defaultInstance == null)
+            throw new ValidationException("No default instance found for xforms:bind element with id: " + bind.getId(), bind.getLocationData());
+        nodeset.add(defaultInstance.getInstanceRootElementInfo());
 
         for (Iterator i = parents.iterator(); i.hasNext();) {
             final ModelBind current = (ModelBind) i.next();

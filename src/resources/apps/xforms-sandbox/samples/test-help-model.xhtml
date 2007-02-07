@@ -51,7 +51,7 @@
         <xforms:select1 ref="objectivesSummary/rating" class="labeled-select1">
             <xforms:label model="resources-model" ref="labels/rating"/>
             <xforms:help model="resources-model">                            <!-- this help does not appear -->
-                <xforms:output model="resources-model" mediatype="text/html" value="xxforms:serialize(xxforms:instance('resources-instance')/help/rating/*, 'html')"/>
+                <xforms:output model="resources-model" mediatype="text/html" value="xxforms:serialize(instance('resources-instance')/help/rating/*, 'html')"/>
             </xforms:help>
 
             <!-- do not allow n/a in this rating select1, since N/A is last we can use position() != last() -->

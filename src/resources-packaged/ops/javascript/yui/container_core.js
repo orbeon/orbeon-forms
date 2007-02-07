@@ -1784,7 +1784,7 @@ YAHOO.widget.Overlay.prototype.configIframe = function(type, args, obj) {
 			if (! this.iframe) {
 				this.iframe = document.createElement("iframe");
 				if (this.isSecure) {
-					this.iframe.src = this.imageRoot + YAHOO.widget.Overlay.IFRAME_SRC;
+					this.iframe.src = YAHOO.widget.Overlay.IFRAME_SRC;
 				}
 
 				var parent = this.element.parentNode;

@@ -205,7 +205,7 @@
                 </xhtml:tr>
             </xhtml:table>
 
-            <div class="widgets-xforms-instance-inspector-source" id="widgets-xforms-instance-inspector">
+            <xhtml:div class="widgets-xforms-instance-inspector-source" id="widgets-xforms-instance-inspector">
                 <xforms:group ref="xxforms:instance(instance('orbeon-xforms-instance-inspector-instance')/current-instance)">
                     <xforms:group ref=".[instance('orbeon-xforms-instance-inspector-instance')/mode = 'formatted']">
                         <xforms:output mediatype="text/html"
@@ -216,7 +216,7 @@
                                        value="replace(replace(replace(replace(xxforms:serialize(., 'xml'), '&amp;', '&amp;amp;'), '&lt;', '&amp;lt;'), '&#x0a;', '&lt;br>'), ' ', '&#160;')"/>
                     </xforms:group>
                 </xforms:group>
-            </div>
+            </xhtml:div>
 
         </xforms:group>
 

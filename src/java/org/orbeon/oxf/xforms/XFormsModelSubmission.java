@@ -235,7 +235,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final boolean isReplaceAll = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
                 final boolean isReplaceInstance = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE);
 
-                final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method) && isReplaceAll;
+                final boolean isHandlingOptimizedGet = XFormsUtils.isOptimizeGetAllSubmission() && XFormsSubmissionUtils.isGet(method)
+                        && isReplaceAll
+                        && avtXXFormsUsername == null; // can't optimize if there are authentication credentials
 
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
 

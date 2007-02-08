@@ -105,7 +105,7 @@
 
 .xforms-loading-none {
     display: block;
-    height: 18px;
+    height: 0;
 }
 
 .xforms-input {

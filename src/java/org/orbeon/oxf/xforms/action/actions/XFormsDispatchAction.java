@@ -35,51 +35,76 @@ public class XFormsDispatchAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         // Mandatory attributes
-        final String newEventName = actionElement.attributeValue("name");
-        if (newEventName == null)
+        final String newEventNameAttributeValue = actionElement.attributeValue("name");
+        if (newEventNameAttributeValue == null)
             throw new OXFException("Missing mandatory name attribute on xforms:dispatch element.");
-        final String newEventTargetId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("target"));
-        if (newEventTargetId == null)
+        final String newEventTargetIdValue = actionElement.attributeValue("target");
+        if (newEventTargetIdValue == null)
             throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
+
+        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+
+        final String resolvedNewEventName;
+        {
+            // NOP if there is an AVT but no context node
+            if (bindingContext.getSingleNode() == null && newEventNameAttributeValue.indexOf('{') != -1)
+                return;
+
+            // Resolve AVT
+            resolvedNewEventName = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    null, xformsControls.getFunctionLibrary(), actionElement, newEventNameAttributeValue);
+        }
+
+        final String resolvedNewEventTargetId;
+        {
+            // NOP if there is an AVT but no context node
+            if (bindingContext.getSingleNode() == null && newEventTargetIdValue.indexOf('{') != -1)
+                return;
+
+            // Resolve AVT
+            resolvedNewEventTargetId = XFormsUtils.namespaceId(containingDocument,
+                    XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    null, xformsControls.getFunctionLibrary(), actionElement, newEventTargetIdValue));
+        }
 
         // Optional attributes
         final boolean newEventBubbles;
         {
-                        final String newEventBubblesString = actionElement.attributeValue("bubbles");
-                        // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
-                        // The event factory makes sure that those values are ignored for predefined events
-                        newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString).booleanValue();
-                    }
+            final String newEventBubblesString = actionElement.attributeValue("bubbles");
+            // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+            // The event factory makes sure that those values are ignored for predefined events
+            newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString).booleanValue();
+        }
         final boolean newEventCancelable;
         {
-                        // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
-                        // The event factory makes sure that those values are ignored for predefined events
-                        final String newEventCancelableString = actionElement.attributeValue("cancelable");
-                        newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
-                    }
+            // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+            // The event factory makes sure that those values are ignored for predefined events
+            final String newEventCancelableString = actionElement.attributeValue("cancelable");
+            newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
+        }
 
         // Find actual target
         final Object xformsEventTarget;
         {
-            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetId);
+            final Object tempXFormsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, resolvedNewEventTargetId);
             if (tempXFormsEventTarget != null) {
                 // Object with this id exists
                 xformsEventTarget = tempXFormsEventTarget;
             } else {
                 // Otherwise, try effective id
-                final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(newEventTargetId);
+                final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedNewEventTargetId);
                 xformsEventTarget = (XFormsEventTarget) containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
             }
         }
 
         if (xformsEventTarget == null)
-            throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + newEventTargetId);
+            throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + resolvedNewEventTargetId);
 
         if (xformsEventTarget instanceof XFormsEventTarget) {
             // This can be anything
-            containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(newEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable));
+            containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable));
         } else {
-            throw new OXFException("Invalid event target for id: " + newEventTargetId);
+            throw new OXFException("Invalid event target for id: " + resolvedNewEventTargetId);
         }
     }
 }

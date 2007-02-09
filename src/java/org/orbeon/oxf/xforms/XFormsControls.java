@@ -124,7 +124,6 @@ public class XFormsControls {
 
         mandatoryNodesetControls.put("repeat", "");
         mandatoryNodesetControls.put("itemset", "");
-        mandatoryNodesetControls.put("insert", "");
         mandatoryNodesetControls.put("delete", "");
 
         noNodesetControls.putAll(mandatorySingleNodeControls);

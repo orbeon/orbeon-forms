@@ -28,6 +28,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.util.List;
+import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * 9.3.5 The insert Element
@@ -46,7 +48,9 @@ public class XFormsInsertAction extends XFormsAction {
         final String originAttribute = actionElement.attributeValue("origin");
         final String contextAttribute = actionElement.attributeValue("context");
 
-        final List collectionToBeUpdated = xformsControls.getCurrentNodeset();
+        final XFormsControls.BindingContext curBindingContext = xformsControls.getCurrentBindingContext();
+
+        final List collectionToBeUpdated = curBindingContext.isNewBind() ? curBindingContext.getNodeset() : Collections.EMPTY_LIST;
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
         // "The insert action is terminated with no effect if [...] the context attribute is not given and the Node
@@ -87,12 +91,31 @@ public class XFormsInsertAction extends XFormsAction {
                     // If the result is a node, then it is cloned, and otherwise the insert action is terminated
                     // with no effect."
                     xformsControls.pushBinding(pipelineContext, null, null, originAttribute, null, null, null, Dom4jUtils.getNamespaceContextNoDefault(actionElement));
-                    final Object originObject = xformsControls.getCurrentSingleNode();
-                    if (!(originObject instanceof NodeInfo))
-                        return;
 
-                    sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
-                    clonedNodeTemp = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+                    final boolean NEW_XFORMS_11 = false;
+
+                    if (!NEW_XFORMS_11) {
+                        final Object originObject = xformsControls.getCurrentSingleNode();
+                        if (!(originObject instanceof NodeInfo))
+                            return;
+
+                        sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) originObject, CANNOT_INSERT_READONLY_MESSAGE);
+                        clonedNodeTemp = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+                    } else {
+                        // TODO: as per XForms 1.1, clone all the nodes in the nodeset
+
+                        final List originObjects = xformsControls.getCurrentNodeset();
+                        for (Iterator i = originObjects.iterator();i .hasNext();) {
+                            final Object currentObject = i.next();
+                            if (!(currentObject instanceof NodeInfo))
+                                continue;
+
+//                            sourceNode = XFormsUtils.getNodeFromNodeInfoConvert((NodeInfo) currentObject, CANNOT_INSERT_READONLY_MESSAGE);
+//                            clonedNodeTemp = (sourceNode instanceof Element) ? ((Node) ((Element) sourceNode).createCopy()) : (Node) sourceNode.clone();
+                        }
+
+                    }
+
                     xformsControls.popBinding();
                 }
 

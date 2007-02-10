@@ -672,6 +672,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     // Forward content to response
                                     NetUtils.copyStream(connectionResult.getResultInputStream(), response.getOutputStream());
 
+                                    // TODO: Must be able to do replace="all" during initialization. Suggestion is to
+                                    // write either binary or XML to processor output ContentHandler, and make sure
+                                    // the code which would output the XHTML+XForms is disabled.
+
                                 } else if (isReplaceInstance) {
 
                                     if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
@@ -815,32 +819,36 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private XFormsSubmitErrorEvent createErrorEvent(ConnectionResult connectionResult) throws IOException {
-        XFormsSubmitErrorEvent submitErrorEvent = null;
+        final XFormsSubmitErrorEvent submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
         if (connectionResult.hasContent()) {
             if (ProcessorUtils.isXMLContentType(connectionResult.resultMediaType)) {
                 // XML content-type
                 // TODO: XForms 1.1 may mandate that we always try to parse the body as XML first
                 // Read stream into Document
-                final DocumentInfo responseBody
-                        = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
-
-                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
-                submitErrorEvent.setBodyDocument(responseBody);
+                try {
+                    final DocumentInfo responseBody = TransformerUtils.readTinyTree(connectionResult.getResultInputStream(), connectionResult.resourceURI);
+                    submitErrorEvent.setBodyDocument(responseBody);
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while parsing respond body ", e);
+                }
             } else if (ProcessorUtils.isTextContentType(connectionResult.resultMediaType)) {
                 // Text content-type
                 // Read stream into String
-                final String charset;
-                {
-                    final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
-                    if (connectionCharset != null)
-                        charset = connectionCharset;
-                    else
-                        charset = DEFAULT_TEXT_READING_ENCODING;
+                try {
+                    final String charset;
+                    {
+                        final String connectionCharset = NetUtils.getContentTypeCharset(connectionResult.resultMediaType);
+                        if (connectionCharset != null)
+                            charset = connectionCharset;
+                        else
+                            charset = DEFAULT_TEXT_READING_ENCODING;
+                    }
+                    final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
+                    final String responseBody = NetUtils.readStreamAsString(reader);
+                    submitErrorEvent.setBodyString(responseBody);
+                } catch (Exception e) {
+                    XFormsServer.logger.error("XForms - submission - error while reading respond body ", e);
                 }
-                final Reader reader = new InputStreamReader(connectionResult.getResultInputStream(), charset);
-                final String responseBody = NetUtils.readStreamAsString(reader);
-                submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource);
-                submitErrorEvent.setBodyString(responseBody);
             } else {
                 // This is binary
                 // Don't store anything for now

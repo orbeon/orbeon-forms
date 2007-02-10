@@ -347,6 +347,15 @@
             </servlet>
 
             <servlet>
+                <servlet-name>exist-atom-servlet</servlet-name>
+                <servlet-class>org.exist.atom.http.AtomServlet</servlet-class>
+                <init-param>
+                    <param-name>authentication</param-name>
+                    <param-value>basic</param-value>
+                </init-param>
+            </servlet>
+
+            <servlet>
                 <servlet-name>struts-servlet</servlet-name>
                 <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
                 <init-param>
@@ -394,6 +403,11 @@
             <servlet-mapping>
                 <servlet-name>exist-webdav-servlet</servlet-name>
                 <url-pattern>/exist/webdav/*</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+                <servlet-name>exist-atom-servlet</servlet-name>
+                <url-pattern>/exist/atom/*</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>

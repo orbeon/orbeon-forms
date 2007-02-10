@@ -1,202 +1,522 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-	This is the central configuration file for the database. If the database
+<?xml version="1.0" encoding="UTF-8"?><!--
+    This is the central configuration file for the database. If the database
     is running in a servlet-context, the configuration file will be read from
     the WEB-INF directory of the web application. Otherwise, the configuration
     is read from the directory specified by the exist.home system property.
--->
-<exist>
+
+    Structure of this xml document:
+
+        exist
+            cluster
+            db-connection
+                default-permissions
+                pool
+                recovery
+                security
+                system-task
+                watchdog
+            indexer
+            serializer
+            transformer
+            xquery
+            xupdate
 
 
-    <!-- Configures the cluster configuration
-        - protocol:
-        defines a protocol stack. Refers the jgroups protocol stack.
+    For detailed and latest information please consult the eXist documentation:
+
+        - http://exist-db.org/configuration.html
+        - http://exist-db.org/cluster.html
+        - http://exist-db.org/documentation.html
+        - http://wiki.exist-db.org/
+--><exist>
+
+
+
+    <!--
+        Configures the cluster configuration
+
         - dbaUser:
-        defines the user used by the cluster for the replica.
-        - dbaPassword:
-        defines the user password used by the cluster for the replica.
-   -->
-    <cluster protocol="UDP:PING" dbaUser="admin" dbaPassword=""/>
+            defines the user used by the cluster for the replica.
 
-    <!-- Configures the database backend:
-        - database:
-            selects a database backend. Currently, "native" and "native_cluster"
-            are the only valid setting.
-        - files:
-            path to the directory where database files are
-            stored.
+        - dbaPassword:
+            defines the user password used by the cluster for the replica.
+
+        - exclude:
+            some collections should be signed as no-replicated collections i.e.
+            during the replica phase eXist cluster environment doesn't send
+            events based on these collections, colon is the separator char when
+            more than one collection is added.
+
+        - journalDir
+            specifies the folder where the eXist cluster node saves its journal
+            file. Directory is automatically created if it doesn't exist. If no
+            journaldir is specified, journal is disabled.
+
+        - protocol:
+            defines a protocol stack. Refers the jgroups protocol stack.
+   -->
+
+    <cluster dbaPassword="" dbaUser="admin" exclude="/db/system,/db/system/config" journalDir="exist-data/journal" protocol="UDP(mcast_addr=228.1.2.3;mcast_port=45566;ip_ttl=8;ip_mcast=true;mcast_send_buf_size=800000;mcast_recv_buf_size=150000;ucast_send_buf_size=800000;ucast_recv_buf_size=150000;loopback=true):PING(timeout=2000;num_initial_members=3;up_thread=true;down_thread=true):MERGE2(min_interval=10000;max_interval=20000):FD(shun=true;up_thread=true;down_thread=true;timeout=2500;max_tries=5):VERIFY_SUSPECT(timeout=3000;num_msgs=3;up_thread=true;down_thread=true):pbcast.NAKACK(gc_lag=50;retransmit_timeout=300,600,1200,2400,4800;max_xmit_size=8192;up_thread=true;down_thread=true):UNICAST(timeout=300,600,1200,2400,4800;window_size=100;min_threshold=10;down_thread=true):pbcast.STABLE(desired_avg_gossip=20000;up_thread=true;down_thread=true):FRAG(frag_size=8192;down_thread=true;up_thread=true):pbcast.GMS(join_timeout=5000;join_retry_timeout=2000;shun=true;print_local_addr=true)"/>
+
+
+
+    <!--
+        Configures the database backend:
+
         - cacheSize:
             the maximum amount of memory to use for database page buffers.
             Each database file has an associated page buffer for B+-tree and
             data pages. However, the memory specified via cacheSize is shared
             between all page buffers. It represents an absolute maximum, which
             would be occupied if all page buffers were completely full.
+
+            The cacheSize should not be more than half of the size of the JVM
+            heap size (set by the JVM -Xmx parameter).
+
+        - collectionCacheSize:
+            not documented.
+
+        - database:
+            selects a database backend. Currently, "native" and "native_cluster"
+            are the only valid setting.
+
+        - files:
+            path to the directory where database files are stored.
+
         - free_mem_min:
             minimum amount of free memory in percent during indexing. The
             database will start to flush its internal buffers whenever
             free memory drops below the specified limit.
+
         - pageSize:
             the size of one page on the disk. This is the smallest unit
             transferred from and to the database files. Should be a multiple of
             the operating system's file system page size (usually 4096).
+
+        =====================================================================
+
+        The settings below are very conservative to avoid out-of-memory
+        exceptions on machines with limited memory (256MB).
+
+        Increase the buffer settings for elements_buffers and words_buffers if
+        you have some more memory to waste. If you deal with lots of
+        collections, you can also increase the collectionCacheSize value
     -->
 
-    <!-- The settings below are very conservative to avoid out-of-memory
-    exceptions on machines with limited memory (256MB). Increase the
-    buffer settings for elements_buffers and words_buffers if you have
-    some more memory to waste. -->
-	<db-connection database="native" files="exist-data"
-		pageSize="4096" cacheSize="64M" free_mem_min="5">
+    <db-connection cacheSize="48M" collectionCacheSize="128" database="native" files="exist-data" free_mem_min="5" pageSize="4096">
 
-        <!-- Settings for the database connection pool:
-            - sync-period
+
+
+        <!--
+            Specifies the default permissions for all resources and collections
+            in eXist (see  User Authentication and Access Control). When this is
+            not configured, the default "mod" (similar to the Unix "chmod"
+            command) is set to 0775 in the resources and collections attributes.
+            A different default value may be set for a database instance, and
+            local overrides are also possible.
+        -->
+
+        <!--default-permissions collection="0775" resource="0775" /-->
+
+
+
+        <!--
+            Settings for the database connection pool:
+
+            - min:
+                minimum number of connections to keep alive.
+
+            - max:
+                maximum number of connections allowed.
+
+            - sync-period:
                 defines how often the database will flush its
                 internal buffers to disk. The sync thread will interrupt
                 normal database operation after the specified number of
                 milliseconds and write all dirty pages to disk.
-            - min: minimum number of connections to keep alive.
-            - max: maximum number of connections allowed.
-			- wait-before-shutdown:
-			    defines how long the database instance will wait for running
-			    operations to complete before it forces a shutdown.
+
+            - wait-before-shutdown:
+                defines how long the database instance will wait for running
+                operations to complete before it forces a shutdown.
         -->
-		<pool min="1" max="20" sync-period="120000" wait-before-shutdown="120000"/>
 
-		<recovery enabled="yes" sync-on-commit="no"
-            size="10M" journal-dir="exist-data"/>
+        <pool max="20" min="1" sync-period="120000" wait-before-shutdown="120000"/>
 
-		<watchdog query-timeout="-1" output-size-limit="10000"/>
 
-		<!--system-task class="org.exist.storage.DataBackup" period="120000">
-			<parameter name="output-dir" value="backup"/>
-		</system-task-->
+
+        <!--
+            Settings for the journaling and recovery of the database. With
+            recovery enabled, the database is able to recover from an unclean
+            database shutdown due to, for example, power failures, OS reboots,
+            and hanging processes. For this to work correctly, all database
+            operations must be logged to a journal file.
+
+            - enabled:
+                if this attribute is set to yes, automatic recovery is enabled.
+
+            - group-commit:
+                not documented.
+
+            - journal-dir:
+                this attribute sets the directory where journal files are to be
+                written. If no directory is specified, the default path is to
+                the data directory.
+
+            - size:
+                this attributes sets the maximum allowed size of the journal
+                file. Once the journal reaches this limit, a checkpoint will be
+                triggered and the journal will be cleaned. However, the database
+                waits for running transactions to return before processing this
+                checkpoint. In the event one of these transactions writes a lot
+                of data to the journal file, the file will grow until the
+                transaction has completed. Hence, the size limit is not enforced
+                in all cases.
+
+            - sync-on-commit:
+                this attribute determines whether or not to protect the journal
+                during operating system failures. That is, it determines whether
+                the database forces a file-sync on the journal after every
+                commit.
+                If this attribute is set to "yes", the journal is protected
+                against operating system failures. However, this will slow
+                performance - especially on Windows systems.
+                If set to "no", eXist will rely on the operating system to flush
+                out the journal contents to disk. In the worst case scenario,
+                in which there is a complete system failure, some committed
+                transactions might not have yet been written to the journal,
+                and so will be rolled back.
+        -->
+
+        <recovery enabled="yes" group-commit="no" journal-dir="exist-data" size="100M" sync-on-commit="no"/>
+
+
+
+        <!--
+            The <security> element in the <db-connection> node is used to select
+            the security manager Class and control the database of users and
+            groups.
+
+            - class:
+		            this attribute is required, and specifies a Java class name used
+		            to implement the org.exist.security.SecurityManager interface,
+		            as in the following example:
+
+            Example: <security> class Attribute (LDAP)
+            <security class="org.exist.security.LDAPSecurityManager" />
+
+            eXist is distributed with the following built-in security manager
+            implementations:
+
+            - org.exist.security.XMLSecurityManager
+
+                stores the user information in the database. This is the
+                default manager if the <security> element is not included
+                in <db-connection>.
+
+            - org.exist.security.LDAPSecurityManager
+
+                retrieves the user and groups from the LDAP database. This
+                requires addition configuration parameters which are
+                described in the LDAP Security Manager documentation.
+
+            - password-encoding:
+                password encoding can be set to one of the following types:
+
+                - plain:
+                    applies plain encryption.
+
+                - md5: (default)
+                    applies the MD5 algorithm to encrypt passwords.
+
+                - simple-md5:
+                    applies a simplified MD5 algorithm to encrypt passwords.
+
+            - password-realm:
+                the realm to use for basic auth or http-digest password
+                challenges.
+        -->
+
+        <!-- security class="org.exist.security.LDAPSecurityManager" /-->
+
+
+
+        <!--
+            Tasks used for system maintenance. System tasks require the database
+            to be in a consistent state. All database operations will be stopped
+            until method returned or throws an exception. Any exception will be
+            caught and a warning written to the log.
+
+            Currently only the databackup task is available.
+        -->
+
+        <!--system-task class="org.exist.storage.DataBackup" period="120000">
+            <parameter name="output-dir" value="backup" />
+        </system-task-->
+
+
+
+        <!--
+            This is the global configuration for the query watchdog. The
+            watchdog monitors all query processes, and can terminate any
+            long-running queries if they exceed one of the predefined limits.
+            These limits are as follows:
+
+            - output-size-limit
+                this attribute limits the size of XML fragments constructed
+                using XQuery, and thus sets the maximum amount of main memory a
+                query is allowed to use. This limit is expressed as the maximum
+                number of nodes allowed for an in-memory DOM tree. The purpose
+                of this option is to avoid memory shortages on the server in
+                cases where users are allowed to run queries that produce very
+                large output fragments.
+
+            - query-timeout
+                this attribute sets the maximum amount of time (expressed in
+                milliseconds) that the query can take before it is killed..
+
+        -->
+
+        <watchdog output-size-limit="10000" query-timeout="-1"/>
+
+
+
     </db-connection>
 
-    <!-- Default settings for the serializer. Most of these can be changed
-    by client code:
 
-    - enable-xinclude:
-        should the database expand XInclude tags by default?
-    - enable-xsl:
-        should the database evaluate XSL processing instructions
-        when serializing documents?
-    - indent:
-        should the serializer pretty-print (indent) XML?
-    - match-tagging-elements:
-    - match-tagging-attributes:
-
-    - add-exist-id:
-        for debugging: add an exist:id attribute to every element, showing
-        the internal node identifier (as a long int) assigned to this node.
-        Possible values are: "none", "element", "all". "all" displays the node
-        of every element node; "element" displays the id only for the root nodes
-        of the returned XML fragments.
-    -->
-    <serializer enable-xinclude="yes" enable-xsl="no"
-		indent="yes" add-exist-id="none" match-tagging-elements="yes"
-        match-tagging-attributes="no"/>
-
-	<!-- During XUpdates, the database needs to do a partial reindex of the
-	document whenever the internal node-id structure has changed. Reindex
-	runs can occur quite frequently and slow down the XUpdate process.
-
-	Frequent reindex runs can be avoided by leaving some space between the
-	numeric identifiers assigned to every node. Future insertions will first
-	fill up these spare identifiers, so no reindex is required.
-
-	The "growth-factor" attribute determines the number of spare ids to be
-	inserted whenever the node id scheme is recomputed after an XUpdate.
-	Increase the setting to have less reindex runs. However, you have to
-	be aware that leaving spare ids also limits the maximum size of a
-	document that can be indexed.
-
-	"enable-consistency-checks" is for debugging only. If the parameter
-	is set to "yes", a consistency check will be run on every modified
-	document after every XUpdate request. It checks if the
-	persistent DOM is complete and all pointers in the structural
-	index point to valid storage addresses containing valid nodes.
-
-    "allowed-fragmentation" defines the maximum number of page splits allowed within a
-    document before a defragmentation run will be triggered.
-	-->
-
-	<xupdate growth-factor="20" allowed-fragmentation="20"
-		enable-consistency-checks="no"/>
-
-    <xquery>
-        <builtin-modules>
-            <module uri="http://exist-db.org/xquery/util"
-                class="org.exist.xquery.functions.util.UtilModule"/>
-            <module uri="http://exist-db.org/xquery/transform"
-                class="org.exist.xquery.functions.transform.TransformModule"/>
-            <module uri="http://exist-db.org/xquery/xmldb"
-                class="org.exist.xquery.functions.xmldb.XMLDBModule"/>
-            <module uri="http://exist-db.org/xquery/request"
-                class="org.exist.xquery.functions.request.RequestModule"/>
-            <module uri="http://exist-db.org/xquery/text"
-                class="org.exist.xquery.functions.text.TextModule"/>
-            <module uri="http://exist-db.org/xquery/examples"
-                class="org.exist.xquery.modules.example.ExampleModule"/>
-            <module uri="http://exist-db.org/xquery/validation"
-                class="org.exist.xquery.functions.validation.ValidationModule"/>
-        </builtin-modules>
-    </xquery>
 
     <!--
         Settings for the indexer:
-        - suppress-whitespace
-            should leading or trailing whitespace be removed from a text
-            node? Set to "leading", "trailing", "both" or "none". Changing
-            the parameter will only have an effect on newly loaded files, not
-            old ones.
+
         - caseSensitive
             should equality comparisons between strings be case-sensitive or
             insensitive: "yes" or "no".
-        - validation
-            should XML source files be validated against a schema or DTD before
-            storing them? The setting is passed to the XML parser. The actual
-            effects depend on the parser you use. eXist comes with Xerces which can
-            validate against both: schemas and DTDs. Possible values: "yes",
-            "no", "auto". "auto" will leave validation to the parser.
-        - stemming
-            eXist includes a very simple english language stemmer, based on Porter's algorithm.
-            Set the "stemming"-option to "true" if you would like to use stemming. This does
-            only work for english.
+
         - index-depth
             defines the maximum nesting depth of nodes which will be indexed
             in the DOM index. Nodes below the specified nesting depth will
             not be indexed in the DOM file. This has only an effect when
-            retrieving query results or for some types of XPath subexpressions, like
-            equality comparisons.
+            retrieving query results or for some types of XPath subexpressions,
+            like equality comparisons.
+
+        - stemming
+            eXist includes a very simple english language stemmer, based on
+            Porter's algorithm. Set the "stemming"-option to "true" if you
+            would like to use stemming. This does only work for english.
+
+        - suppress-whitespace
+            should leading or trailing whitespace be removed from a text node?
+            Set to "leading", "trailing", "both" or "none".
+            Changing the parameter will only have an effect on newly loaded
+            files, not old ones.
+
         - suppress-whitespace-mixed-content
             preserve the white space inside a mixed content node
+
+        - tokenizer:
+            this attribute invokes the Java class used to tokenize a string into
+            a sequence of single words or tokens, which are stored to the
+            fulltext index. Currently only the SimpleTokenizer is available.
+
+        - track-term-freq:
+            not documented.
+
+        - validation:
+            should XML source files be validated against a schema or DTD before
+            storing them? The setting is passed to the XML parser. The actual
+            effects depend on the parser you use. eXist comes with Xerces which
+            can validate against both: schemas and DTDs.
+            Possible values: "yes", "no", "auto". "auto" will leave validation
+            to the parser.
     -->
-    <indexer stemming="no" caseSensitive="yes" suppress-whitespace="both"
-	index-depth="1" tokenizer="org.exist.storage.analysis.SimpleTokenizer"
-	track-term-freq="yes" validation="no" preserve-whitespace-mixed-content="no">
 
-		<!-- where's the file containing a list of stopwords to be ignored
-         by the parser. -->
-		<stopwords file="stopword"/>
+    <indexer caseSensitive="yes" index-depth="5" preserve-whitespace-mixed-content="no" stemming="no" suppress-whitespace="both" tokenizer="org.exist.storage.analysis.SimpleTokenizer" track-term-freq="yes" validation="auto">
 
-		<!-- default index settings. Default settings apply if there's no collection-specific
-		configuration for a collection.
-        -->
-        <index>
-			<fulltext default="all" attributes="true">
-				<exclude path="/auth"/>
-			</fulltext>
-		</index>
 
-        <!-- Specify the location of one or more catalog files.
-        Catalogs are used to resolve external entities in XML documents.
-        -->
+
         <!--
-		<entity-resolver>
-			<catalog file="exist-catalog.xml"/>
-		</entity-resolver>
+            The file for this element points to a file containing a list of
+            stopwords. Note that stopwords are NOT added to the fullext index.
         -->
+
+        <stopwords file="stopword"/>
+
+
+
+        <!--
+            Default index settings. Default settings apply if there's no
+            collection-specific configuration for a collection.
+        -->
+
+        <index>
+
+            <fulltext attributes="true" default="all">
+
+                <exclude path="/auth"/>
+
+            </fulltext>
+
+        </index>
+
+
+
+        <!--
+            Specify the location of one or more catalog files.
+            Catalogs are used to resolve external entities in XML documents.
+        -->
+
+        <entity-resolver>
+
+            <!--<catalog file="catalog.xml"/>-->
+
+        </entity-resolver>
+
     </indexer>
+
+
+
+    <!--
+        Default settings for the serializer. Most of these can be changed
+        by client code:
+
+        - add-exist-id:
+            for debugging: add an exist:id attribute to every element, showing
+            the internal node identifier (as a long int) assigned to this node.
+            Possible values are: "none", "element", "all". "all" displays the
+            node of every element node; "element" displays the id only for the
+            root nodes of the returned XML fragments.
+
+       - compress-output:
+           should the output be compressed when serializing documents?
+           Sometimes useful with remote clients.
+           Remember to add a statement like this to your client code:
+           service.setProperty("compress-output", "yes");
+           to uncompress the retrieved result in the client too.
+
+        - enable-xinclude:
+            should the database expand XInclude tags by default?
+
+        - enable-xsl:
+            should the database evaluate XSL processing instructions
+            when serializing documents?
+
+        - indent:
+            should the serializer pretty-print (indent) XML?
+
+        - match-tagging-attributes:
+            matches for attribute values can also be tagged using the character
+            sequence "||" to demarcate the matching text string. Since this
+            changes the content of the attribute value, the feature is disabled
+            by default.
+
+        - match-tagging-elements:
+            the database can highlight matches in the text content of a node by
+            tagging the matching text string with <exist:match> . Clearly, this
+            only works for XPath expressions using the fulltext index.
+
+            Set the parameter to "yes" to disable this feature.
+
+    -->
+
+    <serializer add-exist-id="none" compress-output="no" enable-xinclude="yes" enable-xsl="no" indent="yes" match-tagging-attributes="no" match-tagging-elements="yes"/>
+
+
+
+	<!--
+        Default settings for the XSLT Transformer. Allow's for a choice of
+        implementation:
+
+        - class:
+            the name of the class that implements javax.xml.transform.TransformerFactory
+
+            for Saxon (XSLT 2.0 support) - net.sf.saxon.TransformerFactoryImpl
+            	You will need to copy saxon8.jar saxon8-dom.jar and saxon8-xpath.jar
+            	into lib/endorsed.
+            	You can get these from http://sourceforge.net/projects/saxon
+
+            for Xalan (XSLT 1.0 support) - org.apache.xalan.processor.TransformerFactoryImpl
+
+
+        For further details see - http://wiki.exist-db.org/space/Howtos/Adding+XSLT+2.0+%28Saxon%29
+
+    -->
+
+    <transformer class="org.apache.xalan.processor.TransformerFactoryImpl"/>
+
+
+
+
+
+    <!--
+        Define modules that contain xQuery functions.
+
+            - enable-java-binding:
+                eXist supports calls to arbitrary Java methods from within
+                XQuery. Setting to "yes" might introduce a security risk.
+    -->
+
+    <xquery enable-java-binding="no">
+
+        <builtin-modules>
+
+            <module class="org.exist.xquery.functions.util.UtilModule" uri="http://exist-db.org/xquery/util"/>
+
+            <module class="org.exist.xquery.functions.transform.TransformModule" uri="http://exist-db.org/xquery/transform"/>
+
+            <module class="org.exist.xquery.functions.xmldb.XMLDBModule" uri="http://exist-db.org/xquery/xmldb"/>
+
+            <module class="org.exist.xquery.functions.request.RequestModule" uri="http://exist-db.org/xquery/request"/>
+
+            <module class="org.exist.xquery.functions.response.ResponseModule" uri="http://exist-db.org/xquery/response"/>
+
+            <module class="org.exist.xquery.functions.session.SessionModule" uri="http://exist-db.org/xquery/session"/>
+
+            <module class="org.exist.xquery.functions.text.TextModule" uri="http://exist-db.org/xquery/text"/>
+
+            <module class="org.exist.xquery.modules.example.ExampleModule" uri="http://exist-db.org/xquery/examples"/>
+
+            <module class="org.exist.xquery.functions.validation.ValidationModule" uri="http://exist-db.org/xquery/validation"/>
+
+            <module class="org.exist.xquery.functions.system.SystemModule" uri="http://exist-db.org/xquery/system"/>
+
+        </builtin-modules>
+
+    </xquery>
+
+
+
+
+
+    <!--
+        During XUpdates, the database needs to do a partial reindex of the
+      document whenever the internal node-id structure has changed. Reindex
+      runs can occur quite frequently and slow down the XUpdate process.
+
+      Frequent reindex runs can be avoided by leaving some space between the
+      numeric identifiers assigned to every node. Future insertions will first
+      fill up these spare identifiers, so no reindex is required.
+
+        - allowed-fragmentation:
+            defines the maximum number of page splits allowed within a document
+            before a defragmentation run will be triggered.
+
+      - enable-consistency-checks:
+            for debugging only. If the parameter is set to "yes", a consistency
+            check will be run on every modified document after every XUpdate
+            request. It checks if the persistent DOM is complete and all
+            pointers in the structural index point to valid storage addresses
+            containing valid nodes.
+
+        - growth-factor:
+            determines the number of spare ids to be inserted whenever the node
+            id scheme is recomputed after an XUpdate.
+            Increase the setting to have less reindex runs. However, you have
+            to be aware that leaving spare ids also limits the maximum size of
+            a document that can be indexed.
+
+  	-->
+
+    <xupdate allowed-fragmentation="5" enable-consistency-checks="no" growth-factor="20"/>
+
+
 
 </exist>

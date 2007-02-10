@@ -80,11 +80,22 @@
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
         <include name="portlet-api_1.0.jar"/>
-        <include name="exist-20060316.jar"/>
-        <include name="exist-optional-20060316.jar"/>
-        <include name="xmldb-exist_20060316.jar"/>
-        <include name="xmlrpc-1_2_patched_exist_20060316.jar"/>
-        <include name="jgroups-all-exist_20060316.jar"/>
+
+        <!--<include name="exist-20060316.jar"/>-->
+        <!--<include name="exist-optional-20060316.jar"/>-->
+        <!--<include name="xmldb-exist_20060316.jar"/>-->
+        <!--<include name="xmlrpc-1_2_patched_exist_20060316.jar"/>-->
+        <!--<include name="jgroups-all-exist_20060316.jar"/>-->
+
+        <include name="exist-modules-1_1_1.jar"/>
+        <include name="exist-1_1_1.jar"/>
+        <include name="exist-optional-1_1_1.jar"/>
+        <include name="xmlrpc-1.2-patched-exist_1_1_1.jar"/>
+        <include name="xmldb-exist_1_1_1.jar"/>
+        <include name="jgroups-all-exist_1_1_1.jar"/>
+        <include name="antlr-2.7.6-exist_1_1_1.jar"/>
+        <include name="jug-lgpl-2_0_0-exist_1_1_1.jar"/>
+
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>
         <include name="itext-1_02b.jar"/>
@@ -109,7 +120,7 @@
         </tstamp>
         <property name='release.number' value='${version.number}.${time}'/>
 
-        <echo message="Building Orbeon PresentationServer ${release.number}"/>
+        <echo message="Building Orbeon Forms ${release.number}"/>
 
         <property name="java-src.dir" value="${src.dir}/java"/>
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>

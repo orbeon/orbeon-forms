@@ -159,7 +159,8 @@
                             <b>Improved PDF generation.</b> The PDF Template processor has been improved to facilitate
                             the creation of PDF versions of forms based on PDF templates. The processor now supports
                             groups, repetitions, and XPath 2.0. See <a href="/forms/">Government Forms</a> sample
-                            application's <i>View PDF</i> option for an example [TODO]
+                            application's <i>View PDF</i> option for an example.
+                            <!-- TODO: document -->
                         </p>
                     </li>
                 </ul>
@@ -192,7 +193,7 @@
                         <p>
                             <b>Tree control and menu control.</b> You enable this on <code>xforms:select1</code> and
                             <code>xforms:select</code> (tree only) with the <code>xxforms:tree</code> and
-                            <code>xxforms:menu</code> apperances. [TODO: examples]
+                            <code>xxforms:menu</code> apperances. <!-- TODO: examples -->
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Teleflex.</i>
@@ -200,8 +201,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>Dialog control.</b> This control allows you to show modal or modeless dialogs. [TODO:
-                            example + doc]
+                            <b>Dialog control.</b> This control allows you to show modal or modeless dialogs.
+                            <!-- TODO: document + example -->
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Teleflex.</i>
@@ -212,7 +213,7 @@
                             <b>Upload control.</b> The upload control now works when submitting instances with
                             <code>replace="instance"</code> or <code>replace="none"</code>. From the form user's
                             perspective, this allows uploading files in the background. See <a
-                            href="/xforms-upload/">XForms Upload</a> for examples. [TODO: doc]
+                            href="/xforms-upload/">XForms Upload</a> for examples. <!-- TODO: document -->
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Teleflex.</i>
@@ -223,14 +224,13 @@
                             <b>Selection controls.</b> Support of hierarchy for single selection controls
                             <code>xforms:select1</code> when using the <code>minimal</code> and <code>compact</code>
                             appearances. Support for mix-and-match of <code>xforms:item</code>,
-                            <code>xforms:itemset</code> and <code>xforms:choices</code> [TODO: example (from blog
-                            entry)]
+                            <code>xforms:itemset</code> and <code>xforms:choices</code> <!-- TODO: example (from blog entry?) -->
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Switch within repeat.</b> Enhanced support of <code>xforms:switch</code> within
-                            <code>xforms:repeat</code>. [TODO: example]
+                            <code>xforms:repeat</code>. <!-- TODO: example -->
                         </p>
                     </li>
                     <li>
@@ -245,9 +245,7 @@
                                 <xforms:label>Dynamic label with a number (<xforms:output value="count(/*/*)"/>) in it!</xforms:label>
                             </xforms:trigger>
                         </xml-source>
-                        <p>
-                             [TODO: documentation]
-                        </p>
+                        <!-- TODO: document -->
                         <p>
                             <i>This feature was kindly sponsored by Esprit.</i>
                         </p>
@@ -281,24 +279,20 @@
                     <li>
                         <p>
                             <b>Conditional XForms actions.</b> Support for XForms 1.1 conditional actions with the
-                            <code>if</code> (and <code>exf:if</code>) attributes. [TODO: example]
+                            <code>if</code> (and <code>exf:if</code>) attributes. <!-- TODO: example -->
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>Repeated XForms actions.</b> Support for XForms 1.1 actions iterations with the
-                            <code>while</code> (and <code>exf:while</code>) attributes. [TODO: example]
+                            <code>while</code> (and <code>exf:while</code>) attributes. <!-- TODO: example -->
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>New functions.</b> Support for XForms 1.1 <code>digest()</code>, <code>random()</code>
-                            and <code>seconds-to-dateTime()</code> functions. [TODO: doc]
+                            and <code>seconds-to-dateTime()</code> functions. <!-- TODO: document -->
                         </p>
-                    </li>
-                    <li>
-                        [TODO: new event context information; REST support; error summary; improved Government Forms
-                        example; etc.]
                     </li>
                 </ul>
             </section>
@@ -324,8 +318,7 @@
                     <li>
                         <p>
                             <b>DELETE HTTP method.</b> Support for the XForms 1.1 <code>DELETE</code>
-                            HTTP method on <code>xforms:submission</code>. <!--[TODO: Elaborate on using
-                            REST APIs--> <!--for eXist] [TODO: Elaborate on using REST APIs for eXist]-->
+                            HTTP method on <code>xforms:submission</code>.
                         </p>
                     </li>
                     <li>
@@ -333,7 +326,7 @@
                             <b><code>urlencoded-post</code> submission method.</b> Support for the
                             <code>urlencoded-post</code> has been available. This allows in particular using the
                             HTTP POST method to access APIs such as the <a
-                            href="http://www.flickr.com/services/api/">Flickr API</a>. [TODO: doc]
+                            href="http://www.flickr.com/services/api/">Flickr API</a>. <!-- TODO: document -->
                         </p>
                     </li>
                     <li>
@@ -521,12 +514,13 @@
                 <ul>
                     <li>
                         <p>
-                            Create, save, update, and delete forms persisted in an XML database.
+                            Create, save, update, and delete forms persisted in the eXist XML database using a REST
+                            API directly from XForms.
                         </p>
                     </li>
                     <li>
                         <p>
-                            Perform as-you-type validation and display an up-to-date error summary.
+                            Perform as-you-type validation and display an always up-to-date error summary.
                         </p>
                     </li>
                     <li>
@@ -566,15 +560,13 @@
                     <li>
                         <p>
                             <b>New Execute processor.</b> A new Execute processor has been added. It allows executing
-                            external commands and retrieving the command's standard output and standard error. [TODO:
-                            doc]
+                            external commands and retrieving the command's standard output and standard error. <!-- TODO: document -->
                         </p>
                     </li>
                     <li>
                         <p>
                             <b>XUpdate processor.</b> The XUpdate processor now supports an extension element,
-                            <code>xu:node-set</code>, which allows functions to return node-sets. [TODO: show example,
-                            add this to XUpdate doc]
+                            <code>xu:node-set</code>, which allows functions to return node-sets.
                         </p>
                     </li>
                     <li>
@@ -603,13 +595,13 @@
                     <li>
                         <p>
                             Upgrade to the <a href="http://developer.yahoo.com/yui/">Yahoo! User Interface library</a>
-                            as a support library for the client-side part of the XForms engine. We no longer use <a
-                            href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
+                            as a support library for the client-side part of the XForms engine. Orbeon Forms no longer
+                            uses <a href="http://sarissa.sourceforge.net/doc/overview-summary.html">Sarissa</a>.
                         </p>
                     </li>
                     <li>
                         <p>
-                            The embedded eXist database has been upgraded to the 20060316 snapshot.
+                            The embedded eXist database has been upgraded to version 1.1.1.
                         </p>
                     </li>
                     <li>
@@ -619,8 +611,8 @@
                     </li>
                     <li>
                         <p>
-                            Other JAR files have been updated to their latest versions, including dom4j, Jaxen, and
-                            ant. [TODO]
+                            Other JAR files have been updated to more recent versions, including dom4j (1.6.1), Jaxen
+                            (1.1 beta 9), and ant (1.6.5).
                         </p>
                     </li>
                 </ul>
@@ -628,12 +620,11 @@
             <a name="bug-fixes"/>
             <section>
                 <title>Bug-Fixes</title>
-                <ul>
-                    <li>
-                        TODO: list major bug-fixes.
-                        <!--<a href=""></a>-->
-                    </li>
-                </ul>
+                <p>
+                    Too many bugs have been fixed to be listed here. You can search for closed bugs on the <a
+                    href="http://forge.objectweb.org/tracker/index.php?group_id=168&amp;atid=350207">ObjectWeb
+                    Tracker.</a>
+                </p>
             </section>
             <a name="upgrade-notes"/>
             <section>
@@ -664,29 +655,6 @@
                     </li>
                 </ul>
             </section>
-            <ul>
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--Support for the XForms 1.1 <code>current()</code> function. [TODO: doc, example]-->
-                    <!--</p>-->
-                <!--</li>-->
-
-
-                <!--<li>-->
-                    <!--<p>-->
-                        <!--New deferred update behavior as per 1.0 errata.-->
-                        <!--TODO-->
-                    <!--</p>-->
-                <!--</li>-->
-            </ul>
         </section>
-        <!--
-
-        TODO: note incompatible change move from oxf:/config/theme/format.xpl|xml-formatting.xsl|formatting.xsl to
-              oxf:/utils/formatting/*
-
-        TODO: note incompatible Saxon change xs:positiveInteger, etc.
-
-        -->
     </body>
 </document>

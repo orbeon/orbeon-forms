@@ -39,13 +39,26 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (controlId == null)
             throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
         final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(controlId);
-        if (effectiveControlId == null)
-            throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + controlId);
+
+
+        // "4.7 Resolving ID References in XForms [...] a null search result for an IDREF resolution is handled
+        // differently depending on the source object. If there is a null search result for the target object and the
+        // source object is an XForms action such as dispatch, send, setfocus, setindex or toggle, then the action is
+        // terminated with no effect."
+
+        if (effectiveControlId == null) {
+            return;
+           // TODO: It would be nice to have a warning mechanism in place to help the developer
+//            throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + controlId);
+        }
 
         final Object controlObject = containingDocument.getObjectById(pipelineContext, effectiveControlId);
 
-        if (!(controlObject instanceof XFormsControl))
-            throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
+        if (!(controlObject instanceof XFormsControl)) {
+            return;
+            // TODO: It would be nice to have a warning mechanism in place to help the developer
+//            throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
+        }
 
         containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
     }

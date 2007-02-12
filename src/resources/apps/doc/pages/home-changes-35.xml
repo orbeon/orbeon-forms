@@ -28,19 +28,13 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon Forms 3.5 beta!
+                Welcome to Orbeon Forms 3.5 RC 1!
             </p>
-            <note>
-                <p>
-                    This is not a final release of Orbeon Forms 3.5. The purpose of Orbeon Forms 3.5 beta is to provide
-                    an intermediate version of Orbeon Forms on the path to Orbeon Forms 3.5.
-                </p>
-            </note>
             <p>
-                Orbeon Forms 3.5 features many improvements over Orbeon PresentationServer (OPS) 3.0.1, including XForms
-                engine performance enhancements, enhanced browser support, and quality improvements. Orbeon Forms 3.5
-                also features a much simplified directory structure that makes it easier to get started with your own
-                Orbeon Forms applications.
+                Orbeon Forms 3.5 features many improvements over Orbeon PresentationServer (OPS) 3.0.1, including
+                XForms engine performance enhancements, enhanced browser support, and quality improvements. Orbeon Forms
+                3.5 also features a much simplified directory structure that makes it easier to get started with your
+                own Orbeon Forms applications.
             </p>
             <p>
                 This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.

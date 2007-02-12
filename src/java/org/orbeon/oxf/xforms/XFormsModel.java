@@ -1298,6 +1298,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                 if (!(currentNodeInfo instanceof NodeWrapper))
                     return;
 
+                // Don't send events for controls that don't have a value
+                final boolean isValueControl = XFormsControls.isValueControl(xformsControl.getName());
+                if (!isValueControl)
+                    return;
+
                 final InstanceData updatedInstanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNodeInfo);
 
                 // Check if value has changed

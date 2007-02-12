@@ -53,12 +53,10 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
     public void setThrowable(Throwable throwable) {
         this.throwable = throwable;
 
-        // Log exception
-        if (XFormsServer.logger.isDebugEnabled()) {
-            CharArrayWriter writer = new CharArrayWriter();
-            OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
-            XFormsServer.logger.debug("XForms - submit error throwable: " + writer.toString());
-        }
+        // Log exception at error level
+        final CharArrayWriter writer = new CharArrayWriter();
+        OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
+        XFormsServer.logger.error("XForms - submission - xforms-submit-error throwable: " + writer.toString());
     }
 
     public String getUrlString() {

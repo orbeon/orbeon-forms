@@ -318,7 +318,7 @@
                     <li>
                         <p>
                             <b><code>urlencoded-post</code> submission method.</b> Support for the
-                            <code>urlencoded-post</code> has been available. This allows in particular using the
+                            <code>urlencoded-post</code> method is now available. This allows in particular using the
                             HTTP POST method to access APIs such as the <a
                             href="http://www.flickr.com/services/api/">Flickr API</a>. <!-- TODO: document -->
                         </p>

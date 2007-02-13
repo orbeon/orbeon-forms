@@ -45,6 +45,10 @@
                     </item>
                 </items>
             </xforms:instance>
+            <xforms:instance id="gaga">
+                <gaga/>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('gaga')" constraint="false()"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -52,11 +56,14 @@
             Selected values:
             <xforms:output ref="select1"/>
         </xhtml:p>
-         <xforms:select1 ref="select1" appearance="xxforms:menu">
+        <xforms:select1 ref="select1" appearance="xxforms:menu">
             <xforms:itemset nodeset="instance('items')//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>
         </xforms:select1>
+        <xhtml:p>
+            <xforms:input ref="instance('gaga')"/>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

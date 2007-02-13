@@ -20,7 +20,7 @@
             PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" SYSTEM
             "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
 
-            $Id: xhtml1-transitional-orbeon.xsd,v 1.3 2006/12/26 19:29:06 avernet Exp $
+            $Id: xhtml1-transitional-orbeon.xsd,v 1.4 2007/02/13 09:24:59 avernet Exp $
 </xs:documentation>
     </xs:annotation>
 
@@ -766,7 +766,7 @@
         <xs:complexType>
             <xs:attributeGroup ref="attrs"/>
             <xs:attribute name="charset" type="Charset"/>
-            <xs:attribute name="href" type="URI"/>
+            <xs:attribute name="href" type="xs:string"/>
             <xs:attribute name="hreflang" type="LanguageCode"/>
             <xs:attribute name="type" type="ContentType"/>
             <xs:attribute name="rel" type="LinkTypes"/>

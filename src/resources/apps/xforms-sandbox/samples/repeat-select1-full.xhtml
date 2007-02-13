@@ -23,10 +23,9 @@
         <xhtml:title>Repeat xforms:select1 Full</xhtml:title>
         <xforms:model>
             <xforms:instance id="main-instance">
-                <instance xmlns="">
+                <instance xmlns="" count="2">
                     <row>
                         <select>1</select>
-                        <textarea/>
                     </row>
                 </instance>
             </xforms:instance>
@@ -36,7 +35,11 @@
 
         <xforms:trigger>
             <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="row"/>
+            <xforms:action ev:event="DOMActivate" while="20 > @count">
+                <xforms:insert nodeset="row"/>
+                <xforms:setvalue ref="row/select[number(/instance/@count)]" value="/instance/@count"/>
+                <xforms:setvalue ref="@count" value=". + 1"/>
+            </xforms:action>
         </xforms:trigger>
 
         <ul>
@@ -44,22 +47,25 @@
                 <xforms:repeat nodeset="row">
                     <tr>
                         <td>
-                            <xforms:select1 ref="select" appearance="full">
-                                <xforms:item>
-                                    <xforms:label>One</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Two</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Three</xforms:label>
-                                    <xforms:value>3</xforms:value>
-                                </xforms:item>
-                            </xforms:select1>
-                            <br/>
-                            <xforms:textarea ref="textarea" appearance="xxforms:autosize"/>
+                            <xforms:output ref="."/>
+                        </td>
+                        <td>
+                            <xforms:group ref=".[. mod 2 = 0]">
+                                <xforms:select1 ref="select" appearance="full">
+                                    <xforms:item>
+                                        <xforms:label>One</xforms:label>
+                                        <xforms:value>1</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Two</xforms:label>
+                                        <xforms:value>2</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Three</xforms:label>
+                                        <xforms:value>3</xforms:value>
+                                    </xforms:item>
+                                </xforms:select1>
+                            </xforms:group>
                         </td>
                     </tr>
                 </xforms:repeat>

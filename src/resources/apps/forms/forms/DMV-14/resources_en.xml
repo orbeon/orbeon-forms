@@ -54,7 +54,7 @@
             <birth-date>Birth Date</birth-date>
             <driver-license-number>Driver License / Id Card No.</driver-license-number>
             <change-voting-address>Mark this box if you do not want to change your voting address</change-voting-address>
-            <street-number>Street Number Only</street-number>
+            <street-number>Street Number</street-number>
             <street-name-1>Street Name 1</street-name-1>
             <street-name-2>Street Name 2</street-name-2>
             <apt>Apt. No</apt>

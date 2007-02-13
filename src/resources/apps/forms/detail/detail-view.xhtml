@@ -51,14 +51,16 @@
             <xforms:instance id="control-instance">
                 <control xmlns="">
                     <data-status/>
-                    <save-trigger/>
                     <back-trigger/>
+                    <save-trigger/>
+                    <errors-on-page/>
                 </control>
             </xforms:instance>
 
             <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0) or instance('parameters-instance')/readonly = 'true'"/>
                 <xforms:bind nodeset="back-trigger" readonly="../data-status = 'dirty' and not(instance('parameters-instance')/readonly = 'true')"/>
+                <xforms:bind nodeset="save-trigger" readonly="not(../data-status = 'dirty' and count(instance('errors-instance')/error) = 0) or instance('parameters-instance')/readonly = 'true'"/>
+                <xforms:bind nodeset="errors-on-page" relevant="count(instance('errors-instance')/error) != 0"/>
             </xforms:bind>
 
             <!-- XForms instance for error information -->
@@ -81,9 +83,6 @@
     <body>
         <table class="forms-title-table">
             <tr>
-                <!--<td>-->
-                    <!--<img src="/apps/forms/images/dmv-logo.png" alt="DMV"/>-->
-                <!--</td>-->
                 <td>
                     <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/detail-title"/>
                 </td>
@@ -91,11 +90,10 @@
         </table>
 
         <!-- Error summary -->
-        <xxforms:dialog level="modeless" close="false" id="error-summary-dialog">
+        <xxforms:dialog level="modal" close="true" id="error-summary-dialog">
             <xforms:label>Errors</xforms:label>
             <xforms:group model="common-model" ref="instance('errors-instance')/error">
                 <table class="forms-errors-table">
-                    <!--<xforms:repeat nodeset="exforms:sort(instance('errors-instance')/error, '@id', 'text')" id="errors-repeat">-->
                     <xforms:repeat nodeset="instance('errors-instance')/error" id="errors-repeat">
                         <tr>
                             <th>
@@ -112,85 +110,97 @@
                         </tr>
                     </xforms:repeat>
                 </table>
+                <div class="forms-error-actions">
+                    <xforms:trigger>
+                        <xforms:label>
+                            <xhtml:img src="../../../apps/forms/images/close.gif" alt="Close"/>
+                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/close"/>
+                        </xforms:label>
+                        <xxforms:hide dialog="error-summary-dialog" ev:event="DOMActivate"/>
+                    </xforms:trigger>
+                </div>
             </xforms:group>
         </xxforms:dialog>
 
-        <xforms:group>
+        <xforms:group model="common-model">
             <!-- Clear messages upon user moving around in the form -->
             <xforms:toggle ev:event="DOMFocusIn" case="no-message"/>
 
+            <table class="forms-action-table" id="main-action-table">
+                <tr>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/back-trigger">
+                            <xforms:trigger>
+                                <xforms:label>
+                                    <xhtml:img src="../../../apps/forms/images/back.gif" alt="Back"/>
+                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
+                                </xforms:label>
+                                <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </td>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/save-trigger">
+                            <xforms:trigger>
+                                <xforms:label>
+                                    <xhtml:img src="../../../apps/forms/images/save.gif" alt="Save"/>
+                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:send submission="save-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xforms:group>
+                    </td>
+                    <td>
+                        <xforms:group ref="instance('control-instance')/errors-on-page">
+                            <xforms:output class="forms-message-fatal" model="resources-model" ref="instance('resources-instance')/detail/labels/check-errors-in-form"/>
+                            <xforms:trigger appearance="minimal">
+                                <xforms:label>  
+                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/error-details"/>
+                                </xforms:label>
+                                <xxforms:show dialog="error-summary-dialog" ev:event="DOMActivate"/>
+                            </xforms:trigger>
+                        </xforms:group>
+                        <xforms:switch>
+                            <xforms:case id="no-message">
+                                <span/>
+                            </xforms:case>
+                            <xforms:case id="ok-message">
+                                <span class="forms-message-positive">
+                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                </span>
+                            </xforms:case>
+                            <xforms:case id="validation-error-message">
+                                <span class="forms-message-negative">
+                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                </span>
+                            </xforms:case>
+                            <xforms:case id="fatal-error-message">
+                                <span class="forms-message-fatal">
+                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
+                                </span>
+                            </xforms:case>
+                        </xforms:switch>
+                    </td>
+                    <td id="language-choice-td">
+                        <xforms:select1 model="resources-model" ref="instance('language-instance')">
+                            <xforms:label ref="instance('resources-instance')/detail/labels/language-choice"/>
+                            <xforms:item>
+                                <xforms:label>en</xforms:label>
+                                <xforms:value>en</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>fr</xforms:label>
+                                <xforms:value>fr</xforms:value>
+                            </xforms:item>
+                            <xforms:send ev:event="xforms-value-changed" submission="update-language-submission"/>
+                        </xforms:select1>
+                    </td>
+                </tr>
+            </table>
+
             <table class="forms-main-table">
-                <xforms:group model="common-model">
-                    <tr>
-                        <td colspan="2">
-                            <!-- Main form actions -->
-                            <table class="forms-action-table" id="main-action-table">
-                                <tr>
-                                    <td>
-                                        <xforms:group ref="instance('control-instance')/back-trigger">
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label>
-                                                    <xhtml:img src="../../../apps/forms/images/back.gif" alt="Back"/>
-                                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
-                                                </xforms:label>
-                                                <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
-                                            </xforms:trigger>
-                                        </xforms:group>
-                                    </td>
-                                    <td>
-                                        <xforms:group ref="instance('control-instance')/save-trigger">
-                                            <xforms:trigger appearance="minimal">
-                                                <xforms:label>
-                                                    <xhtml:img src="../../../apps/forms/images/save.gif" alt="Save"/>
-                                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
-                                                </xforms:label>
-                                                <xforms:action ev:event="DOMActivate">
-                                                    <xforms:send submission="save-submission"/>
-                                                </xforms:action>
-                                            </xforms:trigger>
-                                        </xforms:group>
-                                    </td>
-                                    <td>
-                                        <xforms:switch>
-                                            <xforms:case id="no-message">
-                                                <span/>
-                                            </xforms:case>
-                                            <xforms:case id="ok-message">
-                                                <span class="forms-message-positive">
-                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
-                                                </span>
-                                            </xforms:case>
-                                            <xforms:case id="validation-error-message">
-                                                <span class="forms-message-negative">
-                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
-                                                </span>
-                                            </xforms:case>
-                                            <xforms:case id="fatal-error-message">
-                                                <span class="forms-message-fatal">
-                                                    <xforms:output model="persistence-model" ref="instance('persistence-instance')/message"/>
-                                                </span>
-                                            </xforms:case>
-                                        </xforms:switch>
-                                    </td>
-                                    <td id="language-choice-td">
-                                        <xforms:select1 model="resources-model" ref="instance('language-instance')">
-                                            <xforms:label ref="instance('resources-instance')/detail/labels/language-choice"/>
-                                            <xforms:item>
-                                                <xforms:label>en</xforms:label>
-                                                <xforms:value>en</xforms:value>
-                                            </xforms:item>
-                                            <xforms:item>
-                                                <xforms:label>fr</xforms:label>
-                                                <xforms:value>fr</xforms:value>
-                                            </xforms:item>
-                                            <xforms:send ev:event="xforms-value-changed" submission="update-language-submission"/>
-                                        </xforms:select1>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </xforms:group>
                 <xforms:group model="common-model">
                     <!-- Handle invalid and valid events in order to update error summary -->
                     <xforms:action ev:event="xforms-invalid" if="normalize-space(event('alert')) != ''">
@@ -198,14 +208,12 @@
                             <xforms:insert context="instance('errors-instance')" nodeset="error" origin="instance('error-template')"/>
                             <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@id" value="event('target')"/>
                             <xforms:setvalue ref="instance('errors-instance')/error[index('errors-repeat')]/@indexes" value="string-join(event('repeat-indexes'), '-')"/>
-                            <xxforms:show dialog="error-summary-dialog"/>
                         </xforms:action>
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@alert" value="event('alert')"/>
                         <xforms:setvalue ref="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]/@label" value="event('label')"/>
                     </xforms:action>
                     <xforms:action ev:event="xforms-valid" if="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]">
                         <xforms:delete nodeset="instance('errors-instance')/error[@id = event('target') and @indexes = string-join(event('repeat-indexes'), '-')]"/>
-                        <xxforms:hide if="count(instance('errors-instance')/error) = 0" dialog="error-summary-dialog"/>
                     </xforms:action>
                     <!-- Mark that data has changed -->
                     <xforms:action ev:event="xforms-value-changed">

@@ -14,12 +14,14 @@
 th { padding: 1em; padding-top: 0; text-align: left; vertical-align: top }
 td { vertical-align: top }
 
-#main-action-table { width: 100% }
+#main-action-table { width: 65em; margin-top: 1em; margin-bottom: 1em }
+#main-action-table .forms-message-fatal { padding-left: 1em }
 #language-choice-td { width: 100%; text-align: right }
 
-.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 62em; background: #fcc }
+.forms-errors-table { margin: 1em; padding: .5em; border: 1px dotted red; width: 50em; background: #fcc }
 .forms-errors-table .xforms-repeat-selected-item-1 { background: none }
 .forms-errors-table th { padding: 0; color: red }
+.forms-error-actions { text-align: center; margin-bottom: .5em; }
 
 .forms-main-table { border: solid 2px #ffcc66; width: 64em }
 .forms-main-table th p { text-align: center; vertical-align: top }
@@ -27,7 +29,6 @@ td { vertical-align: top }
 
 .forms-action-table td { white-space: nowrap; vertical-align: middle }
 .forms-action-table input { vertical-align: middle }
-.forms-action-table .xforms-trigger { vertical-align: middle }
 
 .forms-gridtable { border-collapse: collapse; width: 95%; margin-left: 1em; margin-right: 1em }
 .forms-gridtable th { background-color: #ffcc66; text-align: center; padding: .3em; border: 1px solid #f93 }
@@ -35,13 +36,13 @@ td { vertical-align: top }
 .forms-gridtable .xforms-label { display: none }
 
 .forms-title-table { margin-bottom: 1em }
-.forms-title-table td { vertical-align: middle; font-size: 24pt; font-weight: bold; font-family: verdana,sans-serif }
+.forms-title-table td { vertical-align: middle; font-size: 16pt; font-weight: bold; font-family: verdana,sans-serif }
 
 .forms-message-positive { color: green }
 .forms-message-negative { color: orange }
 .forms-message-fatal { color: red }
 
-.forms-hr { height: 3px; border: 0; background-color: #ffcc66; color: #ffcc66 }
+.forms-hr { height: 2px; border: 0; background-color: #ffcc66; color: #ffcc66 }
 
 .xforms-label { margin-right: 1em; font-style: italic }
 .xforms-repeat-selected-item-1 td { cursor: default }
@@ -49,22 +50,28 @@ td { vertical-align: top }
 .xforms-static.xforms-input { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-static.xforms-select1 { margin-right: 1em; font-variant: small-caps; text-decoration: underline }
 .xforms-trigger-appearance-minimal img { margin-right: 0.5em; vertical-align: middle }
+button.xforms-trigger img { vertical-align: -20%; padding-right: .5em }
 
+.dmv-heading-column { padding-top: 1em; padding-bottom: 1em; }
+.dmv-data-column { padding-top: 1em; padding-bottom: 1em; }
 .dmv-last-name input { width: 20em }
 .dmv-driver-license-number input { width: 8em }
 .dmv-first-name input { width: 10em }
 .dmv-initial input { width: 1.5em }
 .dmv-street-number input { width: 5em }
 .dmv-street-name-1 input { width: 21em }
-.dmv-street-name-2 input { width: 22em }
-.dmv-city input { width: 22em }
+.dmv-street-name-2 input { width: 21em }
+.dmv-city input { width: 10em }
 .dmv-state input { width: 2em }
 .dmv-zip input { width: 5em }
 .dmv-plate-number input { width: 8em }
 .dmv-vin input { width: 17em }
 .dmv-company-name input { width: 22em }
 .dmv-street-number-name input { width: 22em }
-.dmv-apt-number input { width: 4em }
+.dmv-apt-number input { width: 5em }
+.dmv-address-col1-label { display: -moz-inline-box; display: inline-block; width: expression('7em'); min-width: 7em; }
+.dmv-address-col2-label { display: -moz-inline-box; display: inline-block; width: expression('7em'); min-width: 7em; }
+
 
 .dmv-plate-table .xforms-repeat-selected-item-2 { background: none }
 .dmv-plate-table td { background-image: url('images/platetahoe_small.jpg'); width: 100px; height: 51px; display: block; padding: 0; border: none; text-align: center; vertical-align: top }
@@ -84,3 +91,4 @@ td { vertical-align: top }
 .g-325a-parents-table .xforms-label { display: inline-block; display: -moz-inline-box; width: 7em }
 
 .g-325a-personal-information-table .xforms-label { display: inline-block; display: -moz-inline-box; width: 7em }
+

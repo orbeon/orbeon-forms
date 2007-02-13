@@ -52,6 +52,10 @@
             <save-document>Sauvegarder</save-document>
             <return>Retour aux Formulaires</return>
             <language-choice>Langue</language-choice>
+            <check-errors-in-form>Vérifiez les erreurs dans le formulaire</check-errors-in-form>
+            <error-details>Détail des erreurs</error-details>
+            <language-choice>Language</language-choice>
+            <close>Fermer</close>
         </labels>
     </detail>
 </resources>

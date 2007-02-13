@@ -60,10 +60,10 @@
     <xforms:group ref="dmv:address-information">
         <xforms:group ref="dmv:voter-address-change">
             <tr>
-                <th>
+                <th class="dmv-heading-column">
                     <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/voter-address-change" mediatype="text/html"/><br/>
                 </th>
-                <td>
+                <td class="dmv-data-column">
                     <xforms:select ref="dmv:change-address" appearance="full">
                         <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/change-voting-address"/>
                         <xforms:item>
@@ -77,51 +77,53 @@
         <tr><td colspan="2" class="forms-hr"/></tr>
         <xforms:group ref="dmv:address[@type = 'residence']">
             <tr>
-                <th>
+                <th class="dmv-heading-column">
                     <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/new-residence-address" mediatype="text/html"/><br/>
                     <p>
                         <img src="/apps/forms/images/residence-address.png" alt="New or Correct Residence Address"/>
                     </p>
                 </th>
-                <td>
+                <td class="dmv-data-column">
                     <table>
                         <tr>
-                            <td align="right">
+                            <td>
                                 <xforms:input incremental="true" ref="dmv:street/dmv:number" class="dmv-street-number">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-number"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-number" class="dmv-address-col1-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/street-number"/>
                                 </xforms:input>
                             </td>
                             <td>
                                 <xforms:input incremental="true" ref="dmv:street/dmv:name-1" class="dmv-street-name-1">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-name-1"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-name-1" class="dmv-address-col2-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/street-name-1"/>
                                 </xforms:input>
                             </td>
                         </tr>
                         <tr>
-                            <td align="right">
+                            <td>
                                 <xforms:input incremental="true" ref="dmv:apt" class="dmv-apt-number">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/apt"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/apt" class="dmv-address-col1-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/apt"/>
                                 </xforms:input>
                             </td>
                             <td>
                                 <xforms:input incremental="true" ref="dmv:street/dmv:name-2" class="dmv-street-name-2">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-name-2"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/street-name-2" class="dmv-address-col2-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/street-name-2"/>
                                 </xforms:input>
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2">
+                            <td>
                                 <xforms:input incremental="true" ref="dmv:city" class="dmv-city">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/city" class="dmv-address-col1-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/city"/>
                                     <!--<xforms:hint>Do Not Abbreviate - Use First 22 Characters in City Name</xforms:hint>-->
                                 </xforms:input>
+                            </td>
+                            <td>
                                 <xforms:select1 ref="dmv:state">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state"/>
+                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/state" class="dmv-address-col2-label"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/state"/>
                                     <xforms:item>
                                         <xforms:label/>
@@ -144,14 +146,13 @@
         </xforms:group>
         <tr><td colspan="2" class="forms-hr"/></tr>
         <tr>
-            <th>
+            <th class="dmv-heading-column">
                 <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/new-mailing-address" mediatype="text/html"/><br/>
                 <p>
                     <img src="/apps/forms/images/mailing-address.png" alt="New or Correct Mailing Address"/>
                 </p>
             </th>
-            <td>
-
+            <td class="dmv-data-column">
                 <table class="forms-action-table">
                     <tr>
                         <td>
@@ -255,10 +256,10 @@
     <xforms:group ref="dmv:vehicle-information">
         <xforms:group ref="dmv:vehicles">
             <tr>
-                <th>
+                <th class="dmv-heading-column">
                     <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/vehicles-owned" mediatype="text/html"/><br/>
                 </th>
-                <td>
+                <td class="dmv-data-column">
                     <table class="forms-action-table">
                         <tr>
                             <td>
@@ -350,10 +351,10 @@
         <tr><td colspan="2" class="forms-hr"/></tr>
         <xforms:group ref="dmv:leased-vehicles">
             <tr>
-                <th>
+                <th class="dmv-heading-column">
                     <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/leased-vehicles" mediatype="text/html"/>
                 </th>
-                <td>
+                <td class="dmv-data-column">
                     <xforms:input incremental="true" ref="dmv:company-name" class="dmv-company-name">
                         <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/company-name"/>
                         <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/company-name"/>
@@ -363,11 +364,10 @@
         </xforms:group>
         <tr><td colspan="2" class="forms-hr"/></tr>
         <tr>
-            <th>
+            <th class="dmv-heading-column">
                 <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/coach-vessel-location" mediatype="text/html"/><br/>
             </th>
-            <td>
-
+            <td class="dmv-data-column">
                 <table class="forms-action-table">
                     <tr>
                         <td>
@@ -453,10 +453,10 @@
     <tr><td colspan="2" class="forms-hr"/></tr>
     <xforms:group ref="dmv:address-information/dmv:address[@type = 'old']">
         <tr>
-            <th>
+            <th class="dmv-heading-column">
                 <xforms:output model="resources-model" value="instance('resources-instance')/detail/titles/old-address" mediatype="text/html"/><br/>
             </th>
-            <td>
+            <td class="dmv-data-column">
                 <table>
                     <tr>
                         <td align="right">

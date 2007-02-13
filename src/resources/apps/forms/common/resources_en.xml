@@ -33,7 +33,6 @@
             <view-readonly>View Read-Only</view-readonly>
             <view-xml>View XML</view-xml>
             <view-pdf>View PDF</view-pdf>
-
             <language-choice>Language</language-choice>
             <form-choice>Choose a form</form-choice>
         </labels>
@@ -51,7 +50,10 @@
         <labels>
             <save-document>Save Document</save-document>
             <return>Return to Forms</return>
+            <check-errors-in-form>Please check errors in form</check-errors-in-form>
+            <error-details>View error details</error-details>
             <language-choice>Language</language-choice>
+            <close>Close</close>
         </labels>
     </detail>
 </resources>

@@ -105,6 +105,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private boolean xxfShowProgress;
 
+    private boolean fURLNorewrite;
+
     public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
         this.containingDocument = containingDocument;
         this.id = id;
@@ -187,6 +189,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
             // Whether we must show progress or not
             xxfShowProgress = !"false".equals(submissionElement.attributeValue(XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
+
+            // Whether or not to rewrite URLs
+            fURLNorewrite = XFormsUtils.resolveUrlNorewrite(submissionElement);
 
             // Remember that we did this
             submissionElementExtracted = true;
@@ -553,8 +558,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                     } else if (isHandlingOptimizedGet) {
                         // GET with replace="all": we can optimize and tell the client to just load the URL
-                        connectionResult = doOptimizedGet(pipelineContext, queryString, xxfShowProgress);
+
+                        final String actionString = (queryString == null) ? resolvedActionOrResource : resolvedActionOrResource + ((resolvedActionOrResource.indexOf('?') == -1) ? "?" : "") + queryString;
+                        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, fURLNorewrite, xxfShowProgress);
+                        connectionResult = new ConnectionResult(resultURL);
+                        connectionResult.dontHandleResponse = true;
+
                     } else if (!NetUtils.urlHasProtocol(resolvedActionOrResource)
+                               && !fURLNorewrite
                                && ((request.getContainerType().equals("portlet") && !"resource".equals(urlType))
                                     || (request.getContainerType().equals("servlet")
                                         && (XFormsUtils.isOptimizeLocalSubmission() || isMethodOptimizedLocalSubmission())
@@ -583,11 +594,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // This is a regular remote submission going through a protocol handler
 
                         // Absolute URLs or absolute paths are allowed to a local servlet
-                        String resolvedURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, submissionElement, false, resolvedActionOrResource);
+                        String resolvedURL;
 
-                        if (request.getContainerType().equals("portlet") && "resource".equals(urlType) && !NetUtils.urlHasProtocol(resolvedURL)) {
-                            // In this case, we have to prepend the complete server path
-                            resolvedURL = request.getScheme() + "://" + request.getServerName() + (request.getServerPort() > 0 ? ":" + request.getServerPort() : "") + resolvedURL;
+                        if (NetUtils.urlHasProtocol(resolvedActionOrResource) || fURLNorewrite) {
+                            // Don't touch the URL if it is absolute or if f:url-norewrite="true"
+                            resolvedURL = resolvedActionOrResource;
+                        } else {
+                            // Rewrite URL
+                            resolvedURL= XFormsUtils.resolveResourceURL(pipelineContext, submissionElement, resolvedActionOrResource);
+
+                            if (request.getContainerType().equals("portlet") && "resource".equals(urlType) && !NetUtils.urlHasProtocol(resolvedURL)) {
+                                // In this case, we have to prepend the complete server path
+                                resolvedURL = request.getScheme() + "://" + request.getServerName() + (request.getServerPort() > 0 ? ":" + request.getServerPort() : "") + resolvedURL;
+                            }
                         }
 
                         if (isApplicationSharedHint) {
@@ -855,14 +874,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
         }
         return submitErrorEvent;
-    }
-
-    private ConnectionResult doOptimizedGet(PipelineContext pipelineContext, String queryString, boolean isShowProgress) {
-        final String actionString = (queryString == null) ? resolvedActionOrResource : resolvedActionOrResource + ((resolvedActionOrResource.indexOf('?') == -1) ? "?" : "") + queryString;
-        final String resultURL = XFormsLoadAction.resolveLoadValue(containingDocument, pipelineContext, submissionElement, true, actionString, null, null, false, isShowProgress);
-        final ConnectionResult connectionResult = new ConnectionResult(resultURL);
-        connectionResult.dontHandleResponse = true;
-        return connectionResult;
     }
 
     private Document createDocumentToSubmit(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {

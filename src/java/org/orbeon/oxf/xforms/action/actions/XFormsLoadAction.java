@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -89,7 +87,11 @@ public class XFormsLoadAction extends XFormsAction {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
         final String externalURL;
         if (!urlNorewrite) {
-            externalURL = XFormsUtils.resolveURL(containingDocument, pipelineContext, currentElement, (!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType)), value);
+            if ((!isPortletLoad) ? doReplace : (doReplace && !"resource".equals(urlType))) {
+                externalURL = XFormsUtils.resolveURLDoReplace(containingDocument, pipelineContext, currentElement, value);
+            } else {
+                externalURL = XFormsUtils.resolveResourceURL(pipelineContext, currentElement, value);
+            }
         } else {
             externalURL = value;
         }

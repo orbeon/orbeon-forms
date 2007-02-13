@@ -83,7 +83,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             final String type = getType();
             if (!urlNorewrite && (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI")))) {
                 // Rewrite image URI
-                updatedValue = XFormsUtils.resolveURL(containingDocument, pipelineContext, getControlElement(), false, rawValue);
+                updatedValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue);
             } else {
                 updatedValue = rawValue;
             }
@@ -115,7 +115,7 @@ public class XFormsOutputControl extends XFormsValueControl {
 
                             final String rewrittenValue;
                             if ("src".equals(currentName) || "href".equals(currentName)) {
-                                rewrittenValue = XFormsUtils.resolveURL(containingDocument, pipelineContext, getControlElement(), false, currentValue);
+                                rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), currentValue);
                             } else {
                                 rewrittenValue = currentValue;
                             }

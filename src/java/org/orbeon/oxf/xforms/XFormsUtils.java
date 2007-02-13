@@ -572,7 +572,7 @@ public class XFormsUtils {
      * @param acceptHTML            whether the result may contain HTML
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, Element childElement, final boolean acceptHTML) {
+    public static String getChildElementValue(final PipelineContext pipelineContext, final XFormsContainingDocument containingDocument, final Element childElement, final boolean acceptHTML) {
 
         // NOTE: This returns an HTML string.
 
@@ -678,12 +678,24 @@ public class XFormsUtils {
                                 for (Iterator i = attributes.iterator(); i.hasNext();) {
                                     final Attribute currentAttribute = (Attribute) i.next();
 
+                                    final String currentName = currentAttribute.getName();
+                                    final String currentValue = currentAttribute.getValue();
+
+                                    // Rewrite HTML attributes if needed
+                                    final String rewrittenValue;
+                                    final boolean mustRewrite = false;//TODO: issue is that further rewriting will occur (upon initialization only) unless the caller uses f:url-norewrite="true" 
+                                    if (mustRewrite && ("src".equals(currentName) || "href".equals(currentName))) {
+                                        rewrittenValue = XFormsUtils.resolveResourceURL(pipelineContext, childElement, currentValue);
+                                    } else {
+                                        rewrittenValue = currentValue;
+                                    }
+
                                     // Only consider attributes in no namespace
                                     if ("".equals(currentAttribute.getNamespaceURI())) {
                                         sb.append(' ');
-                                        sb.append(currentAttribute.getName());
+                                        sb.append(currentName);
                                         sb.append("=\"");
-                                        sb.append(XMLUtils.escapeXMLMinimal(currentAttribute.getValue()));
+                                        sb.append(XMLUtils.escapeXMLMinimal(rewrittenValue));
                                         sb.append('"');
                                     }
                                 }
@@ -1068,10 +1080,10 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_OPTIMIZE_RELEVANCE_PROPERTY, XFormsConstants.DEFAULT_OPTIMIZE_RELEVANCE).booleanValue();
     }
 
-    public static String resolveURL(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, boolean doReplace, String value) {
+    public static String resolveURLDoReplace(XFormsContainingDocument containingDocument, PipelineContext pipelineContext, Element currentElement, String url) {
         final boolean isPortletLoad = "portlet".equals(containingDocument.getContainerType());
 
-        final URI resolvedURI = resolveXMLBase(currentElement, value);
+        final URI resolvedURI = resolveXMLBase(currentElement, url);
         final String resolvedURISTring = resolvedURI.toString();
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
@@ -1080,30 +1092,31 @@ public class XFormsUtils {
         // runs in a servlet when processing these events!
         if (!isPortletLoad) {
             // XForms page was loaded from a servlet
-            if (doReplace) {
-                externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
-            } else {
-                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
-            }
+            externalURL = externalContext.getResponse().rewriteRenderURL(resolvedURISTring);
         } else {
             // XForms page was loaded from a portlet
-            if (doReplace) {
-                if (resolvedURI.getFragment() != null) {
-                    // Remove fragment if there is one, as it doesn't serve in a portlet
-                    try {
-                        externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
-                    } catch (URISyntaxException e) {
-                        throw new OXFException(e);
-                    }
-                } else {
-                    externalURL = resolvedURISTring;
+            if (resolvedURI.getFragment() != null) {
+                // Remove fragment if there is one, as it doesn't serve in a portlet
+                try {
+                    externalURL = new URI(resolvedURI.getScheme(), resolvedURI.getAuthority(), resolvedURI.getPath(), resolvedURI.getQuery(), null).toString();
+                } catch (URISyntaxException e) {
+                    throw new OXFException(e);
                 }
             } else {
-                externalURL = externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
+                externalURL = resolvedURISTring;
             }
         }
 
         return externalURL;
+    }
+
+    public static String resolveResourceURL(PipelineContext pipelineContext, Element currentElement, String url) {
+
+        final URI resolvedURI = resolveXMLBase(currentElement, url);
+        final String resolvedURISTring = resolvedURI.toString();
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+
+        return externalContext.getResponse().rewriteResourceURL(resolvedURISTring, false);
     }
 
     /**

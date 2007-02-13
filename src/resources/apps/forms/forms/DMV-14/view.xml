@@ -23,21 +23,21 @@
                 <table>
                     <tr>
                         <td>
+                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/last-name"/>
+                        </td>
+                        <td>
                             <xforms:input id="dmv-last-name-control" incremental="true" ref="dmv:name/dmv:last-name" class="dmv-last-name">
-                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/last-name"/>
                                 <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/last-name"/>
-                            </xforms:input>
-                            <xforms:input incremental="true" ref="dmv:driver-license-number" class="dmv-driver-license-number">
-                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/driver-license-number"/>
-                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/driver-license-number"/>
                             </xforms:input>
                         </td>
                     </tr>
                     <tr>
                         <td>
+                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/first-name"/>
+                        </td>
+                        <td>
                             <xforms:group ref="dmv:name">
                                 <xforms:input incremental="true" ref="dmv:first-name" class="dmv-first-name">
-                                    <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/first-name"/>
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/first-name"/>
                                 </xforms:input>
                                 <xforms:input incremental="true" ref="dmv:initial" xhtml:size="2" class="dmv-initial">
@@ -45,9 +45,25 @@
                                     <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/initial"/>
                                 </xforms:input>
                             </xforms:group>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/driver-license-number"/>
+                        </td>
+                        <td>
+                            <xforms:input incremental="true" ref="dmv:driver-license-number" class="dmv-driver-license-number">
+                                <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/driver-license-number"/>
+                            </xforms:input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/birth-date"/>
+                        </td>
+                        <td>
                             <xforms:input incremental="true" ref="dmv:birth-date"
                                           xxforms:format="if (. castable as xs:date) then format-date(xs:date(.), xxforms:instance('resources-instance')/detail/formats/birth-date, xxforms:instance('language-instance'), (), ()) else ''">
-                                <xforms:label model="resources-model" ref="instance('resources-instance')/detail/labels/birth-date"/>
                                 <xforms:alert model="resources-model" ref="instance('resources-instance')/detail/alerts/birth-date"/>
                             </xforms:input>
                         </td>

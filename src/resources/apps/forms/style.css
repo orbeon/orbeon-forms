@@ -55,7 +55,7 @@ button.xforms-trigger img { vertical-align: -20%; padding-right: .5em }
 .dmv-heading-column { padding-top: 1em; padding-bottom: 1em; }
 .dmv-data-column { padding-top: 1em; padding-bottom: 1em; }
 .dmv-last-name input { width: 20em }
-.dmv-driver-license-number input { width: 8em }
+.dmv-driver-license-number input { width: 10em }
 .dmv-first-name input { width: 10em }
 .dmv-initial input { width: 1.5em }
 .dmv-street-number input { width: 5em }

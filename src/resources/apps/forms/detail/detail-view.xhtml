@@ -111,7 +111,7 @@
                     </xforms:repeat>
                 </table>
                 <div class="forms-error-actions">
-                    <xforms:trigger>
+                    <xforms:trigger id="errors-close-trigger">
                         <xforms:label>
                             <xhtml:img src="../../../apps/forms/images/close.gif" alt="Close"/>
                             <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/close"/>
@@ -159,7 +159,10 @@
                                 <xforms:label>  
                                     <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/error-details"/>
                                 </xforms:label>
-                                <xxforms:show dialog="error-summary-dialog" ev:event="DOMActivate"/>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xxforms:show dialog="error-summary-dialog"/>
+                                    <xforms:setfocus control="errors-close-trigger"/> 
+                                </xforms:action>
                             </xforms:trigger>
                         </xforms:group>
                         <xforms:switch>

@@ -16,7 +16,7 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param name="data" type="input"/>
-    <p:param name="instance" type="input" debug="xxxxx"/>
+    <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
     <!-- Create URL generator configuration and generate data from the URL -->

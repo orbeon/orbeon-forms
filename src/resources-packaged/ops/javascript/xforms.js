@@ -1584,7 +1584,7 @@ ORBEON.xforms.Init = {
 	        fckEditor.Config["AutoDetectLanguage"] = false;
     	    fckEditor.Config["DefaultLanguage"] = (USER_LANGUAGE != '') ? USER_LANGUAGE : 'en';
     	}
-        // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable 
+        // Change the path to a custom configuration, based on the FCK_CUSTOM_CONFIG variable
     	type_check = typeof FCK_CUSTOM_CONFIG;
     	if (type_check != 'undefined')
     		fckEditor.Config["CustomConfigurationsPath"] = FCK_CUSTOM_CONFIG;
@@ -1861,7 +1861,7 @@ ORBEON.xforms.Server = {
         var uploadElements = YAHOO.util.Dom.getElementsByClassName("xforms-upload", "span");
         for (var uploadIndex = 0; uploadIndex < uploadElements.length; uploadIndex++) {
             var uploadElement = uploadElements[uploadIndex];
-            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates 
+            if (ORBEON.util.Dom.hasClass(uploadElement, "xforms-upload-state-empty"))// this also excludes templates
                 ORBEON.util.Dom.clearUploadControl(uploadElement);
         }
 
@@ -2348,6 +2348,13 @@ ORBEON.xforms.Server = {
                                                             // Directly modify the DOM instead of using SetHTML() provided by the FCKeditor,
                                                             // as we loose our listeners after using the later
                                                             htmlEditor.EditorDocument.body.innerHTML = newControlValue;
+                                                            // Set again the server value based on the HTML as seen from the field. HTML changes slightly when it
+                                                            // is pasted in the FCK editor. The server value will be compared to the field value, to (a) figure out
+                                                            // if we need to send the value again to the server and (b) to figure out if the FCK editor has been edited
+                                                            // since the last time we sent the value to the serer. The bottom line is that we are going to compare
+                                                            // the server value to the content of the field. So storing the value as seen by the field vs. as seen by
+                                                            // server accounts for the slight difference there might be in those 2 representations.
+                                                            ORBEON.xforms.Globals.serverValue[controlId] = htmlEditor.GetXHTML();
                                                             documentElement.value = newControlValue;
                                                             documentElement.previousValue = newControlValue;
                                                         }

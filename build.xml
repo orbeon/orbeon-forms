@@ -606,15 +606,8 @@
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}/reference">
-            <fileset dir="${resources.dir}">
-                <include name="images/*.*"/>
-            </fileset>
-        </copy>
-        <copy todir="${build.doc.dir}/reference">
             <fileset dir="${resources.dir}/apps/doc">
-                <include name="pages/*.png"/>
-                <include name="pages/*.gif"/>
-                <include name="pages/*.pdf"/>
+                <include name="images/**/*.*"/>
             </fileset>
         </copy>
         <copy toDir="${build.doc.dir}/reference/theme">

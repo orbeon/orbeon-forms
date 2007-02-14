@@ -193,7 +193,7 @@
                                 <p>
                                     You should see the Tomcat welcome page.
                                 </p>
-                                <figure src="/apps/doc/images/tutorial/01.png"/>
+                                <figure src="../apps/doc/images/tutorial/01.png"/>
                             </li>
                         </ul>
                     </li>
@@ -249,13 +249,13 @@
                 <p>
                     You should see the Orbeon Forms welcome page:
                 </p>
-                <figure src="/apps/doc/images/tutorial/02.png"/>
+                <figure src="../apps/doc/images/tutorial/02.png"/>
                 <p>
                     You can now navigate the list of sample applications listed on the left side. You can see the source
                     code of each application directly in your web browser by selecting the "View Source Code" tab at
                     the top of the page to open up the Orbeon Forms Source Viewer:
                 </p>
-                <figure src="/apps/doc/images/tutorial/00.png"/>
+                <figure src="../apps/doc/images/tutorial/00.png"/>
             </section>
         </section>
         <a name="hello-application"/>
@@ -275,12 +275,12 @@
                     Simply enter your first name in the input field, for example "Joe". You should promptly see a
                     message underneath saying "Hello, Joe!".
                 </p>
-                <figure src="/apps/doc/images/tutorial/03.png"/>
+                <figure src="../apps/doc/images/tutorial/03.png"/>
                 <p>
                     You can directly view the source code from your web browser by selecting the "View Source Code"
                     tab. There you see:
                 </p>
-                <figure src="/apps/doc/images/tutorial/04.png"/>
+                <figure src="../apps/doc/images/tutorial/04.png"/>
                 <ul>
                     <li>
                         <p>
@@ -660,7 +660,7 @@
                              Go back to the Hello application in your web browser and reload the page. You should see
                              the new text appear:
                         </p>
-                        <figure src="/apps/doc/images/tutorial/05.png"/>
+                        <figure src="../apps/doc/images/tutorial/05.png"/>
                     </li>
                     <li>
                         <p>
@@ -677,7 +677,7 @@
                            <code>incremental="true"</code> attribute allows the changes to occur as you type, instead of
                            occurring when you focus in and out of fields:
                         </p>
-                        <figure src="/apps/doc/images/tutorial/06.png"/>
+                        <figure src="../apps/doc/images/tutorial/06.png"/>
                     </li>
                 </ul>
                 <p>
@@ -698,7 +698,7 @@
                     is persisted so you can access it again. Then you can do cool things with the available data such
                     create an Atom feed of your entries.
                 </p>
-                <figure src="/apps/doc/images/tutorial/07.png"/>
+                <figure src="../apps/doc/images/tutorial/07.png"/>
                 <p>
                     You can run the final application <a href="/xforms-bookcast/">on your local Orbeon Forms install</a> or <a
                     href="http://www.orbeon.com/ops/xforms-bookcast/">online on the Orbeon web site</a>.
@@ -774,7 +774,7 @@
                 <p>
                     You should something like this:
                 </p>
-                <figure src="/apps/doc/images/tutorial/08.png"/>
+                <figure src="../apps/doc/images/tutorial/08.png"/>
                 <note>
                     <p>
                         If you get lost at some point in this tutorial, feel free to look at the reference
@@ -919,7 +919,7 @@
                 <p>
                     Reload the page. You should seem something like this:
                 </p>
-                <figure src="/apps/doc/images/tutorial/09.png"/>
+                <figure src="../apps/doc/images/tutorial/09.png"/>
                 <p>
                     After having looked at the Hello example, this should be clear, with a little novelty:
                     <code>&lt;xforms:group></code>: this element allows grouping XForms controls together. The
@@ -1061,7 +1061,7 @@
                 <p>
                     Reload the page. You should see the following:
                 </p>
-                <figure src="/apps/doc/images/tutorial/11.png"/>
+                <figure src="../apps/doc/images/tutorial/11.png"/>
                 <p>
                     You have just added a single selection control with <code>&lt;xforms:select1></code>. The name means
                     that the user can "select one" item among several items. (XForms tends to call controls using more
@@ -1263,7 +1263,7 @@
                 <p>
                     And this is how the result should look like:
                 </p>
-                <figure src="/apps/doc/images/tutorial/12.png"/>
+                <figure src="../apps/doc/images/tutorial/12.png"/>
                 <p>
                     By now you probably get the gist of it!
                 </p>
@@ -1416,7 +1416,7 @@
                             your browser, you tell it to do an HTTP GET instead, and the eXist database simply sends
                             the XML document to your browser. You should see this:
                         </p>
-                        <figure src="/apps/doc/images/tutorial/13.png"/>
+                        <figure src="../apps/doc/images/tutorial/13.png"/>
                     </li>
                 </ul>
                 <p>
@@ -1695,7 +1695,7 @@
                 <p>
                     Make the changes above, press on the "Add One" button, and you see a new row of controls created.
                 </p>
-                <figure src="/apps/doc/images/tutorial/14.png"/>
+                <figure src="../apps/doc/images/tutorial/14.png"/>
                 <p>
                     Again the XForms engine does its magic and takes care of updating the web page automatically. You
                     also notice that the web page does not reload as it updates. This is because Orbeon Forms uses Ajax
@@ -1768,7 +1768,7 @@
                     Now add the new trigger within <code>&lt;xforms:repeat></code> and reload the page. Try adding
                     books, then removing them by pressing the "Remove" button.
                 </p>
-                <figure src="/apps/doc/images/tutorial/15.png"/>
+                <figure src="../apps/doc/images/tutorial/15.png"/>
             </section>
             <a name="bookcast-revert-button"/>
             <section>
@@ -2070,7 +2070,7 @@
                 <p>
                     Reload the page, and you should see something like this:
                 </p>
-                <figure src="/apps/doc/images/tutorial/16.png"/>
+                <figure src="../apps/doc/images/tutorial/16.png"/>
                 <p>
                     A little bit of CSS does make things look a little better, doesn't it?
                 </p>
@@ -2269,7 +2269,7 @@
                     Try now making this change, enter an invalid link, and press the "Save" link: an alert message
                     should show up!
                 </p>
-                <figure src="/apps/doc/images/tutorial/17.png"/>
+                <figure src="../apps/doc/images/tutorial/17.png"/>
             </section>
             <a name="bookcast-atom-feed"/>
             <section>
@@ -2506,7 +2506,7 @@
             <p>
                 You should see something similar to this, depending on your browser:
             </p>
-            <figure src="/apps/doc/images/tutorial/19.png"/>
+            <figure src="../apps/doc/images/tutorial/19.png"/>
             <p>
                 To make things even better, add the following to <code>view.xhtml</code> under the
                 <code>&lt;head></code> element:
@@ -2516,14 +2516,14 @@
             </xml-source>
             <p>
                 With this addition, most modern browsers will display a feed icon <icon
-                src="/apps/doc/images/tutorial/feed-icon-14x14.png" alt="Feed Icon" width="14" height="14"/> or an RSS
+                src="../apps/doc/images/tutorial/feed-icon-14x14.png" alt="Feed Icon" width="14" height="14"/> or an RSS
                 icon, making the feed directly accessible from the main Bookcast page.
             </p>
             <p>
                 You can now try to load the feed into your favorite feed reader! Here is how the Bookcast feed looks in
                 the Mozilla Thunderbird feed reader:
             </p>
-            <figure src="/apps/doc/images/tutorial/20.png"/>
+            <figure src="../apps/doc/images/tutorial/20.png"/>
         </section>
         <a name="bookcast-next"/>
         <section>

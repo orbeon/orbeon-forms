@@ -71,10 +71,10 @@
                         <xsl:attribute name="src" select="substring(@src, string-length('/config/') + 1)"/>
                     </xsl:copy>
                 </xsl:template>
-                <xsl:template match="xhtml:img[starts-with(@src, '/images/')]">
+                <xsl:template match="xhtml:img[starts-with(@src, '../apps/doc/images/')]">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
-                        <xsl:attribute name="src" select="substring(@src, 2)"/>
+                        <xsl:attribute name="src" select="substring(@src, 13)"/>
                     </xsl:copy>
                 </xsl:template>
                 <xsl:template match="xhtml:a[@href = '/']" priority="100">

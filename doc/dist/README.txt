@@ -1,46 +1,42 @@
 =====================================================
 
-= = = =    Orbeon PresentationServer Read Me    = = =
+= = = =          Orbeon Forms Read Me           = = =
 
 =====================================================
 
-Copyright 1999-2006 (C) Orbeon, Inc. All rights reserved.
+Last updated for Orbeon Forms 3.5, February 2007
 
 This README.TXT file covers the following topics:
 
-    1. About Orbeon PresentationServer
+    1. About Orbeon Forms
     2. Licenses
     3. New Features
-    4. Software Prerequisites
-    5. Installing PresentationServer
-    6. Compiling PresentationServer
-    7. More Information
-    8. Known Issues
-    9. Third-Party Software
+    4. System Requirements and Installation
+    5. Compiling Orbeon Forms
+    6. More Information
+    7. Known Issues
+    8. Third-Party Software
 
-For more information, visit:
+
+****************************************
+1. About Orbeon Forms
+****************************************
+
+Orbeon Forms is an open source forms solution that handles the
+complexity of forms typical of the enterprise or government. It is
+brought to standard web browsers (including Internet Explorer,
+Firefox, Safari and Opera) thanks to Ajax technology, with no need for
+client-side software or plugins.
+
+Orbeon Forms allows you to build fully interactive forms with features
+that include as-you-type validation, optional and repeated sections,
+always up-to-date error summaries, PDF output, full
+internationalization, and controls like auto-completion, tabs, dialogs,
+trees and menus.
+
+For more information about Orbeon Forms, please visit:
 
   http://www.orbeon.com/
-
-
-****************************************
-1. About Orbeon PresentationServer
-****************************************
-
-Orbeon PresentationServer is an open source platform that uses standard
-XForms to make your form-based web applications more user-friendly and
-simpler to create.
-
-Unlike other web application frameworks based on Java objects or
-scripting languages, OPS is based on XML documents and XForms. This
-leads to an architecture perfectly suited for the tasks of capturing,
-processing, and presenting XML data, and does not require writing any
-Java or scripting code at all to implement a dynamic presentation layer
-for your web application.
-
-OPS is built around a user-friendly Ajax-based XForms engine, which
-brings standard W3C XForms to mainstream browsers, and the XPL engine,
-a mature, high-performance XML pipeline engine for processing XML data.
 
 
 ****************************************
@@ -49,7 +45,9 @@ a mature, high-performance XML pipeline engine for processing XML data.
 
 The source code is distributed under the terms of the GNU Lesser General
 Public License (LGPL). The full text of the license is available at
-http://www.gnu.org/copyleft/lesser.html.
+http://www.gnu.org/copyleft/lesser.html. LGPL is a business-friendly
+license that allows you to use Orbeon Forms for open source and
+commercial applications.
 
 Some examples are distributed under the terms of the Apache License,
 Version 2.0. The full text of the license is available at:
@@ -72,7 +70,7 @@ The documentation is subject to the following terms:
       of) the manual in another publication, prior written agreement
       from Orbeon, Inc. is required.
 
-See section 9 for more details about the licenses of included
+See section 8 for more details about the licenses of included
 third-party software.
 
 
@@ -90,67 +88,40 @@ or in this distribution under:
 
 
 ****************************************
-4. Software Prerequisites
+4. System Requirements and Installation
 ****************************************
 
-OPS has been tested on the following application servers:
-
-    * Apache Tomcat 5.5.20 with JDK 1.5.0
-    * BEA WebLogic Server 9.1
-    * IBM WebSphere 6
-    * JOnAS 4.6.6 (Tomcat 5.5.12, JDK 1.5.0)
-    * JBoss 4.0
-
-
-****************************************
-5. Installing OPS
-****************************************
-
-    * Download the OPS zip or tgz archive from
-      http://forge.objectweb.org/projects/ops
-
-    * Extract the archive in a directory that we call below:
-      OPS_HOME/
-
-After extraction, you will find the following files and directories
-under the root directory OPS_HOME/:
-
-    * README.txt: this document.
-
-    * ops.war: the Web Archive where the software, required
-      resources, and demo samples reside.
-
-    * doc: this directory contains the OPS documentation as static
-      HTML files, as well as the OPS 2.8 tutorial in PDF format
-      ("doc/OPS Tutorial.pdf").
-
-    * cli-examples: this directory contains command line examples.
-
-    * licenses: this directory contains third-party software licenses.
-
-You then need to deploy ops.war file to your servlet container or
-application server of choice. In the OPS documentation, you will find
-detailed installation instructions for several servlet containers /
-applications servers.
-
-More detailed information on installing OPS can be found in the
-documentation under OPS_HOME/doc/ in the "Installing" section, or
-directly online:
+The system requirements and installation procedure are detailed online
+at:
 
   http://www.orbeon.com/ops/doc/intro-install
 
+or in this distribution under:
+
+  doc/intro-install
+
+In addition, the Orbeon Forms tutorial also tackles installation. Online
+version:
+
+  http://www.orbeon.com/ops/doc/intro-tutorial
+
+or in this distribution under:
+
+  doc/intro-tutorial
+
 
 ****************************************
-6. Compiling OPS
+5. Compiling Orbeon Forms
 ****************************************
 
-For information about compiling OPS, please visit:
+You usually don't have to compile Orbeon Forms yourself, but for
+information about compiling Orbeon Forms from sources, please visit:
 
   http://www.orbeon.com/ops/doc/integration-development
 
 
 ****************************************
-7. More Information
+6. More Information
 ****************************************
 
 Here are some pointers to useful information related to this release.
@@ -159,14 +130,14 @@ Here are some pointers to useful information related to this release.
 
         http://www.orbeon.com/
 
-    * If you have questions, comments, or difficulties with OPS,
-      please subscribe to the ops-users mailing-list at ObjectWeb:
+    * If you have questions, comments, or difficulties with Orbeon
+      Forms, please subscribe to the ops-users mailing-list at:
 
-        http://www.objectweb.org/wws/info/ops-users
+        http://www.orbeon.com/forms/mailing-list
 
     * For commercial support and licensing alternatives, please visit:
 
-        http://www.orbeon.com/services/
+        http://www.orbeon.com/support-services/overview
 
       or contact us at:
 
@@ -174,7 +145,7 @@ Here are some pointers to useful information related to this release.
 
 
 ****************************************
-8. Known Issues
+7. Known Issues
 ****************************************
 
 For a list of known issues ordered by priority, consult the ObjectWeb
@@ -184,7 +155,7 @@ issue tracking system:
 
 
 ****************************************
-9. Third-Party Software
+8. Third-Party Software
 ****************************************
 
 This product includes software developed by the Apache Software Foundation
@@ -213,7 +184,6 @@ In addition, this product includes the following software:
     * Joost (http://joost.sourceforge.net/)
     * JTidy (http://sourceforge.net/projects/jtidy/)
     * JUnit (http://www.junit.org/)
-    * Mondrian (http://mondrian.sourceforge.net/)
     * Saxon (http://saxon.sourceforge.net/)
     * SAXPath (http://sourceforge.net/projects/saxpath/)
     * Sun Multi-Schema XML Validator
@@ -227,8 +197,6 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Last updated: August 2006
-
-Copyright 1999-2006 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2007 (C) Orbeon, Inc. All rights reserved.
 
 --

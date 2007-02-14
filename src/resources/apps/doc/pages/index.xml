@@ -33,52 +33,82 @@
                 internationalization, and controls like auto-completion, tabs, dialogs, trees and menus.
             </p>
             <p>
-                Unlike other web application frameworks based on Java objects or scripting languages, Orbeon Forms is based on
-                XML documents and XForms. This leads to an architecture perfectly suited for the tasks of capturing,
-                processing, and presenting XML data, and does not require writing any Java or scripting code at all to
-                implement a dynamic presentation layer for your web application.
-            </p>
-            <p>
-                Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings standard W3C XForms to
-                mainstream browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
+                Orbeon Forms is built around a user-friendly Ajax-based XForms engine, which brings standard W3C
+                XForms to mainstream browsers, and the <a href="reference-xpl-pipelines">XPL engine</a>, a mature,
                 high-performance XML pipeline engine for processing XML data.
             </p>
         </section>
-
         <section>
-            <title>Purpose of the User Guide</title>
+            <title>Getting Started</title>
             <p>
-                The purpose of this guide is to get you acquainted with the main components of Orbeon Forms:
+                If you are new to Orbeon Forms, we recommend that you first look at:
             </p>
             <ul>
                 <li>
                     <p>
-                        <a href="reference-xforms-ng"><b>XForms.</b></a> XForms is the W3C standard for creating
-                        complex web forms.
+                        The <a href="intro-tutorial">Orbeon Forms Tutorial</a>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <a href="reference-page-flow"><b>The Page Flow Controller (PFC).</b></a> The PFC is the heart
-                        of your Orbeon Forms application. It defines your application's pages and how you navigate
-                        between them.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <a href="reference-xpl-pipelines"><b>The XML Pipeline Definition Language (XPL).</b></a> XPL
-                        allows you to implement lightweight processes that handle XML data, without writing a single
-                        line of Java or other scripting language.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Orbeon Forms's built-in XML components.</b> The built-in Orbeon Forms XML components provide
-                        services such as accessing databases, performing data transformations, calling web services, and
-                        more. If you need more, you can write your own XML components.
+                        The <a href="/">Orbeon Forms example applications</a>.
                     </p>
                 </li>
             </ul>
+            <p>
+                Important parts of the documentation include:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        The <a href="/doc/home-faq">Frequently Asked Questions (FAQ)</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The <a href="/doc/reference-xforms-ng">XForms Reference</a>.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                For any further questions, you are invited to join the Orbeon Forms community <a
+                href="http://www.orbeon.com/forms/mailing-list">mailing-list</a>.
+            </p>
         </section>
+        <!--<section>-->
+            <!--<title>Purpose of the User Guide</title>-->
+            <!--<p>-->
+                <!--The purpose of this guide is to get you acquainted with the main components of Orbeon Forms:-->
+            <!--</p>-->
+            <!--<ul>-->
+                <!--<li>-->
+                    <!--<p>-->
+                        <!--<a href="reference-xforms-ng"><b>XForms.</b></a> XForms is the W3C standard for creating-->
+                        <!--complex web forms.-->
+                    <!--</p>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<p>-->
+                        <!--<a href="reference-page-flow"><b>The Page Flow Controller (PFC).</b></a> The PFC is the heart-->
+                        <!--of your Orbeon Forms application. It defines your application's pages and how you navigate-->
+                        <!--between them.-->
+                    <!--</p>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<p>-->
+                        <!--<a href="reference-xpl-pipelines"><b>The XML Pipeline Definition Language (XPL).</b></a> XPL-->
+                        <!--allows you to implement lightweight processes that handle XML data, without writing a single-->
+                        <!--line of Java or other scripting language.-->
+                    <!--</p>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<p>-->
+                        <!--<b>Orbeon Forms's built-in XML components.</b> The built-in Orbeon Forms XML components provide-->
+                        <!--services such as accessing databases, performing data transformations, calling web services, and-->
+                        <!--more. If you need more, you can write your own XML components.-->
+                    <!--</p>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</section>-->
     </body>
 </document>

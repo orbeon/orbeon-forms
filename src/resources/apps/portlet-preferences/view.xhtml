@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting">
+
+    <head>
+        <title>View Portlet Preferences</title>
+        <xforms:model>
+            <xforms:instance id="preferences">
+                <xi:include href="input:data"/>
+            </xforms:instance>
+        </xforms:model>
+        <style type="text/css">
+            .xforms-trigger img { vertical-align: middle }
+            .xforms-submit img { vertical-align: middle }
+            .ops-link img { vertical-align: middle }
+            .preferences-table { background-color: #fce5b6 }
+            .preferences-table th { padding: 2px }
+            .preferences-table td { background-color: white }
+        </style>
+    </head>
+    <body>
+        <p>
+            <a class="ops-link" href="/portlet-preferences/" f:portlet-mode="edit"><img src="/apps/portlet-preferences/images/edit.gif" alt="Edit Preferences"/> Edit Preferences</a>
+        </p>
+        <table class="preferences-table">
+            <tr>
+                <th>Preference Name</th>
+                <th>Preference Values</th>
+            </tr>
+            <xforms:repeat nodeset="instance('preferences')/preference">
+                <tr>
+                    <td>
+                        <xforms:output value="name"/>
+                    </td>
+                    <td>
+                        <xforms:output value="string-join(value, ', ')"/>
+                    </td>
+                </tr>
+            </xforms:repeat>
+        </table>
+    </body>
+</html>

@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2006 Orbeon, Inc.
+    Copyright (C) 2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,28 +15,8 @@
         xmlns:xu="http://www.xmldb.org/xupdate"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Files to serve directly -->
-    <files path-info="*.gif"/>
-    <files path-info="*.css"/>
-    <files path-info="*.pdf"/>
-    <files path-info="*.js"/>
-    <files path-info="*.png"/>
-    <files path-info="*.jpg"/>
-    <files path-info="*.xsd"/>
-    <files path-info="*.xml" mime-type="application/xml"/>
-    <files path-info="*.html" mime-type="text/html"/>
-    <files path-info="*.htm" mime-type="text/html"/>
-    <files path-info="*.java" mime-type="text/plain"/>
-    <files path-info="*.txt" mime-type="text/plain"/>
-    <files path-info="*.xq" mime-type="text/plain"/>
-
-    <!-- Home redirects to Welcome application -->
-    <page id="home" path-info="/">
-        <action><result page="welcome"/></action>
-    </page>
-
-    <!-- Welcome application -->
-    <page id="welcome" path-info="/welcome/" model="apps/welcome/page-flow.xml"/>
+    <!-- Home / welcome application -->
+    <page id="home" path-info="/" model="apps/portlet-welcome/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
     <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>
@@ -46,5 +26,5 @@
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>
-    
+
 </config>

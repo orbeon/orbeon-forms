@@ -1,15 +1,19 @@
 <?xml version="1.0" ?>
 <portlet-app>
     <portlet>
-        <portlet-name>Orbeon Forms Portlet</portlet-name>
+        <portlet-name>OrbeonFormsPortlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>edit</portlet-mode>
+        </supports>
         <init-param>
             <name>oxf.main-processor.name</name>
-            <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
         </init-param>
         <init-param>
-            <name>oxf.main-processor.input.controller</name>
-            <value>oxf:/my/page-flow.xml</value>
+            <name>oxf.main-processor.input.config</name>
+            <value>oxf:/config/prologue-portlet.xpl</value>
         </init-param>
         <init-param>
             <name>oxf.error-processor.name</name>
@@ -26,5 +30,15 @@
         <portlet-info>
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
+        <portlet-preferences>
+            <preference>
+                <name>web-site</name>
+                <value>http://www.orbeon.com/</value>
+            </preference>
+            <preference>
+                <name>favorite-animals</name>
+                <value>cat, dog</value>
+            </preference>
+        </portlet-preferences>
     </portlet>
 </portlet-app>

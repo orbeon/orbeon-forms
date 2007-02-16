@@ -79,7 +79,7 @@
         <include name="castor-0_9_4_3-xml.jar"/>
         <include name="antlr-2_7_4_orbeon.jar"/>
         <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
-        <include name="portlet-api_1.0.jar"/>
+        <!--<include name="portlet-api_1.0.jar"/>-->
 
         <!--<include name="exist-20060316.jar"/>-->
         <!--<include name="exist-optional-20060316.jar"/>-->
@@ -758,7 +758,7 @@
 
         <!-- Prepare Orbeon -->
         <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/ops-${release.number}"/>
-        <copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>
+        <!--<copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>-->
         <delete file="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml"/>
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl"
             out="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml">

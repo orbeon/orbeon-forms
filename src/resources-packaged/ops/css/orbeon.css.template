@@ -465,6 +465,8 @@ ul {
 }
 
 .ops-portlet-div { text-align: left; margin: 1em }
+.ops-portlet-content { }
+.ops-portlet-home { margin-top: 1em; font-style: italic }
 
 @media print {
     #orbeon-logo { display: none }

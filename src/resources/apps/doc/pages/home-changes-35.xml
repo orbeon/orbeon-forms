@@ -118,11 +118,11 @@
                     </li>
                     <li>
                         <p>
-                            <b>Support for Liferay portal.</b> Orbeon Forms, including XForms, now works within Liferay portal
-                            3.6.1 and 4.1.0. A new epilogue pipeline, <code>epilogue-portlet-liferay.xpl</code>, can
-                            now be used to deploy JSR-168 portlets into liferay, including multiple Orbeon Forms
-                            portlets at the
-                            same time.
+                            <b>Support for Liferay portal.</b> Orbeon Forms, including XForms functionality, is now able
+                            to deploy as JSR-168 portlets within Liferay portal (version 4.2.1 is the most recent tried,
+                            other versions and other portals may also work), including multiple Orbeon Forms portlets at
+                            the same time. For more information, see <a
+                            href="integration-portlets#portlet-deployment-liferay">Liferay Deployment</a>.
                         </p>
                         <p>
                             <i>This feature was kindly sponsored by Atkins Transport Systems.</i>

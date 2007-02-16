@@ -446,9 +446,9 @@
                     (JSR-168) compliant Liferay portal, thanks to kind sponsoring by Atkins Transport Systems.
                 </p>
                 <p>
-                    To do this, use the provided <code>epilogue-portlet-liferay.xpl</code> epilogue instead of the
-                    default <code>epilogue-portlet.xpl</code>. It is expected that Orbeon Forms will work within other
-                    JSR-168 portals, or that only minor adjustments will be needed in such cases.
+                    It is expected that Orbeon Forms will work within other JSR-168 portals, or that only minor
+                    adjustments will be needed in such cases. Please report your experience to the <a
+                    href="http://www.orbeon.com/forms/mailing-list">ops-users</a> mailing-list!
                 </p>
                 <p>
                     The great thing about Orbeon Forms and portlets is that there is very little difference if any
@@ -542,7 +542,7 @@
                     or the PFC. Users have been successfuylly using the Orbeon Forms XForms engine with JSP/Struts or
                     PHP. The bad news is that we haven't yet written as much documentation as we would want on this
                     topic. In the meanwhile, check <a href="/doc/integration-xforms-jsp">Using XForms with JSP</a> and
-                    post your questions to the <a href="http://www.orbeon.com/forms/download">ops-users</a>
+                    post your questions to the <a href="http://www.orbeon.com/forms/mailing-list">ops-users</a>
                     mailing-list.
                 </p>
             </section>

@@ -132,6 +132,47 @@
                 </li>
             </ul>
         </section>
+        <a name="portlet-deployment-liferay"/>
+        <section>
+            <title>Liferay Deployment</title>
+            <p>
+                The Orbeon Forms WAR can be directly deployed into the <a href="http://www.liferay.com/">Liferay</a>
+                portal. Follow the following steps with Liferay 4.2.1:
+            </p>
+            <ol>
+                <li>
+                    <p>
+                        Either enable Auto Deploy in the Liferay Admin portlet and drop <code>ops.war</code> into the
+                        Deploy Directory, or upload <code>ops.war</code> directly from the Liferay Admin portlet:
+                    </p>
+                    <figure src="../apps/doc/images/portlets/liferay01.png"/>
+                </li>
+                <li>
+                    <p>
+                        Create a new Liferay page called "Orbeon" and open that page. Move your mouse to the upper
+                        right corner and use the big "+" icon to add content:
+                    </p>
+                    <figure src="../apps/doc/images/portlets/liferay02.png"/>
+                </li>
+                <li>
+                    <p>
+                        You should see the Orbeon Form Portlet appear in the menu. Select "Add" to add the portlet to
+                        the page:
+                    </p>
+                    <figure src="../apps/doc/images/portlets/liferay03.png"/>
+                </li>
+                <li>
+                    <p>
+                        The portlet displays a welcome page with links to Orbeon Forms examples (here shown maximized):
+                    </p>
+                    <figure src="../apps/doc/images/portlets/liferay04.png"/>
+                </li>
+            </ol>
+            <p>
+                This is the "Flickr Resize" example running in the portlet:
+            </p>
+            <figure src="../apps/doc/images/portlets/liferay05.png"/>
+        </section>
         <a name="portlet-configuration"/>
         <section>
             <title>Configuration</title>
@@ -146,15 +187,19 @@
             <xml-source>
                 <portlet-app>
                     <portlet>
-                        <portlet-name>Orbeon Forms Portlet</portlet-name>
+                        <portlet-name>OrbeonFormsPortlet</portlet-name>
                         <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+                        <supports>
+                            <mime-type>text/html</mime-type>
+                            <portlet-mode>edit</portlet-mode>
+                        </supports>
                         <init-param>
                             <name>oxf.main-processor.name</name>
-                            <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
+                            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
                         </init-param>
                         <init-param>
-                            <name>oxf.main-processor.input.controller</name>
-                            <value>oxf:/my/page-flow.xml</value>
+                            <name>oxf.main-processor.input.config</name>
+                            <value>oxf:/config/prologue-portlet.xpl</value>
                         </init-param>
                         <init-param>
                             <name>oxf.error-processor.name</name>
@@ -185,9 +230,8 @@
         <section>
             <title>Portlet Output</title>
             <p>
-                The type of the portlet output is determined by the serializer. With the default
-                Orbeon Forms epilogue, the HTML serializer is used. The Simple Portlet
-                example illustrates how to use the XML Serializer instead.
+                The type of the portlet output is determined by the serializer. With the default Orbeon Forms epilogue
+                in <code>config/epilogue-portlet.xpl</code>, the HTML serializer is used.
             </p>
         </section>
         <a name="portlet-preferences"/>
@@ -269,7 +313,7 @@
             <img print-format="pdf" src="../apps/doc/images/integration-portlets-deployment.png" width="522" height="234"/>
             <p>
                 For more information, see <a href="integration-packaging">Packaging and Deployment</a>. Note that the
-                Page Flow Controller is always optional, but its use is typical.
+                use of the Page Flow Controller is optional but its use is typical.
             </p>
         </section>
         <a name="portlet-limitations"/>

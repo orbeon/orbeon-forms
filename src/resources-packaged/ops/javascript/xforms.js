@@ -1981,7 +1981,7 @@ ORBEON.xforms.Server = {
                                                     }
                                                 }
                                                 // Insert copy of template nodes
-                                                for (var templateNodeIndex in templateNodes) {
+                                                for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
                                                     templateNode = templateNodes[templateNodeIndex];
                                                     afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
                                                 }
@@ -2635,26 +2635,32 @@ ORBEON.xforms.Server = {
                                     // For each repeat id that changes, see if all the children are also included in
                                     // newRepeatIndexes. If they are not, add an entry with the index unchanged.
                                     for (var repeatId in newRepeatIndexes) {
-                                        var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
-                                        for (var childIndex in children) {
-                                            var child = children[childIndex];
-                                            if (!newRepeatIndexes[child])
-                                                newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
+                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                            var children = ORBEON.xforms.Globals.repeatTreeParentToAllChildren[repeatId];
+                                            if (children != null) { // test on null is a hack because repeatId may be trash when some libraries override Object
+                                                for (var childIndex in children) {
+                                                    var child = children[childIndex];
+                                                    if (!newRepeatIndexes[child])
+                                                        newRepeatIndexes[child] = ORBEON.xforms.Globals.repeatIndexes[child];
+                                                }
+                                            }
                                         }
                                     }
                                     // Unhighlight items at old indexes
                                     for (var repeatId in newRepeatIndexes) {
-                                        var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
-                                        if (oldIndex != 0) {
-                                            var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
-                                            if (oldItemDelimiter != null) {
-                                                var cursor = oldItemDelimiter.nextSibling;
-                                                while (cursor.nodeType != ELEMENT_TYPE ||
-                                                       (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                       && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
-                                                    if (cursor.nodeType == ELEMENT_TYPE)
-                                                        ORBEON.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
-                                                    cursor = cursor.nextSibling;
+                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                            var oldIndex = ORBEON.xforms.Globals.repeatIndexes[repeatId];
+                                            if (typeof oldIndex == "string" && oldIndex != 0) { // hack because repeatId may be trash when some libraries override Object
+                                                var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
+                                                if (oldItemDelimiter != null) {
+                                                    var cursor = oldItemDelimiter.nextSibling;
+                                                    while (cursor.nodeType != ELEMENT_TYPE ||
+                                                           (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                           && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                                        if (cursor.nodeType == ELEMENT_TYPE)
+                                                            ORBEON.util.Dom.removeClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                        cursor = cursor.nextSibling;
+                                                    }
                                                 }
                                             }
                                         }
@@ -2664,18 +2670,20 @@ ORBEON.xforms.Server = {
                                         var newIndex = newRepeatIndexes[repeatId];
                                         ORBEON.xforms.Globals.repeatIndexes[repeatId] = newIndex;
                                     }
-                                    // Highlight item a new index
+                                    // Highlight item at new index
                                     for (var repeatId in newRepeatIndexes) {
-                                        var newIndex = newRepeatIndexes[repeatId];
-                                        if (newIndex != 0) {
-                                            var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
-                                            var cursor = newItemDelimiter.nextSibling;
-                                            while (cursor.nodeType != ELEMENT_TYPE ||
-                                                   (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
-                                                   && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
-                                                if (cursor.nodeType == ELEMENT_TYPE)
-                                                    ORBEON.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
-                                                cursor = cursor.nextSibling;
+                                        if (typeof repeatId == "string") { // hack because repeatId may be trash when some libraries override Object
+                                            var newIndex = newRepeatIndexes[repeatId];
+                                            if (typeof newIndex == "string" && newIndex != 0) { // hack because repeatId may be trash when some libraries override Object
+                                                var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
+                                                var cursor = newItemDelimiter.nextSibling;
+                                                while (cursor.nodeType != ELEMENT_TYPE ||
+                                                       (!ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-delimiter")
+                                                       && !ORBEON.util.Dom.hasClass(cursor, "xforms-repeat-begin-end"))) {
+                                                    if (cursor.nodeType == ELEMENT_TYPE)
+                                                        ORBEON.util.Dom.addClass(cursor, xformsGetClassForRepeatId(repeatId));
+                                                    cursor = cursor.nextSibling;
+                                                }
                                             }
                                         }
                                     }

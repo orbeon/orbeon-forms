@@ -15,6 +15,7 @@
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -32,11 +33,9 @@
             <xforms:instance id="main-instance">
                 <form xmlns="">
                     <action>upload</action>
-
                     <file filename="" mediatype="" size="" selected="false"/>
                     <file filename="" mediatype="" size="" valid=""/>
                     <sample/>
-
                     <upload-trigger/>
                     <download-trigger/>
                     <sample-trigger/>
@@ -54,8 +53,9 @@
             <xforms:instance id="samples-instance">
                 <directory xmlns=""/>
             </xforms:instance>
-            <xforms:submission id="main-submission" method="post" replace="all" action="/xforms-sandbox/"/>
-            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance" action="/xforms-sandbox/service/get-files" serialize="false"/>
+            <xforms:submission id="upload-submission" method="post" replace="all" action="/xforms-sandbox/run"/>
+            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance"
+                    action="/xforms-sandbox/service/get-files" serialize="false"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .widget-tab-panel { padding-top: 1em; }
@@ -96,7 +96,7 @@
                             <td>
                                 <xforms:trigger ref="upload-trigger">
                                     <xforms:label>Run XForms</xforms:label>
-                                    <xforms:send ev:event="DOMActivate" submission="main-submission"/>
+                                    <xforms:send ev:event="DOMActivate" submission="upload-submission"/>
                                 </xforms:trigger>
                             </td>
                         </tr>
@@ -109,7 +109,7 @@
                         Please enter the HTTP URL of the XHTML + XForms to download from the web and run:
                     </p>
                     <xforms:group>
-                        <xforms:send ev:event="DOMActivate" submission="main-submission"/>
+                        <xforms:load ev:event="DOMActivate" resource="/xforms-sandbox/run?url={file[2]}"/>
                         <table style="width: 100%">
                             <tr>
                                 <td style="width: 100%">

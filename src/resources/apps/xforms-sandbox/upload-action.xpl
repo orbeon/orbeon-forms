@@ -12,19 +12,39 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param name="data" type="input"/>
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
+
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/parameters/parameter[name = 'url']</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
     <!-- Create URL generator configuration and generate data from the URL -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="instance" href="#instance"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config">
             <config xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                <url><xsl:value-of select="if (/*/action = 'upload') then /*/file[1] else /*/file[2]"/></url>
+                <xsl:variable name="instance" as="document-node()" select="doc('input:instance')"/>
+                <xsl:variable name="request" as="document-node()" select="doc('input:request')"/>
+                <xsl:variable name="url-parameter" as="xs:string?" select="$request/request/parameters/parameter/value"/>
+                <url>
+                    <!-- Also check that the URL supplied as a parameter starts with http:// for security reasons -->
+                    <xsl:value-of select="if ($instance/form) then $instance/form/file[1]
+                        else if (starts-with($url-parameter, 'http://')) then $url-parameter
+                        else ()"/>
+                </url>
                 <content-type>application/xml</content-type>
                 <force-content-type>true</force-content-type>
                 <cache-control>

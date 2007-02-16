@@ -35,7 +35,9 @@ public class XXFormsHideAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
 
-        // Dispatch xxforms-dialog-close event to dialog
-        containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogCloseEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId)));
+        if (dialogId != null) {
+            // Dispatch xxforms-dialog-close event to dialog
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogCloseEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId)));
+        }
     }
 }

@@ -35,7 +35,9 @@ public class XXFormsShowAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
         final String dialogId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("dialog"));
 
-        // Dispatch xxforms-dialog-open event to dialog
-        containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId)));
+        if (dialogId != null) {
+            // Dispatch xxforms-dialog-open event to dialog
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsDialogOpenEvent((XFormsEventTarget) xformsControls.getObjectById(dialogId)));
+        }
     }
 }

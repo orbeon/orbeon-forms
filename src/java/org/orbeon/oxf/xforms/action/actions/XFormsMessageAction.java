@@ -34,7 +34,7 @@ public class XFormsMessageAction extends XFormsAction {
 
         final String level;
         {
-            final String levelAttribute = actionElement.attributeValue("level");;
+            final String levelAttribute = actionElement.attributeValue("level");
             if (levelAttribute == null)
                 throw new OXFException("xforms:message element is missing mandatory 'level' attribute.");
             final QName levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
@@ -50,7 +50,7 @@ public class XFormsMessageAction extends XFormsAction {
 
         // Get message value
         // TODO: In the future, we should support HTML
-        final String messageValue = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, actionElement, false);
+        final String messageValue = XFormsUtils.getElementValue(pipelineContext, containingDocument, actionElement, false);
         if (messageValue != null) {
             // Store message for sending to client
             containingDocument.addMessageToRun(messageValue, level);

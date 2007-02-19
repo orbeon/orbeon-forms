@@ -452,10 +452,10 @@
                 </p>
                 <p>
                     The great thing about Orbeon Forms and portlets is that there is very little difference if any
-                    between writing an application working in a portlet vs. a servlet. In fact, all the Orbeon Forms
-                    XForms examples work unmodified as portlets. You can use some particularities of portlets, like
-                    preferences, and you have to be careful about paths to serve resources, but otherwise portlets are
-                    transparent to the developer. This contrasts with many other web platforms.
+                    between writing an application working in a portlet vs. a servlet. In fact, most of the Orbeon
+                    Forms XForms examples work unmodified as portlets. You can use some particularities of portlets,
+                    like preferences, and you have to be careful about paths to serve resources, but otherwise portlets
+                    are transparent to the developer. This contrasts with many other web platforms.
                 </p>
                 <p>
                     In other words, Orbeon Forms gives you the flexibility to write an application that works in

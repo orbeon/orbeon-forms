@@ -269,32 +269,42 @@ public class XFormsInsertAction extends XFormsAction {
                         // "d. Otherwise, the target location is immediately before or after the insert location
                         // node, based on the position attribute setting or its default."
 
-                        final Element parentNode = insertLocationNode.getParent();
-                        final List siblingElements = parentNode.content();
-                        final int actualIndex = siblingElements.indexOf(insertLocationNode);
+                        if (insertLocationNode.getNodeType() == org.dom4j.Node.ATTRIBUTE_NODE) {
+                            // Special case for attributes
 
-                        // Prepare insertion of new element
-                        final int actualInsertionIndex;
-                        if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
-                            actualInsertionIndex = actualIndex + 1;
-                        } else if ("before".equals(positionAttribute)) {
-                            actualInsertionIndex = actualIndex;
+                            // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but
+                            // the XForms spec shouldn't rely on attribute order. We could try to keep the order, but it
+                            // is harder as we have to deal with removing duplicate attributes and find a reasonable
+                            // insertion strategy.
+
+                            doInsert(insertLocationNode.getParent(), clonedNodes);
+
                         } else {
-                            throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
-                        }
+                            // Other node types
+                            final Element parentNode = insertLocationNode.getParent();
+                            final List siblingElements = parentNode.content();
+                            final int actualIndex = siblingElements.indexOf(insertLocationNode);
 
-                        // "7. The cloned node or nodes are inserted in the order they were cloned at their target
-                        // location depending on their node type."
-                        // TODO: check insertion of attributes!
+                            // Prepare insertion of new element
+                            final int actualInsertionIndex;
+                            if (positionAttribute == null || "after".equals(positionAttribute)) { // "after" is the default
+                                actualInsertionIndex = actualIndex + 1;
+                            } else if ("before".equals(positionAttribute)) {
+                                actualInsertionIndex = actualIndex;
+                            } else {
+                                throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after' if present.");
+                            }
 
-                        // Normalize text nodes if needed to respect XPath 1.0 constraint
-                        {
+                            // "7. The cloned node or nodes are inserted in the order they were cloned at their target
+                            // location depending on their node type."
+
                             boolean hasTextNode = false;
                             for (int i = 0; i < clonedNodes.size(); i++) {
                                 final Node clonedNode = (Node) clonedNodes.get(i);
                                 hasTextNode |= clonedNode.getNodeType() == org.dom4j.Node.TEXT_NODE;
                                 siblingElements.add(actualInsertionIndex + i, clonedNode);
                             }
+                            // Normalize text nodes if needed to respect XPath 1.0 constraint
                             if (hasTextNode)
                                 Dom4jUtils.normalizeTextNodes(parentNode);
                         }
@@ -326,7 +336,7 @@ public class XFormsInsertAction extends XFormsAction {
             // Insert inside an element
             final Element insertContextElement = (Element) insertionNode;
 
-            int attributeIndex = 0;
+//            int attributeIndex = 0;
             int otherNodeIndex = 0;
             for (int i = 0; i < clonedNodes.size(); i++) {
                 final Node clonedNode = (Node) clonedNodes.get(i);
@@ -336,9 +346,16 @@ public class XFormsInsertAction extends XFormsAction {
                     final Attribute clonedAttribute = (Attribute) clonedNode;
                     final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
                     if (existingAttribute != null)
-                        insertContextElement.attributes().remove(existingAttribute);
-                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
-                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
+                        insertContextElement.remove(existingAttribute);
+//                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
+//                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
+
+                    // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but the
+                    // XForms spec shouldn't rely on attribute order. We could try to keep the order, but it is harder
+                    // as we have to deal with removing duplicate attributes and find a reasonable insertion strategy.
+
+                    insertContextElement.add(clonedAttribute);
+
                 } else if (!(clonedNode instanceof Document)) {
                     // Add other node to element
                     insertContextElement.content().add(otherNodeIndex++, clonedNode);

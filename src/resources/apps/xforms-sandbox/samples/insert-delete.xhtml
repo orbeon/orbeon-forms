@@ -77,6 +77,11 @@
                 <xforms:insert ev:event="DOMActivate"
                         context="instance('main-instance')" origin="instance('books-instance')/book[1]/@*"/>
             </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label>Insert Attributes on Root Element (Node-Set)</xforms:label>
+                <xforms:insert ev:event="DOMActivate"
+                        nodeset="instance('main-instance')/@*" origin="instance('books-instance')/book[1]/@*"/>
+            </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
             <xforms:trigger>

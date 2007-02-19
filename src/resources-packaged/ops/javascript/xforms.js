@@ -624,10 +624,13 @@ ORBEON.xforms.Controls = {
      */
     setFocus: function(controlId) {
         var control = ORBEON.util.Dom.getElementById(controlId);
+        // TODO: getting elements by position is not very robust
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
             ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(control, 0), 0).focus();
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-autocomplete")) {
+            ORBEON.util.Dom.getChildElementByIndex(control, 0).focus();
         } else if (typeof control.focus != "undefined") {
             control.focus();
         }

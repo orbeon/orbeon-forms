@@ -294,7 +294,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
                 }
 
-                final boolean isDeferredSubmission = (isReplaceAll || serialize && isReplaceInstance && hasBoundRelevantUploadControl) && !isHandlingOptimizedGet;
+                final boolean isDeferredSubmission = (isReplaceAll && !isHandlingOptimizedGet) || (!isReplaceAll && serialize && hasBoundRelevantUploadControl);
                 final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
                 isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
 

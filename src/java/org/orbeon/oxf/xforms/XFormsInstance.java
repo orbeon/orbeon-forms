@@ -85,7 +85,7 @@ public class XFormsInstance implements XFormsEventTarget {
             try {
                 final String xmlString = containerElement.getStringValue();
                 if (!readonly) {
-                    documentInfo = new DocumentWrapper(Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, new Configuration());
+                    documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(Dom4jUtils.readDom4j(xmlString)), null, new Configuration());
                 } else {
 
                     if (xmlString.length() > 0) {
@@ -102,7 +102,7 @@ public class XFormsInstance implements XFormsEventTarget {
         } else {
             // Old serialization (instance is directly in the DOM)
             final Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) containerElement.elements().get(0));
-            documentInfo = new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
+            documentInfo = new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration());
         }
 
         setInstanceDocumentInfo(documentInfo, true);
@@ -110,7 +110,7 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public XFormsInstance(String modelId, String instanceId, Document instanceDocument, String instanceSourceURI, String username, String password, boolean applicationShared) {
         // We normalize the Document before setting it, so that text nodes follow the XPath constraints
-        this(modelId, instanceId, new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared);
+        this(modelId, instanceId, new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), instanceSourceURI, username, password, applicationShared);
     }
 
     protected XFormsInstance(String modelId, String instanceId, DocumentInfo instanceDocumentInfo, String instanceSourceURI, String username, String password, boolean applicationShared) {
@@ -249,7 +249,7 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param initialize        true if initial decoration (MIPs) has to be reset
      */
     public void setInstanceDocument(Document instanceDocument, boolean initialize) {
-        setInstanceDocumentInfo(new DocumentWrapper(Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize);
+        setInstanceDocumentInfo(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(instanceDocument), null, new Configuration()), initialize);
     }
 
     /**

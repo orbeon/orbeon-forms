@@ -66,7 +66,7 @@ public class XFormsInsertAction extends XFormsAction {
         actionInterpreter.pushContextAttributeIfNeeded(pipelineContext, actionElement);
 
         // We are now in the insert context
-        final NodeInfo insertContextNode;
+        final NodeInfo insertContextNodeInfo;
         {
             final List insertContextNodeset = xformsControls.getCurrentNodeset();
 
@@ -74,12 +74,12 @@ public class XFormsInsertAction extends XFormsAction {
             if (insertContextNodeset == null || insertContextNodeset.size() == 0 || !(insertContextNodeset.get(0) instanceof NodeInfo))
                 return;
 
-            insertContextNode = xformsControls.getCurrentSingleNode();
+            insertContextNodeInfo = xformsControls.getCurrentSingleNode();
         }
 
         // "The insert action is terminated with no effect if [...] b. The context attribute is given, the insert
         // context does not evaluate to an element node and the Node Set Binding node-set is the empty node-set."
-        if (contextAttribute != null && insertContextNode.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding)
+        if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding)
             return;
 
         {
@@ -112,7 +112,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                     // origin attribute in the insert context."
 
-                    final List originObjects = containingDocument.getEvaluator().evaluate(pipelineContext, insertContextNode,
+                    final List originObjects = containingDocument.getEvaluator().evaluate(pipelineContext, insertContextNodeInfo,
                         originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -148,8 +148,6 @@ public class XFormsInsertAction extends XFormsAction {
                             clonedNodesTemp.add(textNode);
                         }
                     }
-
-                    xformsControls.popBinding();
                 }
 
                 // We can never really insert a document into anything, but we assume that this means the root element
@@ -231,8 +229,20 @@ public class XFormsInsertAction extends XFormsAction {
                 // the first attribute of the insert location node. If the cloned node is not an attribute, then the
                 // target location is before the first child of the insert location node."
 
-                modifiedInstance = containingDocument.getInstanceForNode(insertContextNode);
-                doInsert(XFormsUtils.getNodeFromNodeInfo(insertContextNode, CANNOT_INSERT_READONLY_MESSAGE), clonedNodes);
+                modifiedInstance = containingDocument.getInstanceForNode(insertContextNodeInfo);
+                final Node insertContextNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
+                doInsert(insertContextNode, clonedNodes);
+
+                // Normalize text nodes if needed to respect XPath 1.0 constraint
+                {
+                    boolean hasTextNode = false;
+                    for (int i = 0; i < clonedNodes.size(); i++) {
+                        final Node clonedNode = (Node) clonedNodes.get(i);
+                        hasTextNode |= clonedNode.getNodeType() == org.dom4j.Node.TEXT_NODE;
+                    }
+                    if (hasTextNode)
+                        Dom4jUtils.normalizeTextNodes(insertContextNode);
+                }
             } else {
                 final NodeInfo insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
                 final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
@@ -253,6 +263,8 @@ public class XFormsInsertAction extends XFormsAction {
                         // first node that does not cause a conflict is considered."
 
                         doInsert(insertLocationNode.getDocument(), clonedNodes);
+
+                        // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
                     } else {
                         // "d. Otherwise, the target location is immediately before or after the insert location
                         // node, based on the position attribute setting or its default."
@@ -274,16 +286,21 @@ public class XFormsInsertAction extends XFormsAction {
                         // "7. The cloned node or nodes are inserted in the order they were cloned at their target
                         // location depending on their node type."
                         // TODO: check insertion of attributes!
-                        for (int i = 0; i < clonedNodes.size(); i++) {
-                            final Node clonedNode = (Node) clonedNodes.get(i);
-                            
-                            siblingElements.add(actualInsertionIndex + i, clonedNode);
+
+                        // Normalize text nodes if needed to respect XPath 1.0 constraint
+                        {
+                            boolean hasTextNode = false;
+                            for (int i = 0; i < clonedNodes.size(); i++) {
+                                final Node clonedNode = (Node) clonedNodes.get(i);
+                                hasTextNode |= clonedNode.getNodeType() == org.dom4j.Node.TEXT_NODE;
+                                siblingElements.add(actualInsertionIndex + i, clonedNode);
+                            }
+                            if (hasTextNode)
+                                Dom4jUtils.normalizeTextNodes(parentNode);
                         }
                     }
 //                }
             }
-
-            // TODO: Should normalize tree for text nodes or XPath will be messed-up!
 
             // Rebuild ControlsState
             xformsControls.rebuildCurrentControlsState(pipelineContext);

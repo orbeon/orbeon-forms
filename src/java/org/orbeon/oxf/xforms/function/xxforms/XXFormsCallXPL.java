@@ -202,7 +202,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                         DOMSerializer domSerializer = (DOMSerializer) i.next();
 
                         domSerializer.start(pipelineContext);
-                        results.add(new DocumentWrapper(Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null, new Configuration()));
+                        results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null, new Configuration()));
                     }
                     if (newPipelineContext && !pipelineContext.isDestroyed())
                         pipelineContext.destroy(true);

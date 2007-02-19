@@ -237,18 +237,18 @@ public class Dom4jUtils {
     }
 
     /**
-     * Go over the Document and make sure that there are no two contiguous text nodes so as to ensure that XPath
-     * expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
+     * Go over the Node and its children and make sure that there are no two contiguous text nodes so as to ensure that
+     * XPath expressions run correctly. As per XPath 1.0 (http://www.w3.org/TR/xpath):
      *
      * "As much character data as possible is grouped into each text node: a text node never has an immediately
      * following or preceding sibling that is a text node. "
      *
-     * @param document  Document to normalize
-     * @return          normalized Document (the same Document object, but children text nodes may have been adjusted)
+     * @param nodeToNormalize Node hiearchy to normalize
+     * @return                the input node, normalized
      */
-    public static Document normalizeTextNodes(Document document) {
+    public static Node normalizeTextNodes(Node nodeToNormalize) {
         final List nodesToDetatch = new ArrayList();
-        document.accept(new VisitorSupport() {
+        nodeToNormalize.accept(new VisitorSupport() {
             public void visit(Element element) {
                 final List children = element.content();
                 Node previousNode = null;
@@ -284,13 +284,13 @@ public class Dom4jUtils {
                 }
             }
         });
-        // Detach nodes in the end so as to not confuse the acceptor above
+        // Detach nodes only in the end so as to not confuse the acceptor above
         for (Iterator i = nodesToDetatch.iterator(); i.hasNext();) {
             final Node currentNode = (Node) i.next();
             currentNode.detach();
         }
 
-        return document;
+        return nodeToNormalize;
     }
 
     public static DocumentSource getDocumentSource(final Document d) {

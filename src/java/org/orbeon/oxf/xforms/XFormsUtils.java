@@ -1306,8 +1306,8 @@ public class XFormsUtils {
     public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo, String errorMessage) {
         if (nodeInfo instanceof NodeWrapper)
             return getNodeFromNodeInfo(nodeInfo, errorMessage);
-
-        return TransformerUtils.tinyTreeToDom4j2((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
+        else
+            return TransformerUtils.tinyTreeToDom4j2((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }
 
     /**

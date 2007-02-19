@@ -20,10 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Useful functions for handling repeat indexes.
@@ -113,10 +110,10 @@ public class XFormsIndexUtils {
      * @param pipelineContext
      * @param xformsControls
      * @param currentControlsState
-     * @param clonedNode
+     * @param clonedNodes
      */
     public static void ajustIndexesAfterInsert(PipelineContext pipelineContext, final XFormsControls xformsControls,
-                                               final XFormsControls.ControlsState currentControlsState, final Node clonedNode) {
+                                               final XFormsControls.ControlsState currentControlsState, final List clonedNodes) {
 
         // NOTE: The code below assumes that there are no nested repeats bound to node-sets that intersect
         currentControlsState.visitControlsFollowRepeats(pipelineContext, xformsControls, new XFormsControls.XFormsControlVisitorListener() {
@@ -134,30 +131,51 @@ public class XFormsIndexUtils {
                         // We are not yet inside a matching xforms:repeat
 
                         if (repeatNodeSet != null && repeatNodeSet.size() > 0) {
-                            // Find whether one node of the repeat node-set contains the inserted node
-                            int index = 1;
-                            for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); index++) {
-                                final NodeInfo currentNode = (NodeInfo) i.next();
-                                if (((NodeWrapper) currentNode).getUnderlyingNode() == clonedNode) {
-                                    // Found xforms:repeat affected by the change
+                            // Find whether one node of the repeat node-set contains one of the inserted nodes
 
-                                    // "The index for any repeating sequence that is bound
-                                    // to the homogeneous collection where the node was
-                                    // added is updated to point to the newly added node."
-                                    currentControlsState.updateRepeatIndex(repeatId, index);
+                            int newRepeatIndex = -1;
+                            {
+                                int clonedNodesIndex = -1;
+                                int currentRepeatIndex = 1;
+                                for (Iterator i = repeatNodeSet.iterator(); i.hasNext(); currentRepeatIndex++) {
+                                    final NodeInfo currentNodeInfo = (NodeInfo) i.next();
+                                    final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                                    // First step: set all children indexes to 0
-                                    final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
-                                    if (nestedRepeatIds != null) {
-                                        for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
-                                            final String nestedRepeatId = (String) j.next();
-                                            currentControlsState.updateRepeatIndex(nestedRepeatId, 0);
+                                    final int currentNodeIndex = clonedNodes.indexOf(currentNode);
+
+                                    if (currentNodeIndex != -1) {
+                                        // This node of the repeat node-set points to an inserted node
+                                        if (currentNodeIndex > clonedNodesIndex) {
+                                            clonedNodesIndex = currentNodeIndex; // prefer nodes inserted last
+                                            newRepeatIndex = currentRepeatIndex;
                                         }
-                                    }
 
-                                    foundXFormsControl = XFormsControl;
-                                    break;
+                                        // Stop if this node of the repeat node-set points to the last inserted node
+                                        if (clonedNodesIndex == clonedNodes.size() - 1)
+                                            break;
+                                    }
                                 }
+                            }
+
+                            if (newRepeatIndex != -1) {
+
+                                // This xforms:repeat affected by the change
+
+                                // "The index for any repeating sequence that is bound
+                                // to the homogeneous collection where the node was
+                                // added is updated to point to the newly added node."
+                                currentControlsState.updateRepeatIndex(repeatId, newRepeatIndex);
+
+                                // First step: set all children indexes to 0
+                                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(xformsControls, repeatId);
+                                if (nestedRepeatIds != null) {
+                                    for (Iterator j = nestedRepeatIds.iterator(); j.hasNext();) {
+                                        final String nestedRepeatId = (String) j.next();
+                                        currentControlsState.updateRepeatIndex(nestedRepeatId, 0);
+                                    }
+                                }
+
+                                foundXFormsControl = XFormsControl;
                             }
 
                             if (foundXFormsControl == null) {

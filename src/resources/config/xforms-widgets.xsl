@@ -224,7 +224,7 @@
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:delete while="exists(instance('orbeon-xforms-instance-inspector-instance')/xml-output/node())"
                                             nodeset="instance('orbeon-xforms-instance-inspector-instance')/xml-output/node()"/>
-                                    <xforms:insert
+                                    <xforms:insert if="instance('orbeon-xforms-instance-inspector-instance')/xpath != ''"
                                             context="instance('orbeon-xforms-instance-inspector-instance')/xml-output"
                                             origin="xxforms:instance(instance('orbeon-xforms-instance-inspector-instance')/current-instance)/
                                                 saxon:evaluate(instance('orbeon-xforms-instance-inspector-instance')/xpath)"/>

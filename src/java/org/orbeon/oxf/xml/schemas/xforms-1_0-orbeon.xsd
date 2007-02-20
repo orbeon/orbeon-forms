@@ -657,8 +657,7 @@
     <xsd:element name="refresh">
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <xsd:attribute name="model" type="xsd:IDREF" use="required"/>
-
+            <xsd:attribute name="model" type="xsd:IDREF" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>
@@ -741,8 +740,8 @@
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Nodeset.Binding.Attributes"/>
-
             <xsd:attribute name="at" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="context" use="optional"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
     </xsd:element>

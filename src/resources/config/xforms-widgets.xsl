@@ -167,39 +167,42 @@
                             </xforms:select1>
                         </xhtml:td>
                         <xhtml:td>
-                            <!-- Model section -->
-                            <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model) gt 1]">
-                                <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-model">
-                                    <xforms:label>Model: </xforms:label>
-                                    <xforms:itemset nodeset="instance('orbeon-xforms-instance-inspector-itemset')/model">
-                                        <xforms:label ref="@id"/>
-                                        <xforms:value ref="@id"/>
-                                    </xforms:itemset>
-                                    <xforms:action ev:event="xforms-value-changed">
-                                        <xforms:setvalue ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance"/>
-                                    </xforms:action>
-                                </xforms:select1>
-                            </xforms:group>
-                            <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model) = 1]">
-                                <xforms:output value="instance('orbeon-xforms-instance-inspector-instance')/current-model">
-                                    <xforms:label>Model: </xforms:label>
-                                </xforms:output>
-                            </xforms:group>
-                            <xhtml:span>&#160;</xhtml:span>
-                            <!-- Instance selection -->
-                            <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) gt 1]">
-                                <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
-                                    <xforms:label>Instance: </xforms:label>
-                                    <xforms:itemset nodeset="instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance">
-                                        <xforms:label ref="@id"/>
-                                        <xforms:value ref="@id"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xforms:group>
-                            <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) = 1]">
-                                <xforms:output ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
-                                    <xforms:label>Instance: </xforms:label>
-                                </xforms:output>
+                            <xforms:group>
+                                <xforms:dispatch ev:event="xforms-value-changed" name="DOMActivate" target="orbeon-xforms-instance-inspector-xpath"/>
+                                <!-- Model section -->
+                                <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model) gt 1]">
+                                    <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-model">
+                                        <xforms:label>Model: </xforms:label>
+                                        <xforms:itemset nodeset="instance('orbeon-xforms-instance-inspector-itemset')/model">
+                                            <xforms:label ref="@id"/>
+                                            <xforms:value ref="@id"/>
+                                        </xforms:itemset>
+                                        <xforms:action ev:event="xforms-value-changed">
+                                            <xforms:setvalue ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance"/>
+                                        </xforms:action>
+                                    </xforms:select1>
+                                </xforms:group>
+                                <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model) = 1]">
+                                    <xforms:output value="instance('orbeon-xforms-instance-inspector-instance')/current-model">
+                                        <xforms:label>Model: </xforms:label>
+                                    </xforms:output>
+                                </xforms:group>
+                                <xhtml:span>&#160;</xhtml:span>
+                                <!-- Instance selection -->
+                                <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) gt 1]">
+                                    <xforms:select1 ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
+                                        <xforms:label>Instance: </xforms:label>
+                                        <xforms:itemset nodeset="instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance">
+                                            <xforms:label ref="@id"/>
+                                            <xforms:value ref="@id"/>
+                                        </xforms:itemset>
+                                    </xforms:select1>
+                                </xforms:group>
+                                <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) = 1]">
+                                    <xforms:output ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
+                                        <xforms:label>Instance: </xforms:label>
+                                    </xforms:output>
+                                </xforms:group>
                             </xforms:group>
                         </xhtml:td>
                     </xhtml:tr>
@@ -222,13 +225,25 @@
                                             nodeset="instance('orbeon-xforms-instance-inspector-instance')/xml-output/node()"/>
                                     <xforms:insert
                                             context="instance('orbeon-xforms-instance-inspector-instance')/xml-output"
-                                            origin="saxon:evaluate(instance('orbeon-xforms-instance-inspector-instance')/xpath)"/>
+                                            origin="xxforms:instance(instance('orbeon-xforms-instance-inspector-instance')/current-instance)/
+                                                saxon:evaluate(instance('orbeon-xforms-instance-inspector-instance')/xpath)"/>
                                 </xforms:action>
                                 <xforms:input ref="." id="orbeon-xforms-instance-inspector-xpath">
                                     <xforms:label>XPath expression: </xforms:label>
                                 </xforms:input>
                                 <xforms:trigger ref=".">
                                     <xforms:label>Run XPath</xforms:label>
+                                    <xforms:help>
+                                        <xhtml:ul>
+                                            <xhtml:li>
+                                                To trigger the evaluation of your expression, either press on the "Run
+                                                XPath" button or just enter in the text field.
+                                            </xhtml:li>
+                                            <xhtml:li>
+                                                Your XPath expression is evaluated on the currently selected instance.
+                                            </xhtml:li>
+                                        </xhtml:ul>
+                                    </xforms:help>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:td>
@@ -329,7 +344,6 @@
                 <xforms:bind nodeset="current-instance" readonly="false()"
                              calculate="if (. = '') then instance('orbeon-xforms-instance-inspector-itemset')
                              /model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance[1]/@id else ."/>
-                <xforms:bind nodeset="current-model | current-instance" readonly="../function != 'view-instance'"/>
                 <xforms:bind nodeset="xpath" readonly="../function != 'evaluate-xpath'"/>
             </xforms:bind>
             <xforms:setvalue ev:event="xforms-ready"

@@ -29,10 +29,10 @@
                 </sandbox-instance>
             </xforms:instance>
             <xforms:bind nodeset="formatted-output"
-                calculate="xxforms:call-xpl
+                calculate="xxforms:serialize(xxforms:call-xpl
                                 ('oxf:/apps/sandbox-xpath/run-xpath.xpl', ('input', 'xpath'),
                                 (instance('instance')/input, instance('instance')/xpath),
-                                'formatted-output')"/>
+                                'formatted-output')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

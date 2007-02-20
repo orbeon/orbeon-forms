@@ -14,6 +14,7 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="data" type="input"/>
@@ -22,15 +23,11 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#data"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:saxon="http://saxon.sf.net/">
-                <xsl:include href="xml-formatting.xsl"/>
-                <xsl:output method="html" omit-xml-declaration="yes" name="html-output"/>
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="formatting.xsl"/>
                 <xsl:template match="/">
                     <div>
-                        <xsl:variable name="formatted-xml">
-                            <xsl:apply-templates select="/*/node()" mode="xml-formatting"/>
-                        </xsl:variable>
-                        <xsl:value-of select="saxon:serialize($formatted-xml, 'html-output')"/>
+                        <xsl:apply-templates select="/*/node()" mode="xml-formatting"/>
                     </div>
                 </xsl:template>
             </xsl:stylesheet>

@@ -280,11 +280,10 @@
                         <xforms:group ref=".[self::*]">
                             <xforms:group ref=".[instance('orbeon-xforms-instance-inspector-instance')/mode = 'formatted']">
                                 <xforms:output mediatype="text/html"
-                                        value="if (exists(*)) then xxforms:serialize(xxforms:call-xpl(
+                                        value="xxforms:serialize(xxforms:call-xpl(
                                                 concat('oxf:/ops/utils/formatting/format',
                                                 if (instance('orbeon-xforms-instance-inspector-instance')/function = 'evaluate-xpath') then '-multiple' else '',
-                                                '.xpl'), 'data', ., 'data')/*, 'html')
-                                                else ."/>
+                                                '.xpl'), 'data', ., 'data')/*, 'html')"/>
                             </xforms:group>
                             <xforms:group ref=".[instance('orbeon-xforms-instance-inspector-instance')/mode = 'plain']">
                                 <xforms:output mediatype="text/html"

@@ -321,7 +321,7 @@ public class XPathCache {
                             public Executable getExecutable() {
                                 return new Executable() {
                                     {
-                                        setFunctionLibrary(functionLibrary);
+                                        setFunctionLibrary(independentContext.getFunctionLibrary());
                                         setLocationMap(new LocationMap());
                                     }
                                 };

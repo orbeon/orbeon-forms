@@ -660,7 +660,9 @@ public class XFormsServer extends ProcessorImpl {
                         if (xformsControl1 == null && xformsControl2.isStaticReadonly() && xformsControl2.isRelevant())
                             attributesImpl.addAttribute("", "static", "static", ContentHandlerHelper.CDATA, "true");
 
-                        if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
+                        if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl)
+                                && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)
+                                && !(xformsControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsControl2.getAppearance()))) {
                             // Don't send anything if nothing has changed
                             // But we force a change for controls whose values changed in the request
                             // Also, we don't output anything for triggers in static readonly mode
@@ -830,7 +832,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Handle itemsets
-                        if (xformsControl2 instanceof XFormsSelect1Control || xformsControl2 instanceof XFormsSelectControl) {
+                        if (xformsControl2 instanceof XFormsSelect1Control) {
                             final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsControl1;
                             final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 
@@ -971,7 +973,9 @@ public class XFormsServer extends ProcessorImpl {
                 // Output diffs between controlInfo1 and controlInfo2
 
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.get(xformsControl2.getEffectiveId()) != null;
-                if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl) && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)) {
+                if ((!xformsControl2.equals(xformsControl1) || isValueChangeControl)
+                        && !(isStaticReadonly && xformsControl2.isReadonly() && xformsControl2 instanceof XFormsTriggerControl)
+                        && !(xformsControl2 instanceof XFormsGroupControl && XFormsGroupControl.INTERNAL_APPEARANCE.equals(xformsControl2.getAppearance()))) {
                     // Don't send anything if nothing has changed
                     // But we force a change for controls whose values changed in the request
                     // Also, we don't output anything for triggers in static readonly mode
@@ -1149,7 +1153,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Handle itemsets
-                if (xformsControl2 instanceof XFormsSelect1Control || xformsControl2 instanceof XFormsSelectControl) {
+                if (xformsControl2 instanceof XFormsSelect1Control) {
                     final XFormsSelect1Control xformsSelect1Control1 = (XFormsSelect1Control) xformsControl1;
                     final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 

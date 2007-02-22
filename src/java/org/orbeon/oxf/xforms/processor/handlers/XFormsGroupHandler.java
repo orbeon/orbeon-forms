@@ -30,6 +30,7 @@ public class XFormsGroupHandler extends HandlerBase {
     protected String effectiveGroupId;
     private XFormsControl groupXFormsControl;
     private boolean isFieldsetAppearance;
+    private boolean isInternalAppearance;
 
     public XFormsGroupHandler() {
         super(false, true);
@@ -37,9 +38,12 @@ public class XFormsGroupHandler extends HandlerBase {
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        effectiveGroupId = handlerContext.getEffectiveId(attributes);
+        // Special appearance that does not output any HTML. This is temporary until xforms:group is correctly supported within xforms:repeat.
+        isInternalAppearance = XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME.equals(getAppearance(attributes));
+        if (isInternalAppearance)
+            return;
 
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        effectiveGroupId = handlerContext.getEffectiveId(attributes);
         isFieldsetAppearance = XFormsConstants.XXFORMS_FIELDSET_APPEARANCE_QNAME.equals(getAppearance(attributes));
 
         // Find classes to add
@@ -54,6 +58,8 @@ public class XFormsGroupHandler extends HandlerBase {
         final String groupElementName = isFieldsetAppearance ? "fieldset" : "span";
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
+
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
         // xforms:label
@@ -78,6 +84,9 @@ public class XFormsGroupHandler extends HandlerBase {
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
+
+        if (isInternalAppearance)
+            return;
 
         // Close xhtml:span
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();

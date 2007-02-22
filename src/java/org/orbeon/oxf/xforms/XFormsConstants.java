@@ -95,6 +95,7 @@ public class XFormsConstants {
     public static final QName XFORMS_COPY_QNAME = new QName("copy", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_OUTPUT_QNAME = new QName("output", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_LOAD_QNAME = new QName("load", XFormsConstants.XFORMS_NAMESPACE);
 
     public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
     public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
@@ -153,6 +154,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_IMAGE_APPEARANCE_QNAME = new QName("image", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_HTML_APPEARANCE_QNAME = new QName("html", XFormsConstants.XXFORMS_NAMESPACE);// legacy
     public static final QName XXFORMS_FIELDSET_APPEARANCE_QNAME = new QName("fieldset", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_INTERNAL_APPEARANCE_QNAME = new QName("internal", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNALIZE_QNAME = new QName("externalize", XFormsConstants.XXFORMS_NAMESPACE);

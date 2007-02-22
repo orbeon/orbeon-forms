@@ -570,6 +570,7 @@
           <arg value='--rsh=/usr/bin/ssh' />
           <arg value='build.log' />
           <arg value='ops.war' />
+          <arg value='ops-${release.number}.zip' />
           <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
         </exec>
 

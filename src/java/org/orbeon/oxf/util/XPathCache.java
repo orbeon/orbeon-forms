@@ -323,6 +323,7 @@ public class XPathCache {
                                     {
                                         setFunctionLibrary(independentContext.getFunctionLibrary());
                                         setLocationMap(new LocationMap());
+                                        setConfiguration(independentContext.getConfiguration());
                                     }
                                 };
                             }

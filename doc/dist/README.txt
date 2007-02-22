@@ -24,9 +24,9 @@ This README.TXT file covers the following topics:
 
 Orbeon Forms is an open source forms solution that handles the
 complexity of forms typical of the enterprise or government. It is
-brought to standard web browsers (including Internet Explorer,
-Firefox, Safari and Opera) thanks to Ajax technology, with no need for
-client-side software or plugins.
+delivered to standard web browsers (including Internet Explorer,
+Firefox, Safari and Opera) thanks to XForms and Ajax technology, with
+no need for client-side software or plugins.
 
 Orbeon Forms allows you to build fully interactive forms with features
 that include as-you-type validation, optional and repeated sections,

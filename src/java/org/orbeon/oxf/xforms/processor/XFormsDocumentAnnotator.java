@@ -62,10 +62,17 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
 
                     private int currentId = 1;
                     private Locator documentLocator;
+                    private int level = 0;
+                    private int xformsInstanceLevel = -1;
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-                        if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+                        level++;
+
+                        if (xformsInstanceLevel >= 0) {
+                            // Don't generate ids within an XForms instance, 
+                            super.startElement(uri, localname, qName, attributes);
+                        } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
                             // This is an XForms element
 
                             final int idIndex = attributes.getIndex("id");
@@ -101,6 +108,12 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                             currentId++;
 
                             super.startElement(uri, localname, qName, attributes);
+
+                            if ("instance".equals(localname)) { // NOTE: this catches xforms:instance AND xxforms:instance (shouldn't be a problem...)
+                                // Remember we are inside an instance
+                                xformsInstanceLevel = level;
+                            }
+
                         } else if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri) && isHostLanguageAVTs) {
                             // This is an XHTML element
 
@@ -135,7 +148,14 @@ public class XFormsDocumentAnnotator extends ProcessorImpl {
                     }
 
                     public void endElement(String uri, String localname, String qName) throws SAXException {
+
+                        if (level == xformsInstanceLevel) {
+                            // Exiting xforms:instance
+                            xformsInstanceLevel = -1;
+                        }
+
                         super.endElement(uri, localname, qName);
+                        level--;
                     }
 
                     public void setDocumentLocator(Locator locator) {

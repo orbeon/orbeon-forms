@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2007 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller">
@@ -19,14 +19,6 @@
 
     <!-- Bookcast application Atom feed -->
     <page path-info="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
-
-    <!--<page path-info="/xforms-bookcast/summary" default-submission="parameters.xml" view="summary.xhtml">-->
-        <!--<setvalue ref="/parameters/book-id" parameter="book-id"/>-->
-    <!--</page>-->
-
-    <!--<page path-info="/xforms-bookcast/detail" default-submission="parameters.xml" view="detail.xhtml">-->
-        <!--<setvalue ref="/parameters/book-id" parameter="book-id"/>-->
-    <!--</page>-->
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

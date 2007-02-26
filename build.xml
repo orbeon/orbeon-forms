@@ -568,6 +568,7 @@
         <!-- Post the unstable build -->
         <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
           <arg value='--stats' />
+          <arg value='--delete' />
           <arg value='-z' />
           <arg value='-c' />
           <arg value='--rsh=/usr/bin/ssh' />

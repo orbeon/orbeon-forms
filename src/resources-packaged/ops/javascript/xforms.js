@@ -93,6 +93,8 @@ ORBEON.xforms.Globals = {
     debugDiv: null,                      // Points to the div when debug messages are displayed
     debugLastTime: new Date().getTime(), // Timestamp when the last debug message was printed
     pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
+    menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
+    menuYui: {},                         // Maps menu id to the YUI object for that menu
 
     // Data relative to a form is stored in an array indexed by the position of the form on the page.
     // Use ORBEON.util.Dom.getFormIndex(form) to get the index of a given form on the page
@@ -624,7 +626,7 @@ ORBEON.xforms.Controls = {
      */
     setFocus: function(controlId) {
         var control = ORBEON.util.Dom.getElementById(controlId);
-        // TODO: getting elements by position is not very robust
+        // To-do: getting elements by position is not very robust
         if (ORBEON.util.Dom.hasClass(control, "xforms-input")) {
             ORBEON.util.Dom.getChildElementByIndex(control, 1).focus();
         } else if (ORBEON.util.Dom.hasClass(control, "xforms-select-appearance-full")) {
@@ -1073,6 +1075,47 @@ ORBEON.xforms.Events = {
             // Click on remove icon in upload control
             if (ORBEON.util.Dom.hasClass(target, "xforms-upload") && ORBEON.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
                 xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", "")), false);
+            }
+
+            // Click on menu item
+            if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-menu")) {
+
+                // Find what is the position in the hiearchy of the item
+                var positions = [];
+                var currentParent = originalTarget.parentNode;
+                while (true) {
+                    if (currentParent.tagName.toLowerCase() == "li") {
+                        // Get the position of this li, and add it to positions
+                        var liPosition = 0;
+                        while (true) {
+                            var previousSibling = currentParent.previousSibling;
+                            if (previousSibling == null) break;
+                            currentParent = previousSibling;
+                            if (currentParent.nodeType == ELEMENT_TYPE && currentParent.tagName.toLowerCase() == "li") liPosition++;
+                        }
+                        positions.push(liPosition);
+                    } else if (currentParent.tagName.toLowerCase() == "div" && ORBEON.util.Dom.hasClass(currentParent, "yuimenubar")) {
+                        // Got to the top of the tree
+                        break;
+                    }
+                    currentParent = currentParent.parentNode;
+                }
+                positions = positions.reverse();
+
+                // Find value for this item
+                var currentLevel = ORBEON.xforms.Globals.menuItemsets[target.id];
+                var increment = 0;
+                for (var positionIndex = 0; positionIndex < positions.length; positionIndex++) {
+                    var position = positions[positionIndex];
+                    currentLevel = currentLevel[position + increment];
+                    increment = 3;
+                }
+
+                // Send value change to server
+                var itemValue = currentLevel[1];
+                xformsFireEvents(new Array(xformsCreateEventArray(target, "xxforms-value-change-with-focus-change", itemValue)), false);
+                // Close the menu
+                ORBEON.xforms.Globals.menuYui[target.id].clearActiveItem();
             }
         }
     },
@@ -1534,14 +1577,14 @@ ORBEON.xforms.Init = {
     },
 
     _menu: function (menu) {
-        // Find the divs for the tree and for the values inside the control
-        var treeDiv;
+        // Find the divs for the YUI menu and for the values inside the control
+        var yuiMenuDiv;
         var valuesDiv;
         for (var j = 0; j < menu.childNodes.length; j++) {
             var childNode =  menu.childNodes[j];
             if (childNode.nodeType == ELEMENT_TYPE) {
                 if (ORBEON.util.Dom.hasClass(childNode, "yuimenubar")) {
-                    treeDiv = childNode;
+                    yuiMenuDiv = childNode;
                 } else if (ORBEON.util.Dom.hasClass(childNode, "xforms-initially-hidden")) {
                     valuesDiv = childNode;
                 }
@@ -1552,23 +1595,17 @@ ORBEON.xforms.Init = {
         var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);
         menuString = ORBEON.util.String.replace(menuString, "\n", " ");
         menuString = ORBEON.util.String.replace(menuString, "\r", " ");
-        var menuArray = eval(menuString);
-        ORBEON.util.Dom.setStringValue(valuesDiv, "");
+        ORBEON.xforms.Globals.menuItemsets[menu.id] = eval(menuString);
+
         // Initialize tree
-        YAHOO.util.Dom.generateId(treeDiv);
-        menu.xformsMenu = new YAHOO.widget.MenuBar(treeDiv.id, {
-            autosubmenudisplay:true,
-            showdelay:250,
-            hidedelay:750
+        YAHOO.util.Dom.generateId(yuiMenuDiv);
+        var yuiMenu = new YAHOO.widget.MenuBar(yuiMenuDiv.id, {
+            autosubmenudisplay: true,
+            hidedelay: 750,
+            lazyload: true
         });
-        for (var topLevelIndex = 0; topLevelIndex < menu.xformsMenu.getItemGroups()[0].length; topLevelIndex++) {
-            var topLevelArray = menuArray[topLevelIndex];
-            var menuItem = menu.xformsMenu.getItem(topLevelIndex);
-            ORBEON.xforms.Init._addToMenuItem(menu, topLevelArray, menuItem);
-        }
-        menu.xformsMenu.render();
-        menu.xformsMenu.show();
-        ORBEON.util.Dom.removeClass(menu, "xforms-initially-hidden");
+        yuiMenu.render();
+        ORBEON.xforms.Globals.menuYui[menu.id] = yuiMenu;
     },
 
     /**

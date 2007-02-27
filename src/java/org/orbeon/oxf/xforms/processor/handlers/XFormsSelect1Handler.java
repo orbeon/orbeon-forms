@@ -258,7 +258,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                             private boolean groupJustStarted = false;
 
-                            public void startGroup(ContentHandler contentHandler, int level) throws SAXException {
+                            public void startLevel(ContentHandler contentHandler, int level) throws SAXException {
 
                                 reusableAttributes.clear();
                                 final String className;
@@ -282,7 +282,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 groupJustStarted = true;
                             }
 
-                            public void endGroup(ContentHandler contentHandler, int level) throws SAXException {
+                            public void endLevel(ContentHandler contentHandler, int level) throws SAXException {
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
@@ -290,7 +290,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 groupJustStarted = false;
                             }
 
-                            public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
+                            public void startItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
 
                                 final String className;
                                 {
@@ -311,6 +311,12 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 contentHandler.characters(text.toCharArray(), 0, text.length());
 
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+
+                                groupJustStarted = false;
+                            }
+
+
+                            public void endItem(ContentHandler contentHandler) throws SAXException {
                                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
 
                                 groupJustStarted = false;
@@ -350,18 +356,18 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                             private int optgroupCount = 0;
 
-                            public void startGroup(ContentHandler contentHandler, int level) throws SAXException {
+                            public void startLevel(ContentHandler contentHandler, int level) throws SAXException {
                                 // NOP
                             }
 
-                            public void endGroup(ContentHandler contentHandler, int level) throws SAXException {
+                            public void endLevel(ContentHandler contentHandler, int level) throws SAXException {
                                 if (optgroupCount-- > 0) {
                                     // End xhtml:optgroup
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                                 }
                             }
 
-                            public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
+                            public void startItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
 
                                 final String label = item.getLabel();
                                 final String value = item.getValue();
@@ -377,6 +383,10 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                                 } else {
                                     handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, item);
                                 }
+                            }
+
+
+                            public void endItem(ContentHandler contentHandler) throws SAXException {
                             }
                         });
                     }
@@ -426,6 +436,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         if (items.size() > 0) { // may be null when there is no item in the itemset
 
             int currentLevel = 0;
+            int startItemCount = 0;
             for (Iterator j = items.iterator(); j.hasNext();) {
                 final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
 
@@ -434,30 +445,46 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                 if (newLevel < currentLevel) {
                     //  We are going down one or more levels
                     for (int i = currentLevel; i > newLevel; i--) {
-                        listener.endGroup(contentHandler, i);
+                        listener.endItem(contentHandler);
+                        startItemCount--;
+                        if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                        listener.endLevel(contentHandler, i);
                     }
+                    listener.endItem(contentHandler);
+                    startItemCount--;
+                    if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
                 } else if (newLevel > currentLevel) {
                     // We are going up one or more levels
                     for (int i = currentLevel + 1; i <= newLevel; i++) {
-                        listener.startGroup(contentHandler, i);
+                        listener.startLevel(contentHandler, i);
                     }
+                } else {
+                    // Same level as previous item
+                    listener.endItem(contentHandler);
+                    startItemCount--;
+                    if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
                 }
 
-                listener.outputItem(contentHandler, currentItem);
+                startItemCount++;
+                listener.startItem(contentHandler, currentItem);
                 currentLevel = newLevel;
             }
 
             // Make sure we go back down all levels
             for (int i = currentLevel; i > 0; i--) {
-                listener.endGroup(contentHandler, i);
+                listener.endItem(contentHandler);
+                startItemCount--;
+                if (startItemCount < 0) throw new OXFException("Too many endItem() generated.");
+                listener.endLevel(contentHandler, i);
             }
         }
     }
 
     private interface TreeListener {
-        public void startGroup(ContentHandler contentHandler, int level) throws SAXException;
-        public void endGroup(ContentHandler contentHandler, int level) throws SAXException;
-        public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException;
+        public void startLevel(ContentHandler contentHandler, int level) throws SAXException;
+        public void endLevel(ContentHandler contentHandler, int level) throws SAXException;
+        public void startItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException;
+        public void endItem(ContentHandler contentHandler) throws SAXException;
     }
 
     private void outputJSONTreeInfo(XFormsSelect1Control xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {

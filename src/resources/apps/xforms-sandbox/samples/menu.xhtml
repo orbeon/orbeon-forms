@@ -62,77 +62,13 @@
             <xforms:output ref="select1"/>
         </xhtml:p>
 
-        <!--<xforms:select1 ref="select1" appearance="xxforms:menu">-->
-            <!--<xforms:itemset nodeset="instance('items')//item">-->
-                <!--<xforms:label ref="@label"/>-->
-                <!--<xforms:value ref="@value"/>-->
-            <!--</xforms:itemset>-->
-        <!--</xforms:select1>-->
+        <xforms:select1 ref="select1" appearance="xxforms:menu">
+            <xforms:itemset nodeset="instance('items')//item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </xforms:select1>
 
-        <div id="xforms-element-5" class="xforms-control xforms-select1
-                xforms-select1-appearance-xxforms-menu" xmlns="http://www.w3.org/1999/xhtml">
-            <div class="yuimenubar">
-                 <div class="bd">
-                     <ul class="first-of-type">
-                         <li class="yuimenubaritem first-of-type"><a href="#">Encyclopedia</a>
-                             <div class="yuimenu">
-                                 <div class="bd">
-                                     <ul>
-                                         <li class="yuimenuitem"><a href="#">Science</a></li>
-                                         <li class="yuimenuitem"><a href="#">Culture</a>
-                                             <div class="yuimenu">
-                                                 <div class="bd">
-                                                     <ul class="first-of-type">
-                                                         <li class="yuimenuitem"><a href="#">Art</a></li>
-                                                         <li class="yuimenuitem"><a href="#">Craft</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                         </li>
-                                     </ul>
-                                 </div>
-                             </div>
-                         </li>
-                         <li class="yuimenubaritem"><a href="#">Encyclopedia</a>
-                             <div class="yuimenu">
-                                 <div class="bd">
-                                     <ul>
-                                         <li class="yuimenuitem"><a href="#">Science</a></li>
-                                         <li class="yuimenuitem"><a href="#">Culture</a>
-                                             <div class="yuimenu">
-                                                 <div class="bd">
-                                                     <ul>
-                                                         <li class="yuimenuitem"><a href="#">Art</a></li>
-                                                         <li class="yuimenuitem"><a href="#">Craft</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                         </li>
-                                     </ul>
-                                 </div>
-                             </div>
-                        </li>
-                     </ul>
-                 </div>
-            </div>
-            <div class="xforms-initially-hidden">[
-                ["Encyclopedia","en1",false,
-                    ["Science","sc1",false],
-                        [
-                            "Culture",
-                            "cu1",
-                            false,
-                            ["Art","ar1",true],
-                            ["Craft","cr1",false]
-                        ]
-                    ],
-                ["Encyclopedia","en2",false,
-                    ["Science","sc2",false],
-                    ["Culture","cu2",false,
-                        ["Art","ar2",false],
-                        ["Craft","cr2",false]]]]
-            </div>
-        </div>
 
     </xhtml:body>
 </xhtml:html>

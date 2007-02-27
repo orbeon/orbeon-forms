@@ -237,9 +237,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                     handleReadOnlyAttribute(newAttributes, containingDocument, xformsSelect1Control);
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
-
                     outputJSONTreeInfo(xformsSelect1Control, isMany, contentHandler);
-
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else if (isMenu) {
@@ -255,52 +253,71 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, newAttributes);
 
                     // Create xhtml:div with initial menu entries
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "yuimenubar");
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                     {
-                        reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
-                        {
-                            reusableAttributes.clear();
-                            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first");
+                        outputTree(contentHandler, items, new TreeListener() {
 
-                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
-                            if (items != null) {
+                            private boolean groupJustStarted = false;
+
+                            public void startGroup(ContentHandler contentHandler, int level) throws SAXException {
+
                                 reusableAttributes.clear();
-
-                                int index = 0;
-                                for (Iterator j = items.iterator(); j.hasNext(); index++) {
-                                    final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
-
-                                    // Only care about item at level 1
-                                    if (currentItem.getLevel() != 1)
-                                        continue;
-
-                                    reusableAttributes.clear();
-                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
-                                            (index == 0) ? "yuimenubaritem first" : "yuimenubaritem");
-
-                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
-
-                                    {
-                                        reusableAttributes.clear();
-                                        reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-                                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
-                                        final String text = currentItem.getLabel();
-                                        contentHandler.characters(text.toCharArray(), 0, text.length());
-                                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
-                                    }
-
-                                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
+                                final String className;
+                                {
+                                    if (level == 1)
+                                        className = "yuimenubar";
+                                    else
+                                        className = "yuimenu";
                                 }
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, className);
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "first-of-type");
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
+
+                                groupJustStarted = true;
                             }
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
-                        }
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
+                            public void endGroup(ContentHandler contentHandler, int level) throws SAXException {
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName);
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
+
+                                groupJustStarted = false;
+                            }
+
+                            public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
+
+                                final String className;
+                                {
+                                    if (item.getLevel() == 1)
+                                        className = "yuimenubaritem";
+                                    else
+                                        className = "yuimenuitem";
+                                }
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, className + (groupJustStarted ? " first-of-type" : ""));
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
+
+                                reusableAttributes.clear();
+                                reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
+
+                                final String text = item.getLabel();
+                                contentHandler.characters(text.toCharArray(), 0, text.length());
+
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName);
+
+                                groupJustStarted = false;
+                            }
+                        });
+
                     }
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                     // Create xhtml:div with tree info
                     reusableAttributes.clear();
@@ -328,52 +345,40 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
                     final String optionQName = XMLUtils.buildQName(xhtmlPrefix, "option");
                     final String optGroupQName = XMLUtils.buildQName(xhtmlPrefix, "optgroup");
 
-                    int optgroupCount = 0;
-
                     if (items != null) {
-                        int level = 0;
-                        for (Iterator j = items.iterator(); j.hasNext();) {
-                            final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
-                            final String value = currentItem.getValue();
+                        outputTree(contentHandler, items, new TreeListener() {
 
-                            final int newLevel = currentItem.getLevel();
+                            private int optgroupCount = 0;
 
-                            if (newLevel < level) {
-                                //  We are going down one or more levels
-                                for (int i = newLevel; i < level; i++) {
+                            public void startGroup(ContentHandler contentHandler, int level) throws SAXException {
+                                // NOP
+                            }
+
+                            public void endGroup(ContentHandler contentHandler, int level) throws SAXException {
+                                if (optgroupCount-- > 0) {
                                     // End xhtml:optgroup
-                                    optgroupCount--;
-                                    if (optgroupCount < 0)
-                                        throw new OXFException("Incorrect SAX being generated for select control with id: " + id);
                                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
                                 }
                             }
 
-                            if (value == null) {
-                                // Starting a new group
+                            public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException {
 
-                                final String label = currentItem.getLabel();
-                                final AttributesImpl optGroupAttributes = getAttributes(new AttributesImpl(), null, null);
-                                if (label != null)
-                                    optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+                                final String label = item.getLabel();
+                                final String value = item.getValue();
 
-                                // Start xhtml:optgroup
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
-                                optgroupCount++;
-                            } else {
-                                // Adding a new item
-                                handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, currentItem);
+                                if (value == null) {
+                                    final AttributesImpl optGroupAttributes = getAttributes(new AttributesImpl(), null, null);
+                                    if (label != null)
+                                        optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+
+                                    // Start xhtml:optgroup
+                                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName, optGroupAttributes);
+                                    optgroupCount++;
+                                } else {
+                                    handleItemCompact(contentHandler, optionQName, xformsSelect1Control, isMany, item);
+                                }
                             }
-
-                            level = newLevel;
-                        }
-
-                        // Close unclosed optgroups
-                        while (optgroupCount > 0) {
-                            // End xhtml:optgroup
-                            optgroupCount--;
-                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "optgroup", optGroupQName);
-                        }
+                        });
                     }
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "select", selectQName);
                 }
@@ -417,6 +422,44 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         handleLabelHintHelpAlert(effectiveId, "hint", xformsSelect1Control);
     }
 
+    private void outputTree(ContentHandler contentHandler, List items, TreeListener listener) throws SAXException {
+        if (items.size() > 0) { // may be null when there is no item in the itemset
+
+            int currentLevel = 0;
+            for (Iterator j = items.iterator(); j.hasNext();) {
+                final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
+
+                final int newLevel = currentItem.getLevel();
+
+                if (newLevel < currentLevel) {
+                    //  We are going down one or more levels
+                    for (int i = currentLevel; i > newLevel; i--) {
+                        listener.endGroup(contentHandler, i);
+                    }
+                } else if (newLevel > currentLevel) {
+                    // We are going up one or more levels
+                    for (int i = currentLevel + 1; i <= newLevel; i++) {
+                        listener.startGroup(contentHandler, i);
+                    }
+                }
+
+                listener.outputItem(contentHandler, currentItem);
+                currentLevel = newLevel;
+            }
+
+            // Make sure we go back down all levels
+            for (int i = currentLevel; i > 0; i--) {
+                listener.endGroup(contentHandler, i);
+            }
+        }
+    }
+
+    private interface TreeListener {
+        public void startGroup(ContentHandler contentHandler, int level) throws SAXException;
+        public void endGroup(ContentHandler contentHandler, int level) throws SAXException;
+        public void outputItem(ContentHandler contentHandler, XFormsSelect1Control.Item item) throws SAXException;
+    }
+
     private void outputJSONTreeInfo(XFormsSelect1Control xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
         if (xformsControl != null && !handlerContext.isGenerateTemplate()) {
             // Produce a JSON fragment with hierachical information
@@ -435,7 +478,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
                     final int newLevel = currentItem.getLevel();
 
-                    if (level - newLevel >= 0) {
+                    if (newLevel <= level) {
                         //  We are going down one or more levels
                         for (int i = newLevel; i <= level; i++) {
                             sb.append("]");

@@ -206,7 +206,7 @@ public class XFormsInsertAction extends XFormsAction {
             // Prepare switches
             for (int i = 0; i < sourceNodes.size(); i++) {
                 final Node sourceNode = (Node) sourceNodes.get(i);
-                if (sourceNode != null) { // may be null when source is an item
+                if (sourceNode != null && XFormsUtils.getLocalInstanceData(sourceNode) != null) { // 1) may be null when source is an item 2) may be null when source is from a read-only instance
                     final Node clonedNode = (Node) clonedNodes.get(i);
                     XFormsSwitchUtils.prepareSwitches(xformsControls, sourceNode, clonedNode);
                 }

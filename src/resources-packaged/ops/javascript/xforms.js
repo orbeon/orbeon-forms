@@ -1082,7 +1082,7 @@ ORBEON.xforms.Events = {
 
                 // Find what is the position in the hiearchy of the item
                 var positions = [];
-                var currentParent = originalTarget.parentNode;
+                var currentParent = originalTarget;
                 while (true) {
                     if (currentParent.tagName.toLowerCase() == "li") {
                         // Get the position of this li, and add it to positions

@@ -327,7 +327,7 @@
                 </xml-source>
                 <p>
                     The first thing you notice is that this looks very much like HTML (notice the <code>&lt;html></code>
-                    tag). But in fact, this is XHTML, the XML-compatible version of XHTML. There are only a few
+                    tag). But in fact, this is XHTML, the XML-compatible version of HTML. There are only a few
                     differences that matter between HTML and XHTML, in particular you must close all your tags and use
                     quotes around attributes. Also, you must place your tags in a <i>namespace</i>, which is why the
                     <code>&lt;html></code> tag features the <code>xmlns="http://www.w3.org/1999/xhtml"</code>

@@ -62,7 +62,6 @@
                 </xhtml:script>
             </xsl:if>
             <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css"/>
-            <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
         </xsl:copy>
     </xsl:template>
 

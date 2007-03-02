@@ -95,6 +95,7 @@ ORBEON.xforms.Globals = {
     pageLoadedRegistered: false,         // If the page loaded listener has been registered already, to avoid running it more than once
     menuItemsets: {},                    // Maps menu id to structure defining the content of the menu
     menuYui: {},                         // Maps menu id to the YUI object for that menu
+    treeYui: {},                         // Maps tree id to the YUI object for that tree
 
     // Data relative to a form is stored in an array indexed by the position of the form on the page.
     // Use ORBEON.util.Dom.getFormIndex(form) to get the index of a given form on the page
@@ -1203,7 +1204,7 @@ ORBEON.xforms.Events = {
      */
     treeSelectSelect: function(id, value) {
         var control = ORBEON.util.Dom.getElementById(id);
-        var yuiTree = control.xformsTree;
+        var yuiTree = ORBEON.xforms.Globals.treeYui[control.id];
         var yuiNode = yuiTree.getNodeByProperty("value", value);
 
         // If checked uncheck, if unchecked check
@@ -1523,13 +1524,14 @@ ORBEON.xforms.Init = {
         ORBEON.util.Dom.setStringValue(tree, "");
         tree.value = "";
         // Create, populate, and show the tree
-        tree.xformsTree = new YAHOO.widget.TreeView(tree.id);
-        var treeRoot = tree.xformsTree.getRoot();
+        var yuiTree = new YAHOO.widget.TreeView(tree.id);
+        ORBEON.xforms.Globals.treeYui[tree.id] = yuiTree;
+        var treeRoot = yuiTree.getRoot();
         ORBEON.xforms.Init._addToTree(tree, treeArray, treeRoot, 0);
-        // Make selected nodes visible'
+        // Make selected nodes visible
         var values = tree.xformsAllowMultipleSelection ? tree.value.split(" ") : [ tree.value ];
-        for (nodeIndex in tree.xformsTree._nodes) {
-            var node = tree.xformsTree._nodes[nodeIndex];
+        for (nodeIndex in yuiTree._nodes) {
+            var node = yuiTree._nodes[nodeIndex];
             if (xformsArrayContains(values, node.data.value)) {
                 var nodeParent = node.parent;
                 while (nodeParent != null) {
@@ -1540,7 +1542,7 @@ ORBEON.xforms.Init = {
         }
         // Save value in tree
         tree.previousValue = tree.value;
-        tree.xformsTree.draw();
+        yuiTree.draw();
         ORBEON.util.Dom.removeClass(tree, "xforms-initially-hidden");
     },
 
@@ -2401,8 +2403,9 @@ ORBEON.xforms.Server = {
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")) {
                                                         // Tree
                                                         var values = newControlValue.split(" ");
-                                                        for (nodeIndex in documentElement.xformsTree._nodes) {
-                                                            var node = documentElement.xformsTree._nodes[nodeIndex];
+                                                        var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
+                                                        for (nodeIndex in yuiTree._nodes) {
+                                                            var node = yuiTree._nodes[nodeIndex];
                                                             if (node.children.length == 0) {
                                                                 var checked = xformsArrayContains(values, node.data.value);
                                                                 if (checked) node.check(); else node.uncheck();

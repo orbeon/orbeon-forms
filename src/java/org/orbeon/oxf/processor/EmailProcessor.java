@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -24,6 +25,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -44,6 +46,8 @@ import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.*;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -68,6 +72,7 @@ import java.util.Properties;
  * o build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 public class EmailProcessor extends ProcessorImpl {
+	static private Logger logger = LoggerFactory.createLogger(EmailProcessor.class);
 
     // Properties for this processor
     public static final String EMAIL_SMTP_HOST = "smtp-host";
@@ -120,8 +125,37 @@ public class EmailProcessor extends ProcessorImpl {
                 }
             }
 
+            // Get credentials
+            Element credentials = messageElement.element("credentials");
+
+            // Create session variable, but don't assign it
+            Session session = null;
+
+            // Check if credentials are supplied
+            if(credentials != null && !credentials.equals("")) {
+            	if(logger.isInfoEnabled())
+            		logger.info("Authentication");
+            	// Set the auth property to true
+            	properties.setProperty("mail.smtp.auth", "true");
+
+            	String username = credentials.element("username").getStringValue();
+            	String password = credentials.element("password").getStringValue();
+
+            	if(logger.isInfoEnabled())
+            		logger.info("Username: "+username+"; Password: "+password);
+
+            	// Create an authenticator
+            	Authenticator auth = new SMTPAuthenticator(username,password);
+
+            	// Create session with auth
+            	session = Session.getInstance(properties,auth);
+            } else {
+            	if(logger.isInfoEnabled())
+            		logger.info("No Authentication");
+            	session = Session.getInstance(properties);
+            }
+
             // Create message
-            Session session = Session.getInstance(properties);
             Message message = new MimeMessage(session);
 
             // Set From
@@ -509,6 +543,20 @@ public class EmailProcessor extends ProcessorImpl {
         } catch (IOException e) {
             throw new OXFException(e);
         }
+    }
+
+    private class SMTPAuthenticator extends javax.mail.Authenticator {
+    	private String username;
+    	private String password;
+
+    	public SMTPAuthenticator(String user, String pass){
+    		username = user;
+    		password = pass;
+}
+
+    	public PasswordAuthentication getPasswordAuthentication() {
+    		return new PasswordAuthentication(username,password);
+    	}
     }
 }
 

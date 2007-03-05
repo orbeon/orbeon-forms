@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -460,7 +461,13 @@ public class XFormsInstance implements XFormsEventTarget {
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-        // NOP
+        final String eventName = event.getEventName();
+        if (XFormsEvents.XXFORMS_INSTANCE_INVALIDATE.equals(eventName)) {
+            // Invalidate instance if it is shared read-only
+            if (applicationShared) {
+                XFormsServerSharedInstancesCache.instance().remove(pipelineContext, sourceURI);
+            }
+        }
     }
 
     /**

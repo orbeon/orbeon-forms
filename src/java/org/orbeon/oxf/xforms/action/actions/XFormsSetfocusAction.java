@@ -35,11 +35,24 @@ public class XFormsSetfocusAction extends XFormsAction {
         final XFormsControls xformsControls = actionInterpreter.getXFormsControls();
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
-        final String controlId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("control"));
-        if (controlId == null)
-            throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
-        final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(controlId);
 
+        final String controlIdAttributeValue = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("control"));
+        if (controlIdAttributeValue == null)
+            throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
+
+        final XFormsControls.BindingContext bindingContext = xformsControls.getCurrentBindingContext();
+        final String resolvedControlId;
+        {
+            // NOP if there is an AVT but no context node
+            if (bindingContext.getSingleNode() == null && controlIdAttributeValue.indexOf('{') != -1)
+                return;
+
+            // Resolve AVT
+            resolvedControlId = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
+                    null, xformsControls.getFunctionLibrary(), actionElement, controlIdAttributeValue);
+        }
+
+        final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(resolvedControlId);
 
         // "4.7 Resolving ID References in XForms [...] a null search result for an IDREF resolution is handled
         // differently depending on the source object. If there is a null search result for the target object and the
@@ -49,7 +62,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (effectiveControlId == null) {
             return;
            // TODO: It would be nice to have a warning mechanism in place to help the developer
-//            throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + controlId);
+//            throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + resolvedControlId);
         }
 
         final Object controlObject = containingDocument.getObjectById(pipelineContext, effectiveControlId);
@@ -57,7 +70,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         if (!(controlObject instanceof XFormsControl)) {
             return;
             // TODO: It would be nice to have a warning mechanism in place to help the developer
-//            throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
+//            throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + resolvedControlId);
         }
 
         containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));

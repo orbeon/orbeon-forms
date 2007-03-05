@@ -71,6 +71,16 @@
                     <td>The SMTP host used to send the message</td>
                 </tr>
                 <tr>
+                    <td>message/credentials/username</td>
+                    <td>0..1</td>
+                    <td>The SMTP username</td>
+                </tr>
+                <tr>
+                    <td>message/credentials/password</td>
+                    <td>0..1</td>
+                    <td>The SMTP password</td>
+                </tr>
+                <tr>
                     <td>message/from</td>
                     <td>1</td>
                     <td>Sender of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>

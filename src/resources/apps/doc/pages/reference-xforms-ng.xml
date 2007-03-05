@@ -3493,6 +3493,17 @@
                     <xml-source>
                         <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="10"/>
                     </xml-source>
+                    <p>
+                        You can force the XForms engine to remove a shared instance from the cache by dispatching the
+                        <code>xxforms-instance-invalidate</code> event to it. The next time an XForms document requires
+                        this instance, it will not be found in the cache and therefore reloaded. Example:
+                    </p>
+                    <xml-source>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:send submission="save-submission"/>
+                            <xforms:dispatch name="xxforms-instance-invalidate" target="data-to-save-instance"/>
+                        </xforms:action>
+                    </xml-source>
                     <warning>
                         When using <code>xxforms:shared="application"</code>, be sure that the data contained in the
                         instance does not contain information that could be inadvertently shared with other XForms

@@ -145,10 +145,9 @@ public class XFormsResourceServer extends ProcessorImpl {
                                 url = content.substring(newIndex + 4, closingIndex);
                                 index = closingIndex + 1;
                             }
-                            // Rewrite URL and output it
-                            // TODO: use absolute path only?
+                            // Rewrite URL and output it as an absolute path
                             final URI resolvedURI = resourceURI.resolve(url.trim());
-                            outputWriter.write("url(" + resolvedURI.toString() + ")");
+                            outputWriter.write("url(" + resolvedURI.getPath() + ")");
                         }
                     }
                 }

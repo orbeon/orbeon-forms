@@ -3367,14 +3367,36 @@
                 <title>Other Extensions</title>
                 <a name="submission-auth-extension"/>
                 <section>
-                    <title>XForms Submission</title>
+                    <title>XForms Submission - HTTP Authentication</title>
                     <p>
                         The <code>xforms:submission</code> element supports optional <code>xxforms:username</code> and
-                        <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials:
+                        <code>xxforms:password</code> attributes that allow specifying HTTP authentication credentials.
+                        You can specify either both attributes, or only the <code>xxforms:username</code> attribute. The
+                        latter case is equivalent to setting the value of <code>xxforms:password</code> to an empty
+                        string.
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:submission id="save-submission" ref="instance('my-instance')"
                                    method="put" action="/exist/rest/ops/my-file.xml" replace="none" xxforms:username="admin" xxforms:password=""/>
+                    </xml-source>
+                </section>
+                <a name="submission-show-progress"/>
+                <section>
+                    <title>XForms Submission - Loading Indicator</title>
+                    <p>
+                        When an <code>xforms:submission</code> with <code>replace="all"</code> is executed, in general,
+                        the browser will load another page. While this happens, the loading indicator, by default shown
+                        in red at the top right of the window, is displayed. However, when the browser is served not a
+                        web page but say a ZIP file, the browser might ask you in you want to download it, and then stay
+                        in the current page. When this happens, the loading indicator does not go away.
+                    </p>
+                    <p>
+                        In those cases where you know that the target page does not replace the current page, you can
+                        prevent the loading indicator from being displayed by adding the
+                        <code>xxforms:show-progress="false"</code> attribute:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:submission xxforms:show-progress="false"/>
                     </xml-source>
                 </section>
                 <a name="xxforms-script-extension"/>

@@ -115,4 +115,15 @@ public class XFormsServerSharedInstancesCache {
             }
         }
     }
+
+    public synchronized void remove(PipelineContext pipelineContext, String instanceSourceURI) {
+
+        if (XFormsServer.logger.isDebugEnabled())
+            XFormsServer.logger.debug("XForms - removing application shared instance with URI '" + instanceSourceURI);
+
+        final Cache cache = ObjectCache.instance(XFORMS_SHARED_INSTANCES_CACHE_NAME, XFORMS_SHARED_INSTANCES_CACHE_DEFAULT_SIZE);
+        final InternalCacheKey cacheKey = new InternalCacheKey(SHARED_INSTANCE_KEY_TYPE, instanceSourceURI);
+
+        cache.remove(pipelineContext, cacheKey);
+    }
 }

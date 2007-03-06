@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.saxon.om.FastStringBuffer;
 
 import java.util.*;
@@ -30,10 +29,10 @@ public class XFormsFeatures {
             new FeatureConfig("htmlarea", "textarea", "text/html"),
             new FeatureConfig("dialog", "dialog")
     };
-
+    
     public static class FeatureConfig {
         private String name;
-        private String id;
+//        private String id;
         private String[] controlNames;
         private String[] controlAppearanceOrMediatypes;
 
@@ -51,7 +50,7 @@ public class XFormsFeatures {
 
         public FeatureConfig(String name, String[] controlNames, String[] controlAppearanceOrMediatypes) {
             this.name = name;
-            this.id = SecureUtils.digestString(name, "md5", "base64");
+//            this.id = SecureUtils.digestString(name, "md5", "base64");
             this.controlNames = controlNames;
             this.controlAppearanceOrMediatypes = controlAppearanceOrMediatypes;
         }
@@ -123,6 +122,13 @@ public class XFormsFeatures {
                 }
                 public String getFeatureName() { return "dialog"; }
             },
+            // NOTE: This doesn't work, probably because FCK editor files must be loaded in an iframe
+//            new ResourceConfig("/ops/fckeditor/editor/skins/default/fck_editor.css", null) {
+//                public boolean isInUse(Map appearancesMap) {
+//                    return isHtmlAreaInUse(appearancesMap);
+//                }
+//                public String getFeatureName() { return "htmlarea"; }
+//            },
             // Other standard stylesheets
             new ResourceConfig("/config/theme/xforms.css", null)
     };
@@ -244,10 +250,9 @@ public class XFormsFeatures {
             this.minResource = minResource;
         }
 
-        public String getResourcePath() {
+        public String getResourcePath(boolean tryMinimal) {
             // Load minimal resource if requested and there exists a minimal resource
-            final boolean isMinimal = XFormsUtils.isMinimalResources();
-            return (isMinimal && minResource != null) ? minResource : fullResource;
+            return (tryMinimal && minResource != null) ? minResource : fullResource;
         }
 
         public boolean isInUse(Map appearancesMap) {
@@ -308,7 +313,7 @@ public class XFormsFeatures {
         }
     }
 
-    public static String getCombinedResourcesName(Map appearancesMap) {
+    public static String getCombinedResourcesName(Map appearancesMap, boolean isMinimal) {
         if (XFormsUtils.isCombineResources()) {
             final FastStringBuffer sb = new FastStringBuffer("/xforms-server/xforms");
             for (int i = 0; i < features.length; i++) {
@@ -318,6 +323,8 @@ public class XFormsFeatures {
                     sb.append(currentFeature.getId());
                 }
             }
+            if (isMinimal)
+                sb.append("-min");
             return sb.toString();
         } else {
             return null;

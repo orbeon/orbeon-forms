@@ -24,6 +24,9 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 
+/**
+ * Serve XForms engine JavaScript and CSS resources by combining them.
+ */
 public class XFormsResourceServer extends ProcessorImpl {
 
     public XFormsResourceServer() {
@@ -39,11 +42,19 @@ public class XFormsResourceServer extends ProcessorImpl {
         final boolean isCSS = filename.endsWith(".css");
 
         // Find what features are requested
+        // Assume a file name of the form: xforms-feature1-feature2-feature3-...[-min].[css|js]
+        boolean isMinimal = false;
         final Map requestedFeaturesMap = new HashMap();
         {
             final StringTokenizer st = new StringTokenizer(filename.substring(0, filename.lastIndexOf(".")), "-");
             while (st.hasMoreTokens()) {
                 final String currentToken = st.nextToken();
+
+                if (currentToken.equals("min")) {
+                    isMinimal = true;
+                    continue;
+                }
+
                 final XFormsFeatures.FeatureConfig currentFeature = XFormsFeatures.getFeatureById(currentToken);
                 if (currentFeature != null)
                     requestedFeaturesMap.put(currentFeature.getName(), currentFeature);
@@ -62,7 +73,7 @@ public class XFormsResourceServer extends ProcessorImpl {
         for (Iterator i = resources.iterator(); i.hasNext();) {
             final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
 
-            final long lastModified = ResourceManagerWrapper.instance().lastModified(resourceConfig.getResourcePath(), false);
+            final long lastModified = ResourceManagerWrapper.instance().lastModified(resourceConfig.getResourcePath(isMinimal), false);
             if (lastModified > combinedLastModified)
                 combinedLastModified = lastModified;
         }
@@ -95,7 +106,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                 final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
                 for (Iterator i = resources.iterator(); i.hasNext();) {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                    final String resourcePath = resourceConfig.getResourcePath();
+                    final String resourcePath = resourceConfig.getResourcePath(isMinimal);
                     final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
 
                     final String content;
@@ -107,7 +118,6 @@ public class XFormsResourceServer extends ProcessorImpl {
                     }
 
                     final URI resourceURI = applicationBaseURI.resolve(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath);
-
                     {
                         int index = 0;
                         while (true) {
@@ -130,12 +140,13 @@ public class XFormsResourceServer extends ProcessorImpl {
                             {
                                 final int closingIndex = content.indexOf(")", newIndex + 4);
                                 if (closingIndex == -1)
-                                    throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath());
+                                    throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(isMinimal));
 
                                 url = content.substring(newIndex + 4, closingIndex);
                                 index = closingIndex + 1;
                             }
                             // Rewrite URL and output it
+                            // TODO: use absolute path only?
                             final URI resolvedURI = resourceURI.resolve(url.trim());
                             outputWriter.write("url(" + resolvedURI.toString() + ")");
                         }
@@ -150,7 +161,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                 int index = 0;
                 for (Iterator i = resources.iterator(); i.hasNext(); index++) {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                    final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath());
+                    final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
+                    // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
                     if (index > 0)
                         os.write((byte) '\n');
                     NetUtils.copyStream(is, os);
@@ -161,6 +173,6 @@ public class XFormsResourceServer extends ProcessorImpl {
             throw new OXFException(e);
         }
 
-        // Generate file if needed, otherwise get from cache
+        // TODO: cache result (options: memory cache, temp file, or resources under /xforms-server/...)
     }
 }

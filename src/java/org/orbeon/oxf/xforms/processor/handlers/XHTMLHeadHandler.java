@@ -85,7 +85,8 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Create prefix for combined resources if needed
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesName(appearancesMap);
+        final boolean isMinimal = XFormsUtils.isMinimalResources();
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesName(appearancesMap, isMinimal);
 
         // Stylesheets
         if (XFormsUtils.isCombineResources()) {
@@ -96,7 +97,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
-                        "rel", "stylesheet", "href", resourceConfig.getResourcePath(), "type", "text/css"});
+                        "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css"});
             }
         }
 
@@ -111,7 +112,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                     // Only include stylesheet if needed
                     helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                            "type", "text/javascript", "src", resourceConfig.getResourcePath()});
+                            "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal)});
                 }
             }
 
@@ -172,6 +173,7 @@ public class XHTMLHeadHandler extends HandlerBase {
             helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                     "type", "text/javascript"});
             {
+                // TODO: Use absolute path only?
                 final String applicationBase = externalContext.getResponse().rewriteResourceURL("/", true);
                 helper.text("var opsXFormsServerBase = \"" + applicationBase + "\";");
             }

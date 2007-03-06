@@ -490,12 +490,16 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
 
-    <processor name="oxf:xforms-document-annotator">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotator"/>
+    <processor name="oxf:xforms-to-xhtml">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsToXHTML"/>
     </processor>
 
-    <processor name="oxf:xforms-request-encoder">
-        <class name="org.orbeon.oxf.xforms.processor.XFormsRequestEncoder"/>
+    <processor name="oxf:xforms-resource-server">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsResourceServer"/>
+    </processor>
+
+    <processor name="oxf:xforms-document-annotator">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotator"/>
     </processor>
 
     <processor name="oxf:xforms-submission">

@@ -18,6 +18,7 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -26,6 +27,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.security.MessageDigest;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
@@ -197,5 +199,39 @@ public class SecureUtils {
         } catch (InvalidKeySpecException e) {
             throw new OXFException(e);
         }
+    }
+
+    public static String digestString(String data, String algorithm, String encoding) {
+        final MessageDigest messageDigest;
+        try {
+            messageDigest = MessageDigest.getInstance(algorithm);
+            messageDigest.update(data.getBytes("utf-8"));
+        } catch (Exception e) {
+            throw new OXFException("Exception computing digest with algorithm: " + algorithm, e);
+        }
+        byte[] digestBytes = messageDigest.digest();
+
+        // Format result
+        final String result;
+        if ("base64".equals(encoding)) {
+            result = Base64.encode(digestBytes);
+        } else if ("hex".equals(encoding)) {
+            result = byteArrayToHex(digestBytes);
+        } else {
+            throw new OXFException("Invalid digest encoding (must be one of 'base64' or 'hex'): " + encoding);
+        }
+        return result;
+    }
+
+    private static final char[] HEXADECIMAL_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+    private static String byteArrayToHex(byte[] bytes) {
+//        final StringBuilder sb = new StringBuilder(bytes.length * 2);
+        final FastStringBuffer sb = new FastStringBuffer(bytes.length * 2);
+        for (int i = 0; i < bytes.length; i++) {
+            sb.append(HEXADECIMAL_DIGITS[(bytes[i] >> 4) & 0xf]);
+            sb.append(HEXADECIMAL_DIGITS[bytes[i] & 0xf]);
+        }
+        return sb.toString();
     }
 }

@@ -128,6 +128,7 @@ public class XFormsConstants {
     public static final String XFORMS_GZIP_STATE_PROPERTY = "oxf.xforms.gzip-state";
     public static final String XFORMS_HOST_LANGUAGE_AVTS_PROPERTY = "oxf.xforms.host-language-avts";
     public static final String XFORMS_MINIMAL_RESOURCES_PROPERTY = "oxf.xforms.minimal-resources";
+    public static final String XFORMS_COMBINE_RESOURCES_PROPERTY = "oxf.xforms.combine-resources";
     public static final String XFORMS_OPTIMIZE_RELEVANCE_PROPERTY = "oxf.xforms.optimize-relevance";
 
     public static final String XXFORMS_STATE_HANDLING_ATTRIBUTE_NAME = "state-handling";
@@ -175,6 +176,7 @@ public class XFormsConstants {
     public static final boolean DEFAULT_GZIP_STATE = true;
     public static final boolean DEFAULT_HOST_LANGUAGE_AVTS = false;
     public static final boolean DEFAULT_MINIMAL_RESOURCES = false;
+    public static final boolean DEFAULT_COMBINE_RESOURCES = false;
     public static final boolean DEFAULT_OPTIMIZE_RELEVANCE = false;
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";

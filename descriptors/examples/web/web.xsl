@@ -392,7 +392,7 @@
 
             <servlet-mapping>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
-                <url-pattern>/xforms-server</url-pattern>
+                <url-pattern>/xforms-server/*</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>

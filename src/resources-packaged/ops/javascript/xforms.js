@@ -31,7 +31,6 @@ var XFORMS_SEPARATOR_2 = "-";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var BASE_URL = null;
 var XFORMS_SERVER_URL = null;
-var PATH_TO_JAVASCRIPT = "/ops/javascript/xforms.js";
 var XFORMS_IS_GECKO = navigator.userAgent.toLowerCase().indexOf("gecko") != -1;
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
@@ -1326,18 +1325,9 @@ ORBEON.xforms.Init = {
         YAHOO.widget.Overlay.windowResizeEvent.subscribe(ORBEON.xforms.Events.scrollOrResize);
 
         // Initialize XForms server URL
-        var scripts = document.getElementsByTagName("script");
-        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-            var script = scripts[scriptIndex];
-            var scriptSrc = ORBEON.util.Dom.getAttribute(script, "src");
-            if (scriptSrc != null) {
-                var startPathToJavaScript = scriptSrc.indexOf(PATH_TO_JAVASCRIPT);
-                if (startPathToJavaScript != -1) {
-                    BASE_URL = ORBEON.util.Dom.getAttribute(script, "src").substr(0, startPathToJavaScript);
-                    XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-                    break;
-                }
-            }
+        if (!(window.opsXFormsServerBase === undefined)) {
+            BASE_URL = window.opsXFormsServerBase;
+            XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
         }
 
         // Override image location for YUI to use local images

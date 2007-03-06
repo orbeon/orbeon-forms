@@ -16,19 +16,20 @@
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <!-- Extract request body -->
+    <!-- Extract request headers and method -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
                 <include>/request/headers/header[name = 'content-type']</include>
+                <include>/request/method</include>
             </config>
         </p:input>
-        <p:output name="request-headers" id="request-headers"/>
-        <!--<p:output name="request-headers" id="request-headers" debug="xxxparams"/>-->
+        <p:output name="request-metadata" id="request-metadata"/>
+        <!--<p:output name="request-metadata" id="request-metadata" debug="xxxparams"/>-->
     </p:processor>
 
-    <p:choose href="#request-headers">
-        <p:when test="not(starts-with(/request/headers/header[name = 'content-type']/value, 'multipart/form-data'))">
+    <p:choose href="#request-metadata">
+        <p:when test="/request/method = 'POST' and not(starts-with(/request/headers/header[name = 'content-type']/value, 'multipart/form-data'))">
             <!-- This is a regular AJAX request -->
 
             <!-- Extract request body -->
@@ -66,8 +67,12 @@
                 </p:input>
             </p:processor>
         </p:when>
+        <p:when test="/request/method = 'GET'">
+            <!-- Handle combined resources -->
+            <p:processor name="oxf:xforms-resource-server"/>
+        </p:when>
         <p:otherwise>
-            <!-- This is a form submission that requires a pseudo-AJAX response -->
+            <!-- This is (probably) a form submission that requires a pseudo-AJAX response -->
 
             <!-- Extract parameters -->
             <p:processor name="oxf:request">

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * FCKeditor - The text editor for internet
  * Copyright (C) 2003-2006 Frederico Caldeira Knabben
  * 

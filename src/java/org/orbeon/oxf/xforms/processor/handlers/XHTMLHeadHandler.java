@@ -17,8 +17,8 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.processor.XFormsFeatures;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -32,120 +32,6 @@ import java.util.*;
  * Handle xhtml:head.
  */
 public class XHTMLHeadHandler extends HandlerBase {
-
-    private static final ResourceConfig[] stylesheets = {
-            // Calendar stylesheets
-            // TODO: move to YUI if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-blue.css", null),
-            // Yahoo! UI Library
-            new ResourceConfig("/ops/css/yui/tree.css", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/css/yui/tree-check.css", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/css/yui/menu.css", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/css/yui/container.css", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-            },
-            // Other standard stylesheets
-            new ResourceConfig("/config/theme/xforms.css", null)
-    };
-
-    private static final ResourceConfig[] scripts = {
-            // Calendar scripts
-            // TODO: move to YUI in the future if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
-            new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),// our min version
-            new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
-            // Yahoo UI Library
-            new ResourceConfig("/ops/javascript/yui/yahoo.js", "/ops/javascript/yui/yahoo-min.js"),
-            new ResourceConfig("/ops/javascript/yui/event.js", "/ops/javascript/yui/event-min.js"),
-            new ResourceConfig("/ops/javascript/yui/dom.js", "/ops/javascript/yui/dom-min.js"),
-            new ResourceConfig("/ops/javascript/yui/connection.js", "/ops/javascript/yui/connection-min.js"),
-            new ResourceConfig("/ops/javascript/yui/container_core.js", "/ops/javascript/yui/container_core-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return !isDialogInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/animation.js", "/ops/javascript/yui/animation-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isRangeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isRangeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/slider.js", "/ops/javascript/yui/slider-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isRangeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/treeview.js", "/ops/javascript/yui/treeview-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/treeview-tasknode.js", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/treeview-checkonclicknode.js", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isTreeInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/container.js", "/ops/javascript/yui/container-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/menu.js", "/ops/javascript/yui/menu-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isMenuInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/yui/dragdrop.js", "/ops/javascript/yui/dragdrop-min.js") {
-                public boolean isInUse(Map appearancesMap) {
-                    return isDialogInUse(appearancesMap);
-                }
-            },
-            // HTML area
-            new ResourceConfig("/ops/fckeditor/fckeditor.js", null) {
-                public boolean isInUse(Map appearancesMap) {
-                    return isHtmlAreaInUse(appearancesMap);
-                }
-            },
-            // Autocomplete
-            new ResourceConfig("/ops/javascript/suggest-common.js", "/ops/javascript/suggest-common-min.js") {// our min version
-                public boolean isInUse(Map appearancesMap) {
-                    return isAutocompleteInUse(appearancesMap);
-                }
-            },
-            new ResourceConfig("/ops/javascript/suggest-actb.js", "/ops/javascript/suggest-actb-min.js") {// our min version
-                public boolean isInUse(Map appearancesMap) {
-                    return isAutocompleteInUse(appearancesMap);
-                }
-            },
-            // Other standard scripts
-            new ResourceConfig("/ops/javascript/wz_tooltip.js", "/ops/javascript/wz_tooltip-min.js"),// TODO: move to YUI // our min version
-            new ResourceConfig("/ops/javascript/time-utils.js", "/ops/javascript/time-utils-min.js"),// TODO: check who uses this // our min version
-            // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js", null)// our min version
-    };
 
     public XHTMLHeadHandler() {
         super(false, true);
@@ -198,27 +84,37 @@ public class XHTMLHeadHandler extends HandlerBase {
             });
         }
 
+        // Create prefix for combined resources if needed
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesName(appearancesMap);
+
         // Stylesheets
-        for (int i = 0; i < stylesheets.length; i++) {
-            final ResourceConfig resourceConfig = stylesheets[i];
-            if (resourceConfig.isInUse(appearancesMap)) {
+        if (XFormsUtils.isCombineResources()) {
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
+                        "rel", "stylesheet", "href", combinedResourcesPrefix + ".css", "type", "text/css"});
+        } else {
+            for (Iterator i = XFormsFeatures.getCSSResources(appearancesMap).iterator(); i.hasNext();) {
+                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
-                        "rel", "stylesheet", "href", resourceConfig.getResource(), "type", "text/css"});
+                        "rel", "stylesheet", "href", resourceConfig.getResourcePath(), "type", "text/css"});
             }
         }
 
         // Scripts
         if (!containingDocument.isReadonly()) {
 
-            for (int i = 0; i < scripts.length; i++) {
-                final ResourceConfig resourceConfig = scripts[i];
-                if (resourceConfig.isInUse(appearancesMap)) {
-                    // Only include script if needed
+            if (XFormsUtils.isCombineResources()) {
+                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                        "type", "text/javascript", "src", combinedResourcesPrefix + ".js"});
+            } else {
+                for (Iterator i = XFormsFeatures.getJavaScriptResources(appearancesMap).iterator(); i.hasNext();) {
+                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                    // Only include stylesheet if needed
                     helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                        "type", "text/javascript", "src", resourceConfig.getResource()});
+                            "type", "text/javascript", "src", resourceConfig.getResourcePath()});
                 }
             }
+
 
             // User-defined scripts (with xxforms:script)
             final Map scriptsToDeclare = containingDocument.getScripts();
@@ -273,8 +169,12 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Store information about "special" controls that need JavaScript initialization
         {
-            final String serverBase = externalContext.getResponse().rewriteResourceURL("/", true);
-            // TODO: store server base
+            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
+                    "type", "text/javascript"});
+            {
+                final String applicationBase = externalContext.getResponse().rewriteResourceURL("/", true);
+                helper.text("var opsXFormsServerBase = \"" + applicationBase + "\";");
+            }
 
             // Produce JSON output
             if (appearancesMap.size() > 0) {
@@ -319,14 +219,10 @@ public class XHTMLHeadHandler extends HandlerBase {
 
                 sb.append("}};");
 
-                helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                    "type", "text/javascript"});
-
                 helper.text(sb.toString());
-
-                helper.endElement();
-
             }
+
+            helper.endElement();
         }
     }
 
@@ -335,61 +231,5 @@ public class XHTMLHeadHandler extends HandlerBase {
         // Close head element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
-    }
-
-    private static class ResourceConfig {
-        private String fullResource;
-        private String minResource;
-
-        public ResourceConfig(String fullResource, String minResource) {
-            this.fullResource = fullResource;
-            this.minResource = minResource;
-        }
-
-        public String getResource() {
-            // Load minimal resource if requested and there exists a minimal resource
-            final boolean isMinimal = XFormsUtils.isMinimalResources();
-            return (isMinimal && minResource != null) ? minResource : fullResource;
-        }
-
-        public boolean isInUse(Map appearancesMap) {
-            return true;
-        }
-
-        protected boolean isInUse(Map appearancesMap, String controlName) {
-            final Map controlMap = (Map) appearancesMap.get(controlName);
-            return controlMap != null;
-        }
-
-        protected boolean isInUse(Map appearancesMap, String controlName, String appearanceOrMediatypeName) {
-            final Map controlMap = (Map) appearancesMap.get(controlName);
-            if (controlMap == null) return false;
-            final Object controlAppearanceOrMediatypeList = controlMap.get(appearanceOrMediatypeName);
-            return controlAppearanceOrMediatypeList != null;
-        }
-
-        protected boolean isRangeInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "range");
-        }
-
-        protected boolean isTreeInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "select1", XFormsSelect1Control.TREE_APPEARANCE) || isInUse(appearancesMap, "select", XFormsSelect1Control.TREE_APPEARANCE);
-        }
-
-        protected boolean isMenuInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "select1", XFormsSelect1Control.MENU_APPEARANCE) || isInUse(appearancesMap, "select", XFormsSelect1Control.MENU_APPEARANCE);
-        }
-
-        protected boolean isAutocompleteInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "select1", XFormsSelect1Control.AUTOCOMPLETE_APPEARANCE);
-        }
-
-        protected boolean isHtmlAreaInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "textarea", "text/html");
-        }
-
-        protected boolean isDialogInUse(Map appearancesMap) {
-            return isInUse(appearancesMap, "dialog");
-        }
     }
 }

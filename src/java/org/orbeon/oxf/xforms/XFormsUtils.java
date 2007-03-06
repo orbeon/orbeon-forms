@@ -79,17 +79,22 @@ public class XFormsUtils {
     }
 
     public static InstanceData getLocalInstanceData(Node node) {
+        final Object instanceData;
         if (node instanceof Element) {
-            return (InstanceData) ((Element) node).getData();
+             instanceData = ((Element) node).getData();
         } else if (node instanceof Attribute) {
-            return (InstanceData) ((Attribute) node).getData();
+            instanceData = ((Attribute) node).getData();
         } else if (node instanceof Document) {
             // We can't store data on the Document object. Use root element instead.
-            return (InstanceData) ((Document) node).getRootElement().getData();
+            instanceData = ((Document) node).getRootElement().getData();
         } else {
             return null;
         }
         // TODO: other node types once we update to handling text nodes correctly
+        if (instanceData instanceof InstanceData)
+            return (InstanceData) instanceData;
+        else
+            return null;
     }
 
     public static Map getIdToNodeMap(NodeInfo nodeInfo) {
@@ -1089,6 +1094,11 @@ public class XFormsUtils {
     public static boolean isMinimalResources() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_MINIMAL_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_MINIMAL_RESOURCES).booleanValue();
+    }
+
+    public static boolean isCombineResources() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_COMBINE_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_COMBINE_RESOURCES).booleanValue();
     }
 
     public static boolean isOptimizeRelevance() {

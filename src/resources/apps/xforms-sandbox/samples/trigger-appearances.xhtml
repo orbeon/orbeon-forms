@@ -44,20 +44,22 @@
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
-            <xforms:trigger appearance="xxforms:image">
-                <xforms:label ref="label"/>
+            <xforms:trigger appearance="minimal">
+                <xforms:label>
+                    <img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
+                </xforms:label>
                 <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
                 <xforms:help ref="help"/>
                 <xforms:hint ref="hint"/>
-                <xxforms:img src="/images/submit.gif"/>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
-            <xforms:trigger appearance="xxforms:link">
+            <xforms:trigger appearance="minimal">
                 <xforms:label ref="label"/>
                 <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
                 <xforms:help ref="help"/>
                 <xforms:hint ref="hint"/>
+                <xforms:load ev:event="DOMActivate" resource="http://www.google.com/"/>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:h2>Submit</xhtml:h2>
@@ -70,16 +72,17 @@
             </xforms:submit>
         </xhtml:p>
         <xhtml:p>
-            <xforms:submit submission="submission" appearance="xxforms:image">
-                <xforms:label ref="label"/>
+            <xforms:submit submission="submission" appearance="minimal">
+                <xforms:label>
+                    <img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
+                </xforms:label>
                 <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
                 <xforms:help ref="help"/>
                 <xforms:hint ref="hint"/>
-                <xxforms:img src="/images/submit.gif"/>
             </xforms:submit>
         </xhtml:p>
         <xhtml:p>
-            <xforms:submit submission="submission" appearance="xxforms:link">
+            <xforms:submit submission="submission" appearance="minimal">
                 <xforms:label ref="label"/>
                 <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
                 <xforms:help ref="help"/>

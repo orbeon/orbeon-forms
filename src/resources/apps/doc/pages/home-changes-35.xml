@@ -40,6 +40,22 @@
                 This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.
             </p>
         </section>
+        <a name="changes-351"/>
+        <section>
+            <title>Changes in Version 3.5.1</title>
+            <p>
+                Orbeon Forms 3.5.1 is a minor update containing the following changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        The <a href="reference-xforms-ng#submission-show-progress">extension attribute
+                        <code>xxforms:show-progress="false"</code></a> of <code>&lt;xforms:submission></code> is now
+                        documented.
+                    </p>
+                </li>
+            </ul>
+        </section>
         <a name="changes-35"/>
         <section>
             <title>Changes in Version 3.5</title>

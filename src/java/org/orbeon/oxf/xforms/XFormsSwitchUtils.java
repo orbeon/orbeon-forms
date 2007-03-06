@@ -80,11 +80,11 @@ public class XFormsSwitchUtils {
     /**
      * Prepare switch information before a modification to the DOM.
      */
-    public static void prepareSwitches(XFormsControls xformsControls, Node sourceElement, Node clonedElement) {
+    public static void prepareSwitches(XFormsControls xformsControls, Node sourceNode, Node clonedNode) {
         final boolean found = prepareSwitches(xformsControls);
         if (found) {
             // Propagate temporary switch information to new nodes
-            copySwitchInfo(sourceElement, clonedElement);
+            copySwitchInfo(sourceNode, clonedNode);
         }
     }
 

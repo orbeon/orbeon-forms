@@ -19,9 +19,11 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -89,89 +91,118 @@ public class XFormsResourceServer extends ProcessorImpl {
             return;
         }
 
-        // Otherwise, send content
         try {
-            final OutputStream os = response.getOutputStream();
-            if (isCSS) {
-                // CSS, rewrite content
-
-                response.setContentType("text/css");
-
-                final URI applicationBaseURI;
-                {
-                    final String applicationBase = response.rewriteResourceURL("/", true);
-                    applicationBaseURI = new URI(applicationBase);
-                }
-
-                final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
-                for (Iterator i = resources.iterator(); i.hasNext();) {
-                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                    final String resourcePath = resourceConfig.getResourcePath(isMinimal);
-                    final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
-
-                    final String content;
-                    {
-                        final Reader reader = new InputStreamReader(is, "utf-8");
-                        final StringWriter stringWriter = new StringWriter();
-                        NetUtils.copyStream(reader, stringWriter);
-                        content = stringWriter.toString();
-                    }
-
-                    final URI resourceURI = applicationBaseURI.resolve(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath);
-                    {
-                        int index = 0;
-                        while (true) {
-                            final int newIndex = content.indexOf("url(", index);
-
-                            if (newIndex == -1) {
-                                // Output remainder
-                                if (index == 0)
-                                    outputWriter.write(content);
-                                else
-                                    outputWriter.write(content.substring(index));
-                                break;
-                            } else {
-                                // output so far
-                                outputWriter.write(content.substring(index, newIndex));
-                            }
-
-                            // Get URL
-                            final String url;
-                            {
-                                final int closingIndex = content.indexOf(")", newIndex + 4);
-                                if (closingIndex == -1)
-                                    throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(isMinimal));
-
-                                url = content.substring(newIndex + 4, closingIndex);
-                                index = closingIndex + 1;
-                            }
-                            // Rewrite URL and output it as an absolute path
-                            final URI resolvedURI = resourceURI.resolve(url.trim());
-                            outputWriter.write("url(" + resolvedURI.getPath() + ")");
+            response.setContentType(isCSS ? "text/css" : "application/javascript");
+            final OutputStream responseOutputStream = response.getOutputStream();
+            {
+                final boolean cacheCombinedResources = XFormsUtils.isCacheCombinedResources();
+                final String realPath = (cacheCombinedResources) ? ResourceManagerWrapper.instance().getRealPath(requestPath) : null;
+                if (realPath != null) {
+                    // We hope to be able to cache as a resource
+                    final File resourceFile = new File(realPath);
+                    if (resourceFile.exists()) {
+                        final long resourceLastModified = resourceFile.lastModified();
+                        if (resourceLastModified < combinedLastModified) {
+                            // Resource is out of date, generate
+                            final FileOutputStream fos = new FileOutputStream(resourceFile);
+                            generate(resources, response, fos, isCSS, isMinimal);
+                            fos.close();
                         }
+                    } else {
+                        // Resource doesn't exist, generate
+                        resourceFile.getParentFile().mkdirs();
+                        resourceFile.createNewFile();
+                        final FileOutputStream fos = new FileOutputStream(resourceFile);
+                        generate(resources, response, fos, isCSS, isMinimal);
+                        fos.close();
                     }
-                }
-                outputWriter.flush();
-            } else {
-                // JavaScript, just send
 
-                response.setContentType("application/javascript");
-
-                int index = 0;
-                for (Iterator i = resources.iterator(); i.hasNext(); index++) {
-                    final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-                    final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(isMinimal));
-                    // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
-                    if (index > 0)
-                        os.write((byte) '\n');
-                    NetUtils.copyStream(is, os);
+                    final FileInputStream fis = new FileInputStream(resourceFile);
+                    NetUtils.copyStream(fis, responseOutputStream);
+                    fis.close();
+                    responseOutputStream.flush();
+                } else {
+                    // Otherwise, don't try the cache and send content directly
+                    generate(resources, response, responseOutputStream, isCSS, isMinimal);
                 }
             }
-            os.flush();
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
 
-        // TODO: cache result (options: memory cache, temp file, or resources under /xforms-server/...)
+    private void generate(List resources, ExternalContext.Response response, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
+        if (CSS) {
+            // CSS, rewrite content
+            final URI applicationBaseURI;
+            {
+                final String applicationBase = response.rewriteResourceURL("/", true);
+                applicationBaseURI = new URI(applicationBase);
+            }
+
+            final Writer outputWriter = new OutputStreamWriter(os, "utf-8");
+            for (Iterator i = resources.iterator(); i.hasNext();) {
+                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                final String resourcePath = resourceConfig.getResourcePath(minimal);
+                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourcePath);
+
+                final String content;
+                {
+                    final Reader reader = new InputStreamReader(is, "utf-8");
+                    final StringWriter stringWriter = new StringWriter();
+                    NetUtils.copyStream(reader, stringWriter);
+                    reader.close();
+                    content = stringWriter.toString();
+                }
+
+                final URI resourceURI = applicationBaseURI.resolve(resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath);
+                {
+                    int index = 0;
+                    while (true) {
+                        final int newIndex = content.indexOf("url(", index);
+
+                        if (newIndex == -1) {
+                            // Output remainder
+                            if (index == 0)
+                                outputWriter.write(content);
+                            else
+                                outputWriter.write(content.substring(index));
+                            break;
+                        } else {
+                            // output so far
+                            outputWriter.write(content.substring(index, newIndex));
+                        }
+
+                        // Get URL
+                        final String url;
+                        {
+                            final int closingIndex = content.indexOf(")", newIndex + 4);
+                            if (closingIndex == -1)
+                                throw new OXFException("Missing closing parenthesis in url() in resource: " + resourceConfig.getResourcePath(minimal));
+
+                            url = content.substring(newIndex + 4, closingIndex);
+                            index = closingIndex + 1;
+                        }
+                        // Rewrite URL and output it as an absolute path
+                        final URI resolvedURI = resourceURI.resolve(url.trim());
+                        outputWriter.write("url(" + resolvedURI.getPath() + ")");
+                    }
+                }
+            }
+            outputWriter.flush();
+        } else {
+            // JavaScript, just send
+            int index = 0;
+            for (Iterator i = resources.iterator(); i.hasNext(); index++) {
+                final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+                final InputStream is = ResourceManagerWrapper.instance().getContentAsStream(resourceConfig.getResourcePath(minimal));
+                // Line break seems to help. We assume that the encoding is compatible with ASCII/UTF-8
+                if (index > 0)
+                    os.write((byte) '\n');
+                NetUtils.copyStream(is, os);
+                is.close();
+            }
+        }
+        os.flush();
     }
 }

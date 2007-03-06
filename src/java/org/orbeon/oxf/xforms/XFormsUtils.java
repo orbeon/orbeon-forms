@@ -1101,6 +1101,11 @@ public class XFormsUtils {
                 (XFormsConstants.XFORMS_COMBINE_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_COMBINE_RESOURCES).booleanValue();
     }
 
+    public static boolean isCacheCombinedResources() {
+        return OXFProperties.instance().getPropertySet().getBoolean
+                (XFormsConstants.XFORMS_CACHE_COMBINED_RESOURCES_PROPERTY, XFormsConstants.DEFAULT_CACHE_COMBINED_RESOURCES).booleanValue();
+    }
+
     public static boolean isOptimizeRelevance() {
         return OXFProperties.instance().getPropertySet().getBoolean
                 (XFormsConstants.XFORMS_OPTIMIZE_RELEVANCE_PROPERTY, XFormsConstants.DEFAULT_OPTIMIZE_RELEVANCE).booleanValue();

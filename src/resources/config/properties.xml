@@ -62,6 +62,7 @@
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                           value="true"/>
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                    value="true"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                    value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.cache-combined-resources"             value="false"/>
     <property as="xs:boolean" name="oxf.xforms.optimize-relevance"                   value="false"/>
 
     <!-- Rarely used global properties -->

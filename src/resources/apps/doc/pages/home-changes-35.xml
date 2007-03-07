@@ -54,6 +54,12 @@
                         documented.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        The following issue in the XForms engine was fixed: a NullPointerException which often
+                        happened when using the XForms Instance Inspector in a page.
+                    </p>
+                </li>
             </ul>
         </section>
         <a name="changes-35"/>

@@ -320,6 +320,11 @@
             </servlet>
 
             <servlet>
+                <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
+            </servlet>
+
+            <servlet>
                 <servlet-name>exist-rest-servlet</servlet-name>
                 <servlet-class>org.exist.http.servlets.EXistServlet</servlet-class>
                 <init-param>
@@ -393,6 +398,11 @@
             <servlet-mapping>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
                 <url-pattern>/xforms-server/*</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+                <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                <url-pattern>/exist/xmlrpc</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>

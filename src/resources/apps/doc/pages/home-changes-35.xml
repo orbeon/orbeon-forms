@@ -49,15 +49,24 @@
             <ul>
                 <li>
                     <p>
-                        The <a href="reference-xforms-ng#submission-show-progress">extension attribute
-                        <code>xxforms:show-progress="false"</code></a> of <code>&lt;xforms:submission></code> is now
-                        documented.
+                        The extension attribute <a
+                        href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
+                        of <code>&lt;xforms:submission></code> is now documented.
                     </p>
                 </li>
                 <li>
                     <p>
-                        The following issue in the XForms engine was fixed: a NullPointerException which often
-                        happened when using the XForms Instance Inspector in a page.
+                        The following XForms issues were fixed in this release:
+                        <ul>
+                            <li>
+                                A NullPointerException which often happened when using the XForms Instance Inspector
+                                in a page. <a href="http://tinyurl.com/yors44">#306708</a>
+                            </li>
+                            <li>
+                                The error message "Could not set the selected property" appearing on IE in some cases
+                                when drop-down list becomes visible. <a href="http://tinyurl.com/ypoyx5">#306676</a>
+                            </li>
+                        </ul>
                     </p>
                 </li>
             </ul>

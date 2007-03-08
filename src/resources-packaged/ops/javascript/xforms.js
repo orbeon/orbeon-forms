@@ -1255,37 +1255,6 @@ ORBEON.xforms.Init = {
         return ORBEON.xforms.Init._specialControlsInitFunctions;
     },
 
-    _addToTree: function (tree, nameValueArray, treeNode, firstPosition) {
-        for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
-            // Extract information from the first 3 position in the array
-            var childArray = nameValueArray[arrayIndex];
-            var name = childArray[0];
-            var value = childArray[1];
-            var selected = childArray[2];
-            // Create node and add to tree
-            var nodeInformation = { label: name, value: value, href: "javascript:ORBEON.xforms.Events.treeSelect"
-                + (tree.xformsAllowMultipleSelection ? "" : 1)
-                + "Select('"
-                + tree.id + "', '"
-                + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
-                + "')" };
-            var childNode;
-            if (tree.xformsAllowMultipleSelection) {
-                childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
-                childNode.onCheckClick = ORBEON.xforms.Events.treeCheckClick;
-                if (selected) childNode.check();
-            } else {
-                childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
-            }
-            ORBEON.xforms.Init._addToTree(tree, childArray, childNode, 3);
-            // Add this value to the list if selected
-            if (selected) {
-                if (tree.value != "") tree.value += " ";
-                tree.value += value;
-            }
-        }
-    },
-
     _registerListerersOnFormElements: function() {
         for (var i = 0; i < document.forms.length; i++) {
             var form = document.forms[i];
@@ -1503,7 +1472,39 @@ ORBEON.xforms.Init = {
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
     },
 
+    _addToTree: function (tree, nameValueArray, treeNode, firstPosition) {
+        for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
+            // Extract information from the first 3 position in the array
+            var childArray = nameValueArray[arrayIndex];
+            var name = childArray[0];
+            var value = childArray[1];
+            var selected = childArray[2];
+            // Create node and add to tree
+            var nodeInformation = { label: name, value: value, href: "javascript:ORBEON.xforms.Events.treeSelect"
+                + (tree.xformsAllowMultipleSelection ? "" : 1)
+                + "Select('"
+                + tree.id + "', '"
+                + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
+                + "')" };
+            var childNode;
+            if (tree.xformsAllowMultipleSelection) {
+                childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
+                childNode.onCheckClick = ORBEON.xforms.Events.treeCheckClick;
+                if (selected) childNode.check();
+            } else {
+                childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
+            }
+            ORBEON.xforms.Init._addToTree(tree, childArray, childNode, 3);
+            // Add this value to the list if selected
+            if (selected) {
+                if (tree.value != "") tree.value += " ";
+                tree.value += value;
+            }
+        }
+    },
+
     _tree: function(tree) {
+
         // Save in the control if it allows multiple selection
         tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select");
         // Parse data put by the server in the div
@@ -2287,6 +2288,94 @@ ORBEON.xforms.Server = {
                                                     documentElementClasses = documentElement.className.split(" ");
                                                 }
 
+                                                // Handle relevance
+                                                if (relevant != null) {
+                                                    var isRelevant = relevant == "true";
+                                                    ORBEON.xforms.Controls.setRelevant(documentElement, isRelevant);
+                                                    // Autosize textarea
+                                                    if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
+                                                        ORBEON.xforms.Controls.autosizeTextarea(documentElement);
+                                                    }
+                                                }
+
+                                                // Handle required
+                                                if (required != null) {
+                                                    var isRequired = required == "true";
+                                                    if (isRequired) ORBEON.util.Dom.addClass(documentElement, "xforms-required");
+                                                    else ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
+                                                }
+                                                // Update the required-empty/required-full even if the required has not changed or
+                                                // is not specified as the value may have changed
+                                                if (!isStaticReadonly) {
+                                                    ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
+                                                }
+
+                                                // Handle readonly
+                                                if (readonly != null && !isStaticReadonly) {
+                                                    function setReadonlyOnFormElement(element, isReadonly) {
+                                                        if (isReadonly) {
+                                                            element.setAttribute("disabled", "disabled");
+                                                            ORBEON.util.Dom.addClass(element, "xforms-readonly");
+                                                        } else {
+                                                            element.removeAttribute("disabled");
+                                                            ORBEON.util.Dom.removeClass(element, "xforms-readonly");
+                                                        }
+                                                    }
+
+                                                    var isReadonly = readonly == "true";
+                                                    if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
+                                                        // XForms input
+
+                                                        // Display value
+                                                        var displaySpan = documentElement.firstChild;
+                                                        while (displaySpan.nodeType != ELEMENT_TYPE) displaySpan = displaySpan.nextSibling;
+                                                        if (isReadonly) ORBEON.util.Dom.addClass(displaySpan, "xforms-readonly");
+                                                        else ORBEON.util.Dom.removeClass(displaySpan, "xforms-readonly");
+
+                                                        // Text field
+                                                        var textField = displaySpan.nextSibling;
+                                                        while (textField.nodeType != ELEMENT_TYPE) textField = textField.nextSibling;
+                                                        if (isReadonly) textField.setAttribute("disabled", "disabled");
+                                                        else textField.removeAttribute("disabled");
+
+                                                        // Calendar picker
+                                                        var showCalendar = textField.nextSibling;
+                                                        while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
+                                                        if (isReadonly) ORBEON.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
+                                                        else ORBEON.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
+                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")
+                                                            || ORBEON.util.Dom.hasClass(documentElement, "xforms-group")) {
+                                                        // XForms output and group
+                                                        if (isReadonly) ORBEON.util.Dom.addClass(documentElement, "xforms-readonly");
+                                                        else ORBEON.util.Dom.removeClass(documentElement, "xforms-readonly");
+                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-full")
+                                                            || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")) {
+                                                        // XForms radio buttons
+                                                        for (var spanIndex = 0; spanIndex < documentElement.childNodes.length; spanIndex++) {
+                                                            var span = documentElement.childNodes[spanIndex];
+                                                            var input = span.firstChild;
+                                                            setReadonlyOnFormElement(input, isReadonly);
+                                                        }
+                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-autocomplete")) {
+                                                        // Auto-complete field
+                                                        var input = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
+                                                        setReadonlyOnFormElement(input, isReadonly);
+                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea") && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
+                                                        // XForms HTML area
+                                                        var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
+                                                        if (isReadonly) {
+                                                            htmlEditor.ToolbarSet.Collapse();
+                                                            // TO-DO
+                                                        } else {
+                                                            htmlEditor.ToolbarSet.Expand();
+                                                            // TO-DO
+                                                        }
+                                                    } else {
+                                                        // Other controls
+                                                        setReadonlyOnFormElement(documentElement, isReadonly);
+                                                    }
+                                                }
+
                                                 // Update value
                                                 if (isControl) {
                                                     if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output") || isStaticReadonly) {
@@ -2332,7 +2421,17 @@ ORBEON.xforms.Server = {
                                                         var options = documentElement.options;
                                                         for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                                                             var option = options[optionIndex];
-                                                            option.selected = xformsArrayContains(selectedValues, option.value);
+                                                            try {
+                                                                option.selected = xformsArrayContains(selectedValues, option.value);
+                                                            } catch (e) {
+                                                                // nop
+                                                                //
+                                                                // This is to prevent the error "Could not set the selected property. Unspecified error." in IE.
+                                                                // Like noted in this blog entry: http://ianso.blogspot.com/2005_10_01_ianso_archive.html (search
+                                                                // for the error message), it seems that DOM updates are somewhat asynchrous and that when you
+                                                                // make an element visible and change a property right after that, it is sometimes as if the element
+                                                                // is not visible yet, and so the property cannot be changed.
+                                                            }
                                                         }
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
                                                         // XForms input
@@ -2472,94 +2571,6 @@ ORBEON.xforms.Server = {
                                                 if (newValid != null) {
                                                     var newIsValid = newValid != "false";
                                                     ORBEON.xforms.Controls.setValid(documentElement, newIsValid);
-                                                }
-
-                                                // Handle relevance
-                                                if (relevant != null) {
-                                                    var isRelevant = relevant == "true";
-                                                    ORBEON.xforms.Controls.setRelevant(documentElement, isRelevant);
-                                                    // Autosize textarea
-                                                    if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea-appearance-xxforms-autosize")) {
-                                                        ORBEON.xforms.Controls.autosizeTextarea(documentElement);
-                                                    }
-                                                }
-
-                                                // Handle required
-                                                if (required != null) {
-                                                    var isRequired = required == "true";
-                                                    if (isRequired) ORBEON.util.Dom.addClass(documentElement, "xforms-required");
-                                                    else ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
-                                                }
-                                                // Update the required-empty/required-full even if the required has not changed or
-                                                // is not specified as the value may have changed
-                                                if (!isStaticReadonly) {
-                                                    ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
-                                                }
-
-                                                // Handle readonly
-                                                if (readonly != null && !isStaticReadonly) {
-                                                    function setReadonlyOnFormElement(element, isReadonly) {
-                                                        if (isReadonly) {
-                                                            element.setAttribute("disabled", "disabled");
-                                                            ORBEON.util.Dom.addClass(element, "xforms-readonly");
-                                                        } else {
-                                                            element.removeAttribute("disabled");
-                                                            ORBEON.util.Dom.removeClass(element, "xforms-readonly");
-                                                        }
-                                                    }
-
-                                                    var isReadonly = readonly == "true";
-                                                    if (ORBEON.util.Dom.hasClass(documentElement, "xforms-input")) {
-                                                        // XForms input
-
-                                                        // Display value
-                                                        var displaySpan = documentElement.firstChild;
-                                                        while (displaySpan.nodeType != ELEMENT_TYPE) displaySpan = displaySpan.nextSibling;
-                                                        if (isReadonly) ORBEON.util.Dom.addClass(displaySpan, "xforms-readonly");
-                                                        else ORBEON.util.Dom.removeClass(displaySpan, "xforms-readonly");
-
-                                                        // Text field
-                                                        var textField = displaySpan.nextSibling;
-                                                        while (textField.nodeType != ELEMENT_TYPE) textField = textField.nextSibling;
-                                                        if (isReadonly) textField.setAttribute("disabled", "disabled");
-                                                        else textField.removeAttribute("disabled");
-
-                                                        // Calendar picker
-                                                        var showCalendar = textField.nextSibling;
-                                                        while (showCalendar.nodeType != ELEMENT_TYPE) showCalendar = showCalendar.nextSibling;
-                                                        if (isReadonly) ORBEON.util.Dom.addClass(showCalendar, "xforms-showcalendar-readonly");
-                                                        else ORBEON.util.Dom.removeClass(showCalendar, "xforms-showcalendar-readonly");
-                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-output")
-                                                            || ORBEON.util.Dom.hasClass(documentElement, "xforms-group")) {
-                                                        // XForms output and group
-                                                        if (isReadonly) ORBEON.util.Dom.addClass(documentElement, "xforms-readonly");
-                                                        else ORBEON.util.Dom.removeClass(documentElement, "xforms-readonly");
-                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-full")
-                                                            || ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-full")) {
-                                                        // XForms radio buttons
-                                                        for (var spanIndex = 0; spanIndex < documentElement.childNodes.length; spanIndex++) {
-                                                            var span = documentElement.childNodes[spanIndex];
-                                                            var input = span.firstChild;
-                                                            setReadonlyOnFormElement(input, isReadonly);
-                                                        }
-                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-autocomplete")) {
-                                                        // Auto-complete field
-                                                        var input = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
-                                                        setReadonlyOnFormElement(input, isReadonly);
-                                                    } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-textarea") && ORBEON.util.Dom.hasClass(documentElement, "xforms-mediatype-text-html")) {
-                                                        // XForms HTML area
-                                                        var htmlEditor = FCKeditorAPI.GetInstance(documentElement.name);
-                                                        if (isReadonly) {
-                                                            htmlEditor.ToolbarSet.Collapse();
-                                                            // TO-DO
-                                                        } else {
-                                                            htmlEditor.ToolbarSet.Expand();
-                                                            // TO-DO
-                                                        }
-                                                    } else {
-                                                        // Other controls
-                                                        setReadonlyOnFormElement(documentElement, isReadonly);
-                                                    }
                                                 }
 
                                                 // After we update classes on textarea, copy those classes on the FCKeditor iframe
@@ -3061,7 +3072,6 @@ function xformsLog(object) {
 }
 
 function xformsLogTime(text) {
-    return;
     var oldTime = ORBEON.xforms.Globals.debugLastTime;
     var currentTime = new Date().getTime();
     ORBEON.xforms.Globals.debugLastTime = currentTime;

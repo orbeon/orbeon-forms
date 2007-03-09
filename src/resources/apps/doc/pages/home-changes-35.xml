@@ -59,6 +59,12 @@
                         The following XForms issues were fixed in this release:
                         <ul>
                             <li>
+                                The tree and menu controls have been causing significant memory leaks on the browser,
+                                specifically on in IE. The leaks could be in the order of several MB per page load. If
+                                you are using the tree or menu control, you should consider upgrading to 3.5.1. <a
+                                href="http://tinyurl.com/2ozrpo">#306754</a>
+                            </li>
+                            <li>
                                 A NullPointerException which often happened when using the XForms Instance Inspector
                                 in a page. <a href="http://tinyurl.com/yors44">#306708</a>
                             </li>

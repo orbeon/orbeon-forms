@@ -131,7 +131,7 @@ public class XFormsServerDocumentCache {
     private static ObjectPool createXFormsContainingDocumentPool(XFormsState xformsState) {
         try {
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
-            pool.setFactory(new CachedPoolableObjetFactory(pool, xformsState));
+            pool.setFactory(new XFormsContainingDocumentPoolableObjetFactory(pool, xformsState));
 
             return pool;
         } catch (Exception e) {
@@ -139,11 +139,11 @@ public class XFormsServerDocumentCache {
         }
     }
 
-    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
+    private static class XFormsContainingDocumentPoolableObjetFactory implements PoolableObjectFactory {
         private final ObjectPool pool;
         private XFormsState xformsState;
 
-        public CachedPoolableObjetFactory(ObjectPool pool, XFormsState xformsState) {
+        public XFormsContainingDocumentPoolableObjetFactory(ObjectPool pool, XFormsState xformsState) {
             this.pool = pool;
             this.xformsState = xformsState;
         }

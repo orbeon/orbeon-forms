@@ -407,7 +407,7 @@ public class XFormsUtils {
 //    }
 
     // Use a Deflater pool as creating Deflaters is expensive
-    final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new CachedPoolableObjetFactory());
+    final static SoftReferenceObjectPool deflaterPool = new SoftReferenceObjectPool(new DeflaterPoolableObjetFactory());
 
 
     public static String encodeXML(PipelineContext pipelineContext, Document documentToEncode, String encryptionPassword) {
@@ -746,7 +746,7 @@ public class XFormsUtils {
         }
     }
 
-    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
+    private static class DeflaterPoolableObjetFactory implements PoolableObjectFactory {
         public Object makeObject() throws Exception {
             XFormsServer.logger.debug("XForms - creating new Deflater.");
             return new Deflater(Deflater.DEFAULT_COMPRESSION, true);

@@ -135,7 +135,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, modelElement);
 
         // Create XForms function library
-         xformsFunctionLibrary = new XFormsFunctionLibrary(this, getContainingDocument().getXFormsControls());
+        xformsFunctionLibrary = new XFormsFunctionLibrary(this, getContainingDocument().getXFormsControls());
     }
 
     public XFormsContainingDocument getContainingDocument() {

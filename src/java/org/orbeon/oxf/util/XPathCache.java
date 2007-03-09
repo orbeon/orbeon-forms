@@ -20,6 +20,7 @@ import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
 import org.orbeon.saxon.expr.ExpressionTool;
@@ -29,6 +30,7 @@ import org.orbeon.saxon.expr.Container;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
@@ -68,12 +70,12 @@ public class XPathCache {
     public static List evaluate(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpathExpression,
                          Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
 
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition,
+        final PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition,
                 xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
         try {
             return expr.evaluateKeepNodeInfo();
         } catch (XPathException e) {
-            throw new OXFException(e);
+            throw new ValidationException("Exception evaluating XPath expression: " + xpathExpression, e, null);
         } finally {
             if (expr != null)
                 expr.returnToPool();
@@ -94,12 +96,12 @@ public class XPathCache {
     public static Object evaluateSingle(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpathExpression,
                                  Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
 
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition,
+        final PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition,
                 xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
         try {
             return expr.evaluateSingleKeepNodeInfo();
         } catch (XPathException e) {
-            throw new OXFException(e);
+            throw new ValidationException("Exception evaluating XPath expression: " + xpathExpression, e, null);
         } finally {
             if (expr != null)
                 expr.returnToPool();
@@ -117,13 +119,12 @@ public class XPathCache {
      * Evaluate an XPath expression on the document and return its string value.
      */
     public static String evaluateAsString(PipelineContext pipelineContext, List contextNodeSet, int contextPosition, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-        PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition, "string(subsequence(" + xpath + ", 1, 1))",
-                        prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
+        final PooledXPathExpression xpathExpression = XPathCache.getXPathExpression(pipelineContext, contextNodeSet, contextPosition, "string(subsequence(" + xpath + ", 1, 1))",
+            prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
         try {
             return xpathExpression.evaluateSingleKeepNodeInfo().toString();
         } catch (XPathException e) {
-            throw new OXFException(e);
+            throw new ValidationException("Exception evaluating XPath expression: " + xpathExpression, e, null);
         } finally {
             if (xpathExpression != null) xpathExpression.returnToPool();
         }
@@ -142,7 +143,7 @@ public class XPathCache {
         return getXPathExpression(pipelineContext, contextNode, xpathExpression, prefixToURIMap, null, null, null);
     }
 
-     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
                                                            NodeInfo contextNode,
                                                            String xpathExpressionString,
                                                            Map prefixToURIMap,
@@ -164,11 +165,11 @@ public class XPathCache {
             // Find pool from cache
             final Long validity = new Long(0);
             final Cache cache = ObjectCache.instance(XPATH_CACHE_NAME, XPATH_CACHE_DEFAULT_SIZE);
-            final StringBuffer cacheKeyString = new StringBuffer(xpathExpressionString);
+            final FastStringBuffer cacheKeyString = new FastStringBuffer(xpathExpressionString);
             {
                 if (functionLibrary != null) {// This is ok
                     cacheKeyString.append('|');
-                    cacheKeyString.append(functionLibrary.hashCode());
+                    cacheKeyString.append(Integer.toString(functionLibrary.hashCode()));
                 }
             }
             {
@@ -177,14 +178,16 @@ public class XPathCache {
                 // safe to do so functionally, while not always optimal in memory as you may cache several times the
                 // same expression, except for the namespace context. If we do not cache per the namespace context, then
                 // we need to restore the namespace context before using the expression.
+
+                // TODO: PERF: It turns out that this takes a lot of time.
                 if (prefixToURIMap != null) {
                     final Map sortedMap = new TreeMap(prefixToURIMap);// this should make sure we always get the keys in the same order
                     for (Iterator i = sortedMap.entrySet().iterator(); i.hasNext();) {
                         final Map.Entry currentEntry = (Map.Entry) i.next();
                         cacheKeyString.append('|');
-                        cacheKeyString.append(currentEntry.getKey());
+                        cacheKeyString.append((String) currentEntry.getKey());
                         cacheKeyString.append('=');
-                        cacheKeyString.append(currentEntry.getValue());
+                        cacheKeyString.append((String) currentEntry.getValue());
                     }
                 }
             }
@@ -209,7 +212,7 @@ public class XPathCache {
 
             return expr;
         } catch (Exception e) {
-            throw new OXFException(e);
+            throw new ValidationException("Exception evaluating XPath expression: " + xpathExpressionString, e, null);
         }
     }
 
@@ -220,7 +223,7 @@ public class XPathCache {
                                               String baseURI) {
         try {
             final SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
-            pool.setFactory(new CachedPoolableObjetFactory(pool, xpathExpression,
+            pool.setFactory(new XFormsCachePoolableObjetFactory(pool, xpathExpression,
                     prefixToURIMap, variableToValueMap, functionLibrary, baseURI));
 
             return pool;
@@ -229,15 +232,15 @@ public class XPathCache {
         }
     }
 
-    private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
+    private static class  XFormsCachePoolableObjetFactory implements PoolableObjectFactory {
         private final String xpathExpression;
         private final Map prefixToURIMap;
-        private final Map variableToValueMap;
-        private final FunctionLibrary functionLibrary;
+        private final Map variableToValueMap;// TODO: should not store values in cache
+        private final FunctionLibrary functionLibrary;// TODO: should not store in cache, at least not store function library with references to XForms data structures
         private final ObjectPool pool;
         private final String baseURI;
 
-        public CachedPoolableObjetFactory(ObjectPool pool,
+        public XFormsCachePoolableObjetFactory(ObjectPool pool,
                                           String xpathExpression,
                                           Map prefixToURIMap,
                                           Map variableToValueMap,
@@ -361,7 +364,6 @@ public class XPathCache {
 
                 return new PooledXPathExpression(exp, pool, independentContext, variables);
             } catch (Throwable t) {
-                System.out.println(xpathExpression);
                 throw new OXFException(t);
             }
         }

@@ -996,8 +996,9 @@ public class XFormsControls {
         if (initialSwitchState == currentSwitchState)
             currentSwitchState = new SwitchState(new HashMap(initialSwitchState.getSwitchIdToSelectedCaseIdMap()));
 
-        getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
+        // TODO: if switch state changes AND we optimize relevance, then mark controls as dirty
 
+        getCurrentSwitchState().updateSwitchInfo(pipelineContext, containingDocument, getCurrentControlsState(), caseId);
     }
 
 
@@ -1187,13 +1188,16 @@ public class XFormsControls {
                 // Handle XForms grouping controls
                 pushBinding(pipelineContext, controlElement);
                 try {
-
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
                     final BindingContext currentBindingContext = getCurrentBindingContext();
                     if (doContinue) {
-                        // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we are not bound to a node OR we are bound to a relevant node
-                        if (!isOptimizeRelevance || !currentBindingContext.isNewBind()
-                                || (currentBindingContext.getSingleNode() != null && XFormsUtils.getInstanceDataUpdateInherited(currentBindingContext.getSingleNode()).getRelevant().get())) {
+                        // Recurse into grouping control if we don't optimize relevance, OR if we do optimize and we
+                        // are not bound to a node OR we are bound to a relevant node OR we are in a selected case
+                        if (!isOptimizeRelevance
+                                || (!currentBindingContext.isNewBind()
+                                    || (currentBindingContext.getSingleNode() != null && XFormsUtils.getInstanceDataUpdateInherited(currentBindingContext.getSingleNode()).getRelevant().get()))
+                                    && (!controlName.equals("case") || isCaseSelectedByControlElement(controlElement, effectiveControlId, idPostfix))) {
+
                             doContinue = handleControls(pipelineContext, controlElementVisitorListener, isOptimizeRelevance, controlElement, idPostfix);
                         }
                     }
@@ -1215,6 +1219,23 @@ public class XFormsControls {
                 break;
         }
         return doContinue;
+    }
+
+    private boolean isCaseSelectedByControlElement(Element controlElement, String caseElementEffectiveId, String idPostfix) {
+        final Element switchElement = controlElement.getParent();
+        final String switchId = switchElement.attributeValue("id");
+        final String switchElementEffectiveId = switchId + (idPostfix.equals("") ? "" : XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + idPostfix);
+
+        final XFormsControls.SwitchState switchState = containingDocument.getXFormsControls().getCurrentSwitchState();
+
+        // TODO: check @selected attribute, no?
+        if (switchState == null)
+            return true;
+
+        final Map switchIdToSelectedCaseIdMap = switchState.getSwitchIdToSelectedCaseIdMap();
+        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchElementEffectiveId);
+
+        return caseElementEffectiveId.equals(selectedCaseId);
     }
 
     /**
@@ -1293,6 +1314,7 @@ public class XFormsControls {
             this.controlElement = controlElement;
 
             if (nodeset != null && nodeset.size() > 0) {
+                // TODO: This seems to take some significant time                
                 for (Iterator i = nodeset.iterator(); i.hasNext();) {
                     final Object currentItem = i.next();
                     if (!(currentItem instanceof NodeInfo))
@@ -1870,5 +1892,20 @@ public class XFormsControls {
                 }
             }
         }
+    }
+
+    public void destroy() {
+        // HACK: this is a temp XForms Classic hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
+        locator = null;
+        initialControlsState = null;
+        currentControlsState = null;
+        initialSwitchState = null;
+        currentSwitchState = null;
+        initialDialogState = null;
+        currentDialogState = null;
+        containingDocument = null;
+        controlsDocument = null;
+        contextStack = null;
+        functionLibrary = null;
     }
 }

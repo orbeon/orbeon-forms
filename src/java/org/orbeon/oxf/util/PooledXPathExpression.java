@@ -40,9 +40,9 @@ public class PooledXPathExpression {
     private Configuration configuration;
     private SlotManager stackFrameMap;
     private ObjectPool pool;
+    private Map variables;
 
     // Dynamic context
-    private Map variables;
     private Map variableToValueMap;
     private List contextNodeSet;
     private int contextPosition;
@@ -60,6 +60,11 @@ public class PooledXPathExpression {
      */
     public void returnToPool() {
         try {
+            // Free up dynamic context references
+            variableToValueMap = null;
+            contextNodeSet = null;
+
+            // Return object to pool
             pool.returnObject(this);
         } catch (Exception e) {
             throw new OXFException(e);
@@ -241,15 +246,18 @@ public class PooledXPathExpression {
         if ((variables != null && variables.size() > 0) && (variableToValueMap == null || variableToValueMap.size() == 0))
             throw new OXFException("Expression requires variables.");
 
-        if ((variables == null || variables.size() ==0) && (variableToValueMap != null && variableToValueMap.size() > 0))
+        if ((variables == null || variables.size() == 0) && (variableToValueMap != null && variableToValueMap.size() > 0))
             throw new OXFException("Expression does not require variables.");
     }
 
     public void destroy() {
-        configuration = null;
         expression = null;
         pool = null;
+        configuration = null;
+        stackFrameMap = null;
         variables = null;
+
+        variableToValueMap = null;
         contextNodeSet = null;
     }
 }

@@ -15,7 +15,10 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.dom4j.Element;
+
+import java.util.Map;
 
 /**
  * Represents an xforms:case pseudo-control.
@@ -23,5 +26,21 @@ import org.dom4j.Element;
 public class XFormsCaseControl extends XFormsControl {
     public XFormsCaseControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
         super(containingDocument, parent, element, name, id);
+    }
+
+    public boolean isSelected() {
+
+        final XFormsControl switchControl = getParent();
+        final XFormsControls.SwitchState switchState = containingDocument.getXFormsControls().getCurrentSwitchState();
+
+        final Map switchIdToSelectedCaseIdMap = switchState.getSwitchIdToSelectedCaseIdMap();
+        final String selectedCaseId = (String) switchIdToSelectedCaseIdMap.get(switchControl.getEffectiveId());
+
+        return getEffectiveId().equals(selectedCaseId);
+    }
+
+    public boolean isVisible() {
+        final XFormsControl switchControl = getParent();
+        return isSelected() || switchControl.isStaticReadonly();
     }
 }

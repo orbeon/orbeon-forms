@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -35,10 +34,11 @@ public class XPathCacheStandaloneContext extends IndependentContext {
         getConfiguration().setURIResolver(URI_RESOLVER);
     }
 
-    public XPathCacheStandaloneContext(Configuration configuration) {
-        super(configuration);
-        getConfiguration().setURIResolver(URI_RESOLVER);
-    }
+    // This is not used
+//    public XPathCacheStandaloneContext(Configuration configuration) {
+//        super(configuration);
+//        getConfiguration().setURIResolver(URI_RESOLVER);
+//    }
 
     private static class XPathCacheURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {

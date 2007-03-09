@@ -562,6 +562,98 @@
                     <a href="http://www.orbeon.com/support">support page</a> for more information.
                 </p>
             </section>
+            <a name="xforms-server-submit"/>
+            <section added="2007-03-09">
+                <title>What is the matter about this <code>/xforms-server-submit</code> I am seeing?</title>
+                <p>
+                    Remember that the Orbeon Forms XForms engine runs for the most part on the server. This means that
+                    when you perform an XForms submission that uses HTTP, that submission usually originates from the
+                    server, not from the client. Consider the following submission:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" ref="instance('my-instance')"
+                                       method="post" action="http://my.example.com/service" replace="all"/>
+                </xml-source>
+                <p>
+                    This is how this submission is processed.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The server part of Orbeon Forms tells the Orbeon Forms client (in your web browser) to
+                            perform a <code>POST</code> submission at the special Orbeon Forms URL
+                            <code>/xforms-server-submit</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Orbeon Forms responds to that URL and issues an HTTP POST to
+                            <code>http://my.example.com/service</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Orbeon Forms forwards the result of the HTTP request to your web browser.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    This is why you see <code>/xforms-server-submit</code> in URL bar.
+                </p>
+                <p>
+                    Ideally, you would like to see <code>http://my.example.com/service</code> appear in your URL bar,
+                    but technically this is hard to achieve for the following reasons:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The only way to POST XML documents from a browser is to use the XmlHttpRequest object, and
+                            if you do that, you cannot easily, if at all, implement the <code>replace="all"</code>
+                            functionality.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            There are limitations as to what URLs your browser can talk to from a given page, for
+                            security reasons (this is known as cross-domain requests).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    In short we don't believe we will solve this problem perfectly in the short-term, unless we get
+                    clever suggestions as to how this can be done. However, "nice" client-side URLs are already used in
+                    the following cases:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            When using the <code>method="get"</code> method with <code>replace="all"</code>:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:submission xmlns:xforms="http://www.w3.org/2002/xforms" ref="instance('my-instance')"
+                                               method="get" action="http://my.example.com/service" replace="all"/>
+                        </xml-source>
+                        <p>
+                            Note that this assumes the following property is set in <code>properties.xml</code>:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <property as="xs:boolean" name="oxf.xforms.optimize-get-all" value="true"/>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            When using <code>xforms:load</code> instead of <code>xforms:submission</code>:
+                        </p>
+                        <xml-source show-namespaces="false">
+                            <xforms:load xmlns:xforms="http://www.w3.org/2002/xforms" resource="http://my.example.com/service"/>
+                        </xml-source>
+                    </li>
+                </ul>
+                <p>
+                    Finally, note that performing submission from the server offers certain advantages, including solving
+                    cross-domain access.
+                </p>
+            </section>
         </section>
         <a name="xpl"/>
         <section>

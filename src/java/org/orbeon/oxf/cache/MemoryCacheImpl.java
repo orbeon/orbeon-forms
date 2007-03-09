@@ -80,10 +80,12 @@ public class MemoryCacheImpl implements Cache {
     }
 
     public synchronized void remove(PipelineContext context, CacheKey key) {
-        CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
-        keyToEntryMap.remove(key);
-        linkedList.remove(entry.listEntry);
-        currentSize--;
+        final CacheEntry entry = (CacheEntry) keyToEntryMap.get(key);
+        if (entry != null) {
+            keyToEntryMap.remove(key);
+            linkedList.remove(entry.listEntry);
+            currentSize--;
+        }
     }
 
     public synchronized Object findValid(PipelineContext context, CacheKey key, Object validity) {

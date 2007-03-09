@@ -78,7 +78,7 @@
                     <li>
                         <p>
                             <i>Orbeon Forms</i> better reflects the fact that forms have been the main focus of our
-                            development efforts over the last two years.
+                            development efforts since 2004.
                         </p>
                     </li>
                     <li>
@@ -553,13 +553,16 @@
                     that contain embedded XForms markup.
                 </p>
                 <p>
-                    Orbeon Forms 3.5 will come with a new tutorial that explains step by step how to create your first
-                    forms. In the meanwhile, we recommend you look at the sample Orbeon Forms applications that you find
-                    under your WAR file's <code>WEB-INF/resources/apps</code> directory.
+                    Orbeon Forms 3.5 comes with a <a href="intro-tutorial">new tutorial</a> that explains step by step
+                    how to create your first forms. In the meanwhile, we recommend you look at the sample Orbeon Forms
+                    applications that you find under your WAR file's <code>WEB-INF/resources/apps</code> directory.
                 </p>
                 <p>
                     Also note that Orbeon provides services around Orbeon Forms, including training. Please visit our
                     <a href="http://www.orbeon.com/support">support page</a> for more information.
+                </p>
+                <p>
+                    In the future, we hope to be able to provide a web-based tool to help build forms.
                 </p>
             </section>
             <a name="xforms-server-submit"/>
@@ -833,61 +836,43 @@
                     </li>
                 </ul>
                 <p>
-                    Under those assumptions, the XSLT transformation does not
-                    have side effects, which means that if neither the XSLT
-                    stylesheet
-                    (
-                    <code>config</code> input) nor the input XML
-                    document (
-                    <code>data</code> input) change, the output of the
-                    transformation will be the same.
+                    Under those assumptions, the XSLT transformation does not have side effects, which means that if
+                    neither the XSLT stylesheet ( <code>config</code> input) nor the input XML document (
+                    <code>data</code> input) change, the output of the transformation will be the same.
                 </p>
                 <p>
-                    If you were to keep the result of the transformation,
-                    knowing that both inputs have not changed since the last
-                    time you generated that output, you wouldn't have to
-                    actually run the transformation again: you could just reuse
-                    the result you already have. This is the basic of caching in
-                    Orbeon Forms.
+                    If you were to keep the result of the transformation, knowing that both inputs have not changed
+                    since the last time you generated that output, you wouldn't have to actually run the transformation
+                    again: you could just reuse the result you already have. This is the basic of caching in Orbeon
+                    Forms.
                 </p>
                 <p>
-                    In this example, the result of the XSLT transformation is
-                    used to create an XUpdate processor configuration, which is
-                    an XUpdate program that will be interpreted or compiled by
-                    the XUpdate processor. Instead of keeping the result of the
-                    XSLT transformation as an XML document, the XUpdate
-                    processor can cache the compiled XUpdate program. Compared
-                    to a solution where the XML document is cached, this
-                    technique saves memory by not keeping the XML document in
-                    cache, and saves processing power by preventing the XUpdate
-                    processor to recompile its program.
+                    In this example, the result of the XSLT transformation is used to create an XUpdate processor
+                    configuration, which is an XUpdate program that will be interpreted or compiled by the XUpdate
+                    processor. Instead of keeping the result of the XSLT transformation as an XML document, the XUpdate
+                    processor can cache the compiled XUpdate program. Compared to a solution where the XML document is
+                    cached, this technique saves memory by not keeping the XML document in cache, and saves processing
+                    power by preventing the XUpdate processor to recompile its program.
                 </p>
                 <p>
-                    Therefore, if neither the XSLT transformer's
-                    <code>config</code> nor
-                    <code>data</code> input has changed, the XUpdate processor can keep the
-                    same program in the Orbeon Forms object cache, saving an XSLT stylesheet
-                    compilation, an XSLT transformation, and an XUpdate program compilation.
+                    Therefore, if neither the XSLT transformer's <code>config</code> nor <code>data</code> input has
+                    changed, the XUpdate processor can keep the same program in the Orbeon Forms object cache, saving
+                    an XSLT stylesheet compilation, an XSLT transformation, and an XUpdate program compilation.
                 </p>
                 <p>
-                    The same mechanism applies to the XSLT transformer configuration: the compiled
-                    XSLT stylesheet can be kept in the Orbeon Forms object cache. And if the
-                    output of the XUpdate transformation is sent to an HTML serializer, the HTML
-                    output could be cached as well.
+                    The same mechanism applies to the XSLT transformer configuration: the compiled XSLT stylesheet can
+                    be kept in the Orbeon Forms object cache. And if the output of the XUpdate transformation is sent
+                    to an HTML serializer, the HTML output could be cached as well.
                 </p>
                 <p>
-                    In general, Orbeon Forms does not unnecessarily cache the XML
-                    documents passed between processors. Instead, it caches the
-                    result of time-consuming operations, as illustrated above.
+                    In general, Orbeon Forms does not unnecessarily cache the XML documents passed between processors.
+                    Instead, it caches the result of time-consuming operations, as illustrated above.
                 </p>
                 <p>
-                    Some cases are more complex than the example shown here. For
-                    example in the case of XSLT 1.0, Orbeon Forms handles caching and
-                    dependencies related to imports, includes as well as the
-                    XPath
-                    <code>document()</code> function when the URL passed
-                    to the function is static. Some processors, like the SQL
-                    processors, never allow their output to be cached.
+                    Some cases are more complex than the example shown here. For example in the case of XSLT 1.0, Orbeon
+                    Forms handles caching and dependencies related to imports, includes as well as the XPath
+                    <code>document()</code> function when the URL passed to the function is static. Some processors,
+                    like the SQL processors, never allow their output to be cached.
                 </p>
             </section>
             <a name="debug-attr-perf"/>
@@ -1298,7 +1283,7 @@
                     tend to bid on proprietary extensions to the standard XQuery language (e.g. see
                     what Tamino does, and there are talks about implementing something similar in
                     the open source eXist database). In the future, XQuery will support standard
-                    update features, but that is probably years away.
+                    update features.
                 </p>
                 <p>
                     We do recognize that XUpdate has definite advantages over XSLT in certain use
@@ -1352,9 +1337,9 @@
                     method with an attribute that has an empty local name.
                 </p>
                 <p>
-                    Switching to Saxon will solve the problem. Saxon is now the default XSLT 1.0 and
-                    XSLT 2.0 processor in Orbeon Forms, and will get used when using <code>oxf:xslt</code>.
-                    See the <a href="processors-xslt">XSLT documentation</a> for more information.
+                    Switching to Saxon solves the problem. Saxon is now the default XSLT 1.0 and XSLT 2.0 processor in
+                    Orbeon Forms, and will get used when using <code>oxf:xslt</code>. See the <a
+                    href="processors-xslt">XSLT documentation</a> for more information.
                 </p>
             </section>
             <a name="xml-base"/>
@@ -1416,9 +1401,8 @@
                     <li>acceptCount="50"</li>
                 </ul>
                 <p>
-                    This setting will set a small maximum of 3 concurrent requests, and 50 more
-                    requests being queued. This will ensure that memory usage does not go out of
-                    control.
+                    This setting sets a small maximum of 3 concurrent requests, and 50 more requests being queued. This
+                    ensures that memory usage does not go out of control.
                 </p>
                 <p>
                     Then, experiment with a tool like Apache JMeter to test load, and adjust those

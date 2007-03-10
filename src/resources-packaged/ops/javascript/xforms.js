@@ -68,6 +68,8 @@ ORBEON.xforms.Globals = {
     requestForm: null,                   // HTML for the request currently in progress
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
     lastRequestIsError: false,           // Whether the last XHR request returned an error
+    lastFocusControlId: null,            // Id if the control that received a focus event
+    lastBlurControlId: null,             // Id if the control that received a blur event
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
@@ -490,6 +492,10 @@ ORBEON.xforms.Controls = {
                 }
             }
             return selectValue;
+        } else if (ORBEON.util.Dom.hasClass(control, "xforms-textarea")
+                        && ORBEON.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            var editorInstance = FCKeditorAPI.GetInstance(control.name);
+            return editorInstance.GetXHTML();
         } else {
             return control.value;
         }
@@ -782,24 +788,28 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                // Activate hint if we found one
-                ORBEON.xforms.Controls.hintActive(target, true);
-                // Store initial value of control
-                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
-                    ORBEON.xforms.Globals.serverValue[target.id] = target.value;
-                // Send focus events
-                if (ORBEON.xforms.Globals.previousDOMFocusOut) {
-                    if (ORBEON.xforms.Globals.previousDOMFocusOut != target) {
-                        var events = new Array();
-                        events.push(xformsCreateEventArray
-                            (ORBEON.xforms.Globals.previousDOMFocusOut, "DOMFocusOut", null));
-                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                        xformsFireEvents(events, true);
-                    }
-                    ORBEON.xforms.Globals.previousDOMFocusOut = null;
-                } else {
-                    if (document.xformsPreviousDOMFocusIn != target) {
-                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
+                if (ORBEON.xforms.Globals.lastFocusControlId != target.id) {
+                    // Save id of the control that received blur last
+                    ORBEON.xforms.Globals.lastFocusControlId = target.id;
+                    // Activate hint if we found one
+                    ORBEON.xforms.Controls.hintActive(target, true);
+                    // Store initial value of control
+                    if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
+                        ORBEON.xforms.Globals.serverValue[target.id] = target.value;
+                    // Send focus events
+                    if (ORBEON.xforms.Globals.previousDOMFocusOut) {
+                        if (ORBEON.xforms.Globals.previousDOMFocusOut != target) {
+                            var events = new Array();
+                            events.push(xformsCreateEventArray
+                                (ORBEON.xforms.Globals.previousDOMFocusOut, "DOMFocusOut", null));
+                            events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                            xformsFireEvents(events, true);
+                        }
+                        ORBEON.xforms.Globals.previousDOMFocusOut = null;
+                    } else {
+                        if (document.xformsPreviousDOMFocusIn != target) {
+                            xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
+                        }
                     }
                 }
             }
@@ -813,16 +823,24 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                // De-activate hint if we found one
-                ORBEON.xforms.Controls.hintActive(target, false);
-                // This is an event for an XForms control
-                ORBEON.xforms.Globals.previousDOMFocusOut = target;
-                // HTML area does not throw value change event, so we throw it on blur
-                if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
-                        && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
-                    var editorInstance = FCKeditorAPI.GetInstance(target.name);
-                    target.value = editorInstance.GetXHTML();
-                    xformsValueChanged(target, null);
+                if (ORBEON.xforms.Globals.lastBlurControlId != target.id) {
+                    // Save id of the control that received blur last
+                    ORBEON.xforms.Globals.lastBlurControlId = target.id;
+                    // De-activate hint if we found one
+                    ORBEON.xforms.Controls.hintActive(target, false);
+                    // This is an event for an XForms control
+                    ORBEON.xforms.Globals.previousDOMFocusOut = target;
+                    // HTML area and trees does not throw value change event, so we throw it on blur
+                    if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
+                            && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
+                        // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't dupplicate the code here
+                        var editorInstance = FCKeditorAPI.GetInstance(target.name);
+                        target.value = editorInstance.GetXHTML();
+                        xformsValueChanged(target, null);
+                    } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-tree")
+                            || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-xxforms-tree")) {
+                        xformsValueChanged(target, null);
+                    }
                 }
             }
         }
@@ -1182,7 +1200,7 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * Handle click on check box for select tree.
+     * xforms:select tree: handle click on check box
      */
     treeCheckClick: function() {
         var tree = this.tree;
@@ -1195,11 +1213,12 @@ ORBEON.xforms.Events = {
                 control.value += node.data.value;
             }
         }
-        xformsValueChanged(control);
+        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+            xformsValueChanged(control);
     },
 
     /**
-     * Handle click on label in a tree that corresponds to xforms:select.
+     * xforms:select tree: handle click on label
      */
     treeSelectSelect: function(id, value) {
         var control = ORBEON.util.Dom.getElementById(id);
@@ -1218,12 +1237,13 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * Handle click on label in a tree that corresponds to xforms:select1.
+     * xforms:select1 tree: handle click on label
      */
     treeSelect1Select: function(id, value) {
         var control = ORBEON.util.Dom.getElementById(id);
         control.value = value;
-        xformsValueChanged(control);
+        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+            xformsValueChanged(control);
     }
 };
 
@@ -2007,8 +2027,8 @@ ORBEON.xforms.Server = {
                                                             cursor = cursor.previousSibling;
                                                         }
                                                         afterInsertionPoint = cursor;
-                                                    } else {
                                                         // Nested repeat: does not contain a template
+                                                    } else {
                                                         var repeatEnd = ORBEON.util.Dom.getElementById("repeat-end-" + xformsAppendRepeatSuffix(repeatId, parentIndexes));
                                                         afterInsertionPoint = repeatEnd;
                                                     }

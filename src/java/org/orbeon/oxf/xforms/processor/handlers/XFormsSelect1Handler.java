@@ -561,7 +561,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemEffectiveId);
             reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
             reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// TODO: may have duplicate ids for itemsets
-            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue());
+            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getValue() == null ? "" : item.getValue());
 
             if (!handlerContext.isGenerateTemplate() && xformsControl != null) {
                 final String itemValue = ((item.getValue() == null) ? "" : item.getValue()).trim();
@@ -598,7 +598,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final String optionValue = item.getValue();
         final AttributesImpl optionAttributes = getAttributes(new AttributesImpl(), null, null);
 
-        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue);
+        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, optionValue == null ? "" : optionValue);
 
         // Figure out whether what items are selected
         if (!handlerContext.isGenerateTemplate() && xformsControl != null) {

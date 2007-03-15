@@ -79,7 +79,7 @@ public class XFormsUploadHandler extends XFormsValueControlHandler {
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "file");
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
-                        handlerContext.isGenerateTemplate() ? "" : xformsControl.getValue() != null ? xformsControl.getValue() : "");
+                        handlerContext.isGenerateTemplate() || xformsControl.getValue() == null ? "" : xformsControl.getValue());
 
                 // Copy special attributes in xxforms namespace
                 copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);

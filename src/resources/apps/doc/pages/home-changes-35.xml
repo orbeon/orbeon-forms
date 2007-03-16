@@ -75,6 +75,17 @@
                         </ul>
                     </p>
                 </li>
+                <li>
+                    <p>
+                        The following other issues were fixed in this release:
+                        <ul>
+                            <li>
+                                Using the URL generator with a long URL could create a stack overflow error under
+                                certain circumstances. <a href="http://tinyurl.com/2dpnaf">#306795</a>
+                            </li>
+                        </ul>
+                    </p>
+                </li>
             </ul>
         </section>
         <a name="changes-35"/>

@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.common.OXFException;
 
 /**
  * 9.2.3 The toggle Element
@@ -32,6 +33,10 @@ public class XFormsToggleAction extends XFormsAction {
         final XFormsContainingDocument containingDocument = actionInterpreter.getContainingDocument();
 
         final String caseId = XFormsUtils.namespaceId(containingDocument, actionElement.attributeValue("case"));
+
+        if (caseId == null)
+            throw new OXFException("Missing mandatory case attribute on xforms:toggle element.");
+
         final String effectiveCaseId = xformsControls.findEffectiveCaseId(caseId);
 
         if (effectiveCaseId != null) { // can be null if the switch is not relevant

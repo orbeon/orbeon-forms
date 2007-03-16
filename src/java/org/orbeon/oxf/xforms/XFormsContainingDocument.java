@@ -829,8 +829,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
-
         try {
+            if (targetObject == null)
+                throw new OXFException("Target object null for event: " + event.getEventName());
+
             // Find all event handler containers
             final List containers = new ArrayList();
             {
@@ -922,7 +924,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             }
         } catch (Exception e) {
             // Add OPS trace information if possible
-            final LocationData locationData = targetObject.getLocationData();
+            final LocationData locationData = (targetObject != null) ? targetObject.getLocationData() : null;
             if (locationData != null)
                 throw ValidationException.wrapException(e, locationData);
             else if (e instanceof OXFException)

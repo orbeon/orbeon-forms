@@ -18,16 +18,12 @@
         <element name="config">
             <choice>
                 <!-- URL is directly under the config element -->
-                <data type="string">
-                    <param name="pattern">\s*\S.*\s*</param>
-                </data>
+                <data type="string"/>
                 <group>
                     <!-- If there are other options, the URL must be in a child element -->
                     <!-- Case of XML -->
                     <element name="url">
-                        <data type="string">
-                            <param name="pattern">\s*\S.*\s*</param>
-                        </data>
+                        <data type="string"/>
                     </element>
                     <interleave>
                         <optional>

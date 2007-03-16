@@ -253,7 +253,7 @@ public class TransformerUtils {
         final Templates templates = factory.newTemplates(source);
         // These should only be used during stylesheet compilation. It is dangerous to keep them around when the
         // Templates object is cached especially the URI Resolver which may reference PipelineContext objects.
-        factory.setErrorListener(null);
+//        factory.setErrorListener(null);// This causes issues with Xalan
         factory.setURIResolver(null);
 
         return templates;

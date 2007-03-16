@@ -35,6 +35,7 @@ import org.orbeon.saxon.query.XQueryExpression;
 import org.xml.sax.ContentHandler;
 
 import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.URIResolver;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +46,7 @@ import java.util.Properties;
  *
  * TODO: should work like the XSLT processor, and handle:
  *
- *   o caching
+ *   o caching [BE CAREFUL WITH NOT CACHING TransformerURIResolver!]
  *   o errors
  *   o additional inputs
  *   o etc.
@@ -85,10 +86,11 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
                     // Create XQuery configuration (depends on attributes input)
+                    final URIResolver uriResolver = new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
                     final Configuration config = new Configuration();
                     {
                         config.setErrorListener(new StringErrorListener(logger));
-                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
+                        config.setURIResolver(uriResolver);
 
                         // Read attributes
                         Map attributes = null;
@@ -141,7 +143,10 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                             }
 
                             try {
-                                return staticContext.compileQuery(xqueryBody);
+                                final XQueryExpression result = staticContext.compileQuery(xqueryBody);
+                                // Clear URI resolver from static context as this must not end up in the cache
+                                staticContext.getConfiguration().setURIResolver(null);
+                                return result;
                             } catch (Exception e) {
                                 throw new OXFException(e);
                             }
@@ -151,6 +156,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Create dynamic context and run query
                     DynamicQueryContext dynamicContext =  new DynamicQueryContext(config);
                     dynamicContext.setContextNode(staticContext.buildDocument(new DocumentSource(dataDocument)));
+                    dynamicContext.setURIResolver(uriResolver);
                     // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded
                     xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new Properties());
 

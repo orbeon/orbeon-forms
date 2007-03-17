@@ -50,8 +50,7 @@
     <property as="xs:integer" name="oxf.xforms.cache.session.size"                   value="500000"/>
     <property as="xs:integer" name="oxf.xforms.cache.application.size"               value="2000000"/>
     <property as="xs:integer" name="oxf.xforms.cache.documents.size"                 value="10"/>
-    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="10"/>
-    <!--<property as="xs:integer" name="oxf.cache.xforms-sessions.size"                  value="10"/>-->
+    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"          value="40"/>
 
     <!-- Other XForms options -->
     <property as="xs:boolean" name="oxf.xforms.optimize-post-all"                    value="true"/>

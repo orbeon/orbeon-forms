@@ -136,7 +136,7 @@ public class XFormsFeatures {
     private static final ResourceConfig[] scripts = {
             // Calendar scripts
             // TODO: move to YUI in the future if possible
-            new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
+             new ResourceConfig("/ops/javascript/jscalendar/calendar.js", "/ops/javascript/jscalendar/calendar-min.js"),// our min version
             new ResourceConfig("/ops/javascript/jscalendar/lang/calendar-en.js", "/ops/javascript/jscalendar/lang/calendar-en-min.js"),// our min version
             new ResourceConfig("/ops/javascript/jscalendar/calendar-setup.js", "/ops/javascript/jscalendar/calendar-setup-min.js"),// our min version
             // Yahoo UI Library
@@ -313,7 +313,7 @@ public class XFormsFeatures {
         }
     }
 
-    public static String getCombinedResourcesName(Map appearancesMap, boolean isMinimal) {
+    public static String getCombinedResourcesPrefix(Map appearancesMap, boolean isMinimal) {
         if (XFormsUtils.isCombineResources()) {
             final FastStringBuffer sb = new FastStringBuffer("/xforms-server/xforms");
             for (int i = 0; i < features.length; i++) {

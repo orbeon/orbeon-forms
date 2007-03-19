@@ -71,14 +71,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             resources = XFormsFeatures.getJavaScriptResourcesByFeatureMap(requestedFeaturesMap);
 
         // Get last modified date
-        long combinedLastModified = 0;
-        for (Iterator i = resources.iterator(); i.hasNext();) {
-            final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
-
-            final long lastModified = ResourceManagerWrapper.instance().lastModified(resourceConfig.getResourcePath(isMinimal), false);
-            if (lastModified > combinedLastModified)
-                combinedLastModified = lastModified;
-        }
+        final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
 
         // If conditional get and date ok, send not modified
 
@@ -95,43 +88,112 @@ public class XFormsResourceServer extends ProcessorImpl {
             response.setContentType(isCSS ? "text/css" : "application/javascript");
             final OutputStream responseOutputStream = response.getOutputStream();
             {
-                final boolean cacheCombinedResources = XFormsUtils.isCacheCombinedResources();
-                final String realPath = (cacheCombinedResources) ? ResourceManagerWrapper.instance().getRealPath(requestPath) : null;
-                if (realPath != null) {
-                    // We hope to be able to cache as a resource
-                    final File resourceFile = new File(realPath);
-                    if (resourceFile.exists()) {
-                        final long resourceLastModified = resourceFile.lastModified();
-                        if (resourceLastModified < combinedLastModified) {
-                            // Resource is out of date, generate
-                            final FileOutputStream fos = new FileOutputStream(resourceFile);
-                            generate(resources, response, fos, isCSS, isMinimal);
-                            fos.close();
-                        }
+                final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+                if (XFormsUtils.isCacheCombinedResources()) {
+                    // Caching requested
+                    final File resourceFile = cacheResources(resources, response, requestPath, combinedLastModified, isCSS, isMinimal);
+                    if (resourceFile != null) {
+                        // Caching could take place, send out cached result
+                        if (isDebugEnabled)
+                            XFormsServer.logger.debug("XForms resources - serving from cache " + requestPath + ".");
+                        final FileInputStream fis = new FileInputStream(resourceFile);
+                        NetUtils.copyStream(fis, responseOutputStream);
+                        fis.close();
+                        responseOutputStream.flush();
                     } else {
-                        // Resource doesn't exist, generate
-                        resourceFile.getParentFile().mkdirs();
-                        resourceFile.createNewFile();
-                        final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        generate(resources, response, fos, isCSS, isMinimal);
-                        fos.close();
+                        // Was unable to cache, just serve
+                        if (isDebugEnabled)
+                            XFormsServer.logger.debug("XForms resources - caching requested but not possible, serving directly " + requestPath + ".");
+                        generate(resources, response, responseOutputStream, isCSS, isMinimal);
                     }
-
-                    final FileInputStream fis = new FileInputStream(resourceFile);
-                    NetUtils.copyStream(fis, responseOutputStream);
-                    fis.close();
-                    responseOutputStream.flush();
                 } else {
-                    // Otherwise, don't try the cache and send content directly
+                    // Should not cache, just serve
+                    if (isDebugEnabled)
+                        XFormsServer.logger.debug("XForms resources - caching not requested, serving directly " + requestPath + ".");
                     generate(resources, response, responseOutputStream, isCSS, isMinimal);
                 }
             }
+        } catch (OXFException e) {
+            throw e;
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
-    private void generate(List resources, ExternalContext.Response response, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
+    /**
+     * Compute the last modification date of the given resources.
+     *
+     * @param resources     list of XFormsFeatures.ResourceConfig to consider
+     * @param isMinimal     whether to use minimal resources
+     * @return              last modification date
+     */
+    public static long computeCombinedLastModified(List resources, boolean isMinimal) {
+        long combinedLastModified = 0;
+        for (Iterator i = resources.iterator(); i.hasNext();) {
+            final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
+
+            final long lastModified = ResourceManagerWrapper.instance().lastModified(resourceConfig.getResourcePath(isMinimal), false);
+            if (lastModified > combinedLastModified)
+                combinedLastModified = lastModified;
+        }
+        return combinedLastModified;
+    }
+
+    /**
+     * Try to cache the combined resources on disk.
+     *
+     * @param resources             list of XFormsFeatures.ResourceConfig to consider
+     * @param response              Response (used for rewriting)
+     * @param resourcePath          path to store the cached resource to
+     * @param combinedLastModified  last modification date of the resources to combine
+     * @param isCSS                 whether to generate CSS or JavaScript resources
+     * @param isMinimal             whether to use minimal resources
+     * @return                      File pointing to the generated resource, null if caching could not take place
+     */
+    public static File cacheResources(List resources, ExternalContext.Response response, String resourcePath, long combinedLastModified, boolean isCSS, boolean isMinimal) {
+        try {
+            final File resourceFile;
+            final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
+            final boolean isDebugEnabled = XFormsServer.logger.isDebugEnabled();
+            if (realPath != null) {
+                // We hope to be able to cache as a resource
+                resourceFile = new File(realPath);
+                if (resourceFile.exists()) {
+                    // Resources exist, generate if needed
+                    final long resourceLastModified = resourceFile.lastModified();
+                    if (resourceLastModified < combinedLastModified) {
+                        // Resource is out of date, generate
+                        if (isDebugEnabled)
+                            XFormsServer.logger.debug("XForms resources - cached combined resources out of date, saving " + resourcePath + ".");
+                        final FileOutputStream fos = new FileOutputStream(resourceFile);
+                        generate(resources, response, fos, isCSS, isMinimal);
+                        fos.close();
+                    } else {
+                        if (isDebugEnabled)
+                            XFormsServer.logger.debug("XForms resources - cached combined resources exist and are up-to-date for " + resourcePath + ".");
+                    }
+                } else {
+                    // Resource doesn't exist, generate
+                    if (isDebugEnabled)
+                        XFormsServer.logger.debug("XForms resources - cached combined resources don't exist, saving " + resourcePath + ".");
+                    resourceFile.getParentFile().mkdirs();
+                    resourceFile.createNewFile();
+                    final FileOutputStream fos = new FileOutputStream(resourceFile);
+                    generate(resources, response, fos, isCSS, isMinimal);
+                    fos.close();
+                }
+            } else {
+                if (isDebugEnabled)
+                    XFormsServer.logger.debug("XForms resources - unable to locate real path for cached combined resources, not saving " + resourcePath + ".");
+                resourceFile = null;
+            }
+            return resourceFile;
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private static void generate(List resources, ExternalContext.Response response, OutputStream os, boolean CSS, boolean minimal) throws URISyntaxException, IOException {
         if (CSS) {
             // CSS, rewrite content
             final URI applicationBaseURI;

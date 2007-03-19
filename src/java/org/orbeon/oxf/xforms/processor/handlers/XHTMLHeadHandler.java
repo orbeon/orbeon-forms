@@ -18,6 +18,8 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.processor.XFormsFeatures;
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
+import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -86,12 +88,30 @@ public class XHTMLHeadHandler extends HandlerBase {
 
         // Create prefix for combined resources if needed
         final boolean isMinimal = XFormsUtils.isMinimalResources();
-        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesName(appearancesMap, isMinimal);
+        final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(appearancesMap, isMinimal);
+
+        final boolean isCombineResources = XFormsUtils.isCombineResources();
+        final boolean isCacheCombinedResources = (isCombineResources) ? XFormsUtils.isCacheCombinedResources() : false;
+        if (isCombineResources) {
+            XFormsServer.logger.debug("XForms resources - creating xhtml:head with combined resources.");
+            if (isCacheCombinedResources) {
+                XFormsServer.logger.debug("XForms resources - attempting to cache combined resources.");
+            }
+        }
 
         // Stylesheets
-        if (XFormsUtils.isCombineResources()) {
+        if (isCombineResources) {
+            final String combinedResourceName = combinedResourcesPrefix + ".css";
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
-                        "rel", "stylesheet", "href", combinedResourcesPrefix + ".css", "type", "text/css"});
+                        "rel", "stylesheet", "href", combinedResourceName, "type", "text/css"});
+
+            if (isCacheCombinedResources) {
+                // Attempt to cache combined resources
+                // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
+                final List resources = XFormsFeatures.getCSSResources(appearancesMap);
+                final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
+                XFormsResourceServer.cacheResources(resources, externalContext.getResponse(), combinedResourceName, combinedLastModified, true, isMinimal);
+            }
         } else {
             for (Iterator i = XFormsFeatures.getCSSResources(appearancesMap).iterator(); i.hasNext();) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
@@ -104,9 +124,19 @@ public class XHTMLHeadHandler extends HandlerBase {
         // Scripts
         if (!containingDocument.isReadonly()) {
 
-            if (XFormsUtils.isCombineResources()) {
+            if (isCombineResources) {
+                final String combinedResourceName = combinedResourcesPrefix + ".js";
                 helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                        "type", "text/javascript", "src", combinedResourcesPrefix + ".js"});
+                        "type", "text/javascript", "src", combinedResourceName});
+
+                if (isCacheCombinedResources) {
+                    // Attempt to cache combined resources
+                    // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
+                    final List resources = XFormsFeatures.getJavaScriptResources(appearancesMap);
+                    final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
+                    XFormsResourceServer.cacheResources(resources, externalContext.getResponse(), combinedResourceName, combinedLastModified, false, isMinimal);
+                }
+
             } else {
                 for (Iterator i = XFormsFeatures.getJavaScriptResources(appearancesMap).iterator(); i.hasNext();) {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
@@ -115,7 +145,6 @@ public class XHTMLHeadHandler extends HandlerBase {
                             "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal)});
                 }
             }
-
 
             // User-defined scripts (with xxforms:script)
             final Map scriptsToDeclare = containingDocument.getScripts();

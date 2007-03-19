@@ -27,11 +27,12 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utilities for XForms submission processing.
@@ -321,5 +322,147 @@ public class XFormsSubmissionUtils {
 
     public static String getHttpMethod(String method) {
         return isGet(method) ? "GET" : isPost(method) ? "POST" : isPut(method) ? "PUT" : isDelete(method) ? "DELETE" : null;
+    }
+}
+
+class ResponseAdapter implements ExternalContext.Response {
+
+    private Object nativeResponse;
+
+    private int status = 200;
+    private String contentType;
+
+    private StringWriter stringWriter;
+    private PrintWriter printWriter;
+    private LocalByteArrayOutputStream byteStream;
+
+    private InputStream inputStream;
+
+    public ResponseAdapter(Object nativeResponse) {
+        this.nativeResponse = nativeResponse;
+    }
+
+    public int getResponseCode() {
+        return status;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public Map getHeaders() {
+        return null;
+    }
+
+    public InputStream getInputStream() {
+        if (inputStream == null) {
+            if (stringWriter != null) {
+                final byte[] bytes;
+                try {
+                    bytes = stringWriter.getBuffer().toString().getBytes("utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new OXFException(e); // should not happen
+                }
+                inputStream = new ByteArrayInputStream(bytes, 0, bytes.length);
+//                throw new OXFException("ResponseAdapter.getInputStream() does not yet support content written with getWriter().");
+            } else if (byteStream != null) {
+                inputStream = new ByteArrayInputStream(byteStream.getByteArray(), 0, byteStream.size());
+            }
+        }
+
+        return inputStream;
+    }
+
+    public void addHeader(String name, String value) {
+    }
+
+    public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+        return true;
+    }
+
+    public String getCharacterEncoding() {
+        return null;
+    }
+
+    public String getNamespacePrefix() {
+        return null;
+    }
+
+    public OutputStream getOutputStream() throws IOException {
+        if (byteStream == null)
+            byteStream = new LocalByteArrayOutputStream();
+        return byteStream;
+    }
+
+    public PrintWriter getWriter() throws IOException {
+        if (stringWriter == null) {
+            stringWriter = new StringWriter();
+            printWriter = new PrintWriter(stringWriter);
+        }
+        return printWriter;
+    }
+
+    public boolean isCommitted() {
+        return false;
+    }
+
+    public void reset() {
+    }
+
+    public String rewriteActionURL(String urlString) {
+        return null;
+    }
+
+    public String rewriteRenderURL(String urlString) {
+        return null;
+    }
+
+    public String rewriteActionURL(String urlString, String portletMode, String windowState) {
+        return null;
+    }
+
+    public String rewriteRenderURL(String urlString, String portletMode, String windowState) {
+        return null;
+    }
+
+    public String rewriteResourceURL(String urlString, boolean absolute) {
+        return null;
+    }
+
+    public void sendError(int sc) throws IOException {
+        this.status = sc;
+    }
+
+    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    }
+
+    public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+    }
+
+    public void setContentLength(int len) {
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public void setHeader(String name, String value) {
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public void setTitle(String title) {
+    }
+
+    private static class LocalByteArrayOutputStream extends ByteArrayOutputStream {
+        public byte[] getByteArray() {
+            return buf;
+        }
+    }
+
+    public Object getNativeResponse() {
+        return nativeResponse;
     }
 }

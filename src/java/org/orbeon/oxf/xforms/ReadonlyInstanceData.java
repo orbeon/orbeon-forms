@@ -35,6 +35,11 @@ public class ReadonlyInstanceData extends InstanceData {
         public void set(boolean value) {
             throwException();
         }
+
+        public boolean getDefaultValue() {
+            // Read-only by default
+            return true;
+        }
     };
 
     private static final RequiredModelItemProperty CONSTANT_REQUIRED_MIP = new RequiredModelItemProperty() {

@@ -77,7 +77,7 @@ public class RequestParameters {
                 if ("$instance".equals(name)) {
                     // Un-base64 and uncompress to get XML
 
-                    // There is only one value for $instnace
+                    // There is only one value for $instance
                     String encodedInstance = (String) values.get(0);
                     instance = XFormsUtils.decodeXML(pipelineContext, encodedInstance);
                 } else if (name.startsWith("$upload^")) {

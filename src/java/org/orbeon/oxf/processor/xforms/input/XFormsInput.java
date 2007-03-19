@@ -81,95 +81,84 @@ public class XFormsInput extends ProcessorImpl {
                     throw new OXFException(e);
                 }
 
-//                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);// TODO: do we still need this?
-                XFormsInstance contextInstance = null;
-                if (contextInstance != null) {
-                    // Instance comes from context in case of a forward
-                    model.setInstanceDocument(contextInstance.getDocument(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false);
-                } else {
-                    // Extract parameters from request
-                    final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
-                        public Object read(PipelineContext context, ProcessorInput input) {
-                            Document requestDocument = readInputAsDOM4J(context, input);
-                            return new RequestParameters(pipelineContext, requestDocument);
-                        }
-                    });
+                // Extract parameters from request
+                final RequestParameters requestParameters
+                    = new RequestParameters(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_REQUEST));
 
-                    // Set instance on model if provided
-                    if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument((Document) requestParameters.getInstance().clone(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false);
-                    // Set initialization listener
-                    model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
-                        public void updateInstance(int position, XFormsInstance localInstance) {
-                            if (position == 0) {
+                // Set instance on model if provided
+                if (requestParameters.getInstance() != null)
+                    model.setInstanceDocument((Document) requestParameters.getInstance().clone(), model.getEffectiveId(), model.getDefaultInstanceId(), null, null, null, false);
+                // Set initialization listener
+                model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
+                    public void updateInstance(int position, XFormsInstance localInstance) {
+                        if (position == 0) {
 
-                                // Update instance from request
-                                final int[] ids = requestParameters.getIds();
-                                for (int i = 0; i < ids.length; i++) {
-                                    final int id = ids[i];
+                            // Update instance from request
+                            final int[] ids = requestParameters.getIds();
+                            for (int i = 0; i < ids.length; i++) {
+                                final int id = ids[i];
 
-                                    final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getDocumentInfo()).get(new Integer(id));
-                                    XFormsInstance.setValueForNode(pipelineContext, node, requestParameters.getValue(id), requestParameters.getType(id));
-                                }
-
-                                // Update instance from path info
-                                {
-                                    final List groupElements = readCacheInputAsDOM4J
-                                            (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
-
-                                    final Element inputFilterRootElement = readCacheInputAsDOM4J
-                                            (pipelineContext, INPUT_FILTER).getRootElement();
-
-                                    final List setValueElements;
-                                    {
-                                        // Handle legacy <param> element
-                                        final List paramElements = inputFilterRootElement.elements("param");
-                                        if (paramElements != null && paramElements.size() > 0)
-                                            setValueElements = paramElements;
-                                        else
-                                            setValueElements = inputFilterRootElement.elements("setvalue");
-                                    }
-
-                                    if (groupElements.size() != setValueElements.size())
-                                        throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
-                                    final DocumentXPathEvaluator evaluator = new DocumentXPathEvaluator();
-                                    for (Iterator setValueIterator = setValueElements.iterator(),
-                                            groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
-                                        final Element paramElement = (Element) setValueIterator.next();
-                                        final Element groupElement = (Element) groupIterator.next();
-                                        final String value = groupElement.getStringValue();
-                                        if (!"".equals(value)) {
-
-                                            final String refXPath = paramElement.attributeValue("ref");
-                                            final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
-                                                    refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null);
-                                            if (o == null || !(o instanceof NodeInfo))
-                                                throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
-
-                                            XFormsInstance.setValueForNodeInfo(pipelineContext, (NodeInfo) o, value, null);
-                                        }
-                                    }
-                                }
-
-                                if (logger.isDebugEnabled())
-                                    logger.debug("1) Instance recontructed from request:\n"
-                                            + Dom4jUtils.domToString(localInstance.getDocument()));
-
-                                // Run actions
-                                // TODO: this has to be done in Model
-                                Action[] actions = requestParameters.getActions();
-                                for (int i = 0; i < actions.length; i++) {
-                                    Action action = actions[i];
-                                    action.run(pipelineContext, new ActionFunctionContext(),
-                                            requestParameters.getEncryptionKey(), localInstance.getDocumentInfo());
-                                }
-                                if (logger.isDebugEnabled())
-                                    logger.debug("2) Instance with actions applied:\n"
-                                            + Dom4jUtils.domToString(localInstance.getDocument()));
+                                final Node node = (Node) XFormsUtils.getIdToNodeMap(localInstance.getDocumentInfo()).get(new Integer(id));
+                                XFormsInstance.setValueForNode(pipelineContext, node, requestParameters.getValue(id), requestParameters.getType(id));
                             }
+
+                            // Update instance from path info
+                            {
+                                final List groupElements = readCacheInputAsDOM4J
+                                        (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
+
+                                final Element inputFilterRootElement = readCacheInputAsDOM4J
+                                        (pipelineContext, INPUT_FILTER).getRootElement();
+
+                                final List setValueElements;
+                                {
+                                    // Handle legacy <param> element
+                                    final List paramElements = inputFilterRootElement.elements("param");
+                                    if (paramElements != null && paramElements.size() > 0)
+                                        setValueElements = paramElements;
+                                    else
+                                        setValueElements = inputFilterRootElement.elements("setvalue");
+                                }
+
+                                if (groupElements.size() != setValueElements.size())
+                                    throw new OXFException("Number of <setvalue> or <param> elements does not match number of groups in path regular expression");
+                                final DocumentXPathEvaluator evaluator = new DocumentXPathEvaluator();
+                                for (Iterator setValueIterator = setValueElements.iterator(),
+                                        groupIterator = groupElements.iterator(); setValueIterator.hasNext();) {
+                                    final Element paramElement = (Element) setValueIterator.next();
+                                    final Element groupElement = (Element) groupIterator.next();
+                                    final String value = groupElement.getStringValue();
+                                    if (!"".equals(value)) {
+
+                                        final String refXPath = paramElement.attributeValue("ref");
+                                        final Object o = evaluator.evaluateSingle(pipelineContext, localInstance.getDocumentInfo(),
+                                                refXPath, Dom4jUtils.getNamespaceContextNoDefault(paramElement), null, null, null);
+                                        if (o == null || !(o instanceof NodeInfo))
+                                            throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
+
+                                        XFormsInstance.setValueForNodeInfo(pipelineContext, (NodeInfo) o, value, null);
+                                    }
+                                }
+                            }
+
+                            if (logger.isDebugEnabled())
+                                logger.debug("1) Instance recontructed from request:\n"
+                                        + Dom4jUtils.domToString(localInstance.getDocument()));
+
+                            // Run actions
+                            // TODO: this has to be done in Model
+                            Action[] actions = requestParameters.getActions();
+                            for (int i = 0; i < actions.length; i++) {
+                                Action action = actions[i];
+                                action.run(pipelineContext, new ActionFunctionContext(),
+                                        requestParameters.getEncryptionKey(), localInstance.getDocumentInfo());
+                            }
+                            if (logger.isDebugEnabled())
+                                logger.debug("2) Instance with actions applied:\n"
+                                        + Dom4jUtils.domToString(localInstance.getDocument()));
                         }
-                    });
-                }
+                    }
+                });
 
                 // Create and initialize XForms Engine
                 new XFormsContainingDocument(pipelineContext, model);

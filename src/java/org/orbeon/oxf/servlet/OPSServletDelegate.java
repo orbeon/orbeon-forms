@@ -139,7 +139,8 @@ public class OPSServletDelegate extends HttpServlet {
             // Filter on supported methods
             String httpMethod = request.getMethod();
             if (acceptedMethods.get(httpMethod.toLowerCase()) == null)
-                throw new OXFException("Unsupported HTTP method: " + httpMethod);
+                throw new OXFException("HTTP method not accepted: " + httpMethod
+                        + ". You can configure methods in your web.xml using the parameter: " + ProcessorService.HTTP_ACCEPT_METHODS_PROPERTY);
 
             // Run service
             PipelineContext pipelineContext = new PipelineContext();

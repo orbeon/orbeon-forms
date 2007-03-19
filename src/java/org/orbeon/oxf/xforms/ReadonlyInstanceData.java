@@ -72,7 +72,7 @@ public class ReadonlyInstanceData extends InstanceData {
         this.constraint = CONSTANT_VALID_MIP;
 
         setInheritedReadonly(new ReadonlyModelItemProperty());
-        getInheritedReadonly().set(false);
+        getInheritedReadonly().set(true); // read-only by default
         setInheritedRelevant(new RelevantModelItemProperty());
         getInheritedRelevant().set(true);
     }

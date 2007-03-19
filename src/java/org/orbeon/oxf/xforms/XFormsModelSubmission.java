@@ -39,6 +39,7 @@ import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.FastStringBuffer;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.TransformerHandler;
@@ -979,7 +980,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     instanceSatisfiesValidRequired[0] &= valid;
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - submission - found invalid element: " + element.getQName() + ", value:" + element.getText());
+                        XFormsServer.logger.debug("XForms - submission - found invalid element: " + elementToString(element));
                     }
                 }
 
@@ -990,7 +991,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     instanceSatisfiesValidRequired[0] &= valid;
 
                     if (!valid && XFormsServer.logger.isDebugEnabled()) {
-                        XFormsServer.logger.debug("XForms - submission - found invalid attribute: " + attribute.getQName() + ", value:" + attribute.getValue());
+                        XFormsServer.logger.debug("XForms - submission - found invalid attribute: " + attributeToString(attribute)
+                                + " (parent element: " + elementToString(attribute.getParent()) + ")");
                     }
                 }
 
@@ -1014,6 +1016,53 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             });
         }
         return instanceSatisfiesValidRequired[0];
+    }
+
+    private static String elementToString(Element element) {
+        // Open start tag
+        final FastStringBuffer sb = new FastStringBuffer("<");
+        sb.append(element.getQualifiedName());
+
+        // Attributes if any
+        for (Iterator i = element.attributeIterator(); i.hasNext();) {
+            final Attribute currentAttribute = (Attribute) i.next();
+
+            sb.append(' ');
+            sb.append(currentAttribute.getQualifiedName());
+            sb.append("=\"");
+            sb.append(currentAttribute.getValue());
+            sb.append('\"');
+        }
+
+        // Close start tag
+        sb.append('>');
+
+        if (!element.elements().isEmpty()) {
+            // Mixed content
+            final Object firstChild = element.content().get(0);
+            if (firstChild instanceof Text) {
+                sb.append(((Text) firstChild).getText());
+            }
+            sb.append("[...]");
+        } else {
+            // Not mixed content
+            sb.append(element.getText());
+        }
+
+        // Close element with end tag
+        sb.append("</");
+        sb.append(element.getQualifiedName());
+        sb.append('>');
+
+        return sb.toString();
+    }
+
+    private static String attributeToString(Attribute attribute) {
+        final FastStringBuffer sb = new FastStringBuffer(attribute.getQualifiedName());
+        sb.append("=\"");
+        sb.append(attribute.getValue());
+        sb.append('\"');
+        return sb.toString();
     }
 
     public static class ConnectionResult {

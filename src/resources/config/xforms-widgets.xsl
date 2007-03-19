@@ -114,7 +114,7 @@
                                 <xhtml:div class="widget-tab-active">
                                     <xsl:choose>
                                         <xsl:when test="widget:label/@ref">
-                                            <xforms:output ref="{widget:label/@ref}"/>
+                                            <xforms:output value="{widget:label/@ref}"/>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <xsl:value-of select="widget:label"/>
@@ -199,7 +199,7 @@
                                     </xforms:select1>
                                 </xforms:group>
                                 <xforms:group ref=".[count(instance('orbeon-xforms-instance-inspector-itemset')/model[@id = instance('orbeon-xforms-instance-inspector-instance')/current-model]/instance) = 1]">
-                                    <xforms:output ref="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
+                                    <xforms:output value="instance('orbeon-xforms-instance-inspector-instance')/current-instance">
                                         <xforms:label>Instance: </xforms:label>
                                     </xforms:output>
                                 </xforms:group>

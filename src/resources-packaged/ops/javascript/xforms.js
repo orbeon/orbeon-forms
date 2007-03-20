@@ -68,8 +68,6 @@ ORBEON.xforms.Globals = {
     requestForm: null,                   // HTML for the request currently in progress
     requestInProgress: false,            // Indicates wether an Ajax request is currently in process
     lastRequestIsError: false,           // Whether the last XHR request returned an error
-    lastFocusControlId: null,            // Id if the control that received a focus event
-    lastBlurControlId: null,             // Id if the control that received a blur event
     executeEventFunctionQueued: 0,       // Number of ORBEON.xforms.Server.executeNextRequest waiting to be executed
     maskFocusEvents: false,              // Avoid catching focus event when we do it because the server told us to
     previousDOMFocusOut: null,           // We only send a focus out when we receive a focus in, or another focus out
@@ -788,28 +786,38 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                if (ORBEON.xforms.Globals.lastFocusControlId != target.id) {
-                    // Save id of the control that received blur last
-                    ORBEON.xforms.Globals.lastFocusControlId = target.id;
-                    // Activate hint if we found one
-                    ORBEON.xforms.Controls.hintActive(target, true);
-                    // Store initial value of control
-                    if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
-                        ORBEON.xforms.Globals.serverValue[target.id] = target.value;
-                    // Send focus events
-                    if (ORBEON.xforms.Globals.previousDOMFocusOut) {
-                        if (ORBEON.xforms.Globals.previousDOMFocusOut != target) {
-                            var events = new Array();
-                            events.push(xformsCreateEventArray
-                                (ORBEON.xforms.Globals.previousDOMFocusOut, "DOMFocusOut", null));
-                            events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
-                            xformsFireEvents(events, true);
+                // Save id of the control that received blur last
+                ORBEON.xforms.Globals.lastFocusControlId = target.id;
+                // Activate hint if we found one
+                ORBEON.xforms.Controls.hintActive(target, true);
+                // Store initial value of control
+                if (typeof ORBEON.xforms.Globals.serverValue[target.id] == "undefined")
+                    ORBEON.xforms.Globals.serverValue[target.id] = target.value;
+                // Send focus events
+                var previousDOMFocusOut = ORBEON.xforms.Globals.previousDOMFocusOut;
+                if (previousDOMFocusOut) {
+                    if (previousDOMFocusOut != target) {
+                        // HTML area and trees does not throw value change event, so we throw it on blur
+                        if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-textarea")
+                                && ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-mediatype-text-html")) {
+                            // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't dupplicate the code here
+                            var editorInstance = FCKeditorAPI.GetInstance(previousDOMFocusOut.name);
+                            previousDOMFocusOut.value = editorInstance.GetXHTML();
+                            xformsValueChanged(previousDOMFocusOut, null);
+                        } else if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select1-appearance-xxforms-tree")
+                                || ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-select-appearance-xxforms-tree")) {
+                            xformsValueChanged(previousDOMFocusOut, null);
                         }
-                        ORBEON.xforms.Globals.previousDOMFocusOut = null;
-                    } else {
-                        if (document.xformsPreviousDOMFocusIn != target) {
-                            xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
-                        }
+                        // Send focus out/focus in events
+                        var events = new Array();
+                        events.push(xformsCreateEventArray(previousDOMFocusOut, "DOMFocusOut", null));
+                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null));
+                        xformsFireEvents(events, true);
+                    }
+                    ORBEON.xforms.Globals.previousDOMFocusOut = null;
+                } else {
+                    if (document.xformsPreviousDOMFocusIn != target) {
+                        xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null)), true);
                     }
                 }
             }
@@ -823,25 +831,12 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                if (ORBEON.xforms.Globals.lastBlurControlId != target.id) {
-                    // Save id of the control that received blur last
-                    ORBEON.xforms.Globals.lastBlurControlId = target.id;
-                    // De-activate hint if we found one
-                    ORBEON.xforms.Controls.hintActive(target, false);
-                    // This is an event for an XForms control
-                    ORBEON.xforms.Globals.previousDOMFocusOut = target;
-                    // HTML area and trees does not throw value change event, so we throw it on blur
-                    if (ORBEON.util.Dom.hasClass(target, "xforms-textarea")
-                            && ORBEON.util.Dom.hasClass(target, "xforms-mediatype-text-html")) {
-                        // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't dupplicate the code here
-                        var editorInstance = FCKeditorAPI.GetInstance(target.name);
-                        target.value = editorInstance.GetXHTML();
-                        xformsValueChanged(target, null);
-                    } else if (ORBEON.util.Dom.hasClass(target, "xforms-select1-appearance-xxforms-tree")
-                            || ORBEON.util.Dom.hasClass(target, "xforms-select-appearance-xxforms-tree")) {
-                        xformsValueChanged(target, null);
-                    }
-                }
+                // Save id of the control that received blur last
+                ORBEON.xforms.Globals.lastBlurControlId = target.id;
+                // De-activate hint if we found one
+                ORBEON.xforms.Controls.hintActive(target, false);
+                // This is an event for an XForms control
+                ORBEON.xforms.Globals.previousDOMFocusOut = target;
             }
         }
     },
@@ -1213,7 +1208,8 @@ ORBEON.xforms.Events = {
                 control.value += node.data.value;
             }
         }
-        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+        // Always do this, as we can't detect yet focus/blur events on trees
+        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
             xformsValueChanged(control);
     },
 
@@ -1242,7 +1238,8 @@ ORBEON.xforms.Events = {
     treeSelect1Select: function(id, value) {
         var control = ORBEON.util.Dom.getElementById(id);
         control.value = value;
-        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+        // Always do this, as we can't detect yet focus/blur events on trees
+        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
             xformsValueChanged(control);
     }
 };
@@ -1291,7 +1288,7 @@ ORBEON.xforms.Init = {
 
     document: function() {
 
-        // Register events in capture phase for W3C-compliant browsers.
+        // Register events in the capture phase for W3C-compliant browsers.
         // Avoid Safari 1.3 which is buggy.
         if (window.addEventListener && !ORBEON.xforms.Globals.isRenderingEngineWebCore13) {
             window.addEventListener("focus", ORBEON.xforms.Events.focus, true);

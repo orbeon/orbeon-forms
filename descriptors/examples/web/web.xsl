@@ -268,6 +268,11 @@
                     <param-name>oxf.error-processor.input.config</param-name>
                     <param-value>oxf:/config/error.xpl</param-value>
                 </init-param>
+                <xsl:comment> Set supported methods </xsl:comment>
+                <init-param>
+                    <param-name>oxf.http.accept-methods</param-name>
+                    <param-value>get,post,head</param-value>
+                </init-param>
                 <xsl:comment> Set initialization listener </xsl:comment>
                 <init-param>
                     <param-name>oxf.servlet-initialized-processor.name</param-name>

@@ -163,76 +163,75 @@ public class ResourceManagerTest extends TestCase {
     }
 
 
-    public void testDSDOM() {
-        try {
-            Context jndi = new InitialContext();
-            DataSource ds = new DataSource() {
-                final String driver = "oracle.jdbc.driver.OracleDriver";
-                final String url = "jdbc:oracle:thin:@localhost:1521:dune";
-                final String user = "chub";
-                final String password = "chub";
-
-                public Connection getConnection() throws SQLException {
-                    Properties info = new Properties();
-                    info.setProperty("user", user);
-                    info.setProperty("password", password);
-                    try {
-                        Class.forName(driver);
-                        return DriverManager.getConnection(url, info);
-                    } catch (SQLException sql) {
-                        throw sql;
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        fail();
-                        return null;
-                    }
-                }
-
-                public Connection getConnection(String s, String s1) throws SQLException {
-                    return getConnection();
-                }
-
-                public int getLoginTimeout() throws SQLException {
-                    return 0;
-                }
-
-                public PrintWriter getLogWriter() throws SQLException {
-                    return null;
-                }
-
-                public void setLoginTimeout(int i) throws SQLException {
-                }
-
-                public void setLogWriter(PrintWriter writer) throws SQLException {
-                }
-            };
-            jndi.bind("testDS", ds);
-
-            Properties props = new Properties();
-            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, DataSourceResourceManagerFactory.class.getName());
-            props.setProperty("org.orbeon.oxf.resources.DataSourceResourceManagerFactory.datasource", "testDS");
-            ResourceManagerWrapper.setFactory(new DataSourceResourceManagerFactory(props, jndi));
-
-
-            Node doc = ResourceManagerWrapper.instance().getContentAsDOM("/display/orbeon.xml");
-            compareResult(doc, ORBEON_DATA);
-
-            /** Fix import task first
-             InputStream stream = ResourceManagerWrapper.instance().getContentAsStream("/display/big.xml");
-             int n = 0;
-             byte[] b = new byte[512];
-             while(n != -1) {
-             n = stream.read(b);
-             System.out.println(b);
-             }
-             **/
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail();
-        }
-
-    }
+//    public void testDSDOM() {
+//        try {
+//            Context jndi = new InitialContext();
+//            DataSource ds = new DataSource() {
+//                final String driver = "oracle.jdbc.driver.OracleDriver";
+//                final String url = "jdbc:oracle:thin:@localhost:1521:dune";
+//                final String user = "chub";
+//                final String password = "chub";
+//
+//                public Connection getConnection() throws SQLException {
+//                    Properties info = new Properties();
+//                    info.setProperty("user", user);
+//                    info.setProperty("password", password);
+//                    try {
+//                        Class.forName(driver);
+//                        return DriverManager.getConnection(url, info);
+//                    } catch (SQLException sql) {
+//                        throw sql;
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        fail();
+//                        return null;
+//                    }
+//                }
+//
+//                public Connection getConnection(String s, String s1) throws SQLException {
+//                    return getConnection();
+//                }
+//
+//                public int getLoginTimeout() throws SQLException {
+//                    return 0;
+//                }
+//
+//                public PrintWriter getLogWriter() throws SQLException {
+//                    return null;
+//                }
+//
+//                public void setLoginTimeout(int i) throws SQLException {
+//                }
+//
+//                public void setLogWriter(PrintWriter writer) throws SQLException {
+//                }
+//            };
+//            jndi.bind("testDS", ds);
+//
+//            Properties props = new Properties();
+//            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, DataSourceResourceManagerFactory.class.getName());
+//            props.setProperty("org.orbeon.oxf.resources.DataSourceResourceManagerFactory.datasource", "testDS");
+//            ResourceManagerWrapper.setFactory(new DataSourceResourceManagerFactory(props, jndi));
+//
+//
+//            Node doc = ResourceManagerWrapper.instance().getContentAsDOM("/display/orbeon.xml");
+//            compareResult(doc, ORBEON_DATA);
+//
+//            /** Fix import task first
+//             InputStream stream = ResourceManagerWrapper.instance().getContentAsStream("/display/big.xml");
+//             int n = 0;
+//             byte[] b = new byte[512];
+//             while(n != -1) {
+//             n = stream.read(b);
+//             System.out.println(b);
+//             }
+//             **/
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 
 
     public void testLocator() {

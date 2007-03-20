@@ -322,6 +322,27 @@
                     reference</a> for details. Also enable gzip compression in addition.
                 </p>
             </section>
+            <a name="xforms-combined-resources"/>
+            <section>
+                <title>Enable combined resources</title>
+                <p>
+                    Make sure that combined JavaScript and CSS resources are enabled, as they will load faster in the
+                    user's web browser when the resources are not yet in browser cache. See the <a
+                    href="reference-xforms-ng#xforms-combined-resources">XForms reference</a> for details. Also enable
+                    combined resources caching and gzip compression in addition.
+                </p>
+            </section>
+            <a name="xforms-readonly-instances"/>
+            <section>
+                <title>Consider using read-only and shared instances</title>
+                <p>
+                    Some XForms instances that never change or that are simply replaced during a submission can be set
+                    as read-only, and can also optionally be shared between pages and even applications. Such instances
+                    take less memory and are more efficient to build. However they cannot hold data that changes over
+                    time and they cannot use XForms Model Item Properties (MIPs). See the <a
+                    href="reference-xforms-ng#xxforms-readonly">XForms reference</a> for details.
+                </p>
+            </section>
             <a name="xforms-state"/>
             <section>
                 <title>Consider server-side XForms state handling</title>

@@ -132,8 +132,8 @@
                         <xforms:group ref="instance('control-instance')/back-trigger">
                             <xforms:trigger>
                                 <xforms:label>
-                                    <xhtml:img src="../../../apps/forms/images/back.gif" alt="Back"/>
-                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/>
+                                    <img src="../../../apps/forms/images/back.gif" alt="Back"/>
+                                    <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/></span>
                                 </xforms:label>
                                 <xforms:load ev:event="DOMActivate" resource="/forms/{{xxforms:instance('parameters-instance')/form-id}}"/>
                             </xforms:trigger>
@@ -143,8 +143,8 @@
                         <xforms:group ref="instance('control-instance')/save-trigger">
                             <xforms:trigger>
                                 <xforms:label>
-                                    <xhtml:img src="../../../apps/forms/images/save.gif" alt="Save"/>
-                                    <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/>
+                                    <img src="../../../apps/forms/images/save.gif" alt="Save"/>
+                                    <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/></span>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:send submission="save-submission"/>

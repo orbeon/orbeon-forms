@@ -28,7 +28,7 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon Forms 3.5!
+                Welcome to Orbeon Forms 3.5.1!
             </p>
             <p>
                 Orbeon Forms 3.5 features many improvements over Orbeon PresentationServer (OPS) 3.0.1, including
@@ -37,7 +37,7 @@
                 own Orbeon Forms applications.
             </p>
             <p>
-                This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.
+                This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.1.
             </p>
         </section>
         <a name="changes-351"/>

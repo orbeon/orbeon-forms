@@ -44,47 +44,99 @@
         <section>
             <title>Changes in Version 3.5.1</title>
             <p>
-                Orbeon Forms 3.5.1 is a minor update containing the following changes:
+                Orbeon Forms 3.5.1 is an update containing the following changes:
             </p>
             <ul>
                 <li>
                     <p>
-                        The extension attribute <a
+                        <b>Support for combined XForms resources.</b> The XForms engine now supports an option to
+                        automatically combine CSS and JavaScript resources used by XForms pages. This can lead to page
+                        loading time improvements. See the <a
+                        href="reference-xforms-ng#xforms-combined-resources">XForms Reference</a> for details.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Documentation of submission attribute.</b> The extension attribute <a
                         href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
                         of <code>&lt;xforms:submission></code> is now documented.
                     </p>
                 </li>
                 <li>
-                    <p>
-                        The following XForms issues were fixed in this release:
-                        <ul>
-                            <li>
-                                The tree and menu controls have been causing significant memory leaks on the browser,
-                                specifically on in IE. The leaks could be in the order of several MB per page load. If
-                                you are using the tree or menu control, you should consider upgrading to 3.5.1. <a
-                                href="http://tinyurl.com/2ozrpo">#306754</a>
-                            </li>
-                            <li>
-                                A NullPointerException which often happened when using the XForms Instance Inspector
-                                in a page. <a href="http://tinyurl.com/yors44">#306708</a>
-                            </li>
-                            <li>
-                                The error message "Could not set the selected property" appearing on IE in some cases
-                                when drop-down list becomes visible. <a href="http://tinyurl.com/ypoyx5">#306676</a>
-                            </li>
-                        </ul>
-                    </p>
+                    <li>
+                        <b>Tree and menu memory leaks.</b> The tree and menu controls have been causing significant
+                        memory leaks on the browser, especially on in IE. The leaks could be in the order of several
+                        MB per page load. If you are using the tree or menu control, you should consider upgrading to
+                        3.5.1. See issue <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754</a>.
+                    </li>
+                </li>
+                <li>
+                    <li>
+                        <b>XSLT memory leak.</b> In certain circumstances, too many objects were stored in the Orbeon
+                        Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826</a>.
+                    </li>
+                </li>
+                <li>
+                    <li>
+                        <b>XForms Classic memory leaks.</b> In certain circumstances, to many objects were stored in
+                        the Orbeon Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue
+                        <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827</a>.
+                    </li>
                 </li>
                 <li>
                     <p>
-                        The following other issues were fixed in this release:
-                        <ul>
-                            <li>
-                                Using the URL generator with a long URL could create a stack overflow error under
-                                certain circumstances. <a href="http://tinyurl.com/2dpnaf">#306795</a>
-                            </li>
-                        </ul>
+                        The following is the complete list of issues fixed in this release:
                     </p>
+                    <ul>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827: XForms Classic keeps references to PipelineContext objects</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826: XSLT TransformerURIResolver object keeps references to PipelineContext object</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306795">#306795: Stack overflow with long URL</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306793">#306793: MIP for read-only instances should return readonly="true"</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306782">#306782: Combined resources cache should generate resources upon loading the page</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305780">#305780: Way to pass the base URL to the client</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306268">#306268: xforms:select does not update as instance values change</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306530">#306530: IE: JS error when canceling page unload</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306542">#306542: xforms:select1 won't dropdown after showing a dialog</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754: Menu and tree causing memory leak on IE</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306592">#306592: Repeat bug with IE 6</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306676">#306676: "Could not set the selected property" in IE</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305808">#305808: Server to send XForms server URL to client when the page is loaded</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306708">#306708: NPE when enabling XForms instance inspector</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306540">#306540: Setfocus action does not work for auto-complete field</a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </section>

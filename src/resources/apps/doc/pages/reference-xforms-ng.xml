@@ -3770,6 +3770,62 @@
                 <property as="xs:boolean" name="oxf.xforms.minimal-resources" value="true"/>
             </xml-source>
         </section>
+        <a name="xforms-combined-resources"/>
+        <section>
+            <title>Combined Resources</title>
+            <p>
+                Serving CSS and JavaScript can have a high performance cost on page loads. This is particularly
+                important with the intensive use of JavaScript in Orbeon Forms. In particular, it can be shown that
+                serving many small files is slower than serving a single large file. In theory, HTTP pipelining can
+                improve very much on this, but this is (very unfortunately) useless in practice at the time of writing
+                because Internet Explorer doesn't implement it at all and Firefox / Mozilla do implemente it but do not
+                enable it by default. This is why Orbeon Forms supports the option of combining the multiple JavaScript
+                and CSS files required for a given XForms page into a single JavaScript file and a single CSS file.
+            </p>
+            <p>
+                You enable this feature in <code>properties.xml</code> as follows
+            </p>
+            <xml-source>
+                <comment> Enable combined resources </comment>
+                <property as="xs:boolean" name="oxf.xforms.combined-resources" value="true"/>
+            </xml-source>
+            <p>
+                When this is enabled, Orbeon Forms refers to a single JavaScript file and a single CSS file for
+                XForms-related functionality. The URL identifies special resources needed by the page, for example:
+            </p>
+            <xml-source>
+                <link rel="stylesheet" href="/ops/xforms-server/xforms-range-autocomplete-min.css" type="text/css"/>
+                <script type="text/javascript" src="/ops/xforms-server/xforms-range-autocomplete-min.js"/>
+            </xml-source>
+            <p>
+                This in short tells the XForms server to produce the minimal CSS and JavaScript for the XForms engine
+                including support for the "range" and "autocomplete" features. Note that you don't have to write these
+                URLs yourself: the Orbeon Forms XForms engine adds them automatically to your page.
+            </p>
+            <p>
+                When the Orbeon Forms XForms server receives a request for a combined resource, it determine what files
+                need to be combined and outputs them all together. Furthmore, for CSS files, all URLs referred to with
+                <code>url()</code> are rewritten, so that links to images, in particular, remain correct.
+            </p>
+            <p>
+                In addition, you can enable caching of combined resources with:
+            </p>
+            <xml-source>
+                <comment> Enable caching of combined resources </comment>
+                <property as="xs:boolean" name="oxf.xforms.cache-combined-resources" value="true"/>
+            </xml-source>
+            <p>
+                This cache works differently from other Orbeon Forms caches, as the result is stored in the resources,
+                typically under:
+            </p>
+            <xml-source>
+                WEB-INF/resources/xforms-server/
+            </xml-source>
+            <p>
+                One benefit of this mechanism is that it allows making such combined files to be served by an Apache
+                front-end.
+            </p>
+        </section>
         <a name="xforms-debugging"/>
         <section>
             <title>Debugging XForms Pages</title>

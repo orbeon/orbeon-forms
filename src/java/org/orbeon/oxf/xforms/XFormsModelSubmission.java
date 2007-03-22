@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -350,7 +351,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 {
                     final FunctionLibrary functionLibrary = xformsControls.getFunctionLibrary();
 
-                    resolvedActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtActionOrResource);
+                    final String tempActionOrResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtActionOrResource);
+                    // For user convenience, allow spaces as there is only one URI (this would be different if we had
+                    // several URIs separated by spaces as is the case with xforms:model/@schema). Note that the XML
+                    // Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI, however,
+                    // their use is highly discouraged (unless they are encoded by %20).".
+                    resolvedActionOrResource = StringUtils.replace(tempActionOrResource, " ", "%20");
+
                     resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsUsername);
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsPassword);
                     resolvedXXFormsReadonly = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsReadonly);

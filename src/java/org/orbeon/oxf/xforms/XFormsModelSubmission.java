@@ -356,7 +356,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     // several URIs separated by spaces as is the case with xforms:model/@schema). Note that the XML
                     // Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI, however,
                     // their use is highly discouraged (unless they are encoded by %20).".
-                    resolvedActionOrResource = StringUtils.replace(tempActionOrResource, " ", "%20");
+                    resolvedActionOrResource = StringUtils.replace(tempActionOrResource.trim(), " ", "%20");
 
                     resolvedXXFormsUsername = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsUsername);
                     resolvedXXFormsPassword = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, currentNodeInfo, null, functionLibrary, submissionElement, avtXXFormsPassword);

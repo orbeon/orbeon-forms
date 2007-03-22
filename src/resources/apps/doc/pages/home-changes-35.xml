@@ -80,9 +80,9 @@
                 </li>
                 <li>
                     <li>
-                        <b>XForms Classic memory leaks.</b> In certain circumstances, to many objects were stored in
-                        the Orbeon Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue
-                        <a
+                        <b>XForms Classic memory leaks.</b> In certain circumstances, too many objects were stored in
+                        the Orbeon Cache when using <a href="home-faq#xforms-classic-ng">XForms Classic</a>. This
+                        could cause Orbeon Forms to run out of memory. See issue <a
                         href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827</a>.
                     </li>
                 </li>

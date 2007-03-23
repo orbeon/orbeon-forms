@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.pipeline;
 
+import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.common.Version;
-import org.dom4j.Node;
 
 import java.util.*;
 
@@ -87,7 +86,7 @@ public class StaticExternalContext {
         return XFormsUtils.encodeXMLAsDOM(getStaticContext().getPipelineContext(), node);
     }
 
-    public static Node decodeXML(String encodedXML) {
+    public static Document decodeXML(String encodedXML) {
         return XFormsUtils.decodeXML(getStaticContext().getPipelineContext(), encodedXML);
     }
 }

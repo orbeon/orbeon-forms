@@ -92,6 +92,12 @@
                     </p>
                     <ul>
                         <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306832">#306832: xforms:group gets too many events</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306829">#306829: When item is added, label is not displayed</a>
+                        </li>
+                        <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827: XForms Classic keeps references to PipelineContext objects</a>
                         </li>
                         <li>

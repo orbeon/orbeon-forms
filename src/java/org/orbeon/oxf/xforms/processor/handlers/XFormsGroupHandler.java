@@ -59,25 +59,24 @@ public class XFormsGroupHandler extends HandlerBase {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
 
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
-
         // xforms:label
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel();
-        if (labelValue != null) {
-            if (isFieldsetAppearance) {
-                // Output an xhtml:legend element
-                final AttributesImpl labelAttributes = getAttributes(attributes, null, null);
-                final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, labelAttributes);
+        if (isFieldsetAppearance) {
+            // Output an xhtml:legend element
+            final AttributesImpl labelAttributes = getAttributes(attributes, null, null);
+            final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName, labelAttributes);
+            if (labelValue != null && !labelValue.equals(""))
                 contentHandler.characters(labelValue.toCharArray(), 0, labelValue.length());
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
-            } else {
-                // Output an xhtml:label element
-                final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
-                outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
-            }
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
+        } else {
+            // Output an xhtml:label element
+            final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
+            outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
         }
+
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
 
         // NOTE: This doesn't work because attributes for the label are only gathered after start()
 //        handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);

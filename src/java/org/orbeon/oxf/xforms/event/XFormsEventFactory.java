@@ -161,7 +161,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_VALUE_CHANGED, new Factory() {
             public XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
-                return new XFormsValueChangeEvent(targetObject);
+                return new XFormsValueChangeEvent((XFormsControl) targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_DOM_FOCUS_OUT, new Factory() {

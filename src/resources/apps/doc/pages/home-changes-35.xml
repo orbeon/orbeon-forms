@@ -111,6 +111,14 @@
                 </li>
                 <li>
                     <p>
+                        <b>Attribute Value Templates (AVTs).</b> Support for AVTs is now <a
+                        href="reference-xforms-ng#avts">documented</a>. Support for escaping brackets has been added.
+                        See issue <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>Documentation of submission attribute.</b> The extension attribute <a
                         href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
                         of <code>&lt;xforms:submission></code> is now documented.
@@ -121,6 +129,9 @@
                         The following is the complete list of issues fixed in this release:
                     </p>
                     <ul>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835: Support escaping of { and } in AVTs</a>
+                        </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306806">#306806: Autocomplete doesn't work in dialog</a>
                         </li>

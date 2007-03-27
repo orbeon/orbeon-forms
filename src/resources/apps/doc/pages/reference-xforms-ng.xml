@@ -3421,6 +3421,64 @@
                     </xml-source>
                 </section>
             </section>
+            <a name="avts"/>
+            <section>
+                <title>Attribute Value Templates</title>
+                <p>
+                    Certain attributes in XForms are literal values defined by the form author at the time the form is
+                    written, as opposed to being evaluated at runtime. Examples include the <code>action</code>
+                    attribute on <code>&lt;xforms:submission></code>, or the <code>resource</code> attribute on
+                    <code>&lt;xforms:load></code>.
+                </p>
+                <p>
+                    To improve this, Orbeon Form supports a notation called <i>Attribute Value Templates</i> (AVTs),
+                    borrowed from XSLT, which allows including XPath expressions within attributes. You include XPath
+                    expressions in attributes by enclosing them within curly brackets (<code>{</code> and
+                    <code>}</code>). Consider this example:
+                </p>
+                <xml-source>
+                    <xforms:load resource="/forms/detail/{instance('documents-instance')/documents/document[index('documents-repeat')]/id}"/>
+                </xml-source>
+                <p>
+                    When <code>&lt;xforms:load></code> is executed, the <code>resource</code> attribute is evaluated.
+                    The results is the concatenation of <code>/forms/detail/</code> and of the result of the expression
+                    within brackets
+                    <code>instance('documents-instance')/documents/document[index('documents-repeat')]/id</code>. If the
+                    <code>id</code> element pointed to contains the string
+                    <code>C728595E0E43A8BF50D8DED9F196A582</code>, the <code>resource</code> attribute takes the
+                    value <code>/forms/detail/C728595E0E43A8BF50D8DED9F196A582</code>.
+                </p>
+                <p>
+                    AVTs are currently supported only within certain attributes:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:submission></code>: <code>action</code>, <code>xxforms:username</code>,
+                            <code>xxforms:password</code>, <code>xxforms:readonly</code> and
+                            <code>xxforms:shared</code> attributes.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:dispatch></code>: <code>name</code> attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:load></code>: <code>resource</code> attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>&lt;xforms:setfocus></code>: <code>control</code> attribute.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    There are plans to support AVTs in more places in the future.
+                </p>
+            </section>
             <a name="other-extensions"/>
             <section>
                 <title>Other Extensions</title>

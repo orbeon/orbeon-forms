@@ -52,30 +52,34 @@ public class Index extends XFormsFunction {
             return new IntegerValue(((Integer) xFormsElementContext.getRepeatIdToIndex().get(repeatId)).intValue());
         } else {
             // New implementation
-            final int index = getXFormsControls().getRepeatIdIndex(repeatId);
-
-            if (index == -1) {
-                // Dispatch exception event
-                final String message = "Function index uses repeat id '" + repeatId + "' which is not in scope";
-                final RuntimeException exception = new ValidationException(message, null);
-
-                // Obtain PipelineContext - this function is always called from controls so
-                // PipelineContext should be present
-                final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-                PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
-
-                final XFormsModel currentModel = getXFormsControls().getCurrentModel();
-                currentModel.getContainingDocument().dispatchEvent(pipelineContext,
-                        new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(currentModel, message, exception));
-
-                // TODO: stop processing!
-                // How do we do this: throw special exception? Or should throw exception with
-                // XFormsComputeException() and then dispatch the event?
-                throw exception;
-            }
-
-            // Return value found
-            return new IntegerValue(index);
+            return findIndexForRepeatId(repeatId);
         }
+    }
+
+    protected Item findIndexForRepeatId(String repeatId) {
+        final int index = getXFormsControls().getRepeatIdIndex(repeatId);
+
+        if (index == -1) {
+            // Dispatch exception event
+            final String message = "Function index uses repeat id '" + repeatId + "' which is not in scope";
+            final RuntimeException exception = new ValidationException(message, null);
+
+            // Obtain PipelineContext - this function is always called from controls so
+            // PipelineContext should be present
+            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+            PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+
+            final XFormsModel currentModel = getXFormsControls().getCurrentModel();
+            currentModel.getContainingDocument().dispatchEvent(pipelineContext,
+                    new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(currentModel, message, exception));
+
+            // TODO: stop processing!
+            // How do we do this: throw special exception? Or should throw exception with
+            // XFormsComputeException() and then dispatch the event?
+            throw exception;
+        }
+
+        // Return value found
+        return new IntegerValue(index);
     }
 }

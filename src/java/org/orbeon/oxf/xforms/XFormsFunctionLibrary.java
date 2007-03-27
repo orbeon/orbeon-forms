@@ -177,6 +177,10 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}instance", XXFormsInstance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
+        // xxforms:index
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}index", XXFormsIndex.class, 0, 0, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
+
         // xxforms:list-models
         e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI  + "}list-models", XXFormsListModels.class, 0, 0, 0, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
 
@@ -303,8 +307,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     }
 
     public int hashCode() {
-        // NOTE: maybe this could be optimized to depend on the actual function names, etc. This is used to cache XPath
-        // expressions.
+        // This should be better than super.hashCode()!
+        // TODO: Fix this once FunctionLibrary no longer refers to controls and models
+//        return functionTable.hashCode();
         return super.hashCode();
     }
 }

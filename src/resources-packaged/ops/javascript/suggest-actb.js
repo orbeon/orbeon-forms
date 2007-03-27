@@ -104,7 +104,8 @@ function actb(obj,ca,no_filter) {
 		a.cellSpacing='0px';
 		a.cellPadding='0px';
 		a.style.position= 'absolute';
-		a.style.backgroundColor=actb_self.actb_bgColor;
+        a.style.zIndex= 999;
+        a.style.backgroundColor=actb_self.actb_bgColor;
 		a.style.color = actb_self.actb_textColor;
         a.style.border = "1px solid black";
         a.id = actb_table_id;

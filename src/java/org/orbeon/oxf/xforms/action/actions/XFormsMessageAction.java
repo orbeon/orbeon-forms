@@ -19,13 +19,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 /**
- * 10.1.12 The message Element
+ * 10.12 The message Element
  */
 public class XFormsMessageAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
@@ -34,10 +35,19 @@ public class XFormsMessageAction extends XFormsAction {
 
         final String level;
         {
-            final String levelAttribute = actionElement.attributeValue("level");
-            if (levelAttribute == null)
-                throw new OXFException("xforms:message element is missing mandatory 'level' attribute.");
-            final QName levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
+            final String levelAttribute;
+            final QName levelQName;
+            {
+                final String tempLevelAttribute = actionElement.attributeValue("level");
+                if (tempLevelAttribute == null) {
+                    // "The default is "modal" if the attribute is not specified."
+                    levelQName = XFormsConstants.XFORMS_MODAL_LEVEL_QNAME;
+                    levelAttribute = levelQName.getName();
+                } else {
+                    levelAttribute = tempLevelAttribute;
+                    levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
+                }
+            }
             if (levelQName.getNamespacePrefix().equals("")) {
                 if (!("ephemeral".equals(levelAttribute) || "modeless".equals(levelAttribute) || "modal".equals(levelAttribute))) {
                     throw new OXFException("xforms:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|QName-but-not-NCName.");

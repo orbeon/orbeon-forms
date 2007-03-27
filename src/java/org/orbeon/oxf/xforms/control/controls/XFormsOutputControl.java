@@ -69,9 +69,23 @@ public class XFormsOutputControl extends XFormsValueControl {
             // Value comes from the XPath expression within the value attribute
             final List currentNodeset = bindingContext.getNodeset();
             if (currentNodeset != null && currentNodeset.size() > 0) {
+
+//                boolean isTest = false;
+//                if (valueAttribute.indexOf("preceding::lom:entity") != -1) {
+//                    isTest = true;
+//                    System.out.print("xxx evaluating preceding::..." + valueAttribute + ", nodeset size " + currentNodeset.size());
+//                }
+                
                 rawValue = containingDocument.getEvaluator().evaluateAsString(pipelineContext,
                         currentNodeset, bindingContext.getPosition(),
                         valueAttribute, Dom4jUtils.getNamespaceContextNoDefault(getControlElement()), null, containingDocument.getXFormsControls().getFunctionLibrary(), null);
+
+//                if (isTest) {
+//                    System.out.print("  " + rawValue);
+//                    final String otherAPIResult = XPathUtils.selectStringValue((org.dom4j.Node) ((NodeWrapper) bindingContext.getSingleNode()).getUnderlyingNode(), valueAttribute,
+//                            Dom4jUtils.getNamespaceContextNoDefault(getControlElement()));
+//                    System.out.println(" -> other API result: " + otherAPIResult);
+//                }
             } else {
                 rawValue = "";
             }

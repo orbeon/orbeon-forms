@@ -65,7 +65,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     private Map instancesMap;
 
     // Event handlers
-    private List eventHandlers;
+    private Map eventHandlers;
 
     private InstanceConstructListener instanceConstructListener;
 
@@ -132,7 +132,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
 
         // Extract event handlers
-        eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, modelElement);
+        eventHandlers = XFormsEventHandlerImpl.extractEventHandlersObserver(containingDocument, this, modelElement);
 
         // Create XForms function library
         xformsFunctionLibrary = new XFormsFunctionLibrary(this, getContainingDocument().getXFormsControls());
@@ -702,17 +702,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         } else {
             return null;
         }
-    }
-
-    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
-        return this.containingDocument;
-    }
-
-    /**
-     * Return the List of XFormsEventHandler objects within this object.
-     */
-    public List getEventHandlers() {
-        return eventHandlers;
     }
 
     /**
@@ -1666,5 +1655,26 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public void setInstanceConstructListener(InstanceConstructListener instanceConstructListener) {
         this.instanceConstructListener = instanceConstructListener;
+    }
+
+    public XFormsEventHandlerContainer getParentContainer(XFormsContainingDocument containingDocument) {
+        return this.containingDocument;
+    }
+
+    /**
+     * Return the List of XFormsEventHandler objects within this object.
+     */
+    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+        return (eventHandlers == null) ? null : (List) eventHandlers.get(getEffectiveId());
+    }
+
+    /**
+     * Return the List of XFormsEventHandler objects for the given child instance.
+     *
+     * @param instanceId    event handlers for instance
+     * @return              List of XFormsEventHandler, null if not found
+     */
+    public List getEventHandlersForInstance(String instanceId) {
+        return (eventHandlers == null) ? null : (List) eventHandlers.get(instanceId);
     }
 }

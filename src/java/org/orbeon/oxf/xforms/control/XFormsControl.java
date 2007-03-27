@@ -70,9 +70,10 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         this.name = name;
         this.effectiveId = effectiveId;
 
-        // Extract event handlers
         if (element != null) {
             originalId = element.attributeValue("id");
+
+            // Extract event handlers
             eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
 
             labelId = getChildElementId(element, XFormsConstants.XFORMS_LABEL_QNAME);
@@ -308,7 +309,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
         xformsControls.setBinding(pipelineContext, this);
 
-        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);
+        this.label = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_LABEL_QNAME), false);// TODO: must support HTML
         this.help = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HELP_QNAME), true);
         this.hint = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_HINT_QNAME), true);
         this.alert = XFormsUtils.getChildElementValue(pipelineContext, containingDocument, controlElement.element(XFormsConstants.XFORMS_ALERT_QNAME), false);
@@ -318,7 +319,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
         return parent;
     }
 
-    public List getEventHandlers() {
+    public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return eventHandlers;
     }
 

@@ -19,9 +19,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents an XForms (or just plain XML Events) event handler implementation.
@@ -79,6 +77,45 @@ public class XFormsEventHandlerImpl implements org.orbeon.oxf.xforms.event.XForm
             }
         }
         return eventHandlers;
+    }
+
+    public static Map extractEventHandlersObserver(XFormsContainingDocument containingDocument, XFormsEventHandlerContainer eventHandlerContainer, Element containingElement) {
+        final List children = containingElement.elements();
+        if (children == null)
+            return null;
+
+        final Map eventHandlersMap = new HashMap();
+        for (Iterator i = children.iterator(); i.hasNext();) {
+            final Element currentElement = (Element) i.next();
+
+            // Check if this is an action and a handler
+            if (XFormsActions.isActionName(currentElement.getNamespaceURI(), currentElement.getName())
+                    && currentElement.attributeValue(XFormsConstants.XML_EVENTS_EVENT_ATTRIBUTE_QNAME) != null) {
+
+                // Get observer
+                final String observerId;
+                {
+                    final String observerIdAttribute = currentElement.attributeValue(XFormsConstants.XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME);
+                    observerId = (observerIdAttribute == null) ? eventHandlerContainer.getEffectiveId() : observerIdAttribute;
+                }
+
+                // Get handlers for observer
+                final List eventHandlersForObserver;
+                {
+                    final Object currentList = eventHandlersMap.get(observerId);
+                    if (currentList == null) {
+                        eventHandlersForObserver = new ArrayList();
+                        eventHandlersMap.put(observerId, eventHandlersForObserver);
+                    } else {
+                        eventHandlersForObserver = (List) currentList;
+                    }
+                }
+
+                // TODO: FIXME: eventHandlerContainer may not be the actual container when using @ev:observer
+                eventHandlersForObserver.add(new XFormsEventHandlerImpl(containingDocument, eventHandlerContainer, currentElement));
+            }
+        }
+        return eventHandlersMap;
     }
 
     public void handleEvent(PipelineContext pipelineContext, XFormsEvent event) {

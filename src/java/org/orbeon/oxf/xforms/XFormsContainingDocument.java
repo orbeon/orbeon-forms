@@ -779,7 +779,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         return null;
     }
 
-    public List getEventHandlers() {
+    public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return null;
     }
 
@@ -853,7 +853,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             // Capture phase
             for (Iterator i = containers.iterator(); i.hasNext();) {
                 final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-                final List eventHandlers = container.getEventHandlers();
+                final List eventHandlers = container.getEventHandlers(this);
 
                 if (eventHandlers != null) {
                     if (container != targetObject) {
@@ -888,7 +888,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (propagate && event.isBubbles()) {
                 for (Iterator i = containers.iterator(); i.hasNext();) {
                     final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-                    final List eventHandlers = container.getEventHandlers();
+                    final List eventHandlers = container.getEventHandlers(this);
 
                     if (eventHandlers != null) {
                         for (Iterator j = eventHandlers.iterator(); j.hasNext();) {

@@ -38,11 +38,12 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
+import java.util.List;
 
 /**
  * Represent an XForms instance.
  */
-public class XFormsInstance implements XFormsEventTarget {
+public class XFormsInstance implements XFormsEventTarget, XFormsEventHandlerContainer {
 
     private DocumentInfo documentInfo;
 
@@ -531,5 +532,10 @@ public class XFormsInstance implements XFormsEventTarget {
                 throw new ValidationException("xxforms:shared must be either of \"application\" or \"document\" for element: "
                         + element.attributeValue("id"), (LocationData) element.getData());
         }
+    }
+
+
+    public List getEventHandlers(XFormsContainingDocument containingDocument) {
+        return getModel(containingDocument).getEventHandlersForInstance(instanceId);
     }
 }

@@ -217,7 +217,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
         return model;
     }
 
-    public List getEventHandlers() {
+    public List getEventHandlers(XFormsContainingDocument containingDocument) {
         return eventHandlers;
     }
 

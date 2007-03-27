@@ -148,6 +148,8 @@ public class XFormsConstants {
     public static final QName XFORMS_COMPACT_APPEARANCE_QNAME = new QName("compact");
     public static final QName XFORMS_MINIMAL_APPEARANCE_QNAME = new QName("minimal");
 
+    public static final QName XFORMS_MODAL_LEVEL_QNAME = new QName("modal");
+
     public static final QName XXFORMS_TREE_APPEARANCE_QNAME = new QName("tree", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = new QName("autocomplete", XFormsConstants.XXFORMS_NAMESPACE);

@@ -57,13 +57,6 @@
                 </li>
                 <li>
                     <p>
-                        <b>Documentation of submission attribute.</b> The extension attribute <a
-                        href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
-                        of <code>&lt;xforms:submission></code> is now documented.
-                    </p>
-                </li>
-                <li>
-                    <p>
                         <b>Tree and menu memory leaks.</b> The tree and menu controls have been causing significant
                         memory leaks on the browser, especially on in IE. The leaks could be in the order of several
                         MB per page load. If you are using the tree or menu control, you should consider upgrading to
@@ -114,6 +107,13 @@
                         <code>&lt;xforms:repeat></code> element. See the <a
                         href="reference-xforms-ng#xxforms-index">XForms Reference</a> for details.
 
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Documentation of submission attribute.</b> The extension attribute <a
+                        href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
+                        of <code>&lt;xforms:submission></code> is now documented.
                     </p>
                 </li>
                 <li>

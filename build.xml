@@ -30,7 +30,6 @@
     <property name="war.lib" value="${war.inf}/lib"/>
 
     <property name="src.dir" location="src"/>
-    <property name="examples-src.dir" location="${src.dir}/examples"/>
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_6_1.jar"/>
@@ -182,7 +181,7 @@
         </copy>
         <javac destdir="${build.classes.dir}"
             classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.3" source="1.3"
+            debug="${build.debug}" optimize="off" target="1.4" source="1.4"
             fork="true" memoryInitialSize="128m" memoryMaximumSize="256m">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
@@ -190,7 +189,6 @@
             <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
             <exclude name="org/orbeon/oxf/processor/bpel/**/*.java"/>
             <exclude name="org/orbeon/oxf/resources/Cache*"/>
-            <exclude name="org/orbeon/saxon/dom4j/*"/>
         </javac>
     </target>
 
@@ -198,7 +196,7 @@
     <target name="test-classes" depends="classes">
         <mkdir dir="${build.test-classes.dir}"/>
         <javac srcdir="${test-src.dir}" destdir="${build.test-classes.dir}"
-            classpathref="class.path" debug="on" optimize="off" target="1.3" source="1.3"
+            classpathref="class.path" debug="on" optimize="off" target="1.4" source="1.4"
             includes="**/*.java">
         </javac>
     </target>
@@ -802,72 +800,6 @@
                 <include name="ops-${release.number}.*"/>
             </fileset>
         </copy>
-    </target>
-
-    <target name="oxfmark" depends="classes">
-        <!-- Compile code -->
-        <javac destdir="build/classes"
-            classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.3" source="1.3" failonerror="true">
-            <src path="oxfmark/src"/>
-        </javac>
-
-        <!-- Unzip libraries -->
-        <mkdir dir="build/oxfmark"/>
-        <mkdir dir="build/oxfmark/lib"/>
-        <unzip src="lib/looks-1_1_2.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/dom4j-1_4_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/log4j-1.3alpha0.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/jaxen-1_1-beta-1-dev.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/saxpath-dev_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xercesImpl_2_6_2_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xml-apis-xerces_2_6_2_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xalan-2_5_1_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/commons-collections-2_0.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/commons-lang-1_0-b1.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/commons-beanutils-1_5.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/commons-logging-1_0_4.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/commons-fileupload-1.0-beta-1.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/jakarta-oro-2_0_6.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/msv-20031020.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/isorelax-20031020.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xsdlib-20031020.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/relaxngDatatype-20031020.jar" dest="build/oxfmark/lib"/>
-        <!-- <unzip src="lib/servlet-2_3-4_0_4.jar" dest="build/oxfmark/lib"/> -->
-        <unzip src="lib/avalon-framework-cvs-20020315.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/saxon-6_5_2.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/saxon-7_9_1_orbeon.jar" dest="build/oxfmark/lib"/>
-        <delete file="build/oxfmark/lib/META-INF/MANIFEST.MF"/>
-
-        <!-- Create oxfmark.jar -->
-        <jar jarfile="build/oxfmark/oxfmark.jar" manifest="oxfmark/resources/MANIFEST.MF">
-            <fileset dir="${build.classes.dir}"/>
-            <fileset dir="oxfmark/resources" includes="*.png"/>
-            <fileset dir="${java-src.dir}">
-                <include name="**/*.xml"/>
-                <include name="**/*.rng"/>
-                <include name="**/*.css"/>
-                <include name="**/*.xsd"/>
-            </fileset>
-            <fileset dir="${resources-packaged.dir}/oxf"/>
-            <fileset dir="${resources.dir}">
-                <include name="config/controller.xml"/>
-                <include name="config/epilogue.xpl"/>
-                <include name="config/properties.xml"/>
-                <include name="hello/view.xsl"/>
-                <include name="hello/xforms.xml"/>
-                <include name="welcome/page.xml"/>
-                <include name="config/theme/theme.xsl"/>
-            </fileset>
-            <fileset dir="build/oxfmark/lib"/>
-        </jar>
-        <signjar alias="orbeon" storepass="password" keystore="oxfmark/resources/myKeystore" jar="build/oxfmark/oxfmark.jar"/>
-
-        <!-- Copy libraries and other files -->
-        <copy file="oxfmark/resources/icon32.gif" todir="build/oxfmark"/>
-        <copy file="oxfmark/resources/icon64.gif" todir="build/oxfmark"/>
-        <copy file="oxfmark/resources/oxfmark.jnlp" todir="build/oxfmark"/>
-
     </target>
 
 </project>

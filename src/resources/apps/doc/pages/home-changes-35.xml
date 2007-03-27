@@ -63,34 +63,70 @@
                     </p>
                 </li>
                 <li>
-                    <li>
+                    <p>
                         <b>Tree and menu memory leaks.</b> The tree and menu controls have been causing significant
                         memory leaks on the browser, especially on in IE. The leaks could be in the order of several
                         MB per page load. If you are using the tree or menu control, you should consider upgrading to
                         3.5.1. See issue <a
                         href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754</a>.
-                    </li>
+                    </p>
                 </li>
                 <li>
-                    <li>
+                    <p>
+                        <b>Incorrect XPath evaluation of <code>preceding::</code> and <code>preceding-sibling::</code>
+                        axes.</b> This issue could result in particularly confusing results when using XPath expressions
+                        with these axes from XForms. See issue <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>XSLT memory leak.</b> In certain circumstances, too many objects were stored in the Orbeon
                         Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue <a
                         href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826</a>.
-                    </li>
+                    </p>
                 </li>
                 <li>
-                    <li>
+                    <p>
                         <b>XForms Classic memory leaks.</b> In certain circumstances, too many objects were stored in
                         the Orbeon Cache when using <a href="home-faq#xforms-classic-ng">XForms Classic</a>. This
                         could cause Orbeon Forms to run out of memory. See issue <a
                         href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827</a>.
-                    </li>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Partial support for <code>ev:observer</code> attribute.</b> This attribute, defined by the
+                        XML Events specification, allows you to register event handlers by specifying an element
+                        identifier, instead of embedding the event handler within that element. This is particularly
+                        useful to register event handlers on <code>&lt;xforms:instance></code> elements, which do not
+                        allow you to directly embed XML event handlers. The current support is limited to adding the
+                        <code>ev:observer</code> attribute on XForms actions under <code>&lt;xforms:model></code> with
+                        the <code>ev:observer</code> attribute referring to a child <code>&lt;xforms:instance></code>.
+                        See the <a href="reference-xforms-ng#events-observer">XForms Reference</a> for details.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>New <code>xxforms:index()</code> function.</b> The <code>xxforms:index()</code> function
+                        behaves like the standard XForms <code>index()</code> function, except that its argument is
+                        optional. When the argument is omitted, the function returns the index of the closest enclosing
+                        <code>&lt;xforms:repeat></code> element. See the <a
+                        href="reference-xforms-ng#xxforms-index">XForms Reference</a> for details.
+
+                    </p>
                 </li>
                 <li>
                     <p>
                         The following is the complete list of issues fixed in this release:
                     </p>
                     <ul>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306837">#306837: xforms:message/@level is not required in XForms 1.1</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836: Saxon dom4j wrapper incorrectly iterates over preceding-sibling:: and preceding:: axes</a>
+                        </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306832">#306832: xforms:group gets too many events</a>
                         </li>

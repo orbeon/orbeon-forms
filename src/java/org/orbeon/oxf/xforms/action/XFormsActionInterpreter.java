@@ -127,7 +127,7 @@ public class XFormsActionInterpreter {
 
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
 
-        // Get "fresh" event handler containier
+        // Get "fresh" event handler container
         final XFormsEventHandlerContainer eventHandlerContainer = (XFormsEventHandlerContainer) containingDocument.getObjectById(pipelineContext, eventHandlerContainerId);
 
         if (eventHandlerContainer instanceof XFormsControl) {

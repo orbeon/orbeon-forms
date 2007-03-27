@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.pool.PoolableObjectFactory;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -1153,36 +1154,43 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param pipelineContext   current pipeline context
-     * @param contextNode       context node for evaluation
-     * @param functionLibrary   XPath function libary to use
-     * @param element           element on which the AVT attribute is present
-     * @param attributeValue    attribute value
-     * @return                  resolved attribute value
+     * @param pipelineContext    current pipeline context
+     * @param contextNode        context node for evaluation
+     * @param variableToValueMap variables
+     * @param functionLibrary    XPath function libary to use
+     * @param element            element on which the AVT attribute is present
+     * @param attributeValue     attribute value
+     * @return                   resolved attribute value
      */
     public static String resolveAttributeValueTemplates(PipelineContext pipelineContext, NodeInfo contextNode, Map variableToValueMap, FunctionLibrary functionLibrary, Element element, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        int startIndex = 0;
-        int openingIndex;
-        final StringBuffer sb = new StringBuffer();
-        while ((openingIndex = attributeValue.indexOf('{', startIndex)) != -1) {
-            sb.append(attributeValue.substring(startIndex, openingIndex));
-            final int closingIndex = attributeValue.indexOf('}', openingIndex + 1);
-            if (closingIndex == -1)
-                throw new OXFException("Missing closing '}' in attribute value: " + attributeValue);
-            final String xpathExpression = attributeValue.substring(openingIndex + 1, closingIndex);
+        return XPathCache.evaluateAsAvt(pipelineContext, contextNode, attributeValue, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null);
+    }
 
-            final String result = XPathCache.evaluateAsString(pipelineContext, contextNode,
-                    xpathExpression, Dom4jUtils.getNamespaceContextNoDefault(element), variableToValueMap, functionLibrary, null);
+    /**
+     * Encode certain special URI characters for convenience. This includes spaces and brackets.
+     *
+     * @param uriString    URI to encode
+     * @return             encoded URI
+     */
+    public static String encodeConvenienceCharactersForURI(String uriString) {
 
-            sb.append(result);
-            startIndex = closingIndex + 1;
-        }
-        sb.append(attributeValue.substring(startIndex));
-        return sb.toString();
+        // For user convenience, allow spaces and brackets
+
+        // Note that the XML Schema spec says "Spaces are, in principle, allowed in the álexical spaceá of anyURI,
+        // however, their use is highly discouraged (unless they are encoded by %20).".
+
+        uriString = uriString.trim();
+        uriString = StringUtils.replace(uriString , " ", "%20");
+        uriString = StringUtils.replace(uriString , "{", "%7B");
+        uriString = StringUtils.replace(uriString , "}", "%7D");
+        uriString = StringUtils.replace(uriString , "<", "%3C");
+        uriString = StringUtils.replace(uriString , ">", "%3E");
+
+        return uriString;
     }
 
     public static interface InstanceWalker {

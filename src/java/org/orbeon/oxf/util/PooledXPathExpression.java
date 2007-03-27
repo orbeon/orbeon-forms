@@ -23,7 +23,6 @@ import org.orbeon.saxon.instruct.SlotManager;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.sxpath.XPathExpression;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.Variable;
 import org.orbeon.saxon.trans.XPathException;
@@ -36,7 +35,7 @@ import java.util.Map;
 
 public class PooledXPathExpression {
 
-    private XPathExpression expression;
+    private Expression expression;
     private Configuration configuration;
     private SlotManager stackFrameMap;
     private ObjectPool pool;
@@ -47,7 +46,7 @@ public class PooledXPathExpression {
     private List contextNodeSet;
     private int contextPosition;
 
-    public PooledXPathExpression(XPathExpression expression, ObjectPool pool, IndependentContext context, Map variables) {
+    public PooledXPathExpression(Expression expression, ObjectPool pool, IndependentContext context, Map variables) {
         this.expression = expression;
         this.pool = pool;
         this.configuration = context.getConfiguration();
@@ -65,7 +64,8 @@ public class PooledXPathExpression {
             contextNodeSet = null;
 
             // Return object to pool
-            pool.returnObject(this);
+            if (pool != null) // may be null for testing
+                pool.returnObject(this);
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -156,8 +156,6 @@ public class PooledXPathExpression {
     private SequenceIterator evaluate(XPathContextMajor xpathContext) throws XPathException {
 
         // Use low-level Expression object and implement context node-set and context position
-        final Expression expression = this.expression.getInternalExpression();
-
         final SlotManager slotManager = this.stackFrameMap; // this is already set on XPathExpressionImpl but we can't get to it
         xpathContext.setCurrentIterator(new ListSequenceIterator(contextNodeSet, contextPosition));
         xpathContext.openStackFrame(slotManager);

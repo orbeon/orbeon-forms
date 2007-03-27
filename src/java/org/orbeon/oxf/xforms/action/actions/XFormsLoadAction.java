@@ -57,7 +57,8 @@ public class XFormsLoadAction extends XFormsAction {
             final NodeInfo currentNode = bindingContext.getSingleNode();
             if (currentNode != null) {
                 final String value = XFormsInstance.getValueForNodeInfo(currentNode);
-                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, value, target, urlType, urlNorewrite, isShowProgress);
+                final String encodedValue = XFormsUtils.encodeConvenienceCharactersForURI(value);
+                resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedValue, target, urlType, urlNorewrite, isShowProgress);
             } else {
                 // The action is a NOP if it's not bound to a node
                 return;
@@ -73,7 +74,8 @@ public class XFormsLoadAction extends XFormsAction {
             // Resolve AVT
             final String resolvedResource = XFormsUtils.resolveAttributeValueTemplates(pipelineContext, bindingContext.getSingleNode(),
                     null, xformsControls.getFunctionLibrary(), actionElement, resourceAttributeValue);
-            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, resolvedResource, target, urlType, urlNorewrite, isShowProgress);
+            final String encodedResource = XFormsUtils.encodeConvenienceCharactersForURI(resolvedResource);
+            resolveLoadValue(containingDocument, pipelineContext, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance

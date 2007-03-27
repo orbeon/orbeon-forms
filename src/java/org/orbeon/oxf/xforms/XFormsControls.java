@@ -669,6 +669,26 @@ public class XFormsControls {
     }
 
     /**
+     * Return the closest enclosing repeat id.
+     *
+     * @return  repeat id, throw if not found
+     */
+    public String getEnclosingRepeatId() {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
+            final BindingContext currentBindingContext = (BindingContext) contextStack.get(i);
+
+            final Element bindingElement = currentBindingContext.getControlElement();
+            final String repeatIdForIteration = currentBindingContext.getIdForContext();
+            if (bindingElement == null && repeatIdForIteration != null) {
+                // Found binding context for relevant repeat iteration
+                return repeatIdForIteration;
+            }
+        }
+        // It is required that there is a relevant enclosing xforms:repeat
+        throw new OXFException("Enclosing xforms:repeat not found.");
+    }
+
+    /**
      * For the given case id and the current binding, try to find an effective case id.
      *
      * The effective case id is for now the effective case id following repeat branches. This can be improved in the
@@ -1314,7 +1334,7 @@ public class XFormsControls {
             this.controlElement = controlElement;
 
             if (nodeset != null && nodeset.size() > 0) {
-                // TODO: This seems to take some significant time                
+                // TODO: PERF: This seems to take some significant time
                 for (Iterator i = nodeset.iterator(); i.hasNext();) {
                     final Object currentItem = i.next();
                     if (!(currentItem instanceof NodeInfo))

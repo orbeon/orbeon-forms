@@ -1749,6 +1749,42 @@
                     department, Anne, Mark and Sophie.
                 </p>
             </section>
+            <a name="xforms-events"/>
+            <section>
+                <title>Events</title>
+                <a name="events-intro"/>
+                <section>
+                    <title>Introduction</title>
+                    <p>
+                        [TODO: Introduction to events in XForms.]
+                    </p>
+                </section>
+                <a name="events-observer"/>
+                <section>
+                    <title>Using the <code>ev:observer</code> Attribute</title>
+                    <p>
+                        The <code>ev:observer</code> attribute, defined by the XML Events specification, allows you to
+                        register event handlers by specifying an element identifier, instead of embedding the event
+                        handler within that element. This is particularly useful to register event handlers on
+                        <code>&lt;xforms:instance></code> elements, which do not allow you to directly embed XML event
+                        handlers. The current support is limited to adding the <code>ev:observer</code> attribute on
+                        XForms actions under <code>&lt;xforms:model></code> with the <code>ev:observer</code> attribute
+                        referring to a child <code>&lt;xforms:instance></code>.
+                    </p>
+                    <xml-source>
+                        <xforms:model id="main-model">
+                            <comment> Child instance </comment>
+                            <xforms:instance id="child-instance" src="my-instance.xml"/>
+                            <comment> Register the event handler on the child instance </comment>
+                            <xforms:dispatch ev:observer="child-instance" ev:event="xforms-insert" target="main-model" name="update-after-insert"/>
+                        </xforms:model>
+                    </xml-source>
+                    <p>
+                        Note that you still need to use the <code>&lt;ev:event</code> attribute to specify to what
+                        event the handler responds.
+                    </p>
+                </section>
+            </section>
             <a name="xforms-actions"/>
             <section>
                 <title>Actions</title>
@@ -3134,6 +3170,29 @@
                                 <xforms:group model="main-model">
                                     <xforms:output value="xxforms:instance('resources-instance')/titles/company-information"/>
                                 </xforms:group>
+                            </xml-source>
+                        </li>
+                        <li>
+                            <a name="xxforms-index"/>
+                            <p>
+                                <code>xxforms:index($repeat-id as xs:string?) as xs:integer</code>.
+                            </p>
+                            <p>
+                                The <code>xxforms:index()</code> function behaves like the standard XForms
+                                <code>index()</code> function, except that its argument is optional. When the argument
+                                is omitted, the function returns the index of the closest enclosing
+                                <code>&lt;xforms:repeat></code> element. This function must always be used within
+                                <code>&lt;xforms:repeat></code> otherwise an error is raised.
+                            </p>
+                            <xml-source show-namespaces="false">
+                                <xforms:repeat nodeset="employee" id="employee-repeat">
+                                    <div>
+                                        <xforms:trigger>
+                                            <xforms:label>Add One</xforms:label>
+                                            <xforms:insert ev:event="DOMActivate" nodeset="../employee" at="xxforms:index()"/>
+                                        </xforms:trigger>
+                                    </div>
+                                </xforms:repeat>
                             </xml-source>
                         </li>
                     </ul>

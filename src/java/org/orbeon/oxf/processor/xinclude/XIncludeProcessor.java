@@ -83,7 +83,7 @@ public class XIncludeProcessor extends ProcessorImpl {
         private URIProcessorOutputImpl.URIReferences uriReferences;
         private boolean topLevelContentHandler;
         private String xmlBase;
-        private NamespaceSupport3 paremtNamespaceSupport;
+        private NamespaceSupport3 parentNamespaceSupport;
 
         private Locator locator;
         private TransformerURIResolver uriResolver;
@@ -110,31 +110,30 @@ public class XIncludeProcessor extends ProcessorImpl {
             this.uriResolver = uriResolver;
             this.topLevelContentHandler = topLevelContentHandler;
             this.xmlBase = xmlBase;
-            this.paremtNamespaceSupport = paremtNamespaceSupport;
+            this.parentNamespaceSupport = paremtNamespaceSupport;
             this.generateXMLBase = generateXMLBase;
         }
 
         public void startDocument() throws SAXException {
             if (topLevelContentHandler) {
                 super.startDocument();
-            } else {
-                // Clean-up namespace mappings
-                sendClearStartPrefixMappings();
             }
         }
 
         public void endDocument() throws SAXException {
             if (topLevelContentHandler) {
                 super.endDocument();
-            } else {
-                // Clean-up namespace mappings
-                sendClearEndPrefixMappings();
             }
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
             namespaceSupport.startElement();
+
+            if (!topLevelContentHandler && level == 0) {
+                // Clean-up namespace mappings
+                sendClearStartPrefixMappings();
+            }
 
             if (!topLevelContentHandler && level == 0 && generateXMLBase) {
                 // Add or replace xml:base attribute
@@ -206,26 +205,28 @@ public class XIncludeProcessor extends ProcessorImpl {
         }
 
         private void sendClearStartPrefixMappings() throws SAXException {
-            for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            // NOTE: This is called before handling start of root element of included document
+            for (Enumeration e = parentNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();
-                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("") && namespaceSupport.getURI(namespacePrefix) == null) // handle only if not declared again on root element
                     super.startPrefixMapping(namespacePrefix, "");
             }
 
-            final String defaultNS = paremtNamespaceSupport.getURI("");
-            if (defaultNS != null && defaultNS.length() > 0)
+            final String defaultNS = parentNamespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0 && namespaceSupport.getURI("") == null) // handle only if not declared again on root element
                 super.startPrefixMapping("", "");
         }
 
         private void sendClearEndPrefixMappings() throws SAXException {
-            for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            // NOTE: This is called after handling end of root element of included document
+            for (Enumeration e = parentNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
                 final String namespacePrefix = (String) e.nextElement();
-                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
+                if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("") && namespaceSupport.getURI(namespacePrefix) == null) // handle only if not declared again on root element
                     super.endPrefixMapping(namespacePrefix);
             }
 
-            final String defaultNS = paremtNamespaceSupport.getURI("");
-            if (defaultNS != null && defaultNS.length() > 0)
+            final String defaultNS = parentNamespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0 && namespaceSupport.getURI("") == null) // handle only if not declared again on root element
                 super.endPrefixMapping("");
         }
 
@@ -279,6 +280,9 @@ public class XIncludeProcessor extends ProcessorImpl {
                 } else if (level < includeLevel) {
                     // Clear include level indicator
                     includeLevel = -1;
+                } else if (!topLevelContentHandler && level == 0) {
+                    // Clean-up namespace mappings around root element
+                    sendClearEndPrefixMappings();
                 }
             }
 

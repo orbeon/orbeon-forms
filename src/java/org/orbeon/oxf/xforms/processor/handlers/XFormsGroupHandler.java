@@ -17,6 +17,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -72,8 +73,10 @@ public class XFormsGroupHandler extends HandlerBase {
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
         } else {
             // Output an xhtml:label element
-            final AttributesImpl labelAttributes = getAttributes(attributes, "xforms-label", null);
-            outputLabelHintHelpAlert(handlerContext, labelAttributes, effectiveGroupId, labelValue);
+            // TODO: Should find a way to find xforms:alert/@class
+            reusableAttributes.clear();
+            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
+            outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
         }
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));

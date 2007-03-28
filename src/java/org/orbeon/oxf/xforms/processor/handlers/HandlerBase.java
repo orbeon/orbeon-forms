@@ -404,18 +404,18 @@ public abstract class HandlerBase extends ElementHandlerNew {
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelHintHelpAlert(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
             }
         }
     }
 
-    public static void outputLabelHintHelpAlert(HandlerContext handlerContext, AttributesImpl labelHintHelpAlertAttributes, String parentId, String value) throws SAXException {
-        labelHintHelpAlertAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, parentId);
+    public static void outputLabelFor(HandlerContext handlerContext, AttributesImpl attributes, String forId, String value) throws SAXException {
+        attributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, "label");
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, labelHintHelpAlertAttributes);
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "label", labelQName, attributes);
         if (value != null) {
             contentHandler.characters(value.toCharArray(), 0, value.length());
         }

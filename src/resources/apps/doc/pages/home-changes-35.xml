@@ -130,6 +130,9 @@
                     </p>
                     <ul>
                         <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306849">#306849: Using schema id constraints throws exception</a>
+                        </li>
+                        <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306843">#306843: xforms:repeat only allows styling selected row up to two levels</a>
                         </li>
                         <li>

@@ -225,6 +225,7 @@
               <include name="**/*.rng"/>
               <include name="**/*.css"/>
               <include name="**/*.xsd"/>
+              <include name="**/*.properties"/>
           </fileset>
           <fileset dir="${build.classes.dir}">
               <include name="**/*.class"/>

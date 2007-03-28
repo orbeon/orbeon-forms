@@ -12,7 +12,7 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 /*
- * @(#)$Id: IDConstraintChecker.java,v 1.1 2005/05/04 23:55:58 ebruchez Exp $
+ * @(#)$Id: IDConstraintChecker.java,v 1.2 2007/03/28 18:50:39 ebruchez Exp $
  *
  * Copyright 2001 Sun Microsystems, Inc. All Rights Reserved.
  * 
@@ -253,8 +253,8 @@ public class IDConstraintChecker implements ValidationContext {
     }
 
     public static String localizeMessage( String propertyName, Object[] args ) {
-        String format = java.util.ResourceBundle.getBundle(
-            "org.orbeon.oxf.processor.xforms.Messages").getString(propertyName);
+        String format = java.util.PropertyResourceBundle.getBundle(
+            "org.orbeon.oxf.xforms.msv.Messages").getString(propertyName);
         
         return java.text.MessageFormat.format(format, args );
     }

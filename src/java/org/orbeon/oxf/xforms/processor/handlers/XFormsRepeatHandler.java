@@ -93,7 +93,7 @@ public class XFormsRepeatHandler extends HandlerBase {
                     addedClasses = new StringBuffer();
                     if (isCurrentRepeatSelected && !isStaticReadonly(repeatControlInfo)) {
                         addedClasses.append("xforms-repeat-selected-item-");
-                        addedClasses.append((numberParentRepeat % 2 == 0) ? '1' : '2');
+                        addedClasses.append(Integer.toString((numberParentRepeat % 4) + 1));
                     }
                     if (!isCurrentRepeatRelevant)
                         addedClasses.append(" xforms-disabled");

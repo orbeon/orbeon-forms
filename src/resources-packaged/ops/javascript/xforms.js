@@ -3367,7 +3367,7 @@ function xformsGetClassForRepeatId(repeatId) {
     while (true) {
         currentRepeatId = ORBEON.xforms.Globals.repeatTreeChildToParent[currentRepeatId];
         if (currentRepeatId == null) break;
-        depth = depth == 1 ? 2 : 1;
+        depth = (depth == 4) ? 1 : depth + 1;
     }
     return "xforms-repeat-selected-item-" + depth;
 }

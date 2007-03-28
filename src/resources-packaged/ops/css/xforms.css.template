@@ -223,6 +223,14 @@
     background-color: #ff9;
 }
 
+.xforms-repeat-selected-item-3 {
+    background-color: #ff6;
+}
+
+.xforms-repeat-selected-item-4 {
+    background-color: #ff3;
+}
+
 .xforms-debug {
     background-color: #fc9;
     position: absolute;

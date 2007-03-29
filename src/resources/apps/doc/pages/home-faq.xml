@@ -392,6 +392,48 @@
                     <code>replace="all"</code>.
                 </p>
             </section>
+            <a name="xforms-xpath20"/>
+            <section added="2007-03-29">
+                <title>I get errors when I use the XPath <code>if()</code> function in Orbeon Forms. What's wrong?</title>
+                <p>
+                    Orbeon Forms uses XPath 2.0 expressions instead of XPath 1.0 expressions. This allows much greater
+                    flexibility in the expressions you can use in Orbeon Forms (and once you have tasted XPath 2.0, you
+                    can't go back to XPath 1.0!).
+                </p>
+                <p>
+                    In general, this does not cause incompatibilities: most XPath 1.0 expressions work without issues
+                    with an XPath 2.0 implementation. But one place where there is an incompatibility is the use of the
+                    XPath 1.0 <code>if()</code> function. This function clashes with XPath 2.0's built-in
+                    <code>if()</code> construct. The bottom line is that you cannot directly use the XForms 1.0
+                    <code>if()</code> function in Orbeon Forms at the moment. The following, for example, will not work
+                    in Orbeon Forms:
+                </p>
+                <xml-source>
+                    if (normalize-space(/first-name) = '', '', concat('Hello, ', /first-name, '!'))
+                </xml-source>
+                <p>
+                    But you have workarounds:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Use the XPath 2.0 <code>if()</code> construct instead:
+                        </p>
+                        <xml-source>
+                            if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            Use the Orbeon Forms <code>xxforms:if()</code> extension, which behaves like the XForms 1.0
+                            <code>if()</code> function:
+                        </p>
+                        <xml-source>
+                            xxforms:if (normalize-space(/first-name) = '', '', concat('Hello, ', /first-name, '!'))
+                        </xml-source>
+                    </li>
+                </ul>
+            </section>
             <a name="xforms-jsp-mix"/>
             <section added="2006-01-11">
                 <title>Can I mix and match XForms and JSP?</title>

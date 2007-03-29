@@ -26,8 +26,9 @@
             <i>This example is described in details in the <a href="/doc/intro-tutorial">Orbeon Forms Tutorial</a>.</i>
         </p>
         <p>
-            Please enter your first name:
-            <xforms:input ref="/first-name" incremental="true"/>
+            <xforms:input ref="/first-name" incremental="true">
+                <xforms:label>Please enter your first name:</xforms:label>
+            </xforms:input>
         </p>
         <p>
             <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>

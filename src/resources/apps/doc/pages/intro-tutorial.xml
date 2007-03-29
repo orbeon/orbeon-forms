@@ -316,8 +316,9 @@
                         </head>
                         <body>
                             <p>
-                                Please enter your first name:
-                                <xforms:input ref="/first-name" incremental="true"/>
+                                <xforms:input ref="/first-name" incremental="true">
+                                    <xforms:label>Please enter your first name:</xforms:label>
+                                </xforms:input>
                             </p>
                             <p>
                                 <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>

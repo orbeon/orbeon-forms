@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 
 import java.util.List;
 import java.util.Iterator;
@@ -45,6 +46,13 @@ public class XFormsInsertAction extends XFormsAction {
         final String positionAttribute = actionElement.attributeValue("position");
         final String originAttribute = actionElement.attributeValue("origin");
         final String contextAttribute = actionElement.attributeValue("context");
+
+        final String binding;
+        {
+            final String nodesetAttribute = actionElement.attributeValue("nodeset");
+            final String bindAttribute = actionElement.attributeValue("bind");
+            binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
+        }
 
         final XFormsControls.BindingContext curBindingContext = xformsControls.getCurrentBindingContext();
 
@@ -82,6 +90,7 @@ public class XFormsInsertAction extends XFormsAction {
         if (contextAttribute != null && insertContextNodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE && isEmptyNodesetBinding)
             return;
 
+        final List originObjects;
         {
             // "3. The origin node-set is determined."
             // "5. Each node in the origin node-set is cloned in the order it appears in the origin node-set."
@@ -106,13 +115,15 @@ public class XFormsInsertAction extends XFormsAction {
 
                     sourceNodes = Collections.singletonList(singleSourceNode);
                     clonedNodesTemp = Collections.singletonList(singleClonedNode);
+
+                    originObjects = null;
                 } else {
                     // There is an @origin attribute
 
                     // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                     // origin attribute in the insert context."
 
-                    final List originObjects = containingDocument.getEvaluator().evaluate(pipelineContext, insertContextNodeInfo,
+                    originObjects = containingDocument.getEvaluator().evaluate(pipelineContext, insertContextNodeInfo,
                         originAttribute, Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
                     // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
@@ -219,6 +230,8 @@ public class XFormsInsertAction extends XFormsAction {
             // Identify the instance that actually changes
             final XFormsInstance modifiedInstance;
             // Find actual insertion point and insert
+            final NodeInfo insertLocationNodeInfo;
+            final List insertedNodes;
             if (isEmptyNodesetBinding) {
 
                 // "If the Node Set Binding node-set is not specified or empty, the insert location node is the insert
@@ -230,8 +243,9 @@ public class XFormsInsertAction extends XFormsAction {
                 // target location is before the first child of the insert location node."
 
                 modifiedInstance = containingDocument.getInstanceForNode(insertContextNodeInfo);
-                final Node insertContextNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
-                doInsert(insertContextNode, clonedNodes);
+                insertLocationNodeInfo = insertContextNodeInfo;
+                final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
+                insertedNodes = doInsert(insertLocationNode, clonedNodes);
 
                 // Normalize text nodes if needed to respect XPath 1.0 constraint
                 {
@@ -241,10 +255,10 @@ public class XFormsInsertAction extends XFormsAction {
                         hasTextNode |= clonedNode.getNodeType() == org.dom4j.Node.TEXT_NODE;
                     }
                     if (hasTextNode)
-                        Dom4jUtils.normalizeTextNodes(insertContextNode);
+                        Dom4jUtils.normalizeTextNodes(insertLocationNode);
                 }
             } else {
-                final NodeInfo insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
+                insertLocationNodeInfo = (NodeInfo) collectionToBeUpdated.get(insertionIndex - 1);
                 final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertLocationNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
                 modifiedInstance = containingDocument.getInstanceForNode(insertLocationNodeInfo);
 
@@ -262,7 +276,7 @@ public class XFormsInsertAction extends XFormsAction {
                         // location is the target location. If there is more than one cloned node to insert, only the
                         // first node that does not cause a conflict is considered."
 
-                        doInsert(insertLocationNode.getDocument(), clonedNodes);
+                        insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes);
 
                         // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
                     } else {
@@ -277,7 +291,7 @@ public class XFormsInsertAction extends XFormsAction {
                             // is harder as we have to deal with removing duplicate attributes and find a reasonable
                             // insertion strategy.
 
-                            doInsert(insertLocationNode.getParent(), clonedNodes);
+                            insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes);
 
                         } else {
                             // Other node types
@@ -304,6 +318,8 @@ public class XFormsInsertAction extends XFormsAction {
                                 hasTextNode |= clonedNode.getNodeType() == org.dom4j.Node.TEXT_NODE;
                                 siblingElements.add(actualInsertionIndex + i, clonedNode);
                             }
+                            insertedNodes = clonedNodes;
+
                             // Normalize text nodes if needed to respect XPath 1.0 constraint
                             if (hasTextNode)
                                 Dom4jUtils.normalizeTextNodes(parentNode);
@@ -323,7 +339,21 @@ public class XFormsInsertAction extends XFormsAction {
             XFormsSwitchUtils.updateSwitches(xformsControls);
 
             // "4. If the insert is successful, the event xforms-insert is dispatched."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsInsertEvent(modifiedInstance, atAttribute));
+            {
+                final List insertedNodeInfos;
+                if (insertedNodes == null || insertedNodes.size() == 0) {
+                    insertedNodeInfos = null;
+                } else {
+                    final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.getDocumentInfo();
+                    insertedNodeInfos = new ArrayList(insertedNodes.size());
+                    for (Iterator i = insertedNodes.iterator(); i.hasNext();)
+                        insertedNodeInfos.add(documentWrapper.wrap(i.next()));
+                }
+
+
+                containingDocument.dispatchEvent(pipelineContext,
+                        new XFormsInsertEvent(modifiedInstance, binding, insertedNodeInfos, originObjects, insertLocationNodeInfo, positionAttribute == null ? "after" : positionAttribute));
+            }
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
             modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);
@@ -331,7 +361,8 @@ public class XFormsInsertAction extends XFormsAction {
         }
     }
 
-    private void doInsert(Node insertionNode, List clonedNodes) {
+    private List doInsert(Node insertionNode, List clonedNodes) {
+        final List insertedNodes = new ArrayList(clonedNodes.size());
         if (insertionNode instanceof Element) {
             // Insert inside an element
             final Element insertContextElement = (Element) insertionNode;
@@ -355,15 +386,18 @@ public class XFormsInsertAction extends XFormsAction {
                     // as we have to deal with removing duplicate attributes and find a reasonable insertion strategy.
 
                     insertContextElement.add(clonedAttribute);
+                    insertedNodes.add(clonedAttribute);
 
                 } else if (!(clonedNode instanceof Document)) {
                     // Add other node to element
                     insertContextElement.content().add(otherNodeIndex++, clonedNode);
+                    insertedNodes.add(clonedNode);
                 } else {
                     // "If a cloned node cannot be placed at the target location due to a node type conflict, then the
                     // insertion for that particular clone node is ignored."
                 }
             }
+            return insertedNodes;
         } else if (insertionNode instanceof Document) {
             final Document insertContextDocument = (Document) insertionNode;
 
@@ -375,13 +409,15 @@ public class XFormsInsertAction extends XFormsAction {
                 // Only an element can be inserted at the root of an instance
                 if (clonedNode instanceof Element) {
                     insertContextDocument.setRootElement((Element) clonedNode);
-                    return;
+                    insertedNodes.add(clonedNode);
+                    return insertedNodes;
                 }
             }
 
             // NOTE: The spec does not allow inserting comments and PIs at the root of an instance document at this
             // point.
 
+            return insertedNodes;
         } else {
             throw new OXFException("Unsupported insertion node type: " + insertionNode.getClass().getName());
         }

@@ -26,11 +26,9 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 9.3.6 The delete Element
@@ -46,6 +44,13 @@ public class XFormsDeleteAction extends XFormsAction {
 
         final String atAttribute = actionElement.attributeValue("at");
         final String contextAttribute = actionElement.attributeValue("context");
+
+        final String binding;
+        {
+            final String nodesetAttribute = actionElement.attributeValue("nodeset");
+            final String bindAttribute = actionElement.attributeValue("bind");
+            binding = (bindAttribute != null) ? bindAttribute : nodesetAttribute;
+        }
 
         final List collectionToUpdate = xformsControls.getCurrentNodeset();
         final boolean isEmptyNodesetBinding = collectionToUpdate == null || collectionToUpdate.size() == 0;
@@ -73,8 +78,8 @@ public class XFormsDeleteAction extends XFormsAction {
             final Node nodeToRemove;
             final List parentContent;
             final int actualIndexInParentContentCollection;
+            int deleteIndex;
             {
-                int deleteIndex;
                 {
                     if (isEmptyNodesetBinding) {
                         // "If the Node Set Binding node-set empty, then this attribute is ignored"
@@ -179,7 +184,10 @@ public class XFormsDeleteAction extends XFormsAction {
             XFormsIndexUtils.adjustRepeatIndexes(pipelineContext, xformsControls, nestedRepeatIndexUpdates);
 
             // "4. If the delete is successful, the event xforms-delete is dispatched."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, atAttribute));
+            {
+                final List deletedNodeInfos = Collections.singletonList(nodeInfoToRemove);
+                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(modifiedInstance, binding, deletedNodeInfos, deleteIndex));
+            }
 
             // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
             modifiedInstance.getModel(containingDocument).setAllDeferredFlags(true);

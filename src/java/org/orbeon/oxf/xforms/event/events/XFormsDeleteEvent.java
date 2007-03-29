@@ -16,6 +16,15 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.value.IntegerValue;
+
+import java.util.List;
+import java.util.Collections;
 
 
 /**
@@ -28,12 +37,36 @@ public class XFormsDeleteEvent extends XFormsEvent {
 
     private String xpathExpression;
 
+    private String binding;
+    private List deletedNodeInfos;
+    private int deleteIndex;
+
     public XFormsDeleteEvent(XFormsEventTarget targetObject, String xpathExpression) {
         super(XFormsEvents.XFORMS_DELETE, targetObject, true, false);
         this.xpathExpression = xpathExpression;
     }
 
-    public String getXpathExpression() {
-        return xpathExpression;
+    public XFormsDeleteEvent(XFormsEventTarget targetObject,
+                             String binding, List deletedNodeInfos,
+                             int deleteIndex) {
+        super(XFormsEvents.XFORMS_DELETE, targetObject, true, false);
+        this.binding = binding;
+        this.deletedNodeInfos = deletedNodeInfos;
+        this.deleteIndex = deleteIndex;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        if ("binding".equals(name)) {
+            // "The attribute value of the delete action's nodeset or bind attribute."
+            return (binding == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(Collections.singletonList(new StringValue(binding)));
+        } else if ("deleted-nodes".equals(name)) {
+            // "The instance data node deleted. Note that these nodes are no longer referenced by their parents."
+            return (deletedNodeInfos == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(deletedNodeInfos);
+        } else if ("delete-location".equals(name)) {
+            // "The delete location as defined by the delete action, or NaN if there is no delete location."
+            return (deleteIndex < 1) ? new EmptyIterator() : (SequenceIterator) new ListIterator(Collections.singletonList(new IntegerValue(deleteIndex)));
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

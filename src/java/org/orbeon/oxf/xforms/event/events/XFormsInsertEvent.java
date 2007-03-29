@@ -16,6 +16,14 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.saxon.om.SequenceIterator;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.EmptyIterator;
+import org.orbeon.saxon.value.StringValue;
+
+import java.util.List;
+import java.util.Collections;
 
 
 /**
@@ -28,12 +36,46 @@ public class XFormsInsertEvent extends XFormsEvent {
 
     private String xpathExpression;
 
+    private String binding;
+    private List insertedNodeInfos;
+    private List originObjects;
+    private NodeInfo insertLocationNodeInfo;
+    private String position;
+
     public XFormsInsertEvent(XFormsEventTarget targetObject, String xpathExpression) {
         super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         this.xpathExpression = xpathExpression;
     }
 
-    public String getXpathExpression() {
-        return xpathExpression;
+    public XFormsInsertEvent(XFormsEventTarget targetObject,
+                             String binding, List insertedNodes, List originObjects,
+                             NodeInfo insertLocationNodeInfo, String position) {
+        super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
+        this.binding = binding;
+        this.insertedNodeInfos = insertedNodes;
+        this.originObjects = originObjects;
+        this.insertLocationNodeInfo = insertLocationNodeInfo;
+        this.position = position;
+    }
+
+    public SequenceIterator getAttribute(String name) {
+        if ("binding".equals(name)) {
+            // "The attribute value of the insert action's nodeset or bind attribute."
+            return (binding == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(Collections.singletonList(new StringValue(binding)));
+        } else if ("inserted-nodes".equals(name)) {
+            // "The instance data nodes inserted."
+            return (insertedNodeInfos == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(insertedNodeInfos);
+        } else if ("origin-nodes".equals(name)) {
+            // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
+            return (originObjects == null) ? new EmptyIterator() : (SequenceIterator) new ListIterator(originObjects);
+        } else if ("insert-location-node".equals(name)) {
+            // "The insert location node as defined by the insert action."
+            return new ListIterator(Collections.singletonList(insertLocationNodeInfo));
+        } else if ("position".equals(name)) {
+            // "The insert position, before or after."
+            return new ListIterator(Collections.singletonList(new StringValue(position)));
+        } else {
+            return super.getAttribute(name);
+        }
     }
 }

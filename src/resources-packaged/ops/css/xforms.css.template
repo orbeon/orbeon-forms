@@ -269,6 +269,8 @@ select.xforms-required-empty {
 /* Reasonable defaults for alignment of button content */
 button.xforms-trigger img { vertical-align: middle }
 button.xforms-trigger span { vertical-align: middle }
+button.xforms-submit img { vertical-align: middle }
+button.xforms-submit span { vertical-align: middle }
 
 /* Reasonable defaults for alignment of anchor content */
 a.xforms-trigger img { vertical-align: middle }

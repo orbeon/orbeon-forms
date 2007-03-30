@@ -119,6 +119,14 @@
                 </li>
                 <li>
                     <p>
+                        <b>Auto-complete field in repeat.</b> Only the auto-complete initially present when the page was
+                        generated used to work in repeat. Now the auto-complete feature also works on auto-complete
+                        controls that are added to the page after it is first loaded. See issue <a
+                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306805&amp;group_id=168&amp;atid=350207">#306805</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>Documentation of submission attribute.</b> The extension attribute <a
                         href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
                         of <code>&lt;xforms:submission></code> is now documented.
@@ -146,6 +154,9 @@
                         </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306806">#306806: Autocomplete doesn't work in dialog</a>
+                        </li>
+                        <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306805">#306805: Autocomplete doesn't work in repeat</a>
                         </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306837">#306837: xforms:message/@level is not required in XForms 1.1</a>

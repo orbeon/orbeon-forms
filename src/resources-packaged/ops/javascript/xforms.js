@@ -2284,8 +2284,6 @@ ORBEON.xforms.Server = {
                                                         var newDocumentElement = document.createElement("span");
                                                         newDocumentElement.setAttribute("id", controlId);
                                                         newDocumentElement.setAttribute("class", documentElementClasses.join(" ") + " xforms-static");
-//                                                        if (documentElement.style != null)// xxx
-//                                                            newDocumentElement.setAttribute("style", documentElement.style);
                                                         parentElement.replaceChild(newDocumentElement, documentElement);
                                                         // Remove alert
                                                         var alertElement = ORBEON.xforms.Controls._getControlLabel(newDocumentElement, "xforms-alert");
@@ -2305,6 +2303,9 @@ ORBEON.xforms.Server = {
                                                     documentElementClasses = documentElement.className.split(" ");
                                                 }
 
+                                                // We update the relevance and readonly before we update the value. If we don't, updating the value
+                                                // can fail on IE in some cases. (The details about this issue have been lost.)
+
                                                 // Handle relevance
                                                 if (relevant != null) {
                                                     var isRelevant = relevant == "true";
@@ -2320,11 +2321,6 @@ ORBEON.xforms.Server = {
                                                     var isRequired = required == "true";
                                                     if (isRequired) ORBEON.util.Dom.addClass(documentElement, "xforms-required");
                                                     else ORBEON.util.Dom.removeClass(documentElement, "xforms-required");
-                                                }
-                                                // Update the required-empty/required-full even if the required has not changed or
-                                                // is not specified as the value may have changed
-                                                if (!isStaticReadonly) {
-                                                    ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
                                                 }
 
                                                 // Handle readonly
@@ -2565,6 +2561,12 @@ ORBEON.xforms.Server = {
                                                             }
                                                         }
                                                     }
+                                                }
+
+                                                // Update the required-empty/required-full even if the required has not changed or
+                                                // is not specified as the value may have changed
+                                                if (!isStaticReadonly) {
+                                                    ORBEON.xforms.Controls.updateRequiredEmpty(documentElement);
                                                 }
 
                                                 // Store new label message in control attribute

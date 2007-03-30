@@ -1462,6 +1462,28 @@ ORBEON.xforms.Init = {
             xformsPageLoadedServer();
     },
 
+
+    /**
+     * Initialize a newly copied subtree.
+     *
+     * Some of the more advanced controls are initialized when the page first loads. The server sets the value of the
+     * opsXFormsControls variable to tell the client the id of those controls and the type of each control. When new
+     * controls are added, this function must be called so those the inserted advanced controls are initialized as
+     * well.
+     */
+    insertedElement: function(element) {
+        if (element.nodeType == ORBEON.util.Dom.ELEMENT_TYPE) {
+            if (ORBEON.util.Dom.hasClass(element, "xforms-select1-appearance-xxforms-autocomplete")) {
+                ORBEON.xforms.Init._autoComplete(element);
+            }
+            for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                var child = element.childNodes[childIndex];
+                if (child.nodeType == ORBEON.util.Dom.ELEMENT_TYPE)
+                    ORBEON.xforms.Init.insertedElement(child);
+            }
+        }
+    },
+
     _autoComplete: function(autoComplete) {
         var textfield = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 0);
         var select = ORBEON.util.Dom.getChildElementByIndex(autoComplete, 1);
@@ -2034,6 +2056,7 @@ ORBEON.xforms.Server = {
                                                 for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
                                                     templateNode = templateNodes[templateNodeIndex];
                                                     afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
+                                                    ORBEON.xforms.Init.insertedElement(templateNode);
                                                 }
                                                 // Initialize newly added form elements
                                                 if (ORBEON.xforms.Globals.isRenderingEngineWebCore13)

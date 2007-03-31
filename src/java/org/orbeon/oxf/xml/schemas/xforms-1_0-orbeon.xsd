@@ -83,7 +83,6 @@
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:choice>
                     <xsd:element ref="xforms:instance"/>
-                    <xsd:element ref="xsd:schema"/>
                     <xsd:element ref="xforms:submission"/>
                     <xsd:element ref="xforms:bind"/>
                     <xsd:group ref="xforms:Action"/>
@@ -587,7 +586,6 @@
     <xsd:group name="Action">
         <xsd:sequence>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
-
                 <xsd:element ref="xforms:action"/>
                 <xsd:element ref="xforms:dispatch"/>
                 <xsd:element ref="xforms:rebuild"/>
@@ -597,7 +595,6 @@
                 <xsd:element ref="xforms:setfocus"/>
                 <xsd:element ref="xforms:load"/>
                 <xsd:element ref="xforms:setvalue"/>
-
                 <xsd:element ref="xforms:send"/>
                 <xsd:element ref="xforms:reset"/>
                 <xsd:element ref="xforms:insert"/>
@@ -611,14 +608,13 @@
     </xsd:group>
     <xsd:element name="action">
         <xsd:complexType>
-            <xsd:sequence maxOccurs="unbounded">
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="xforms:Action"/>
                 <xsd:any namespace="##other" processContents="lax"/>
-            </xsd:sequence>
+            </xsd:choice>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>
-
     </xsd:element>
     <xsd:element name="dispatch">
         <xsd:complexType>
@@ -823,13 +819,11 @@
                 <xsd:element ref="xforms:label" minOccurs="0"/>
                 <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                     <xsd:choice>
-
                         <xsd:group ref="xforms:UI.Common"/>
                         <xsd:group ref="xforms:Form.Controls"/>
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
-                        <xsd:any namespace="##other" processContents="lax"/>
                         <!-- containing document language to add additional allowed content here -->
                     </xsd:choice>
                 </xsd:sequence>

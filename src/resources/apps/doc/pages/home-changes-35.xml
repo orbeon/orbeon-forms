@@ -28,7 +28,7 @@
         <section>
             <title>Introduction</title>
             <p>
-                Welcome to Orbeon Forms 3.5.1!
+                Welcome to Orbeon Forms 3.5!
             </p>
             <p>
                 Orbeon Forms 3.5 features many improvements over Orbeon PresentationServer (OPS) 3.0.1, including
@@ -44,180 +44,181 @@
         <section>
             <title>Changes in Version 3.5.1</title>
             <p>
-                Orbeon Forms 3.5.1 is an update containing the following changes:
+                Orbeon Forms 3.5.1 is an update to Orbeon Forms 3.5.
             </p>
-            <ul>
-                <li>
-                    <p>
-                        <b>Support for combined XForms resources.</b> The XForms engine now supports an option to
-                        automatically combine CSS and JavaScript resources used by XForms pages. This can lead to page
-                        loading time improvements. See the <a
-                        href="reference-xforms-ng#xforms-combined-resources">XForms Reference</a> for details.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Tree and menu memory leaks.</b> The tree and menu controls have been causing significant
-                        memory leaks on the browser, especially on in IE. The leaks could be in the order of several
-                        MB per page load. If you are using the tree or menu control, you should consider upgrading to
-                        3.5.1. See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Incorrect XPath evaluation of <code>preceding::</code> and <code>preceding-sibling::</code>
-                        axes.</b> This issue could result in particularly confusing results when using XPath expressions
-                        with these axes from XForms. See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XSLT memory leak.</b> In certain circumstances, too many objects were stored in the Orbeon
-                        Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms Classic memory leaks.</b> In certain circumstances, too many objects were stored in
-                        the Orbeon Cache when using <a href="home-faq#xforms-classic-ng">XForms Classic</a>. This
-                        could cause Orbeon Forms to run out of memory. See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Partial support for <code>ev:observer</code> attribute.</b> This attribute, defined by the
-                        XML Events specification, allows you to register event handlers by specifying an element
-                        identifier, instead of embedding the event handler within that element. This is particularly
-                        useful to register event handlers on <code>&lt;xforms:instance></code> elements, which do not
-                        allow you to directly embed XML event handlers. The current support is limited to adding the
-                        <code>ev:observer</code> attribute on XForms actions under <code>&lt;xforms:model></code> with
-                        the <code>ev:observer</code> attribute referring to a child <code>&lt;xforms:instance></code>.
-                        See the <a href="reference-xforms-ng#events-observer">XForms Reference</a> for details.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>New <code>xxforms:index()</code> function.</b> The <code>xxforms:index()</code> function
-                        behaves like the standard XForms <code>index()</code> function, except that its argument is
-                        optional. When the argument is omitted, the function returns the index of the closest enclosing
-                        <code>&lt;xforms:repeat></code> element. See the <a
-                        href="reference-xforms-ng#xxforms-index">XForms Reference</a> for details.
+            <section>
+                <title>Noteworthy Changes</title>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Support for combined XForms resources.</b> The XForms engine now supports an option to
+                            automatically combine CSS and JavaScript resources used by XForms pages. This can lead to page
+                            loading time improvements. See the <a
+                            href="reference-xforms-ng#xforms-combined-resources">XForms Reference</a> for details.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Tree and menu memory leaks.</b> The tree and menu controls have been causing significant
+                            memory leaks on the browser, especially on in IE. The leaks could be in the order of several
+                            MB per page load. If you are using the tree or menu control, you should consider upgrading to
+                            3.5.1. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Incorrect XPath evaluation of <code>preceding::</code> and <code>preceding-sibling::</code>
+                            axes.</b> This issue could result in particularly confusing results when using XPath expressions
+                            with these axes from XForms. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XSLT memory leak.</b> In certain circumstances, too many objects were stored in the Orbeon
+                            Cache when using XSLT. This could cause Orbeon Forms to run out of memory. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms Classic memory leaks.</b> In certain circumstances, too many objects were stored in
+                            the Orbeon Cache when using <a href="home-faq#xforms-classic-ng">XForms Classic</a>. This
+                            could cause Orbeon Forms to run out of memory. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Partial support for <code>ev:observer</code> attribute.</b> This attribute, defined by the
+                            XML Events specification, allows you to register event handlers by specifying an element
+                            identifier, instead of embedding the event handler within that element. This is particularly
+                            useful to register event handlers on <code>&lt;xforms:instance></code> elements, which do not
+                            allow you to directly embed XML event handlers. The current support is limited to adding the
+                            <code>ev:observer</code> attribute on XForms actions under <code>&lt;xforms:model></code> with
+                            the <code>ev:observer</code> attribute referring to a child <code>&lt;xforms:instance></code>.
+                            See the <a href="reference-xforms-ng#events-observer">XForms Reference</a> for details.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>New <code>xxforms:index()</code> function.</b> The <code>xxforms:index()</code> function
+                            behaves like the standard XForms <code>index()</code> function, except that its argument is
+                            optional. When the argument is omitted, the function returns the index of the closest enclosing
+                            <code>&lt;xforms:repeat></code> element. See the <a
+                            href="reference-xforms-ng#xxforms-index">XForms Reference</a> for details.
 
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Attribute Value Templates (AVTs).</b> Support for AVTs is now <a
-                        href="reference-xforms-ng#avts">documented</a>. Support for escaping brackets has been added.
-                        See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Auto-complete field in repeat.</b> Only the auto-complete initially present when the page was
-                        generated used to work in repeat. Now the auto-complete feature also works on auto-complete
-                        controls that are added to the page after it is first loaded. See issue <a
-                        href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306805&amp;group_id=168&amp;atid=350207">#306805</a>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Documentation of submission attribute.</b> The extension attribute <a
-                        href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
-                        of <code>&lt;xforms:submission></code> is now documented.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        The following is the complete list of issues fixed in this release:
-                    </p>
-                    <ul>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306805">#306805: Autocomplete doesn't work in repeat</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306850">#306850: Support XForms 1.1 xforms-insert and xforms-delete context information</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306828">#306828: XInclude: namespace declared and undeclared on the same element</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306849">#306849: Using schema id constraints throws exception</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306843">#306843: xforms:repeat only allows styling selected row up to two levels</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835: Support escaping of { and } in AVTs</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306806">#306806: Autocomplete doesn't work in dialog</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306837">#306837: xforms:message/@level is not required in XForms 1.1</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836: Saxon dom4j wrapper incorrectly iterates over preceding-sibling:: and preceding:: axes</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306832">#306832: xforms:group gets too many events</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306829">#306829: When item is added, label is not displayed</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827: XForms Classic keeps references to PipelineContext objects</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826: XSLT TransformerURIResolver object keeps references to PipelineContext object</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306795">#306795: Stack overflow with long URL</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306793">#306793: MIP for read-only instances should return readonly="true"</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306782">#306782: Combined resources cache should generate resources upon loading the page</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305780">#305780: Way to pass the base URL to the client</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306268">#306268: xforms:select does not update as instance values change</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306530">#306530: IE: JS error when canceling page unload</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306542">#306542: xforms:select1 won't dropdown after showing a dialog</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754: Menu and tree causing memory leak on IE</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306592">#306592: Repeat bug with IE 6</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306676">#306676: "Could not set the selected property" in IE</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305808">#305808: Server to send XForms server URL to client when the page is loaded</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306708">#306708: NPE when enabling XForms instance inspector</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306540">#306540: Setfocus action does not work for auto-complete field</a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Attribute Value Templates (AVTs).</b> Support for AVTs is now <a
+                            href="reference-xforms-ng#avts">documented</a>. Support for escaping brackets has been added.
+                            See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Auto-complete field in repeat.</b> Only the auto-complete initially present when the page was
+                            generated used to work in repeat. Now the auto-complete feature also works on auto-complete
+                            controls that are added to the page after it is first loaded. See issue <a
+                            href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;aid=306805&amp;group_id=168&amp;atid=350207">#306805</a>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Documentation of submission attribute.</b> The extension attribute <a
+                            href="reference-xforms-ng#submission-show-progress"><code>xxforms:show-progress="false"</code></a>
+                            of <code>&lt;xforms:submission></code> is now documented.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Complete List of Issues Addressed in this Release</title>
+                <ul>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306805">#306805: Autocomplete doesn't work in repeat</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306850">#306850: Support XForms 1.1 xforms-insert and xforms-delete context information</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306828">#306828: XInclude: namespace declared and undeclared on the same element</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306849">#306849: Using schema id constraints throws exception</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306843">#306843: xforms:repeat only allows styling selected row up to two levels</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306835">#306835: Support escaping of { and } in AVTs</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306806">#306806: Autocomplete doesn't work in dialog</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306837">#306837: xforms:message/@level is not required in XForms 1.1</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306836">#306836: Saxon dom4j wrapper incorrectly iterates over preceding-sibling:: and preceding:: axes</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306832">#306832: xforms:group gets too many events</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306829">#306829: When item is added, label is not displayed</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306827">#306827: XForms Classic keeps references to PipelineContext objects</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306826">#306826: XSLT TransformerURIResolver object keeps references to PipelineContext object</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306795">#306795: Stack overflow with long URL</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306793">#306793: MIP for read-only instances should return readonly="true"</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306782">#306782: Combined resources cache should generate resources upon loading the page</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305780">#305780: Way to pass the base URL to the client</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306268">#306268: xforms:select does not update as instance values change</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306530">#306530: IE: JS error when canceling page unload</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306542">#306542: xforms:select1 won't dropdown after showing a dialog</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306754">#306754: Menu and tree causing memory leak on IE</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306592">#306592: Repeat bug with IE 6</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306676">#306676: "Could not set the selected property" in IE</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=305808">#305808: Server to send XForms server URL to client when the page is loaded</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306708">#306708: NPE when enabling XForms instance inspector</a>
+                    </li>
+                    <li>
+                    <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306540">#306540: Setfocus action does not work for auto-complete field</a>
+                    </li>
+                </ul>
+            </section>
         </section>
         <a name="changes-35"/>
         <section>

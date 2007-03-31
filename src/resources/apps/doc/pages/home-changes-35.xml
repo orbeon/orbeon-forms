@@ -138,6 +138,9 @@
                     </p>
                     <ul>
                         <li>
+                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306805">#306805: Autocomplete doesn't work in repeat</a>
+                        </li>
+                        <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306850">#306850: Support XForms 1.1 xforms-insert and xforms-delete context information</a>
                         </li>
                         <li>
@@ -154,9 +157,6 @@
                         </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306806">#306806: Autocomplete doesn't work in dialog</a>
-                        </li>
-                        <li>
-                        <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306805">#306805: Autocomplete doesn't work in repeat</a>
                         </li>
                         <li>
                         <a href="http://forge.objectweb.org/tracker/index.php?func=detail&amp;group_id=168&amp;atid=350207&amp;aid=306837">#306837: xforms:message/@level is not required in XForms 1.1</a>

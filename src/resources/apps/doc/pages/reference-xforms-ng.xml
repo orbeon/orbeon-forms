@@ -3408,16 +3408,19 @@
                         In most cases, you only need to call <code>dispatchEvent()</code> with a target id and event name,
                         as in:
                     </p>
-                    <source>ORBEON.xforms.Document.dispatchEvent("my-id", "acme-super-event");</source>
+                    <source>ORBEON.xforms.Document.dispatchEvent("main-model", "do-something");</source>
                     <p>
                         An event handler for the custom event can be in an XForms model or control, and can execute any
-                        valid XForms action, for example:
+                        valid XForms action. Here an action is explicatly declared to handle the
+                        <code>do-something</code> even on the XForms model:
                     </p>
                     <xml-source show-namespaces="false">
-                        <xforms:action id="my-id" ev:event="acme-super-event">
-                            <xforms:setvalue ref="first-name" value="instance('default-values')/first-name"/>
-                            <xforms:toggle case="first-name-case"/>
-                        </xforms:action>
+                        <xforms:model id="main-model" xxforms:external-events="do-something">
+                            <xforms:action ev:event="do-something">
+                                <xforms:setvalue ref="first-name" value="instance('default-values')/first-name"/>
+                                <xforms:toggle case="first-name-case"/>
+                            </xforms:action>
+                        </xforms:model>
                     </xml-source>
                 </section>
             </section>

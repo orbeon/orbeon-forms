@@ -1780,7 +1780,7 @@
                         </xforms:model>
                     </xml-source>
                     <p>
-                        Note that you still need to use the <code>&lt;ev:event</code> attribute to specify to what
+                        Note that you still need to use the <code>ev:event</code> attribute to specify to what
                         event the handler responds.
                     </p>
                 </section>

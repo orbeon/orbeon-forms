@@ -18,10 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.Cookie;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Locale;
 
 /**
@@ -32,213 +29,53 @@ import java.util.Locale;
  */
 public class OPSRendererFilter implements Filter {
 
-    private static final String OPS_CONTEXT_PATH_PARAMETER_NAME = "oxf.xforms.renderer.context";
-    private static final String OPS_RENDER_SERVLET_PATH = "/xforms-renderer";
-    private static final String DEFAULT_ENCODING = "utf-8";
+    public static final String OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME = "oxf.xforms.renderer.document";
+    public static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+    public static final String OPS_RENDERER_PATH = "/xforms-renderer";
+
+    private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
 
     private ServletContext servletContext;
     private String opsContextPath;
 
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
-        opsContextPath = filterConfig.getInitParameter(OPS_CONTEXT_PATH_PARAMETER_NAME);
+        opsContextPath = filterConfig.getInitParameter(OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME);
         if (opsContextPath == null)
-            throw new ServletException("Filter initialization parameter '" + OPS_CONTEXT_PATH_PARAMETER_NAME + "' is required for filter: " + filterConfig.getFilterName());
+            throw new ServletException("Filter initialization parameter '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' is required for filter: " + filterConfig.getFilterName());
 
         // TODO: check opsContextPath format: starts with /, doesn't end with one, etc.
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-        final HttpServletRequest request = (HttpServletRequest) servletRequest;
-        final HttpServletResponse response = (HttpServletResponse) servletResponse;
+        final HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
+        final HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
 
-        if (isOPSResourceRequest(request)) {
-            // Directly forward all requests meant for Orbeon Forms
-            final String subRequestPath = getRequestPathInfo(request).substring(opsContextPath.length());
-            getOPSDispatcher(subRequestPath).forward(request, response);
+        if (isOPSResourceRequest(httpRequest)) {
+            // Directly forward all requests meant for Orbeon Forms resources
+            final String subRequestPath = getRequestPathInfo(httpRequest).substring(opsContextPath.length());
+            getOPSDispatcher(subRequestPath).forward(httpRequest, httpResponse);
         } else {
             // Forward the request to the Orbeon Forms renderer
-            final HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response) {
-                // TODO: capture output
-
-                private ByteArrayOutputStream byteArrayOutputStream;
-                private ServletOutputStream servletOutputStream;
-                private PrintWriter printWriter;
-
-                private String encoding;
-                private String mediatype;
-
-                public void addCookie(Cookie cookie) {
-                    super.addCookie(cookie);
-                }
-
-                public boolean containsHeader(String string) {
-                    return super.containsHeader(string);
-                }
-
-                public String encodeURL(String string) {
-                    return super.encodeURL(string);
-                }
-
-                public String encodeRedirectURL(String string) {
-                    return super.encodeRedirectURL(string);
-                }
-
-                public String encodeUrl(String string) {
-                    return super.encodeUrl(string);
-                }
-
-                public String encodeRedirectUrl(String string) {
-                    return super.encodeRedirectUrl(string);
-                }
-
-                public void sendError(int i, String string) throws IOException {
-                    System.out.println();
-//                    super.sendError(i, string);
-                }
-
-                public void sendError(int i) throws IOException {
-                    System.out.println();
-//                    super.sendError(i);
-                }
-
-                public void sendRedirect(String string) throws IOException {
-                    System.out.println();
-//                    super.sendRedirect(string);
-                }
-
-                public void setDateHeader(String string, long l) {
-                    System.out.println();
-//                    super.setDateHeader(string, l);
-                }
-
-                public void addDateHeader(String string, long l) {
-                    System.out.println();
-//                    super.addDateHeader(string, l);
-                }
-
-                public void setHeader(String string, String string1) {
-                    System.out.println();
-//                    super.setHeader(string, string1);
-                }
-
-                public void addHeader(String string, String string1) {
-                    System.out.println();
-//                    super.addHeader(string, string1);
-                }
-
-                public void setIntHeader(String string, int i) {
-                    System.out.println();
-//                    super.setIntHeader(string, i);
-                }
-
-                public void addIntHeader(String string, int i) {
-                    System.out.println();
-//                    super.addIntHeader(string, i);
-                }
-
-                public void setStatus(int i) {
-                    System.out.println();
-//                    super.setStatus(i);
-                }
-
-                public void setStatus(int i, String string) {
-                    System.out.println();
-//                    super.setStatus(i, string);
-                }
-
-
-                public ServletResponse getResponse() {
-                    return super.getResponse();
-                }
-
-                public void setResponse(ServletResponse servletResponse) {
-                    super.setResponse(servletResponse);
-                }
-
-                public String getCharacterEncoding() {
-                    return super.getCharacterEncoding();
-                }
-
-                public ServletOutputStream getOutputStream() throws IOException {
-                    System.out.println();
-                    if (byteArrayOutputStream == null) {
-                        byteArrayOutputStream = new ByteArrayOutputStream();
-                        servletOutputStream = new ServletOutputStream() {
-                            public void write(int i) throws IOException {
-                                byteArrayOutputStream.write(i);
-                            }
-                        };
-                    }
-                    return servletOutputStream;
-                }
-
-                public PrintWriter getWriter() throws IOException {
-                    System.out.println();
-                    if (printWriter == null) {
-                        final String actualEncoding = (encoding == null) ? DEFAULT_ENCODING : encoding;
-                        printWriter = new PrintWriter(new OutputStreamWriter(getOutputStream(), actualEncoding));
-                    }
-                    return printWriter;
-                }
-
-                public void setContentLength(int i) {
-                    // NOP
-                }
-
-                public void setContentType(String contentType) {
-                    this.encoding = getContentTypeCharset(contentType);
-                    this.mediatype = getContentTypeMediaType(contentType);
-                }
-
-                public void setBufferSize(int i) {
-                    System.out.println();
-//                    super.setBufferSize(i);
-                }
-
-                public int getBufferSize() {
-                    System.out.println();
-                    return super.getBufferSize();
-                }
-
-                public void flushBuffer() throws IOException {
-                    System.out.println();
-//                    super.flushBuffer();
-                }
-
-                public boolean isCommitted() {
-                    return super.isCommitted();
-                }
-
-                public void reset() {
-                    System.out.println();
-//                    super.reset();
-                }
-
-                public void resetBuffer() {
-                    System.out.println();
-//                    super.resetBuffer();
-                }
-
-                public void setLocale(Locale locale) {
-                    System.out.println();
-//                    super.setLocale(locale);
-                }
-
-                public Locale getLocale() {
-                    return super.getLocale();
-                }
-            };
+            final MyHttpServletResponseWrapper responseWrapper = new MyHttpServletResponseWrapper(httpResponse);
 
             // Execute filter
             filterChain.doFilter(servletRequest, responseWrapper);
 
-            // Override Orbeon Forms context
-            request.setAttribute("oxf.servlet.context", request.getContextPath() + opsContextPath);
+            // Set document if not present AND output was intercepted
+            if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME) == null) {
+                final String content = responseWrapper.getContent();
+                if (content != null) {
+                    httpRequest.setAttribute(OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME, content);
+                }
+            }
+
+            // Override Orbeon Forms context so that rewriting works correctly
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME, httpRequest.getContextPath() + opsContextPath);
 
             // Forward to Orbeon Forms for rendering
-            getOPSDispatcher(OPS_RENDER_SERVLET_PATH).forward(request, response);
+            getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
         }
     }
 
@@ -248,7 +85,7 @@ public class OPSRendererFilter implements Filter {
     private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
         final ServletContext opsContext = servletContext.getContext(opsContextPath);
         if (opsContext == null)
-            throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_CONTEXT_PATH_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
+            throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
         final RequestDispatcher dispatcher = opsContext.getRequestDispatcher(path);
         if (dispatcher == null)
             throw new ServletException("Can't find Orbeon Forms request dispatcher.");
@@ -261,6 +98,7 @@ public class OPSRendererFilter implements Filter {
         return (pathInfo != null && pathInfo.startsWith(opsContextPath + "/"));
     }
 
+    // NOTE: This is borrowed from NetUtils but we don't want the dependency
     private static String getRequestPathInfo(HttpServletRequest request) {
 
         // Get servlet path and path info
@@ -281,6 +119,7 @@ public class OPSRendererFilter implements Filter {
         return requestPath;
     }
 
+    // NOTE: This is borrowed from NetUtils but we don't want the dependency
     public static String getContentTypeCharset(String contentType) {
         if (contentType == null)
             return null;
@@ -296,6 +135,7 @@ public class OPSRendererFilter implements Filter {
         return afterCharset.trim();
     }
 
+    // NOTE: This is borrowed from NetUtils but we don't want the dependency
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;
@@ -303,5 +143,193 @@ public class OPSRendererFilter implements Filter {
         if (semicolumnIndex == -1)
             return contentType;
         return contentType.substring(0, semicolumnIndex).trim();
+    }
+
+    private static class MyHttpServletResponseWrapper extends HttpServletResponseWrapper {
+
+        public MyHttpServletResponseWrapper(HttpServletResponse response) {
+            super(response);
+        }
+
+        private ByteArrayOutputStream byteArrayOutputStream;
+        private ServletOutputStream servletOutputStream;
+
+        private StringWriter stringWriter;
+        private PrintWriter printWriter;
+
+
+        private String encoding;
+        private String mediatype;
+
+        public void addCookie(Cookie cookie) {
+            super.addCookie(cookie);
+        }
+
+        public boolean containsHeader(String string) {
+            return super.containsHeader(string);
+        }
+
+        public String encodeURL(String string) {
+            return super.encodeURL(string);
+        }
+
+        public String encodeRedirectURL(String string) {
+            return super.encodeRedirectURL(string);
+        }
+
+        public String encodeUrl(String string) {
+            return super.encodeUrl(string);
+        }
+
+        public String encodeRedirectUrl(String string) {
+            return super.encodeRedirectUrl(string);
+        }
+
+        public void sendError(int i, String string) throws IOException {
+            // TODO
+        }
+
+        public void sendError(int i) throws IOException {
+            // TODO
+        }
+
+        public void sendRedirect(String string) throws IOException {
+            // TODO
+        }
+
+        public void setDateHeader(String string, long l) {
+            // TODO
+        }
+
+        public void addDateHeader(String string, long l) {
+            // TODO
+        }
+
+        public void setHeader(String string, String string1) {
+            // TODO
+        }
+
+        public void addHeader(String string, String string1) {
+            // TODO
+        }
+
+        public void setIntHeader(String string, int i) {
+            // TODO
+        }
+
+        public void addIntHeader(String string, int i) {
+
+            // TODO
+        }
+
+        public void setStatus(int i) {
+            // TODO
+        }
+
+        public void setStatus(int i, String string) {
+            // TODO
+        }
+
+
+        public ServletResponse getResponse() {
+            return super.getResponse();
+        }
+
+        public void setResponse(ServletResponse servletResponse) {
+            super.setResponse(servletResponse);
+        }
+
+        public String getCharacterEncoding() {
+            // TODO: we don't support setLocale()
+            return (encoding == null) ? DEFAULT_ENCODING : encoding;
+        }
+
+        public ServletOutputStream getOutputStream() throws IOException {
+            if (byteArrayOutputStream == null) {
+                byteArrayOutputStream = new ByteArrayOutputStream();
+                servletOutputStream = new ServletOutputStream() {
+                    public void write(int i) throws IOException {
+                        byteArrayOutputStream.write(i);
+                    }
+                };
+            }
+            return servletOutputStream;
+        }
+
+        public PrintWriter getWriter() throws IOException {
+            if (printWriter == null) {
+                stringWriter = new StringWriter();
+                printWriter = new PrintWriter(stringWriter);
+            }
+            return printWriter;
+        }
+
+        public void setContentLength(int i) {
+            // NOP
+        }
+
+        public void setContentType(String contentType) {
+            this.encoding = getContentTypeCharset(contentType);
+            this.mediatype = getContentTypeMediaType(contentType);
+        }
+
+        public void setBufferSize(int i) {
+            // NOP
+        }
+
+        public int getBufferSize() {
+            // We have a buffer, but it is infinite
+            return Integer.MAX_VALUE;
+        }
+
+        public void flushBuffer() throws IOException {
+            // NOPE
+        }
+
+        public boolean isCommitted() {
+            // We buffer everything so return false all the time
+            return false;
+        }
+
+        public void reset() {
+            resetBuffer();
+        }
+
+        public void resetBuffer() {
+            if (byteArrayOutputStream != null) {
+                try {
+                    servletOutputStream.flush();
+                } catch (IOException e) {
+                    // ignore?
+                }
+                byteArrayOutputStream.reset();
+            } else if (stringWriter != null) {
+                printWriter.flush();
+                final StringBuffer sb = stringWriter.getBuffer();
+                sb.delete(0, sb.length());
+            }
+        }
+
+        public void setLocale(Locale locale) {
+            // TODO
+        }
+
+        public Locale getLocale() {
+            return super.getLocale();
+        }
+
+        public String getContent() throws IOException {
+            if (stringWriter != null) {
+                // getWriter() was used
+                printWriter.flush();
+                return stringWriter.toString();
+            } else if (servletOutputStream != null) {
+                // getOutputStream() was used
+                servletOutputStream.flush();
+                return new String(byteArrayOutputStream.toByteArray(), getCharacterEncoding());
+            } else {
+                return null;
+            }
+        }
     }
 }

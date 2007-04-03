@@ -52,7 +52,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
     public static final String EXTERNALIZE_FORM_VALUES_PREFIX_PROPERTY = "oxf.servlet.externalize-form-values-prefix";
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
-    public static final String OXF_SERVLET_CONTEXT = "oxf.servlet.context";
 
     private class Request implements ExternalContext.Request {
 
@@ -79,7 +78,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public String getContextPath() {
             if (contextPath == null) {
                 // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
-                final String overriddenServletContext = (String) nativeRequest.getAttribute(OXF_SERVLET_CONTEXT);
+                final String overriddenServletContext = (String) nativeRequest.getAttribute(OPSRendererFilter.OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME);
                 if (overriddenServletContext == null)
                     contextPath = nativeRequest.getContextPath(); // use regular context
                 else

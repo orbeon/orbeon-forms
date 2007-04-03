@@ -1313,7 +1313,7 @@ ORBEON.xforms.Init = {
         // Initialize XForms server URL
         if (!(window.opsXFormsServerBase === undefined)) {
             BASE_URL = window.opsXFormsServerBase;
-            XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+            XFORMS_SERVER_URL = BASE_URL + "xforms-server"; // BASE_URL must end with '/'
         }
 
         // Override image location for YUI to use local images

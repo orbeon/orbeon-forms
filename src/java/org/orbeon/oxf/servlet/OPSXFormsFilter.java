@@ -43,8 +43,6 @@ public class OPSXFormsFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
         opsContextPath = filterConfig.getInitParameter(OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME);
-        if (opsContextPath == null)
-            throw new ServletException("Filter initialization parameter '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' is required for filter: " + filterConfig.getFilterName());
 
         // TODO: check opsContextPath format: starts with /, doesn't end with one, etc.
     }
@@ -74,7 +72,8 @@ public class OPSXFormsFilter implements Filter {
             }
 
             // Override Orbeon Forms context so that rewriting works correctly
-            httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
+            if (opsContextPath != null)
+                httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
 
             // Forward to Orbeon Forms for rendering
             getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);
@@ -85,7 +84,7 @@ public class OPSXFormsFilter implements Filter {
     }
 
     private RequestDispatcher getOPSDispatcher(String path) throws ServletException {
-        final ServletContext opsContext = servletContext.getContext(opsContextPath);
+        final ServletContext opsContext = (opsContextPath != null) ? servletContext.getContext(opsContextPath) : servletContext;
         if (opsContext == null)
             throw new ServletException("Can't find Orbeon Forms context called '" + opsContextPath + "'. Check the '" + OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
         final RequestDispatcher dispatcher = opsContext.getRequestDispatcher(path);
@@ -96,8 +95,11 @@ public class OPSXFormsFilter implements Filter {
     }
 
     private boolean isOPSResourceRequest(HttpServletRequest request) {
+        if (opsContextPath == null)
+            return false;
+
         final String pathInfo = getRequestPathInfo(request);
-        return (pathInfo != null && pathInfo.startsWith(opsContextPath + "/"));
+        return pathInfo != null && pathInfo.startsWith(opsContextPath + "/");
     }
 
     // NOTE: This is borrowed from NetUtils but we don't want the dependency

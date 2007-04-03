@@ -11,11 +11,6 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 --%>
-<%@ page import="java.util.Random"%>
-<%
-    // Set content type to XML. By default it will be HTML, and OPS will tidy it.
-    response.setContentType("application/xhtml+xml");
-%>
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events">
@@ -39,10 +34,14 @@
         </xhtml:style>
     </xhtml:head>
     <xhtml:body>
+        <xhtml:h1>Flickr Search</xhtml:h1>
         <xhtml:div class="paragraph">
-            <xhtml:h1>Flickr Search</xhtml:h1>
             <xforms:group>
-                <xforms:input ref="instance('query')"/>
+                <xforms:input ref="instance('query')">
+                    <xforms:label>Search:</xforms:label>
+                    <xforms:help>Enter a Flickr search tag</xforms:help>
+                    <xforms:hint>Enter a Flickr search tag</xforms:hint>
+                </xforms:input>
                 <xforms:trigger>
                     <xforms:label>Flickr Search</xforms:label>
                 </xforms:trigger>
@@ -50,7 +49,7 @@
             </xforms:group>
         </xhtml:div>
         <xhtml:div>
-            <xforms:repeat nodeset="photo">
+            <xforms:repeat nodeset="photo[position() le 50]">
                 <xforms:output
                     value="concat(
                             '&lt;a',

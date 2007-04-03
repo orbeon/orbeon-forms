@@ -109,17 +109,6 @@
                <param-value>true</param-value>
             </context-param>
 
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'Set XML Server configuration file'"/>
-                <xsl:with-param name="commented" select="true()"/>
-                <xsl:with-param name="content">
-                    <context-param>
-                        <param-name>oxf.xml-server.config</param-name>
-                        <param-value>oxf:/ops/xml-server/xml-server.xml</param-value>
-                    </context-param>
-                </xsl:with-param>
-            </xsl:call-template>
-
             <xsl:comment> Set context listener processors </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'context listener processors'"/>
@@ -168,29 +157,23 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:comment> All JSP files under /xforms-jsp go through the OPS filter </xsl:comment>
+            <xsl:comment> All JSP files under /xforms-jsp go through the XForms filter </xsl:comment>
             <filter>
-                <filter-name>ops-main-filter</filter-name>
-                <filter-class>org.orbeon.oxf.servlet.OPSServletFilter</filter-class>
-                <init-param>
-                    <param-name>oxf.main-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.main-processor.input.config</param-name>
-                    <param-value>oxf:/config/filter.xpl</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.error-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/config/error.xpl</param-value>
-                </init-param>
+                <filter-name>ops-xforms-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.OPSXFormsFilter</filter-class>
+                <xsl:call-template name="comment">
+                    <xsl:with-param name="caption" select="'separate WAR deployment'"/>
+                    <xsl:with-param name="commented" select="true()"/>
+                    <xsl:with-param name="content">
+                        <init-param>
+                            <param-name>oxf.xforms.renderer.context</param-name>
+                            <param-value>/ops</param-value>
+                        </init-param>
+                    </xsl:with-param>
+                </xsl:call-template>
             </filter>
             <filter-mapping>
-                <filter-name>ops-main-filter</filter-name>
+                <filter-name>ops-xforms-filter</filter-name>
                 <url-pattern>/xforms-jsp/*</url-pattern>
             </filter-mapping>
 
@@ -204,16 +187,6 @@
                     </listener>
                     <listener>
                         <listener-class>org.orbeon.oxf.webapp.OPSSessionListener</listener-class>
-                    </listener>
-                </xsl:with-param>
-            </xsl:call-template>
-
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'XML Server'"/>
-                <xsl:with-param name="commented" select="true()"/>
-                <xsl:with-param name="content">
-                    <listener>
-                        <listener-class>org.orbeon.oxf.xmlserver.ContextListener</listener-class>
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>

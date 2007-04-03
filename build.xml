@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2004-2007 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -134,8 +134,8 @@
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
-        <property name="renderer.jar.file" value="${build.lib.dir}/renderer-${project.name}.jar"/>
-        <property name="cli.jar.file" value="${build.lib.dir}/cli-${project.name}.jar"/>
+        <property name="xforms-filter.jar.file" value="${build.lib.dir}/${project.name}-xforms-filter.jar"/>
+        <property name="cli.jar.file" value="${build.lib.dir}/${project.name}-cli.jar"/>
         <property name="resources-private.jar.file" value="${build.lib.dir}/${project.name}-resources-private.jar"/>
         <property name="resources-public.jar.file" value="${build.lib.dir}/${project.name}-resources-public.jar"/>
 
@@ -232,7 +232,7 @@
               <include name="**/*.class"/>
               <include name="**/*.xsd"/>
               <!-- These classes go into their own JAR -->
-              <exclude name="org/orbeon/oxf/servlet/OPSRendererFilter*.class"/>
+              <exclude name="org/orbeon/oxf/servlet/OPSXFormsFilter*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
               <include name="oxf/**/*.*"/>
@@ -244,9 +244,9 @@
           </zipfileset>
         </jar>
 
-        <jar destfile="${renderer.jar.file}" compress="false">
+        <jar destfile="${xforms-filter.jar.file}" compress="false">
           <fileset dir="${build.classes.dir}">
-              <include name="org/orbeon/oxf/servlet/OPSRendererFilter*.class"/>
+              <include name="org/orbeon/oxf/servlet/OPSXFormsFilter*.class"/>
           </fileset>
         </jar>
 
@@ -328,7 +328,7 @@
         </copy>
 
         <copy file="${jar.file}" todir="${war.lib}"/>
-        <copy file="${renderer.jar.file}" todir="${war.lib}"/>
+        <copy file="${xforms-filter.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-private.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-public.jar.file}" todir="${war.lib}"/>
 

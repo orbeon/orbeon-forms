@@ -59,8 +59,8 @@
                             This was already possible in the past, but you had to either copy over all the Orbeon Forms
                             JAR files and configuration files into your application, or the other way around. The new
                             deployment method allows you to deploy Orbeon Forms separately. You just need to include a
-                            very small Orbeon Forms JAR file in your application (<code>ops-xforms-filter.jar</code>), and
-                            to add a special configuration for a filter to your <code>web.xml</code>.
+                            very small Orbeon Forms JAR file in your application (<code>ops-xforms-filter.jar</code>),
+                            and to add a short configuration for a filter to your <code>web.xml</code>.
                         </p>
                         <p>
                             Separate deployment allows for easier upgrades or both your application and Orbeon Forms. It

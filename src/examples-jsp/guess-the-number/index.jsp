@@ -12,10 +12,6 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 --%>
 <%@ page import="java.util.Random"%>
-<%
-    // Set content type to XML. By default it will be HTML, and OPS will tidy it.
-    response.setContentType("application/xhtml+xml");
-%>
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events">
@@ -44,8 +40,12 @@
             I picked a number between 1 and 100. Can you guess it?
         </xhtml:div>
         <xhtml:div>
-            Good, I like the spirit. Try your best guess:
-            <xforms:input ref="guess" class="guess" incremental="true"/>
+            <xhtml:p>
+                Good, I like the spirit.
+            </xhtml:p>
+            <xforms:input ref="guess" class="guess" incremental="true">
+                <xforms:label>Try your best guess:</xforms:label>
+            </xforms:input>
             <xforms:trigger>
                 <xforms:label>Go</xforms:label>
             </xforms:trigger>

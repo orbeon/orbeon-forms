@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.processor.XFormsState;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 
 import java.util.Stack;
 
@@ -102,6 +103,43 @@ public class HandlerContext {
         }
 
         return null;
+    }
+
+    public String findFormattingPrefixDeclare() throws SAXException {
+        final String formattingPrefix;
+        final boolean isNewPrefix;
+
+        final String existingFormattingPrefix = findFormattingPrefix();
+        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
+            // No prefix is currently mapped
+            formattingPrefix = findNewPrefix();
+            isNewPrefix = true;
+        } else {
+            formattingPrefix = existingFormattingPrefix;
+            isNewPrefix = false;
+        }
+
+        // Start mapping if needed
+        if (isNewPrefix)
+            getController().getOutput().startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
+
+        return formattingPrefix;
+    }
+
+    public void findFormattingPrefixUndeclare(String formattingPrefix) throws SAXException {
+        final boolean isNewPrefix;
+
+        final String existingFormattingPrefix = findFormattingPrefix();
+        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
+            // No prefix is currently mapped
+            isNewPrefix = true;
+        } else {
+            isNewPrefix = false;
+        }
+
+        // End mapping if needed
+        if (isNewPrefix)
+            getController().getOutput().endPrefixMapping(formattingPrefix);
     }
 
     public String findNewPrefix() {

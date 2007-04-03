@@ -95,31 +95,12 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         final String enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname);
 
         final String formattingPrefix;
-        final boolean isNewPrefix;
-
-        if (isImageMediatype || isHTMLMediaType) {
-
-            // TODO: Need better mechanism to handle this!
-            final String existingFormattingPrefix = handlerContext.findFormattingPrefix();
-            if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
-                // No prefix is currently mapped
-                formattingPrefix = handlerContext.findNewPrefix();
-                isNewPrefix = true;
-            } else {
-                formattingPrefix = existingFormattingPrefix;
-                isNewPrefix = false;
-            }
+        if (isConcreteControl && (isImageMediatype || isHTMLMediaType)) {
+            formattingPrefix = handlerContext.findFormattingPrefixDeclare();
+            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
         } else {
             formattingPrefix = null;
-            isNewPrefix = false;
         }
-
-        // Handle namespace prefix if needed
-        if (isNewPrefix)
-            contentHandler.startPrefixMapping(formattingPrefix, XMLConstants.OPS_FORMATTING_URI);
-
-        if (isConcreteControl && (isImageMediatype || isHTMLMediaType))
-            newAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, newAttributes);
         {
@@ -162,8 +143,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
 
         // Handle namespace prefix if needed
-        if (isNewPrefix)
-            contentHandler.endPrefixMapping(formattingPrefix);
+        handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
 
         // xforms:help
         handleLabelHintHelpAlert(effectiveId, "help", xformsOutputControl);

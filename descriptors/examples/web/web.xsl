@@ -247,6 +247,7 @@
             </servlet-mapping>
             -->
 
+            <xsl:comment> This is the main Orbeon Forms servlet </xsl:comment>
             <servlet>
                 <servlet-name>ops-main-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
@@ -294,6 +295,7 @@
                 <load-on-startup>1</load-on-startup>
             </servlet>
 
+            <xsl:comment> This is the XForms Server servlet </xsl:comment>
             <servlet>
                 <servlet-name>ops-xforms-server-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
@@ -316,6 +318,30 @@
                     <param-value>oxf:/ops/xforms/xforms-server-error.xpl</param-value>
                 </init-param>
                 <load-on-startup>1</load-on-startup>
+            </servlet>
+
+            <xsl:comment> This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR </xsl:comment>
+            <servlet>
+                <servlet-name>ops-renderer-servlet</servlet-name>
+                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                <xsl:comment> Set main processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.main-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.main-processor.input.config</param-name>
+                    <param-value>oxf:/ops/xforms/xforms-renderer.xpl</param-value>
+                </init-param>
+                <xsl:comment> Set error processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.error-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.input.config</param-name>
+                    <param-value>oxf:/config/error.xpl</param-value>
+                </init-param>
             </servlet>
 
             <servlet>
@@ -406,7 +432,12 @@
             </servlet-mapping>
 
             <servlet-mapping>
-                <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                <servlet-name>ops-renderer-servlet</servlet-name>
+                <url-pattern>/xforms-renderer</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+            <servlet-name>exist-xmlrpc-servlet</servlet-name>
                 <url-pattern>/exist/xmlrpc</url-pattern>
             </servlet-mapping>
 

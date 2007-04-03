@@ -24,9 +24,11 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
 
@@ -35,6 +37,8 @@ import java.util.*;
  */
 public class XHTMLHeadHandler extends HandlerBase {
 
+    private String formattingPrefix;
+
     public XHTMLHeadHandler() {
         super(false, true);
     }
@@ -42,6 +46,10 @@ public class XHTMLHeadHandler extends HandlerBase {
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
+        final ExternalContext.Response response = externalContext.getResponse();
+
+        // Declare xmlns:f
+        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
         // Open head element
         contentHandler.startElement(uri, localname, qName, attributes);
@@ -91,7 +99,7 @@ public class XHTMLHeadHandler extends HandlerBase {
         final String combinedResourcesPrefix = XFormsFeatures.getCombinedResourcesPrefix(appearancesMap, isMinimal);
 
         final boolean isCombineResources = XFormsUtils.isCombineResources();
-        final boolean isCacheCombinedResources = (isCombineResources) ? XFormsUtils.isCacheCombinedResources() : false;
+        final boolean isCacheCombinedResources = isCombineResources && XFormsUtils.isCacheCombinedResources();
         if (isCombineResources) {
             XFormsServer.logger.debug("XForms resources - creating xhtml:head with combined resources.");
             if (isCacheCombinedResources) {
@@ -100,24 +108,32 @@ public class XHTMLHeadHandler extends HandlerBase {
         }
 
         // Stylesheets
+        final AttributesImpl attributesImpl = new AttributesImpl();
         if (isCombineResources) {
             final String combinedResourceName = combinedResourcesPrefix + ".css";
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
-                        "rel", "stylesheet", "href", combinedResourceName, "type", "text/css"});
+
+            attributesImpl.clear();
+            final String[] attributesList = new String[] { "rel", "stylesheet", "href", response.rewriteResourceURL(combinedResourceName, false), "type", "text/css" };
+            ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+            attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
 
             if (isCacheCombinedResources) {
                 // Attempt to cache combined resources
                 // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                 final List resources = XFormsFeatures.getCSSResources(appearancesMap);
                 final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                XFormsResourceServer.cacheResources(resources, externalContext.getResponse(), combinedResourceName, combinedLastModified, true, isMinimal);
+                XFormsResourceServer.cacheResources(resources, response, combinedResourceName, combinedLastModified, true, isMinimal);
             }
         } else {
             for (Iterator i = XFormsFeatures.getCSSResources(appearancesMap).iterator(); i.hasNext();) {
                 final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                 // Only include stylesheet if needed
-                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", new String[] {
-                        "rel", "stylesheet", "href", resourceConfig.getResourcePath(isMinimal), "type", "text/css"});
+                attributesImpl.clear();
+                final String[] attributesList = new String[] { "rel", "stylesheet", "href", response.rewriteResourceURL(resourceConfig.getResourcePath(isMinimal), false), "type", "text/css" };
+                ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "link", attributesImpl);
             }
         }
 
@@ -126,23 +142,31 @@ public class XHTMLHeadHandler extends HandlerBase {
 
             if (isCombineResources) {
                 final String combinedResourceName = combinedResourcesPrefix + ".js";
-                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                        "type", "text/javascript", "src", combinedResourceName});
+
+                attributesImpl.clear();
+                final String[] attributesList = new String[] { "type", "text/javascript", "src", response.rewriteResourceURL(combinedResourceName, false) };
+                ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+                helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
 
                 if (isCacheCombinedResources) {
                     // Attempt to cache combined resources
                     // Do it at this point so that deployments using an HTTP server front-end can access the resource on disk directly
                     final List resources = XFormsFeatures.getJavaScriptResources(appearancesMap);
                     final long combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resources, isMinimal);
-                    XFormsResourceServer.cacheResources(resources, externalContext.getResponse(), combinedResourceName, combinedLastModified, false, isMinimal);
+                    XFormsResourceServer.cacheResources(resources, response, combinedResourceName, combinedLastModified, false, isMinimal);
                 }
 
             } else {
                 for (Iterator i = XFormsFeatures.getJavaScriptResources(appearancesMap).iterator(); i.hasNext();) {
                     final XFormsFeatures.ResourceConfig resourceConfig = (XFormsFeatures.ResourceConfig) i.next();
                     // Only include stylesheet if needed
-                    helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
-                            "type", "text/javascript", "src", resourceConfig.getResourcePath(isMinimal)});
+
+                    attributesImpl.clear();
+                    final String[] attributesList =  new String[] { "type", "text/javascript", "src", response.rewriteResourceURL(resourceConfig.getResourcePath(isMinimal), false) };
+                    ContentHandlerHelper.populateAttributes(attributesImpl, attributesList);
+                    attributesImpl.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+                    helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "script", attributesImpl);
                 }
             }
 
@@ -203,7 +227,7 @@ public class XHTMLHeadHandler extends HandlerBase {
                     "type", "text/javascript"});
             {
                 // TODO: Use absolute path only?
-                final String applicationBase = externalContext.getResponse().rewriteResourceURL("/", true);
+                final String applicationBase = response.rewriteResourceURL("/", true);
                 helper.text("var opsXFormsServerBase = \"" + applicationBase + "\";");
             }
 
@@ -262,5 +286,8 @@ public class XHTMLHeadHandler extends HandlerBase {
         // Close head element
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         contentHandler.endElement(uri, localname, qName);
+
+        // Undeclare xmlns:f
+        handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
     }
 }

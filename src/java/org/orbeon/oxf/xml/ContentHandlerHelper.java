@@ -93,12 +93,7 @@ public class ContentHandlerHelper {
 
     public void startElement(String prefix, String namespaceURI, String name, String[] attributes) {
         attributesImpl.clear();
-        for (int i = 0; i < attributes.length / 2; i++) {
-            final String attributeName = attributes[i * 2];
-            final String attributeValue = attributes[i * 2 + 1];
-            if (attributeName != null && attributeValue != null)
-                attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue);
-        }
+        populateAttributes(attributesImpl, attributes);
         startElement(prefix, namespaceURI, name, attributesImpl);
     }
 
@@ -196,6 +191,15 @@ public class ContentHandlerHelper {
             contentHandler.endDocument();
         } catch (SAXException e) {
             throw new OXFException(e);
+        }
+    }
+
+    public static void populateAttributes(AttributesImpl attributesImpl, String[] attributes) {
+        for (int i = 0; i < attributes.length / 2; i++) {
+            final String attributeName = attributes[i * 2];
+            final String attributeValue = attributes[i * 2 + 1];
+            if (attributeName != null && attributeValue != null)
+                attributesImpl.addAttribute("", attributeName, attributeName, CDATA, attributeValue);
         }
     }
 }

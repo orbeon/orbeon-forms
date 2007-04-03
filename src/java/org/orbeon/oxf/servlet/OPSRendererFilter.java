@@ -30,9 +30,11 @@ import java.util.Locale;
 public class OPSRendererFilter implements Filter {
 
     public static final String OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME = "oxf.xforms.renderer.document";
-    public static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
+
+    public static final String OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME = "oxf.servlet.context";
     public static final String OPS_RENDERER_PATH = "/xforms-renderer";
 
+    private static final String OPS_XFORMS_RENDERER_CONTEXT_PARAMETER_NAME = "oxf.xforms.renderer.context";
     private static final String DEFAULT_ENCODING = "ISO-8859-1"; // must be this per Servlet spec
 
     private ServletContext servletContext;

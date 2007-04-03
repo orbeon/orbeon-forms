@@ -51,23 +51,52 @@
                 <ul>
                     <li>
                         <p>
-                            <b>Support for deployment as separate WAR.</b> Orbeon Forms can now be deployed as a
-                            separate Java web application archive (WAR). This is most useful when you want to produce
-                            XForms using Java technology (whether using JSP, Java Servlets, or other frameworks).
+                            <b>Support for deployment as separate WAR.</b> Orbeon Forms can now be deployed as a Java
+                            web application archive (WAR) separate from your Java application. This is most useful when
+                            you want to produce XForms using Java technology (whether using JSP, Java Servlets, or other
+                            frameworks).
                         </p>
                         <p>
-                            This was already possible in the past, but you had to either copy over all the Orbeon Forms
-                            JAR files and configuration files into your application, or the other way around. The new
-                            deployment method allows you to deploy Orbeon Forms separately. You just need to include a
-                            very small Orbeon Forms JAR file in your application (<code>ops-xforms-filter.jar</code>),
-                            and to add a short configuration for a filter to your <code>web.xml</code>.
+                            Using XForms with your Java applications was already possible in the past, but you had to
+                            either copy over all the Orbeon Forms JAR files and configuration files into your
+                            application, or the other way around. The new deployment method allows you to deploy Orbeon
+                            Forms separately. You just need to include a very small Orbeon Forms JAR file in your
+                            application (<code>ops-xforms-filter.jar</code>), and to add a short configuration for a
+                            filter to your <code>web.xml</code>.
                         </p>
                         <p>
-                            Separate deployment allows for easier upgrades or both your application and Orbeon Forms. It
-                            also prevents situations where different versions of JAR files could conflict.
+                            Separate deployment has several benefits including:
                         </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    Easier upgrades of both your application and Orbeon Forms.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Preventing situations where different versions of JAR files could conflict.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Cleaner application architecture.
+                                </p>
+                            </li>
+                        </ul>
                         <p>
                             [TODO: full doc]
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Improved support for built-in JSP deployment.</b> Deploying JavaServer Pages (JSP)
+                            directly into Orbeon Forms is now better documented and uses the same mechanism used when
+                            deploying Orbeon Forms as a separate WAR. In addition, using <code>setContentType()</code>
+                            at the beginning of JSP files is no longer necessary.
+                        </p>
+                        <p>
+                            [TODO: ref doc]
                         </p>
                     </li>
                 </ul>

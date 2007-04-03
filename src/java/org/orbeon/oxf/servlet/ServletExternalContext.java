@@ -78,7 +78,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public String getContextPath() {
             if (contextPath == null) {
                 // This attribute allows overriding the context path, for example when Orbeon Forms is deployed as a separate WAR
-                final String overriddenServletContext = (String) nativeRequest.getAttribute(OPSRendererFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
+                final String overriddenServletContext = (String) nativeRequest.getAttribute(OPSXFormsFilter.OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME);
                 if (overriddenServletContext == null)
                     contextPath = nativeRequest.getContextPath(); // use regular context
                 else

@@ -33,9 +33,9 @@
             <title>Command Line Interface</title>
             <p>
                 Orbeon Forms ships with a command line interface (CLI). The easiest way to run it is to use
-                the executable <code>cli-ops.jar</code> file and pass it a pipeline file:
+                the executable <code>ops-cli.jar</code> file and pass it a pipeline file:
             </p>
-            <source>java -jar cli-ops.jar pipeline.xpl</source>
+            <source>java -jar ops-cli.jar pipeline.xpl</source>
             <p>
                 In this case, a pipeline can use relative URLs, or, if using absolute URLs, can use
                 either the <code>file:</code> protocol to access files or, equivalently, the
@@ -48,22 +48,22 @@
                 applications. In such cases, specify a resource manager root directory with the
                 <code>-r</code> option, for example:
             </p>
-            <source>java -jar cli-ops.jar -r . oxf:/pipeline.xpl</source>
+            <source>java -jar ops-cli.jar -r . oxf:/pipeline.xpl</source>
             <p>
                 or:
             </p>
-            <source>java -jar cli-ops.jar -r C:/my-example oxf:/pipeline.xpl</source>
+            <source>java -jar ops-cli.jar -r C:/my-example oxf:/pipeline.xpl</source>
             <p>
                 When specifying a resource manager root directory, it is mandatory to use a protocol
                 and an absolute path within the sandbox, as shown above.
             </p>
             <note>
                 <p>
-                    Orbeon Forms's jar file (<code>cli-ops.jar</code>) is executable via the <code>java
+                    Orbeon Forms's jar file (<code>ops-cli.jar</code>) is executable via the <code>java
                     -jar</code> mechanism. However, it depends on a number of libraries that must be
                     in the 'lib' directory beneath the directory containing
-                    <code>cli-ops.jar</code>. It is recommended to expand the WAR file, and refer
-                    to the <code>cli-ops.jar</code> file under the WAR file's <i>WEB-INF</i>
+                    <code>ops-cli.jar</code>. It is recommended to expand the WAR file, and refer
+                    to the <code>ops-cli.jar</code> file under the WAR file's <i>WEB-INF</i>
                     directory.
                 </p>
             </note>
@@ -77,11 +77,11 @@
                 following the explanations above, for example, from the <code>simple</code>
                 directory:
             </p>
-            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-ops.jar stdout.xpl</source>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/ops-cli.jar stdout.xpl</source>
             <p>
                 or, from the <code>transform</code> directory:
             </p>
-            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-ops.jar transform.xpl</source>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/ops-cli.jar transform.xpl</source>
             <p>
                 Notice that those two example pipelines use serializers, for example:
             </p>

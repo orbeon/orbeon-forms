@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  * NOTE: This implementation probably needs to do more work to detect and adjust to namespace
  * declarations conflicts.
  *
- * Question: attributes should probably also be updated!
+ * TODO: attributes should probably also be updated, or removed!
  */
 public class QNameConverter extends ProcessorImpl {
 

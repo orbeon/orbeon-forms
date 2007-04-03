@@ -639,17 +639,23 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * </ul>
          * @see State2#skippedEntity(String)
          */
-        protected State startElementStart
-                (final String ns, final String lnam, final String qnam, final Attributes atts)
-                throws SAXException {
-            final String no_urlrewrite
-                    = atts.getValue(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+        protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
+
+            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+            final String noRewriteValue = atts.getValue(noRewriteIndex);
             State ret = null;
             flushCharacters();
+
+            if (noRewriteValue != null) {
+                // Remove f:url-norewrite attribute
+                final AttributesImpl attributesImpl = new AttributesImpl(atts);
+                attributesImpl.removeAttribute(noRewriteIndex);
+                atts = attributesImpl;
+            }
+
             done :
-            if ("true".equals(no_urlrewrite)) {
-                final State stt = new NoRewriteState
-                        (this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
+            if ("true".equals(noRewriteValue)) {
+                final State stt = new NoRewriteState(this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else if (XMLConstants.OPS_FORMATTING_URI.equals(ns) && "rewrite".equals(lnam)) {
                 final String typ = atts.getValue("", "type");
@@ -793,15 +799,21 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *
          * @see NoRewriteState
          */
-        protected State startElementStart
-                (final String ns, final String lnam, final String qnam, final Attributes atts)
-                throws SAXException {
-            final String no_urlrewrite
-                    = atts.getValue(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+        protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
+
+            final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
+            final String noRewriteValue = atts.getValue(noRewriteIndex);
             final State ret;
-            if ("false".equals(no_urlrewrite)) {
-                final State stt = new RewriteState
-                        (this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
+
+            if (noRewriteValue != null) {
+                // Remove f:url-norewrite attribute
+                final AttributesImpl attributesImpl = new AttributesImpl(atts);
+                attributesImpl.removeAttribute(noRewriteIndex);
+                atts = attributesImpl;
+            }
+
+            if ("false".equals(noRewriteValue)) {
+                final State stt = new RewriteState(this, contentHandler, response, isPortlet, scriptDepth, rewriteURI);
                 ret = stt.startElement(ns, lnam, qnam, atts);
             } else {
                 scriptDepthOnStart(ns, lnam);

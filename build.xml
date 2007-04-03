@@ -134,6 +134,7 @@
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
+        <property name="renderer.jar.file" value="${build.lib.dir}/renderer-${project.name}.jar"/>
         <property name="cli.jar.file" value="${build.lib.dir}/cli-${project.name}.jar"/>
         <property name="resources-private.jar.file" value="${build.lib.dir}/${project.name}-resources-private.jar"/>
         <property name="resources-public.jar.file" value="${build.lib.dir}/${project.name}-resources-public.jar"/>
@@ -230,6 +231,8 @@
           <fileset dir="${build.classes.dir}">
               <include name="**/*.class"/>
               <include name="**/*.xsd"/>
+              <!-- These classes go into their own JAR -->
+              <exclude name="org/orbeon/oxf/servlet/OPSRendererFilter*.class"/>
           </fileset>
           <fileset dir="${resources-packaged.dir}">
               <include name="oxf/**/*.*"/>
@@ -239,6 +242,12 @@
           <zipfileset dir="descriptors/jar" prefix="META-INF" >
             <exclude name='*.MF' />
           </zipfileset>
+        </jar>
+
+        <jar destfile="${renderer.jar.file}" compress="false">
+          <fileset dir="${build.classes.dir}">
+              <include name="org/orbeon/oxf/servlet/OPSRendererFilter*.class"/>
+          </fileset>
         </jar>
 
         <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
@@ -319,6 +328,7 @@
         </copy>
 
         <copy file="${jar.file}" todir="${war.lib}"/>
+        <copy file="${renderer.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-private.jar.file}" todir="${war.lib}"/>
         <copy file="${resources-public.jar.file}" todir="${war.lib}"/>
 

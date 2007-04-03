@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.ElementHandlerNew;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.om.FastStringBuffer;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -199,7 +200,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         }
         // Create "class" attribute if necessary
         {
-            final StringBuffer sb = new StringBuffer();
+            final FastStringBuffer sb = new FastStringBuffer(100);
             // User-defined classes go first
             {
                 final String value = elementAttributes.getValue("class");

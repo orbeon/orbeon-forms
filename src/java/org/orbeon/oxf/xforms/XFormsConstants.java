@@ -184,6 +184,7 @@ public class XFormsConstants {
     public static final boolean DEFAULT_OPTIMIZE_RELEVANCE = false;
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
+    public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.gif";
 
     private XFormsConstants() {
         // Disallow contruction

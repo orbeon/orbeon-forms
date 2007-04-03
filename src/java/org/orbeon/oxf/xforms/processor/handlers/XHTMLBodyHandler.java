@@ -40,6 +40,8 @@ public class XHTMLBodyHandler extends HandlerBase {
 
     private ContentHandlerHelper helper;
 
+//    private String formattingPrefix;
+
     public XHTMLBodyHandler() {
         super(false, true);
     }
@@ -78,6 +80,10 @@ public class XHTMLBodyHandler extends HandlerBase {
         final String prefix = XMLUtils.prefixFromQName(qName);
 
         final boolean hasUpload = xformsControls.getCurrentControlsState().isHasUpload();
+
+        // Get formatting prefix and declare it if needed
+        // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
+//        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
         // Create xhtml:form
         final String xformsSubmissionPath = OXFProperties.instance().getPropertySet(

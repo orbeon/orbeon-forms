@@ -374,8 +374,7 @@ public abstract class HandlerBase extends ElementHandlerNew {
         if (labelHintHelpAlertAttributes != null || type.equals("alert")) {
             // If no attributes were found, there is no such label / help / hint / alert
 
-            final StringBuffer classes = new StringBuffer("xforms-");
-            classes.append(type);
+            final StringBuffer classes = new StringBuffer();
 
             // Handle alert state
             if (type.equals("alert")) {
@@ -401,10 +400,41 @@ public abstract class HandlerBase extends ElementHandlerNew {
                 }
             }
 
+            classes.append(" xforms-");
+            classes.append(type);
+
+            final String labelClasses = classes.toString();
+
+            if (type.equals("help")) {
+                // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
+                // background images way too often.
+
+                classes.append("-image"); // xforms-help-image class
+                final String helpImageClasses = classes.toString();
+
+                final AttributesImpl imgAttributes = new AttributesImpl();
+                imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
+                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, externalContext.getResponse().rewriteResourceURL(XFormsConstants.HELP_IMAGE_URI, false));
+                imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
+                imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "Help");
+
+                // TODO: xmlns:f declaration should be placed on xhtml:body
+                final String formattingPrefix = handlerContext.findFormattingPrefixDeclare();
+                imgAttributes.addAttribute(XMLConstants.OPS_FORMATTING_URI, "url-norewrite", XMLUtils.buildQName(formattingPrefix, "url-norewrite"), ContentHandlerHelper.CDATA, "true");
+
+                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
+                final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+
+                handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
+            }
+
             // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
             final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : (placeholder) ? new AttributesImpl() : null;
             if (newAttributes != null) {
-                outputLabelFor(handlerContext, getAttributes(newAttributes, classes.toString(), null), parentId, labelHintHelpAlertValue);
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), parentId, labelHintHelpAlertValue);
             }
         }
     }

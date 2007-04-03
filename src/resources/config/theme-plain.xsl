@@ -74,17 +74,6 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Add images to the page instead of using CSS to get around IE reloading issue -->
-    <xsl:template match="xhtml:label[tokenize(@class, ' ') = 'xforms-help']" >
-        <xsl:variable name="image-class" as="xs:string+" select="
-            ('xforms-help-image',
-            (for $c in tokenize(@class, ' ') return if ($c = 'xforms-help') then () else $c))"/>
-        <xhtml:img alt="Help" title="" src="/ops/images/xforms/help.gif" class="{string-join($image-class, ' ')}"/>
-        <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:copy>
-    </xsl:template>
-
     <!-- - - - - - - Generic copy rules - - - - - - -->
 
     <!-- Copy attributes in XHTML namespace to no namespace -->

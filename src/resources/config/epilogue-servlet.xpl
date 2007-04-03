@@ -53,27 +53,43 @@
             <!-- Apply theme -->
             <p:choose href="#request">
                 <p:when test="starts-with(/request/request-path, '/doc/') or /request/parameters/parameter[name = 'orbeon-theme']/value = 'plain'">
+                    <!-- Case of doc: use plain theme -->
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
                         <p:input name="config" href="theme-plain.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
+                    <!-- Rewrite all URLs in HTML and XHTML documents -->
+                    <p:processor name="oxf:xhtml-rewrite">
+                        <p:input name="rewrite-in" href="#themed-data"/>
+                        <p:output name="rewrite-out" id="rewritten-data"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="starts-with(/request/request-path, '/xforms-renderer')">
+                    <!-- Case of XForms Renderer mode: use plain theme and don't rewrite -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="#xformed-data"/>
+                        <p:input name="request" href="#request"/>
+                        <p:input name="config" href="theme-plain.xsl"/>
+                        <p:output name="data" id="rewritten-data"/>
+                    </p:processor>
                 </p:when>
                 <p:otherwise>
+                    <!-- Default case: show portal theme and rewrite data -->
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>
                         <p:input name="config" href="theme-portal.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
+                    <!-- Rewrite all URLs in HTML and XHTML documents -->
+                    <p:processor name="oxf:xhtml-rewrite">
+                        <p:input name="rewrite-in" href="#themed-data"/>
+                        <p:output name="rewrite-out" id="rewritten-data"/>
+                    </p:processor>
                 </p:otherwise>
             </p:choose>
-            <!-- Rewrite all URLs in HTML and XHTML documents -->
-            <p:processor name="oxf:xhtml-rewrite">
-                <p:input name="rewrite-in" href="#themed-data"/>
-                <p:output name="rewrite-out" id="rewritten-data"/>
-            </p:processor>
 
             <!-- Use this choose block if you want to send XHTML to browsers that support it. -->
             <!-- BEGIN ASSUME SOME XHTML CLIENTS -->

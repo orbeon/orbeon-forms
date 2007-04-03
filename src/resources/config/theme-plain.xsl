@@ -64,16 +64,6 @@
         </xhtml:html>
     </xsl:template>
 
-    <!-- - - - - - - XForms adjustments (should probably be native) - - - - - - -->
-
-    <!-- Populate content of loading indicator -->
-    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-loading-loading']">
-        <xsl:copy>
-            <xsl:apply-templates select="@*"/>
-            Loading...
-        </xsl:copy>
-    </xsl:template>
-
     <!-- - - - - - - Generic copy rules - - - - - - -->
 
     <!-- Copy attributes in XHTML namespace to no namespace -->

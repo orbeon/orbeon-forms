@@ -229,9 +229,13 @@ public class XHTMLBodyHandler extends HandlerBase {
             });
         }
 
-        // Ajax loading icon
+        // Ajax loading indicator
         if (XFormsUtils.isAjaxShowLoadingIcon()) {
-            helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-loading"});
+
+            helper.startElement(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-loading"});
+            helper.text("Loading..."); // text is hardcoded, but you can rewrite it in the theme if needed 
+            helper.endElement();
+
             helper.element(prefix, XMLConstants.XHTML_NAMESPACE_URI, "span", new String[]{"class", "xforms-loading-none"});
         }
 

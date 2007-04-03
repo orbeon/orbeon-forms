@@ -1901,25 +1901,40 @@
             <section>
                 <title>Note About XPath 2.0 Expressions</title>
                 <p>
-                    Orbeon Forms uses an XPath 2.0 implementation instead of an XPath 1.0 implementation as mandated by
-                    XForms 1.0 and XForms 1.1. The main impact of this is that the XForms 1.0 and 1.1 <code>if()</code>
-                    function is not directly available. With Orbeon Forms, you have two options to write conditions
-                    within XPath expressions:
+                    Orbeon Forms uses XPath 2.0 expressions instead of XPath 1.0 expressions as mandated by XForms 1.0
+                    and XForms 1.1. This allows much greater flexibility in the expressions you can use in Orbeon Forms
+                    (and once you have tasted XPath 2.0, you can't go back to XPath 1.0!).
+                </p>
+                <p>
+                    In general, this does not cause incompatibilities: most XPath 1.0 expressions work without issues
+                    with an XPath 2.0 implementation. But one place where there is an incompatibility is the use of the
+                    XPath 1.0 <code>if()</code> function. This function clashes with XPath 2.0's built-in
+                    <code>if()</code> construct. The bottom line is that you cannot directly use the XForms 1.0
+                    <code>if()</code> function in Orbeon Forms at the moment. The following, for example, will not work
+                    in Orbeon Forms:
+                </p>
+                <xml-source>
+                    if (normalize-space(/first-name) = '', '', concat('Hello, ', /first-name, '!'))
+                </xml-source>
+                <p>
+                    But you have workarounds:
                 </p>
                 <ul>
                     <li>
-                        <p>Use the <code>xxforms:if()</code> function (note the namespace prefix), which has the same
-                        semantic as the standard XForms 1.0 <code>if()</code> function:</p>
-                        <xml-source show-namespaces="false">
-                            <xforms:setvalue ref="total" value="xxforms:if(../item-price[. = ''], 0, sum(../item-price))"/>
+                        <p>
+                            Use the XPath 2.0 <code>if (...) then ... else ...</code> construct instead:
+                        </p>
+                        <xml-source>
+                            if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')
                         </xml-source>
                     </li>
-                </ul>
-                <ul>
                     <li>
-                        <p>Use the native XPath 2.0 <code>if... then... else</code> construct</p>
-                        <xml-source show-namespaces="false">
-                            <xforms:setvalue ref="total" value="if (../item-price[. = '']) then 0 else sum(../item-price)"/>
+                        <p>
+                            Use the Orbeon Forms <code>xxforms:if()</code> extension, which behaves like the XForms 1.0
+                            <code>if()</code> function:
+                        </p>
+                        <xml-source>
+                            xxforms:if (normalize-space(/first-name) = '', '', concat('Hello, ', /first-name, '!'))
                         </xml-source>
                     </li>
                 </ul>
@@ -2224,13 +2239,13 @@
             <section>
                 <title>Initializing XForms Instances from a URI</title>
                 <p>
-                    TODO (xforms:instance/@src).
+                    [TODO: xforms:instance/@src]
                 </p>
             </section>
             <section>
                 <title>Initializing XForms Instances with an XForms Submission</title>
                 <p>
-                    TODO.
+                    [TODO]
                 </p>
             </section>
         </section>
@@ -2897,10 +2912,10 @@
                 <section>
                     <title><code>origin</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports an
-                        <code>origin</code> attribute on the <code>xforms:insert</code> action. This attribute allows
-                        specifying the source node to use as template. This allows storing templates separately from the
-                        node-set specified by the <code>nodeset</code> attribute. For example:
+                        Orbeon Forms supports the XForms 1.1 <code>origin</code> attribute on the
+                        <code>xforms:insert</code> action. This attribute allows specifying the source node to use as
+                        template. This allows storing templates separately from the node-set specified by the
+                        <code>nodeset</code> attribute. For example:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:insert nodeset="address" at="last()" position="after" origin="instance('template-instance')"/>
@@ -2928,10 +2943,9 @@
                 <section>
                     <title><code>context</code> Attribute on <code>xforms:insert</code> Action</title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports a
-                        <code>context</code> attribute on the <code>xforms:insert</code> action. This attribute allows
-                        specifying a context for insertion, which along with the <code>origin</code> attribute allows
-                        inserting content into elements:
+                        Orbeon Forms supports the XForms 1.1 <code>context</code> attribute on the
+                        <code>xforms:insert</code> action. This attribute allows specifying a context for insertion,
+                        which along with the <code>origin</code> attribute allows inserting content into elements:
                     </p>
                     <xml-source show-namespaces="false">
                         <xforms:insert context="instance('main-instance')/books" nodeset="book" origin="instance('book-instance')"/>
@@ -2972,10 +2986,18 @@
                 <section>
                     <title><code>validate</code> and <code>relevant</code> Attributes on <code>xforms:submission</code></title>
                     <p>
-                        Based on a proposal in a draft version of XForms 1.1, Orbeon Forms supports the
-                        <code>validate</code> and <code>relevant</code> attributes on <code>xforms:submission</code>.
-                        For more information, please visit the <a
-                        href="http://www.w3.org/TR/2004/WD-xforms11-20041115/#submit-attribs">XForms 1.1 draft</a>.
+                        Orbeon Forms supports the XForms 1.1 <code>validate</code> and <code>relevant</code> attributes
+                        on <code>xforms:submission</code>. For more information, please visit the <a
+                        href="http://www.w3.org/TR/xforms11/#submit-submission-element">XForms 1.1 specification</a>.
+                    </p>
+                </section>
+                <a name="xforms11-if-while"/>
+                <section>
+                    <title>Conditional Execution and Iteration of XForms Actions</title>
+                    <p>
+                        Orbeon Forms supports the XForms 1.1 <code>if</code> and <code>while</code> attributes on XForms
+                        action elements. For more information, please visit the <a
+                        href="http://www.w3.org/TR/xforms11/#action-conditional">XForms 1.1 specification</a>.
                     </p>
                 </section>
             </section>
@@ -3651,6 +3673,29 @@
                         instance does not contain information that could be inadvertently shared with other XForms
                         documents. It is recommended to use it to load localized resources or similar types of data.
                     </warning>
+                </section>
+                <a name="tree"/>
+                <section>
+                    <title>Trees with the <code>xxforms:tree</code> Appearance</title>
+                    <p>
+                        [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
+                        <code>xforms:select</code> and <code>xforms:select1</code>]
+                    </p>
+                </section>
+                <a name="menu"/>
+                <section>
+                    <title>Menus with the <code>xxforms:menu</code> Appearance</title>
+                    <p>
+                        [TODO: describe the Orbeon Forms <code>xxforms:tree</code> appearance on
+                        <code>xforms:select1</code>]
+                    </p>
+                </section>
+                <a name="dialog"/>
+                <section>
+                    <title>Dialogs with <code>xxforms:dialog</code>, <code>xxforms:show</code> and <code>xxforms:hide</code></title>
+                    <p>
+                        [TODO: describe the Orbeon Forms <code>xxforms:dialog</code> extension]
+                    </p>
                 </section>
             </section>
         </section>

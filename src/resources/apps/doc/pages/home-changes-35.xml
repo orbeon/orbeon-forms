@@ -40,6 +40,45 @@
                 This document describes changes made between Orbeon PresentationServer 3.0.1 and Orbeon Forms 3.5.1.
             </p>
         </section>
+        <a name="changes-352"/>
+        <section>
+            <title>Changes in Version 3.5.2</title>
+            <p>
+                Orbeon Forms 3.5.2 is an update to Orbeon Forms 3.5.1.
+            </p>
+            <section>
+                <title>Noteworthy Changes</title>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Support for deployment as separate WAR.</b> Orbeon Forms can now be deployed as a
+                            separate Java web application archive (WAR). This is most useful when you want to produce
+                            XForms using Java technology (whether using JSP, Java Servlets, or other frameworks).
+                        </p>
+                        <p>
+                            This was already possible in the past, but you had to either copy over all the Orbeon Forms
+                            JAR files and configuration files into your application, or the other way around. The new
+                            deployment method allows you to deploy Orbeon Forms separately. You just need to include a
+                            very small Orbeon Forms JAR file in your application (<code>renderer-ops.jar</code>), and
+                            to add a special configuration for a filter to your <code>web.xml</code>.
+                        </p>
+                        <p>
+                            Separate deployment allows for easier upgrades or both your application and Orbeon Forms. It
+                            also prevents situations where different versions of JAR files could conflict.
+                        </p>
+                        <p>
+                            [TODO: full doc]
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Complete List of Issues Addressed in this Release</title>
+                <ul>
+                    [TODO]
+                </ul>
+            </section>
+        </section>
         <a name="changes-351"/>
         <section>
             <title>Changes in Version 3.5.1</title>

@@ -3540,6 +3540,13 @@
                     <xml-source show-namespaces="false">
                         <xforms:submission xxforms:show-progress="false"/>
                     </xml-source>
+                    <p>
+                        Similarly the <code>xxforms:show-progress="false"</code> attribute can be used with the
+                        <code>xforms:load</code> action:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:load xxforms:show-progress="false"/>
+                    </xml-source>
                 </section>
                 <a name="xxforms-script-extension"/>
                 <section>

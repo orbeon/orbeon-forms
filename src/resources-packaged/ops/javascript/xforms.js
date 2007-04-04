@@ -2801,6 +2801,9 @@ ORBEON.xforms.Server = {
                                         if (showProcess != "false")
                                             // Display loading indicator unless the server tells us not to display it
                                             newDynamicStateTriggersReplace = true;
+                                        // Reset these as they may be changed by asyncRequest!
+                                        ORBEON.xforms.Globals.requestForm.action = action;
+                                        ORBEON.xforms.Globals.requestForm.target = null;
                                         ORBEON.xforms.Globals.requestForm.submit();
                                     } else {
                                         // Submit form in the background

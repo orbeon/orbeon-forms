@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.UUIDUtils;
@@ -32,7 +33,9 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.*;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -1275,10 +1278,24 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     private static void outputSubmissionInfo(ExternalContext externalContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
-        final String requestURL = externalContext.getRequest().getRequestURL();
+        final String clientSubmisssionURL;
+        if ("all".equals(activeSubmission.getReplace())) {
+            // Replace all
+
+            // The submission path is actually defined by the oxf:page-flow processor and its configuration
+            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.PAGE_FLOW_PROCESSOR_QNAME);
+            final String submissionPath = propertySet.getString(PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_PROPERTY_NAME,
+                    PageFlowControllerProcessor.XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
+
+            clientSubmisssionURL = externalContext.getResponse().rewriteResourceURL(submissionPath, false);
+        } else {
+            // Replace instance
+            clientSubmisssionURL = externalContext.getRequest().getRequestURL();
+        }
+
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
-                new String[]{"action", requestURL, "method", "POST",
+                new String[]{"action", clientSubmisssionURL, "method", "POST",
                         "show-progress", (activeSubmission == null || activeSubmission.isXxfShowProgress()) ? null : "false",
                         "replace", activeSubmission.getReplace()
                 });

@@ -218,6 +218,11 @@ public class XPathCache {
                     }
                 }
             }
+            {
+                // Add this to the key as evaluating "name" as XPath or as AVT is very different!
+                cacheKeyString.append('|');
+                cacheKeyString.append(Boolean.toString(isAvt));
+            }
 
             final PooledXPathExpression expr;
             if (testNoCache) {

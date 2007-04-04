@@ -1,0 +1,399 @@
+<!--
+    Copyright (C) 2006-2007 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Using the Orbeon Forms XForms Engine with Java Applications</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Most of the example applications shipped with Orbeon Forms use the <a href="reference-page-flow">Page
+                Flow Controller (PFC)</a> and are implemented using components provided by Orbeon Forms such as <a
+                href="reference-xpl-pipelines">XML pipelines</a>. But it is also possible to use the XForms engine
+                without worrying about these technologies and to simply use it as an XForms engine for your Java
+                applications.
+            </p>
+            <p>
+                There are two main ways of integrating the Orbeon Forms XForms engine with Java applications:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Separately from the Orbeon Forms WAR.</b> With this method, your application is deployed in
+                        its own Java web archive (WAR), and Orbeon Forms in its own WAR.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Together with the Orbeon Forms WAR.</b> With this method, you integrate your application
+                        directly with Orbeon Forms. This means that the Java JAR files and classes of your application
+                        and Orbeon Forms are deployed within the same WAR.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Both methods are documented below. Deploying <i>separately</i> is the recommended method.
+            </p>
+        </section>
+        <section>
+            <title>Deployment and Configuration</title>
+            <p>
+                The following table compares the two deployment methods:
+            </p>
+            <table>
+                <tr>
+                    <td/>
+                    <th>Separate Deployment</th>
+                    <th>Integrated Deployment</th>
+                </tr>
+                <tr>
+                    <th>Benefits</th>
+                    <td>
+                        <ul>
+                            <li>
+                                <p>
+                                    Easier upgrades of both your application and Orbeon Forms.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Preventing situations where different versions of JAR files could conflict.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Cleaner application architecture.
+                                </p>
+                            </li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>
+                                <p>
+                                    No need to create your own WAR. Just use the Orbeon Forms WAR.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    Default <code>web.xml</code> configuration works out of the box for JSPs.
+                                </p>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th><code>web.xml</code> Configuration</th>
+                    <td>
+                        <p>
+                            In order to enable XForms in your application, you need to add the following configuration
+                            to your application's <code>web.xml</code>:
+                        </p>
+                        <xml-source border="false">
+                            <comment> Declare and configure the Orbeon Forms XForms filter </comment>
+                            <filter>
+                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-class>
+                                    org.orbeon.oxf.servlet.OPSXFormsFilter
+                                </filter-class>
+                                <init-param>
+                                    <param-name>oxf.xforms.renderer.context</param-name>
+                                    <param-value>/ops</param-value>
+                                </init-param>
+                            </filter>
+
+                            <comment> Any web resource under /xforms-jsp is processed by the XForms engine </comment>
+                            <filter-mapping>
+                                <filter-name>ops-xforms-filter</filter-name>
+                                <url-pattern>/xforms-jsp/*</url-pattern>
+                            </filter-mapping>
+
+                            <comment> This is necessary so that XForms engine resources can be served appropriately </comment>
+                            <filter-mapping>
+                                <filter-name>ops-xforms-filter</filter-name>
+                                <url-pattern>/ops/*</url-pattern>
+                            </filter-mapping>
+                        </xml-source>
+                        <p>
+                            The value of the <code>oxf.xforms.renderer.context</code> parameter specifies the context
+                            into which you have deployed Orbeon Forms. By default, Orbeon forms deploys to
+                            <code>/ops</code> so this value is usually safe. If you deploy Orbeon Forms to another
+                            context, you need to change this value accordingly.
+                        </p>
+                        <p>
+                            The <code>&lt;url-pattern></code> defined under the first <code>&lt;filter-mapping></code>
+                            has the value <code>/xforms-jsp/*</code>. This means that all the data generated by URLs
+                            starting with <code>/xforms-jsp/</code> is post-processed by Orbeon Forms. You can change
+                            this value as desired.
+                        </p>
+                        <p>
+                            The <code>&lt;url-pattern></code> defined under the second <code>&lt;filter-mapping></code> has
+                            the value <code>/ops/*</code>. This is necessary to allow for all Orbeon Forms resources,
+                            such as JavaScript, CSS, and Ajax server, to be accessible. Note that this
+                            <code>/ops/*</code> value is not related to the default context into which you deploy Orbeon
+                            Forms: if you change you context, you don't change this value and keep it as
+                            <code>/ops/*</code>.
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            The following configuration is enabled by default in the Orbeon Forms <code>web.xml</code>:
+                        </p>
+                        <xml-source border="false">
+                            <filter>
+                                <filter-name>ops-xforms-filter</filter-name>
+                                <filter-class>
+                                    org.orbeon.oxf.servlet.OPSXFormsFilter
+                                </filter-class>
+                            </filter>
+                            <filter-mapping>
+                                <filter-name>ops-xforms-filter</filter-name>
+                                <url-pattern>/xforms-jsp/*</url-pattern>
+                            </filter-mapping>
+                        </xml-source>
+                        <p>
+                            The <code>&lt;url-pattern></code> defined under the <code>&lt;filter-mapping></code> has the
+                            value <code>/xforms-jsp/*</code>. This means that all the data generated by URLs starting
+                            with <code>/xforms-jsp/</code> is post-processed by Orbeon Forms. You can change this value
+                            as desired.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Application Server Configuration</th>
+                    <td>
+                        <p>
+                            Your WAR must be deployed in such a way that it is allowed forwarding requests to other web
+                            applications. With Tomcat, this is called a <i>cross-context</i> setup, and you enable it as
+                            follows with the <code>crossContext</code> attribute in <code>server.xml</code>:
+                        </p>
+                        <xml-source border="false">
+                            <Context path="/my-app" docBase="/path/to/my-app/war" crossContext="true"/>
+                        </xml-source>
+                    </td>
+                    <td>
+                        None particular: just deploy Orbeon Forms as usual.
+                    </td>
+                </tr>
+                <tr>
+                    <th>Location of JSPs</th>
+                    <td>
+                        <p>
+                            With the default configuration shown above, all JSPs located in the directory called
+                            <code>xforms-jsp</code> in your WAR are processed by the XForms engine. However, it is
+                            likely that you will prefer another location. In that case, you just change the
+                            <code>url-mapping</code> configuration.
+                        </p>
+                        <p>
+                            You must <b>not</b> deploy resources under the <code>/ops/</code> directory, as that
+                            directory is reserved for Orbeon Forms resources.
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            With the default configuration in the Orbeon Forms <code>web.xml</code>, all JSPs located in
+                            the directory called <code>xforms-jsp</code> in your WAR are processed by the XForms engine.
+                        </p>
+                        <p>
+                            Under this directory, by default you find one directory per example, for instance
+                            <code>xforms-jsp/guess-the-number</code> or <code>xforms-jsp/flickr-search</code>. You can
+                            add your own directories and JSP files as desired.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Other Java Resources</th>
+                    <td colspan="2">
+                        <p>
+                            You don't have to produce XForms from JSP. You can do so directly from servlets, or other
+                            Java web application frameworks (usually based on servlets and template languages). What
+                            matters is that the filter defined in <code>web.xml</code> kicks in for those resources. For
+                            this to happen, you modify the <code>&lt;filter-mapping></code> accordingly.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </section>
+        <section>
+            <title>Separate WAR Deployment Steps</title>
+            <p>
+                You deploy Orbeon Forms as a separate WAR with the following steps:
+            </p>
+            <ol>
+                <li>
+                    <p>
+                        Deploy Orbeon Forms as usual, typically in the <code>/ops</code> context. Follow the <a
+                        href="intro-install">installation instructions</a> and the <a href="intro-tutorial">Orbeon Forms
+                        Tutorial</a> if needed.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Deploy your own application as a separate WAR. We assume below that the context for your
+                        application is <code>/my-app</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Copy <code>WEB-INF/lib/ops-xforms-filter.jar</code> from the Orbeon Forms WAR into your
+                        application's <code>WEB-INF/lib/</code> directory.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Configure your application's <code>web.xml</code> as described in the previous section to
+                        setup the Orbeon Forms XForms filter.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Setup your application in cross-context mode, as described in the previous section.
+                    </p>
+                </li>
+            </ol>
+        </section>
+        <section>
+            <title>Generating XHTML and XForms</title>
+            <p>
+                Your JSP pages or servlets must generate well-formed XML documents that contain XHTML and XForms tags.
+                There are two methods of passing this information to Orbeon Forms, described below.
+            </p>
+            <section>
+                <title>Producing XHTML and XForms as JSP or Servlet Output</title>
+                <p>
+                    With this method, your JSP or servlet simply outputs XHTML and XForms in its output as it would HTML
+                    content. For example, a basic JSP page typically looks like this:
+                </p>
+                <xml-source>
+                    <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+                        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                        xmlns:ev="http://www.w3.org/2001/xml-events">
+
+                        <xhtml:head>
+                            <xhtml:title>Guess The Number</xhtml:title>
+                            <xforms:model>
+                                <xforms:instance>
+                                    ...
+                                </xforms:instance>
+                            </xforms:model>
+                        </xhtml:head>
+                        <xhtml:body>
+                            <xhtml:h1>My Page</xhtml:h1>
+                            <xforms:input ref="..."/>
+                            ...
+                        </xhtml:body>
+                    </xhtml:html>
+                </xml-source>
+                <p>
+                    When using JSP, you can then use JSP tags as usual to produce your XHTML + XForms page as you would
+                    a regular HTML page.
+                </p>
+            </section>
+            <section>
+                <title>Passing XHTML and XForms as a Request Attribute</title>
+                <p>
+                    With this method, the output of your JSP or servlet is ignored by Orbeon Forms. Instead, you set an
+                    attribute into the <code>HttpServletRequest</code> object which is passed to servlets (and also
+                    accessible in JSP through the <code>request</code> variable):
+                </p>
+                <xml-source>
+                    request.setAttribute("oxf.xforms.renderer.document", xformsDocument);
+                </xml-source>
+                <p>
+                    The name of the attribute must be <code>"oxf.xforms.renderer.document"</code>. It may contain XHTML
+                    and XForms as an XML Document Object Model (DOM), as a dom4j <code>Document</code>, or as a String
+                    containing XML.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Processing Model</title>
+            <p>
+                What happens after your JSP or servlet produces an XHTML + XForms document?
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        If configured appropriately in <code>web.xml</code>, the Orbeon Forms XForms filter kicks in and
+                        intercepts the output of the JSP or servlet (whether produced the regular way or passed as a
+                        request attribute).
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The Orbeon Forms XForms filter then forward the request to Orbeon Forms, at the location
+                        <code>/xforms-renderer</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Orbeon Forms reacts to <code>/xforms-renderer</code> by extracting the XHTML and XForms document
+                        from the forwarded request.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Orbeon Forms sends the XHTML and XForms document to the standard Orbeon Forms <a
+                        href="reference-epilogue">epilogue</a> called <code>/config/epilogue-servlet.xpl</code>. The
+                        epilogue performs several tasks, including transforming XHTML and XForms into HTML that the
+                        browser can understand. The default configuration of this pipeline should be fine for most use
+                        cases, which means you usually don't need to worry about it.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Note that the epilogue applies the default theme under <code>/config/theme-plain.xsl</code>. However, it
+                does not perform further URL rewriting by default.
+            </p>
+        </section>
+        <section>
+            <title>Implementing XForms Services with JSP</title>
+            <p>
+                The backend of your forms is usually best implemented with "services" which can be called with
+                <code>&lt;xforms:submission></code>. Most of the time, XML is being posted to the service and XML is
+                returned by the service. Since services take XML as input and generate XML, <a
+                href="reference-xpl-pipelines">XML pipelines</a> are an ideal tool to implement services.
+            </p>
+            <p>
+                However, you can also implement simple services directly with JSP. To produce XML output, your JSP page
+                has to set the appropriate content type for the response with:
+            </p>
+            <xml-source>
+                response.setContentType("application/xml")
+            </xml-source>
+            <p>
+                To read XML input, you can create an object that represents the input document using the dom4j API:
+            </p>
+            <xml-source>
+                Document queryDocument = xmlReader.read(request.getInputStream())
+            </xml-source>
+            <p>
+                You then use this object to gather data about the query sent to your service.
+            </p>
+            <p>
+                In XForms you reference the service with the action attribute of <code>&lt;xforms:submission></code>:
+            </p>
+            <xml-source>
+                <xforms:submission id="do-query" method="post" replace="instance"
+                        ref="instance('query')"
+                        instance="photos" action="/xforms-jsp/flickr-search/service-search.jsp"/>
+            </xml-source>
+        </section>
+    </body>
+</document>

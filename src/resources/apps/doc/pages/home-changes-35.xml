@@ -85,7 +85,8 @@
                             </li>
                         </ul>
                         <p>
-                            [TODO: full doc]
+                            See <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
+                            Applications</a> for more information.
                         </p>
                     </li>
                     <li>
@@ -96,7 +97,8 @@
                             at the beginning of JSP files is no longer necessary.
                         </p>
                         <p>
-                            [TODO: ref doc]
+                            See <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
+                            Applications</a> for more information.
                         </p>
                     </li>
                 </ul>

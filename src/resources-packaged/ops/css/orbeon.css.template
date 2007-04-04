@@ -426,6 +426,7 @@ ul {
     padding: .3em;
     border:    1px solid &light-color;;
     margin:    0;
+    vertical-align: top
 }
 
 .dashedbox {

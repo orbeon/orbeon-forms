@@ -245,8 +245,8 @@
                 </li>
                 <li>
                     <p>
-                        Deploy your own application as a separate WAR. We assume below that the context for your
-                        application is <code>/my-app</code>.
+                        Deploy your own application as a separate WAR.
+                        <!--We assume below that the context for your application is <code>/my-app</code>.-->
                     </p>
                 </li>
                 <li>
@@ -301,7 +301,7 @@
                     </xhtml:html>
                 </xml-source>
                 <p>
-                    When using JSP, you can then use JSP tags as usual to produce your XHTML + XForms page as you would
+                    When using JSP, you can then use JSP tags as usual to produce your XHTML and XForms page as you would
                     a regular HTML page.
                 </p>
             </section>
@@ -325,7 +325,7 @@
         <section>
             <title>Processing Model</title>
             <p>
-                What happens after your JSP or servlet produces an XHTML + XForms document?
+                What happens after your JSP or servlet produces an XHTML and XForms document?
             </p>
             <ul>
                 <li>

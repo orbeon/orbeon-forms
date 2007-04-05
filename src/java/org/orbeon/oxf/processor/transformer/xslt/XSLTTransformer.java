@@ -144,8 +144,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
 
-                    final LocationData locDat = getLocationData();
-                    final SAXResult sr = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
+                    final LocationData locationData = getLocationData();
+                    final SAXResult saxResult = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
 
                         private Locator locator;
 
@@ -162,14 +162,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             super.startPrefixMapping(s, s1);
                         }
 
-                        public void setDocumentLocator(final Locator loc) {
-                            locator = loc;
+                        public void setDocumentLocator(final Locator locator) {
+                            this.locator = locator;
                         }
 
                         public void startDocument() throws SAXException {
-                            if ((locator == null || locator.getSystemId() == null)
-                                    && locDat != null) {
-                                final Locator loc = new ConstantLocator(locDat);
+                            if ((locator == null || locator.getSystemId() == null) && locationData != null) {
+                                final Locator loc = new ConstantLocator(locationData);
                                 super.setDocumentLocator(loc);
                             }
                             super.startDocument();
@@ -184,12 +183,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             super.endDocument();
                         }
                     });
-                    if ( locDat != null ) {
-                        final String sysID = locDat.getSystemID();
-                        sr.setSystemId( sysID );
-                        transformerHandler.setSystemId( sysID );
+                    if (locationData != null) {
+                        final String sysID = locationData.getSystemID();
+                        saxResult.setSystemId(sysID);
+                        transformerHandler.setSystemId(sysID);
                     }
-                    transformerHandler.setResult( sr );
+                    transformerHandler.setResult(saxResult);
 
                     // Execute transformation
                     try {
@@ -322,15 +321,12 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             }
 
             /**
-             * Reads the input and creates the JAXP Templates object (wrapped in a
-             * Transformer object). While reading the input, figures out the direct
-             * dependencies on other files (URIReferences object), and stores
-             * these two mappings in cache:
-             * <p/>
-             * <pre>
+             * Reads the input and creates the JAXP Templates object (wrapped in a Transformer object). While reading
+             * the input, figures out the direct dependencies on other files (URIReferences object), and stores these
+             * two mappings in cache:
+             *
              * configKey        -> uriReferences
              * uriReferencesKey -> transformer
-             * </pre>
              */
             private TemplatesInfo createTransformer(PipelineContext context, String transformerClass, Map attributes) {
                 StringErrorListener errorListener = new StringErrorListener(logger);

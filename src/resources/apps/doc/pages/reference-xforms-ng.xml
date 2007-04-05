@@ -3114,7 +3114,7 @@
                         <li>
                             <a name="xxforms-repeat-current"/>
                             <p>
-                                <code>xxforms:repeat-current($repeat-id as xs:string?) as xs:string</code>.
+                                <code>xxforms:repeat-current($repeat-id as xs:string?) as node()</code>.
                             </p>
                             <p>
                                 The <code>xxforms:repeat-current()</code> function allows you to obtain a reference to
@@ -3146,7 +3146,7 @@
                         <li>
                             <a name="xxforms-context"/>
                             <p>
-                                <code>xxforms:context($element-id as xs:string) as xs:string</code>.
+                                <code>xxforms:context($element-id as xs:string) as node()</code>.
                             </p>
                             <p>
                                 The <code>xxforms:context()</code> function allows you to obtain the evaluation context

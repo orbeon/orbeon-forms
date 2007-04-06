@@ -108,6 +108,80 @@
                 <ul>
                     [TODO]
                 </ul>
+                <!--
+Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
+
+http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2&_category=100&_group=100&_sort_col=close_date&_sort_ord=DESC&submit=Browse&atid=350207&group_id=168&func=browse
+
+<ul>
+    {
+        for $table in //table[tr/td/span/strong[. = 'ID']]
+            let $latest-id := '306805'
+            let $latest-position := count(($table//tr)[td[normalize-space(.) = $latest-id]]/preceding-sibling::tr) + 1
+            return
+                for $row in ($table//tr)[position() ge 2 and position() lt $latest-position and normalize-space(td[7]) = 'Fixed'] return
+                <li>
+                    <a href="http://forge.objectweb.org/{$row/td[2]/a/@href}">#{string($row/td[1])}: {string($row/td[2]/a)}</a>
+                </li>
+    }
+</ul>
+
+                -->
+                <ul>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306641&amp;group_id=168&amp;atid=350207">#306641:
+                            RFE: Integrate "Deploying Orbeon Forms as a separate WebApp" changes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306703&amp;group_id=168&amp;atid=350207">#306703:
+                            Orbeon 3.5 doesn't compile with Java 6
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305208&amp;group_id=168&amp;atid=350207">#305208:
+                            Upgrade to Saxon 8.7.3
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306897&amp;group_id=168&amp;atid=350207">#306897:
+                            XPath cache mixes up XPath expressions with AVT expressions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306896&amp;group_id=168&amp;atid=350207">#306896:
+                            Submission with replace="all" is broken after background upload
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306869&amp;group_id=168&amp;atid=350207">#306869:
+                            Remove handling of xforms-help from themes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306894&amp;group_id=168&amp;atid=350207">#306894:
+                            Should rename cli-ops.jar to ops-cli.jar for consistency
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306862&amp;group_id=168&amp;atid=350207">#306862:
+                            Resource Server processor locks the files it serves
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306859&amp;group_id=168&amp;atid=350207">#306859:
+                            XForms schema: xsd:any conflicts with xsd:element ref="xsd:schema"
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306858&amp;group_id=168&amp;atid=350207">#306858:
+                            XPL schema is invalid
+                        </a>
+                    </li>
+                </ul>
             </section>
         </section>
         <a name="changes-351"/>

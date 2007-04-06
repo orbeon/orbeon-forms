@@ -64,6 +64,10 @@ public class XFormsGroupHandler extends HandlerBase {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final String labelValue = (handlerContext.isGenerateTemplate() || groupXFormsControl == null) ? null : groupXFormsControl.getLabel();
         if (isFieldsetAppearance) {
+
+            // Start xhtml:fieldset element
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+
             // Output an xhtml:legend element
             final AttributesImpl labelAttributes = getAttributes(attributes, null, null);
             final String legendQName = XMLUtils.buildQName(xhtmlPrefix, "legend");
@@ -77,9 +81,10 @@ public class XFormsGroupHandler extends HandlerBase {
             reusableAttributes.clear();
             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
             outputLabelFor(handlerContext, reusableAttributes, effectiveGroupId, labelValue);
-        }
 
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+            // Start xhtml:span element
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName, getAttributes(attributes, classes.toString(), effectiveGroupId));
+        }
 
         // NOTE: This doesn't work because attributes for the label are only gathered after start()
 //        handleLabelHintHelpAlert(effectiveGroupId, "label", groupXFormsControl);

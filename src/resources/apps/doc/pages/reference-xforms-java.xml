@@ -228,6 +228,42 @@
                         </p>
                     </td>
                 </tr>
+                <tr>
+                    <th>Session Handling</th>
+                    <td>
+                        <p>
+                            All URLs are designed go through your web application's context, so your application and the
+                            Orbeon Forms XForms engine automatically share the same session.
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            All URLs access the same web application context, so your application and Orbeon Forms
+                            automatically share the same session.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Access Control</th>
+                    <td>
+                        <p>
+                            You control security for all of your application's pages, including XForms pages, in your
+                            own application's <code>web.xml</code>. It is not possible to access your application's
+                            XForms pages by accessing Orbeon Forms URLs directly: your application controls the
+                            generation of XForms content, not Orbeon Forms.
+                        </p>
+                        <p>
+                            However by default you can still access Orbeon Forms applications through Orbeon Forms URLs.
+                            If you don't want to deploy any Orbeon Forms applications directly, you can block external
+                            accesses to the Orbeon Forms WAR by configuring the Orbeon Forms WAR's <code>web.xml</code>.
+                        </p>
+                    </td>
+                    <td>
+                        <p>
+                            You control security for all pages in the single application's <code>web.xml</code>.
+                        </p>
+                    </td>
+                </tr>
             </table>
         </section>
         <section>

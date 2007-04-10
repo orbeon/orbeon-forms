@@ -25,13 +25,18 @@
             <xforms:instance id="instance">
                 <instance/>
             </xforms:instance>
-            <xforms:submission id="submission" method="get" serialize="false" action="http://www.google.com/"/>
+            <xforms:submission id="get" method="get" serialize="false" action="http://www.google.com/"/>
+            <xforms:submission id="post" method="post" serialize="false" action="http://localhost/" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xforms:trigger>
             <xforms:label>Go to Google</xforms:label>
-            <xforms:send submission="submission" ev:event="DOMActivate"/>
+            <xforms:send submission="get" ev:event="DOMActivate"/>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Post to localhost</xforms:label>
+            <xforms:send submission="post" ev:event="DOMActivate"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

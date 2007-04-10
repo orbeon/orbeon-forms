@@ -223,8 +223,10 @@
                         <p>
                             You don't have to produce XForms from JSP. You can do so directly from servlets, or other
                             Java web application frameworks (usually based on servlets and template languages). What
-                            matters is that the filter defined in <code>web.xml</code> kicks in for those resources. For
-                            this to happen, you modify the <code>&lt;filter-mapping></code> accordingly.
+                            matters is that the filter defined in <code>web.xml</code> kicks in for those resources and
+                            that you produce well-formed XML as output. For this to happen, you modify the
+                            <code>&lt;filter-mapping></code> accordingly to enable the filter for the URLs handled by
+                            your framework.
                         </p>
                     </td>
                 </tr>

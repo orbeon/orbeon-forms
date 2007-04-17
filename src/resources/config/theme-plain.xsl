@@ -12,8 +12,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <!--
-    This is a very simple theme that shows you how to create a common layout for all your pages. You
-    can modify it at will.
+    This is a very simple theme that shows you how to create a common layout for all your pages. You can modify it at
+    will or, even better, copy it as theme-[yourapp].xsl and refer to the new name from the epilogue pipeline.
 -->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -33,7 +33,6 @@
             <xhtml:head>
                 <!-- Standard scripts/styles -->
                 <!-- NOTE: The XForms engine may place additional scripts and stylesheets here as needed -->
-                <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
                 <!-- Handle head elements -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/(xhtml:meta | xhtml:link | xhtml:style | xhtml:script)">
                     <xsl:element name="xhtml:{local-name()}" namespace="{namespace-uri()}">
@@ -62,16 +61,6 @@
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </xhtml:body>
         </xhtml:html>
-    </xsl:template>
-
-    <!-- - - - - - - Generic copy rules - - - - - - -->
-
-    <!-- Copy attributes in XHTML namespace to no namespace -->
-    <xsl:template match="@xhtml:*">
-        <xsl:attribute name="{local-name()}">
-            <xsl:value-of select="."/>
-            <xsl:message>Got XHTML attribute: <xsl:value-of select="concat(local-name(), '=', .)"/></xsl:message>
-        </xsl:attribute>
     </xsl:template>
 
     <!-- Simply copy everything that's not matched -->

@@ -514,7 +514,8 @@ public class XFormsUtils {
     }
 
     public static void streamHTMLFragment(final ContentHandler contentHandler, String value, LocationData locationData, final String xhtmlPrefix) {
-        if (value != null && value.length() > 0) {
+        
+        if (value != null && value.trim().length() > 0) { // don't parse blank values
 
             // TODO: optimize and skip creation of Dom4j document - we should be able to just stream out the W3C DOM crated by Tidy
             final Document bodyDocument = htmlStringToDocument(value, locationData);

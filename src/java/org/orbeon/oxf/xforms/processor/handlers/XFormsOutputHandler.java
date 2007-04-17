@@ -128,8 +128,7 @@ public class XFormsOutputHandler extends XFormsValueControlHandler {
 
                 if (isConcreteControl) {
                     final String displayValue = xformsOutputControl.getDisplayValueOrValue();
-                    if (displayValue != null && displayValue.trim().length() > 0) // don't parse blank values
-                        XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
+                    XFormsUtils.streamHTMLFragment(contentHandler, displayValue, xformsOutputControl.getLocationData(), xhtmlPrefix);
                 }
             } else {
                 // Regular text case

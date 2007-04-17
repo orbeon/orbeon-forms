@@ -40,7 +40,11 @@ import java.util.*;
 public class WebAppContext {
     
     static {
-        TomcatClasspathFix.applyIfNeedBe();   
+        try {
+            TomcatClasspathFix.applyIfNeedBe();
+        } catch (Throwable t) {
+            // ignore
+        }
     }
 
     public static final String PROPERTIES_PROPERTY = "oxf.properties";

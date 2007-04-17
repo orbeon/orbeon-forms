@@ -132,9 +132,34 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
+                        [TODO: complete]
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306937&amp;group_id=168&amp;atid=350207">#306937:
+                            theme-plain.xsl must not refer to orbeon.css
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306931&amp;group_id=168&amp;atid=350207">#306931:
+                            Schemas and instance URIs don't resolve against URI of JSP page
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306927&amp;group_id=168&amp;atid=350207">#306927:
+                            Exception with trigger appearance="minimal" and empty label
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306911&amp;group_id=168&amp;atid=350207">#306911:
+                            Group with appearance="xxforms:fieldset" generates xhtml:legend outside xhtml:fieldset
+                        </a>
+                    </li>
+                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306641&amp;group_id=168&amp;atid=350207">#306641:
                             RFE: Integrate "Deploying Orbeon Forms as a separate WebApp" changes
                         </a>
+
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306703&amp;group_id=168&amp;atid=350207">#306703:
@@ -142,12 +167,12 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         </a>
                     </li>
                     <li>
-
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=305208&amp;group_id=168&amp;atid=350207">#305208:
                             Upgrade to Saxon 8.7.3
                         </a>
                     </li>
                     <li>
+
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306897&amp;group_id=168&amp;atid=350207">#306897:
                             XPath cache mixes up XPath expressions with AVT expressions
                         </a>
@@ -156,12 +181,12 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306896&amp;group_id=168&amp;atid=350207">#306896:
                             Submission with replace="all" is broken after background upload
                         </a>
-
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306869&amp;group_id=168&amp;atid=350207">#306869:
                             Remove handling of xforms-help from themes
                         </a>
+
                     </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306894&amp;group_id=168&amp;atid=350207">#306894:
@@ -169,11 +194,11 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                         </a>
                     </li>
                     <li>
-
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306862&amp;group_id=168&amp;atid=350207">#306862:
                             Resource Server processor locks the files it serves
                         </a>
                     </li>
+
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306859&amp;group_id=168&amp;atid=350207">#306859:
                             XForms schema: xsd:any conflicts with xsd:element ref="xsd:schema"

@@ -143,12 +143,11 @@
                             this value as desired.
                         </p>
                         <p>
-                            The <code>&lt;url-pattern></code> defined under the second <code>&lt;filter-mapping></code> has
-                            the value <code>/ops/*</code>. This is necessary to allow for all Orbeon Forms resources,
-                            such as JavaScript, CSS, and Ajax server, to be accessible. Note that this
-                            <code>/ops/*</code> value is not related to the default context into which you deploy Orbeon
-                            Forms: if you change you context, you don't change this value and keep it as
-                            <code>/ops/*</code>.
+                            The <code>&lt;url-pattern></code> defined under the second <code>&lt;filter-mapping></code>
+                            has the value <code>/ops/*</code>. This is necessary to allow for all Orbeon Forms
+                            resources, such as JavaScript, CSS, and Ajax server, to be accessible. This
+                            <code>/ops/*</code> value is related to the default context into which you deploy Orbeon
+                            Forms: if you change you context, you change this value as well.
                         </p>
                     </td>
                     <td>

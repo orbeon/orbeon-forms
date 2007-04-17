@@ -20,6 +20,7 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
+    <xsl:variable name="has-widgets" as="xs:boolean" select="exists(//widget:*)"/>
     <xsl:variable name="has-xforms-instance-inspector" as="xs:boolean" select="exists(//widget:xforms-instance-inspector)"/>
 
     <xsl:template match="@*|node()" priority="-100">
@@ -61,7 +62,9 @@
                     }
                 </xhtml:script>
             </xsl:if>
-            <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css"/>
+            <xsl:if test="$has-widgets">
+                <xhtml:link rel="stylesheet" href="/config/theme/xforms-widgets.css" type="text/css"/>
+            </xsl:if>
         </xsl:copy>
     </xsl:template>
 

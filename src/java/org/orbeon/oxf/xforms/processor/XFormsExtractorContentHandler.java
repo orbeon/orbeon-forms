@@ -6,6 +6,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.servlet.OPSXFormsFilter;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -66,7 +67,15 @@ public class XFormsExtractorContentHandler extends ForwardingContentHandler {
 
         // Create xml:base stack
         try {
-            final String rootXMLBase = externalContext.getRequest().getRequestPath();
+            final String rootXMLBase;
+            {
+                // It is possible to override the base URI by setting a request attribute. This is used by OPSXFormsFilter.
+                final String rendererBaseURI = (String) externalContext.getRequest().getAttributesMap().get(OPSXFormsFilter.OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME);
+                if (rendererBaseURI != null)
+                    rootXMLBase = rendererBaseURI;
+                else
+                    rootXMLBase = externalContext.getRequest().getRequestPath();
+            }
             xmlBaseStack.push(new URI(null, null, rootXMLBase, null));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));

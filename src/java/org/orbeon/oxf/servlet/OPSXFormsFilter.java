@@ -29,7 +29,8 @@ import java.util.Locale;
  */
 public class OPSXFormsFilter implements Filter {
 
-    public static final String OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME = "oxf.xforms.renderer.document";
+    public static final String OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME = "oxf.xforms.renderer.document";
+    public static final String OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME = "oxf.xforms.renderer.base-uri";
 
     public static final String OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME = "oxf.servlet.context";
     public static final String OPS_RENDERER_PATH = "/xforms-renderer";
@@ -64,16 +65,21 @@ public class OPSXFormsFilter implements Filter {
             filterChain.doFilter(servletRequest, responseWrapper);
 
             // Set document if not present AND output was intercepted
-            if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME) == null) {
+            if (httpRequest.getAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME) == null) {
                 final String content = responseWrapper.getContent();
                 if (content != null) {
-                    httpRequest.setAttribute(OPS_XFORMS_RENDERER_DOCUMENT_PARAMETER_NAME, content);
+                    httpRequest.setAttribute(OPS_XFORMS_RENDERER_DOCUMENT_ATTRIBUTE_NAME, content);
                 }
             }
 
             // Override Orbeon Forms context so that rewriting works correctly
             if (opsContextPath != null)
                 httpRequest.setAttribute(OPS_SERVLET_CONTEXT_ATTRIBUTE_NAME, httpRequest.getContextPath() + opsContextPath);
+
+            // Set base URI
+
+            final String absoluteBaseURI = httpRequest.getRequestURL().toString();
+            httpRequest.setAttribute(OPS_XFORMS_RENDERER_BASE_URI_ATTRIBUTE_NAME, absoluteBaseURI);
 
             // Forward to Orbeon Forms for rendering
             getOPSDispatcher(OPS_RENDERER_PATH).forward(httpRequest, httpResponse);

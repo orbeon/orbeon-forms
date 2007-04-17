@@ -32,7 +32,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     private String pathQuery;
     private String method;
     private String mediaType;
-    private byte[] postData;
+    private byte[] messageBody;
 
     private Map headerMap;
     private Map headerValuesMap;
@@ -45,12 +45,12 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     /**
      * This simulates a POST or a PUT.
      */
-    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String pathQuery, String method, String mediaType, byte[] postData) {
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String pathQuery, String method, String mediaType, byte[] messageBody) {
         super(request);
         this.pathQuery = pathQuery;
         this.method = method;
         this.mediaType = mediaType;
-        this.postData = postData;
+        this.messageBody = messageBody;
 
         initializeHeaders(request);
     }
@@ -96,7 +96,7 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     }
 
     public int getContentLength() {
-        return (postData == null) ? 0 : postData.length;
+        return (messageBody == null) ? 0 : messageBody.length;
     }
 
     public String getContentType() {
@@ -104,8 +104,8 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
     }
 
     public InputStream getInputStream() throws IOException {
-        if (inputStream == null && postData != null) {
-            inputStream = new ByteArrayInputStream(postData);
+        if (inputStream == null && messageBody != null) {
+            inputStream = new ByteArrayInputStream(messageBody);
         }
 
         return inputStream;

@@ -44,9 +44,13 @@ public class XFormsSubmissionUtils {
      */
     public static XFormsModelSubmission.ConnectionResult doOptimized(PipelineContext pipelineContext, ExternalContext externalContext,
                                                                      XFormsModelSubmission xformsModelSubmission, String method, final String action, String mediatype, boolean doReplace,
-                                                                     byte[] serializedInstance, String queryString) {
+                                                                     byte[] messageBody, String queryString) {
         try {
             if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
+
+                // Case of empty body
+                if (messageBody == null)
+                    messageBody = new byte[0];
 
                 // Create requestAdapter depending on method
                 final ForwardExternalContextRequestWrapper requestAdapter;
@@ -57,10 +61,10 @@ public class XFormsSubmissionUtils {
                         effectiveResourceURI = action;
 
                         if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - setting request body: " + new String(serializedInstance, "UTF-8"));
+                            XFormsServer.logger.debug("XForms - setting request body: " + new String(messageBody, "UTF-8"));
 
                         requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                                effectiveResourceURI, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
+                                effectiveResourceURI, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", messageBody);
                     } else {
                         // Simulate a GET
                         {
@@ -141,16 +145,16 @@ public class XFormsSubmissionUtils {
      */
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
                                                                    String method, final String action, String username, String password, String mediatype,
-                                                                   byte[] serializedInstance, String queryString) {
+                                                                   byte[] messageBody, String queryString) {
 
         // Compute absolute submission URL
         final URL submissionURL = createAbsoluteURL(action, queryString, externalContext);
-        return doRegular(externalContext, method, submissionURL, username, password, mediatype, serializedInstance);
+        return doRegular(externalContext, method, submissionURL, username, password, mediatype, messageBody);
     }
 
     public static XFormsModelSubmission.ConnectionResult doRegular(ExternalContext externalContext,
                                                                    String method, final URL submissionURL, String username, String password, String mediatype,
-                                                                   byte[] serializedInstance) {
+                                                                   byte[] messageBody) {
 
         // Perform submission
         final String scheme = submissionURL.getProtocol();
@@ -165,7 +169,12 @@ public class XFormsSubmissionUtils {
                 final URLConnection urlConnection = submissionURL.openConnection();
                 final HTTPURLConnection httpURLConnection = (urlConnection instanceof HTTPURLConnection) ? (HTTPURLConnection) urlConnection : null;
                 if (isPost(method) || isPut(method) || isGet(method) || isDelete(method)) {
+                    // Whether a message body must be sent
                     final boolean hasRequestBody = isPost(method) || isPut(method);
+                    // Case of empty body
+                    if (messageBody == null)
+                        messageBody = new byte[0];
+
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(hasRequestBody);
 
@@ -207,8 +216,8 @@ public class XFormsSubmissionUtils {
                     // Write request body if needed
                     if (hasRequestBody) {
                         if (XFormsServer.logger.isDebugEnabled())
-                            XFormsServer.logger.debug("XForms - setting request body: " + new String(serializedInstance, "UTF-8"));
-                        httpURLConnection.setRequestBody(serializedInstance);
+                            XFormsServer.logger.debug("XForms - setting request body: " + new String(messageBody, "UTF-8"));
+                        httpURLConnection.setRequestBody(messageBody);
                     }
 
                     urlConnection.connect();

@@ -468,44 +468,40 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 final String defaultMediatype;
                 {
                     if (method.equals("multipart-post")) {
-                        if (!serialize)
-                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
                         // TODO
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("form-data-post")) {
-                        if (!serialize)
-                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
                         // TODO
 
 //                        final MultipartFormDataBuilder builder = new MultipartFormDataBuilder(, , null);
 
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                     } else if (method.equals("urlencoded-post")) {
-                        if (!serialize)
-                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
 
                         // Perform "application/x-www-form-urlencoded" serialization
                         queryString = null;
-                        messageBody = createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8");// the resulting string is already ASCII
+                        messageBody = serialize? createWwwFormUrlEncoded(documentToSubmit).getBytes("UTF-8") : null;// the resulting string is already ASCII
                         defaultMediatype = "application/x-www-form-urlencoded";
 
                     } else if (XFormsSubmissionUtils.isPost(method) || XFormsSubmissionUtils.isPut(method)) {
-                        if (!serialize)
-                            throw new OXFException("xforms:submission: method is incompatible with serialize=\"false\": " + method);
 
-                        // Serialize XML to a stream of bytes
-                        try {
-                            final Transformer identity = TransformerUtils.getIdentityTransformer();
-                            TransformerUtils.applyOutputProperties(identity,
-                                    "xml", version, null, null, encoding, omitxmldeclaration, standalone, indent, 4);
+                        if (serialize) {
+                            // Serialize XML to a stream of bytes
+                            try {
+                                final Transformer identity = TransformerUtils.getIdentityTransformer();
+                                TransformerUtils.applyOutputProperties(identity,
+                                        "xml", version, null, null, encoding, omitxmldeclaration, standalone, indent, 4);
 
-                            // TODO: use cdata-section-elements
+                                // TODO: use cdata-section-elements
 
-                            final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                            messageBody = os.toByteArray();
-                        } catch (Exception e) {
-                            throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
+                                final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                                identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
+                                messageBody = os.toByteArray();
+                            } catch (Exception e) {
+                                throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
+                            }
+                        } else {
+                            messageBody = null;
                         }
                         queryString = null;
                         defaultMediatype = "application/xml";
@@ -549,7 +545,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Test action
 
                         if (messageBody == null)
-                            throw new OXFException("Action 'test:' can only be used with POST method.");
+                            throw new OXFException("Action 'test:': no message body.");
 
                         connectionResult = new ConnectionResult(null);
                         connectionResult.resultCode = 200;

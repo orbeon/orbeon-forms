@@ -109,7 +109,7 @@
             <section>
                 <title>Complete List of Issues Addressed in this Release</title>
                 <ul>
-                    [TODO]
+                    [TODO: complete]
                 </ul>
                 <!--
 Request to extract bugs from SourceForge with http://www.orbeon.com/ops/xquery-the-web/ :
@@ -131,9 +131,6 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
 
                 -->
                 <ul>
-                    <li>
-                        [TODO: complete]
-                    </li>
                     <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306937&amp;group_id=168&amp;atid=350207">#306937:
                             theme-plain.xsl must not refer to orbeon.css

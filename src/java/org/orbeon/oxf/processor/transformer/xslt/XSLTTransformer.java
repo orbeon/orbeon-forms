@@ -328,7 +328,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
              * configKey        -> uriReferences
              * uriReferencesKey -> transformer
              */
-            private TemplatesInfo createTransformer(PipelineContext context, String transformerClass, Map attributes) {
+            private TemplatesInfo createTransformer(PipelineContext pipelineContext, String transformerClass, Map attributes) {
                 StringErrorListener errorListener = new StringErrorListener(logger);
                 final StylesheetForwardingContentHandler topStylesheetContentHandler = new StylesheetForwardingContentHandler();
                 try {
@@ -340,7 +340,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         final SAXSource stylesheetSAXSource;
                         {
                             xsltContentHandlers.add(topStylesheetContentHandler);
-                            XMLReader xmlReader = new ProcessorOutputXMLReader(context, getInputByName(INPUT_CONFIG).getOutput()) {
+                            XMLReader xmlReader = new ProcessorOutputXMLReader(pipelineContext, getInputByName(INPUT_CONFIG).getOutput()) {
                                 public void setContentHandler(ContentHandler handler) {
                                     super.setContentHandler(new TeeContentHandler(Arrays.asList(new Object[]{
                                             topStylesheetContentHandler, handler})));
@@ -350,16 +350,17 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         // Put listener in context that will be called by URI resolved
-                        context.setAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER, new URIResolverListener() {
+                        pipelineContext.setAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER, new URIResolverListener() {
                             public ContentHandler getContentHandler() {
                                 StylesheetForwardingContentHandler contentHandler = new StylesheetForwardingContentHandler();
                                 xsltContentHandlers.add(contentHandler);
                                 return contentHandler;
                             }
                         });
-                        templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener,
-                                new TransformerURIResolver(XSLTTransformer.this, context, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
-                        TransformerUtils.removeURIResolverListener();
+                        final TransformerURIResolver uriResolver
+                                = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE);
+                        templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener, uriResolver);
+                        uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;
                         templatesInfo.systemId = topStylesheetContentHandler.getSystemId();
                     }
@@ -379,14 +380,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         // Put in cache: configKey -> uriReferences
-                        KeyValidity configKeyValidty = getInputKeyValidity(context, INPUT_CONFIG);
+                        KeyValidity configKeyValidty = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
                         if (configKeyValidty != null)
-                            ObjectCache.instance().add(context, configKeyValidty.key, configKeyValidty.validity, uriReferences);
+                            ObjectCache.instance().add(pipelineContext, configKeyValidty.key, configKeyValidty.validity, uriReferences);
 
                         // Put in cache: (configKey, uriReferences.stylesheetReferences) -> transformer
-                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(context, configKeyValidty, uriReferences);
+                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidty, uriReferences);
                         if (stylesheetKeyValidity != null)
-                            ObjectCache.instance().add(context, stylesheetKeyValidity.key, stylesheetKeyValidity.validity, templatesInfo);
+                            ObjectCache.instance().add(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity, templatesInfo);
                     }
 
                     return templatesInfo;

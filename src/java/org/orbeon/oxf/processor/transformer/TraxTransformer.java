@@ -107,7 +107,6 @@ public class TraxTransformer extends ProcessorImpl {
                         // TODO: If we were to use setURIResolver(), be careful to null it afterwards so that no ref to TransformerURIResolver occurs
                         templatesHandler = transformerFactory.newTemplatesHandler();
 
-
                         // Create template
                         readInputAsSAX(context, configInput, templatesHandler);
                         templates = templatesHandler.getTemplates();

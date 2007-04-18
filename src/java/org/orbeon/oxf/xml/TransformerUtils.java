@@ -136,23 +136,6 @@ public class TransformerUtils {
         }
     }
 
-    private static Map listeners = Collections.synchronizedMap(new HashMap());
-
-    public static interface URIResolverListener {
-        public void startResolving(String href, String base);
-        public ContentHandler getContentHandler();
-        public ProcessorInput getInputByName(String name);
-
-    }
-
-    public static void setURIResolverListener(URIResolverListener listener) {
-        listeners.put(Thread.currentThread(), listener);
-    }
-
-    public static void removeURIResolverListener() {
-        listeners.remove(Thread.currentThread());
-    }
-
     public static Transformer getXMLIdentityTransformer() {
         try {
             Transformer transformer = getIdentityTransformer();

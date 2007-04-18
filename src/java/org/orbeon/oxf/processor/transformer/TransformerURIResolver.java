@@ -128,4 +128,16 @@ public class TransformerURIResolver implements URIResolver {
     protected boolean isHandleXInclude() {
         return handleXInclude;
     }
+
+    /**
+     * Make sure this resolver no longer keeps references to foreign objects.
+     *
+     * This is useful when a resolver is used for example by a Saxon PreparedStylesheet and we can't remove the
+     * reference PreparedStylesheet has on the resolver.
+     */
+    public void destroy() {
+        this.processor = null;
+        this.pipelineContext = null;
+        this.prohibitedInput = null;
+    }
 }

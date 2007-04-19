@@ -1208,36 +1208,29 @@ ORBEON.xforms.Events = {
                 control.value += node.data.value;
             }
         }
-        // Always do this, as we can't detect yet focus/blur events on trees
-        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
-            xformsValueChanged(control);
     },
 
     /**
-     * xforms:select tree: handle click on label
+     * xforms:select and xforms:select tree: handle click on label
      */
-    treeSelectSelect: function(id, value) {
-        var control = ORBEON.util.Dom.getElementById(id);
-        var yuiTree = ORBEON.xforms.Globals.treeYui[control.id];
-        var yuiNode = yuiTree.getNodeByProperty("value", value);
+    treeLabelClick: function(node) {
+        var yuiTree = this;
+        var control = document.getElementById(yuiTree.id);
+        var allowMultipleSelection = ORBEON.util.Dom.hasClass(control, "xforms-select");
+        if (allowMultipleSelection) {
+            // If checked uncheck, if unchecked check
+            if (node.checked) {
+                node.uncheck();
+            } else {
+                node.check();
+            }
 
-        // If checked uncheck, if unchecked check
-        if (yuiNode.checked) {
-            yuiNode.uncheck();
+            // Call listener on check event
+            node.onCheckClick();
+
         } else {
-            yuiNode.check();
+            control.value = node.data.value;
         }
-
-        // Call listener on check event
-        yuiNode.onCheckClick();
-    },
-
-    /**
-     * xforms:select1 tree: handle click on label
-     */
-    treeSelect1Select: function(id, value) {
-        var control = ORBEON.util.Dom.getElementById(id);
-        control.value = value;
         // Always do this, as we can't detect yet focus/blur events on trees
         //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
             xformsValueChanged(control);
@@ -1519,12 +1512,7 @@ ORBEON.xforms.Init = {
             var value = childArray[1];
             var selected = childArray[2];
             // Create node and add to tree
-            var nodeInformation = { label: name, value: value, href: "javascript:ORBEON.xforms.Events.treeSelect"
-                + (tree.xformsAllowMultipleSelection ? "" : 1)
-                + "Select('"
-                + tree.id + "', '"
-                + value.replace(XFORMS_REGEXP_SINGLE_QUOTE, "\\'")
-                + "')" };
+            var nodeInformation = { label: name, value: value };
             var childNode;
             if (tree.xformsAllowMultipleSelection) {
                 childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
@@ -1570,6 +1558,8 @@ ORBEON.xforms.Init = {
                 }
             }
         }
+        // Register event handler for click on label
+        yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         // Save value in tree
         tree.previousValue = tree.value;
         yuiTree.draw();

@@ -1817,7 +1817,9 @@ YAHOO.extend(YAHOO.widget.TextNode, YAHOO.widget.Node, {
         sb[sb.length] = '<a';
         sb[sb.length] = ' id="' + this.labelElId + '"';
         sb[sb.length] = ' class="' + this.labelStyle + '"';
-        sb[sb.length] = ' href="' + this.href + '"';
+        // avernet 2007-04-19
+        // Would be nice to have an option to disable the href         
+        //sb[sb.length] = ' href="' + this.href + '"';
         sb[sb.length] = ' target="' + this.target + '"';
         sb[sb.length] = ' onclick="return ' + getNode + '.onLabelClick(' + getNode +')"';
         if (this.hasChildren(true)) {

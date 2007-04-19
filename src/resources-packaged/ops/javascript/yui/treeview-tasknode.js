@@ -239,14 +239,20 @@ YAHOO.extend(YAHOO.widget.TaskNode, YAHOO.widget.TextNode, {
         sb[sb.length] = ' class="' + this.getCheckStyle() + '"';
         sb[sb.length] = ' onclick="javascript:' + this.getCheckLink() + '">';
         sb[sb.length] = '&#160;</td>';
-        
+
+        // avernet 2007-04-18
+        var getNode = 'YAHOO.widget.TreeView.getNode(\'' +
+                        this.tree.id + '\',' + this.index + ')';
 
         sb[sb.length] = '<td>';
         sb[sb.length] = '<a';
         sb[sb.length] = ' id="' + this.labelElId + '"';
         sb[sb.length] = ' class="' + this.labelStyle + '"';
-        sb[sb.length] = ' href="' + this.href + '"';
+        // avernet 2007-04-19
+        //sb[sb.length] = ' href="' + this.href + '"';
         sb[sb.length] = ' target="' + this.target + '"';
+        // avernet 2007-04-18
+        sb[sb.length] = ' onclick="return ' + getNode + '.onLabelClick(' + getNode +')"';
         if (this.hasChildren(true)) {
             sb[sb.length] = ' onmouseover="document.getElementById(\'';
             sb[sb.length] = this.getToggleElId() + '\').className=';

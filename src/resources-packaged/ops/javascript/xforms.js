@@ -1208,6 +1208,9 @@ ORBEON.xforms.Events = {
                 control.value += node.data.value;
             }
         }
+        // Always do this, as we can't detect yet focus/blur events on trees
+        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+            xformsValueChanged(control);
     },
 
     /**
@@ -1230,10 +1233,10 @@ ORBEON.xforms.Events = {
 
         } else {
             control.value = node.data.value;
+            // Always do this, as we can't detect yet focus/blur events on trees
+            //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+                xformsValueChanged(control);
         }
-        // Always do this, as we can't detect yet focus/blur events on trees
-        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
-            xformsValueChanged(control);
     }
 };
 

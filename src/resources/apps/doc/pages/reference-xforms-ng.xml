@@ -3524,7 +3524,7 @@
                 </section>
                 <a name="submission-show-progress"/>
                 <section>
-                    <title>XForms Submission - Loading Indicator</title>
+                    <title>XForms Submission/Load - Loading Indicator</title>
                     <p>
                         When an <code>xforms:submission</code> with <code>replace="all"</code> is executed, in general,
                         the browser will load another page. While this happens, the loading indicator, by default shown
@@ -3547,6 +3547,18 @@
                     <xml-source show-namespaces="false">
                         <xforms:load xxforms:show-progress="false"/>
                     </xml-source>
+                </section>
+                <a name="submission-target"/>
+                <section>
+                    <title>XForms Submission/Load - Target</title>
+                    <p>
+                        You can use the <code>xxforms:target</code> attribute on both <code>xforms:submission</code> and
+                        <code>xforms:load</code>. It behaves just like the <a
+                        href="http://www.w3.org/TR/html401/present/frames.html#adef-target">HTML target attribute</a>.
+                        When used on <code>xforms:submission</code>, it makes sense to use this attribute only when you
+                        have a <code>replace="all"</code>, as the <code>replace="instance"</code> doesn't load another
+                        page.
+                    </p>
                 </section>
                 <a name="xxforms-script-extension"/>
                 <section>

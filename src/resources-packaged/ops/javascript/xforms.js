@@ -797,7 +797,8 @@ ORBEON.xforms.Events = {
                 var previousDOMFocusOut = ORBEON.xforms.Globals.previousDOMFocusOut;
                 if (previousDOMFocusOut) {
                     if (previousDOMFocusOut != target) {
-                        // HTML area and trees does not throw value change event, so we throw it on blur
+                        // HTML area and trees does not throw value change event, so we send the value change to the server
+                        // when we get the focus on the next control
                         if (ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-textarea")
                                 && ORBEON.util.Dom.hasClass(previousDOMFocusOut, "xforms-mediatype-text-html")) {
                             // To-do: would be nice to use the ORBEON.xforms.Controls.getCurrentValue() so we don't dupplicate the code here
@@ -831,8 +832,6 @@ ORBEON.xforms.Events = {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
             var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
             if (target != null) {
-                // Save id of the control that received blur last
-                ORBEON.xforms.Globals.lastBlurControlId = target.id;
                 // De-activate hint if we found one
                 ORBEON.xforms.Controls.hintActive(target, false);
                 // This is an event for an XForms control
@@ -1168,7 +1167,7 @@ ORBEON.xforms.Events = {
         calendar.hide();
     },
 
-    sliderValueChange: function (offset) {
+    sliderValueChange: function(offset) {
         // Notify server that value changed
         var rangeControl = ORBEON.util.Dom.getElementById(this.id);
         rangeControl.value = offset / 200;
@@ -1178,7 +1177,7 @@ ORBEON.xforms.Events = {
     /**
      * Called by the YUI menu library when a click happens a menu entry.
      */
-    menuClick: function(eventType, arguments, userObject) {
+    menuClick: function (eventType, arguments, userObject) {
         var menu = userObject["menu"];
         var value = userObject["value"];
         xformsFireEvents([xformsCreateEventArray(menu, "xxforms-value-change-with-focus-change", value)], false);
@@ -1195,11 +1194,33 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * What we need to do when there is a click on a tree (select and select1)
+     */
+    treeClickFocus: function(control) {
+        var isIncremental = ORBEON.util.Dom.hasClass(control, "xforms-incremental");
+        if (ORBEON.xforms.Globals.lastFocusControlId != control.id) {
+            // We are comming from another control, simulate a focus on this control
+            var focusEvent = { target: control };
+            ORBEON.xforms.Events.focus(focusEvent);
+        }
+        // Preemptively store current control in previousDOMFocusOut, so when another control gets
+        // the focus it will send the value of this control to the server
+        ORBEON.xforms.Globals.previousDOMFocusOut = control;
+    },
+
+    treeClickValueUpdated: function(control) {
+        // If we are in incremental mode, send value to the server on every click
+//        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+            xformsValueChanged(control);
+    },
+
+    /**
      * xforms:select tree: handle click on check box
      */
     treeCheckClick: function() {
         var tree = this.tree;
         var control = ORBEON.util.Dom.getElementById(tree.id);
+        ORBEON.xforms.Events.treeClickFocus(control);
         control.value = "";
         for (nodeIndex in tree._nodes) {
             var node = tree._nodes[nodeIndex];
@@ -1208,9 +1229,7 @@ ORBEON.xforms.Events = {
                 control.value += node.data.value;
             }
         }
-        // Always do this, as we can't detect yet focus/blur events on trees
-        //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
-            xformsValueChanged(control);
+        ORBEON.xforms.Events.treeClickValueUpdated(control);
     },
 
     /**
@@ -1232,10 +1251,9 @@ ORBEON.xforms.Events = {
             node.onCheckClick();
 
         } else {
+            ORBEON.xforms.Events.treeClickFocus(control);
             control.value = node.data.value;
-            // Always do this, as we can't detect yet focus/blur events on trees
-            //if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
-                xformsValueChanged(control);
+            ORBEON.xforms.Events.treeClickValueUpdated(control);
         }
     }
 };
@@ -1779,7 +1797,7 @@ ORBEON.xforms.Server = {
                     var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
                     if (event.eventName == "xxforms-value-change-with-focus-change") {
                         // Don't send change value if there is already a change value for the same control
-                        if (!seenControlValue[event.targetId] == true) {
+                        if (seenControlValue[event.targetId] == null) {
                             seenControlValue[event.targetId] = true;
                             // Don't send change value if the server already knows about the value of this control
                             if (ORBEON.util.Dom.hasClass(ORBEON.util.Dom.getElementById(event.targetId), "xforms-upload") ||

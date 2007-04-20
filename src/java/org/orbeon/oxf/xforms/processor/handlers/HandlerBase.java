@@ -244,10 +244,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl) {
-        return getInitialClasses(controlName, controlAttributes, xformsControl, null);
+        return getInitialClasses(controlName, controlAttributes, xformsControl, null, false);
     }
 
-    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance) {
+    protected StringBuffer getInitialClasses(String controlName, Attributes controlAttributes, XFormsControl xformsControl, QName appearance, boolean incrementalDefault) {
 
         // Control name
         final StringBuffer sb;
@@ -262,7 +262,9 @@ public abstract class HandlerBase extends ElementHandlerNew {
         {
             // Class for incremental mode
             final String value = controlAttributes.getValue("incremental");
-            if ("true".equals(value)) {
+            // Set the class if the default is non-incremental and the user explicitly set the value to true, or the
+            // default is incremental and the user did not explicitly set it to false
+            if ((!incrementalDefault && "true".equals(value)) || (incrementalDefault && !"false".equals(value))) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-incremental");

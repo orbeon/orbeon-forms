@@ -113,7 +113,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         {
-            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsSelect1Control, appearance);
+            final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsSelect1Control, appearance, true); // incremental mode is the default
 
             if (isOpenSelection)
                 classes.append(" xforms-select1-open");

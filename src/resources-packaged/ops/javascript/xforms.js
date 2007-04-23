@@ -1210,7 +1210,7 @@ ORBEON.xforms.Events = {
 
     treeClickValueUpdated: function(control) {
         // If we are in incremental mode, send value to the server on every click
-//        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
+        if (ORBEON.util.Dom.hasClass(control, "xforms-incremental"))
             xformsValueChanged(control);
     },
 

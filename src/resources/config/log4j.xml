@@ -108,9 +108,9 @@
         <priority value="info"/>
         <!--<appender-ref ref="ConsoleAppender"/>-->
         <!--<appender-ref ref="ChainsawAppender"/>-->
-        <!--<appender-ref ref="SingleFileAppender"/>-->
+        <appender-ref ref="SingleFileAppender"/>
         <!--<appender-ref ref="RollingFileAppender"/>-->
-        <appender-ref ref="OPSMonitor"/>
+        <!--<appender-ref ref="OPSMonitor"/>-->
     </root>
 
 </log4j:configuration>

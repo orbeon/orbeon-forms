@@ -160,10 +160,20 @@
                             the Orbeon Forms code has dependencies on those libraries.
                         </li>
                         <li>
-                            Setup your IDE to compile the files in <code>src/java</code> with the
-                            exclusion of files in the following packages:
-                            <code>orb.orbeon.faces</code>, <code>org.orbeon.faces11</code>, and
-                            <code>org.orbeon.oxf.processor.bpel</code>.
+                            Setup your IDE to compile the files in <code>src/java</code>. Exclude all the
+                            classes in the following packages:
+                            <ul>
+                                <li><code>orb.orbeon.faces</code></li>
+                                <li><code>org.orbeon.faces11</code></li>
+                                <li><code>org.orbeon.oxf.processor.bpel</code></li>
+                            </ul>
+                            Also exclude the following classes:
+                            <ul>
+                                <li><code>org.orbeon.oxf.resources.CacheImport</code></li>
+                                <li><code>org.orbeon.oxf.resources.CacheResourceManagerFactory</code></li>
+                                <li><code>org.orbeon.oxf.resources.CacheResourceManagerImpl</code></li>
+                                <li><code>org.orbeon.oxf.resources.XMLDBImport</code></li>
+                            </ul>
                         </li>
                     </ul>
                 </li>

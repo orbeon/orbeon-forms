@@ -22,7 +22,7 @@
     </p:processor>
     
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+        <p:input name="config" href="oxf:/config/deprecated/xforms-to-xhtml.xsl"/>
         <p:input name="model" href="#model"/>
         <p:input name="instance" href="#instance"/>
         <p:input name="data" href="#annotated-data"/>

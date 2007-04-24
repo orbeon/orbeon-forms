@@ -46,7 +46,7 @@
             </p:processor>
             <!-- Transform annotated XForms to XHTML -->
             <p:processor name="oxf:unsafe-xslt">
-                <p:input name="config" href="/config/xforms-to-xhtml.xsl"/>
+                <p:input name="config" href="/config/deprecated/xforms-to-xhtml.xsl"/>
                 <p:input name="model" href="#xforms-model"/>
                 <p:input name="instance" href="#instance"/>
                 <p:input name="data" href="#annotated-data"/>
@@ -89,6 +89,11 @@
                         <p:output name="data" id="widgeted-view"/>
                     </p:processor>
 
+                    <!--<p:processor name="oxf:sax-logger">-->
+                        <!--<p:input name="data" href="#widgeted-view"/>-->
+                        <!--<p:output name="data" id="widgeted-view2"/>-->
+                    <!--</p:processor>-->
+
                     <!-- Get current namespace to enable caching per portlet only -->
                     <p:processor name="oxf:request">
                         <p:input name="config">
@@ -102,7 +107,8 @@
                     <!-- Annotate elements in view with ids -->
                     <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
-                        <!--<p:input name="data" href="#data"/>-->
+                        <!--<p:input name="data" href="#widgeted-view2"/>-->
+                        <p:input name="data" href="#data"/>
                         <p:input name="namespace" href="#namespace"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>

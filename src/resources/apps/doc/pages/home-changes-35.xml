@@ -132,6 +132,49 @@ http://forge.objectweb.org/tracker/index.php?set=custom&_assigned_to=0&_status=2
                 -->
                 <ul>
                     <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306960&amp;group_id=168&amp;atid=350207">#306960:
+                            RFE: XSLT transformer should leverage Saxon input document location information
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306959&amp;group_id=168&amp;atid=350207">#306959:
+                            SAXStore only keeps track of a single system ID per document
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306958&amp;group_id=168&amp;atid=350207">#306958:
+                            XInclude processor does not adjust system ID in output locator
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306957&amp;group_id=168&amp;atid=350207">#306957:
+                            Dialog: cursor now showing in text fields on Firefox when multiple dialog in the same page
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306728&amp;group_id=168&amp;atid=350207">#306728:
+                            Tree shouldn't send Ajax requests as you click on it, unless incremental mode is set
+                        </a>
+
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306950&amp;group_id=168&amp;atid=350207">#306950:
+                            XForms: document xxforms:target
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306942&amp;group_id=168&amp;atid=350207">#306942:
+                            XSLT Templates object still indirectly refers to some PipelineContext objects
+                        </a>
+                    </li>
+                    <li>
+
+                        <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306919&amp;group_id=168&amp;atid=350207">#306919:
+                            Submission: can't use serialize="false" with method="post"
+                        </a>
+                    </li>
+                    <li>
                         <a href="http://forge.objectweb.org//tracker/index.php?func=detail&amp;aid=306937&amp;group_id=168&amp;atid=350207">#306937:
                             theme-plain.xsl must not refer to orbeon.css
                         </a>

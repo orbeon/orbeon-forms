@@ -793,7 +793,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } else {
                             // Error code received
                             submitErrorEvent = createErrorEvent(connectionResult);
-                            throw new OXFException("Error code received when submitting instance: " + connectionResult.resultCode);
+                            throw new OXFException("xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.resultCode);
                         }
                     }
                 } finally {

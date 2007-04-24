@@ -28,6 +28,7 @@ import org.xml.sax.*;
 
 import javax.xml.transform.sax.SAXSource;
 import java.util.Enumeration;
+import java.util.Stack;
 
 /**
  * XInclude processor.
@@ -85,7 +86,8 @@ public class XIncludeProcessor extends ProcessorImpl {
         private String xmlBase;
         private NamespaceSupport3 parentNamespaceSupport;
 
-        private Locator locator;
+        private Locator currentLocator;
+        private OutputLocator outputLocator;
         private TransformerURIResolver uriResolver;
         private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
@@ -96,14 +98,14 @@ public class XIncludeProcessor extends ProcessorImpl {
         private boolean generateXMLBase;
 
         public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true);
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null, true, new OutputLocator());
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase) {
-            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport, generateXMLBase);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport3 parentNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, parentNamespaceSupport, generateXMLBase, outputLocator);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIProcessorOutputImpl.URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport3 paremtNamespaceSupport, boolean generateXMLBase, OutputLocator outputLocator) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
             this.uriReferences = uriReferences;
@@ -112,18 +114,25 @@ public class XIncludeProcessor extends ProcessorImpl {
             this.xmlBase = xmlBase;
             this.parentNamespaceSupport = paremtNamespaceSupport;
             this.generateXMLBase = generateXMLBase;
+            this.outputLocator = outputLocator;
         }
 
         public void startDocument() throws SAXException {
+            // Update locator stack
+            outputLocator.pushLocator(currentLocator);
+            // Make sure only once startDocument() is produced
             if (topLevelContentHandler) {
                 super.startDocument();
             }
         }
 
         public void endDocument() throws SAXException {
+            // Make sure only once endDocument() is produced
             if (topLevelContentHandler) {
                 super.endDocument();
             }
+            // Restore locator stack
+            outputLocator.popLocator();
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -145,7 +154,7 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                 // Warn upon obsolete namespace URI
                 if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
-                    logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(locator).toString());
+                    logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(outputLocator).toString());
 
                 if ("include".equals(localname)) {
                     // Start inclusion
@@ -163,14 +172,14 @@ public class XIncludeProcessor extends ProcessorImpl {
                     }
 
                     if (parse != null && !parse.equals("xml"))
-                        throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(locator));
+                        throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator));
 
                     try {
                         // Get SAXSource
-                        final String base = locator == null ? null : locator.getSystemId();
+                        final String base = outputLocator == null ? null : outputLocator.getSystemId();
                         final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
                         final XMLReader xmlReader = source.getXMLReader();
-                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase));
+                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport, generateXMLBase, outputLocator));
 
                         // Keep URI reference
                         if (uriReferences != null)
@@ -187,7 +196,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 } else if ("fallback".equals(localname)) {
                     // TODO
                 } else {
-                    throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(locator));
+                    throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(outputLocator));
                 }
 
             } else if (includeLevel != -1 && level == includeLevel) {
@@ -296,8 +305,62 @@ public class XIncludeProcessor extends ProcessorImpl {
         }
 
         public void setDocumentLocator(Locator locator) {
-            this.locator = locator;
-            super.setDocumentLocator(locator);
+
+            // Keep track of current locator
+            this.currentLocator = locator;
+
+            // Set output locator to be our own locator if we are at the top-level
+            if (topLevelContentHandler) {
+                super.setDocumentLocator(outputLocator);
+            }
+        }
+    }
+
+    /**
+     * This is the Locator object passed to the output. It supports a stack of input Locator objects in order to
+     * correctly report location information of the included documents.
+     */
+    private static class OutputLocator implements Locator {
+
+        private Stack locators = new Stack();
+
+        public OutputLocator() {
+        }
+
+        public void pushLocator(Locator locator) {
+            locators.push(locator);
+        }
+
+        public void popLocator() {
+            locators.pop();
+        }
+
+        public String getPublicId() {
+            if (locators.size() == 0)
+                return null;
+            else
+                return ((Locator) locators.peek()).getPublicId();
+        }
+
+        public String getSystemId() {
+            if (locators.size() == 0)
+                return null;
+            else
+                return ((Locator) locators.peek()).getSystemId();
+        }
+
+        public int getLineNumber() {
+            if (locators.size() == 0)
+                return -1;
+            else
+                return ((Locator) locators.peek()).getLineNumber();
+        }
+
+        public int getColumnNumber() {
+            if (locators.size() == 0)
+                return -1;
+            else
+                return ((Locator) locators.peek()).getColumnNumber();
         }
     }
 }

@@ -108,7 +108,7 @@
                     <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
                         <!--<p:input name="data" href="#widgeted-view2"/>-->
-                        <p:input name="data" href="#data"/>
+                        <!--<p:input name="data" href="#data"/>-->
                         <p:input name="namespace" href="#namespace"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>

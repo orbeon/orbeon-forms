@@ -17,7 +17,7 @@
  */
 var XFORMS_DELAY_BEFORE_INCREMENTAL_REQUEST_IN_MS = 500;
 var XFORMS_DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_IN_MS = 2000;
-var XFORMS_DELAY_BEFORE_ANY_REQUEST_IN_MS = 10;
+var XFORMS_INTERNAL_SHORT_DELAY_IN_MS = 10;
 var XFORMS_DELAY_BEFORE_DISPLAY_LOADING_IN_MS = 500;
 var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
@@ -1717,6 +1717,9 @@ ORBEON.xforms.Init = {
         });
         yuiDialog.beforeHideEvent.subscribe(ORBEON.xforms.Events.dialogClose, dialog.id);
         yuiDialog.render();
+        // We hide the dialog as it otherwise interfers with other dialogs, preventing
+        // the cursor from showing in input fields of other dialogs
+        yuiDialog.element.style.display = "none";
         ORBEON.xforms.Globals.dialogs[dialog.id] = yuiDialog;
     }
 };
@@ -1774,7 +1777,7 @@ ORBEON.xforms.Server = {
             // The small delay is here so we don't send multiple requests to the server when the
             // browser gives us a sequence of events (e.g. focus out, change, focus in).
             window.setTimeout(function() { ORBEON.xforms.Server.executeNextRequest(true); },
-                XFORMS_DELAY_BEFORE_ANY_REQUEST_IN_MS);
+                XFORMS_INTERNAL_SHORT_DELAY_IN_MS);
         }
         return false;
     },
@@ -2692,8 +2695,15 @@ ORBEON.xforms.Server = {
                                                 }
                                             } else {
                                                 // This is a dialog
-                                                if (visibile) yuiDialog.show();
-                                                else yuiDialog.hide();
+                                                if (visibile)  {
+                                                    yuiDialog.show();
+                                                    // Fixes cursor Firefox issue; more on this in dialog init code
+                                                    yuiDialog.element.style.display = "block";
+                                                } else {
+                                                    yuiDialog.hide();
+                                                    // Fixes cursor Firefox issue; more on this in dialog init code
+                                                    yuiDialog.element.style.display = "none";
+                                                }
                                             }
                                         }
                                     }

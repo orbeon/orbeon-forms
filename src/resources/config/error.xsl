@@ -38,9 +38,8 @@
         <html>
             <head>
                 <title><xsl:value-of select="$title"/></title>
-            </head>
-            <body>
-                <script>
+                <link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
+                <script type="text/javascript">
                     function hideShowTBody(id) {
                         var tbody = document.getElementById(id);
                         for (var i = 0; tbody.rows.length > i; i++) {
@@ -50,6 +49,8 @@
                         }
                     }
                 </script>
+            </head>
+            <body>
                 <div class="maincontent">
                     <h1><xsl:value-of select="$title"/></h1>
                     <h2>Error Message</h2>

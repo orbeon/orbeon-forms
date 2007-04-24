@@ -53,7 +53,7 @@ public class XIncludeProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(final String name) {
         final ProcessorOutput output = new URIProcessorOutputImpl(XIncludeProcessor.this, name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
-//                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
+//                final ContentHandler debugContentHandler = new SAXLoggerProcessor.DebugContentHandler(contentHandler);
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
 
                 // Try to cache URI references

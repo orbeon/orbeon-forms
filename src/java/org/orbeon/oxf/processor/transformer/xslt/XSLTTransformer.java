@@ -33,9 +33,13 @@ import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.event.SaxonOutputKeys;
+import org.orbeon.saxon.event.ContentHandlerProxyLocator;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NamePool;
+import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.trans.IndependentContext;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.type.ItemType;
@@ -46,6 +50,7 @@ import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
@@ -64,6 +69,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     public static final String XSLT_URI = "http://www.w3.org/1999/XSL/Transform";
     public static final String XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-transformer-config";
     public static final String XSLT_PREFERENCES_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-preferences-config";
+
+    private static final String GENERATE_SOURCE_LOCATION_PROPERTY = "generate-source-location";
+    private static final boolean GENERATE_SOURCE_LOCATION_DEFAULT = false;
 
     // This input determines the JAXP transformer factory class to use
     private static final String INPUT_TRANSFORMER = "transformer";
@@ -125,12 +133,15 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     // Create transformer handler and set output writer for Saxon
                     StringWriter saxonStringWriter = null;
-                    StringErrorListener errorListener = new StringErrorListener(logger);
+                    final StringErrorListener errorListener = new StringErrorListener(logger);
                     transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
 
-                    transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
-                    transformerHandler.getTransformer().setErrorListener(errorListener);
-                    String transformerClassName = transformerHandler.getTransformer().getClass().getName();
+                    final Transformer transformer = transformerHandler.getTransformer();
+                    transformer.setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
+                    transformer.setErrorListener(errorListener);
+                    transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
+
+                    final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
                         saxonStringWriter = new StringWriter();
                         Object saxonTransformer = transformerHandler.getTransformer();
@@ -144,10 +155,43 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
 
-                    final LocationData locationData = getLocationData();
+                    // Whether to obtain source location data whenever possible
+                    final boolean isGenerateSourceLocation = getPropertySet().getBoolean(GENERATE_SOURCE_LOCATION_PROPERTY, GENERATE_SOURCE_LOCATION_DEFAULT).booleanValue();
+
+                    // Fallback location data
+                    final LocationData processorLocationData = getLocationData();
+
+                    // Output filter to fix-up SAX stream and handle location data if needed
                     final SAXResult saxResult = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
 
-                        private Locator locator;
+                        private Locator inputLocator;
+                        private OutputLocator outputLocator;
+                        private Stack startElementLocationStack;
+
+                        class OutputLocator implements Locator {
+
+                            private LocationData currentLocationData;
+
+                            public String getPublicId() {
+                                return (currentLocationData != null) ? currentLocationData.getPublicID() : inputLocator.getPublicId();
+                            }
+
+                            public String getSystemId() {
+                                return (currentLocationData != null) ? currentLocationData.getSystemID() : inputLocator.getSystemId();
+                            }
+
+                            public int getLineNumber() {
+                                return (currentLocationData != null) ? currentLocationData.getLine() : inputLocator.getLineNumber();
+                            }
+
+                            public int getColumnNumber() {
+                                return (currentLocationData != null) ? currentLocationData.getCol() : inputLocator.getColumnNumber();
+                            }
+
+                            public void setLocationData(LocationData locationData) {
+                                this.currentLocationData = locationData;
+                            }
+                        }
 
                         // Saxon happens to issue such prefix mappings from time to time. Those
                         // cause issues later down the chain, and anyway serialize to incorrect XML
@@ -163,13 +207,22 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         public void setDocumentLocator(final Locator locator) {
-                            this.locator = locator;
+                            this.inputLocator = locator;
+                            if (isGenerateSourceLocation) {
+                                this.outputLocator = new OutputLocator();
+                                this.startElementLocationStack = new Stack();
+                                super.setDocumentLocator(this.outputLocator);
+                            } else {
+                                super.setDocumentLocator(this.inputLocator);
+                            }
                         }
 
                         public void startDocument() throws SAXException {
-                            if ((locator == null || locator.getSystemId() == null) && locationData != null) {
-                                final Locator loc = new ConstantLocator(locationData);
-                                super.setDocumentLocator(loc);
+                            // Try to set fallback Locator
+                            if (((outputLocator != null && outputLocator.getSystemId() == null) || (inputLocator != null && inputLocator.getSystemId() == null))
+                                    && processorLocationData != null) {
+                                final Locator locator = new ConstantLocator(processorLocationData);
+                                super.setDocumentLocator(locator);
                             }
                             super.startDocument();
                         }
@@ -182,11 +235,88 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                             super.endDocument();
                         }
+
+                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                            if (outputLocator != null) {
+                                final LocationData locationData = findSourceElementLocationData(uri, localname);
+                                outputLocator.setLocationData(locationData);
+                                startElementLocationStack.push(locationData);
+                                super.startElement(uri, localname, qName, attributes);
+                                outputLocator.setLocationData(null);
+                            } else {
+                                super.startElement(uri, localname, qName, attributes);
+                            }
+                        }
+
+
+                        public void endElement(String uri, String localname, String qName) throws SAXException {
+                            if (outputLocator != null) {
+                                // Here we do a funny thing: since Saxon does not provide location data on endElement(), we use that of startElement()
+                                final LocationData locationData = (LocationData) startElementLocationStack.peek();
+                                outputLocator.setLocationData(locationData);
+                                super.endElement(uri, localname, qName);
+                                outputLocator.setLocationData(null);
+                                startElementLocationStack.pop();
+                            } else {
+                                super.endElement(uri, localname, qName);
+                            }
+                        }
+
+                        public void characters(char[] chars, int start, int length) throws SAXException {
+                            if (outputLocator != null) {
+                                final LocationData locationData = findSourceCharacterLocationData();
+                                outputLocator.setLocationData(locationData);
+                                super.characters(chars, start, length);
+                                outputLocator.setLocationData(null);
+                            } else {
+                                super.characters(chars, start, length);
+                            }
+                        }
+
+                        private LocationData findSourceElementLocationData(String uri, String localname) {
+                            if (inputLocator instanceof ContentHandlerProxyLocator) {
+                                final Stack stack = ((ContentHandlerProxyLocator) inputLocator).getContextItemStack();
+
+                                for (int i = stack.size() - 1; i >= 0; i--) {
+                                    final Item currentItem = (Item) stack.get(i);
+                                    if (currentItem instanceof NodeInfo) {
+                                        final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE
+                                                && currentNodeInfo.getLocalPart().equals(localname)
+                                                && currentNodeInfo.getURI().equals(uri)) {
+                                            // Very probable match...
+                                            return new LocationData(currentNodeInfo.getSystemId(), currentNodeInfo.getLineNumber(), -1);
+                                        }
+                                    }
+                                }
+                            }
+                            return null;
+                        }
+
+                        private LocationData findSourceCharacterLocationData() {
+                            if (inputLocator instanceof ContentHandlerProxyLocator) {
+                                final Stack stack = ((ContentHandlerProxyLocator) inputLocator).getContextItemStack();
+
+                                for (int i = stack.size() - 1; i >= 0; i--) {
+                                    final Item currentItem = (Item) stack.get(i);
+                                    if (currentItem instanceof NodeInfo) {
+                                        final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+//                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+                                            // Possible match
+                                            return new LocationData(currentNodeInfo.getSystemId(), currentNodeInfo.getLineNumber(), -1);
+//                                        }
+                                    }
+                                }
+                            }
+                            return null;
+                        }
                     });
-                    if (locationData != null) {
-                        final String sysID = locationData.getSystemID();
-                        saxResult.setSystemId(sysID);
-                        transformerHandler.setSystemId(sysID);
+
+                    if (processorLocationData != null) {
+                        final String processorSystemId = processorLocationData.getSystemID();
+                        //saxResult.setSystemId(sysID); // NOT SURE WHY WE DID THIS
+                        // TODO: use source document system ID, not stylesheet system ID
+                        transformerHandler.setSystemId(processorSystemId);
                     }
                     transformerHandler.setResult(saxResult);
 

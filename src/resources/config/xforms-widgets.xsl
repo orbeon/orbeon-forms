@@ -31,7 +31,8 @@
 
     <xsl:template match="xhtml:head">
         <xsl:copy>
-            <xsl:copy-of select="@* | node()"/>
+            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates select="node()"/>
             <xsl:if test="$has-xforms-instance-inspector">
                 <xsl:call-template name="widget:xforms-instance-inspector-model"/>
                 <xhtml:script language="Javascript" type="text/javascript">

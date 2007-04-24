@@ -399,7 +399,7 @@ public abstract class ProcessorImpl implements Processor {
 
     protected org.dom4j.Document readInputAsDOM4J(PipelineContext context, ProcessorInput input) {
         LocationSAXContentHandler ch = new LocationSAXContentHandler();
-//        readInputAsSAX(context, input, new SAXDebuggerProcessor.DebugContentHandler(ch));
+//        readInputAsSAX(context, input, new SAXLoggerProcessor.DebugContentHandler(ch));
         readInputAsSAX(context, input, ch);
         return ch.getDocument();
     }

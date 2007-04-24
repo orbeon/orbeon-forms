@@ -136,7 +136,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                         }
                     };
 
-                    //final ContentHandler _contentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
+                    //final ContentHandler _contentHandler = new SAXLoggerProcessor.DebugContentHandler(contentHandler);
                     final ContentHandler _contentHandler = contentHandler;
 
                     Handler stateContentHandler = new Handler(verifier.getVerifierHandler()) {

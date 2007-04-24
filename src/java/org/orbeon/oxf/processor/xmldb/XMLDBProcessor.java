@@ -88,7 +88,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     }
 
     protected Config getConfig(PipelineContext pipelineContext) {
-//        readInputAsSAX(pipelineContext, INPUT_CONFIG, new SAXDebuggerProcessor.DebugContentHandler(new ForwardingContentHandler(null, false)));
+//        readInputAsSAX(pipelineContext, INPUT_CONFIG, new SAXLoggerProcessor.DebugContentHandler(new ForwardingContentHandler(null, false)));
          return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_QUERY), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
                 // Use readInputAsSAX so that we can filter namespaces if needed

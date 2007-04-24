@@ -123,9 +123,9 @@ public class ProcessorUtils {
                     (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
 
                 if (saxDebug) {
-                    final SAXDebuggerProcessor debuggerProcessor = new SAXDebuggerProcessor();
-                    PipelineUtils.connect(domGenerator, "data", debuggerProcessor, "data");
-                    PipelineUtils.connect(debuggerProcessor, "data", processor, name);
+                    final SAXLoggerProcessor loggerProcessor = new SAXLoggerProcessor();
+                    PipelineUtils.connect(domGenerator, "data", loggerProcessor, "data");
+                    PipelineUtils.connect(loggerProcessor, "data", processor, name);
                 } else {
                     PipelineUtils.connect(domGenerator, "data", processor, name );
                 }

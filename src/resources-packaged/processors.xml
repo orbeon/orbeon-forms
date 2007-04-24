@@ -131,8 +131,6 @@
                 <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
                     <!-- By default, prevent usage of external functions for security purposes -->
                     <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="false"/>
-                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/linenumbering" value="true"/>
-                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/compile-with-tracing" value="true"/>
                     <!--
                     <attribute as="xs:boolean" name="http://saxon.sf.net/feature/trace-external-functions" value="false"/>
                     <attribute as="xs:boolean" name="http://saxon.sf.net/feature/timing" value="false"/>
@@ -158,8 +156,6 @@
             <input name="attributes">
                 <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
                     <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="true"/>
-                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/linenumbering" value="true"/>
-                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/compile-with-tracing" value="true"/>
                 </attributes>
             </input>
         </instantiation>

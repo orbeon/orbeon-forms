@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.FeatureKeys;
 import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.event.ContentHandlerProxyLocator;
 import org.orbeon.saxon.expr.*;
@@ -122,6 +123,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
                     }
 
+                    // Whether to obtain source location data whenever possible
+                    final boolean isGenerateSourceLocation = getPropertySet().getBoolean(GENERATE_SOURCE_LOCATION_PROPERTY, GENERATE_SOURCE_LOCATION_DEFAULT).booleanValue();
+                    if (isGenerateSourceLocation) {
+                        // Create new HashMap as we don't want to change the one in cache
+                        attributes = (attributes == null) ? new HashMap() : new HashMap(attributes);
+                        // Set attributes for Saxon source location
+                        attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
+                        attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
+                    }
+
                     // Create transformer if we did not find one in cache
                     if (templatesInfo == null) {
                         // Get transformer configuration
@@ -139,7 +150,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final Transformer transformer = transformerHandler.getTransformer();
                     transformer.setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, URLGenerator.DEFAULT_HANDLE_XINCLUDE));
                     transformer.setErrorListener(errorListener);
-                    transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
+                    if (isGenerateSourceLocation)
+                        transformer.setOutputProperty(SaxonOutputKeys.SUPPLY_SOURCE_LOCATOR, "yes");
 
                     final String transformerClassName = transformerHandler.getTransformer().getClass().getName();
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
@@ -154,9 +166,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
                         setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
-
-                    // Whether to obtain source location data whenever possible
-                    final boolean isGenerateSourceLocation = getPropertySet().getBoolean(GENERATE_SOURCE_LOCATION_PROPERTY, GENERATE_SOURCE_LOCATION_DEFAULT).booleanValue();
 
                     // Fallback location data
                     final LocationData processorLocationData = getLocationData();

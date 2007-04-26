@@ -434,6 +434,7 @@ ORBEON.xforms.Document = {
      */
     setValue: function(controlId, newValue) {
         var control = ORBEON.util.Dom.getElementById(controlId);
+        if (control == null) throw "ORBEON.xforms.Document.setValue: can't find control id '" + controlId + "'";
         xformsFireEvents(new Array(xformsCreateEventArray
                 (control, "xxforms-value-change-with-focus-change", String(newValue), null)), false);
     }

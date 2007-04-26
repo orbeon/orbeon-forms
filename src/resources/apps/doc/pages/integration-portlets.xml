@@ -173,6 +173,16 @@
             </p>
             <figure src="../apps/doc/images/portlets/liferay05.png"/>
         </section>
+        <a name="portlet-deployment-websphere-portal"/>
+        <section>
+            <title>IBM WebSphere Portal 6 Deployment</title>
+            <p>
+                It has been reported that Orbeon Forms deploys into IBM WebSphere Portal 6.
+            </p>
+            <p>
+                [TODO: Exact configuration steps.]
+            </p>
+        </section>
         <a name="portlet-configuration"/>
         <section>
             <title>Configuration</title>

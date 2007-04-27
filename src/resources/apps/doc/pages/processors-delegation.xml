@@ -258,7 +258,7 @@
 				        <p:input name="call">
 				            <delegation:execute service="stock-quote" operation="get-quote" xsl:version="2.0">
 				                <m:GetQuote xmlns:m="http://ws.cdyne.com/">
-				                    <m:StockSymbol><xsl:value-of select="/symbol"/></m:StockSymbol>
+				                    <m:StockSymbol>IBM</m:StockSymbol>
 				                    <m:LicenseKey>0</m:LicenseKey>
 				                </m:GetQuote>
 				            </delegation:execute>

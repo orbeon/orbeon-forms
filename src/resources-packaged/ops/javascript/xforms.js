@@ -2697,9 +2697,9 @@ ORBEON.xforms.Server = {
                                             } else {
                                                 // This is a dialog
                                                 if (visibile)  {
-                                                    yuiDialog.show();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code
                                                     yuiDialog.element.style.display = "block";
+                                                    yuiDialog.show();
                                                 } else {
                                                     yuiDialog.hide();
                                                     // Fixes cursor Firefox issue; more on this in dialog init code

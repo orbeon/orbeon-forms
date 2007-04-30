@@ -23,7 +23,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.tree.TreeBuilder;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -133,7 +133,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
         try {
             final SAXSource source = (SAXSource) resolve(urlString, null, username, password);
 
-            final TreeBuilder treeBuilder = new TreeBuilder();
+            final TinyBuilder treeBuilder = new TinyBuilder();
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
             identity.setResult(treeBuilder);
 

@@ -17,13 +17,12 @@ import orbeon.apache.xalan.processor.StylesheetHandler;
 import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.tree.TreeBuilder;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -278,7 +277,7 @@ public class TransformerUtils {
      * Transform a dom4j Document into a TinyTree.
      */
     public static DocumentInfo dom4jToTinyTree(Document document) {
-        final TreeBuilder treeBuilder = new TreeBuilder();
+        final TinyBuilder treeBuilder = new TinyBuilder();
         try {
             final Transformer identity = getIdentityTransformer();
             identity.transform(new LocationDocumentSource(document), treeBuilder);
@@ -343,7 +342,7 @@ public class TransformerUtils {
      * Transform a SAX Source to a TinyTree.
      */
     public static DocumentInfo readTinyTree(Source source) {
-        final TreeBuilder treeBuilder = new TreeBuilder();
+        final TinyBuilder treeBuilder = new TinyBuilder();
         try {
             final Transformer identity = getIdentityTransformer();
             identity.transform(source, treeBuilder);

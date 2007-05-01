@@ -39,6 +39,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     public static final String AUTOCOMPLETE_APPEARANCE = Dom4jUtils.qNameToexplodedQName(XFormsConstants.XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME);
 
     private boolean hasItemset;
+    private boolean itemsetsEvaluated;
     private List itemsetInfos;
 
     public XFormsSelect1Control(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String id) {
@@ -51,12 +52,18 @@ public class XFormsSelect1Control extends XFormsValueControl {
                 && (TREE_APPEARANCE.equals(appearance) || MENU_APPEARANCE.equals(appearance) || AUTOCOMPLETE_APPEARANCE.equals(appearance) || "compact".equals(appearance));
     }
 
-    public void evaluateItemsets(final PipelineContext pipelineContext) {
-        // When entering this method, binding must be on control
+    public void markItemsetDirty() {
+        itemsetsEvaluated = false;
+    }
+
+    private void evaluateItemsets(final PipelineContext pipelineContext) {
 
         hasItemset = false;
         itemsetInfos = new ArrayList();
+
+        // Set binding on this control
         final XFormsControls xformsControls = containingDocument.getXFormsControls();
+        xformsControls.setBinding(pipelineContext, this);
 
         Dom4jUtils.visitSubtree(getControlElement(), new Dom4jUtils.VisitorListener() {
 
@@ -77,7 +84,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                     hasItemset = true;
                     final int itemsetLevel = hierarchyLevel;
-                    xformsControls.pushBinding(pipelineContext, element); // when entering this method, binding must be on control
+                    xformsControls.pushBinding(pipelineContext, element);
                     {
                         final XFormsControls.BindingContext currentBindingContext = xformsControls.getCurrentBindingContext();
 
@@ -154,9 +161,13 @@ public class XFormsSelect1Control extends XFormsValueControl {
             public void text(Text text) {
             }
         });
+        itemsetsEvaluated = true;
     }
 
-    public List getItemset() {
+    public List getItemset(PipelineContext pipelineContext) {
+        if (!itemsetsEvaluated) {
+            evaluateItemsets(pipelineContext);
+        }
         return itemsetInfos;
     }
 

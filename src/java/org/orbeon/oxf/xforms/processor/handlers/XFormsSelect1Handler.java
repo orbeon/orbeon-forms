@@ -131,7 +131,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             }
         }
 
-        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset() : null;
+        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext) : null;
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         if (!isStaticReadonly(xformsSelect1Control)) {
@@ -490,7 +490,7 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
     private void outputJSONTreeInfo(XFormsSelect1Control xformsControl, boolean many, ContentHandler contentHandler) throws SAXException {
         if (xformsControl != null && !handlerContext.isGenerateTemplate()) {
             // Produce a JSON fragment with hierachical information
-            final List items = xformsControl.getItemset();
+            final List items = xformsControl.getItemset(pipelineContext);
             if (items.size() > 0) { // may be null when there is no item in the itemset
                 final String controlValue = xformsControl.getValue();
                 final StringBuffer sb = new StringBuffer();

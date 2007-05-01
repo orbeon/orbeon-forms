@@ -364,7 +364,7 @@ public class XFormsServer extends ProcessorImpl {
                             xformsControls.rebuildCurrentControlsStateIfNeeded(pipelineContext);
                             final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
-                            diffControlsState(ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            diffControlsState(pipelineContext, ch, containingDocument, testOutputAllActions ? null : xformsControls.getInitialControlsState().getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Reload / back case
@@ -373,7 +373,7 @@ public class XFormsServer extends ProcessorImpl {
                         final XFormsControls.ControlsState initialControlsState = initialContainingDocument.getXFormsControls().getCurrentControlsState();
 
                         // Output diffs
-                        diffControlsState(ch, containingDocument, initialControlsState.getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
+                        diffControlsState(pipelineContext, ch, containingDocument, initialControlsState.getChildren(), currentControlsState.getChildren(), itemsetsFull1, itemsetsFull2, null);
                     }
 
                     ch.endElement();
@@ -603,14 +603,14 @@ public class XFormsServer extends ProcessorImpl {
         return itemsetUpdate;
     }
 
-    public static void diffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void diffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
         if (XFormsUtils.isOptimizeRelevance())
-            newDiffControlsState(ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+            newDiffControlsState(pipelineContext, ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
         else
-            oldDiffControlsState(ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+            oldDiffControlsState(pipelineContext, ch, containingDocument, state1, state2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
     }
 
-    public static void newDiffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void newDiffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Normalize
         if (state1 != null && state1.size() == 0)
@@ -840,13 +840,13 @@ public class XFormsServer extends ProcessorImpl {
                             final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 
                             if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
-                                final Object items = xformsSelect1Control1.getItemset();
+                                final Object items = xformsSelect1Control1.getItemset(pipelineContext);
                                 if (items != null)
                                     itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                             }
 
                             if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
-                                final Object items = xformsSelect1Control2.getItemset();
+                                final Object items = xformsSelect1Control2.getItemset(pipelineContext);
                                 if (items != null)
                                     itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
                             }
@@ -919,7 +919,7 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             // Diff children
-                            newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            newDiffControlsState(pipelineContext, ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         } else if (size2 > size1) {
                             // Size has grown
 
@@ -929,10 +929,10 @@ public class XFormsServer extends ProcessorImpl {
                             }
 
                             // Diff the common subset
-                            newDiffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            newDiffControlsState(pipelineContext, ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                             // Issue new values for new iterations
-                            newDiffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            newDiffControlsState(pipelineContext, ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         } else if (size2 < size1) {
                             // Size has shrunk
@@ -940,18 +940,18 @@ public class XFormsServer extends ProcessorImpl {
                             outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
 
                             // Diff the remaining subset
-                            newDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                            newDiffControlsState(pipelineContext, ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                         }
                     } else {
                         // Other grouping controls
-                        newDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        newDiffControlsState(pipelineContext, ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 }
             }
         }
     }
 
-    public static void oldDiffControlsState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
+    public static void oldDiffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List state1, List state2, Map itemsetsFull1, Map itemsetsFull2, Map valueChangeControlIds) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -1161,13 +1161,13 @@ public class XFormsServer extends ProcessorImpl {
                     final XFormsSelect1Control xformsSelect1Control2 = (XFormsSelect1Control) xformsControl2;
 
                     if (itemsetsFull1 != null && xformsSelect1Control1 != null) {
-                        final Object items = xformsSelect1Control1.getItemset();
+                        final Object items = xformsSelect1Control1.getItemset(pipelineContext);
                         if (items != null)
                             itemsetsFull1.put(xformsSelect1Control1.getEffectiveId(), items);
                     }
 
                     if (itemsetsFull2 != null && xformsSelect1Control2 != null) {
-                        final Object items = xformsSelect1Control2.getItemset();
+                        final Object items = xformsSelect1Control2.getItemset(pipelineContext);
                         if (items != null)
                             itemsetsFull2.put(xformsSelect1Control2.getEffectiveId(), items);
                     }
@@ -1192,7 +1192,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        oldDiffControlsState(ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(pipelineContext, ch, containingDocument, children1, xformsControl2.getChildren(), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -1202,17 +1202,17 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        oldDiffControlsState(ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(pipelineContext, ch, containingDocument, children1, children2.subList(0, size1), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                         // Issue new values for new iterations
-                        oldDiffControlsState(ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(pipelineContext, ch, containingDocument, null, children2.subList(size1, size2), itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                     } else if (size2 < size1) {
                         // Size has shrunk
                         outputDeleteRepeatTemplate(ch, xformsControl2, size1 - size2);
 
                         // Diff the remaining subset
-                        oldDiffControlsState(ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                        oldDiffControlsState(pipelineContext, ch, containingDocument, children1.subList(0, size2), children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                     }
                 } else if (xformsControl2 instanceof XFormsRepeatControl && xformsControl1 == null) {
 
@@ -1234,7 +1234,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    oldDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
 
                 } else if (xformsControl2 instanceof XFormsRepeatControl && children1 == null) {
 
@@ -1249,10 +1249,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    oldDiffControlsState(ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(pipelineContext, ch, containingDocument, null, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 } else {
                     // Other grouping controls
-                    oldDiffControlsState(ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
+                    oldDiffControlsState(pipelineContext, ch, containingDocument, children1, children2, itemsetsFull1, itemsetsFull2, valueChangeControlIds);
                 }
             }
         }

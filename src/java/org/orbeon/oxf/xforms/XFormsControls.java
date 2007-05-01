@@ -819,9 +819,9 @@ public class XFormsControls {
                 }
 
                 // Handle xforms:itemset
-                // TODO: We don't need to do this every time, only when we need to produce output, right?
                 if (xformsControl instanceof XFormsSelectControl || xformsControl instanceof XFormsSelect1Control) {
-                    ((XFormsSelect1Control) xformsControl).evaluateItemsets(pipelineContext);
+                    // NOTE: This is dirty anyway because 
+                    ((XFormsSelect1Control) xformsControl).markItemsetDirty();
                 }
 
                 // Set current binding for control element

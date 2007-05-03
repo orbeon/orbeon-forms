@@ -357,7 +357,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
                 if (controlValue != null) {
                     // We allow the value to be null when this method is used just to produce the structure of the tree without selection
-                    sb.append("\",");
+                    sb.append(',');
                     sb.append((value != null) && isSelected(many, controlValue, value));
                 }
 

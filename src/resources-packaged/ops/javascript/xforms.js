@@ -578,23 +578,44 @@ ORBEON.xforms.Controls = {
     },
 
     setRelevant: function(control, isRelevant) {
-        var elementsToUpdate = [ control,
-            ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
-            ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert")
-        ];
-        // Also show help if message is not empty
-        if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "")) {
-            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"));
-            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"));
-        }
-        // Also show hint if message is not empty
-        if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
-            elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"));
-        for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
-            var element = elementsToUpdate[elementIndex];
-            if (element != null) {
-                if (isRelevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled");
-                else ORBEON.util.Dom.addClass(element, "xforms-disabled");
+
+        if (ORBEON.util.Dom.hasClass(control, "xforms-group-begin-end")) {
+            // Case of group delimiters
+
+            // Figure out id of the end delimiter
+            var beginMarkerPrefix = "group-begin-";
+            var id = control.id.substring(beginMarkerPrefix.length);
+            var endMarker = "group-end-" + id;
+
+            // Iterate over nodes until we find the end delimiter
+            var current = control.nextSibling;
+            while (true) {
+                if (ORBEON.util.Dom.isElement(current)) {
+                    if (current.id == endMarker) break;
+                    if (isRelevant) ORBEON.util.Dom.removeClass(current, "xforms-disabled");
+                    else ORBEON.util.Dom.addClass(current, "xforms-disabled");
+                }
+                current = current.nextSibling;
+            }
+        } else {
+            var elementsToUpdate = [ control,
+                ORBEON.xforms.Controls._getControlLabel(control, "xforms-label"),
+                ORBEON.xforms.Controls._getControlLabel(control, "xforms-alert")
+            ];
+            // Also show help if message is not empty
+            if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "")) {
+                elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help"));
+                elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-help-image"));
+            }
+            // Also show hint if message is not empty
+            if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
+                elementsToUpdate.push(ORBEON.xforms.Controls._getControlLabel(control, "xforms-hint"));
+            for (var elementIndex = 0; elementIndex < elementsToUpdate.length; elementIndex++) {
+                var element = elementsToUpdate[elementIndex];
+                if (element != null) {
+                    if (isRelevant) ORBEON.util.Dom.removeClass(element, "xforms-disabled");
+                    else ORBEON.util.Dom.addClass(element, "xforms-disabled");
+                }
             }
         }
     },
@@ -2305,7 +2326,11 @@ ORBEON.xforms.Server = {
                                                 var displayValue = ORBEON.util.Dom.getAttribute(controlElement, "display-value");
                                                 var type = ORBEON.util.Dom.getAttribute(controlElement, "type");
                                                 var documentElement = ORBEON.util.Dom.getElementById(controlId);
+                                                if (documentElement == null) {
+                                                    documentElement = ORBEON.util.Dom.getElementById("group-begin-" + controlId);
+                                                }
                                                 var documentElementClasses = documentElement.className.split(" ");
+                                                var isControl = ORBEON.util.Dom.hasClass(documentElement, "xforms-control");
 
                                                 // Save new value sent by server (upload controls don't carry their value the same way as other controls)
                                                 var previousServerValue = ORBEON.xforms.Globals.serverValue[controlId];
@@ -2313,7 +2338,6 @@ ORBEON.xforms.Server = {
                                                     ORBEON.xforms.Globals.serverValue[controlId] = newControlValue;
 
                                                 // Handle migration of control from non-static to static if needed
-                                                var isControl = ORBEON.util.Dom.hasClass(documentElement, "xforms-control");
                                                 var isStaticReadonly = ORBEON.util.Dom.hasClass(documentElement, "xforms-static");
                                                 if (!isStaticReadonly && staticReadonly == "true") {
                                                     if (isControl) {

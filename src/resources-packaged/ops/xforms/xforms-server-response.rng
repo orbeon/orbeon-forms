@@ -180,12 +180,7 @@
                         <zeroOrMore>
                             <element name="xxforms:itemset">
                                 <attribute name="id"/>
-                                <zeroOrMore>
-                                    <element name="xxforms:item">
-                                        <attribute name="label"/>
-                                        <attribute name="value"/>
-                                    </element>
-                                </zeroOrMore>
+                                <data type="string"/>
                             </element>
                         </zeroOrMore>
                     </element>

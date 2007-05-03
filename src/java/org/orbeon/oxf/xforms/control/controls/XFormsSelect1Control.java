@@ -300,4 +300,111 @@ public class XFormsSelect1Control extends XFormsValueControl {
             return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
         }
     }
+
+    /**
+     * Return a list of items as a JSON tree.
+     *
+     * @param items         list of XFormsSelect1Control.Item
+     * @return              String representing a JSON tree
+     */
+    public static String getJSONTreeInfo(List items) {
+        return getJSONTreeInfo(items, null, false);
+    }
+
+    /**
+     * Return a list of items as a JSON tree.
+     *
+     * @param items         list of XFormsSelect1Control.Item
+     * @param controlValue  current value of the control (to determine selected item) or null
+     * @param many          whether multiple selection is allowed (to determine selected item)
+     * @return              String representing a JSON tree
+     */
+    public static String getJSONTreeInfo(List items, String controlValue, boolean many) {
+        // Produce a JSON fragment with hierachical information
+        if (items.size() > 0) {
+            final StringBuffer sb = new StringBuffer();
+
+            sb.append("[");
+
+            int level = 0;
+            for (Iterator j = items.iterator(); j.hasNext();) {
+                final XFormsSelect1Control.Item currentItem = (XFormsSelect1Control.Item) j.next();
+                final String label = currentItem.getLabel();
+                final String value = currentItem.getValue();
+
+                final int newLevel = currentItem.getLevel();
+
+                if (newLevel <= level) {
+                    //  We are going down one or more levels
+                    for (int i = newLevel; i <= level; i++) {
+                        sb.append("]");
+                    }
+                    sb.append(",[");
+                } else {
+                    // We are going up one level
+                    if (level > 0)
+                        sb.append(",");
+
+                    sb.append("[");
+                }
+
+                sb.append('"');
+                sb.append(label);
+                sb.append("\",\"");
+                if (value != null)
+                    sb.append(value);
+                sb.append('\"');
+
+                if (controlValue != null) {
+                    // We allow the value to be null when this method is used just to produce the structure of the tree without selection
+                    sb.append("\",");
+                    sb.append((value != null) && isSelected(many, controlValue, value));
+                }
+
+                level = newLevel;
+            }
+
+            // Close brackets
+            for (int i = level; i >= 0; i--) {
+                sb.append("]");
+            }
+
+            return sb.toString();
+        } else {
+            // Safer to return an empty array rather than en empty string
+            return "[]";
+        }
+    }
+
+    /**
+     * Return whether a select control's value is selected given an item value.
+     *
+     * @param isMany        whether multiple selection is allowed
+     * @param controlValue  current value of the control (to determine selected item) or null
+     * @param itemValue     item value to check
+     * @return              true is selected, false otherwise
+     */
+    public static boolean isSelected(boolean isMany, String controlValue, String itemValue) {
+        boolean selected = false;
+        if (isMany) {
+            if ("".equals(controlValue)) {
+                // Special case of empty string: check the item that has empty string if any
+                if ("".equals(itemValue)) {
+                    selected = true;
+                }
+            } else {
+                // Case of multiple tokens
+                for (final StringTokenizer st = new StringTokenizer(controlValue); st.hasMoreTokens();) {
+                    final String token = st.nextToken();
+                    if (token.equals(itemValue)) {
+                        selected = true;
+                        break;
+                    }
+                }
+            }
+        } else {
+            selected = controlValue.equals(itemValue);
+        }
+        return selected;
+    }
 }

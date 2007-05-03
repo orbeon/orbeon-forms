@@ -1346,13 +1346,9 @@ public class XFormsServer extends ProcessorImpl {
                 final List items = (List) currentEntry.getValue();
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", itemsetId});
-                for (Iterator j = items.iterator(); j.hasNext();) {
-                    final XFormsSelect1Control.Item itemsetInfo = (XFormsSelect1Control.Item) j.next();
-
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "item",
-                            new String[]{"label", itemsetInfo.getLabel(), "value", itemsetInfo.getValue()});
-                    ch.endElement();
-                }
+                final String result = XFormsSelect1Control.getJSONTreeInfo(items);
+                if (result.length() > 0)
+                    ch.text(result);
                 ch.endElement();
             }
             ch.endElement();

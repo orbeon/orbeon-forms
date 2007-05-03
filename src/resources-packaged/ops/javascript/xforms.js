@@ -2169,6 +2169,7 @@ ORBEON.xforms.Server = {
                                 for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
                                     if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
                                         var itemsetElement = itemsetsElement.childNodes[j];
+                                        var itemsetTree = eval(ORBEON.util.Dom.getStringValue(itemsetElement));
                                         var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");
@@ -2176,11 +2177,8 @@ ORBEON.xforms.Server = {
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
                                             // Build list with new values
                                             var newValues = new Array();
-                                            for (var k = 0; k < itemsetElement.childNodes.length; k++) {
-                                                var itemElement = itemsetElement.childNodes[k];
-                                                if (itemElement.nodeType == ELEMENT_TYPE)
-                                                    newValues.push(ORBEON.util.Dom.getAttribute(itemElement, "value"));
-                                            }
+                                            for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++)
+                                                newValues.push(itemsetTree[topIndex][1]);
 
                                             // Case of the auto-complete control
                                             var textfield = ORBEON.util.Dom.getChildElementByIndex(documentElement, 0);
@@ -2206,29 +2204,27 @@ ORBEON.xforms.Server = {
 
                                             // Update select per content of itemset
                                             var itemCount = 0;
-                                            for (var k = 0; k < itemsetElement.childNodes.length; k++) {
-                                                var itemElement = itemsetElement.childNodes[k];
-                                                if (itemElement.nodeType == ELEMENT_TYPE) {
-                                                    if (itemCount >= options.length) {
-                                                        // Add a new option
-                                                        var newOption = document.createElement("OPTION");
-                                                        documentElement.appendChild(newOption);
-                                                        newOption.text = ORBEON.util.Dom.getAttribute(itemElement, "label");
-                                                        newOption.value = ORBEON.util.Dom.getAttribute(itemElement, "value");
-                                                        newOption.selected = xformsArrayContains(selectedValues, newOption.value);
-                                                    } else {
-                                                        // Replace current label/value if necessary
-                                                        var option = options[itemCount];
-                                                        if (option.text != ORBEON.util.Dom.getAttribute(itemElement, "label")) {
-                                                            option.text = ORBEON.util.Dom.getAttribute(itemElement, "label");
-                                                        }
-                                                        if (option.value != ORBEON.util.Dom.getAttribute(itemElement, "value")) {
-                                                            option.value = ORBEON.util.Dom.getAttribute(itemElement, "value");
-                                                        }
-                                                        option.selected = xformsArrayContains(selectedValues, option.value);
+                                            for (var k = 0; k < itemsetTree.length; k++) {
+                                                var itemElement = itemsetTree[k];
+                                                if (itemCount >= options.length) {
+                                                    // Add a new option
+                                                    var newOption = document.createElement("OPTION");
+                                                    documentElement.appendChild(newOption);
+                                                    newOption.text = itemElement[0];
+                                                    newOption.value = itemElement[1];
+                                                    newOption.selected = xformsArrayContains(selectedValues, newOption.value);
+                                                } else {
+                                                    // Replace current label/value if necessary
+                                                    var option = options[itemCount];
+                                                    if (option.text != itemElement[0]) {
+                                                        option.text = itemElement[0];
                                                     }
-                                                    itemCount++;
+                                                    if (option.value != itemElement[1]) {
+                                                        option.value = itemElement[1];
+                                                    }
+                                                    option.selected = xformsArrayContains(selectedValues, option.value);
                                                 }
+                                                itemCount++;
                                             }
 
                                             // Remove options in select if necessary
@@ -2278,21 +2274,17 @@ ORBEON.xforms.Server = {
 
                                             // Recreate content based on template
                                             var itemIndex = 0;
-                                            for (var k = 0; k < itemsetElement.childNodes.length; k++) {
-                                                var itemElement = itemsetElement.childNodes[k];
-                                                if (itemElement.nodeType == ELEMENT_TYPE) {
-                                                    var templateClone = template.cloneNode(true);
-                                                    xformsStringReplace(templateClone, "$xforms-template-label$",
-                                                        ORBEON.util.Dom.getAttribute(itemElement, "label"));
-                                                    xformsStringReplace(templateClone, "$xforms-template-value$",
-                                                        ORBEON.util.Dom.getAttribute(itemElement, "value"));
-                                                    xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
-                                                    documentElement.appendChild(templateClone);
-                                                    // Restore checked state after copy
-                                                    if (valueToChecked[ORBEON.util.Dom.getAttribute(itemElement, "value")] == true)
-                                                        xformsGetInputUnderNode(templateClone).checked = true;
-                                                    itemIndex++;
-                                                }
+                                            for (var k = 0; k < itemsetTree.length; k++) {
+                                                var itemElement = itemsetTree[k];
+                                                var templateClone = template.cloneNode(true);
+                                                xformsStringReplace(templateClone, "$xforms-template-label$", itemElement[0]);
+                                                xformsStringReplace(templateClone, "$xforms-template-value$", itemElement[1]);
+                                                xformsStringReplace(templateClone, "$xforms-item-index$", itemIndex);
+                                                documentElement.appendChild(templateClone);
+                                                // Restore checked state after copy
+                                                if (valueToChecked[itemElement[1]] == true)
+                                                    xformsGetInputUnderNode(templateClone).checked = true;
+                                                itemIndex++;
                                             }
                                         }
                                     }

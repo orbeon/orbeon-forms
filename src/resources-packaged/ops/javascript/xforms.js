@@ -1547,7 +1547,7 @@ ORBEON.xforms.Init = {
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
     },
 
-    _addToTree: function (tree, nameValueArray, treeNode, firstPosition) {
+    _addToTree: function (treeDiv, nameValueArray, treeNode, firstPosition) {
         for (var arrayIndex = firstPosition; arrayIndex < nameValueArray.length; arrayIndex++) {
             // Extract information from the first 3 position in the array
             var childArray = nameValueArray[arrayIndex];
@@ -1557,40 +1557,42 @@ ORBEON.xforms.Init = {
             // Create node and add to tree
             var nodeInformation = { label: name, value: value };
             var childNode;
-            if (tree.xformsAllowMultipleSelection) {
+            if (treeDiv.xformsAllowMultipleSelection) {
                 childNode = new YAHOO.widget.TaskNode(nodeInformation, treeNode, false);
                 childNode.onCheckClick = ORBEON.xforms.Events.treeCheckClick;
-                if (selected) childNode.check();
             } else {
                 childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
             }
-            ORBEON.xforms.Init._addToTree(tree, childArray, childNode, 3);
+            ORBEON.xforms.Init._addToTree(treeDiv, childArray, childNode, 3);
             // Add this value to the list if selected
             if (selected) {
-                if (tree.value != "") tree.value += " ";
-                tree.value += value;
+                if (treeDiv.value != "") treeDiv.value += " ";
+                treeDiv.value += value;
             }
         }
     },
 
-    _tree: function(tree) {
-
-        // Save in the control if it allows multiple selection
-        tree.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(tree, "xforms-select");
-        // Parse data put by the server in the div
-        var treeString = ORBEON.util.Dom.getStringValue(tree);
-        treeString = ORBEON.util.String.replace(treeString, "\n", " ");
-        treeString = ORBEON.util.String.replace(treeString, "\r", " ");
-        var treeArray = eval(treeString);
-        ORBEON.util.Dom.setStringValue(tree, "");
-        tree.value = "";
-        // Create, populate, and show the tree
-        var yuiTree = new YAHOO.widget.TreeView(tree.id);
-        ORBEON.xforms.Globals.treeYui[tree.id] = yuiTree;
+    _initTreeDivFromArray: function(treeDiv, yuiTree, treeArray) {
+        // Populate the tree
         var treeRoot = yuiTree.getRoot();
-        ORBEON.xforms.Init._addToTree(tree, treeArray, treeRoot, 0);
+        ORBEON.xforms.Init._addToTree(treeDiv, treeArray, treeRoot, 0);
+        // For select tree, check the node that are selected
+        if (treeDiv.xformsAllowMultipleSelection) {
+            var values = treeDiv.value.split(" ");
+            var nodes = yuiTree.getNodesByProperty();
+            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                var node = nodes[nodeIndex];
+                var currentValue = node.data.value;
+                for (var valueIndex = 0; valueIndex < values.length; valueIndex++) {
+                    if (currentValue == values[valueIndex]) {
+                        node.check()
+                        break;
+                    }
+                }
+            }
+        }
         // Make selected nodes visible
-        var values = tree.xformsAllowMultipleSelection ? tree.value.split(" ") : [ tree.value ];
+        var values = treeDiv.xformsAllowMultipleSelection ? treeDiv.value.split(" ") : [ treeDiv.value ];
         for (nodeIndex in yuiTree._nodes) {
             var node = yuiTree._nodes[nodeIndex];
             if (xformsArrayContains(values, node.data.value)) {
@@ -1604,9 +1606,25 @@ ORBEON.xforms.Init = {
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         // Save value in tree
-        tree.previousValue = tree.value;
+        treeDiv.previousValue = treeDiv.value;
         yuiTree.draw();
-        ORBEON.util.Dom.removeClass(tree, "xforms-initially-hidden");
+    },
+
+    _tree: function(treeDiv) {
+
+        // Save in the control if it allows multiple selection
+        treeDiv.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(treeDiv, "xforms-select");
+        // Parse data put by the server in the div
+        var treeString = ORBEON.util.Dom.getStringValue(treeDiv);
+        treeString = ORBEON.util.String.replace(treeString, "\n", " ");
+        treeString = ORBEON.util.String.replace(treeString, "\r", " ");
+        var treeArray = eval(treeString);
+        ORBEON.util.Dom.setStringValue(treeDiv, "");
+        treeDiv.value = "";
+        var yuiTree = new YAHOO.widget.TreeView(treeDiv.id);
+        ORBEON.xforms.Globals.treeYui[treeDiv.id] = yuiTree;
+        ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
+        ORBEON.util.Dom.removeClass(treeDiv, "xforms-initially-hidden");
     },
 
     /**
@@ -2175,6 +2193,7 @@ ORBEON.xforms.Server = {
                                         var documentElementClasses = documentElement.className.split(" ");
 
                                         if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-open")) {
+
                                             // Build list with new values
                                             var newValues = new Array();
                                             for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++)
@@ -2187,6 +2206,20 @@ ORBEON.xforms.Server = {
                                             var lastKeyCode = ORBEON.xforms.Globals.autoCompleteLastKeyCode[documentElement.id];
                                             if (lastKeyCode != null)
                                                 ORBEON.xforms.Globals.autoCompleteOpen[documentElement.id](lastKeyCode);
+
+                                        } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select-appearance-xxforms-tree")
+                                                || ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
+
+                                            // Case of a tree
+
+                                            // Remove markup for current tree
+                                            var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
+                                            var yuiRoot = yuiTree.getRoot();
+                                            yuiTree.removeChildren(yuiRoot);
+                                            
+                                            // Re-populate the tree
+                                            ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
+
                                         } else if (documentElement.tagName == "SELECT") {
 
                                             // Case of list / combobox

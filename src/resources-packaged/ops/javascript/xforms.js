@@ -1554,6 +1554,7 @@ ORBEON.xforms.Init = {
             var name = childArray[0];
             var value = childArray[1];
             var selected = childArray[2];
+            var hasSelected = typeof selected == "boolean";
             // Create node and add to tree
             var nodeInformation = { label: name, value: value };
             var childNode;
@@ -1563,9 +1564,9 @@ ORBEON.xforms.Init = {
             } else {
                 childNode = new YAHOO.widget.TextNode(nodeInformation, treeNode, false);
             }
-            ORBEON.xforms.Init._addToTree(treeDiv, childArray, childNode, 3);
+            ORBEON.xforms.Init._addToTree(treeDiv, childArray, childNode, hasSelected ? 3 : 2);
             // Add this value to the list if selected
-            if (selected) {
+            if (hasSelected && selected) {
                 if (treeDiv.value != "") treeDiv.value += " ";
                 treeDiv.value += value;
             }

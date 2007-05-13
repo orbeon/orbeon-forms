@@ -1246,7 +1246,7 @@ ORBEON.xforms.Events = {
         control.value = "";
         for (nodeIndex in tree._nodes) {
             var node = tree._nodes[nodeIndex];
-            if (node.checked) {
+            if (node.checkState == 2) {
                 if (control.value != "") control.value += " ";
                 control.value += node.data.value;
             }
@@ -1604,10 +1604,7 @@ ORBEON.xforms.Init = {
                 }
             }
         }
-        // Register event handler for click on label
-        yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
-        // Save value in tree
-        treeDiv.previousValue = treeDiv.value;
+        // Draw the tree the first time
         yuiTree.draw();
     },
 
@@ -1625,6 +1622,10 @@ ORBEON.xforms.Init = {
         var yuiTree = new YAHOO.widget.TreeView(treeDiv.id);
         ORBEON.xforms.Globals.treeYui[treeDiv.id] = yuiTree;
         ORBEON.xforms.Init._initTreeDivFromArray(treeDiv, yuiTree, treeArray);
+        // Save value in tree
+        treeDiv.previousValue = treeDiv.value;
+        // Register event handler for click on label
+        yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         ORBEON.util.Dom.removeClass(treeDiv, "xforms-initially-hidden");
     },
 
@@ -2217,6 +2218,8 @@ ORBEON.xforms.Server = {
                                             var yuiTree = ORBEON.xforms.Globals.treeYui[documentElement.id];
                                             var yuiRoot = yuiTree.getRoot();
                                             yuiTree.removeChildren(yuiRoot);
+                                            // Expand root. If we don't the tree with checkboxes does not show.
+                                            yuiRoot.expand();
                                             
                                             // Re-populate the tree
                                             ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);

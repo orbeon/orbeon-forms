@@ -1581,13 +1581,16 @@ ORBEON.xforms.Init = {
         if (treeDiv.xformsAllowMultipleSelection) {
             var values = treeDiv.value.split(" ");
             var nodes = yuiTree.getNodesByProperty();
-            for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
-                var node = nodes[nodeIndex];
-                var currentValue = node.data.value;
-                for (var valueIndex = 0; valueIndex < values.length; valueIndex++) {
-                    if (currentValue == values[valueIndex]) {
-                        node.check()
-                        break;
+            // nodes can be null when the tree is empty
+            if (nodes != null) {
+                for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++) {
+                    var node = nodes[nodeIndex];
+                    var currentValue = node.data.value;
+                    for (var valueIndex = 0; valueIndex < values.length; valueIndex++) {
+                        if (currentValue == values[valueIndex]) {
+                            node.check()
+                            break;
+                        }
                     }
                 }
             }

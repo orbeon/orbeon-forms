@@ -39,6 +39,8 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     private HandlerInfo currentHandlerInfo;
     private boolean isFillingUpSAXStore;
 
+    private Stack elementNames = new Stack();
+
     private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
 
     private Locator locator;
@@ -92,6 +94,11 @@ public class ElementHandlerController extends ForwardingContentHandler implement
         return namespaceSupport;
     }
 
+
+    public Stack getElementNames() {
+        return elementNames;
+    }
+
     public void startDocument() throws SAXException {
         try {
             setContentHandler(output);
@@ -113,9 +120,9 @@ public class ElementHandlerController extends ForwardingContentHandler implement
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         try {
             namespaceSupport.startElement();
+            elementNames.add(XMLUtils.buildExplodedQName(uri, localname));
 
             if (!isFillingUpSAXStore) {
-//                namespaceSupport.pushContext();
 
                 final String explodedQName = XMLUtils.buildExplodedQName(uri, localname);
                 final String handlerClassName = (String) handlerKeysToNames.get(explodedQName);
@@ -153,7 +160,6 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                         elementHandler.start(uri, localname, qName, attributes);
                     }
                 } else {
-
                     super.startElement(uri, localname, qName, attributes);
                 }
             } else {
@@ -187,14 +193,11 @@ public class ElementHandlerController extends ForwardingContentHandler implement
                 currentHandlerInfo = (HandlerInfo) ((handlerInfos.size() > 0) ? handlerInfos.pop() : null);
                 super.setContentHandler((currentHandlerInfo != null) ? (ContentHandler) currentHandlerInfo.elementHandler : output);
 
-//                namespaceSupport.popContext();
-
             } else {
                 super.endElement(uri, localname, qName);
-//                if (!isFillingUpSAXStore)
-//                    namespaceSupport.popContext();
             }
 
+            elementNames.pop();
             namespaceSupport.endElement();
 
         } catch (Exception e) {

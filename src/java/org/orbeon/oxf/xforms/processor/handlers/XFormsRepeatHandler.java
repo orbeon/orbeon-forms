@@ -108,8 +108,8 @@ public class XFormsRepeatHandler extends HandlerBase {
             }
         }
 
+        // Generate template
         if (isMustGenerateTemplate) {
-            // Generate template
 
             if (!outputInterceptor.isMustGenerateFirstDelimiters()) {
                 // Delimiter: between repeat entries
@@ -127,8 +127,8 @@ public class XFormsRepeatHandler extends HandlerBase {
             handlerContext.popRepeatContext();
         }
 
+        // If no delimiter has been generated, try to find one!
         if (outputInterceptor.getDelimiterNamespaceURI() == null) {
-            // No delimiter has been generated, try to find one!
 
             outputInterceptor.setForward(false); // prevent interceptor to output anything
 

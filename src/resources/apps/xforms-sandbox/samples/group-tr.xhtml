@@ -20,51 +20,103 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <xhtml:head>
-        <xhtml:title>XForms Load with Target Attribute</xhtml:title>
+        <xhtml:title>xforms:group around xhtml:tr</xhtml:title>
         <xforms:model>
+
             <xforms:instance id="instance">
                 <instance>
-                    <value>true</value>
-                    <value/>
-                    <value>true</value>
+                    <group-value>42</group-value>
+                    <group-value>43</group-value>
                 </instance>
             </xforms:instance>
+
+            <xforms:instance id="control-instance">
+                <instance>
+                    <show-repeat>true</show-repeat>
+                    <show-group-1>true</show-group-1>
+                    <show-group-2>true</show-group-2>
+                </instance>
+            </xforms:instance>
+
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:h2>Table with repeat</xhtml:h2>
-        <xhtml:table>
-            <xforms:repeat id="tr-repeat" nodeset="/instance/value">
-                <xhtml:tr>
-                    <xhtml:td>
-                        Relevant:
-                        <xforms:select ref="." appearance="full">
-                            <xforms:item>
-                                <xforms:value>true</xforms:value>
-                                <xforms:label/>
-                            </xforms:item>
-                        </xforms:select>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+
+        <xforms:select ref="instance('control-instance')/show-repeat" appearance="full">
+            <xforms:item>
+                <xforms:value>true</xforms:value>
+                <xforms:label>Show repeat</xforms:label>
+            </xforms:item>
+        </xforms:select>
+
+        <xforms:select ref="instance('control-instance')/show-group-1" appearance="full">
+            <xforms:item>
+                <xforms:value>true</xforms:value>
+                <xforms:label>Show group 1</xforms:label>
+            </xforms:item>
+        </xforms:select>
+
+        <xforms:select ref="instance('control-instance')/show-group-2" appearance="full">
+            <xforms:item>
+                <xforms:value>true</xforms:value>
+                <xforms:label>Show group 2</xforms:label>
+            </xforms:item>
+        </xforms:select>
 
         <xhtml:h2>Table with group</xhtml:h2>
 
-        <!--<xhtml:table>-->
-            <!--<xforms:group ref=".[/instance/value[1] = 'true']" id="tr-group">-->
-                <!--<xhtml:tr>-->
-                    <!--<xhtml:tr>First is relevant</xhtml:tr>-->
-                <!--</xhtml:tr>-->
-            <!--</xforms:group>-->
-        <!--</xhtml:table>-->
+        <xforms:repeat id="tr-repeat-1" nodeset="group-value[instance('control-instance')/show-repeat = 'true']">
 
+            <xhtml:table>
+                <xhtml:tr>
+                    <xhtml:th>Table Header</xhtml:th>
+                </xhtml:tr>
+                <xforms:group ref=".[instance('control-instance')/show-group-1 = 'true']" id="tr-group-1">
+                    <xforms:group ref=".[instance('control-instance')/show-group-2 = 'true']" id="tr-group-2">
+                        <xhtml:tr>
+                            <xhtml:td>This is a table cell!</xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input ref="xxforms:repeat-current()">
+                                    <xforms:label>Enter a value:</xforms:label>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </xforms:group>
+                </xforms:group>
+            </xhtml:table>
+
+        </xforms:repeat>
+
+        <xhtml:h2>Regular groups</xhtml:h2>
+
+        <xforms:repeat id="tr-repeat-2" nodeset="group-value[instance('control-instance')/show-repeat = 'true']">
+
+            <xhtml:div>
+                <xforms:group ref=".[instance('control-instance')/show-group-1 = 'true']" id="tr-group-3">
+                    <xforms:group ref=".[instance('control-instance')/show-group-2 = 'true']" id="tr-group-4">
+                        <xhtml:div>
+                            <xhtml:span>This is a table cell!</xhtml:span>
+                        </xhtml:div>
+                        <xhtml:div>
+                            <xforms:input ref="xxforms:repeat-current()">
+                                <xforms:label>Enter a value:</xforms:label>
+                            </xforms:input>
+                        </xhtml:div>
+                    </xforms:group>
+                </xforms:group>
+            </xhtml:div>
+
+        </xforms:repeat>
+
+        <xhtml:h2>Table with group (template done by hand)</xhtml:h2>
         <xhtml:table>
-            <xhtml:tr id="group-begin-tr-group" class="xforms-group-begin-end"/>
+            <xhtml:tr id="group-begin-tr-group-2" class="xforms-group-begin-end"/>
             <xhtml:tr>
                 <xhtml:td>First is relevant</xhtml:td>
             </xhtml:tr>
-            <xhtml:tr id="group-end-tr-group" class="xforms-group-begin-end"/>
+            <xhtml:tr id="group-end-tr-group-2" class="xforms-group-begin-end"/>
         </xhtml:table>
 
     </xhtml:body>

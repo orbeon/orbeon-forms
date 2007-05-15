@@ -336,31 +336,27 @@ public class XIncludeProcessor extends ProcessorImpl {
         }
 
         public String getPublicId() {
-            if (locators.size() == 0)
-                return null;
-            else
-                return ((Locator) locators.peek()).getPublicId();
+            final Locator locator = getCurrentLocator();
+            return (locator == null) ? null : locator.getPublicId();
         }
 
         public String getSystemId() {
-            if (locators.size() == 0)
-                return null;
-            else
-                return ((Locator) locators.peek()).getSystemId();
+            final Locator locator = getCurrentLocator();
+            return (locator == null) ? null : locator.getSystemId();
         }
 
         public int getLineNumber() {
-            if (locators.size() == 0)
-                return -1;
-            else
-                return ((Locator) locators.peek()).getLineNumber();
+            final Locator locator = getCurrentLocator();
+            return (locator == null) ? -1 : locator.getLineNumber();
         }
 
         public int getColumnNumber() {
-            if (locators.size() == 0)
-                return -1;
-            else
-                return ((Locator) locators.peek()).getColumnNumber();
+            final Locator locator = getCurrentLocator();
+            return (locator == null) ? -1 : locator.getColumnNumber();
+        }
+
+        private Locator getCurrentLocator() {
+            return (locators.size() == 0) ? null : (Locator) locators.peek();
         }
     }
 }

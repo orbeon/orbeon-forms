@@ -251,7 +251,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     private static boolean isAncestorNode(NodeInfo node, NodeInfo potentialAncestor) {
         NodeInfo parent = node.getParent();
         while (parent != null) {
-            if (parent == potentialAncestor)
+            if (parent.isSameNodeInfo(potentialAncestor))
                 return true;
             parent = parent.getParent();
         }

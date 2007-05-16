@@ -61,12 +61,23 @@
                 <xforms:value ref="@value"/>
             </xforms:itemset>
         </xforms:select1>
+        <xhtml:h2>select1 tree (non-incremental)</xhtml:h2>
+        <xhtml:p>
+            Selected values:
+            <xforms:output ref="select1" id="tree2-output"/>
+        </xhtml:p>
+        <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
+            <xforms:itemset nodeset="instance('items')//item">
+                <xforms:label ref="@label"/>
+                <xforms:value ref="@value"/>
+            </xforms:itemset>
+        </xforms:select1>
         <xhtml:h2>select tree with itemset (incremental)</xhtml:h2>
         <xhtml:p>
             Selected values:
-            <xforms:output ref="select" id="tree2-output"/>
+            <xforms:output ref="select" id="tree3-output"/>
         </xhtml:p>
-        <xforms:select ref="select" appearance="xxforms:tree" id="tree2" incremental="true">
+        <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
             <xforms:itemset nodeset="instance('items')//item">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
@@ -77,7 +88,7 @@
             Selected values:
             <xforms:output ref="select"/>
         </xhtml:p>
-        <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="false">
+        <xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">
             <xforms:choices>
                 <xforms:label>Encyclopedia</xforms:label>
                 <xforms:item>

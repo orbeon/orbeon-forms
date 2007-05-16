@@ -296,6 +296,10 @@ a.xforms-readonly {
     margin-left: 2em;
 }
 
+.xforms-tree-label-selected {
+    background-color: #ffc;
+}
+
 #xforms-repeat-tree {
     display: none;
 }

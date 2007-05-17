@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Locator;
@@ -420,8 +421,34 @@ public class XFormsControls {
             model = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("model"));
         final String bind = XFormsUtils.namespaceId(containingDocument, bindingElement.attributeValue("bind"));
 
-        pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement,
-                (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null);
+        // TODO: PERF: Dom4jUtils.getNamespaceContextNoDefault() takes time. We should maybe cache those?
+        final Map bindingElementNamespaceContext;
+        bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
+//        if (ref != null || nodeset != null) {
+//            if (bindingElement instanceof NonLazyUserDataElement) {
+//                final NonLazyUserDataElement dataElement = (NonLazyUserDataElement) bindingElement;
+//                final Object data = dataElement.getData();
+//
+//                if (data == null) {
+//                    // Get data and cache it
+//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
+//                    dataElement.setData(bindingElementNamespaceContext);
+//                } else if (data instanceof TreeMap) {
+//                    // Use cached data
+//                    bindingElementNamespaceContext = (Map) data;
+//                } else {
+//                    // Just compute the data
+//                    bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
+//                }
+//            } else {
+//                // Just compute the data
+//                bindingElementNamespaceContext = Dom4jUtils.getNamespaceContextNoDefault(bindingElement);
+//            }
+//        } else {
+//            // No need for the data
+//            bindingElementNamespaceContext = null;
+//        }
+        pushBinding(pipelineContext, ref, context, nodeset, model, bind, bindingElement, bindingElementNamespaceContext);
     }
 
     public void pushBinding(PipelineContext pipelineContext, String ref, String context, String nodeset, String modelId, String bindId,
@@ -835,27 +862,37 @@ public class XFormsControls {
                 // TODO: we don't need to set these values until we produce output, right?
                 if (!(xformsControl instanceof XFormsRepeatControl && currentNodeSet != null && currentNodeSet.size() == 0)) {
                     final NodeInfo currentNode = currentBindingContext.getSingleNode();
-                    if (currentNode != null) {
-                        // Control is bound to a node - get model item properties
-                        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
-                        if (instanceData != null) {
-                            xformsControl.setReadonly(instanceData.getInheritedReadonly().get());
-                            xformsControl.setRequired(instanceData.getRequired().get());
-                            xformsControl.setRelevant(instanceData.getInheritedRelevant().get());
-                            xformsControl.setValid(instanceData.getValid().get());
-                            final String typeAsString = instanceData.getType().getAsString();
-                            if (typeAsString != null) {
-                                xformsControl.setType(typeAsString);
+                    if (currentBindingContext.isNewBind()) {
+                        if (currentNode != null) {
+                            // Control is bound to a node - get model item properties
+                            final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
+                            if (instanceData != null) {
+                                xformsControl.setReadonly(instanceData.getInheritedReadonly().get());
+                                xformsControl.setRequired(instanceData.getRequired().get());
+                                xformsControl.setRelevant(instanceData.getInheritedRelevant().get());
+                                xformsControl.setValid(instanceData.getValid().get());
+                                final String typeAsString = instanceData.getType().getAsString();
+                                if (typeAsString != null) {
+                                    xformsControl.setType(typeAsString);
+                                }
                             }
+                            // Handle global read-only setting
+                            if (containingDocument.isReadonly())
+                                xformsControl.setReadonly(true);
+                        } else {
+                            // Control is not bound to a node - it becomes non-relevant
+                            xformsControl.setReadonly(false);
+                            xformsControl.setRequired(false);
+                            xformsControl.setRelevant(false);
+                            xformsControl.setValid(true);// by default, a control is not invalid
+                            xformsControl.setType(null);
                         }
-                        // Handle global read-only setting
-                        if (containingDocument.isReadonly())
-                            xformsControl.setReadonly(true);
                     } else {
-                        // Control is not bound to a node - it becomes non-relevant
+                        // Control is not bound to a node because it doesn't have a binding (group, trigger, etc. without @ref)
+                        final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(currentNode);
                         xformsControl.setReadonly(false);
                         xformsControl.setRequired(false);
-                        xformsControl.setRelevant(false);
+                        xformsControl.setRelevant(instanceData.getInheritedRelevant().get()); // inherit relevance anyway
                         xformsControl.setValid(true);// by default, a control is not invalid
                         xformsControl.setType(null);
                     }

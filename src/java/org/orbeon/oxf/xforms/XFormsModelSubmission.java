@@ -267,10 +267,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     if (!(currentNodeInfo instanceof DocumentInfo || currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
                         throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
                     }
-
-                    // For now, we can't submit a read-only instance (but we could in the future)
-                    if (serialize && !(currentNodeInfo instanceof NodeWrapper))
-                        throw new OXFException("xforms:submission: submitting a read-only instance is not yet implemented.");
                 }
 
                 // Get instance containing the node to submit
@@ -301,25 +297,27 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 // TODO: Somewhere around here, check flags and doRecalculate() if needed
 
+                final XFormsModel modelForInstance = currentInstance.getModel(containingDocument);
                 final Document initialDocumentToSubmit;
                 if (serialize && !isDeferredSubmissionSecondPass) {
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
                         initialDocumentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
-                        currentInstance.setInstanceDocument(initialDocumentToSubmit, false);
+
+                        // Temporarily change instance document so that we can run validation again
+                        modelForInstance.setInstanceDocument(initialDocumentToSubmit,
+                                currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
+                                currentInstance.getUsername(), currentInstance.getPassword(),
+                                currentInstance.isApplicationShared());
 
                         // Revalidate instance
-                        model.doRevalidate(pipelineContext);
+                        modelForInstance.doRevalidate(pipelineContext);
                         // TODO: Check if the validation state can really change. If so, find a solution.
                         // "no notification events are marked for dispatching due to this operation"
 
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
-//                            {
-//                                currentInstance.readOut();
-//                            }
                             if (logger.isDebugEnabled()) {
                                 final LocationDocumentResult documentResult = new LocationDocumentResult();
                                 final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
@@ -332,7 +330,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.setInstanceDocument(backupInstanceDocument, false);
+                        // Restore instance document
+                        modelForInstance.setInstance(currentInstance, false);
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -422,13 +421,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     }
 
                     // Create document to submit
-                    final Document backupInstanceDocument = currentInstance.getDocument();
                     try {
                         documentToSubmit = createDocumentToSubmit(currentNodeInfo, currentInstance);
-                        currentInstance.setInstanceDocument(documentToSubmit, false);
+
+                        // Temporarily change instance document so that we can run validation again
+                        modelForInstance.setInstanceDocument(documentToSubmit,
+                                currentInstance.getModelId(), currentInstance.getEffectiveId(), currentInstance.getSourceURI(),
+                                currentInstance.getUsername(), currentInstance.getPassword(),
+                                currentInstance.isApplicationShared());
 
                         // Revalidate instance
-                        model.doRevalidate(pipelineContext);
+                        modelForInstance.doRevalidate(pipelineContext);
                         // sent out. Check if the validation state can really change. If so, find a
                         // solution.
                         // "no notification events are marked for dispatching due to this operation"
@@ -436,11 +439,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Check that there are no validation errors
                         final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
                         if (!instanceSatisfiesValidRequired) {
-    //                        currentInstance.readOut();// FIXME: DEBUG
+                            if (logger.isDebugEnabled()) {
+                                final LocationDocumentResult documentResult = new LocationDocumentResult();
+                                final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+                                identity.setResult(documentResult);
+                                currentInstance.read(identity);
+                                final String documentString = Dom4jUtils.domToString(documentResult.getDocument());
+
+                                logger.debug("XForms - submission - instance document or subset thereof cannot be submitted:\n" + documentString);
+                            }
                             throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                         }
                     } finally {
-                        currentInstance.setInstanceDocument(backupInstanceDocument, false);
+                        // Restore instance document
+                        modelForInstance.setInstance(currentInstance, false);
                     }
                 } else {
                     // Don't recreate document
@@ -615,7 +627,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             if (XFormsServer.logger.isDebugEnabled())
                                 XFormsServer.logger.debug("XForms - submission - using instance from application shared instance cache: " + replaceInstance.getEffectiveId());
 
-                            final URL absoluteResolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, null, externalContext);
+                            final URL absoluteResolvedURL = XFormsSubmissionUtils.createAbsoluteURL(resolvedURL, queryString, externalContext);
                             final String absoluteResolvedURLString = absoluteResolvedURL.toExternalForm();
 
                             final SharedXFormsInstance sharedInstance
@@ -878,57 +890,66 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     private Document createDocumentToSubmit(final NodeInfo currentNodeInfo, final XFormsInstance currentInstance) {
 
-        final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
-
-        // "A node from the instance data is selected, based on attributes on the submission
-        // element. The indicated node and all nodes for which it is an ancestor are considered for
-        // the remainder of the submit process. "
         final Document documentToSubmit;
-        if (currentNode instanceof Element) {
-            // Create subset of document
-            documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
-        } else {
-            // Use entire instance document
-            documentToSubmit = Dom4jUtils.createDocument(currentInstance.getDocument().getRootElement());
-        }
+        if (currentNodeInfo instanceof NodeWrapper) {
+            final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-        if (relevant) {
-            // "Any node which is considered not relevant as defined in 6.1.4 is removed."
-            final Node[] nodeToDetach = new Node[1];
-            do {
-                // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
-                // detaching elements within accept(). Should implement a more efficient algorithm to
-                // prune non-relevant nodes.
-                nodeToDetach[0] = null;
-                documentToSubmit.accept(new VisitorSupport() {
+            // "A node from the instance data is selected, based on attributes on the submission
+            // element. The indicated node and all nodes for which it is an ancestor are considered for
+            // the remainder of the submit process. "
+            if (currentNode instanceof Element) {
+                // Create subset of document
+                documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
+            } else {
+                // Use entire instance document
+                documentToSubmit = Dom4jUtils.createDocument(currentInstance.getDocument().getRootElement());
+            }
 
-                    public final void visit(Element element) {
-                        checkInstanceData(element);
-                    }
+            if (relevant) {
+                // "Any node which is considered not relevant as defined in 6.1.4 is removed."
+                final Node[] nodeToDetach = new Node[1];
+                do {
+                    // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
+                    // detaching elements within accept(). Should implement a more efficient algorithm to
+                    // prune non-relevant nodes.
+                    nodeToDetach[0] = null;
+                    documentToSubmit.accept(new VisitorSupport() {
 
-                    public final void visit(Attribute attribute) {
-                        checkInstanceData(attribute);
-                    }
+                        public final void visit(Element element) {
+                            checkInstanceData(element);
+                        }
 
-                    private final void checkInstanceData(Node node) {
-                        if (nodeToDetach[0] == null) {
-                            final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
-                            // Check "relevant" MIP and remove non-relevant nodes
-                            {
-                                final BooleanModelItemProperty relevantMIP = instanceData.getInheritedRelevant();
-                                if (relevantMIP != null && !relevantMIP.get())
-                                    nodeToDetach[0] = node;
+                        public final void visit(Attribute attribute) {
+                            checkInstanceData(attribute);
+                        }
+
+                        private final void checkInstanceData(Node node) {
+                            if (nodeToDetach[0] == null) {
+                                final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
+                                // Check "relevant" MIP and remove non-relevant nodes
+                                {
+                                    final BooleanModelItemProperty relevantMIP = instanceData.getInheritedRelevant();
+                                    if (relevantMIP != null && !relevantMIP.get())
+                                        nodeToDetach[0] = node;
+                                }
                             }
                         }
-                    }
-                });
-                if (nodeToDetach[0] != null)
-                    nodeToDetach[0].detach();
+                    });
+                    if (nodeToDetach[0] != null)
+                        nodeToDetach[0].detach();
 
-            } while (nodeToDetach[0] != null);
+                } while (nodeToDetach[0] != null);
+            }
+
+            // TODO: handle includenamespaceprefixes
+        } else {
+            // Submitting read-only instance backed by TinyTree (no MIPs to check)
+            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+                documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo);
+            } else {
+                documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo.getRoot());
+            }
         }
-
-        // TODO: handle includenamespaceprefixes
         return documentToSubmit;
     }
 

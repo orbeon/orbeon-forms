@@ -355,16 +355,16 @@ public class TransformerUtils {
     /**
      * Transform a TinyTree to a dom4j document.
      */
-    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
-        try {
-            final Transformer identity = getIdentityTransformer();
-            final LocationDocumentResult documentResult = new LocationDocumentResult();
-            identity.transform(nodeInfo, documentResult);
-            return documentResult.getDocument();
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        }
-    }
+//    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
+//        try {
+//            final Transformer identity = getIdentityTransformer();
+//            final LocationDocumentResult documentResult = new LocationDocumentResult();
+//            identity.transform(nodeInfo, documentResult);
+//            return documentResult.getDocument();
+//        } catch (TransformerException e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     /**
      * Transform a TinyTree to a dom4j document.

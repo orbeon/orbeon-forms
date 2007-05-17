@@ -51,7 +51,7 @@ public class XFormsServerSharedInstancesCache {
         return instance;
     }
 
-    public void add(PipelineContext pipelineContext, String instanceSourceURI, SharedXFormsInstance sharedXFormsInstance) {
+    private void add(PipelineContext pipelineContext, String instanceSourceURI, SharedXFormsInstance sharedXFormsInstance) {
 
         if (XFormsServer.logger.isDebugEnabled())
             XFormsServer.logger.debug("XForms - adding application shared instance with id '" + sharedXFormsInstance.getEffectiveId() + "' to cache for URI: " + instanceSourceURI);

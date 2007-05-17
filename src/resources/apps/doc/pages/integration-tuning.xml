@@ -405,7 +405,7 @@
                 <p>
                     If you feel comfortable with the source code of Orbeon Forms, you can also use a Java profiler such
                     as <a href="http://www.yourkit.com/">YourKit</a> to figure out if a particular part of the Orbeon
-                    Forms platform if a bottleneck.
+                    Forms platform is a bottleneck.
                 </p>
             </section>
             <a name="other-measure"/>

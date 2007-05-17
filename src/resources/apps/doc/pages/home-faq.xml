@@ -551,10 +551,9 @@
                 <p>
                     The good news is that Orbeon Forms is very configurable and you are not forced to use XML pipelines
                     or the PFC. Users have been successfuylly using the Orbeon Forms XForms engine with JSP/Struts or
-                    PHP. The bad news is that we haven't yet written as much documentation as we would want on this
-                    topic. In the meanwhile, check <a href="/doc/integration-xforms-jsp">Using XForms with JSP</a> and
-                    post your questions to the <a href="http://www.orbeon.com/forms/mailing-list">ops-users</a>
-                    mailing-list.
+                    PHP. Please visit <a href="reference-xforms-java">Using the Orbeon Forms XForms Engine with Java
+                    Applications for more details</a>. Post additional questions to the <a
+                    href="http://www.orbeon.com/forms/mailing-list">ops-users</a> mailing-list.
                 </p>
             </section>
             <section added="2006-12-06">
@@ -1426,41 +1425,10 @@
                     I am getting frequent Out of Memory errors with Orbeon Forms. What can I do?
                 </title>
                 <p>
-                    Often, this is due to too many threads doing processing within Orbeon Forms at the same
-                    time. There is just a lot going on in Orbeon Forms when a request is processed, including
-                    typically several XSLT transformations.
-                </p>
-                <p>
-                    Servlet containers like Tomcat, or application servers like WebLogic, by default
-                    allow a very large number of concurrent threads to enter a servlet. For Tomcat,
-                    the default is 200. This means that memory usage cannot be effectively bound. It
-                    is enough to have a few requests slightly overlapping to cause extra memory
-                    consuption that can lead to Out of Memory errors. In addition, extra memory
-                    usage leads to poorer performance.
-                </p>
-                <p>
-                    It is recommended to start by changing the container parameters that control
-                    threads. With Tomcat (see the <a
-                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html">documentation</a>),
-                    try first:
-                </p>
-                <ul>
-                    <li>maxThreads="3"</li>
-                    <li>acceptCount="50"</li>
-                </ul>
-                <p>
-                    This setting sets a small maximum of 3 concurrent requests, and 50 more requests being queued. This
-                    ensures that memory usage does not go out of control.
-                </p>
-                <p>
-                    Then, experiment with a tool like Apache JMeter to test load, and adjust those
-                    parameters, as well as your virtual machine heap, until you get results that are
-                    satisfactory as far as memory consumption and number of concurrent requests are
-                    concerned.
-                </p>
-                <p>
-                    Note that it is typical for Java virtual machines to have maximum heap sizes of
-                    256 MB to 1 GB in production.
+                    Often, this is due to too many threads doing processing within Orbeon Forms at the same time. There
+                    is just a lot going on in Orbeon Forms when a request is processed, including typically several XSLT
+                    transformations. Please see <a href="integration-tuning#application-server-threads">Reduce the
+                    number of concurrent processing threads</a>.
                 </p>
             </section>
             <a name="stack-traces"/>

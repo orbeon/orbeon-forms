@@ -144,6 +144,39 @@
                     connector documentation</a>.
                 </p>
             </section>
+            <a name="application-server-threads"/>
+            <section>
+                <title>Reduce the number of concurrent processing threads</title>
+                <p>
+                    Servlet containers like Tomcat, or application servers like WebLogic, by default allow a very large
+                    number of concurrent threads to enter a servlet. For Tomcat, the default is 200. This means that
+                    memory usage cannot be effectively bound. It is enough to have a few requests slightly overlapping
+                    to cause extra memory consuption that can lead to Out of Memory errors. In addition, extra memory
+                    usage leads to poorer performance.
+                </p>
+                <p>
+                    It is recommended to start by changing the container parameters that control threads. With Tomcat
+                    (see the <a
+                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html">documentation</a>), try
+                    first:
+                </p>
+                <ul>
+                    <li>maxThreads="3"</li>
+                    <li>acceptCount="50"</li>
+                </ul>
+                <p>
+                    This setting sets a small maximum of 3 concurrent requests, and 50 more requests being queued. This
+                    ensures that memory usage does not go out of control.
+                </p>
+                <p>
+                    Then, experiment with a tool like Apache JMeter to test load, and adjust those parameters, as well
+                    as your virtual machine heap, until you get results that are satisfactory as far as memory
+                    consumption and number of concurrent requests are concerned.
+                </p>
+                <p>
+                    Note that it is typical for Java virtual machines to have maximum heap sizes of 256 MB to 1.5 GB in
+                    production.
+                </p>
         </section>
         <section>
             <title>Tunning Orbeon Forms</title>

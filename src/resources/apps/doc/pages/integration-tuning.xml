@@ -169,9 +169,9 @@
                     ensures that memory usage does not go out of control.
                 </p>
                 <p>
-                    Then, experiment with a tool like Apache JMeter to test load, and adjust those parameters, as well
-                    as your virtual machine heap, until you get results that are satisfactory as far as memory
-                    consumption and number of concurrent requests are concerned.
+                    Then, experiment with a tool like <a href="http://jakarta.apache.org/jmeter/">Apache JMeter</a> to
+                    test load, and adjust those parameters, as well as your virtual machine heap, until you get results
+                    that are satisfactory as far as memory consumption and number of concurrent requests are concerned.
                 </p>
                 <p>
                     Note that it is typical for Java virtual machines to have maximum heap sizes of 256 MB to 1.5 GB in

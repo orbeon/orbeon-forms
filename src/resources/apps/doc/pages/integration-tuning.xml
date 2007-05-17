@@ -177,6 +177,7 @@
                     Note that it is typical for Java virtual machines to have maximum heap sizes of 256 MB to 1.5 GB in
                     production.
                 </p>
+            </section>
         </section>
         <section>
             <title>Tunning Orbeon Forms</title>

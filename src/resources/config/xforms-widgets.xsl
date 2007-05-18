@@ -29,7 +29,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="xhtml:head">
+    <xsl:template match="/xhtml:html/xhtml:head">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates select="node()"/>

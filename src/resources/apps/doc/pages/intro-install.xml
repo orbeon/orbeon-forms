@@ -932,7 +932,7 @@
                 Follow the steps below to install the Security Manager:
                 <ol>
                     <li>
-                        Download the <a href="../apps/doc/images/oxf-policy.txt.html">policy</a> file.
+                        Download the <a href="../apps/doc/pages/oxf-policy.txt.html">policy</a> file.
                     </li>
                     <li>
                         Append the permissions to the application server

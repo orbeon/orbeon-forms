@@ -62,6 +62,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     private List eventHandlers;
 
     protected XFormsControls.BindingContext bindingContext;
+    private NodeInfo boundNode;
 
     public XFormsControl(XFormsContainingDocument containingDocument, XFormsControl parent, Element element, String name, String effectiveId) {
         this.containingDocument = containingDocument;
@@ -278,6 +279,8 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
      */
     public void setBindingContext(XFormsControls.BindingContext bindingContext) {
         this.bindingContext = bindingContext;
+        // Set the bound node at this time as well. This won't change until next refresh.
+        setBoundNode();
     }
 
     /**
@@ -288,20 +291,51 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventHan
     }
 
     /**
+     * Set the node to which the control is bound, if any. If the control is not bound to any node, the bound node is
+     * null. If the node to which the control no longer exists, return null.
+     */
+    private void setBoundNode() {
+        final NodeInfo boundSingleNode = bindingContext.getSingleNode();
+        if (boundSingleNode == null) {
+            this.boundNode = null;
+            return;
+        }
+
+        // Is this needed now that we set the bound node upon setBindingContext()?
+        final XFormsInstance boundInstance = containingDocument.getInstanceForNode(boundSingleNode);
+        if (boundInstance == null) {
+            this.boundNode = null;
+            return;
+        }
+
+        this.boundNode = boundSingleNode;
+    }
+
+    /**
+     * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
+     * the node to which the control no longer exists, return null.
+     *
+     * @return bound node or null
+     */
+    public NodeInfo getBoundNode() {
+        return boundNode;
+    }
+
+    /**
      * Return the node to which the control is bound, if any. If the control is not bound to any node, return null. If
      * the node to which the control no longer exists, return null.
      */
-    public NodeInfo getBoundNode() {
-        final NodeInfo boundSingleNode = bindingContext.getSingleNode();
-        if (boundSingleNode == null)
-            return null;
-
-        final XFormsInstance boundInstance = containingDocument.getInstanceForNode(boundSingleNode);
-        if (boundInstance == null)
-            return null;
-
-        return boundSingleNode;
-    }
+//    public NodeInfo getBoundNodeOld() {
+//        final NodeInfo boundSingleNode = bindingContext.getSingleNode();
+//        if (boundSingleNode == null)
+//            return null;
+//
+//        final XFormsInstance boundInstance = containingDocument.getInstanceForNode(boundSingleNode);
+//        if (boundInstance == null)
+//            return null;
+//
+//        return boundSingleNode;
+//    }
 
     public void evaluate(PipelineContext pipelineContext) {
 

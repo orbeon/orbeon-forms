@@ -141,6 +141,9 @@ public class XFormsGroupHandler extends HandlerBase {
             controller.setOutput(new DeferredContentHandlerImpl(new XFormsElementFilterContentHandler(outputInterceptor)));
             setContentHandler(controller.getOutput());
 
+            // Set control classes
+            outputInterceptor.setAddedClasses(classes);
+
             // Don't support label and other appearances, only the content!
         }
     }

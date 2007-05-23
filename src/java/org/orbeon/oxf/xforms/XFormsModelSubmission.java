@@ -748,7 +748,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                 if (!replaceInstance.isReadOnly()) {
                                                     // Mark all values as changed so that refresh sends appropriate events
-                                                    XFormsUtils.markAllValuesChanged(replaceInstance);
+                                                    XFormsUtils.markAllValuesChanged(newInstance);
                                                 }
 
                                                 // Handle new instance and associated events
@@ -926,6 +926,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         private final void checkInstanceData(Node node) {
                             if (nodeToDetach[0] == null) {
                                 final InstanceData instanceData = XFormsUtils.getInstanceDataUpdateInherited(node);
+
+
+                                if (instanceData == null) {
+                                    System.out.println();
+                                }
+
                                 // Check "relevant" MIP and remove non-relevant nodes
                                 {
                                     final BooleanModelItemProperty relevantMIP = instanceData.getInheritedRelevant();

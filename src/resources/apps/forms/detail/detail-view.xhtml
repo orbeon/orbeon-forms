@@ -130,7 +130,7 @@
                 <tr>
                     <td>
                         <xforms:group ref="instance('control-instance')/back-trigger">
-                            <xforms:trigger>
+                            <xforms:trigger ref=".">
                                 <xforms:label>
                                     <img src="../../../apps/forms/images/back.gif" alt="Back"/>
                                     <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/return"/></span>
@@ -141,7 +141,7 @@
                     </td>
                     <td>
                         <xforms:group ref="instance('control-instance')/save-trigger">
-                            <xforms:trigger>
+                            <xforms:trigger ref=".">
                                 <xforms:label>
                                     <img src="../../../apps/forms/images/save.gif" alt="Save"/>
                                     <span><xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/save-document"/></span>
@@ -155,7 +155,7 @@
                     <td>
                         <xforms:group ref="instance('control-instance')/errors-on-page">
                             <xforms:output class="forms-message-fatal" model="resources-model" ref="instance('resources-instance')/detail/labels/check-errors-in-form"/>
-                            <xforms:trigger appearance="minimal">
+                            <xforms:trigger appearance="minimal" ref=".">
                                 <xforms:label>  
                                     <xforms:output model="resources-model" ref="instance('resources-instance')/detail/labels/error-details"/>
                                 </xforms:label>

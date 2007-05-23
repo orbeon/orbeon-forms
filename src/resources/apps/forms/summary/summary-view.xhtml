@@ -113,7 +113,7 @@
                                         <xforms:send submission="import-documents-submission"/>
                                         <xforms:send submission="list-documents-submission"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/add-all.gif" alt="Import Forms"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/import-forms"/>
@@ -127,7 +127,7 @@
                                         <xforms:recalculate/>
                                         <xforms:load resource="/forms/detail/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/edit.gif" alt="Edit Form"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/edit-form"/>
@@ -141,7 +141,7 @@
                                         <xforms:send submission="delete-document-submission"/>
                                         <xforms:send submission="list-documents-submission"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/remove.gif" alt="Delete Form"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/delete-form"/>
@@ -155,7 +155,7 @@
                                         <xforms:recalculate/>
                                         <xforms:load resource="/forms/detail/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}?readonly=true"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/lockedstate.gif" alt="View Read=Only"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-readonly"/>
@@ -169,7 +169,7 @@
                                         <xforms:recalculate/>
                                         <xforms:load resource="/exist/rest/db/orbeon/forms/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}" f:url-type="resource"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/view-xml.gif" alt="View XML"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-xml"/>
@@ -183,7 +183,7 @@
                                         <xforms:recalculate/>
                                         <xforms:load resource="/forms/pdf-detail/{{instance('parameters-instance')/form-id}}/{{instance('documents-instance')/documents/document[index('documents-repeat')]/id}}" f:url-type="resource" xxforms:show-progress="false"/>
                                     </xforms:action>
-                                    <xforms:trigger appearance="minimal">
+                                    <xforms:trigger appearance="minimal" ref=".">
                                         <xforms:label>
                                             <xhtml:img src="../apps/forms/images/pdf.png" alt="View PDF"/>
                                             <xforms:output model="resources-model" ref="instance('resources-instance')/summary/labels/view-pdf"/>

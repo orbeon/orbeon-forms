@@ -374,6 +374,15 @@ ORBEON.util.Dom = {
 ORBEON.util.String = {
     replace: function(text, placeholder, replacement) {
         return text.replace(new RegExp(placeholder, "g"), replacement);
+    },
+
+    /**
+     * Evaluates JavaScript which can contain return caracters we need to remove
+     */
+    eval: function(javascriptString) {
+        javascriptString = ORBEON.util.String.replace(javascriptString, "\n", " ");
+        javascriptString = ORBEON.util.String.replace(javascriptString, "\r", " ");
+        return eval(javascriptString);
     }
 }
 
@@ -1627,9 +1636,7 @@ ORBEON.xforms.Init = {
         treeDiv.xformsAllowMultipleSelection = ORBEON.util.Dom.hasClass(treeDiv, "xforms-select");
         // Parse data put by the server in the div
         var treeString = ORBEON.util.Dom.getStringValue(treeDiv);
-        treeString = ORBEON.util.String.replace(treeString, "\n", " ");
-        treeString = ORBEON.util.String.replace(treeString, "\r", " ");
-        var treeArray = eval(treeString);
+        var treeArray = ORBEON.util.String.eval(treeString);
         ORBEON.util.Dom.setStringValue(treeDiv, "");
         treeDiv.value = "";
         // Create YUI tree and save a copy
@@ -1643,7 +1650,7 @@ ORBEON.xforms.Init = {
         if (!treeDiv.xformsAllowMultipleSelection) {
             var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
             YAHOO.util.Dom.addClass(selectedNode.getLabelEl(), "xforms-tree-label-selected");
-        }        
+        }
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);
         ORBEON.util.Dom.removeClass(treeDiv, "xforms-initially-hidden");
@@ -1698,9 +1705,7 @@ ORBEON.xforms.Init = {
 
         // Extract menu hierarchy from HTML
         var menuString = ORBEON.util.Dom.getStringValue(valuesDiv);
-        menuString = ORBEON.util.String.replace(menuString, "\n", " ");
-        menuString = ORBEON.util.String.replace(menuString, "\r", " ");
-        ORBEON.xforms.Globals.menuItemsets[menu.id] = eval(menuString);
+        ORBEON.xforms.Globals.menuItemsets[menu.id] = ORBEON.util.String.eval(menuString);
 
         // Initialize tree
         YAHOO.util.Dom.generateId(yuiMenuDiv);
@@ -2209,7 +2214,7 @@ ORBEON.xforms.Server = {
                                 for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
                                     if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
                                         var itemsetElement = itemsetsElement.childNodes[j];
-                                        var itemsetTree = eval(ORBEON.util.Dom.getStringValue(itemsetElement));
+                                        var itemsetTree = ORBEON.util.String.eval(ORBEON.util.Dom.getStringValue(itemsetElement));
                                         var controlId = ORBEON.util.Dom.getAttribute(itemsetElement, "id");
                                         var documentElement = ORBEON.util.Dom.getElementById(controlId);
                                         var documentElementClasses = documentElement.className.split(" ");
@@ -2240,7 +2245,7 @@ ORBEON.xforms.Server = {
                                             yuiTree.removeChildren(yuiRoot);
                                             // Expand root. If we don't the tree with checkboxes does not show.
                                             yuiRoot.expand();
-                                            
+
                                             // Re-populate the tree
                                             ORBEON.xforms.Init._initTreeDivFromArray(documentElement, yuiTree, itemsetTree);
 
@@ -2626,7 +2631,7 @@ ORBEON.xforms.Server = {
                                                         }
                                                         documentElement.value = newControlValue;
                                                         documentElement.previousValue = newControlValue;
-                                                        
+
                                                     } else if (ORBEON.util.Dom.hasClass(documentElement, "xforms-select1-appearance-xxforms-tree")) {
                                                         // Select1 tree
                                                         // Make sure the tree is open enough so the node with the new value is visible

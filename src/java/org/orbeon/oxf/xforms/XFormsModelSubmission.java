@@ -634,10 +634,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     = XFormsServerSharedInstancesCache.instance().find(pipelineContext, replaceInstance.getEffectiveId(), replaceInstance.getModelId(), absoluteResolvedURLString);
 
                             // Handle new instance and associated events
-                            final XFormsModel replaceModel = replaceInstance.getModel(containingDocument);
+                            final XFormsModel replaceModel = sharedInstance.getModel(containingDocument);
 
                             if (XFormsServer.logger.isDebugEnabled())
-                                XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + replaceInstance.getEffectiveId());
+                                XFormsServer.logger.debug("XForms - submission - replacing instance with read-only instance: " + sharedInstance.getEffectiveId());
 
                             replaceModel.setInstance(sharedInstance, true);
                             replaceModel.handleNewInstanceDocuments(pipelineContext);
@@ -743,10 +743,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 }
 
                                                 // Set new instance
-                                                final XFormsModel replaceModel = replaceInstance.getModel(containingDocument);
+                                                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
                                                 replaceModel.setInstance(newInstance, true);
 
-                                                if (!replaceInstance.isReadOnly()) {
+                                                if (!newInstance.isReadOnly()) {
                                                     // Mark all values as changed so that refresh sends appropriate events
                                                     XFormsUtils.markAllValuesChanged(newInstance);
                                                 }

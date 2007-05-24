@@ -231,6 +231,10 @@
     background-color: #ff3;
 }
 
+.xforms-group-begin-end {
+    display: none;
+}
+
 .xforms-debug {
     background-color: #fc9;
     position: absolute;

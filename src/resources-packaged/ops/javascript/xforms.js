@@ -48,14 +48,14 @@ var XFORMS_WIDE_TEXTAREA_MIN_ROWS = 5;
 
 /* * * * * * Utility functions * * * * * */
 
-ORBEON = {};
-ORBEON.util = {};
-ORBEON.xforms = {};
+var ORBEON = ORBEON || {};
+ORBEON.util = ORBEON.util || {};
+ORBEON.xforms = ORBEON.xforms || {};
 
 /**
  * Global constants and variable
  */
-ORBEON.xforms.Globals = {
+ORBEON.xforms.Globals = ORBEON.xforms.Globals || {
     // Booleans used for browser detection
     isRenderingEnginePresto: navigator.userAgent.toLowerCase().indexOf("opera") != -1,    // Opera
     isRenderingEngineWebCore: navigator.userAgent.toLowerCase().indexOf("safari") != -1,  // Safari
@@ -3532,5 +3532,5 @@ if (!ORBEON.xforms.Globals.pageLoadedRegistered) {
     ORBEON.xforms.Globals.pageLoadedRegistered = true;
     // If the browser does not provide a console object, create one which delegates log() to xformsLog()
     YAHOO.util.Event.addListener(window, "load", ORBEON.xforms.Init.document);
+    ORBEON.xforms.Globals.debugLastTime = new Date().getTime();
 }
-ORBEON.xforms.Globals.debugLastTime = new Date().getTime();

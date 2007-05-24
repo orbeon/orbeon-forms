@@ -1296,8 +1296,10 @@ ORBEON.xforms.Events = {
         } else {
             // Unselect the old node and select the new node
             var oldNode = yuiTree.getNodeByProperty("value", control.value);
-            YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
-            YAHOO.util.Dom.addClass(node.getLabelEl(), "xforms-tree-label-selected");
+            if (oldNode != null)
+                YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
+            if (node != null)
+                YAHOO.util.Dom.addClass(node.getLabelEl(), "xforms-tree-label-selected");
             // Make we know this control has the focus
             ORBEON.xforms.Events.treeClickFocus(control);
             // Store the new value for this control
@@ -2643,8 +2645,10 @@ ORBEON.xforms.Server = {
                                                         // Deselect old value, select new value
                                                         var oldNode = yuiTree.getNodeByProperty("value", documentElement.value);
                                                         var newNode = yuiTree.getNodeByProperty("value", newControlValue);
-                                                        YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
-                                                        YAHOO.util.Dom.addClass(newNode.getLabelEl(), "xforms-tree-label-selected");
+                                                        if (oldNode != null)
+                                                            YAHOO.util.Dom.removeClass(oldNode.getLabelEl(), "xforms-tree-label-selected");
+                                                        if (newNode != null)
+                                                            YAHOO.util.Dom.addClass(newNode.getLabelEl(), "xforms-tree-label-selected");
                                                         // Update value
                                                         documentElement.value = newControlValue;
                                                         documentElement.previousValue = newControlValue;

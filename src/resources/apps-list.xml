@@ -36,6 +36,7 @@
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
         <application id="xforms-cart" label="Shopping Cart"/>
         <application id="xforms-sql-address-book" label="SQL Address Book"/>
+        <application id="xforms-tidy" label="HTML to XHTML"/>
     </section>
     <section label="Sandboxes">
         <application id="xforms-sandbox" label="XForms Sandbox"/>

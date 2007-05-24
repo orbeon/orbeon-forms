@@ -1,0 +1,72 @@
+<!--
+    Copyright (C) 2007 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>XForms HTML to XHTML Converter</title>
+        <xforms:model>
+            <xforms:instance id="files-instance">
+                <file filename="" mediatype="" size="" selected="false"/>
+            </xforms:instance>
+            <xforms:instance id="triggers-instance">
+                <triggers xmlns="">
+                    <upload/>
+                </triggers>
+            </xforms:instance>
+            <xforms:bind nodeset="instance('triggers-instance')/upload" readonly="instance('files-instance')/@selected = 'false'"/>
+            <xforms:submission id="convert-submission" method="post" action="/xforms-tidy/convert" replace="all"/>
+        </xforms:model>
+        <style type="text/css">
+            .converter-note { font-style: italic }
+        </style>
+    </head>
+    <body>
+        <p>
+            This XForms application allows you to convert HTML files to XHTML. It's as simple as:
+        </p>
+        <ol>
+            <li>Upload an HTML file</li>
+            <li>Press the "Convert" button</li>
+            <li>Receive back a cleaned-up XHTML file</li>
+            <li>...</li>
+            <li><a href="http://en.wikipedia.org/wiki/Underpants_Gnomes#The_gnomes">Profit!</a></li>
+        </ol>
+        <table>
+            <tr>
+                <td>
+                    <xforms:upload ref="." xxforms:size="40">
+                        <xforms:filename ref="@filename"/>
+                        <xforms:mediatype ref="@mediatype"/>
+                        <xxforms:size ref="@size"/>
+                        <xforms:setvalue ev:event="xforms-select" ref="@selected">true</xforms:setvalue>
+                    </xforms:upload>
+                </td>
+                <td>
+                    <xforms:submit submission="convert-submission" ref="instance('triggers-instance')/upload">
+                        <xforms:label>Convert</xforms:label>
+                    </xforms:submit>
+                </td>
+            </tr>
+        </table>
+        <p class="converter-note">
+            NOTE: The conversion process has limitations: don't expect it to be perfect. But it works just fine in
+            many cases.
+        </p>
+    </body>
+</html>

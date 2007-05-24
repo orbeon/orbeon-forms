@@ -1,0 +1,113 @@
+<config>
+    <template href="oxf:/apps/forms/forms/G-325A/g-325a.pdf" show-grid="false"/>
+
+    <group ref="/*" font-pitch="5" font-family="Courier" font-size="9">
+
+        <group ref=".[$page-number le 4]" offset-x="{if ($page-number = 1) then 0 else 3}"
+               offset-y="{if ($page-number = 1) then 0 else 6}">
+            <!-- Personal information -->
+            <group ref="personal-information">
+                <group ref="name">
+                    <field left="46" top="90" size="100" value="last"/>
+                    <field left="150" top="90" size="100" value="first"/>
+                    <field left="236" top="90" size="100" value="if (initial != '') then initial else '(none)'"/>
+                    <field left="42" top="114" size="100" value="if (other != '') then other else '(none)'"/>
+                </group>
+
+                <field left="305" top="79" size="100" value="if (gender = 'male') then 'X' else ''"/>
+                <field left="305" top="90" size="100" value="if (gender = 'female') then 'X' else ''"/>
+
+                <group ref="birth">
+                    <field left="342" top="90" size="100" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                </group>
+                <field left="430" top="90" size="100" value="citizenship"/>
+                <field left="520" top="90" size="100" value="if (file-number != '') then file-number else '(none)'"/>
+
+                <field left="306" top="114" size="100" value="concat(birth/city, ', ', birth/country)"/>
+                <field left="484" top="114" size="100" value="ssn"/>
+
+                <field left="46" top="190" size="100" value="'(none)'"/>
+                <field left="46" top="224" size="100" value="'(none)'"/>
+            </group>
+
+            <!-- Parents information -->
+            <repeat nodeset="parents-information/*" offset-y="12.5">
+                <field left="100" top="138" size="100" value="name/last"/>
+                <field left="210" top="138" size="100" value="name/first"/>
+                <group ref="birth">
+                    <field left="280" top="138" size="100" value="string-join((substring(date, 6, 2), substring(date, 9, 2), substring(date, 1, 4)), '/')"/>
+                </group>
+                <field left="340" top="138" size="100" value="concat(birth/city, ', ', birth/country)"/>
+                <field left="460" top="138" size="100" value="concat(residence/city, ', ', residence/country)"/>
+            </repeat>
+
+            <!-- Residence -->
+            <group ref="residence-information">
+                <repeat nodeset="last-five-years/residence" offset-y="12.5">
+                    <field left="46" top="274" size="100" value="street"/>
+                    <field left="214" top="274" size="100" value="city"/>
+                    <field left="280" top="274" size="100" value="state"/>
+                    <field left="374" top="274" size="100" value="country"/>
+                    <field left="453" top="274" size="100" value="substring(from, 6, 2)"/>
+                    <field left="484" top="274" size="100" value="substring(from, 1, 4)"/>
+                    <field left="526" top="274" size="100" value="substring(to, 6, 2)"/>
+                    <field left="562" top="274" size="100" value="substring(to, 1, 4)"/>
+                </repeat>
+                <group ref="last-abroad/residence">
+                    <field left="46" top="374" size="100" value="street"/>
+                    <field left="214" top="374" size="100" value="city"/>
+                    <field left="280" top="374" size="100" value="state"/>
+                    <field left="374" top="374" size="100" value="country"/>
+                    <field left="453" top="374" size="100" value="substring(from, 6, 2)"/>
+                    <field left="484" top="374" size="100" value="substring(from, 1, 4)"/>
+
+                    <!-- TODO: allow blank -->
+                    <field left="514" top="374" size="100" value="to"/>
+                </group>
+            </group>
+
+            <!-- Employment -->
+            <group ref="employment-information">
+                <repeat nodeset="last-five-years/employment" offset-y="12.5">
+                    <field left="46" top="414" size="100" value="concat(name, if (address != '') then ', ' else '', address)"/>
+                    <field left="356" top="414" size="100" value="occupation"/>
+                    <field left="453" top="414" size="100" value="substring(from, 6, 2)"/>
+                    <field left="484" top="414" size="100" value="substring(from, 1, 4)"/>
+                    <field left="526" top="414" size="100" value="substring(to, 6, 2)"/>
+                    <field left="562" top="414" size="100" value="substring(to, 1, 4)"/>
+                </repeat>
+                <group ref="last-abroad/employment">
+                    <field left="46" top="494" size="100" value="concat(name, if (address != '') then ', ' else '', address)"/>
+                    <field left="356" top="494" size="100" value="occupation"/>
+                    <field left="453" top="494" size="100" value="substring(from, 6, 2)"/>
+                    <field left="484" top="494" size="100" value="substring(from, 1, 4)"/>
+                    <field left="526" top="494" size="100" value="substring(to, 6, 2)"/>
+                    <field left="562" top="494" size="100" value="substring(to, 1, 4)"/>
+                </group>
+            </group>
+
+            <!-- Connection -->
+            <group ref="connection">
+                <field left="192" top="520" size="100" value="other"/>
+                <field left="47" top="519" size="100" value="if (type = 'naturalization') then 'X' else ''"/>
+                <field left="119" top="519" size="100" value="if (type = 'other') then 'X' else ''"/>
+                <field left="47" top="530" size="100" value="if (type = 'permanent') then 'X' else ''"/>
+            </group>
+
+            <!-- Native alphabet -->
+            <field left="196" top="554" size="100" value="'N/A'"/>
+
+            <!-- Signature -->
+            <group ref="personal-information">
+                <group ref="name">
+                    <field left="50" top="620" size="100" value="last"/>
+                    <field left="240" top="620" size="100" value="first"/>
+                    <field left="370" top="620" size="100" value="if (initial != '') then initial else '(none)'"/>
+                </group>
+                <field left="470" top="620" size="100" value="if (file-number != '') then file-number else '(none)'"/>
+            </group>
+        </group>
+
+    </group>
+
+</config>

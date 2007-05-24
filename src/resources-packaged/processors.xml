@@ -565,8 +565,21 @@
         <class name="org.orbeon.oxf.processor.SchedulerProcessor"/>
     </processor>
 
-    <processor name="oxf:pdf-template">
+    <processor name="oxf:pdf-template-base">
         <class name="org.orbeon.oxf.processor.pdf.PDFTemplateProcessor"/>
+    </processor>
+
+    <!-- Temporary hack to get rid of the config input -->
+    <processor name="oxf:pdf-template">
+        <instantiation name="oxf:pdf-template-base">
+            <input name="config"><config/></input>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:word-template">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/ops/utils/word-template/word-template.xpl"/>
+        </instantiation>
     </processor>
 
     <!-- Portlet processors -->

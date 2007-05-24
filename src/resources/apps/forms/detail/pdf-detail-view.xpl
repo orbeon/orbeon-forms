@@ -38,9 +38,7 @@
     <!-- Produce PDF document -->
     <p:processor name="oxf:pdf-template">
         <p:input name="instance" href="#document"/>
-        <p:input name="model" href="#instance#xpointer(doc(concat('../forms/', /*/form-id, '/pdf-template.xml')))"/>
-        <!-- TODO: Remove this input -->
-        <p:input name="config"><config/></p:input>
+        <p:input name="model" href="#instance#xpointer(doc(concat('../forms/', /*/form-id, '/pdf-model.xml')))"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

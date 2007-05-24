@@ -1649,7 +1649,10 @@ ORBEON.xforms.Init = {
         // Show the currently selected value
         if (!treeDiv.xformsAllowMultipleSelection) {
             var selectedNode = yuiTree.getNodeByProperty("value", treeDiv.value);
-            YAHOO.util.Dom.addClass(selectedNode.getLabelEl(), "xforms-tree-label-selected");
+            // Handle cases where the current value is not in the tree. In most cases this is because the value is
+            // empty string; no value has been selected yet.
+            if (selectedNode != null)
+                YAHOO.util.Dom.addClass(selectedNode.getLabelEl(), "xforms-tree-label-selected");
         }
         // Register event handler for click on label
         yuiTree.subscribe("labelClick", ORBEON.xforms.Events.treeLabelClick);

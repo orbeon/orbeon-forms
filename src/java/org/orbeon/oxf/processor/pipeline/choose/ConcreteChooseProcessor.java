@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.dom4j.Node;
 import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -24,9 +23,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.om.DocumentInfo;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
@@ -161,12 +159,12 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             throw new IllegalStateException("ASTChoose Processor already started");
 
         // Choose which branch we want to run (we cache the decision)
-        Node refNode = null;
+        DocumentInfo hrefDocumentInfo = null;
         int branchIndex = 0;
         int selectedBranch = -1;
         for (Iterator i = branchConditions.iterator(); i.hasNext();) {
             // Evaluate expression
-            String condition = (String) i.next();
+            final String condition = (String) i.next();
             if (condition == null) {
                 selectedBranch = branchIndex;
                 break;
@@ -182,13 +180,12 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 //                break;
 //            }
             // Lazily read input in case there is only a p:otherwise
-            if (refNode == null)
-                refNode = readCacheInputAsDOM4J(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
-            DocumentWrapper wrapper = new DocumentWrapper(refNode.getDocument(), null, new Configuration());
+            if (hrefDocumentInfo == null)
+                hrefDocumentInfo = readCacheInputAsTinyTree(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             PooledXPathExpression expr = null;
-            Map namespaces = (Map)branchNamespaces.get(branchIndex);
+            final Map namespaces = (Map) branchNamespaces.get(branchIndex);
             try {
-                expr = XPathCache.getXPathExpression(context, wrapper, "boolean(" + condition + ")", namespaces);
+                expr = XPathCache.getXPathExpression(context, hrefDocumentInfo, "boolean(" + condition + ")", namespaces);
                 if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
                     selectedBranch = branchIndex;
                     break;
@@ -196,7 +193,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 branchIndex++;
             } catch (XPathException e) {
                 throw new OXFException(e);
-            }finally{
+            } finally{
                 try {
                     if(expr != null)
                         expr.returnToPool();

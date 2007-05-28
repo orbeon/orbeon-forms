@@ -30,18 +30,19 @@ import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.InspectingContentHandler;
-import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.saxon.om.DocumentInfo;
+import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
@@ -404,6 +405,16 @@ public abstract class ProcessorImpl implements Processor {
         return ch.getDocument();
     }
 
+    protected DocumentInfo readInputAsTinyTree(PipelineContext context, ProcessorInput input) {
+        final TinyBuilder treeBuilder = new TinyBuilder();
+
+        final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+        identity.setResult(treeBuilder);
+        readInputAsSAX(context, input, identity);
+
+        return (DocumentInfo) treeBuilder.getCurrentRoot();
+    }
+
     protected Document readInputAsDOM(PipelineContext context, String inputName) {
         return readInputAsDOM(context, getInputByName(inputName));
     }
@@ -425,6 +436,14 @@ public abstract class ProcessorImpl implements Processor {
         return (org.dom4j.Document) readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
                 return readInputAsDOM4J(context, input);
+            }
+        });
+    }
+
+    protected DocumentInfo readCacheInputAsTinyTree(PipelineContext context, String inputName) {
+        return (DocumentInfo) readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader() {
+            public Object read(PipelineContext context, ProcessorInput input) {
+                return readInputAsTinyTree(context, input);
             }
         });
     }

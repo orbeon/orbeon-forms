@@ -414,7 +414,15 @@ public class Dom4jUtils {
         return extractTextValueQName(element, element.getStringValue());
     }
 
-    private static QName extractTextValueQName(Element element, String qNameString) {
+    /**
+     * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
+     * Return null if the text is empty.
+     *
+     * @param element       Element containing the attribute
+     * @param qNameString   QName to analyze
+     * @return              a QName object or null if not found
+     */
+    public static QName extractTextValueQName(Element element, String qNameString) {
         if (qNameString == null)
             return null;
         qNameString = qNameString.trim();

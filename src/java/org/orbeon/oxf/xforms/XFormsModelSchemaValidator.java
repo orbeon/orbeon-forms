@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import com.sun.msv.grammar.Grammar;
 import com.sun.msv.grammar.IDContextProvider2;
+import com.sun.msv.grammar.Expression;
+import com.sun.msv.grammar.xmlschema.*;
 import com.sun.msv.reader.GrammarReaderController;
 import com.sun.msv.reader.util.GrammarLoader;
 import com.sun.msv.util.DatatypeRef;
@@ -23,6 +25,10 @@ import com.sun.msv.util.StringRef;
 import com.sun.msv.verifier.Acceptor;
 import com.sun.msv.verifier.regexp.REDocumentDeclaration;
 import com.sun.msv.verifier.regexp.StringToken;
+import com.sun.msv.verifier.regexp.ExpressionAcceptor;
+import com.sun.msv.verifier.regexp.SimpleAcceptor;
+import com.sun.msv.verifier.regexp.xmlschema.XSAcceptor;
+import com.sun.msv.datatype.xsd.DatatypeFactory;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -40,7 +46,9 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 import org.relaxng.datatype.Datatype;
+import org.relaxng.datatype.DatatypeException;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -218,14 +226,14 @@ public class XFormsModelSchemaValidator {
         } else {
             em = errMsg;
         }
-        instanceData.addSchemaError(em, element.getStringValue());
+        instanceData.addSchemaError(em, element.getStringValue(), null);
     }
 
     private void addSchemaError(final Attribute attribute, final String errMsg) {
         // Looks like if n is an element and errMsg == null then the problem is missing character
         // data.
-        final InstanceData instDat = XFormsUtils.getLocalInstanceData(attribute);
-        instDat.addSchemaError(errMsg, attribute.getStringValue());
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
+        instanceData.addSchemaError(errMsg, attribute.getStringValue(), null);
     }
 
     private Acceptor getChildAcceptor
@@ -244,40 +252,47 @@ public class XFormsModelSchemaValidator {
         }
     }
 
-    private void validateElement(final Element elt, final Acceptor acc, final IDConstraintChecker icc) {
-        final String nsURI = elt.getNamespaceURI();
-        final String nam = elt.getName();
-        final String qnam = elt.getQualifiedName();
-        final List attLst = elt.attributes();
-        final AttributesImpl atts = new AttributesImpl();
+    private void validateElement(final Element element, final Acceptor acceptor, final IDConstraintChecker icc) {
+        final StartTagInfo startTagInfo;
+        {
+            final String nsURI = element.getNamespaceURI();
+            final String nam = element.getName();
+            final String qnam = element.getQualifiedName();
+            final List attLst = element.attributes();
+            final AttributesImpl atts = new AttributesImpl();
 
-        for (final Iterator itr = attLst.iterator(); itr.hasNext();) {
-            final Attribute att = (Attribute) itr.next();
-            final String auri = att.getNamespaceURI();
-            final String anam = att.getName();
-            final String aQNam = att.getQualifiedName();
-            final String val = att.getValue();
-            atts.addAttribute(auri, anam, aQNam, null, val);
+            for (final Iterator itr = attLst.iterator(); itr.hasNext();) {
+                final Attribute att = (Attribute) itr.next();
+                final String auri = att.getNamespaceURI();
+                final String anam = att.getName();
+                final String aQNam = att.getQualifiedName();
+                final String val = att.getValue();
+                atts.addAttribute(auri, anam, aQNam, null, val);
+            }
+            startTagInfo = new StartTagInfo(nsURI, nam, qnam, atts, validationContext);
         }
-        final StartTagInfo si = new StartTagInfo(nsURI, nam, qnam, atts, validationContext);
 
-        final StringRef sr = new StringRef();
-        final Acceptor chldAcc = getChildAcceptor(elt, si, acc, sr);
-        icc.onNextAcceptorReady(si, chldAcc, elt);
-        handleIDErrors(icc);
-
-        final int charCare = chldAcc.getStringCareLevel();
-        final DatatypeRef dref = new DatatypeRef();
-        validateChildren(elt, chldAcc, si, charCare, icc, dref);
-        if (!chldAcc.isAcceptState(null)) {
-            chldAcc.isAcceptState(sr);
-            addSchemaError(elt, sr.str);
+        final StringRef stringRef = new StringRef();
+        final Acceptor childAcceptor = getChildAcceptor(element, startTagInfo, acceptor, stringRef);
+        if (icc != null) {
+            icc.onNextAcceptorReady(startTagInfo, childAcceptor, element);
+            handleIDErrors(icc);
         }
-        icc.endElement(elt, dref.types);
-        handleIDErrors(icc);
-        if (!acc.stepForward(chldAcc, null)) {
-            acc.stepForward(chldAcc, sr);
-            addSchemaError(elt, sr.str);
+
+        final int stringCareLevel = childAcceptor.getStringCareLevel();
+        final DatatypeRef datatypeRef = new DatatypeRef();
+        validateChildren(element, childAcceptor, startTagInfo, stringCareLevel, icc, datatypeRef);
+        if (!childAcceptor.isAcceptState(null)) {
+            childAcceptor.isAcceptState(stringRef);
+            addSchemaError(element, stringRef.str);
+        }
+        if (icc != null) {
+            icc.endElement(element, datatypeRef.types);
+            handleIDErrors(icc);
+        }
+        if (!acceptor.stepForward(childAcceptor, null)) {
+            acceptor.stepForward(childAcceptor, stringRef);
+            addSchemaError(element, stringRef.str);
         }
     }
 
@@ -285,42 +300,43 @@ public class XFormsModelSchemaValidator {
      * Note that all of the attribs of elt should be in si.attributes.  If they are out of synch
      * it break the ability to access the attribs by index.
      */
-    private void validateChildren
-            (final Element elt, final Acceptor acc, final StartTagInfo si, final int charCare
-             , final IDConstraintChecker icc, final DatatypeRef dref) {
+    private void validateChildren(final Element element, final Acceptor acceptor, final StartTagInfo startTagInfo, final int stringCareLevel,
+                                  final IDConstraintChecker icc, final DatatypeRef datatypeRef) {
 
-        final int end = si.attributes.getLength();
+        final int end = startTagInfo.attributes.getLength();
         final StringRef sr = new StringRef();
         final DatatypeRef attDRef = new DatatypeRef();
         for (int i = 0; i < end; i++) {
-            final String uri = si.attributes.getURI(i);
+            final String uri = startTagInfo.attributes.getURI(i);
             if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) continue;
-            final String nam = si.attributes.getLocalName(i);
-            final String qNam = si.attributes.getQName(i);
-            final String val = si.attributes.getValue(i);
+            final String nam = startTagInfo.attributes.getLocalName(i);
+            final String qNam = startTagInfo.attributes.getQName(i);
+            final String val = startTagInfo.attributes.getValue(i);
 
-            if (!acc.onAttribute2(uri, nam, qNam, val, si.context, null, attDRef)) {
-                final Attribute att = elt.attribute(i);
-                acc.onAttribute2(uri, nam, qNam, val, si.context, sr, (DatatypeRef) null);
+            if (!acceptor.onAttribute2(uri, nam, qNam, val, startTagInfo.context, null, attDRef)) {
+                final Attribute att = element.attribute(i);
+                acceptor.onAttribute2(uri, nam, qNam, val, startTagInfo.context, sr, (DatatypeRef) null);
                 addSchemaError(att, sr.str);
             }
-            final Attribute att = elt.attribute(i);
-            icc.feedAttribute(acc, att, attDRef.types);
-            handleIDErrors(icc);
+            final Attribute att = element.attribute(i);
+            if (icc != null) {
+                icc.feedAttribute(acceptor, att, attDRef.types);
+                handleIDErrors(icc);
+            }
         }
-        if (!acc.onEndAttributes(si, null)) {
-            acc.onEndAttributes(si, sr);
-            addSchemaError(elt, sr.str);
+        if (!acceptor.onEndAttributes(startTagInfo, null)) {
+            acceptor.onEndAttributes(startTagInfo, sr);
+            addSchemaError(element, sr.str);
         }
-        for (final Iterator itr = elt.elementIterator(); itr.hasNext();) {
+        for (final Iterator itr = element.elementIterator(); itr.hasNext();) {
             final Element chld = (Element) itr.next();
-            validateElement((Element) chld, acc, icc);
+            validateElement((Element) chld, acceptor, icc);
         }
         // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data
         // ends up being incorrect.  Specifically elements of type xs:string end up being invalid
         // when they are empty. ( Which is wrong. )
-        final String txt = elt.getText();
-        switch (charCare) {
+        final String txt = element.getText();
+        switch (stringCareLevel) {
             case Acceptor.STRING_IGNORE:
                 {
                     if (txt.length() > 0) {
@@ -331,23 +347,23 @@ public class XFormsModelSchemaValidator {
                         // but the element actually containing character content. But is removing
                         // the test correct?
                     }
-                    dref.types = null;
+                    datatypeRef.types = null;
                     break;
                 }
             case Acceptor.STRING_PROHIBITED:
                 {
                     final String trmd = txt.trim();
                     if (trmd.length() > 0) {
-                        addSchemaError(elt, sr.str);
+                        addSchemaError(element, sr.str);
                     }
-                    dref.types = null;
+                    datatypeRef.types = null;
                     break;
                 }
             case Acceptor.STRING_STRICT:
                 {
-                    if (!acc.onText2(txt, si.context, null, dref)) {
-                        acc.onText2(txt, si.context, sr, null);
-                        addSchemaError(elt, sr.str);
+                    if (!acceptor.onText2(txt, startTagInfo.context, null, datatypeRef)) {
+                        acceptor.onText2(txt, startTagInfo.context, sr, null);
+                        addSchemaError(element, sr.str);
                     }
                     break;
                 }
@@ -380,41 +396,43 @@ public class XFormsModelSchemaValidator {
     private Grammar loadCacheGrammar(final PipelineContext pipelineContext, final String schemaURI) {
         try {
             final URL url = URLFactory.createURL(schemaURI);
-            final Long modTim = NetUtils.getLastModified(url, (Long) null);
+            final Long modificationTime = NetUtils.getLastModified(url, (Long) null);
 
             final Cache cache = ObjectCache.instance();
-            final SchemaKey schmKey = new SchemaKey(url);
+            final SchemaKey schemaKey = new SchemaKey(url);
 
-            final SchemaInfo schmInf;
+            final SchemaInfo schemaInfo;
             {
-                final Object cached = cache.findValid(pipelineContext, schmKey, modTim);
-                schmInf = cached == null ? null : (SchemaInfo) cached;
+                final Object cached = cache.findValid(pipelineContext, schemaKey, modificationTime);
+                schemaInfo = cached == null ? null : (SchemaInfo) cached;
             }
 
             // Grammar is thread safe while REDocumentDeclaration is not so cache grammar
             // instead of REDocumentDeclaration
-            final Grammar grmr;
-            if (schmInf == null || !schmInf.includesUpToDate()) {
-                final SchemaInfo newSchmInf = new SchemaInfo();
+            final Grammar grammar;
+            if (schemaInfo == null || !schemaInfo.includesUpToDate()) {
+                final SchemaInfo newSchemaInfo = new SchemaInfo();
 
                 final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", schemaURI);
-                final MSVGrammarReaderController cntrlr = new MSVGrammarReaderController(schemaURI, newSchmInf);
-                final SAXParserFactory fctry = XMLUtils.createSAXParserFactory(false, true);
+                final MSVGrammarReaderController controller = new MSVGrammarReaderController(schemaURI, newSchemaInfo);
+                final SAXParserFactory factory = XMLUtils.createSAXParserFactory(false, true);
 
-                grmr = GrammarLoader.loadSchema(is, cntrlr, fctry);
-                newSchmInf.setGrammar(grmr);
-                cache.add(pipelineContext, schmKey, modTim, newSchmInf);
+                grammar = GrammarLoader.loadSchema(is, controller, factory);
+                newSchemaInfo.setGrammar(grammar);
+                cache.add(pipelineContext, schemaKey, modificationTime, newSchemaInfo);
             } else {
-                grmr = schmInf.getGrammar();
+                grammar = schemaInfo.getGrammar();
             }
-            return grmr;
+            return grammar;
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
     /**
-     * Apply schema validation only.
+     * Apply schema validation.
+     *
+     * @param instance      instance to validate
      */
     public void applySchema(XFormsInstance instance) {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
@@ -427,6 +445,67 @@ public class XFormsModelSchemaValidator {
             idConstraintChecker.endDocument();
             handleIDErrors(idConstraintChecker);
         }
+    }
+
+    /**
+     * Check whether a node's value satisfies a simple schema type definition given by namespace URI and local name.
+     *
+     * @param containingNodeInfo    node containing the value (to update validation MIPs)
+     * @param value                 value to validate
+     * @param typeNamespaceURI      namespace URI of the type ("" if no namespace)
+     * @param typeLocalname         local name of the type
+     * @param typeQName             QName of type type (for error handling)
+     * @return                      validation error message, null if no error
+     */
+    public String validateDatatype(NodeInfo containingNodeInfo, String value, String typeNamespaceURI, String typeLocalname, String typeQName, LocationData locationData, String modelBindId) {
+
+        if (typeNamespaceURI == null)
+            typeNamespaceURI = "";
+
+        // REDocumentDeclaration is not reentrant
+        final REDocumentDeclaration documentDeclaration = new REDocumentDeclaration(schemaGrammar);
+
+        // Find expression to use to validate
+        final Expression contentModelExpression;
+        {
+            if( typeNamespaceURI.equals(XSAcceptor.XMLSchemaNamespace) ) {
+                // Handle built-in schema type
+                try {
+                    contentModelExpression = schemaGrammar.getPool().createData(DatatypeFactory.getTypeByName(typeLocalname) );
+                } catch (DatatypeException e) {
+                    throw new ValidationException("Built-in schema type not found: " + typeLocalname, locationData);
+                }
+            } else {
+                // Find schema for type namespace
+                final XMLSchemaSchema schema = ((XMLSchemaGrammar) schemaGrammar).getByNamespace(typeNamespaceURI);
+                if (schema == null)
+                    throw new ValidationException("No schema found for namespace: " + typeNamespaceURI, locationData);
+
+                final ComplexTypeExp complexTypeExpression = schema.complexTypes.get(typeLocalname);
+                if (complexTypeExpression != null) {
+                    // XForms mandates simple types
+                    throw new ValidationException("Simple type required for type: " + typeQName, locationData);
+                } else {
+                    // Find simple type in schema
+                    final SimpleTypeExp simpleTypeExpression = schema.simpleTypes.get(typeLocalname);
+                    if (simpleTypeExpression == null)
+                        throw new ValidationException("Simple type not found: " + typeQName, locationData);
+
+                    contentModelExpression = simpleTypeExpression;
+                }
+            }
+        }
+
+        // Create a simple acceptor
+        final ExpressionAcceptor expressionAcceptor = new SimpleAcceptor(documentDeclaration, contentModelExpression, null, null);
+
+        // Send text to acceptor
+        final StringRef errorStringRef = new StringRef();
+        final DatatypeRef datatypeRef = new DatatypeRef();
+        expressionAcceptor.onText2(value, validationContext, errorStringRef, datatypeRef);
+
+        // Return validation error if any
+        return errorStringRef.str;
     }
 
     /**

@@ -191,12 +191,15 @@ public class InstanceData {
         return unmod.iterator();
     }
 
-    public void addSchemaError(final String msg, final String stringValue) {
+    public void addSchemaError(final String msg, final String stringValue, String modelBindId) {
         valueValid.set(false, stringValue);
         if (schemaErrors == null) {
             schemaErrors = new ArrayList(1);
         }
         schemaErrors.add(msg);
+
+        if (modelBindId != null)
+            setInvalidBindIds(getInvalidBindIds() == null ? modelBindId : getInvalidBindIds() + " " + modelBindId);
     }
 
     public void clearValidationState() {

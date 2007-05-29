@@ -18,18 +18,20 @@ import org.orbeon.saxon.style.StandardNames;
 public class TypeModelItemProperty {
 
     private boolean isSet = false;
-    private int value;
+    private int valueAsFingerprint;
+    private String valueAsString;
 
     public TypeModelItemProperty() {
     }
 
     public void set(int value) {
-        this.value = value;
+        this.valueAsFingerprint = value;
         isSet = true;
     }
 
-    public int get() {
-        return value;
+    public void set(String valueAsString) {
+        this.valueAsString = valueAsString;
+        isSet = true;
     }
 
     public boolean isSet() {
@@ -40,7 +42,10 @@ public class TypeModelItemProperty {
      * Return the type name as a "Clark name", i.e. in the form "{uri}localname".
      */
     public String getAsString() {
-        final int typeCode = get();
-        return (typeCode != 0) ? StandardNames.getClarkName(typeCode) : null;
+        if (valueAsString != null) {
+            return valueAsString;
+        } else {
+            return (valueAsFingerprint != 0) ? StandardNames.getClarkName(valueAsFingerprint) : null;
+        }
     }
 }

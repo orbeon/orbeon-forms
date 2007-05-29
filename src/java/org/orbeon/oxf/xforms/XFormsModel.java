@@ -26,24 +26,24 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.NodeWrapper;
-import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.style.StandardNames;
 import org.orbeon.saxon.sxpath.XPathEvaluator;
 import org.orbeon.saxon.trans.IndependentContext;
+import org.orbeon.saxon.style.StandardNames;
+import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.value.AtomicValue;
+import org.orbeon.saxon.value.ValidationErrorValue;
+import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.type.BuiltInAtomicType;
 import org.orbeon.saxon.type.BuiltInSchemaFactory;
-import org.orbeon.saxon.value.AtomicValue;
-import org.orbeon.saxon.value.StringValue;
-import org.orbeon.saxon.value.ValidationErrorValue;
 
 import java.net.URI;
 import java.net.URL;
@@ -522,37 +522,71 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             iterateNodeSet(pipelineContext, modelBind, new NodeHandler() {
                 public void handleNode(NodeInfo nodeInfo) {
 
-                    // Get type information
-                    int requiredTypeFingerprint = -1;
                     {
-                        String type = modelBind.getType();
-                        int prefixPosition = type.indexOf(':');
-                        if (prefixPosition > 0) {
-                            String prefix = type.substring(0, prefixPosition);
-                            String namespace = (String) modelBind.getNamespaceMap().get(prefix);
-                            if (namespace == null)
-                                throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
-                                        modelBind.getLocationData());
+                        // Get type namespace and local name
+                        final String typeQName = modelBind.getType();
+                        final String typeNamespaceURI;
+                        final String typeLocalname;
+                        {
+                            final int prefixPosition = typeQName.indexOf(':');
+                            if (prefixPosition > 0) {
+                                final String prefix = typeQName.substring(0, prefixPosition);
+                                typeNamespaceURI = (String) modelBind.getNamespaceMap().get(prefix);
+                                if (typeNamespaceURI == null)
+                                    throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
+                                            modelBind.getLocationData());
 
-                            requiredTypeFingerprint = StandardNames.getFingerprint(namespace, type.substring(prefixPosition + 1));
+                                typeLocalname = typeQName.substring(prefixPosition + 1);
+                            } else {
+                                typeNamespaceURI = null;
+                                typeLocalname = typeQName;
+                            }
                         }
-                    }
-                    if (requiredTypeFingerprint == -1)
-                        throw new ValidationException("Invalid type '" + modelBind.getType() + "'",
-                                modelBind.getLocationData());
 
-                    // Pass-through the type value
-                    InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
-                    instanceData.getType().set(requiredTypeFingerprint);
 
-                    // Try to perform casting
-                    final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo).trim();
-                    if (XFormsUtils.getLocalInstanceData(nodeInfo).getRequired().get() || nodeStringValue.length() != 0) {
-                        StringValue stringValue = new StringValue(nodeStringValue);
-                        XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
-                        AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
+                        // Get value to validate
+                        final String nodeStringValue = XFormsInstance.getValueForNodeInfo(nodeInfo).trim();// TODO: should we really trim?
 
-                        instanceData.updateValueValid(!(result instanceof ValidationErrorValue), nodeInfo, modelBind.getId());
+                        // TODO: XForms 1.1: "The type model item property is not applied to instance nodes that contain child elements"
+
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(nodeInfo);
+                        if (schemaValidator != null) {
+                            // There are possibly types defined in the schema
+                            final String validationError
+                                    = schemaValidator.validateDatatype(nodeInfo, nodeStringValue, typeNamespaceURI, typeLocalname, typeQName, modelBind.getLocationData(), modelBind.getId());
+
+                            // Set error on node if necessary
+                            if (validationError != null) {
+                                instanceData.addSchemaError(validationError, nodeStringValue, modelBind.getId());
+                            }
+
+                        } else {
+                            // There is no schema, use Saxon to validate simple types
+
+                            // Get type information
+                            int requiredTypeFingerprint = -1;
+                            if (typeNamespaceURI != null) {
+                                // Built-in type must be in a namespace
+                                requiredTypeFingerprint = StandardNames.getFingerprint(typeNamespaceURI, typeLocalname);
+                            }
+
+                            if (requiredTypeFingerprint == -1) {
+                                throw new ValidationException("Invalid type '" + modelBind.getType() + "'", modelBind.getLocationData());
+                            }
+
+                            // Try to perform casting
+                            final StringValue stringValue = new StringValue(nodeStringValue);
+                            final XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
+                            final AtomicValue result = stringValue.convertPrimitive((BuiltInAtomicType) BuiltInSchemaFactory.getSchemaType(requiredTypeFingerprint), true, xpContext);
+
+                            // Set error on node if necessary
+                            if (result instanceof ValidationErrorValue) {
+                                instanceData.updateValueValid(false, nodeInfo, modelBind.getId());
+                            }
+                        }
+
+                        // Set type on node
+                        instanceData.getType().set(XMLUtils.buildExplodedQName(typeNamespaceURI, typeLocalname));
                     }
                 }
             });

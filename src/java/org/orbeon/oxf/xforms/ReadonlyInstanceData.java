@@ -81,7 +81,7 @@ public class ReadonlyInstanceData extends InstanceData {
         throw new OXFException("Cannot modify read-only instance.");
     }
 
-    public void addSchemaError(final String msg, final String stringValue) {
+    public void addSchemaError(final String msg, final String stringValue, String modelBindId) {
         throwException();
     }
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -22,6 +23,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Handle xforms:input.
@@ -54,129 +59,140 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
 
         final AttributesImpl newAttributes;
         final boolean isDate;
-        final String typeClass;
+        final boolean isBoolean;
         {
             final StringBuffer classes = getInitialClasses(localname, elementAttributes, xformsControl);
             if (!handlerContext.isGenerateTemplate()) {
                 if (isConcreteControl) {
-                    isDate = isDate(xformsControl.getType());
-                    typeClass = isDate ? "xforms-type-date" : "xforms-type-string";
+                    final String controlType = xformsControl.getType();
+                    isDate = isDate(controlType);
+                    isBoolean = isBoolean(controlType);
                 } else {
                     isDate = false;
-                    typeClass = null;
+                    isBoolean = false;
                 }
 
                 handleMIPClasses(classes, xformsControl);
             } else {
                 isDate = false;
-                typeClass = null;
+                isBoolean = false;
             }
             newAttributes = getAttributes(elementAttributes, classes.toString(), effectiveId);
         }
 
-        // Create xhtml:span
-        final boolean isReadOnly = isConcreteControl && xformsControl.isReadonly();
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-        final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
-        {
-            // Create xhtml:span for date display
-            if (!isStaticReadonly(xformsControl)) {
-                final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
-                if (isReadOnly)
-                    spanClasses.append(" xforms-readonly");
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                if (isConcreteControl && isDate) {
-                    final String displayValueOrValue = xformsControl.getDisplayValueOrValue();
-                    if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
-                        contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
-                    } else {
-                        // Add an nbsp to facilitate styling
-                        contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
-                    }
-                }
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-            }
+        if (isBoolean) {
+            // Produce a boolean output
 
-            // Create xhtml:input
+            final List items = new ArrayList(2);
+
+            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "True", "true", 1));
+            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
+
+            final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler();
+            select1Handler.setContentHandler(getContentHandler());
+            select1Handler.setContext(getContext());
+//            select1Handler.setDocumentLocator(get);
+            select1Handler.start(uri, localname, qName, elementAttributes);
+            select1Handler.outputContent(localname, xformsControl, items);
+
+        } else {
+
+            // Create xhtml:span
+            final boolean isReadOnly = isConcreteControl && xformsControl.isReadonly();
+            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+            final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
+            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, newAttributes);
             {
-                reusableAttributes.clear();
+                // Create xhtml:span for date display
                 if (!isStaticReadonly(xformsControl)) {
-                    // Regular mode
-
-                    final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
-                    if (typeClass != null) {
-                        inputClasses.append(' ');
-                        inputClasses.append(typeClass);
+                    final StringBuffer spanClasses = new StringBuffer("xforms-date-display");
+                    if (isReadOnly)
+                        spanClasses.append(" xforms-readonly");
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());// TODO: check whether like in the XSTL version we need to copy other classes as well
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                    if (isConcreteControl && isDate) {
+                        final String displayValueOrValue = xformsControl.getDisplayValueOrValue();
+                        if (displayValueOrValue != null && !displayValueOrValue.equals("")) {
+                            contentHandler.characters(displayValueOrValue.toCharArray(), 0, displayValueOrValue.length());
+                        } else {
+                            // Add an nbsp to facilitate styling
+                            contentHandler.characters(NBSP.toCharArray(), 0, NBSP.length());
+                        }
                     }
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+                }
 
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input-" + effectiveId);
-                    reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
-                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                // Create xhtml:input
+                {
+                    reusableAttributes.clear();
+                    if (!isStaticReadonly(xformsControl)) {
+                        // Regular mode
+
+                        final StringBuffer inputClasses = new StringBuffer("xforms-input-input");
+
+                        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "input-" + effectiveId);
+                        reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
+                        reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
 
 
-                    if (isConcreteControl) {
-                        // Output value only for concrete control
-                        final String value = xformsControl.getValue();
-                        reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
+                        if (isConcreteControl) {
+                            // Output value only for concrete control
+                            final String value = xformsControl.getValue();
+                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, (value == null) ? "" : value);
+                        } else {
+                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
+                        }
+
+                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
+                                (inputClasses.length() > 0) ? inputClasses.toString() : "");// TODO: check whether like in the XSTL version we need to copy other classes as well
+
+                        handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
+
+                        // Copy special attributes in xxforms namespace
+                        copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
+
+                        // Handle accessibility attributes
+                        handleAccessibilityAttributes(elementAttributes, reusableAttributes);
+
+                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
+                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
                     } else {
-                        reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "");
-                    }
-
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA,
-                            (inputClasses.length() > 0) ? inputClasses.toString() : "");// TODO: check whether like in the XSTL version we need to copy other classes as well
-
-                    handleReadOnlyAttribute(reusableAttributes, containingDocument, xformsControl);
-
-                    // Copy special attributes in xxforms namespace
-                    copyAttributes(elementAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ATTRIBUTES_TO_COPY, reusableAttributes);
-
-                    // Handle accessibility attributes
-                    handleAccessibilityAttributes(elementAttributes, reusableAttributes);
-
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes);
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
-                } else {
-                    // Read-only mode
-                    if (isConcreteControl) {
-                        // Output value only for concrete control
-                        final String value = xformsControl.getDisplayValueOrValue();
-                        if (value != null)
-                            contentHandler.characters(value.toCharArray(), 0, value.length());
+                        // Read-only mode
+                        if (isConcreteControl) {
+                            // Output value only for concrete control
+                            final String value = xformsControl.getDisplayValueOrValue();
+                            if (value != null)
+                                contentHandler.characters(value.toCharArray(), 0, value.length());
+                        }
                     }
                 }
-            }
- 
-            // Create xhtml:span for date picker
-            if (!isStaticReadonly(xformsControl)) {
-                final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
-                if (isReadOnly)
-                    spanClasses.append(" xforms-showcalendar-readonly");
-                if (typeClass != null) {
-                    spanClasses.append(' ');
-                    spanClasses.append(typeClass);
+
+                // Create xhtml:span for date picker
+                if (!isStaticReadonly(xformsControl)) {
+                    final StringBuffer spanClasses = new StringBuffer("xforms-showcalendar");
+                    if (isReadOnly)
+                        spanClasses.append(" xforms-showcalendar-readonly");
+
+                    reusableAttributes.clear();
+                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
+                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
+
+                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
+                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
                 }
-
-                reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, spanClasses.toString());
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "showcalendar-" + effectiveId);
-
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
             }
+            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+
+            // xforms:help
+            handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
+
+            // xforms:alert
+            handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
+
+            // xforms:hint
+            handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
         }
-        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-
-        // xforms:help
-        handleLabelHintHelpAlert(effectiveId, "help", xformsControl);
-
-        // xforms:alert
-        handleLabelHintHelpAlert(effectiveId, "alert", xformsControl);
-
-        // xforms:hint
-        handleLabelHintHelpAlert(effectiveId, "hint", xformsControl);
     }
 }

@@ -49,6 +49,8 @@ public abstract class HandlerBase extends ElementHandlerNew {
     // cannot be used; those should probably be in the XHTML namespace
     private static final String[] XHTML_ATTRIBUTES_TO_COPY = {"style", "onchange"};
 
+    private static final String XSD_PREFIX = "{" + XMLConstants.XSD_URI + "}";
+
     private boolean repeating;
     private boolean forwarding;
 
@@ -133,12 +135,12 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     sb.append(' ');
                 sb.append("xforms-invalid");
             }
-            if (xformsControl != null && xformsControl.isReadonly()) {
+            if (xformsControl.isReadonly()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-readonly");
             }
-            if (xformsControl != null && xformsControl.isRequired()) {
+            if (xformsControl.isRequired()) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append("xforms-required");
@@ -148,6 +150,16 @@ public abstract class HandlerBase extends ElementHandlerNew {
                     else
                         sb.append(" xforms-required-filled");
                 }
+            }
+            final String type = xformsControl.getType();
+            if (type != null && type.startsWith(XSD_PREFIX)) {
+                // Control is bound to built-in schema type
+                if (sb.length() > 0)
+                    sb.append(' ');
+
+                final String typeLocalname = type.substring(XSD_PREFIX.length());
+                sb.append("xforms-type-");
+                sb.append(typeLocalname);
             }
         } else {
             // Case of a non-concrete control - simply mark the control as disabled
@@ -165,6 +177,10 @@ public abstract class HandlerBase extends ElementHandlerNew {
 
     public static boolean isDate(String type) {
         return "{http://www.w3.org/2001/XMLSchema}date".equals(type);
+    }
+
+    public static boolean isBoolean(String type) {
+        return "{http://www.w3.org/2001/XMLSchema}boolean".equals(type);
     }
 
     protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {

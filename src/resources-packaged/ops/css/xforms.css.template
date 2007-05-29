@@ -281,13 +281,18 @@ a.xforms-trigger img { vertical-align: middle }
 a.xforms-trigger span { vertical-align: middle }
 
 /* Hide input field for <xforms:input> when type is date */
-input.xforms-type-date {
+.xforms-type-date input {
     display: none;
 }
 
 /* Hide date pickend for <xforms:input> when type not date */
-span.xforms-type-string {
+.xforms-showcalendar {
     display: none;
+}
+
+.xforms-type-date .xforms-showcalendar {
+    display: -moz-inline-box;
+    display: inline-block;
 }
 
 a.xforms-readonly {

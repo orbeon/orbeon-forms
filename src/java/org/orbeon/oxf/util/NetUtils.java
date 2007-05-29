@@ -108,11 +108,21 @@ public class NetUtils {
      */
     public static String getRequestPathInfo(HttpServletRequest request) {
 
-        // Get servlet path and path info
-        String servletPath = request.getServletPath();
-        if (servletPath == null) servletPath = "";
-        String pathInfo = request.getPathInfo();
-        if (pathInfo == null) pathInfo = "";
+        // Get servlet path
+        String servletPath = (String) request.getAttribute("javax.servlet.include.servlet_path");
+        if (servletPath == null) {
+            servletPath = request.getServletPath();
+            if (servletPath == null)
+                servletPath = "";
+        }
+        
+        // Get path info
+        String pathInfo = (String) request.getAttribute("javax.servlet.include.path_info");
+        if (pathInfo == null) {
+            pathInfo = request.getPathInfo();
+            if (pathInfo == null)
+                pathInfo = "";
+        }
 
         // Concatenate servlet path and path info, avoiding a double slash
         String requestPath = servletPath.endsWith("/") && pathInfo.startsWith("/")

@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xml.XMLConstants;
 
 /**
  * Represents an xforms:input control.
@@ -40,5 +41,19 @@ public class XFormsInputControl extends XFormsValueControl {
 
     public void evaluateDisplayValue(PipelineContext pipelineContext) {
         evaluateDisplayValueUseFormat(pipelineContext, format);
+    }
+
+    public void setExternalValue(PipelineContext pipelineContext, String value, String type) {
+        super.setExternalValue(pipelineContext, convertFromExternalValue(value), type);
+    }
+
+    private String convertFromExternalValue(String externalValue) {
+        final String type = getType();
+        // Store "false" when we get a blank value from the client when type is xs:boolean (case of single checkbox)
+        if (type != null && XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(type) && externalValue.trim().equals("")) {
+            return "false";
+        } else {
+            return externalValue;
+        }
     }
 }

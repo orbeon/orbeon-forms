@@ -170,17 +170,9 @@ public abstract class HandlerBase extends ElementHandlerNew {
     }
 
     public static boolean isDateOrTime(String type) {
-        return isDate(type)
-                || "{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)
-                || "{http://www.w3.org/2001/XMLSchema}time".equals(type);
-    }
-
-    public static boolean isDate(String type) {
-        return "{http://www.w3.org/2001/XMLSchema}date".equals(type);
-    }
-
-    public static boolean isBoolean(String type) {
-        return "{http://www.w3.org/2001/XMLSchema}boolean".equals(type);
+        return XMLConstants.XS_DATE_EXPLODED_QNAME.equals(type)
+                || XMLConstants.XS_DATETIME_EXPLODED_QNAME.equals(type)
+                || XMLConstants.XS_TIME_EXPLODED_QNAME.equals(type);
     }
 
     protected void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {

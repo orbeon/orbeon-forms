@@ -76,17 +76,8 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) (handlerContext.isGenerateTemplate()
                 ? null : (XFormsControl) containingDocument.getObjectById(pipelineContext, effectiveId));
 
-        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext) : null;
-        outputContent(localname, xformsSelect1Control, items);
-    }
-
-    public void outputContent(String localname, final XFormsValueControl xformsValueControl, List items) throws SAXException {
-
-        final ContentHandler contentHandler = handlerContext.getController().getOutput();
-
         final boolean isMany = localname.equals("select");
-
-        QName appearance;
+        final QName appearance;
         {
             final QName tempAppearance = getAppearance(elementAttributes);
             if (tempAppearance != null)
@@ -96,6 +87,14 @@ public class XFormsSelect1Handler extends XFormsValueControlHandler {
             else
                 appearance = XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME;// default for xforms:select1
         }
+
+        final List items = (xformsSelect1Control != null) ? xformsSelect1Control.getItemset(pipelineContext) : null;
+        outputContent(localname, xformsSelect1Control, items, isMany, appearance);
+    }
+
+    public void outputContent(String localname, final XFormsValueControl xformsValueControl, List items, final boolean isMany, QName appearance) throws SAXException {
+
+        final ContentHandler contentHandler = handlerContext.getController().getOutput();
 
         boolean isOpenSelection = "open".equals(elementAttributes.getValue("selection"));
         boolean isAutocomplete = isOpenSelection

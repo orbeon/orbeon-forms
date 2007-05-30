@@ -95,7 +95,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String updatedValue;
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             final String type = getType();
-            if (!urlNorewrite && (type == null || type.equals(XMLUtils.buildExplodedQName(XMLConstants.XSD_URI, "anyURI")))) {
+            if (!urlNorewrite && (type == null || type.equals(XMLConstants.XS_ANYURI_EXPLODED_QNAME))) {
                 // Rewrite image URI
                 updatedValue = XFormsUtils.resolveResourceURL(pipelineContext, getControlElement(), rawValue);
             } else {

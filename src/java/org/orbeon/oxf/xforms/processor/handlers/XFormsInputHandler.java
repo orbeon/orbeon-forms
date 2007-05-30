@@ -23,6 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.QName;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,8 +66,8 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
             if (!handlerContext.isGenerateTemplate()) {
                 if (isConcreteControl) {
                     final String controlType = xformsControl.getType();
-                    isDate = isDate(controlType);
-                    isBoolean = isBoolean(controlType);
+                    isDate = XMLConstants.XS_DATE_EXPLODED_QNAME.equals(controlType);
+                    isBoolean = XMLConstants.XS_BOOLEAN_EXPLODED_QNAME.equals(controlType);
                 } else {
                     isDate = false;
                     isBoolean = false;
@@ -83,17 +84,22 @@ public class XFormsInputHandler extends XFormsValueControlHandler {
         if (isBoolean) {
             // Produce a boolean output
 
-            final List items = new ArrayList(2);
+            // We try to look like an xforms:select[@appearance = 'full']
+            final QName appearance = XFormsConstants.XFORMS_FULL_APPEARANCE_QNAME;
+            final boolean isMany = true;
 
-            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "True", "true", 1));
-            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
+            final List items = new ArrayList(2);
+            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "", "true", 1));
+
+            // NOTE: In the future, we may want to use other appearances provided by xforms:select
+//            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
             final XFormsSelect1Handler select1Handler = new XFormsSelect1Handler();
             select1Handler.setContentHandler(getContentHandler());
             select1Handler.setContext(getContext());
 //            select1Handler.setDocumentLocator(get);
             select1Handler.start(uri, localname, qName, elementAttributes);
-            select1Handler.outputContent(localname, xformsControl, items);
+            select1Handler.outputContent(localname, xformsControl, items, isMany, appearance);
 
         } else {
 

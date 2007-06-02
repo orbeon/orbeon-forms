@@ -53,6 +53,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "$containing-document$";
 
+//    private static int xxxToggleValue = 0;
+
 //    private LocationData locationData; // At some point we need to be able to store this
 
     // Object pool this object must be returned to, if any
@@ -677,6 +679,21 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Create event
+
+//        if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {// XXX HACK FOR PERF TEST
+//            if ("category-select1".equals(controlId)) {
+//                if (xxxToggleValue == 0) {
+//                    xxxToggleValue = 1;
+//                    contextString = "supplier";
+//                } else {
+//                    xxxToggleValue = 0;
+//                    contextString = "customer";
+//                }
+//            } else if ("name".equals(controlId)) {
+//                contextString = "value" + System.currentTimeMillis();
+//            }
+//        }
+        
         final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, true, true, true, contextString, null, null, filesElement);
 
         // Interpret event
@@ -1125,7 +1142,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                             throw new OXFException("Non-initialized instance has to be application shared for id: " + newInstance.getEffectiveId());
 
                         final SharedXFormsInstance sharedInstance
-                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI());
+                                = XFormsServerSharedInstancesCache.instance().find(pipelineContext, newInstance.getEffectiveId(), newInstance.getModelId(), newInstance.getSourceURI(), newInstance.getValidation());
                         getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                     } else {
@@ -1152,7 +1169,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                                 throw new OXFException("Non-initialized instance has to be application shared for id: " + currentInstance.getEffectiveId());
 
                             final SharedXFormsInstance sharedInstance
-                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI());
+                                    = XFormsServerSharedInstancesCache.instance().find(pipelineContext, currentInstance.getEffectiveId(), currentInstance.getModelId(), currentInstance.getSourceURI(), currentInstance.getValidation());
                             getModel(sharedInstance.getModelId()).setInstance(sharedInstance, false);
 
                         } else {
